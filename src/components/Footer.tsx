@@ -1,85 +1,110 @@
 import { Link } from "react-router-dom";
 import FynLogo from "./FynLogo";
 
-const suites = [
-  "Liquidity Intelligence", "Revenue Intelligence", "Cost Intelligence",
-  "GST & Tax Intelligence", "Governance Intelligence", "HR & Workforce Intelligence",
-  "Decision Simulator", "Market & Growth Intelligence", "Banking & Fintech Intelligence",
-  "CA & Partner Ecosystem",
+const productLinks = [
+  { label: "Liquidity Intelligence", href: "/products" },
+  { label: "Revenue Intelligence", href: "/products" },
+  { label: "GST & Tax", href: "/products" },
+  { label: "Governance Intelligence", href: "/products" },
+  { label: "HR & Workforce", href: "/products" },
+  { label: "Decision Simulator", href: "/products" },
+  { label: "Market Intelligence", href: "/products" },
+  { label: "Banking Intelligence", href: "/products" },
+  { label: "CA Partner Program", href: "/products" },
+  { label: "Nidhi AI CFO", href: "/products" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Integrations", href: "/products" },
 ];
 
-const company = [
-  { label: "About", href: "/about" },
-  { label: "Careers", href: "/about" },
+const companyLinks = [
+  { label: "About FynHelp", href: "/about" },
+  { label: "Our Mission", href: "/about" },
+  { label: "Founders", href: "/about" },
+  { label: "Careers (We're Hiring!)", href: "/about" },
+  { label: "Press & Media", href: "/about" },
+  { label: "CA Partner Program", href: "/solutions" },
   { label: "Blog", href: "/blog" },
-  { label: "Press", href: "/about" },
-  { label: "Partners", href: "/about" },
-  { label: "Contact", href: "/about" },
+  { label: "Community", href: "/community" },
+  { label: "Contact Us", href: "/about" },
+];
+
+const legalLinks = [
+  "Privacy Policy", "Terms of Service", "Refund Policy",
+  "Cookie Policy", "DPDP Act Compliance", "GSP License Details",
 ];
 
 const Footer = () => (
-  <footer className="bg-fyn-ink text-white">
-    <div className="fyn-container py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-        {/* Col 1 */}
+  <footer className="bg-fyn-ink pt-20 pb-12">
+    <div className="fyn-container">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        {/* Brand */}
         <div>
-          <FynLogo variant="light" />
-          <p className="mt-4 text-white/60 text-sm leading-relaxed">
-            India's most intelligent Virtual CFO platform. Trusted by 10,000+ SMEs.
+          <FynLogo variant="light" showTagline size="md" />
+          <p className="text-white/55 text-sm leading-relaxed mt-5 mb-6">
+            India's most intelligent Virtual CFO platform. Trusted by 10,000+ Indian SMEs — from textile traders in Surat to exporters in Tiruppur.
           </p>
-          <div className="flex gap-4 mt-4">
-            {["LinkedIn", "X", "YouTube"].map((s) => (
-              <span key={s} className="text-white/40 text-xs hover:text-white cursor-pointer">{s}</span>
+          <p className="text-white/30 text-xs mb-3">Backed by intelligence built for India:</p>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {["GSP Certified", "Account Aggregator Enabled", "ISO 27001 In Progress"].map((b) => (
+              <span key={b} className="text-white/50 text-[10px] border border-white/15 px-2.5 py-1 rounded">{b}</span>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            {["LinkedIn", "X", "YouTube", "WhatsApp"].map((s) => (
+              <a key={s} href="#" className="text-white/40 hover:text-white/70 transition-opacity text-xs border border-white/10 rounded-full w-8 h-8 flex items-center justify-center" aria-label={s}>
+                {s[0]}
+              </a>
             ))}
           </div>
         </div>
 
-        {/* Col 2 */}
+        {/* Product */}
         <div>
-          <h4 className="text-white/40 fyn-label text-xs mb-4">Product</h4>
+          <p className="fyn-caption text-fyn-gold mb-5">Product</p>
           <ul className="space-y-2">
-            {suites.map((s) => (
-              <li key={s}>
-                <Link to="/products" className="text-white/60 text-sm hover:text-white">{s}</Link>
+            {productLinks.map((l) => (
+              <li key={l.label}>
+                <Link to={l.href} className="text-white/60 text-sm hover:text-white nav-link-underline transition-colors">{l.label}</Link>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Col 3 */}
+        {/* Company */}
         <div>
-          <h4 className="text-white/40 fyn-label text-xs mb-4">Company</h4>
+          <p className="fyn-caption text-fyn-gold mb-5">Company</p>
           <ul className="space-y-2">
-            {company.map((c) => (
-              <li key={c.label}>
-                <Link to={c.href} className="text-white/60 text-sm hover:text-white">{c.label}</Link>
+            {companyLinks.map((l) => (
+              <li key={l.label}>
+                <Link to={l.href} className="text-white/60 text-sm hover:text-white nav-link-underline transition-colors">{l.label}</Link>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Col 4 */}
+        {/* Support & Legal */}
         <div>
-          <h4 className="text-white/40 fyn-label text-xs mb-4">Legal & Contact</h4>
-          <ul className="space-y-2 text-sm text-white/60">
-            <li>support@fynhelp.com</li>
-            <li>Bengaluru, Karnataka, India</li>
-            <li className="pt-2">
-              <Link to="/pricing" className="hover:text-white">Privacy Policy</Link>
-              {" | "}
-              <Link to="/pricing" className="hover:text-white">Terms of Service</Link>
-            </li>
-            <li>
-              <Link to="/pricing" className="hover:text-white">Refund Policy</Link>
-            </li>
+          <p className="fyn-caption text-fyn-gold mb-5">Support & Legal</p>
+          <div className="mb-6">
+            <a href="mailto:support@fynhelp.com" className="text-white/70 text-sm hover:text-fyn-gold transition-colors block mb-1">support@fynhelp.com</a>
+            <p className="text-white/40 text-xs">Mon-Fri 9AM-7PM IST | Sat 10AM-2PM IST</p>
+            <p className="text-white/30 text-[11px] mt-1">Avg response time: &lt; 2 hours</p>
+          </div>
+          <ul className="space-y-2">
+            {legalLinks.map((l) => (
+              <li key={l}>
+                <a href="#" className="text-white/50 text-sm hover:text-white/70 transition-colors">{l}</a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
-    </div>
-    <div className="border-t border-white/10 py-4">
-      <p className="text-center text-white/30 text-xs">
-        © 2025 FynHelp Technologies Pvt Ltd. All rights reserved. CIN: UXXXXX | GST: XXXXXXXXXXXX
-      </p>
+
+      <div className="border-t border-white/8 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-white/30 text-xs">
+        <span>© 2025 FynHelp Technologies Pvt Ltd. All rights reserved.</span>
+        <span className="text-center">Registered in Bengaluru, Karnataka, India</span>
+        <span>Made in India, for India 🇮🇳</span>
+      </div>
     </div>
   </footer>
 );
