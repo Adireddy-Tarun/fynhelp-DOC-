@@ -331,7 +331,8 @@
   }
 
   .hover-btn-secondary {
-    @apply transition-all duration-[250ms];
+    @apply transition-all;
+    transition-duration: 250ms;
   }
   .hover-btn-secondary:hover {
     background-color: hsl(24 53% 7%);
