@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,21 +6,58 @@
 
 @layer base {
   :root {
+    /* Core palette */
     --fyn-ink: 24 53% 7%;
     --fyn-red: 0 73% 44%;
     --fyn-beige: 40 52% 91%;
     --fyn-gold: 38 74% 31%;
-    --fyn-beige-dark: 40 42% 86%;
-    --fyn-red-light: 0 52% 95%;
-    --fyn-success: 150 60% 26%;
-    --fyn-warning: 38 100% 27%;
-    --fyn-ink-80: 24 53% 7%;
-    --fyn-ink-40: 24 53% 7%;
-    --fyn-ink-10: 24 53% 7%;
 
+    /* Ink scale */
+    --fyn-ink-95: 24 53% 7% / 0.95;
+    --fyn-ink-80: 24 53% 7% / 0.80;
+    --fyn-ink-60: 24 53% 7% / 0.60;
+    --fyn-ink-40: 24 53% 7% / 0.40;
+    --fyn-ink-20: 24 53% 7% / 0.20;
+    --fyn-ink-10: 24 53% 7% / 0.10;
+    --fyn-ink-05: 24 53% 7% / 0.05;
+
+    /* Red scale */
+    --fyn-red-dark: 0 73% 36%;
+    --fyn-red-mid: 0 73% 44%;
+    --fyn-red-light: 0 52% 95%;
+    --fyn-red-tint: 0 73% 44% / 0.08;
+
+    /* Beige scale */
+    --fyn-beige-dark: 40 42% 86%;
+    --fyn-beige-deep: 40 38% 80%;
+    --fyn-beige-card: 36 50% 96%;
+
+    /* Gold scale */
+    --fyn-gold-dark: 38 74% 24%;
+    --fyn-gold-mid: 38 74% 41%;
+    --fyn-gold-light: 40 65% 87%;
+
+    /* Semantic */
+    --fyn-success: 150 60% 26%;
+    --fyn-success-bg: 150 40% 93%;
+    --fyn-warning: 38 100% 27%;
+    --fyn-warning-bg: 38 90% 94%;
+    --fyn-danger: 0 73% 44%;
+    --fyn-danger-bg: 0 70% 95%;
+    --fyn-info: 216 66% 33%;
+    --fyn-info-bg: 216 60% 95%;
+
+    /* Chart */
+    --chart-1: 0 73% 44%;
+    --chart-2: 150 60% 26%;
+    --chart-3: 38 74% 31%;
+    --chart-4: 216 66% 33%;
+    --chart-5: 300 60% 26%;
+
+    /* Shadcn tokens */
     --background: 40 52% 91%;
     --foreground: 24 53% 7%;
-    --card: 40 42% 86%;
+    --card: 36 50% 96%;
     --card-foreground: 24 53% 7%;
     --popover: 40 52% 91%;
     --popover-foreground: 24 53% 7%;
@@ -47,6 +84,12 @@
     --sidebar-accent-foreground: 24 53% 7%;
     --sidebar-border: 24 53% 7% / 0.08;
     --sidebar-ring: 0 73% 44%;
+
+    /* Easing */
+    --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 }
 
@@ -57,16 +100,144 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 400;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: Georgia, 'Times New Roman', serif;
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
     font-weight: 700;
+  }
+  h4, h5, h6 {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 600;
   }
 }
 
+/* ═══ SCROLL REVEAL ANIMATIONS ═══ */
+.reveal-up,
+.reveal-left,
+.reveal-right,
+.reveal-scale {
+  opacity: 0;
+  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+}
+.reveal-up { transform: translateY(40px); }
+.reveal-left { transform: translateX(-40px); }
+.reveal-right { transform: translateX(40px); }
+.reveal-scale { transform: scale(0.95); transition-duration: 600ms; }
+
+.reveal-up.revealed,
+.reveal-left.revealed,
+.reveal-right.revealed,
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.stagger-children.revealed > *:nth-child(1) { transition-delay: 0ms; }
+.stagger-children.revealed > *:nth-child(2) { transition-delay: 80ms; }
+.stagger-children.revealed > *:nth-child(3) { transition-delay: 160ms; }
+.stagger-children.revealed > *:nth-child(4) { transition-delay: 240ms; }
+.stagger-children.revealed > *:nth-child(5) { transition-delay: 320ms; }
+.stagger-children.revealed > *:nth-child(6) { transition-delay: 400ms; }
+.stagger-children.revealed > *:nth-child(7) { transition-delay: 480ms; }
+.stagger-children.revealed > *:nth-child(8) { transition-delay: 560ms; }
+.stagger-children.revealed > *:nth-child(9) { transition-delay: 640ms; }
+.stagger-children.revealed > *:nth-child(10) { transition-delay: 720ms; }
+.stagger-children.revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ MICRO-INTERACTIONS ═══ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, hsl(var(--fyn-beige-dark)) 25%, hsl(var(--fyn-beige)) 50%, hsl(var(--fyn-beige-dark)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(-6px); }
+  50% { transform: translateY(6px); }
+}
+.float-gentle { animation: float-gentle 4s ease-in-out infinite; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196,30,30,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(196,30,30,0); }
+}
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-scroll { animation: ticker-scroll 30s linear infinite; }
+.ticker-scroll:hover { animation-play-state: paused; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+.typing-dot:nth-child(1) { animation: typing-dot 1.4s ease-in-out infinite 0ms; }
+.typing-dot:nth-child(2) { animation: typing-dot 1.4s ease-in-out infinite 200ms; }
+.typing-dot:nth-child(3) { animation: typing-dot 1.4s ease-in-out infinite 400ms; }
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+.progress-fill-animate { animation: progress-fill 1200ms var(--ease-out) forwards; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake { animation: shake 400ms ease-in-out; }
+
+@keyframes check-draw {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+.check-draw { 
+  stroke-dasharray: 20; 
+  animation: check-draw 500ms var(--ease-out) forwards; 
+}
+
+@keyframes slide-up-bounce {
+  0% { opacity: 0; transform: translateY(16px); }
+  70% { transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.slide-up-bounce { animation: slide-up-bounce 400ms var(--ease-spring); }
+
 @layer components {
   .fyn-container {
-    @apply max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-[1280px] mx-auto px-6 lg:px-12;
   }
   .fyn-section {
     @apply py-16 md:py-24;
@@ -74,55 +245,118 @@
   .fyn-label {
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.12em;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .fyn-caption {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .fyn-metric {
     font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
   .fyn-mono {
     font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
   }
-  .bg-fyn-ink {
+  .fyn-display {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 72px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  /* Color utilities */
+  .bg-fyn-ink { background-color: hsl(24 53% 7%); }
+  .bg-fyn-beige { background-color: hsl(40 52% 91%); }
+  .bg-fyn-beige-dark { background-color: hsl(40 42% 86%); }
+  .bg-fyn-beige-deep { background-color: hsl(40 38% 80%); }
+  .bg-fyn-beige-card { background-color: hsl(36 50% 96%); }
+  .bg-fyn-red { background-color: hsl(0 73% 44%); }
+  .bg-fyn-red-dark { background-color: hsl(0 73% 36%); }
+  .bg-fyn-red-light { background-color: hsl(0 52% 95%); }
+  .bg-fyn-red-tint { background-color: hsl(0 73% 44% / 0.08); }
+  .bg-fyn-gold { background-color: hsl(38 74% 31%); }
+  .bg-fyn-gold-light { background-color: hsl(40 65% 87%); }
+  .bg-fyn-success { background-color: hsl(150 60% 26%); }
+  .bg-fyn-success-bg { background-color: hsl(150 40% 93%); }
+  .bg-fyn-warning { background-color: hsl(38 100% 27%); }
+  .bg-fyn-warning-bg { background-color: hsl(38 90% 94%); }
+  .bg-fyn-danger-bg { background-color: hsl(0 70% 95%); }
+  .bg-fyn-info { background-color: hsl(216 66% 33%); }
+  .bg-fyn-info-bg { background-color: hsl(216 60% 95%); }
+
+  .text-fyn-ink { color: hsl(24 53% 7%); }
+  .text-fyn-ink-80 { color: hsl(24 53% 7% / 0.80); }
+  .text-fyn-ink-60 { color: hsl(24 53% 7% / 0.60); }
+  .text-fyn-ink-40 { color: hsl(24 53% 7% / 0.40); }
+  .text-fyn-red { color: hsl(0 73% 44%); }
+  .text-fyn-red-dark { color: hsl(0 73% 36%); }
+  .text-fyn-gold { color: hsl(38 74% 31%); }
+  .text-fyn-gold-mid { color: hsl(38 74% 41%); }
+  .text-fyn-beige { color: hsl(40 52% 91%); }
+  .text-fyn-success { color: hsl(150 60% 26%); }
+  .text-fyn-warning { color: hsl(38 100% 27%); }
+  .text-fyn-info { color: hsl(216 66% 33%); }
+
+  .border-fyn-ink-10 { border-color: hsl(24 53% 7% / 0.10); }
+  .border-fyn-ink-20 { border-color: hsl(24 53% 7% / 0.20); }
+  .border-fyn-ink { border-color: hsl(24 53% 7%); }
+  .border-fyn-red { border-color: hsl(0 73% 44%); }
+
+  /* Hover animations */
+  .hover-card {
+    @apply transition-all duration-300;
+  }
+  .hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(26,16,8,0.12);
+  }
+
+  .hover-btn-primary {
+    @apply transition-all duration-200;
+  }
+  .hover-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(196,30,30,0.35);
+    filter: brightness(0.92);
+  }
+
+  .hover-btn-secondary {
+    @apply transition-all duration-[250ms];
+  }
+  .hover-btn-secondary:hover {
     background-color: hsl(24 53% 7%);
+    color: white;
   }
-  .bg-fyn-beige {
-    background-color: hsl(40 52% 91%);
+
+  .hover-scale-icon {
+    @apply transition-transform duration-[250ms];
+    transition-timing-function: var(--ease-spring);
   }
-  .bg-fyn-beige-dark {
-    background-color: hsl(40 42% 86%);
+  .hover-scale-icon:hover {
+    transform: scale(1.08);
   }
-  .bg-fyn-red {
+
+  /* Nav link underline animation */
+  .nav-link-underline {
+    @apply relative;
+  }
+  .nav-link-underline::after {
+    content: '';
+    @apply absolute bottom-[-2px] left-0 h-[2px] w-0;
     background-color: hsl(0 73% 44%);
+    transition: width 250ms var(--ease-smooth);
   }
-  .bg-fyn-red-light {
-    background-color: hsl(0 52% 95%);
-  }
-  .text-fyn-ink {
-    color: hsl(24 53% 7%);
-  }
-  .text-fyn-red {
-    color: hsl(0 73% 44%);
-  }
-  .text-fyn-gold {
-    color: hsl(38 74% 31%);
-  }
-  .text-fyn-beige {
-    color: hsl(40 52% 91%);
-  }
-  .text-fyn-success {
-    color: hsl(150 60% 26%);
-  }
-  .text-fyn-warning {
-    color: hsl(38 100% 27%);
-  }
-  .border-fyn-ink-10 {
-    border-color: hsl(24 53% 7% / 0.08);
-  }
-  .border-fyn-ink {
-    border-color: hsl(24 53% 7%);
+  .nav-link-underline:hover::after {
+    width: 100%;
   }
 }
