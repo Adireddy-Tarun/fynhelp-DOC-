@@ -340,7 +340,8 @@
   }
 
   .hover-scale-icon {
-    @apply transition-transform duration-[250ms];
+    @apply transition-transform;
+    transition-duration: 250ms;
     transition-timing-function: var(--ease-spring);
   }
   .hover-scale-icon:hover {
