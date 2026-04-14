@@ -199,7 +199,7 @@ const Navbar = () => {
       </nav>
 
       {/* Spacer */}
-      <div style={{ height: 72 }} />
+      <div style={{ height: 72, background: "#1A1008" }} />
 
       {/* Mobile drawer */}
       <div
