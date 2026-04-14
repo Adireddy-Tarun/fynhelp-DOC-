@@ -52,23 +52,34 @@ const AboutPage = () => (
     {/* Timeline */}
     <section className="bg-fyn-ink fyn-section">
       <div className="fyn-container max-w-3xl">
-        <h2 className="text-3xl text-white mb-12 text-center">Our Journey</h2>
-        <div className="space-y-6">
-          {[
-            { year: "2023", text: "Founded in Bengaluru. First 10 beta users from Whitefield SMEs." },
-            { year: "2024", text: "Launched GST Intelligence + ITC Reconciliation. 500 customers." },
-            { year: "2024", text: "Nidhi AI launched. First Hindi-language CFO brief delivered." },
-            { year: "2025", text: "10,000 customers. Launched HR Intelligence and Decision Simulator." },
-            { year: "2025", text: "CA Partner Program: 500 CA firms onboarded." },
-            { year: "2026", text: "Working Capital Marketplace launched. Series A in progress." },
-          ].map((e, i) => (
-            <div key={i} className="flex gap-6 items-start">
-              <span className="text-fyn-red fyn-metric font-bold text-lg shrink-0 w-12">{e.year}</span>
-              <div className="flex-1 border-l-2 border-fyn-red/30 pl-6 pb-4">
-                <p className="text-white/70 text-base">{e.text}</p>
-              </div>
+        <h2 className="text-3xl text-white mb-12 text-center">Our journey — just beginning</h2>
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-[23px] top-0 bottom-0 w-0.5 bg-fyn-red/30" />
+          {/* Dashed future line */}
+          <div className="absolute left-[23px] top-[80px] bottom-0 w-0.5 border-l-2 border-dashed border-fyn-red/20" style={{ background: "transparent" }} />
+
+          {/* Single entry */}
+          <div className="flex gap-6 items-start relative">
+            <div className="w-12 h-12 rounded-full bg-fyn-red flex items-center justify-center text-white text-sm font-bold shrink-0 z-10">
+              '26
             </div>
-          ))}
+            <div className="pb-8">
+              <p className="text-fyn-gold fyn-label text-[11px] mb-1">JANUARY 2026</p>
+              <h3 className="text-white font-serif text-xl mb-3">FynHelp begins</h3>
+              <p className="text-white/70 text-base leading-relaxed">
+                FynHelp Technologies was founded in Bengaluru in January 2026. Adireddy Tarun and Nidhi Siddhpura started building India's Virtual CFO platform after spending time understanding the financial intelligence gap facing Indian SMEs. The product is currently in active development, with our first customers onboarding in early 2026.
+              </p>
+            </div>
+          </div>
+
+          {/* Future placeholder */}
+          <div className="flex gap-6 items-start relative mt-4">
+            <div className="w-12 h-12 rounded-full border-2 border-dashed border-fyn-red/30 flex items-center justify-center shrink-0 z-10">
+              <span className="text-fyn-red/40 text-lg">…</span>
+            </div>
+            <p className="text-white/40 text-sm italic pt-3">More milestones being written. Watch this space.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -96,20 +107,28 @@ const AboutPage = () => (
     <section className="bg-fyn-beige-dark fyn-section">
       <div className="fyn-container">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {[
-            { title: "General", email: "support@fynhelp.com", desc: "Response within 4 business hours" },
-            { title: "Press & Media", email: "press@fynhelp.com", desc: "For media enquiries and interviews" },
-            { title: "CA Partnerships", email: "partners@fynhelp.com", desc: "For CA firms interested in the white-label partner program" },
-          ].map((c) => (
-            <div key={c.title} className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-6">
-              <h3 className="text-fyn-ink font-serif text-lg mb-2">{c.title}</h3>
-              <p className="text-fyn-red text-sm mb-1">{c.email}</p>
-              <p className="text-fyn-ink/50 text-sm">{c.desc}</p>
-            </div>
-          ))}
+          <div className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-6">
+            <h3 className="text-fyn-ink font-serif text-lg mb-2">General Support</h3>
+            <a href="mailto:support@fynhelp.com" className="text-fyn-red text-sm mb-2 block hover:underline">support@fynhelp.com</a>
+            <p className="text-fyn-ink/60 text-sm mb-2">For product questions, account issues, and billing.</p>
+            <p className="text-fyn-ink/40 text-xs mb-1">Response time: within 4 business hours on business days</p>
+            <p className="text-fyn-ink/40 text-xs">Monday–Friday 9AM–7PM IST, Saturday 10AM–2PM IST</p>
+          </div>
+          <div className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-6">
+            <h3 className="text-fyn-ink font-serif text-lg mb-2">Founders</h3>
+            <a href="mailto:tarun@fynhelp.com" className="text-fyn-red text-sm mb-2 block hover:underline">tarun@fynhelp.com</a>
+            <p className="text-fyn-ink/60 text-sm mb-2">For partnerships, press inquiries, and important business matters.</p>
+            <p className="text-fyn-ink/40 text-xs">Adireddy Tarun, Founder & CEO</p>
+          </div>
+          <div className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-6">
+            <h3 className="text-fyn-ink font-serif text-lg mb-2">CA Partnerships</h3>
+            <a href="mailto:partners@fynhelp.com" className="text-fyn-red text-sm mb-2 block hover:underline">partners@fynhelp.com</a>
+            <p className="text-fyn-ink/60 text-sm mb-2">For CA firms interested in the FynHelp Partner Program.</p>
+            <p className="text-fyn-ink/40 text-xs">White-label dashboard for up to 200 clients per CA firm.</p>
+          </div>
         </div>
         <p className="text-fyn-ink/50 text-sm text-center">
-          FynHelp Technologies Pvt Ltd, Bengaluru, Karnataka, India · CIN: UXXXXX · GSTIN: XXXXXXXXXXXX
+          FynHelp Technologies, Bengaluru, Karnataka, India
         </p>
       </div>
     </section>
