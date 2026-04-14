@@ -195,7 +195,7 @@ export default function MegaMenu({ open, onClose }: MegaMenuProps) {
 
 function ColHeader({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8B6914", marginBottom: 16, paddingBottom: 8, borderBottom: "1px solid rgba(139,105,20,0.20)", margin: 0, marginBottom: 16 }}>
+    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "#8B6914", paddingBottom: 8, borderBottom: "1px solid rgba(139,105,20,0.20)", margin: "0 0 16px 0" }}>
       {children}
     </p>
   );
