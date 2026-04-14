@@ -33,17 +33,8 @@ const Navbar = () => {
     setMegaOpen(false);
   }, [location.pathname]);
 
-  // Escape key + click outside
-  useEffect(() => {
-    if (!megaOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMegaOpen(false); };
-    const onClick = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) setMegaOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => { document.removeEventListener("keydown", onKey); document.removeEventListener("mousedown", onClick); };
-  }, [megaOpen]);
+
+
 
   const handleMegaEnter = useCallback(() => {
     clearTimeout(megaTimeout.current);
