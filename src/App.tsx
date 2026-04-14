@@ -9,6 +9,7 @@ import SolutionsPage from "./pages/SolutionsPage.tsx";
 import ProductsPage from "./pages/ProductsPage.tsx";
 import PricingPage from "./pages/PricingPage.tsx";
 import BlogPage from "./pages/BlogPage.tsx";
+import BlogArticlePage from "./pages/BlogArticlePage.tsx";
 import ResourcesPage from "./pages/ResourcesPage.tsx";
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
