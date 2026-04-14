@@ -19,7 +19,7 @@ const FynLogo = ({ variant = "dark", showTagline = true, className = "", iconOnl
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <svg width={iconSize} height={iconSize} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="1" width="46" height="46" rx="4" fill={isDark ? "#1A1008" : "#F4EDDA"} stroke={inkColor} strokeWidth="2" />
+        <rect x="1" y="1" width="46" height="46" rx="4" fill={isDark ? "#1A1008" : "#F4EDDA"} stroke={isDark ? "rgba(255,255,255,0.15)" : inkColor} strokeWidth="2" />
         {/* Bar chart bars — ascending staircase suggesting "F" */}
         <rect x="8" y="32" width="12" height="4" rx="1" fill={inkColor} />
         <rect x="8" y="25" width="20" height="4" rx="1" fill={inkColor} />
