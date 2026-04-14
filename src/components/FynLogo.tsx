@@ -8,7 +8,7 @@ interface FynLogoProps {
 
 const FynLogo = ({ variant = "dark", showTagline = true, className = "", iconOnly = false, size = "md" }: FynLogoProps) => {
   const isDark = variant === "light"; // light = on dark bg
-  const inkColor = isDark ? "#F4EDDA" : "#1A1008";
+  const inkColor = isDark ? "#FFFFFF" : "#1A1008";
   const redColor = "#C41E1E";
   const goldColor = "#8B6914";
 
