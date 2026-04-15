@@ -35,7 +35,7 @@ const navSections: NavSection[] = [
     items: [
       { label: "360 Dashboard", href: "/dashboard/360", icon: Grid3X3 },
       { label: "Cash Flow", href: "/dashboard/cash-flow", icon: TrendingUp },
-      { label: "Runway", href: "/dashboard/cash-flow", icon: Gauge },
+      { label: "Runway", href: "/dashboard/runway", icon: Gauge },
     ],
   },
   {
@@ -48,14 +48,14 @@ const navSections: NavSection[] = [
     title: "RECEIVABLES & PAYABLES",
     items: [
       { label: "Receivables", href: "/dashboard/receivables", icon: ArrowDownCircle },
-      { label: "Payables", href: "/dashboard/receivables", icon: ArrowUpCircle },
+      { label: "Payables", href: "/dashboard/payables", icon: ArrowUpCircle },
     ],
   },
   {
     title: "COMPLIANCE",
     items: [
       { label: "GST Intelligence", href: "/dashboard/gst", icon: FileCheck },
-      { label: "TDS & Advance Tax", href: "/dashboard/gst", icon: Calculator },
+      { label: "TDS & Advance Tax", href: "/dashboard/tds-tax", icon: Calculator },
       { label: "Filing Calendar", href: "/dashboard/filing-calendar", icon: CalendarDays },
     ],
   },
@@ -63,22 +63,21 @@ const navSections: NavSection[] = [
     title: "WORKFORCE",
     items: [
       { label: "HR Intelligence", href: "/dashboard/hr", icon: Users },
-      { label: "Payroll Planner", href: "/dashboard/hr", icon: IndianRupee },
     ],
   },
   {
     title: "BUSINESS",
     items: [
-      { label: "Vendors", href: "/dashboard/360", icon: Building2 },
-      { label: "Customers", href: "/dashboard/360", icon: UserCheck },
-      { label: "Cost Intelligence", href: "/dashboard/360", icon: PieChart },
+      { label: "Vendors", href: "/dashboard/vendors", icon: Building2 },
+      { label: "Customers", href: "/dashboard/customers", icon: UserCheck },
+      { label: "Cost Intelligence", href: "/dashboard/cost", icon: PieChart },
     ],
   },
   {
     title: "GOVERNANCE",
     items: [
-      { label: "Compliance Health", href: "/dashboard/360", icon: Shield },
-      { label: "Audit Readiness", href: "/dashboard/360", icon: ClipboardCheck },
+      { label: "Compliance Health", href: "/dashboard/compliance", icon: Shield },
+      { label: "Audit Readiness", href: "/dashboard/audit-readiness", icon: ClipboardCheck },
     ],
   },
   {
@@ -113,7 +112,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen flex bg-fyn-beige">
       {/* Sidebar - desktop */}
-      <aside className="hidden lg:flex w-60 bg-fyn-ink flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto">
+      <aside className="hidden lg:flex w-64 bg-fyn-ink flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto">
         <div className="p-4 border-b border-white/10">
           <FynLogo variant="light" showTagline={false} className="mb-2" />
           <p className="text-white/40 text-xs truncate">{profile?.full_name || "Business Owner"}</p>
@@ -129,17 +128,17 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 const active = location.pathname === item.href;
                 return (
                   <Link
-                    key={item.label}
+                    key={item.label + item.href}
                     to={item.href}
                     className={`flex items-center gap-2.5 px-2 py-1.5 rounded text-sm transition-colors ${
                       active ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
                     }`}
                     aria-label={item.label}
                   >
-                    <Icon size={16} />
+                    <Icon size={16} className="flex-shrink-0" />
                     <span className="truncate">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-fyn-red text-white text-[9px] px-1.5 py-0.5 rounded fyn-label">{item.badge}</span>
+                      <span className="ml-auto bg-fyn-red text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0">{item.badge}</span>
                     )}
                   </Link>
                 );
@@ -172,12 +171,12 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                     const Icon = item.icon;
                     return (
                       <Link
-                        key={item.label}
+                        key={item.label + item.href}
                         to={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className="flex items-center gap-2.5 px-2 py-1.5 rounded text-sm text-white/50 hover:text-white"
                       >
-                        <Icon size={16} />{item.label}
+                        <Icon size={16} className="flex-shrink-0" /><span className="truncate">{item.label}</span>
                       </Link>
                     );
                   })}
@@ -190,7 +189,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       )}
 
       {/* Main */}
-      <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         {/* Top header */}
         <header className="h-16 bg-fyn-beige-dark border-b border-fyn-ink-10 flex items-center px-4 lg:px-6 sticky top-0 z-30">
           <button className="lg:hidden mr-3 text-fyn-ink" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
