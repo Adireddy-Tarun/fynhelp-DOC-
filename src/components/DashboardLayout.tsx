@@ -90,10 +90,10 @@ const navSections: NavSection[] = [
   {
     title: "SETTINGS",
     items: [
-      { label: "Integrations", href: "/dashboard/360", icon: Plug },
-      { label: "Business Profile", href: "/dashboard/360", icon: Settings },
-      { label: "Team & Access", href: "/dashboard/360", icon: UsersRound },
-      { label: "Billing", href: "/dashboard/360", icon: CreditCard },
+      { label: "Integrations", href: "/dashboard/settings/integrations", icon: Plug },
+      { label: "Business Profile", href: "/dashboard/settings/business", icon: Settings },
+      { label: "Team & Access", href: "/dashboard/settings/team", icon: UsersRound },
+      { label: "Billing", href: "/dashboard/settings/plan", icon: CreditCard },
     ],
   },
 ];
