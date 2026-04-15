@@ -34,6 +34,13 @@ import CustomersPage from "./pages/dashboard/CustomersPage.tsx";
 import CostPage from "./pages/dashboard/CostPage.tsx";
 import CompliancePage from "./pages/dashboard/CompliancePage.tsx";
 import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
+import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
+import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
+import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
+import NotificationsPage from "./pages/dashboard/settings/NotificationsPage.tsx";
+import PlanPage from "./pages/dashboard/settings/PlanPage.tsx";
+import PaymentsPage from "./pages/dashboard/settings/PaymentsPage.tsx";
+import BillingHistoryPage from "./pages/dashboard/settings/BillingHistoryPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -76,6 +83,15 @@ const App = () => (
             <Route path="/dashboard/cost" element={<CostPage />} />
             <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />}>
+              <Route index element={null} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="security" element={<SecurityPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="plan" element={<PlanPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="billing-history" element={<BillingHistoryPage />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
