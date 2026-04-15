@@ -30,14 +30,15 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (profile) {
+      const p = profile as any;
       setForm({
-        full_name: profile.full_name || "",
-        display_name: (profile as any).display_name || "",
-        mobile: profile.mobile || "",
-        whatsapp_phone: (profile as any).whatsapp_phone || "",
-        whatsapp_same: !(profile as any).whatsapp_phone || (profile as any).whatsapp_phone === profile.mobile,
-        role: profile.role || "CEO / Founder",
-        language_preference: profile.language_preference || "en",
+        full_name: p.full_name || "",
+        display_name: p.display_name || "",
+        mobile: p.mobile || "",
+        whatsapp_phone: p.whatsapp_phone || "",
+        whatsapp_same: !p.whatsapp_phone || p.whatsapp_phone === p.mobile,
+        role: p.role || "CEO / Founder",
+        language_preference: p.language_preference || "en",
       });
     }
   }, [profile]);
