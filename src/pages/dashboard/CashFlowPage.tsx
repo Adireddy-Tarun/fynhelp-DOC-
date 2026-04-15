@@ -220,25 +220,29 @@ const CashFlowPage = () => {
       </div>
 
       {/* TRANSACTION HISTORY */}
-      <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
+      <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-serif text-lg">Transaction History</h3>
-          <button className="text-fyn-red text-sm font-medium border border-fyn-red/20 px-3 py-1.5 rounded hover:bg-fyn-red-light transition-colors">
+          <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Transaction History</h3>
+          <button className="flex items-center gap-2 transition-all hover:bg-[#1A1008] hover:text-white" style={{ border: "1px solid #1A1008", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 500 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 1v8M3 6l4 4 4-4M1 13h12"/></svg>
             Export to Excel
           </button>
         </div>
 
         {/* Filter bar */}
-        <div className="flex flex-wrap gap-2 mb-4 p-3 bg-fyn-beige rounded-lg">
-          <input placeholder="Search description..." className="h-9 px-3 bg-white border border-fyn-ink-10 rounded text-sm flex-1 min-w-[160px] outline-none focus:ring-2 focus:ring-fyn-red" />
+        <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-lg" style={{ background: "#FAF7F0" }}>
+          <input placeholder="Search description..." className="outline-none flex-1 min-w-[160px]" style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }} />
           <div className="flex gap-1">
             {(["all", "in", "out"] as const).map((d) => (
               <button
                 key={d}
                 onClick={() => setDirFilter(d)}
-                className={`text-xs px-3 py-2 rounded transition-colors ${
-                  dirFilter === d ? "bg-fyn-ink text-white" : "bg-white border border-fyn-ink-10 text-fyn-ink/60"
-                }`}
+                style={{
+                  fontSize: 13, padding: "6px 12px", borderRadius: 4,
+                  background: dirFilter === d ? "#1A1008" : "#FFFFFF",
+                  color: dirFilter === d ? "#FFFFFF" : "rgba(26,16,8,0.60)",
+                  border: dirFilter === d ? "none" : "1px solid rgba(26,16,8,0.10)",
+                }}
               >
                 {d === "all" ? "All" : d === "in" ? "Money In" : "Money Out"}
               </button>
@@ -247,39 +251,38 @@ const CashFlowPage = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full">
             <thead>
-              <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
-                <th className="text-left py-2">Date</th>
-                <th className="text-left py-2">Description</th>
-                <th className="text-left py-2">Category</th>
-                <th className="text-left py-2">Bank</th>
-                <th className="text-right py-2">Amount</th>
-                <th className="text-right py-2">Balance</th>
+              <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
+                {["Date", "Description", "Category", "Bank", "Amount", "Balance"].map(h => (
+                  <th key={h} className={`py-2 ${h === "Amount" || h === "Balance" ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {filteredTxns.map((t, i) => (
-                <tr
-                  key={i}
-                  className={`border-b border-fyn-ink-10 last:border-0 hover:bg-fyn-beige-deep transition-colors cursor-pointer ${
-                    i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"
-                  }`}
-                >
-                  <td className="py-3 text-fyn-ink/60">{t.date}</td>
-                  <td className="py-3 text-fyn-ink font-medium">{t.desc}</td>
-                  <td className="py-3">
-                    <span className={`text-[11px] px-2 py-0.5 rounded ${catColors[t.cat] || "bg-gray-100 text-gray-600"}`}>
-                      {t.cat}
-                    </span>
-                  </td>
-                  <td className="py-3 text-fyn-ink/50 text-xs">{t.bank}</td>
-                  <td className={`py-3 text-right fyn-metric font-semibold ${t.dir === "in" ? "text-[#1A6B3C]" : "text-[#C41E1E]"}`}>
-                    {t.dir === "in" ? "+" : "-"}{formatINR(t.amount)}
-                  </td>
-                  <td className="py-3 text-right fyn-metric text-fyn-ink/60">{formatINR(t.balance)}</td>
-                </tr>
-              ))}
+              {filteredTxns.map((t, i) => {
+                const chip = catChipStyles[t.cat] || { bg: "#F1F5F9", color: "#475569" };
+                return (
+                  <tr
+                    key={i}
+                    className="transition-colors cursor-pointer"
+                    style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#F4EDDA"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = i % 2 === 0 ? "#FFFFFF" : "#FAF7F0"; }}
+                  >
+                    <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{t.date}</td>
+                    <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.desc}</td>
+                    <td className="py-3">
+                      <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: chip.bg, color: chip.color }}>{t.cat}</span>
+                    </td>
+                    <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.bank}</td>
+                    <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: t.dir === "in" ? "#16A34A" : "#DC2626" }}>
+                      {t.dir === "in" ? "+" : "-"}{formatINR(t.amount)}
+                    </td>
+                    <td className="py-3 text-right fyn-metric" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{formatINR(t.balance)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
