@@ -5,7 +5,7 @@ import NidhiSection from "@/components/home/NidhiSection";
 import SuitesSection from "@/components/home/SuitesSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import SimulatorSection from "@/components/home/SimulatorSection";
-import TrustSection from "@/components/home/TrustSection";
+
 import SocialProofSection from "@/components/home/SocialProofSection";
 import IntegrationsSection from "@/components/home/IntegrationsSection";
 import PricingSection from "@/components/home/PricingSection";
@@ -21,7 +21,7 @@ const HomePage = () => {
       <SuitesSection />
       <HowItWorksSection />
       <SimulatorSection />
-      <TrustSection />
+      
       <SocialProofSection />
       <IntegrationsSection />
       <PricingSection />
