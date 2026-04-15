@@ -90,10 +90,10 @@ const navSections: NavSection[] = [
   {
     title: "SETTINGS",
     items: [
-      { label: "Integrations", href: "/dashboard/360", icon: Plug },
-      { label: "Business Profile", href: "/dashboard/360", icon: Settings },
-      { label: "Team & Access", href: "/dashboard/360", icon: UsersRound },
-      { label: "Billing", href: "/dashboard/360", icon: CreditCard },
+      { label: "Integrations", href: "/dashboard/settings/integrations", icon: Plug },
+      { label: "Business Profile", href: "/dashboard/settings/business", icon: Settings },
+      { label: "Team & Access", href: "/dashboard/settings/team", icon: UsersRound },
+      { label: "Billing", href: "/dashboard/settings/plan", icon: CreditCard },
     ],
   },
 ];
@@ -115,8 +115,23 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto" style={{ width: 256, background: "#1A1008" }}>
         <div className="p-4 border-b border-white/10">
           <FynLogo variant="light" showTagline={false} className="mb-2" />
-          <p className="text-white/40 text-[13px] truncate">{profile?.full_name || "Business Owner"}</p>
-          <span className="text-[#8B6914] text-[10px] fyn-label">STARTER PLAN</span>
+        </div>
+
+        {/* Subscription badge */}
+        <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#16A34A" }} />
+            <span className="text-[13px] font-semibold text-white truncate">{profile?.full_name || "Business Owner"}</span>
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-[0.10em]"
+              style={{ background: "rgba(139,105,20,0.20)", border: "1px solid rgba(139,105,20,0.40)", color: "#8B6914" }}>
+              ★ EARLY ACCESS
+            </span>
+            <button onClick={() => navigate("/dashboard/settings/plan")}
+              className="text-[11px] transition-colors hover:text-[#C41E1E]"
+              style={{ color: "rgba(255,255,255,0.35)" }}>Manage →</button>
+          </div>
         </div>
 
         <nav className="flex-1 py-2 px-2 space-y-4 overflow-y-auto">
