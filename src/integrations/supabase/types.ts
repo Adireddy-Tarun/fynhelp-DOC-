@@ -99,12 +99,15 @@ export type Database = {
           business_type: string | null
           created_at: string
           employee_count: string | null
+          founding_member: boolean | null
           gstin: string | null
           id: string
           industry: string | null
           msme_udyam: string | null
           plan: string | null
+          razorpay_customer_id: string | null
           state: string | null
+          subscription_status: string | null
           turnover_range: string | null
           updated_at: string
         }
@@ -113,12 +116,15 @@ export type Database = {
           business_type?: string | null
           created_at?: string
           employee_count?: string | null
+          founding_member?: boolean | null
           gstin?: string | null
           id?: string
           industry?: string | null
           msme_udyam?: string | null
           plan?: string | null
+          razorpay_customer_id?: string | null
           state?: string | null
+          subscription_status?: string | null
           turnover_range?: string | null
           updated_at?: string
         }
@@ -127,12 +133,15 @@ export type Database = {
           business_type?: string | null
           created_at?: string
           employee_count?: string | null
+          founding_member?: boolean | null
           gstin?: string | null
           id?: string
           industry?: string | null
           msme_udyam?: string | null
           plan?: string | null
+          razorpay_customer_id?: string | null
           state?: string | null
+          subscription_status?: string | null
           turnover_range?: string | null
           updated_at?: string
         }
@@ -424,37 +433,49 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           business_id: string | null
           created_at: string
+          display_name: string | null
           full_name: string | null
           id: string
           language_preference: string | null
           mobile: string | null
+          notification_prefs: Json | null
           role: string | null
           updated_at: string
           user_id: string
+          whatsapp_phone: string | null
         }
         Insert: {
+          avatar_url?: string | null
           business_id?: string | null
           created_at?: string
+          display_name?: string | null
           full_name?: string | null
           id?: string
           language_preference?: string | null
           mobile?: string | null
+          notification_prefs?: Json | null
           role?: string | null
           updated_at?: string
           user_id: string
+          whatsapp_phone?: string | null
         }
         Update: {
+          avatar_url?: string | null
           business_id?: string | null
           created_at?: string
+          display_name?: string | null
           full_name?: string | null
           id?: string
           language_preference?: string | null
           mobile?: string | null
+          notification_prefs?: Json | null
           role?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp_phone?: string | null
         }
         Relationships: [
           {
