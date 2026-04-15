@@ -24,15 +24,24 @@ const initialMessages: Message[] = [
   },
 ];
 
+const responses: Record<string, string> = {
+  "What's my cash position?": "Your current cash position:\n\n• Bank balance: ₹12.4L (HDFC CA)\n• Available cash after commitments: ₹8.2L\n• Runway at current burn: 52 days\n• Cash in (expected this week): ₹3.1L from Sharma & Sons\n• Cash out (scheduled): ₹3.4L to Raj Textiles (Thursday)\n\nNet position is stable but your runway is in the amber zone. I recommend chasing ABC Electronics today.",
+  "Who hasn't paid me this month?": "Here are your overdue receivables this month:\n\n1. ABC Electronics — ₹8.4L, 62 days overdue (HIGH RISK)\n2. Sharma & Sons — ₹3.1L, 38 days overdue (MEDIUM)\n3. Delhi Distributors — ₹5.7L, 12 days overdue (LOW)\n\nTotal overdue: ₹17.2L\nCollecting just ABC Electronics would add 15 days to your runway.\n\nShall I draft WhatsApp reminders for all three?",
+  default: "Let me look into that for you. Based on your current business data, I can see several relevant factors. Would you like me to break this down in more detail, or would you prefer a summary with action items?",
+};
+
 const NidhiChatPage = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [lang, setLang] = useState("EN");
+  const [isTyping, setIsTyping] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamingText]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -43,97 +52,232 @@ const NidhiChatPage = () => {
       timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
     };
 
+    const currentInput = input;
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setIsTyping(true);
 
-    // Simulated Nidhi response
     setTimeout(() => {
-      const responses: Record<string, string> = {
-        "What's my cash position?": "Your current cash position:\n\n• Bank balance: ₹12.4L (HDFC CA)\n• Available cash after commitments: ₹8.2L\n• Runway at current burn: 52 days\n• Cash in (expected this week): ₹3.1L from Sharma & Sons\n• Cash out (scheduled): ₹3.4L to Raj Textiles (Thursday)\n\nNet position is stable but your runway is in the amber zone. I recommend chasing ABC Electronics today.",
-        "Who hasn't paid me this month?": "Here are your overdue receivables this month:\n\n1. ABC Electronics — ₹8.4L, 62 days overdue (HIGH RISK)\n2. Sharma & Sons — ₹3.1L, 38 days overdue (MEDIUM)\n3. Delhi Distributors — ₹5.7L, 12 days overdue (LOW)\n\nTotal overdue: ₹17.2L\nCollecting just ABC Electronics would add 15 days to your runway.\n\nShall I draft WhatsApp reminders for all three?",
-        default: "Let me look into that for you. Based on your current business data, I can see several relevant factors. Would you like me to break this down in more detail, or would you prefer a summary with action items?",
-      };
+      setIsTyping(false);
+      const fullText = responses[currentInput] || responses.default;
+      setIsStreaming(true);
+      setStreamingText("");
 
-      const nidhi: Message = {
-        role: "nidhi",
-        content: responses[input] || responses.default,
-        timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages((prev) => [...prev, nidhi]);
+      let idx = 0;
+      const interval = setInterval(() => {
+        idx++;
+        setStreamingText(fullText.slice(0, idx));
+        if (idx >= fullText.length) {
+          clearInterval(interval);
+          setIsStreaming(false);
+          setStreamingText("");
+          const nidhi: Message = {
+            role: "nidhi",
+            content: fullText,
+            timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+          };
+          setMessages((prev) => [...prev, nidhi]);
+        }
+      }, 15);
     }, 1200);
   };
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-140px)]">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-fyn-ink-10">
-          <div className="w-10 h-10 rounded-full bg-fyn-red flex items-center justify-center text-white font-bold">N</div>
+      <div className="flex flex-col" style={{ height: "calc(100vh - 64px)" }}>
+        {/* Header bar */}
+        <div className="flex items-center gap-3 px-8 flex-shrink-0" style={{ height: 64, background: "#1A1008" }}>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
           <div className="flex-1">
-            <p className="text-fyn-ink font-serif text-lg">Nidhi</p>
-            <p className="text-fyn-success text-xs">● Live — monitoring your business</p>
+            <p className="text-white font-serif" style={{ fontSize: 16 }}>Nidhi</p>
+            <p style={{ color: "#4ADE80", fontSize: 12 }}>● Live — monitoring your business</p>
           </div>
           <div className="flex gap-1">
             {["EN", "HI", "GU", "TA", "MR"].map((l) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={`text-xs px-2 py-1 rounded ${lang === l ? "bg-fyn-ink text-white" : "text-fyn-ink/40 hover:bg-fyn-ink/5"}`}
+                className="transition-colors"
+                style={{
+                  fontSize: 12, padding: "4px 8px", borderRadius: 4,
+                  background: lang === l ? "rgba(255,255,255,0.15)" : "transparent",
+                  color: lang === l ? "#FFFFFF" : "rgba(255,255,255,0.40)",
+                }}
               >{l}</button>
             ))}
           </div>
         </div>
 
-        {/* Quick prompts */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {quickPrompts.map((p) => (
-            <button
-              key={p}
-              onClick={() => { setInput(p); }}
-              className="bg-fyn-beige-dark border border-fyn-ink-10 text-fyn-ink/60 text-xs px-3 py-1.5 rounded-full hover:border-fyn-ink/30 hover:text-fyn-ink"
-            >{p}</button>
-          ))}
-        </div>
+        {/* Messages area */}
+        <div className="flex-1 overflow-y-auto" style={{ background: "#FAF7F0", padding: "24px 32px" }}>
+          {/* Quick prompts */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {quickPrompts.map((p) => (
+              <button
+                key={p}
+                onClick={() => setInput(p)}
+                className="transition-all"
+                style={{
+                  background: "#FFFFFF",
+                  border: "1.5px solid #E0D9C8",
+                  borderRadius: 100,
+                  padding: "8px 16px",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: "#1A1008",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = "#C41E1E";
+                  e.currentTarget.style.color = "#C41E1E";
+                  e.currentTarget.style.background = "#FDF2F1";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = "#E0D9C8";
+                  e.currentTarget.style.color = "#1A1008";
+                  e.currentTarget.style.background = "#FFFFFF";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >{p}</button>
+            ))}
+          </div>
 
-        {/* Chat area */}
-        <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] ${m.role === "user" ? "order-1" : ""}`}>
-                {m.role === "nidhi" && (
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-6 h-6 rounded-full bg-fyn-red flex items-center justify-center text-white text-xs font-bold">N</div>
-                    <span className="text-fyn-ink/30 text-xs">{m.timestamp}</span>
+          {/* Messages */}
+          <div className="space-y-4">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div style={{ maxWidth: m.role === "user" ? "60%" : "70%" }}>
+                  {m.role === "nidhi" && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
+                      <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>Nidhi</span>
+                      <span style={{ color: "rgba(26,16,8,0.30)", fontSize: 12 }}>{m.timestamp}</span>
+                    </div>
+                  )}
+                  {m.role === "user" && (
+                    <div className="flex items-center gap-2 mb-1 justify-end">
+                      <span style={{ color: "rgba(26,16,8,0.30)", fontSize: 12 }}>{m.timestamp}</span>
+                    </div>
+                  )}
+                  <div
+                    className="whitespace-pre-wrap"
+                    style={{
+                      borderRadius: m.role === "nidhi" ? "4px 12px 12px 12px" : "12px 4px 12px 12px",
+                      padding: "12px 16px",
+                      fontSize: 14,
+                      lineHeight: 1.7,
+                      background: m.role === "nidhi" ? "#FFFFFF" : "#1A1008",
+                      color: m.role === "nidhi" ? "#1A1008" : "#FFFFFF",
+                      border: m.role === "nidhi" ? "1px solid #E0D9C8" : "none",
+                      boxShadow: m.role === "nidhi" ? "0 1px 4px rgba(26,16,8,0.06)" : "none",
+                    }}
+                  >
+                    {m.content}
                   </div>
-                )}
-                {m.role === "user" && (
-                  <div className="flex items-center gap-2 mb-1 justify-end">
-                    <span className="text-fyn-ink/30 text-xs">{m.timestamp}</span>
-                  </div>
-                )}
-                <div className={`rounded-lg p-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                  m.role === "nidhi" ? "bg-fyn-beige-dark border border-fyn-ink-10 text-fyn-ink/80" : "bg-fyn-ink text-white/90"
-                }`}>
-                  {m.content}
                 </div>
               </div>
-            </div>
-          ))}
-          <div ref={chatEndRef} />
+            ))}
+
+            {/* Streaming message */}
+            {isStreaming && streamingText && (
+              <div className="flex justify-start">
+                <div style={{ maxWidth: "70%" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
+                    <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>Nidhi</span>
+                  </div>
+                  <div
+                    className="whitespace-pre-wrap"
+                    style={{
+                      borderRadius: "4px 12px 12px 12px",
+                      padding: "12px 16px",
+                      fontSize: 14,
+                      lineHeight: 1.7,
+                      background: "#FFFFFF",
+                      color: "#1A1008",
+                      border: "1px solid #E0D9C8",
+                      boxShadow: "0 1px 4px rgba(26,16,8,0.06)",
+                    }}
+                  >
+                    {streamingText}
+                    <span className="inline-block" style={{ borderRight: "2px solid #C41E1E", animation: "blink 800ms step-end infinite", marginLeft: 1, height: "1em" }}>&nbsp;</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Typing indicator */}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div style={{ maxWidth: "70%" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
+                  </div>
+                  <div style={{
+                    borderRadius: "4px 12px 12px 12px",
+                    padding: "12px 16px",
+                    background: "#FFFFFF",
+                    border: "1px solid #E0D9C8",
+                    display: "flex",
+                    gap: 6,
+                    alignItems: "center",
+                  }}>
+                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
+                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
+                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={chatEndRef} />
+          </div>
         </div>
 
-        {/* Input */}
-        <div className="flex gap-2">
+        {/* Input bar */}
+        <div className="flex-shrink-0 flex items-center gap-3" style={{ padding: "16px 32px", background: "#FFFFFF", borderTop: "1px solid #E0D9C8", height: 80 }}>
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
             placeholder="Ask Nidhi anything about your business..."
-            className="flex-1 h-11 px-4 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg text-sm text-fyn-ink focus:outline-none focus:ring-2 focus:ring-fyn-red"
+            className="flex-1 outline-none"
+            style={{
+              height: 48,
+              padding: "12px 16px",
+              border: "1.5px solid #E0D9C8",
+              borderRadius: 8,
+              fontSize: 14,
+              color: "#1A1008",
+              background: "#FFFFFF",
+            }}
+            onFocus={e => { e.currentTarget.style.borderColor = "#C41E1E"; }}
+            onBlur={e => { e.currentTarget.style.borderColor = "#E0D9C8"; }}
             aria-label="Message Nidhi"
           />
-          <button onClick={sendMessage} className="bg-fyn-red text-white px-6 rounded-lg font-medium hover:opacity-90 transition-opacity">Send</button>
+          <button
+            onClick={sendMessage}
+            disabled={!input.trim()}
+            className="flex items-center justify-center transition-all"
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 6,
+              background: input.trim() ? "#C41E1E" : "#E0D9C8",
+              color: "#FFFFFF",
+              fontSize: 20,
+              fontWeight: 700,
+              cursor: input.trim() ? "pointer" : "not-allowed",
+            }}
+          >→</button>
         </div>
+        <p style={{ textAlign: "center", fontSize: 11, color: "rgba(26,16,8,0.35)", padding: "4px 0 8px", background: "#FFFFFF" }}>Press Enter to send · Shift+Enter for new line</p>
       </div>
     </DashboardLayout>
   );

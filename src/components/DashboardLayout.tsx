@@ -110,13 +110,13 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
     .find((i) => i.href === location.pathname)?.label || "Dashboard";
 
   return (
-    <div className="min-h-screen flex bg-fyn-beige">
+    <div className="min-h-screen flex" style={{ background: "#EDE4CB" }}>
       {/* Sidebar - desktop */}
-      <aside className="hidden lg:flex w-64 bg-fyn-ink flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto">
+      <aside className="hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto" style={{ width: 256, background: "#1A1008" }}>
         <div className="p-4 border-b border-white/10">
           <FynLogo variant="light" showTagline={false} className="mb-2" />
-          <p className="text-white/40 text-xs truncate">{profile?.full_name || "Business Owner"}</p>
-          <span className="text-fyn-gold text-[10px] fyn-label">STARTER PLAN</span>
+          <p className="text-white/40 text-[13px] truncate">{profile?.full_name || "Business Owner"}</p>
+          <span className="text-[#8B6914] text-[10px] fyn-label">STARTER PLAN</span>
         </div>
 
         <nav className="flex-1 py-2 px-2 space-y-4 overflow-y-auto">
@@ -130,15 +130,34 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                   <Link
                     key={item.label + item.href}
                     to={item.href}
-                    className={`flex items-center gap-2.5 px-2 py-1.5 rounded text-sm transition-colors ${
-                      active ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
-                    }`}
+                    className="flex items-center gap-2.5 px-2 py-1.5 rounded transition-all duration-150"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                      background: active ? "rgba(196,30,30,0.15)" : "transparent",
+                      borderLeft: active ? "3px solid #C41E1E" : "3px solid transparent",
+                      color: active ? "#FFFFFF" : "rgba(255,255,255,0.50)",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+                        e.currentTarget.style.transform = "translateX(2px)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.50)";
+                        e.currentTarget.style.transform = "translateX(0)";
+                      }
+                    }}
                     aria-label={item.label}
                   >
                     <Icon size={16} className="flex-shrink-0" />
-                    <span className="truncate">{item.label}</span>
+                    <span className="whitespace-nowrap">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-fyn-red text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0">{item.badge}</span>
+                      <span className="ml-auto text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0" style={{ background: "#C41E1E" }}>{item.badge}</span>
                     )}
                   </Link>
                 );
@@ -148,8 +167,8 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <p className="text-green-400 text-xs mb-2">● Live | Last sync: 12 min ago</p>
-          <button onClick={signOut} className="flex items-center gap-2 text-white/40 text-sm hover:text-white">
+          <p className="text-[#4ADE80] text-[13px] mb-2">● Live | Last sync: 12 min ago</p>
+          <button onClick={signOut} className="flex items-center gap-2 text-white/40 text-[13px] hover:text-white transition-colors">
             <LogOut size={14} /> Sign Out
           </button>
         </div>
@@ -158,7 +177,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       {/* Mobile sidebar */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-72 bg-fyn-ink overflow-y-auto">
+          <div className="w-72 overflow-y-auto" style={{ background: "#1A1008" }}>
             <div className="p-4 flex justify-between items-center border-b border-white/10">
               <FynLogo variant="light" showTagline={false} />
               <button onClick={() => setSidebarOpen(false)} className="text-white"><X size={20} /></button>
@@ -174,9 +193,10 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                         key={item.label + item.href}
                         to={item.href}
                         onClick={() => setSidebarOpen(false)}
-                        className="flex items-center gap-2.5 px-2 py-1.5 rounded text-sm text-white/50 hover:text-white"
+                        className="flex items-center gap-2.5 px-2 py-1.5 rounded text-white/50 hover:text-white"
+                        style={{ fontSize: 13, fontWeight: 500 }}
                       >
-                        <Icon size={16} className="flex-shrink-0" /><span className="truncate">{item.label}</span>
+                        <Icon size={16} className="flex-shrink-0" /><span className="whitespace-nowrap">{item.label}</span>
                       </Link>
                     );
                   })}
@@ -191,14 +211,14 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       {/* Main */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         {/* Top header */}
-        <header className="h-16 bg-fyn-beige-dark border-b border-fyn-ink-10 flex items-center px-4 lg:px-6 sticky top-0 z-30">
+        <header className="h-16 border-b flex items-center px-4 lg:px-6 sticky top-0 z-30" style={{ background: "#EDE4CB", borderColor: "rgba(26,16,8,0.10)" }}>
           <button className="lg:hidden mr-3 text-fyn-ink" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu size={20} />
           </button>
 
           <div className="flex items-center gap-3">
             {!isCockpit && (
-              <button onClick={() => navigate("/dashboard/cockpit")} className="text-fyn-gold text-sm hover:underline flex items-center gap-1">
+              <button onClick={() => navigate("/dashboard/cockpit")} className="text-[#8B6914] text-[13px] hover:underline flex items-center gap-1">
                 ← Back to Cockpit
               </button>
             )}
@@ -206,24 +226,24 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           </div>
 
           <div className="ml-auto flex items-center gap-4">
-            <div className="hidden md:flex items-center bg-fyn-beige border border-fyn-ink-10 rounded-lg px-3 py-1.5 gap-2 w-64">
+            <div className="hidden md:flex items-center border rounded-lg px-3 py-1.5 gap-2 w-64" style={{ background: "#FFFFFF", borderColor: "rgba(26,16,8,0.10)" }}>
               <Search size={14} className="text-fyn-ink/30" />
-              <input placeholder="Search customers, invoices..." className="bg-transparent text-sm text-fyn-ink outline-none flex-1" aria-label="Search" />
+              <input placeholder="Search customers, invoices..." className="bg-transparent text-[13px] text-fyn-ink outline-none flex-1" aria-label="Search" />
               <span className="text-fyn-ink/20 text-xs">⌘K</span>
             </div>
-            <span className="hidden md:inline text-xs bg-amber-100 text-fyn-warning px-2 py-1 rounded fyn-metric">GSTR-3B in 8 days</span>
+            <span className="hidden md:inline text-[12px] px-2 py-1 rounded fyn-metric" style={{ background: "#FEF3E2", color: "#8B5A00" }}>GSTR-3B in 8 days</span>
             <button className="relative text-fyn-ink/60 hover:text-fyn-ink" aria-label="Notifications">
               <Bell size={18} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-fyn-red rounded-full text-white text-[9px] flex items-center justify-center">3</span>
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: "#C41E1E" }}>3</span>
             </button>
-            <div className="w-8 h-8 rounded-full bg-fyn-red flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: "#C41E1E" }}>
               {profile?.full_name?.[0] || "U"}
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto" style={{ minHeight: "calc(100vh - 64px)" }}>
           {children}
         </main>
       </div>
