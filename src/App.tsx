@@ -19,13 +19,21 @@ import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
+import RunwayPage from "./pages/dashboard/RunwayPage.tsx";
 import ReceivablesPage from "./pages/dashboard/ReceivablesPage.tsx";
+import PayablesPage from "./pages/dashboard/PayablesPage.tsx";
 import SimulatorPage from "./pages/dashboard/SimulatorPage.tsx";
 import GSTPage from "./pages/dashboard/GSTPage.tsx";
+import TDSTaxPage from "./pages/dashboard/TDSTaxPage.tsx";
 import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import NidhiChatPage from "./pages/dashboard/NidhiChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
+import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
+import CustomersPage from "./pages/dashboard/CustomersPage.tsx";
+import CostPage from "./pages/dashboard/CostPage.tsx";
+import CompliancePage from "./pages/dashboard/CompliancePage.tsx";
+import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -53,13 +61,21 @@ const App = () => (
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
+            <Route path="/dashboard/runway" element={<RunwayPage />} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
+            <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<SimulatorPage />} />
             <Route path="/dashboard/gst" element={<GSTPage />} />
+            <Route path="/dashboard/tds-tax" element={<TDSTaxPage />} />
             <Route path="/dashboard/hr" element={<HRPage />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/nidhi" element={<NidhiChatPage />} />
             <Route path="/dashboard/reports" element={<CFOReportsPage />} />
+            <Route path="/dashboard/vendors" element={<VendorsPage />} />
+            <Route path="/dashboard/customers" element={<CustomersPage />} />
+            <Route path="/dashboard/cost" element={<CostPage />} />
+            <Route path="/dashboard/compliance" element={<CompliancePage />} />
+            <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
