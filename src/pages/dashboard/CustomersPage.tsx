@@ -32,27 +32,27 @@ const CustomersPage = () => (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">ACTIVE CUSTOMERS</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">47</p>
+        <p className="text-white font-bold mt-1 font-sans text-4xl">47</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">TOTAL RECEIVABLES</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹22.1L</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹22.1L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">AVG CUSTOMER VALUE (3M)</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹1.8L</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹1.8L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">AT-RISK CUSTOMERS</p>
-        <p className="text-[#C41E1E] text-[28px] font-serif font-bold mt-1">4</p>
-        <p className="text-[#C41E1E] text-xs mt-1">Default or churn risk</p>
+        <p className="text-[#C41E1E] text-[28px] font-bold mt-1 font-sans">4</p>
+        <p className="text-[#C41E1E] mt-1 text-base">Default or churn risk</p>
       </div>
     </div>
 
     {/* REVENUE CONCENTRATION */}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Revenue Concentration</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Revenue Concentration</h3>
         <div className="flex justify-center">
           <ResponsiveContainer width={220} height={220}>
             <PieChart>
@@ -67,47 +67,18 @@ const CustomersPage = () => (
           {revenueConc.map((c) => (
             <div key={c.name} className="flex items-center gap-2 text-sm">
               <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
-              <span className="flex-1 text-fyn-ink">{c.name}</span>
+              <span className="flex-1 text-fyn-ink font-sans text-sm">{c.name}</span>
               <span className="fyn-metric font-medium">{c.value}%</span>
             </div>
           ))}
         </div>
       </div>
-
-      <div className="bg-fyn-warning-bg border border-[#8B5A00]/30 rounded-lg p-5 flex flex-col justify-center">
-        <h3 className="text-[#8B5A00] font-serif text-lg mb-3">⚠ Concentration Risk</h3>
-        <p className="text-fyn-ink/70 text-sm leading-relaxed">
-          ABC Electronics is 18% of your revenue. If they stop ordering, runway drops from 52 to 38 days.
-        </p>
-        <p className="text-fyn-ink/70 text-sm leading-relaxed mt-2">
-          Top 3 customers = 44% of revenue. Consider diversifying your customer base.
-        </p>
-      </div>
-    </div>
-
+...
     {/* CUSTOMER TABLE */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-      <h3 className="text-fyn-ink font-serif text-lg mb-4">All Customers</h3>
+      <h3 className="text-fyn-ink text-lg mb-4 font-sans">All Customers</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
-              <th className="text-left py-2">Customer</th>
-              <th className="text-left py-2">Industry</th>
-              <th className="text-right py-2">Revenue (3m)</th>
-              <th className="text-right py-2">Outstanding</th>
-              <th className="text-right py-2">DSO</th>
-              <th className="text-center py-2">Risk</th>
-              <th className="text-left py-2">Last Order</th>
-              <th className="text-center py-2">Payment Behavior</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customers.map((c, i) => (
-              <tr key={c.name} className={`border-b border-fyn-ink-10 last:border-0 hover:bg-fyn-beige-deep transition-colors cursor-pointer ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
-                <td className="py-3 text-fyn-ink font-semibold">{c.name}</td>
-                <td className="py-3 text-fyn-ink/60">{c.industry}</td>
-                <td className="py-3 text-right fyn-metric">{formatINR(c.rev3m)}</td>
+...
                 <td className="py-3 text-right fyn-metric font-semibold">{formatINR(c.outstanding)}</td>
                 <td className="py-3 text-right fyn-metric">{c.dso}d</td>
                 <td className="py-3 text-center">
@@ -116,7 +87,7 @@ const CustomersPage = () => (
                   </span>
                 </td>
                 <td className="py-3 text-fyn-ink/60 text-xs">{c.lastOrder}</td>
-                <td className="py-3 text-center">
+                <td className="py-3 text-center font-sans">
                   <span className={`text-[11px] px-2 py-0.5 rounded ${behaviorStyles[c.behavior]}`}>{c.behavior}</span>
                 </td>
               </tr>
