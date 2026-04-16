@@ -86,7 +86,7 @@ const RunwayPage = () => {
             <circle cx={cx} cy={cy} r="4" fill="#C41E1E" />
           </svg>
         </div>
-        <p className="text-white text-[72px] font-serif font-bold leading-none">52</p>
+        <p className="text-white text-[72px] font-bold leading-none font-sans">52</p>
         <p className="text-white/60 text-base mt-1">days of runway</p>
         <p className="text-fyn-gold text-[13px] mt-1">At ₹23,846 daily burn</p>
         <div className="flex gap-3 mt-6 justify-center flex-wrap">
@@ -123,7 +123,7 @@ const RunwayPage = () => {
       {/* RUNWAY PROJECTION - 3 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <h4 className="text-fyn-ink font-serif text-base mb-3">Current State</h4>
+          <h4 className="text-fyn-ink text-base mb-3 font-sans">Current State</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-fyn-ink/60">Cash:</span><span className="fyn-metric font-semibold">₹12.4L</span></div>
             <div className="flex justify-between"><span className="text-fyn-ink/60">Daily burn:</span><span className="fyn-metric">₹23,846</span></div>
@@ -134,7 +134,7 @@ const RunwayPage = () => {
         </div>
 
         <div className="bg-[#f0faf4] border-[1.5px] border-[#1A6B3C] rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <h4 className="text-fyn-ink font-serif text-base mb-3">Collect ₹8.4L from ABC Electronics</h4>
+          <h4 className="text-fyn-ink text-base mb-3 font-sans">Collect ₹8.4L from ABC Electronics</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-fyn-ink/60">New runway:</span><span className="fyn-metric font-semibold text-[#1A6B3C]">67 days <span className="text-xs bg-[#1A6B3C]/10 px-1.5 py-0.5 rounded">+15 days</span></span></div>
             <div className="flex justify-between"><span className="text-fyn-ink/60">New crisis date:</span><span className="fyn-metric">June 21, 2026</span></div>
@@ -150,7 +150,7 @@ const RunwayPage = () => {
         </div>
 
         <div className="bg-fyn-info-bg border-[1.5px] border-fyn-info rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <h4 className="text-fyn-ink font-serif text-base mb-3">Invoice discounting on ₹22.1L</h4>
+          <h4 className="text-fyn-ink text-base mb-3 font-sans">Invoice discounting on ₹22.1L</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-fyn-ink/60">New runway:</span><span className="fyn-metric font-semibold text-[#1A6B3C]">95 days <span className="text-xs bg-[#1A6B3C]/10 px-1.5 py-0.5 rounded">+43 days</span></span></div>
             <div className="flex justify-between"><span className="text-fyn-ink/60">Financing cost:</span><span className="fyn-metric">~18% p.a. = ₹33K/30d</span></div>
@@ -162,7 +162,7 @@ const RunwayPage = () => {
       {/* BURN BREAKDOWN */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-          <h3 className="text-fyn-ink font-serif text-lg mb-4">Burn by Category</h3>
+          <h3 className="text-fyn-ink text-lg mb-4 font-sans">Burn by Category</h3>
           <div className="flex justify-center">
             <ResponsiveContainer width={220} height={220}>
               <PieChart>
@@ -188,7 +188,7 @@ const RunwayPage = () => {
         </div>
 
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-          <h3 className="text-fyn-ink font-serif text-lg mb-4">Burn Rate Trend</h3>
+          <h3 className="text-fyn-ink text-lg mb-4 font-sans">Burn Rate Trend</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
