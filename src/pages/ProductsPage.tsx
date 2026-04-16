@@ -202,12 +202,12 @@ export default function ProductsPage() {
   return (
     <Layout>
       {/* Hero */}
-      <section className="bg-fyn-ink" style={{ padding: "48px 0" }}>
-        <div className="fyn-container text-center">
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 48, color: "#FFFFFF", lineHeight: 1.15, marginBottom: 16 }}>
+      <section className="bg-muted" style={{ padding: "48px 0" }}>
+        <div className="fyn-container text-center font-serif">
+          <h1 className="font-serif text-5xl text-primary" style={{ fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>
             50+ modules. One AI connecting everything.
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 18, maxWidth: 720, margin: "0 auto", lineHeight: 1.7 }}>
+          <p className="text-secondary-foreground font-sans" style={{ fontSize: 18, maxWidth: 720, margin: "0 auto", lineHeight: 1.7 }}>
             FynHelp's intelligence modules are not independent features — they are interconnected systems that feed a single intelligence engine: Nidhi. Every module's output is an input into Nidhi's reasoning.
           </p>
         </div>
@@ -215,7 +215,7 @@ export default function ProductsPage() {
 
       {/* Sticky filter bar */}
       <div className="sticky top-[72px] z-30 bg-fyn-beige-dark border-b border-fyn-ink-10" style={{ padding: "12px 0" }}>
-        <div className="fyn-container flex flex-wrap items-center gap-2">
+        <div className="fyn-container flex flex-wrap items-center gap-2 bg-secondary-foreground text-primary-foreground border-destructive">
           {filterTabs.map((t) => (
             <button
               key={t.id}
@@ -223,7 +223,7 @@ export default function ProductsPage() {
               className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                 activeFilter === t.id
                   ? "bg-fyn-ink text-white border-fyn-ink"
-                  : "border-fyn-ink-10 text-fyn-ink/60 hover:border-fyn-ink/30"
+                  : "text-primary-foreground border-accent"
               }`}
               style={{ transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)" }}
             >
@@ -236,7 +236,7 @@ export default function ProductsPage() {
               placeholder="Search modules..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="text-sm px-3 py-1.5 rounded-lg border border-fyn-ink-10 bg-fyn-beige-card text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red"
+              className="text-sm px-3 py-1.5 rounded-lg border bg-fyn-beige-card text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none border-accent"
               style={{ width: 180 }}
               aria-label="Search modules"
             />
@@ -265,7 +265,7 @@ export default function ProductsPage() {
                   <div
                     key={m.name}
                     onClick={() => handleModuleClick(m.name)}
-                    className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-5 cursor-pointer relative group"
+                    className="bg-fyn-beige border rounded-lg p-5 cursor-pointer relative group border-secondary-foreground text-secondary-foreground font-bold"
                     style={{ transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)" }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)";
