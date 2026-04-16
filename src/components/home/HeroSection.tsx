@@ -145,10 +145,10 @@ export default function HeroSection() {
 /* ── Left Column ── */
 function LeftColumn() {
   return (
-    <div className="bg-muted" style={{ maxWidth: 640, position: "relative", zIndex: 10 }}>
+    <div className="bg-secondary-foreground" style={{ maxWidth: 640, position: "relative", zIndex: 10 }}>
       {/* Eyebrow pill */}
       <div
-        className="inline-flex items-center gap-2 rounded-full animate-fade-in"
+        className="inline-flex items-center gap-2 rounded-full animate-fade-in font-bold"
         style={{
           border: "1px solid rgba(139,105,20,0.4)",
           padding: "6px 16px",
@@ -156,7 +156,7 @@ function LeftColumn() {
         }}
       >
         <span className="rounded-full pulse-ring" style={{ width: 6, height: 6, background: "#22C55E" }} />
-        <span style={{
+        <span className="text-primary-foreground" style={{
           fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 11,
           letterSpacing: "0.1em", color: "#8B6914", textTransform: "uppercase" as const,
         }}>
@@ -177,9 +177,9 @@ function LeftColumn() {
           marginBottom: 0,
         }}
       >
-        <span className="text-primary-foreground" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
-        <span style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
-        <span className="text-primary-foreground" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
+        <span className="text-primary-foreground font-serif" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
+        <span className="font-serif text-primary mx-[5px]" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
+        <span className="text-primary-foreground font-serif" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
       </h1>
 
       {/* Subheadline */}
@@ -236,12 +236,12 @@ function LeftColumn() {
 
       {/* Language pills */}
       <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
-        <div className="flex flex-wrap items-center" style={{ gap: 8 }}>
+        <div className="flex flex-wrap items-center text-primary-foreground" style={{ gap: 8 }}>
           <span className="text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
             Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
-            <span key={lang} style={{
+            <span key={lang} className="text-sm mx-[5px]" style={{
               border: "1px solid rgba(139,105,20,0.3)", borderRadius: 100, padding: "4px 12px",
               fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "#8B6914",
               background: "rgba(139,105,20,0.08)",

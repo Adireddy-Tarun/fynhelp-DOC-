@@ -15,8 +15,8 @@ export default function ProblemSection() {
       <div className="fyn-container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div>
-            <span className="fyn-caption text-fyn-gold block mb-4 reveal-up">The Problem</span>
-            <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-6 reveal-left">
+            <span className="fyn-caption text-fyn-gold block mb-4 reveal-up text-base">The Problem</span>
+            <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-6 reveal-left font-serif">
               India's 63 million businesses are making ₹Crore decisions with zero financial intelligence.
             </h2>
             <p className="text-fyn-ink/70 text-lg leading-relaxed mb-4 reveal-left" style={{ transitionDelay: "100ms" }}>

@@ -42,7 +42,7 @@ export default function IntegrationsSection() {
   return (
     <section className="bg-fyn-beige-dark py-20" ref={ref}>
       <div className="fyn-container">
-        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up">Works With What You Already Use</span>
+        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up text-base">Works With What You Already Use</span>
         <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-12 reveal-up">
           Built for the Indian business technology stack
         </h2>
@@ -50,7 +50,7 @@ export default function IntegrationsSection() {
         <div className="space-y-8 stagger-children">
           {rows.map((row) => (
             <div key={row.label} className="bg-fyn-beige-card border border-fyn-ink/8 rounded-lg p-6">
-              <p className="fyn-caption text-fyn-gold text-[11px] mb-4">{row.label}</p>
+              <p className="fyn-caption text-fyn-gold mb-4 text-sm">{row.label}</p>
               <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
                 {row.items.map((item, i) => {
                   const name = typeof item === "string" ? item : item.name;

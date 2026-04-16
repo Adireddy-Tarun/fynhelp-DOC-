@@ -23,8 +23,8 @@ export default function NidhiSection() {
                 <span className="text-white font-display text-2xl font-bold">N</span>
               </div>
               <div>
-                <p className="text-white font-display text-2xl">Nidhi</p>
-                <p className="text-fyn-gold fyn-caption text-xs font-semibold">AI CFO · FynHelp</p>
+                <p className="text-white font-serif text-3xl">Nidhi</p>
+                <p className="fyn-caption font-semibold text-sm text-primary-foreground">AI CFO · FynHelp</p>
               </div>
               <div className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full bg-fyn-success/20">
                 <span className="w-2 h-2 rounded-full bg-fyn-success pulse-dot" />
@@ -72,7 +72,7 @@ export default function NidhiSection() {
           {/* Right — Capabilities */}
           <div>
             <span className="fyn-caption text-fyn-gold block mb-4 reveal-right">Your AI CFO</span>
-            <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-white mb-6 reveal-right" style={{ transitionDelay: "100ms" }}>
+            <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-white mb-6 reveal-right font-serif" style={{ transitionDelay: "100ms" }}>
               The intelligence of a world-class CFO. In your language. On your phone. Every single morning.
             </h2>
             <p className="text-white/60 text-lg leading-relaxed mb-10 reveal-right" style={{ transitionDelay: "200ms" }}>

@@ -96,7 +96,7 @@ export default function PricingSection() {
   return (
     <section className="bg-fyn-ink py-24" ref={ref}>
       <div className="fyn-container">
-        <span className="fyn-caption text-fyn-gold block mb-4 text-center reveal-up">Pricing</span>
+        <span className="fyn-caption text-fyn-gold block mb-4 text-center reveal-up text-base">Pricing</span>
         <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-white text-center mb-4 reveal-up">
           A real CFO costs ₹30–50 lakh per year. Nidhi costs ₹24,000.
         </h2>
@@ -138,7 +138,7 @@ export default function PricingSection() {
               <h3 className={`font-display text-xl mb-1 ${p.featured ? "text-fyn-ink" : "text-white"}`}>{p.name}</h3>
               <p className={`fyn-metric text-3xl font-bold mb-0.5 ${p.featured ? "text-fyn-red" : "text-white"}`}>
                 {p.isEnterprise ? "Custom" : annual ? p.price.annual : p.price.monthly}
-                {!p.isEnterprise && <span className={`text-sm font-normal ${p.featured ? "text-fyn-ink/60" : "text-white/60"}`}>
+                {!p.isEnterprise && <span className={`text-sm font-normal font-serif ${p.featured ? "text-secondary-foreground" : "text-primary-foreground"}`}>
                   /{annual ? "year" : "month"}
                 </span>}
               </p>
