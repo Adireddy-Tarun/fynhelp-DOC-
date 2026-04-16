@@ -129,7 +129,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               ★ EARLY ACCESS
             </span>
             <button onClick={() => navigate("/dashboard/settings/plan")}
-              className="text-[11px] transition-colors hover:text-[#C41E1E]"
+              className="transition-colors text-primary-foreground text-sm"
               style={{ color: "rgba(255,255,255,0.35)" }}>Manage →</button>
           </div>
         </div>
@@ -145,7 +145,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                   <Link
                     key={item.label + item.href}
                     to={item.href}
-                    className="flex items-center gap-2.5 px-2 py-1.5 rounded transition-all duration-150"
+                    className="flex items-center gap-2.5 px-2 py-1.5 rounded transition-all duration-150 border-0"
                     style={{
                       fontSize: 13,
                       fontWeight: 500,
