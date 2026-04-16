@@ -93,7 +93,7 @@ export default function HeroSection() {
       >
         {/* Desktop: grid, Mobile: flex column */}
         <div
-          className="hidden md:grid h-full items-center"
+          className="hidden md:grid h-full items-center bg-sidebar-accent"
           style={{
             gridTemplateColumns: "1fr 1fr",
             gap: 64,
@@ -145,7 +145,7 @@ export default function HeroSection() {
 /* ── Left Column ── */
 function LeftColumn() {
   return (
-    <div style={{ maxWidth: 640, position: "relative", zIndex: 10 }}>
+    <div className="bg-muted" style={{ maxWidth: 640, position: "relative", zIndex: 10 }}>
       {/* Eyebrow pill */}
       <div
         className="inline-flex items-center gap-2 rounded-full animate-fade-in"
@@ -177,14 +177,14 @@ function LeftColumn() {
           marginBottom: 0,
         }}
       >
-        <span style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
+        <span className="text-secondary-foreground" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
         <span style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
-        <span style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
+        <span className="text-secondary-foreground" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
       </h1>
 
       {/* Subheadline */}
       <p
-        className="animate-fade-in"
+        className="animate-fade-in text-secondary-foreground"
         style={{
           animationDelay: "300ms", animationFillMode: "both",
           fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 18,
@@ -211,7 +211,7 @@ function LeftColumn() {
         >
           Start Your 15-Day Free Trial →
         </Link>
-        <button style={{
+        <button className="text-secondary-foreground" style={{
           background: "transparent", color: "#FFFFFF",
           border: "1.5px solid rgba(255,255,255,0.3)", padding: "14px 28px",
           borderRadius: 6, fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 15,
@@ -224,7 +224,7 @@ function LeftColumn() {
 
       {/* Trust line */}
       <p
-        className="animate-fade-in"
+        className="animate-fade-in text-secondary-foreground"
         style={{
           animationDelay: "500ms", animationFillMode: "both",
           fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
@@ -237,7 +237,7 @@ function LeftColumn() {
       {/* Language pills */}
       <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
         <div className="flex flex-wrap items-center" style={{ gap: 8 }}>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
+          <span className="text-secondary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
             Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
