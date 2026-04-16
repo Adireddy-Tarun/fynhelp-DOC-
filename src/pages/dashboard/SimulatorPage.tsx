@@ -298,7 +298,7 @@ const SimulatorPage = () => {
 
               {/* Before vs After chart */}
               <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-                <h4 className="text-fyn-ink font-serif text-lg mb-4">Before vs After: 90 Day Projection</h4>
+                <h4 className="text-fyn-ink font-serif text-lg mb-4">Before vs After — 90 Day Projection</h4>
                 <ResponsiveContainer width="100%" height={260}>
                   <AreaChart data={projectionData}>
                     <XAxis dataKey="day" tick={{ fontSize: 9 }} interval={14} />

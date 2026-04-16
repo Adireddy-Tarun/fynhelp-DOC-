@@ -42,7 +42,7 @@ const TDSTaxPage = () => (
 
     {/* ADVANCE TAX INSTALLMENT TRACKER */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-      <h3 className="text-fyn-ink font-serif text-lg mb-6">Advance Tax Installments: FY 2025-26</h3>
+      <h3 className="text-fyn-ink font-serif text-lg mb-6">Advance Tax Installments — FY 2025-26</h3>
       <div className="flex items-center justify-between mb-6">
         {installments.map((inst, i) => (
           <div key={i} className="flex flex-col items-center flex-1">
@@ -73,7 +73,7 @@ const TDSTaxPage = () => (
 
     {/* TDS OBLIGATIONS TABLE */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-      <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Obligations: This Quarter</h3>
+      <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Obligations — This Quarter</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -111,9 +111,9 @@ const TDSTaxPage = () => (
       <h3 className="text-fyn-ink font-serif text-lg mb-3">TDS Deposit Deadlines</h3>
       <div className="space-y-2">
         {[
-          { name: "TDS deposit: April deductions", due: "May 7", days: 22, status: "pending" },
+          { name: "TDS deposit — April deductions", due: "May 7", days: 22, status: "pending" },
           { name: "TDS Return Q4 (24Q/26Q)", due: "May 31", days: 46, status: "pending" },
-          { name: "TDS deposit: May deductions", due: "Jun 7", days: 53, status: "future" },
+          { name: "TDS deposit — May deductions", due: "Jun 7", days: 53, status: "future" },
         ].map((f) => (
           <div key={f.name} className="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors">
             <span className={`w-2 h-2 rounded-full ${f.days <= 7 ? "bg-[#C41E1E]" : f.days <= 14 ? "bg-[#8B5A00]" : "bg-fyn-ink/20"}`} />

@@ -9,7 +9,7 @@ const plans = [
     target: "Businesses up to ₹5 Crore turnover",
     sub: "Perfect for getting started with financial intelligence",
     features: [
-      "Liquidity Intelligence: all 6 modules",
+      "Liquidity Intelligence — all 6 modules",
       "Cash flow projection (30-day)",
       "GST filing calendar + deadline alerts",
       "Basic ITC reconciliation (100 invoices/month)",
@@ -30,11 +30,11 @@ const plans = [
     sub: "Complete financial intelligence for growing businesses",
     features: [
       "Everything in Starter, plus:",
-      "Revenue Intelligence: all 8 modules",
+      "Revenue Intelligence — all 8 modules",
       "Full ITC reconciliation (unlimited invoices)",
       "GST notice risk scorer + vendor compliance",
       "HR & Workforce Intelligence (all 10 modules)",
-      "Decision Simulator: 4 scenarios",
+      "Decision Simulator — 4 scenarios",
       "Nidhi in Hindi + Gujarati",
       "Up to 5 bank accounts via AA",
       "Tally Prime + Zoho Books + QuickBooks",
@@ -53,8 +53,8 @@ const plans = [
     sub: "Institutional-grade intelligence for serious businesses",
     features: [
       "Everything in Growth, plus:",
-      "Governance Intelligence: all 10 modules",
-      "Full Decision Simulator: all 8 scenarios",
+      "Governance Intelligence — all 10 modules",
+      "Full Decision Simulator — all 8 scenarios",
       "Market benchmarking + credit rating simulator",
       "All 5 Indian languages for Nidhi",
       "Unlimited bank accounts",

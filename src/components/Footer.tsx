@@ -17,7 +17,7 @@ const productLinks = [
 ];
 
 const companyLinks = [
-  { label: "About Us", href: "/about" },
+  { label: "About FynHelp", href: "/about" },
   { label: "Our Mission", href: "/about" },
   { label: "Founders", href: "/about" },
   { label: "Blog", href: "/blog" },

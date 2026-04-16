@@ -2,7 +2,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const rows = [
   {
-    label: "Banking: Via RBI Account Aggregator",
+    label: "Banking — Via RBI Account Aggregator",
     items: ["HDFC Bank", "ICICI Bank", "State Bank of India", "Axis Bank", "Kotak Mahindra Bank", "Yes Bank", "IndusInd Bank", "Punjab National Bank", "Bank of Baroda", "Canara Bank", "Union Bank", "UCO Bank", "IDFC First Bank", "Federal Bank"],
     extra: "+ 15 more banks via Finvu and OneMoney Account Aggregator",
   },

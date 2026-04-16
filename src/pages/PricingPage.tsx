@@ -18,7 +18,7 @@ const faqs = [
 const planFeatures: Record<string, { included: string[]; excluded?: string[]; prefix?: string }> = {
   Starter: {
     included: [
-      "Liquidity Intelligence: all 6 modules (cash, runway, burn, alerts)",
+      "Liquidity Intelligence — all 6 modules (cash, runway, burn, alerts)",
       "Cash flow projection — 30-day forecast with AA bank data",
       "GST filing calendar — your specific deadlines, 14/7/3/0-day alerts",
       "Basic ITC monitoring — up to 100 invoices per month",
@@ -39,7 +39,7 @@ const planFeatures: Record<string, { included: string[]; excluded?: string[]; pr
   Growth: {
     prefix: "Everything in Starter, plus:",
     included: [
-      "Revenue Intelligence: all 8 modules (receivables AI, default prediction, customer risk scoring, collections automation)",
+      "Revenue Intelligence — all 8 modules (receivables AI, default prediction, customer risk scoring, collections automation)",
       "Full ITC reconciliation — unlimited invoices, auto-runs on 14th",
       "GST notice risk scorer — 0-100 score with fix recommendations",
       "Vendor GST health monitoring — score all your suppliers",
@@ -58,7 +58,7 @@ const planFeatures: Record<string, { included: string[]; excluded?: string[]; pr
   Pro: {
     prefix: "Everything in Growth, plus:",
     included: [
-      "Governance Intelligence: all 10 modules (ROC/MCA, FEMA, audit readiness, MSME rights, board governance)",
+      "Governance Intelligence — all 10 modules (ROC/MCA, FEMA, audit readiness, MSME rights, board governance)",
       "Decision Simulator — all 8 scenarios including M&A and capex",
       "Market & Growth Intelligence — industry benchmarking, credit rating simulator, export opportunity scoring",
       "Banking & Fintech Intelligence — multi-bank aggregation, loan eligibility scoring",

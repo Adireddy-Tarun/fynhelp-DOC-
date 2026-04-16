@@ -6,7 +6,7 @@ const mockReceivables = [
   { id: "1", customer: "ABC Electronics", invoice: "INV-2025-0342", invDate: "2025-02-05", due: "2025-02-10", amount: 840000, received: 0, outstanding: 840000, risk: 85, lastChase: "Mar 28", phone: "+919876543210" },
   { id: "2", customer: "Sharma & Sons", invoice: "INV-2025-0298", invDate: "2025-02-20", due: "2025-03-05", amount: 310000, received: 0, outstanding: 310000, risk: 62, lastChase: "Apr 2", phone: "+919876543211" },
   { id: "3", customer: "Delhi Distributors", invoice: "INV-2025-0401", invDate: "2025-03-18", due: "2025-04-01", amount: 570000, received: 0, outstanding: 570000, risk: 35, lastChase: "Never", phone: "+919876543212" },
-  { id: "4", customer: "Kumar Fabrics", invoice: "INV-2025-0412", invDate: "2025-04-01", due: "2025-04-15", amount: 220000, received: 55000, outstanding: 165000, risk: 15, lastChase: "-", phone: "+919876543213" },
+  { id: "4", customer: "Kumar Fabrics", invoice: "INV-2025-0412", invDate: "2025-04-01", due: "2025-04-15", amount: 220000, received: 55000, outstanding: 165000, risk: 15, lastChase: "—", phone: "+919876543213" },
   { id: "5", customer: "Chennai Trading Co", invoice: "INV-2025-0389", invDate: "2025-03-10", due: "2025-03-25", amount: 190000, received: 0, outstanding: 190000, risk: 48, lastChase: "Apr 5", phone: "+919876543214" },
 ];
 
@@ -51,7 +51,7 @@ const ReceivablesPage = () => {
         <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
           <p className="text-fyn-ink/50 text-[13px] fyn-label">DSO</p>
           <p className="text-fyn-ink text-[28px] font-serif font-bold mt-1">42 days</p>
-          <p className="text-[#8B5A00] text-xs mt-1">Industry avg 30 days. You are 12 days slower</p>
+          <p className="text-[#8B5A00] text-xs mt-1">Industry avg 30 days — you are 12 days slower</p>
         </div>
       </div>
 
