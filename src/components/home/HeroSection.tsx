@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 
-const ease = [0.25, 0.1, 0.25, 1];
+const ease = [0.25, 0.1, 0.25, 1] as const;
 
 export default function HeroSection() {
   const [email, setEmail] = useState("");
