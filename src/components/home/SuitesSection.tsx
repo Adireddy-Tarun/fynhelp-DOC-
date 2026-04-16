@@ -45,7 +45,7 @@ export default function SuitesSection() {
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.dot }} />
-                <span className="text-fyn-ink/30 text-[10px] fyn-caption">{s.modules} modules</span>
+                <span className="text-fyn-ink/50 text-[10px] fyn-caption">{s.modules} modules</span>
               </div>
               <h3 className="font-display text-lg text-fyn-ink mb-2">{s.name}</h3>
               <p className="text-fyn-ink/55 text-sm leading-relaxed mb-3">{s.desc}</p>

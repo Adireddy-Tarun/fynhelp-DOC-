@@ -86,7 +86,7 @@ export default function SocialProofSection() {
           {counters.map((c) => (
             <div key={c.label}>
               <p className="fyn-metric text-3xl md:text-4xl font-bold text-fyn-ink">{c.value}</p>
-              <p className="text-fyn-ink/50 text-sm mt-1">{c.label}</p>
+              <p className="text-fyn-ink/70 text-sm mt-1">{c.label}</p>
             </div>
           ))}
         </div>

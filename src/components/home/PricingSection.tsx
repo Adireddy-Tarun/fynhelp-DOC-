@@ -138,7 +138,7 @@ export default function PricingSection() {
               <h3 className={`font-display text-xl mb-1 ${p.featured ? "text-fyn-ink" : "text-white"}`}>{p.name}</h3>
               <p className={`fyn-metric text-3xl font-bold mb-0.5 ${p.featured ? "text-fyn-red" : "text-white"}`}>
                 {p.isEnterprise ? "Custom" : annual ? p.price.annual : p.price.monthly}
-                {!p.isEnterprise && <span className={`text-sm font-normal ${p.featured ? "text-fyn-ink/40" : "text-white/40"}`}>
+                {!p.isEnterprise && <span className={`text-sm font-normal ${p.featured ? "text-fyn-ink/60" : "text-white/60"}`}>
                   /{annual ? "year" : "month"}
                 </span>}
               </p>
@@ -170,7 +170,7 @@ export default function PricingSection() {
           ))}
         </div>
 
-        <p className="text-center text-white/30 text-sm mt-8">
+        <p className="text-center text-white/50 text-sm mt-8">
           All plans include a 15-day free trial. No credit card required. Cancel anytime.
         </p>
       </div>

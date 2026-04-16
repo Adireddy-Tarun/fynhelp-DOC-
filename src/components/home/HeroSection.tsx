@@ -237,7 +237,7 @@ function LeftColumn() {
       {/* Language pills */}
       <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
         <div className="flex flex-wrap items-center" style={{ gap: 8 }}>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.40)" }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
             Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
