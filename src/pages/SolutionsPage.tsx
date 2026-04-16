@@ -201,8 +201,8 @@ const SolutionsPage = () => {
     <Layout>
       <section className="bg-fyn-ink py-16">
         <div className="fyn-container text-center">
-          <span className="fyn-label text-fyn-gold text-[13px] block mb-4">HOW FYNHELP WORKS</span>
-          <h1 className="text-3xl md:text-[48px] leading-tight text-white max-w-[900px] mx-auto mb-4">
+          <span className="fyn-label block mb-4 font-sans text-[#8e7343] text-base">HOW FYNHELP WORKS</span>
+          <h1 className="text-3xl leading-tight text-white max-w-[900px] mx-auto mb-4 font-serif md:text-7xl font-bold">
             One platform. Every financial problem an Indian SME faces. Solved.
           </h1>
           <p className="text-white/60 text-lg max-w-[700px] mx-auto">
@@ -226,7 +226,7 @@ const SolutionsPage = () => {
       {/* Solution deep dives */}
       {solutions.map((s) => (
         <section key={s.title} className={`${s.bg} fyn-section`}>
-          <div className="fyn-container max-w-3xl">
+          <div className="fyn-container max-w-3xl font-bold">
             <h2 className={`text-3xl ${s.text} mb-4`}>{s.title}</h2>
             <p className={`${s.sub} mb-6 leading-relaxed`}>{s.problem}</p>
             <p className={`${s.sub} mb-6 leading-relaxed`}>{s.solution}</p>
