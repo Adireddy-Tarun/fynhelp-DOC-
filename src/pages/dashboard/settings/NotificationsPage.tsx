@@ -103,7 +103,7 @@ const NotificationsPage = () => {
               return (
                 <div key={alert.category} className="grid grid-cols-[1fr_auto_auto_auto] gap-0 items-center px-4 py-3 border-t" style={{ borderColor: "#E0D9C8" }}>
                   <div>
-                    <p className="text-[13px] font-medium" style={{ color: "#1A1008" }}>{alert.category}</p>
+                    <p className="font-medium font-sans text-sm" style={{ color: "#1A1008" }}>{alert.category}</p>
                     <p className="text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>{alert.description}</p>
                   </div>
                   <div className="w-16 flex justify-center">
