@@ -41,7 +41,7 @@ const Footer = () => (
             India's most intelligent Virtual CFO platform. Built for Indian SMEs — from textile traders in Surat to exporters in Tiruppur.
           </p>
           <p className="text-white/30 text-xs mb-3">Built for India:</p>
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6 text-xl font-bold font-sans">
             {["GSP Certified", "Account Aggregator Enabled", "ISO 27001 In Progress"].map((b) => (
               <span key={b} className="text-white/50 text-[10px] border border-white/15 px-2.5 py-1 rounded">{b}</span>
             ))}

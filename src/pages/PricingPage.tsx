@@ -138,7 +138,7 @@ const PricingPage = () => {
             >
               <div>
                 <h3 className="font-serif text-xl text-fyn-ink">Calculate your ROI before you buy</h3>
-                <p className="text-fyn-ink/60 text-sm mt-1">See how much FynHelp saves based on your business</p>
+                <p className="text-sm mt-1 text-secondary-foreground">See how much FynHelp saves based on your business</p>
               </div>
               <svg
                 width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -156,40 +156,40 @@ const PricingPage = () => {
               }}
             >
               <div className="px-6 pb-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
+                <div className="space-y-6 font-sans text-base">
                   <div>
-                    <label className="fyn-label text-fyn-ink/60 text-[11px] block mb-2">Annual turnover: ₹{turnover} Cr</label>
+                    <label className="fyn-label text-[11px] block mb-2 text-secondary-foreground">Annual turnover: ₹{turnover} Cr</label>
                     <input type="range" min={1} max={200} value={turnover} onChange={(e) => setTurnover(+e.target.value)}
                       className="w-full accent-fyn-red" aria-label="Annual turnover" />
-                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span>₹1 Cr</span><span>₹200 Cr</span></div>
+                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span className="text-secondary-foreground">₹1 Cr</span><span className="text-secondary-foreground">₹200 Cr</span></div>
                   </div>
                   <div>
-                    <label className="fyn-label text-fyn-ink/60 text-[11px] block mb-2">Hours/week on financial management: {hours}</label>
+                    <label className="fyn-label text-[11px] block mb-2 text-secondary-foreground">Hours/week on financial management: {hours}</label>
                     <input type="range" min={2} max={20} value={hours} onChange={(e) => setHours(+e.target.value)}
                       className="w-full accent-fyn-red" aria-label="Hours per week" />
-                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span>2h</span><span>20h</span></div>
+                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span className="text-secondary-foreground">2h</span><span className="text-secondary-foreground">20h</span></div>
                   </div>
                   <div>
-                    <label className="fyn-label text-fyn-ink/60 text-[11px] block mb-2">Estimated unrecovered ITC/year: ₹{itcLoss}L</label>
+                    <label className="fyn-label text-[11px] block mb-2 text-secondary-foreground">Estimated unrecovered ITC/year: ₹{itcLoss}L</label>
                     <input type="range" min={0} max={20} value={itcLoss} onChange={(e) => setItcLoss(+e.target.value)}
                       className="w-full accent-fyn-red" aria-label="Unrecovered ITC" />
-                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span>₹0</span><span>₹20L</span></div>
+                    <div className="flex justify-between text-[10px] text-fyn-ink/40"><span className="text-secondary-foreground">₹0</span><span className="text-secondary-foreground">₹20L</span></div>
                   </div>
                 </div>
 
                 <div className="bg-fyn-beige-dark rounded-lg p-6">
-                  <p className="text-fyn-ink/60 text-sm mb-2">Based on your inputs, FynHelp saves approximately:</p>
-                  <p className="font-serif text-fyn-red" style={{ fontSize: 48, fontWeight: 700, lineHeight: 1.1 }}>
+                  <p className="text-sm mb-2 text-secondary-foreground">Based on your inputs, FynHelp saves approximately:</p>
+                  <p className="text-secondary-foreground text-6xl font-sans" style={{ fontWeight: 700, lineHeight: 1.1 }}>
                     {formatINR(roi.total)}
                   </p>
-                  <p className="text-fyn-ink/40 text-xs mb-4">per year</p>
+                  <p className="text-xs mb-4 text-secondary-foreground">per year</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm"><span className="text-fyn-ink/60">Time saved</span><span className="fyn-metric text-fyn-ink">{formatINR(roi.timeSaved)}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-fyn-ink/60">ITC recovery</span><span className="fyn-metric text-fyn-ink">{formatINR(roi.itcRecovery)}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-fyn-ink/60">Crisis prevention</span><span className="fyn-metric text-fyn-ink">{formatINR(roi.crisisPrevention)}</span></div>
                   </div>
                   <div className="mt-4 pt-4 border-t border-fyn-ink-10">
-                    <p className="text-sm text-fyn-ink/60">Recommended plan:
+                    <p className="text-sm text-secondary-foreground">Recommended plan:
                       <span className="ml-2 bg-fyn-red text-white text-xs px-3 py-1 rounded-full font-medium">{roi.recommendedPlan}</span>
                     </p>
                     <Link to="/signup" className="mt-3 inline-block bg-fyn-red text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover-btn-primary">
