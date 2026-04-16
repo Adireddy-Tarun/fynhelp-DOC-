@@ -170,31 +170,31 @@ const OnboardingPage = () => {
             <div className="rounded-xl p-6 mb-8" style={{ background: "hsl(var(--fyn-ink))" }}>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 {[
-                  { label: "Cash Runway", value: "— days", sub: "Awaiting bank data" },
-                  { label: "Bank Balance", value: "—", sub: "Connect to see" },
-                  { label: "GST Notice Risk", value: "—", sub: "Enter GSTIN to score" },
+                  { label: "Cash Runway", value: " days", sub: "Awaiting bank data" },
+                  { label: "Bank Balance", value: "\n", sub: "Connect to see" },
+                  { label: "GST Notice Risk", value: "\n", sub: "Enter GSTIN to score" },
                 ].map((m) => (
                   <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <p className="text-xs text-white/40 fyn-label">{m.label}</p>
+                    <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>
                     <p className="text-2xl text-white fyn-metric mt-1">{m.value}</p>
-                    <p className="text-xs text-white/30">{m.sub}</p>
+                    <p className="text-xs text-primary-foreground">{m.sub}</p>
                   </div>
                 ))}
               </div>
               <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: "hsl(var(--fyn-red))" }}>N</div>
-                <p className="text-sm text-white/70">Welcome! I'm Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.</p>
+                <p className="text-primary-foreground text-base">Welcome! I'm Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.</p>
               </div>
             </div>
 
             <div className="rounded-lg p-4 mb-8 border" style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)" }}>
               <h3 className="font-serif text-lg mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Setup summary</h3>
               <ul className="space-y-1 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                <li>Business type: {form.business_type || "Not set"}</li>
-                <li>Industry: {form.industry || "Not set"}</li>
-                <li>Turnover: {form.turnover_range || "Not set"}</li>
-                <li>Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
-                <li>Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
+                <li className="text-secondary-foreground">Business type: {form.business_type || "Not set"}</li>
+                <li className="text-secondary-foreground">Industry: {form.industry || "Not set"}</li>
+                <li className="text-secondary-foreground">Turnover: {form.turnover_range || "Not set"}</li>
+                <li className="text-secondary-foreground">Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
+                <li className="text-secondary-foreground">Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
               </ul>
             </div>
 
