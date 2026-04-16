@@ -6,7 +6,8 @@ const AboutPage = () => (
     <section className="bg-fyn-ink fyn-section">
       <div className="fyn-container max-w-3xl">
         <h1 className="text-3xl md:text-[48px] leading-tight text-white mb-8">
-          We're building the financial intelligence layer every Indian SME deserves — but couldn't afford.
+          We're building the financial intelligence layer every Indian SME deserves, but couldn't afford a CFO.
+        </h1>
         </h1>
         <div className="space-y-6 text-white/70 text-base leading-relaxed">
           <p>India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
