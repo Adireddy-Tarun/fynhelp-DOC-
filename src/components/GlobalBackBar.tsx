@@ -147,12 +147,13 @@ export default function GlobalBackBar() {
                   <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.25)" }}>/</span>
                 )}
                 {isLast ? (
-                  <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "rgba(26,16,8,0.70)" }}>
+                  <span className="text-secondary-foreground font-serif" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "rgba(26,16,8,0.70)" }}>
                     {seg.label}
                   </span>
                 ) : (
                   <Link
                     to={seg.href || "/"}
+                    className="text-secondary-foreground font-serif"
                     style={{
                       fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
                       color: "rgba(26,16,8,0.45)", textDecoration: "none",

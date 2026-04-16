@@ -57,7 +57,7 @@ const Footer = () => (
 
         {/* Product */}
         <div>
-          <p className="fyn-caption text-fyn-gold mb-5">Product</p>
+          <p className="fyn-caption text-fyn-gold mb-5 text-lg">Product</p>
           <ul className="space-y-2">
             {productLinks.map((l) => (
               <li key={l.label}>
@@ -69,7 +69,7 @@ const Footer = () => (
 
         {/* Company */}
         <div>
-          <p className="fyn-caption text-fyn-gold mb-5">Company</p>
+          <p className="fyn-caption text-fyn-gold mb-5 text-base">Company</p>
           <ul className="space-y-2">
             {companyLinks.map((l) => (
               <li key={l.label}>
@@ -81,7 +81,7 @@ const Footer = () => (
 
         {/* Support & Legal */}
         <div>
-          <p className="fyn-caption text-fyn-gold mb-5">Support & Legal</p>
+          <p className="fyn-caption text-fyn-gold mb-5 text-sm">Support & Legal</p>
           <div className="mb-6">
             <a href="mailto:support@fynhelp.com" className="text-white/70 text-sm hover:text-fyn-gold transition-colors block mb-1">support@fynhelp.com</a>
             <p className="text-white/40 text-xs">Mon-Fri 9AM-7PM IST | Sat 10AM-2PM IST</p>

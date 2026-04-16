@@ -4,14 +4,14 @@ const AboutPage = () => (
   <Layout>
     {/* Mission */}
     <section className="bg-fyn-ink fyn-section">
-      <div className="fyn-container max-w-3xl">
-        <h1 className="text-3xl md:text-[48px] leading-tight text-white mb-8">
+      <div className="fyn-container max-w-3xl text-lg">
+        <h1 className="text-3xl leading-tight text-white mb-8 font-serif md:text-4xl font-bold opacity-100">
           We're building the financial intelligence layer every Indian SME deserves — but couldn't afford.
         </h1>
         <div className="space-y-6 text-white/70 text-base leading-relaxed">
-          <p>India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
-          <p>FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
-          <p>We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.</p>
+          <p className="font-sans text-lg">India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
+          <p className="font-sans text-lg">FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
+          <p className="font-sans text-lg">We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.</p>
         </div>
       </div>
     </section>
@@ -37,11 +37,11 @@ const AboutPage = () => (
               <div className="flex items-center gap-4 mb-4">
                 <div className={`w-16 h-16 rounded-full ${f.color} flex items-center justify-center text-white text-xl font-bold`}>{f.initials}</div>
                 <div>
-                  <h3 className="text-fyn-ink font-serif text-2xl">{f.name}</h3>
-                  <p className="text-fyn-gold fyn-label text-xs">{f.title}</p>
+                  <h3 className="text-fyn-ink font-serif text-3xl">{f.name}</h3>
+                  <p className="text-fyn-gold fyn-label text-base">{f.title}</p>
                 </div>
               </div>
-              {f.note && <p className="text-fyn-red text-sm italic mb-3">{f.note}</p>}
+              {f.note && <p className="text-fyn-red italic mb-3 text-lg">{f.note}</p>}
               <p className="text-fyn-ink/70 text-sm leading-relaxed">{f.bio}</p>
             </div>
           ))}
@@ -65,7 +65,7 @@ const AboutPage = () => (
               '26
             </div>
             <div className="pb-8">
-              <p className="text-fyn-gold fyn-label text-[11px] mb-1">JANUARY 2026</p>
+              <p className="fyn-label mb-1 text-primary-foreground text-base">JANUARY 2026</p>
               <h3 className="text-white font-serif text-xl mb-3">FynHelp begins</h3>
               <p className="text-white/70 text-base leading-relaxed">
                 FynHelp Technologies was founded in Bengaluru in January 2026. Adireddy Tarun and Nidhi Siddhpura started building India's Virtual CFO platform after spending time understanding the financial intelligence gap facing Indian SMEs. The product is currently in active development, with our first customers onboarding in early 2026.
@@ -116,7 +116,7 @@ const AboutPage = () => (
           </div>
           <div className="bg-fyn-beige border border-fyn-ink-10 rounded-lg p-6">
             <h3 className="text-fyn-ink font-serif text-lg mb-2">Founders</h3>
-            <a href="mailto:tarun@fynhelp.com" className="text-fyn-red text-sm mb-2 block hover:underline">tarun@fynhelp.com</a>
+            <a href="mailto:adireddytarun@fynhelp.com" className="text-fyn-red text-sm mb-2 block hover:underline">adireddytarun@fynhelp.com</a>
             <p className="text-fyn-ink/60 text-sm mb-2">For partnerships, press inquiries, and important business matters.</p>
             <p className="text-fyn-ink/40 text-xs">Adireddy Tarun, Founder & CEO</p>
           </div>
@@ -127,7 +127,7 @@ const AboutPage = () => (
             <p className="text-fyn-ink/40 text-xs">White-label dashboard for up to 200 clients per CA firm.</p>
           </div>
         </div>
-        <p className="text-fyn-ink/50 text-sm text-center">
+        <p className="text-sm text-center text-secondary-foreground">
           FynHelp Technologies, Bengaluru, Karnataka, India
         </p>
       </div>
