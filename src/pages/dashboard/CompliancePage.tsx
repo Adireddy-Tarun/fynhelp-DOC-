@@ -42,9 +42,9 @@ const CompliancePage = () => (
   <DashboardLayout>
     {/* OVERALL SCORE */}
     <div className="bg-fyn-ink rounded-xl p-8 mb-6 text-center">
-      <p className="text-white/40 text-xs fyn-label mb-2">OVERALL COMPLIANCE SCORE</p>
-      <p className="text-[#8B5A00] text-[72px] font-serif font-bold leading-none">72</p>
-      <p className="text-white/40 text-base">/100 — Good but 3 issues</p>
+      <p className="text-xs fyn-label mb-2 font-sans text-primary-foreground">OVERALL COMPLIANCE SCORE</p>
+      <p className="text-[#8B5A00] text-[72px] font-bold leading-none font-sans">72</p>
+      <p className="text-base text-primary-foreground">/100 — Good but 3 issues</p>
       <div className="grid grid-cols-4 gap-4 max-w-xl mx-auto mt-6">
         {[
           { label: "GST", score: 68, color: "#8B5A00" },
@@ -53,9 +53,9 @@ const CompliancePage = () => (
           { label: "Labour", score: 71, color: "#8B5A00" },
         ].map((c) => (
           <div key={c.label}>
-            <p className="text-white/60 text-sm mb-1">{c.label}</p>
+            <p className="text-sm mb-1 text-primary-foreground">{c.label}</p>
             <div className="h-2 bg-white/10 rounded-full"><div className="h-2 rounded-full" style={{ width: `${c.score}%`, background: c.color }} /></div>
-            <p className="text-white/40 text-xs mt-1 fyn-metric">{c.score}/100</p>
+            <p className="text-xs mt-1 fyn-metric text-primary-foreground">{c.score}/100</p>
           </div>
         ))}
       </div>
@@ -63,7 +63,7 @@ const CompliancePage = () => (
 
     {/* COMPLIANCE MATRIX */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-      <h3 className="text-fyn-ink font-serif text-lg mb-4">Compliance Matrix — All Obligations</h3>
+      <h3 className="text-fyn-ink text-lg mb-4 font-sans">Compliance Matrix — All Obligations</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -97,11 +97,11 @@ const CompliancePage = () => (
                       }`}
                     >
                       <td className="py-3 text-fyn-ink font-medium">{item.obligation}</td>
-                      <td className="py-3 text-fyn-ink/60 text-xs">{item.regulator}</td>
-                      <td className="py-3 text-center text-fyn-ink/50 text-xs">{item.freq}</td>
-                      <td className="py-3 text-fyn-ink/60 text-xs">{item.lastFiled}</td>
+                      <td className="py-3 text-xs text-secondary-foreground">{item.regulator}</td>
+                      <td className="py-3 text-center text-xs text-secondary-foreground">{item.freq}</td>
+                      <td className="py-3 text-xs text-secondary-foreground">{item.lastFiled}</td>
                       <td className="py-3 text-fyn-ink text-xs font-medium">{item.nextDue}</td>
-                      <td className={`py-3 text-right fyn-metric text-xs ${isOverdue || isDueToday ? "text-[#C41E1E] font-bold" : isUrgent ? "text-[#8B5A00] font-semibold" : "text-fyn-ink/40"}`}>
+                      <td className={`py-3 text-right fyn-metric text-xs ${isOverdue || isDueToday ? "text-[#C41E1E] font-bold" : isUrgent ? "text-[#8B5A00] font-semibold" : "text-secondary-foreground"}`}>
                         {isDueToday ? "TODAY" : item.daysLeft < 0 ? `${Math.abs(item.daysLeft)}d overdue` : `${item.daysLeft}d`}
                       </td>
                       <td className="py-3 text-center">
