@@ -100,7 +100,7 @@ export default function GlobalBackBar() {
             }}
           >
             <ChevronLeft size={14} strokeWidth={1.5} color="#8B6914" />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#8B6914" }}>
+            <span className="text-accent" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#8B6914" }}>
               Back
             </span>
           </button>
@@ -130,8 +130,8 @@ export default function GlobalBackBar() {
               e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            <Home size={14} strokeWidth={1.5} color="#8B6914" />
-            <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#8B6914" }}>
+            <Home className="text-accent" size={14} strokeWidth={1.5} color="#8B6914" />
+            <span className="text-accent" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#8B6914" }}>
               {homeLabel}
             </span>
           </Link>
