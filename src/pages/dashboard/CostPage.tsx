@@ -19,7 +19,7 @@ const marginBySegment = [
 
 const anomalies = [
   { desc: "Office expenses up 340% in March vs 12-month average", amount: 48000, severity: "high" },
-  { desc: "New vendor 'XYZ Traders' paid ₹2.4L — not in approved list", amount: 240000, severity: "high" },
+  { desc: "New vendor 'XYZ Traders' paid ₹2.4L, not in approved list", amount: 240000, severity: "high" },
   { desc: "Petrol expenses claimed 4x in one week", amount: 12000, severity: "medium" },
 ];
 

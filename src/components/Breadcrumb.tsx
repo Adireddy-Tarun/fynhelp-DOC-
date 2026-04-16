@@ -7,7 +7,7 @@ const routeNames: Record<string, string> = {
   resources: "Resources",
   blog: "Blog",
   community: "Community",
-  about: "About",
+  about: "About Us",
   signup: "Sign Up",
   signin: "Sign In",
 };
