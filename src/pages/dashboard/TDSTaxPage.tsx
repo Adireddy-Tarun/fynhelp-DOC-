@@ -22,27 +22,27 @@ const TDSTaxPage = () => (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">ADVANCE TAX PAID YTD</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹2.4L</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹2.4L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">NEXT INSTALLMENT</p>
-        <p className="text-[#C41E1E] text-[28px] font-serif font-bold mt-1">₹1.8L</p>
-        <p className="text-[#C41E1E] text-xs mt-1">Due Jun 15</p>
+        <p className="text-[#C41E1E] text-[28px] font-bold mt-1 font-sans">₹1.8L</p>
+        <p className="text-[#C41E1E] mt-1 text-sm font-sans">Due Jun 15</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">TDS DEDUCTED MTD</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹86K</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹86K</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">TDS TO DEPOSIT</p>
-        <p className="text-[#8B5A00] text-[28px] font-serif font-bold mt-1">₹86K</p>
-        <p className="text-[#8B5A00] text-xs mt-1">Due Apr 30</p>
+        <p className="text-[#8B5A00] text-[28px] font-bold mt-1 font-sans">₹86K</p>
+        <p className="mt-1 text-accent font-sans text-sm">Due Apr 30</p>
       </div>
     </div>
 
     {/* ADVANCE TAX INSTALLMENT TRACKER */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-      <h3 className="text-fyn-ink font-serif text-lg mb-6">Advance Tax Installments — FY 2025-26</h3>
+      <h3 className="text-fyn-ink text-lg mb-6 font-sans">Advance Tax Installments — FY 2025-26</h3>
       <div className="flex items-center justify-between mb-6">
         {installments.map((inst, i) => (
           <div key={i} className="flex flex-col items-center flex-1">
