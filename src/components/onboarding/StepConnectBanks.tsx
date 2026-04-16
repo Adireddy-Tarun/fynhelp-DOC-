@@ -68,7 +68,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
       <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
         Connect your bank accounts
       </h1>
-      <p className="mb-8 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
+      <p className="mb-8 text-sm text-secondary-foreground">
         Connect all your business bank accounts at once. FynHelp aggregates them into one unified cash view.
         Uses RBI's Account Aggregator — your login credentials are never shared with us.
       </p>
@@ -76,7 +76,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         {/* LEFT — Bank Selection */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3" style={{ color: "hsl(var(--fyn-gold))" }}>
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3 text-secondary-foreground">
             Select your banks
           </p>
 
@@ -87,11 +87,10 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search bank name..."
-              className="w-full h-9 pl-9 pr-8 text-sm rounded border"
+              className="w-full h-9 pl-9 pr-8 text-sm rounded border text-secondary-foreground"
               style={{
                 background: "hsl(var(--fyn-beige-card))",
                 borderColor: "hsl(var(--fyn-ink) / 0.10)",
-                color: "hsl(var(--fyn-ink))",
               }}
             />
             {search && (
@@ -147,8 +146,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
           {/* PDF upload link */}
           <button
             onClick={() => setShowPdfUpload(!showPdfUpload)}
-            className="mt-4 text-[13px] hover:underline transition-colors"
-            style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}
+            className="mt-4 text-[13px] hover:underline transition-colors text-secondary-foreground"
           >
             Can't find your bank? Upload a PDF statement instead →
           </button>
@@ -199,7 +197,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-[15px] font-semibold" style={{ color: "hsl(var(--fyn-ink))" }}>Connected accounts</h3>
           </div>
-          <p className="text-xs mb-4" style={{ color: "hsl(var(--fyn-gold))" }}>
+          <p className="text-xs mb-4 text-secondary-foreground">
             {selectedBanks.length} account{selectedBanks.length !== 1 ? "s" : ""} selected
           </p>
 
@@ -212,7 +210,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
                   <circle cx="24" cy="20" r="14" fill="hsl(var(--fyn-beige-dark))" stroke="hsl(var(--fyn-ink) / 0.20)" strokeWidth="1.5" />
                 </svg>
               </div>
-              <p className="text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.40)" }}>
+              <p className="text-sm text-secondary-foreground">
                 Select banks on the left to connect them.
               </p>
             </div>
@@ -261,7 +259,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
       <div className="flex items-center justify-between mt-10 pt-6" style={{ borderTop: "1px solid hsl(var(--fyn-ink) / 0.08)" }}>
         <div>
           {!showSkipWarning ? (
-            <button onClick={() => setShowSkipWarning(true)} className="text-[13px] hover:underline" style={{ color: "hsl(var(--fyn-ink) / 0.40)" }}>
+            <button onClick={() => setShowSkipWarning(true)} className="text-[13px] hover:underline text-secondary-foreground">
               Skip for now — I'll connect banks later
             </button>
           ) : (
