@@ -303,10 +303,10 @@
 
   /* Color utilities */
   .bg-fyn-ink { background-color: hsl(24 53% 7%); }
-  .bg-fyn-beige { background-color: hsl(40 52% 91%); }
+  .bg-fyn-beige { background-color: hsl(40 42% 87%); }
   .bg-fyn-beige-dark { background-color: hsl(40 42% 86%); }
   .bg-fyn-beige-deep { background-color: hsl(40 38% 80%); }
-  .bg-fyn-beige-card { background-color: hsl(36 50% 96%); }
+  .bg-fyn-beige-card { background-color: hsl(0 0% 100%); }
   .bg-fyn-red { background-color: hsl(0 73% 44%); }
   .bg-fyn-red-dark { background-color: hsl(0 73% 36%); }
   .bg-fyn-red-light { background-color: hsl(0 52% 95%); }
@@ -323,8 +323,8 @@
 
   .text-fyn-ink { color: hsl(24 53% 7%); }
   .text-fyn-ink-80 { color: hsl(24 53% 7% / 0.80); }
-  .text-fyn-ink-60 { color: hsl(24 53% 7% / 0.60); }
-  .text-fyn-ink-40 { color: hsl(24 53% 7% / 0.40); }
+  .text-fyn-ink-60 { color: hsl(24 53% 7% / 0.65); }
+  .text-fyn-ink-40 { color: hsl(24 53% 7% / 0.55); }
   .text-fyn-red { color: hsl(0 73% 44%); }
   .text-fyn-red-dark { color: hsl(0 73% 36%); }
   .text-fyn-gold { color: hsl(38 74% 31%); }
@@ -334,7 +334,7 @@
   .text-fyn-warning { color: hsl(38 100% 27%); }
   .text-fyn-info { color: hsl(216 66% 33%); }
 
-  .border-fyn-ink-10 { border-color: hsl(24 53% 7% / 0.10); }
+  .border-fyn-ink-10 { border-color: hsl(24 53% 7% / 0.12); }
   .border-fyn-ink-20 { border-color: hsl(24 53% 7% / 0.20); }
   .border-fyn-ink { border-color: hsl(24 53% 7%); }
   .border-fyn-red { border-color: hsl(0 73% 44%); }
