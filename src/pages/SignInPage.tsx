@@ -15,23 +15,23 @@ const SignInPage = () => (
       <h2 className="text-fyn-ink font-serif text-2xl mb-6">Sign in to your account</h2>
       <form className="space-y-4 max-w-md">
         <div>
-          <label className="text-fyn-ink/70 text-sm mb-1 block">Email address</label>
+          <label className="text-sm mb-1 block text-secondary-foreground">Email address</label>
           <input
             type="email"
             placeholder="rajesh@example.com"
-            className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-fyn-ink text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red"
+            className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
           />
         </div>
         <div>
-          <label className="text-fyn-ink/70 text-sm mb-1 block">Password</label>
+          <label className="text-sm mb-1 block text-secondary-foreground">Password</label>
           <input
             type="password"
             placeholder="Enter your password"
-            className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-fyn-ink text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red"
+            className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
           />
         </div>
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-fyn-ink/60 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 text-sm cursor-pointer text-secondary-foreground">
             <input type="checkbox" className="accent-[#C41E1E]" />
             Remember me
           </label>
@@ -40,10 +40,10 @@ const SignInPage = () => (
         <button type="submit" className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity">
           Sign In
         </button>
-        <p className="text-fyn-ink/50 text-sm text-center">
+        <p className="text-sm text-center text-secondary-foreground">
           Don't have an account? <Link to="/signup" className="text-fyn-red hover:underline">Start free trial →</Link>
         </p>
-        <p className="text-fyn-ink/40 text-xs text-center mt-4">
+        <p className="text-xs text-center mt-4 text-secondary-foreground">
           Logging in as a CA partner? <a href="#" className="text-fyn-gold hover:underline">Use your partner portal →</a>
         </p>
       </form>
