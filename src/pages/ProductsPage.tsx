@@ -222,7 +222,7 @@ export default function ProductsPage() {
               onClick={() => setActiveFilter(t.id)}
               className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                 activeFilter === t.id
-                  ? "bg-fyn-ink text-white border-fyn-ink"
+                  ? "text-white border-fyn-ink bg-primary opacity-100"
                   : "text-primary-foreground border-accent bg-primary"
               }`}
               style={{ transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)" }}
@@ -257,7 +257,7 @@ export default function ProductsPage() {
                 <h3 className="font-serif text-xl text-fyn-ink">{s.name}</h3>
                 <span className="text-sm ml-auto text-secondary-foreground">{s.modules.length} modules</span>
               </div>
-              <p className="px-6 pt-4 pb-2 text-fyn-ink/70 text-sm leading-relaxed max-w-3xl">{s.description}</p>
+              <p className="px-6 pt-4 pb-2 text-sm leading-relaxed max-w-3xl text-secondary-foreground">{s.description}</p>
 
               {/* Modules grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
@@ -289,8 +289,8 @@ export default function ProductsPage() {
                       <span className="font-semibold text-fyn-ink text-[15px]" style={{ fontFamily: "'Inter', sans-serif" }}>{m.name}</span>
                     </div>
                     <div className="flex gap-2 mb-3">
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-gold-light text-fyn-gold fyn-label">{m.plan}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark text-fyn-ink/50 fyn-label">{m.updated}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-gold-light fyn-label text-[#92610c]">{m.plan}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark fyn-label text-secondary-foreground">{m.updated}</span>
                     </div>
                     <div className="mb-3">
                       <p className="fyn-caption text-fyn-gold text-[10px] mb-1">What it tracks</p>
@@ -308,7 +308,7 @@ export default function ProductsPage() {
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {m.sources.map((src) => (
-                        <span key={src} className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark text-fyn-ink/40">{src}</span>
+                        <span key={src} className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark text-secondary-foreground">{src}</span>
                       ))}
                     </div>
                   </div>
