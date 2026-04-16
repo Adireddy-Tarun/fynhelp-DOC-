@@ -73,12 +73,41 @@ const CustomersPage = () => (
           ))}
         </div>
       </div>
-...
+
+      <div className="bg-fyn-warning-bg border border-[#8B5A00]/30 rounded-lg p-5 flex flex-col justify-center">
+        <h3 className="text-[#8B5A00] font-serif text-lg mb-3">⚠ Concentration Risk</h3>
+        <p className="text-fyn-ink/70 text-sm leading-relaxed">
+          ABC Electronics is 18% of your revenue. If they stop ordering, runway drops from 52 to 38 days.
+        </p>
+        <p className="text-fyn-ink/70 text-sm leading-relaxed mt-2">
+          Top 3 customers = 44% of revenue. Consider diversifying your customer base.
+        </p>
+      </div>
+    </div>
+
     {/* CUSTOMER TABLE */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
       <h3 className="text-fyn-ink text-lg mb-4 font-sans">All Customers</h3>
       <div className="overflow-x-auto">
-...
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
+              <th className="text-left py-2">Customer</th>
+              <th className="text-left py-2">Industry</th>
+              <th className="text-right py-2">Revenue (3m)</th>
+              <th className="text-right py-2">Outstanding</th>
+              <th className="text-right py-2">DSO</th>
+              <th className="text-center py-2">Risk</th>
+              <th className="text-left py-2">Last Order</th>
+              <th className="text-center py-2">Payment Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map((c, i) => (
+              <tr key={c.name} className={`border-b border-fyn-ink-10 last:border-0 hover:bg-fyn-beige-deep transition-colors cursor-pointer ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
+                <td className="py-3 text-fyn-ink font-semibold">{c.name}</td>
+                <td className="py-3 text-fyn-ink/60">{c.industry}</td>
+                <td className="py-3 text-right fyn-metric">{formatINR(c.rev3m)}</td>
                 <td className="py-3 text-right fyn-metric font-semibold">{formatINR(c.outstanding)}</td>
                 <td className="py-3 text-right fyn-metric">{c.dso}d</td>
                 <td className="py-3 text-center">
