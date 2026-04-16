@@ -40,9 +40,9 @@ const GSTPage = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
             >
-              <p style={{ fontSize: 12, color: "rgba(22,163,74,0.7)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>ITC SAFE</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#16A34A", marginTop: 4 }}>{formatINR(360000)}</p>
-              <p style={{ fontSize: 13, color: "rgba(22,163,74,0.6)", marginTop: 4 }}>Confirmed in GSTR-2B</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "rgba(22,163,74,0.7)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>ITC SAFE</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#16A34A", marginTop: 4 }}>{formatINR(360000)}</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "rgba(22,163,74,0.6)", marginTop: 4 }}>Confirmed in GSTR-2B</p>
             </div>
 
             {/* ITC at Risk - red */}
@@ -51,9 +51,9 @@ const GSTPage = () => {
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
             >
               <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full pulse-ring" style={{ background: "#C41E1E" }} />
-              <p style={{ fontSize: 12, color: "#C41E1E", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>ITC AT RISK</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#C41E1E", marginTop: 4 }}>{formatINR(320000)}</p>
-              <p style={{ fontSize: 13, color: "rgba(196,30,30,0.7)", marginTop: 4 }}>Not in 2B — vendors haven't filed</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "#C41E1E", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>ITC AT RISK</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#C41E1E", marginTop: 4 }}>{formatINR(320000)}</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "rgba(196,30,30,0.7)", marginTop: 4 }}>Not in 2B — vendors haven't filed</p>
             </div>
 
             {/* Mismatch Count */}
@@ -61,9 +61,9 @@ const GSTPage = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
             >
-              <p style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>MISMATCH COUNT</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#C41E1E", marginTop: 4 }}>4</p>
-              <p style={{ fontSize: 13, color: "#C41E1E", marginTop: 4 }}>↑ 1 from last period</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>MISMATCH COUNT</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#C41E1E", marginTop: 4 }}>4</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "#C41E1E", marginTop: 4 }}>↑ 1 from last period</p>
             </div>
 
             {/* Notice Risk Score - amber */}
@@ -71,9 +71,9 @@ const GSTPage = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
             >
-              <p style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>NOTICE RISK</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#8B5A00", marginTop: 4 }}>34/100</p>
-              <p style={{ fontSize: 13, color: "rgba(139,90,0,0.7)", marginTop: 4 }}>Medium risk · Updated Apr 14</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>NOTICE RISK</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#8B5A00", marginTop: 4 }}>34/100</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "rgba(139,90,0,0.7)", marginTop: 4 }}>Medium risk · Updated Apr 14</p>
             </div>
 
             {/* Next Filing */}
@@ -81,9 +81,9 @@ const GSTPage = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; e.currentTarget.style.borderColor = "#C41E1E"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#E0D9C8"; }}
             >
-              <p style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>NEXT FILING</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#1A1008", marginTop: 4 }}>GSTR-3B</p>
-              <p style={{ fontSize: 13, color: "#C41E1E", marginTop: 4 }}>Apr 20 · 5 days left</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>NEXT FILING</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#1A1008", marginTop: 4 }}>GSTR-3B</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "#C41E1E", marginTop: 4 }}>Apr 20 · 5 days left</p>
             </div>
 
             {/* Last 2B Pull */}
@@ -91,15 +91,15 @@ const GSTPage = () => {
               onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; e.currentTarget.style.borderColor = "#C41E1E"; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#E0D9C8"; }}
             >
-              <p style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>LAST 2B PULL</p>
-              <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: "#16A34A", marginTop: 4 }}>Apr 14</p>
-              <p style={{ fontSize: 13, color: "#16A34A", marginTop: 4 }}>Auto-pulled · Fresh</p>
+              <p className="text-sm" style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>LAST 2B PULL</p>
+              <p className="font-sans text-3xl" style={{ fontSize: 28, fontWeight: 700, color: "#16A34A", marginTop: 4 }}>Apr 14</p>
+              <p className="text-sm" style={{ fontSize: 13, color: "#16A34A", marginTop: 4 }}>Auto-pulled · Fresh</p>
             </div>
           </div>
 
           {/* Notice Risk Breakdown */}
           <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <h3 className="font-serif text-fyn-ink mb-4" style={{ fontSize: 15 }}>Notice Risk Breakdown</h3>
+            <h3 className="text-fyn-ink mb-4 font-sans" style={{ fontSize: 15 }}>Notice Risk Breakdown</h3>
             <div className="space-y-4">
               {[
                 { factor: "ITC Mismatch %", score: 8, max: 20, desc: "4 vendors with mismatches", color: "#F59E0B" },
@@ -111,13 +111,13 @@ const GSTPage = () => {
               ].map((f) => (
                 <div key={f.factor}>
                   <div className="flex justify-between mb-1">
-                    <span style={{ fontSize: 14, color: "#1A1008" }}>{f.factor}</span>
+                    <span className="font-sans" style={{ fontSize: 14, color: "#1A1008" }}>{f.factor}</span>
                     <span className="fyn-metric" style={{ fontSize: 13, color: f.color, fontWeight: 600 }}>{f.score}/{f.max}</span>
                   </div>
                   <div style={{ height: 8, background: "#E0D9C8", borderRadius: 4 }}>
                     <div className="progress-fill-animate" style={{ height: 8, borderRadius: 4, background: f.color, width: `${(f.score / f.max) * 100}%` }} />
                   </div>
-                  <p style={{ fontSize: 13, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>{f.desc}</p>
+                  <p className="font-sans opacity-65" style={{ fontSize: 13, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>{f.desc}</p>
                 </div>
               ))}
             </div>
@@ -128,17 +128,17 @@ const GSTPage = () => {
             <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1A1008", marginBottom: 12 }}>Top 3 things to fix</h3>
             <div className="space-y-3">
               <div className="rounded-lg" style={{ borderLeft: "4px solid #C41E1E", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.08)", borderLeftWidth: 4, borderLeftColor: "#C41E1E", padding: 14 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>Fix ITC mismatches before Apr 20</p>
+                <p className="font-sans" style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>Fix ITC mismatches before Apr 20</p>
                 <p style={{ fontSize: 13, color: "rgba(26,16,8,0.60)", marginTop: 4 }}>4 vendor invoices not in GSTR-2B — chase them today</p>
                 <button className="mt-2 transition-all hover:brightness-90" style={{ color: "#FFFFFF", background: "#C41E1E", fontSize: 13, fontWeight: 500, padding: "6px 14px", borderRadius: 6 }}>Chase vendors →</button>
               </div>
               <div className="rounded-lg" style={{ borderLeft: "4px solid #8B5A00", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.08)", borderLeftWidth: 4, borderLeftColor: "#8B5A00", padding: 14 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>3 vendors have compliance score below 60</p>
+                <p className="font-sans" style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>3 vendors have compliance score below 60</p>
                 <p style={{ fontSize: 13, color: "rgba(26,16,8,0.60)", marginTop: 4 }}>Your ITC of ₹1.8L from Raj Textiles is at risk</p>
                 <button className="mt-2 transition-all hover:brightness-90" style={{ color: "#FFFFFF", background: "#8B5A00", fontSize: 13, fontWeight: 500, padding: "6px 14px", borderRadius: 6 }}>View vendor health →</button>
               </div>
               <div className="rounded-lg" style={{ borderLeft: "4px solid #1A4A8B", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.08)", borderLeftWidth: 4, borderLeftColor: "#1A4A8B", padding: 14 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>GSTR-3B due in 5 days</p>
+                <p className="font-sans" style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>GSTR-3B due in 5 days</p>
                 <p style={{ fontSize: 13, color: "rgba(26,16,8,0.60)", marginTop: 4 }}>Prepare now — review your 2B and compute ITC</p>
                 <button className="mt-2 transition-all hover:brightness-90" style={{ color: "#FFFFFF", background: "#1A4A8B", fontSize: 13, fontWeight: 500, padding: "6px 14px", borderRadius: 6 }}>Start GSTR-3B prep →</button>
               </div>
