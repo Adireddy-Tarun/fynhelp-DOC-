@@ -74,7 +74,7 @@ const CommunityPage = () => {
           <p className="text-fyn-ink/60 text-base mb-6">Discussion categories being prepared:</p>
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((c) => (
-              <span key={c} className="text-sm px-4 py-2 rounded-full bg-fyn-beige-dark text-fyn-ink/40 border border-fyn-ink-10">{c}</span>
+              <span key={c} className="text-sm px-4 py-2 rounded-full bg-fyn-beige-dark border border-fyn-ink-10 text-secondary-foreground">{c}</span>
             ))}
           </div>
 
@@ -99,12 +99,12 @@ const CommunityPage = () => {
 
           {/* Example threads */}
           <h2 className="text-3xl text-fyn-ink mb-2">Preview: What the Community Will Look Like</h2>
-          <p className="fyn-caption text-fyn-gold text-[11px] italic mb-6">Example discussions — the kind of conversations happening when you join:</p>
+          <p className="fyn-caption text-[11px] italic mb-6 text-[#6b4400]">Example discussions — the kind of conversations happening when you join:</p>
           <div className="space-y-4 mb-16">
             {threads.map((t) => (
               <div key={t.title} className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark text-fyn-ink/50 fyn-label">{t.tag}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-fyn-beige-dark fyn-label text-secondary-foreground">{t.tag}</span>
                   <span className="text-fyn-ink/30 text-xs">{t.replies} replies</span>
                 </div>
                 <h3 className="text-fyn-ink font-serif text-lg mb-2">{t.title}</h3>
@@ -112,7 +112,7 @@ const CommunityPage = () => {
               </div>
             ))}
           </div>
-          <p className="text-fyn-ink/50 text-sm mb-16">Join the community to participate → <a href="#waitlist" className="text-fyn-red hover:underline">Sign up above</a></p>
+          <p className="text-sm mb-16 text-secondary-foreground">Join the community to participate → <a href="#waitlist" className="text-fyn-red hover:underline">Sign up above</a></p>
 
           {/* Expert Office Hours */}
           <h2 className="text-3xl text-fyn-ink mb-2">Expert Office Hours</h2>
