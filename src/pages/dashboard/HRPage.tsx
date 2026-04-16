@@ -58,22 +58,22 @@ const HRPage = () => {
         {view === "executive" ? (
           <>
             <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-              <p className="text-white/40 text-[13px] fyn-label">HEADCOUNT</p>
-              <p className="text-white text-[28px] font-serif font-bold mt-1">12</p>
+              <p className="text-white/40 fyn-label font-sans text-sm">HEADCOUNT</p>
+              <p className="text-white font-bold mt-1 font-sans text-3xl">12</p>
             </div>
             <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-              <p className="text-white/40 text-[13px] fyn-label">MONTHLY PAYROLL</p>
-              <p className="text-white text-[28px] font-serif font-bold mt-1">₹8.4L</p>
-              <p className="text-white/40 text-xs mt-1">46% of revenue</p>
+              <p className="text-white/40 fyn-label font-sans text-sm">MONTHLY PAYROLL</p>
+              <p className="text-white text-[28px] font-bold mt-1 font-sans">₹8.4L</p>
+              <p className="text-white/40 mt-1 font-sans text-sm">46% of revenue</p>
             </div>
             <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-              <p className="text-white/40 text-[13px] fyn-label">PAYROLL DATE</p>
-              <p className="text-[#8B5A00] text-[28px] font-serif font-bold mt-1">18 days</p>
+              <p className="text-white/40 fyn-label font-sans text-sm">PAYROLL DATE</p>
+              <p className="text-[#8B5A00] text-[28px] font-bold mt-1 font-sans">18 days</p>
             </div>
             <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-              <p className="text-white/40 text-[13px] fyn-label">ATTRITION RISK</p>
-              <p className="text-[#C41E1E] text-[28px] font-serif font-bold mt-1">2</p>
-              <p className="text-[#C41E1E] text-xs mt-1">employees at risk</p>
+              <p className="text-white/40 fyn-label font-sans text-sm">ATTRITION RISK</p>
+              <p className="text-[#C41E1E] text-[28px] font-bold mt-1 font-sans">2</p>
+              <p className="text-[#C41E1E] mt-1 font-sans text-sm">employees at risk</p>
             </div>
           </>
         ) : (
@@ -104,7 +104,7 @@ const HRPage = () => {
       {/* HEADCOUNT + PAYROLL */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-          <h3 className="text-fyn-ink font-serif text-lg mb-4">Team by Department</h3>
+          <h3 className="text-fyn-ink text-lg mb-4 font-sans">Team by Department</h3>
           <div className="flex justify-center">
             <ResponsiveContainer width={200} height={200}>
               <PieChart>
@@ -128,7 +128,7 @@ const HRPage = () => {
         </div>
 
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-          <h3 className="text-fyn-ink font-serif text-lg mb-4">Headcount Trend (12m)</h3>
+          <h3 className="text-fyn-ink text-lg mb-4 font-sans">Headcount Trend (12m)</h3>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={headcountTrend}>
               <XAxis dataKey="month" tick={{ fontSize: 10 }} />
@@ -142,12 +142,12 @@ const HRPage = () => {
 
       {/* PAYROLL BREAKDOWN */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Payroll Breakdown — This Month</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Payroll Breakdown — This Month</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
-                <th className="text-left py-2">Component</th>
+                <th className="text-left py-2 font-sans">Component</th>
                 <th className="text-right py-2">Amount</th>
                 <th className="text-right py-2">% of Total</th>
               </tr>
@@ -172,13 +172,13 @@ const HRPage = () => {
 
       {/* ATTRITION RISK */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Attrition Risk</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Attrition Risk</h3>
         <div className="space-y-3">
           {attritionRisks.map((e) => (
             <div key={e.role} className="flex items-center justify-between p-3 bg-fyn-beige rounded-lg hover:-translate-y-0.5 hover:shadow-md transition-all">
               <div>
-                <p className="text-fyn-ink font-medium text-sm">{e.role} ({e.count})</p>
-                <p className="text-fyn-ink/50 text-xs">{e.gap}</p>
+                <p className="text-fyn-ink font-medium font-sans text-base">{e.role} ({e.count})</p>
+                <p className="text-fyn-ink/50 text-sm">{e.gap}</p>
               </div>
               <span className={`text-xs px-2 py-1 rounded ${e.risk === "High" ? "bg-[#C41E1E]/10 text-[#C41E1E]" : e.risk === "Medium" ? "bg-amber-100 text-[#8B5A00]" : "bg-green-50 text-[#1A6B3C]"}`}>{e.risk}</span>
             </div>
@@ -188,10 +188,10 @@ const HRPage = () => {
 
       {/* HIRING SIMULATOR */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-        <h3 className="text-fyn-ink font-serif text-lg mb-3">Can I afford to hire?</h3>
+        <h3 className="text-fyn-ink text-lg mb-3 font-sans">Can I afford to hire?</h3>
         <div className="space-y-4">
           <div>
-            <label className="text-fyn-ink/60 text-xs fyn-label block mb-2">CTC: {formatINR(hireCTC)}</label>
+            <label className="text-fyn-ink/60 fyn-label block mb-2 text-sm">CTC: {formatINR(hireCTC)}</label>
             <input type="range" min={300000} max={3000000} step={50000} value={hireCTC} onChange={(e) => setHireCTC(Number(e.target.value))} className="w-full accent-[#C41E1E]" />
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
