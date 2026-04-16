@@ -113,7 +113,7 @@ const SettingsLayout = () => {
     <DashboardLayout>
       <GlobalBackBar />
       <div className="mb-6">
-        <h1 className="font-serif text-4xl font-bold" style={{ color: "#1A1008" }}>Settings</h1>
+        <h1 className="font-serif text-4xl font-bold py-[15px] pt-[100px]" style={{ color: "#1A1008" }}>Settings</h1>
         <p className="text-sm mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
           Manage your account, business profile, and subscription.
         </p>
