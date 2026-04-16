@@ -27,34 +27,34 @@ const PayablesPage = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
           <p className="text-white/40 text-[13px] fyn-label">TOTAL OUTSTANDING</p>
-          <p className="text-white text-[28px] font-serif font-bold mt-1">₹8.7L</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">₹8.7L</p>
         </div>
         <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
           <p className="text-white/40 text-[13px] fyn-label">DUE THIS WEEK</p>
-          <p className="text-[#8B5A00] text-[28px] font-serif font-bold mt-1">₹3.4L</p>
+          <p className="text-[28px] font-bold mt-1 font-sans text-[#ffa600]">₹3.4L</p>
         </div>
         <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
           <p className="text-white/40 text-[13px] fyn-label">OVERDUE</p>
-          <p className="text-[#1A6B3C] text-[28px] font-serif font-bold mt-1">₹0</p>
+          <p className="text-[#1A6B3C] text-[28px] font-bold mt-1 font-sans">₹0</p>
           <p className="text-[#1A6B3C] text-xs mt-1">✓ All clear!</p>
         </div>
         <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
           <p className="text-white/40 text-[13px] fyn-label">DPO</p>
-          <p className="text-white text-[28px] font-serif font-bold mt-1">28 days</p>
-          <p className="text-[#8B5A00] text-xs mt-1">Industry avg 35 — you pay 7 days fast</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">28 days</p>
+          <p className="text-xs mt-1 text-[#fff1d6]">Industry avg 35 — you pay 7 days fast</p>
         </div>
       </div>
 
       {/* CASH IMPACT ALERT */}
       <div className="bg-fyn-warning-bg border border-[#8B5A00]/30 rounded-lg p-4 mb-6">
-        <p className="text-[#8B5A00] text-sm">Paying all due-this-week vendors (₹3.4L) will bring your cash to ₹9.0L — runway remains 38 days.</p>
+        <p className="text-sm font-sans text-[#663f00]">Paying all due-this-week vendors (₹3.4L) will bring your cash to ₹9.0L — runway remains 38 days.</p>
       </div>
 
       {/* PAYABLES TABLE */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-serif text-lg">All Payables</h3>
-          <button className="text-fyn-ink/50 text-xs border border-fyn-ink-10 px-3 py-1.5 rounded hover:bg-fyn-ink/5">Export</button>
+          <h3 className="text-fyn-ink text-lg font-sans">All Payables</h3>
+          <button className="text-xs border border-fyn-ink-10 px-3 py-1.5 rounded hover:bg-fyn-ink/5 text-secondary-foreground">Export</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -62,7 +62,7 @@ const PayablesPage = () => {
               <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
                 <th className="text-left py-2"><input type="checkbox" /></th>
                 <th className="text-left py-2">Vendor</th>
-                <th className="text-left py-2">Bill #</th>
+                <th className="text-left py-2 font-sans">Bill #</th>
                 <th className="text-left py-2">Due Date</th>
                 <th className="text-right py-2">Outstanding</th>
                 <th className="text-center py-2">Priority</th>
@@ -76,7 +76,7 @@ const PayablesPage = () => {
                   <td className="py-3"><input type="checkbox" /></td>
                   <td className="py-3 text-fyn-ink font-semibold">{p.vendor}</td>
                   <td className="py-3 text-fyn-ink/60 fyn-mono text-xs">{p.bill}</td>
-                  <td className="py-3 text-fyn-ink/60 text-xs">{p.due}</td>
+                  <td className="py-3 text-xs font-sans text-secondary-foreground">{p.due}</td>
                   <td className="py-3 text-right fyn-metric font-semibold">{formatINR(p.outstanding)}</td>
                   <td className="py-3 text-center">
                     <span className={`text-[11px] px-2 py-0.5 rounded ${priorityStyles[p.priority]}`}>{p.priority}</span>
@@ -85,7 +85,7 @@ const PayablesPage = () => {
                   <td className="py-3 text-right">
                     <div className="flex gap-1 justify-end">
                       <button onClick={() => setPayModal(p.id)} className="text-[#1A6B3C] text-xs font-medium hover:underline">Pay</button>
-                      <button className="text-fyn-ink/40 text-xs hover:underline ml-2">Defer</button>
+                      <button className="text-xs hover:underline ml-2 opacity-100 text-secondary-foreground">Defer</button>
                     </div>
                   </td>
                 </tr>
