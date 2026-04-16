@@ -93,7 +93,7 @@ const navSections: NavSection[] = [
       { label: "Integrations", href: "/dashboard/settings/integrations", icon: Plug },
       { label: "Business Profile", href: "/dashboard/settings/business", icon: Settings },
       { label: "Team & Access", href: "/dashboard/settings/team", icon: UsersRound },
-      { label: "Billing", href: "/dashboard/settings/plan", icon: CreditCard },
+      { label: "Billing", href: "/dashboard/settings/billing", icon: CreditCard },
     ],
   },
 ];
@@ -128,7 +128,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               style={{ background: "rgba(139,105,20,0.20)", border: "1px solid rgba(139,105,20,0.40)", color: "#8B6914" }}>
               ★ EARLY ACCESS
             </span>
-            <button onClick={() => navigate("/dashboard/settings/plan")}
+            <button onClick={() => navigate("/dashboard/settings/billing")}
               className="transition-colors text-primary-foreground text-sm"
               style={{ color: "rgba(255,255,255,0.35)" }}>Manage →</button>
           </div>

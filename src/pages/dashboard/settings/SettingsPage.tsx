@@ -57,7 +57,7 @@ const SettingsOverview = () => (
       title="Early Access Plan"
       sub="You have full access during our early access period. No payment required."
       statusChip
-      href="/dashboard/settings/plan"
+      href="/dashboard/settings/billing"
       linkText="Manage plan →"
     />
     <SettingsCard
