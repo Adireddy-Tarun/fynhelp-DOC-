@@ -210,7 +210,7 @@ const PricingPage = () => {
                 <div key={p.name} className={`rounded-lg p-6 flex flex-col ${isDark ? "bg-fyn-ink ring-2 ring-fyn-red text-white relative" : "bg-fyn-beige-dark border border-fyn-ink-10"}`}>
                   {p.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-fyn-red text-white text-xs px-3 py-0.5 rounded-full fyn-label">MOST POPULAR</span>}
                   <h3 className="font-serif text-xl mb-1">{p.name}</h3>
-                  <p className="text-fyn-red fyn-metric text-2xl font-bold">{p.price}{p.price !== "Custom" && <span className="text-sm font-normal opacity-50">/month</span>}</p>
+                  <p className="fyn-metric text-2xl font-bold text-primary">{p.price}{p.price !== "Custom" && <span className="text-sm text-primary font-bold font-sans opacity-100">/month</span>}</p>
                   {p.annual && <p className="opacity-50 text-xs mb-3">{p.annual} — save 17%</p>}
                   <p className="opacity-60 text-sm mb-4">{p.desc}</p>
                   {p.name === "Enterprise" && <p className="opacity-40 text-xs mb-4">Starting from ₹2,50,000/month for CA firms managing 50+ clients</p>}
@@ -230,7 +230,7 @@ const PricingPage = () => {
                       {features.included.map((f) => (
                         <li key={f} className="flex gap-2 items-start" style={{ minHeight: 16 }}>
                           <span className="text-fyn-success text-sm flex-shrink-0 mt-0.5">✓</span>
-                          <span className={`text-[13px] leading-snug ${isDark ? "text-white/80" : "text-fyn-ink/80"}`}>{f}</span>
+                          <span className={`text-[13px] leading-snug ${isDark ? "text-white/80 font-medium" : "text-fyn-ink/80"}`}>{f}</span>
                         </li>
                       ))}
                     </ul>
