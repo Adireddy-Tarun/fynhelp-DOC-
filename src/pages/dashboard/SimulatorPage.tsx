@@ -91,7 +91,7 @@ const SimulatorPage = () => {
               >
                 {scenario === s.key && <span className="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-[#C41E1E]" />}
                 <span className="text-lg">{s.icon}</span>
-                <span className="font-medium">{s.label}</span>
+                <span className="font-medium text-secondary-foreground">{s.label}</span>
               </button>
             ))}
           </div>
@@ -111,7 +111,7 @@ const SimulatorPage = () => {
           <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-xl p-6">
             {scenario === "credit" && (
               <>
-                <h3 className="text-fyn-ink font-serif text-xl mb-6">What happens if I extend credit to {creditDays} days?</h3>
+                <h3 className="text-fyn-ink text-xl mb-6 font-sans">What happens if I extend credit to {creditDays} days?</h3>
                 <div className="space-y-6">
                   <div>
                     <label className="text-fyn-ink/60 text-xs fyn-label block mb-2">Current credit days: 30</label>
@@ -120,7 +120,7 @@ const SimulatorPage = () => {
                   <div>
                     <label className="text-fyn-ink/60 text-xs fyn-label block mb-2">New credit days: {creditDays}</label>
                     <input type="range" min={30} max={120} value={creditDays} onChange={(e) => setCreditDays(Number(e.target.value))} className="w-full accent-[#C41E1E]" />
-                    <p className="text-fyn-gold text-[11px] mt-1">From your data · Updated 12 min ago</p>
+                    <p className="text-[11px] mt-1 text-[#754a00]">From your data · Updated 12 min ago</p>
                   </div>
                   <div>
                     <label className="text-fyn-ink/60 text-xs fyn-label block mb-1">Monthly revenue</label>
