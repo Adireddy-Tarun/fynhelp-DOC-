@@ -87,7 +87,7 @@ const AuditReadinessPage = () => {
       {/* READINESS SCORE */}
       <div className="bg-fyn-ink rounded-xl p-8 mb-6 text-center">
         <p className="text-white/40 text-xs fyn-label mb-2">AUDIT READINESS SCORE</p>
-        <p className="text-[#8B5A00] text-[72px] font-serif font-bold leading-none">67</p>
+        <p className="text-[72px] font-bold leading-none text-accent font-sans">67</p>
         <p className="text-white/40 text-base">/100 — Moderate Risk</p>
         <p className="text-white/50 text-sm mt-2">If a GST officer walked in today, these are the 5 things you'd need to explain.</p>
         <button className="mt-4 text-fyn-red text-sm font-medium hover:underline">Improve your score →</button>
@@ -95,11 +95,11 @@ const AuditReadinessPage = () => {
 
       {/* READINESS BY AREA */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Readiness by Area</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Readiness by Area</h3>
         <div className="space-y-3">
           {areas.map((a) => (
             <div key={a.area} className="flex items-center gap-4">
-              <span className="text-fyn-ink text-sm w-40">{a.area}</span>
+              <span className="text-sm w-40 font-sans text-secondary-foreground">{a.area}</span>
               <div className="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden">
                 <div className="h-3 rounded-full transition-all" style={{ width: `${a.score}%`, background: barColors[a.status] }} />
               </div>
@@ -111,7 +111,7 @@ const AuditReadinessPage = () => {
 
       {/* WHAT AUDITORS CHECK */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">What Auditors Check</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">What Auditors Check</h3>
         <div className="space-y-2">
           {checkSections.map((s) => (
             <div key={s.title} className="border border-fyn-ink-10 rounded-lg overflow-hidden">
@@ -121,7 +121,7 @@ const AuditReadinessPage = () => {
               >
                 <div className="flex items-center gap-3">
                   <span className={`text-[10px] px-2 py-0.5 rounded ${priorityColors[s.priority]}`}>{s.priority}</span>
-                  <span className="text-fyn-ink font-medium text-sm">{s.title}</span>
+                  <span className="text-fyn-ink font-medium text-sm font-sans">{s.title}</span>
                 </div>
                 <span className="text-fyn-ink/30">{expandedSection === s.title ? "▲" : "▼"}</span>
               </button>
@@ -142,7 +142,7 @@ const AuditReadinessPage = () => {
       {/* DOCUMENT VAULT */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-serif text-lg">Documents Nidhi Recommends You Keep Ready</h3>
+          <h3 className="text-fyn-ink text-lg font-sans">Documents Nidhi Recommends You Keep Ready</h3>
           <span className="text-fyn-gold text-sm fyn-metric">{doneCount} of {documents.length} ready ({Math.round(doneCount / documents.length * 100)}%)</span>
         </div>
         <div className="space-y-2">
@@ -151,7 +151,7 @@ const AuditReadinessPage = () => {
               <span className={`w-5 h-5 rounded border-2 flex items-center justify-center text-xs ${d.done ? "bg-[#1A6B3C] border-[#1A6B3C] text-white" : "border-fyn-ink/20"}`}>
                 {d.done ? "✓" : ""}
               </span>
-              <span className={`flex-1 text-sm ${d.done ? "text-fyn-ink" : "text-fyn-ink/60"}`}>{d.name}</span>
+              <span className={`flex-1 text-sm font-sans ${d.done ? "text-fyn-ink" : "text-fyn-ink/60"}`}>{d.name}</span>
               {!d.done && <button className="text-fyn-red text-xs font-medium hover:underline">Upload</button>}
               {d.done && <span className="text-[#1A6B3C] text-xs">Uploaded</span>}
             </div>
