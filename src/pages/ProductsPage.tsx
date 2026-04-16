@@ -215,7 +215,7 @@ export default function ProductsPage() {
 
       {/* Sticky filter bar */}
       <div className="sticky top-[72px] z-30 bg-fyn-beige-dark border-b border-fyn-ink-10" style={{ padding: "12px 0" }}>
-        <div className="fyn-container flex flex-wrap items-center gap-2 bg-secondary-foreground text-primary-foreground border-destructive">
+        <div className="fyn-container flex flex-wrap items-center gap-2 text-primary-foreground border-primary-foreground bg-primary-foreground">
           {filterTabs.map((t) => (
             <button
               key={t.id}
@@ -223,7 +223,7 @@ export default function ProductsPage() {
               className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                 activeFilter === t.id
                   ? "bg-fyn-ink text-white border-fyn-ink"
-                  : "text-primary-foreground border-accent"
+                  : "text-primary-foreground border-accent bg-primary"
               }`}
               style={{ transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)" }}
             >
@@ -247,7 +247,7 @@ export default function ProductsPage() {
       {/* Suites */}
       <section className="bg-fyn-beige fyn-section">
         <div className="fyn-container">
-          <p className="text-fyn-ink/40 text-sm mb-8">{totalModules} modules across {suites.length} intelligence suites</p>
+          <p className="mb-8 text-base font-semibold font-sans text-secondary-foreground">{totalModules} modules across {suites.length} intelligence suites</p>
 
           {filteredSuites.map((s) => (
             <div key={s.id} className="mb-12 bg-fyn-beige-card border border-fyn-ink-10 rounded-lg overflow-hidden">
@@ -255,7 +255,7 @@ export default function ProductsPage() {
               <div className="flex items-center gap-3 p-6 border-b border-fyn-ink-10" style={{ borderLeft: `6px solid ${s.color}` }}>
                 <div className="w-3 h-3 rounded-full" style={{ background: s.color }} />
                 <h3 className="font-serif text-xl text-fyn-ink">{s.name}</h3>
-                <span className="text-fyn-ink/40 text-sm ml-auto">{s.modules.length} modules</span>
+                <span className="text-sm ml-auto text-secondary-foreground">{s.modules.length} modules</span>
               </div>
               <p className="px-6 pt-4 pb-2 text-fyn-ink/70 text-sm leading-relaxed max-w-3xl">{s.description}</p>
 
