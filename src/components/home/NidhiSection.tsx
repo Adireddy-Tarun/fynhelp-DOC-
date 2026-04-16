@@ -53,7 +53,7 @@ export default function NidhiSection() {
                 <p className="text-white/80 text-sm">What should I do today?</p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/30 text-[10px] mb-1">Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">Nidhi</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   Three actions with highest impact:<br/>
                   1. Chase ABC Electronics (₹8.4L, 62 days) — adds 15 days runway.<br/>
