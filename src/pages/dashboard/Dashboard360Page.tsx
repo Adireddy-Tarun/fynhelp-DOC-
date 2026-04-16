@@ -123,8 +123,8 @@ const Dashboard360Page = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h2 className="text-fyn-ink font-serif" style={{ fontSize: 22 }}>360 Dashboard — Complete Business Health View</h2>
-        <p style={{ color: "rgba(26,16,8,0.50)", fontSize: 14, marginTop: 4 }}>Every metric. Every module. One view. Last updated 12 min ago.</p>
+        <h2 className="text-fyn-ink text-lg font-sans">360 Dashboard — Complete Business Health View</h2>
+        <p className="font-sans" style={{ color: "rgba(26,16,8,0.50)", fontSize: 14, marginTop: 4 }}>Every metric. Every module. One view. Last updated 12 min ago.</p>
         <div className="flex gap-4 mt-3">
           {[
             { src: "Bank AA", status: "Fresh", color: "#16A34A" },
@@ -140,15 +140,15 @@ const Dashboard360Page = () => {
       {/* Health Score */}
       <div id="health-score" className="rounded-xl p-8 text-center mb-8" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
         <p className="fyn-label" style={{ color: "#8B6914", fontSize: 12, marginBottom: 8 }}>BUSINESS HEALTH SCORE</p>
-        <p className="font-serif" style={{ color: "#F59E0B", fontSize: 64, fontWeight: 700, lineHeight: 1 }}>74<span style={{ fontSize: 24, color: "rgba(26,16,8,0.30)" }}>/100</span></p>
+        <p className="font-sans text-5xl" style={{ color: "#F59E0B", fontWeight: 700, lineHeight: 1 }}>74<span style={{ fontSize: 24, color: "rgba(26,16,8,0.30)" }}>/100</span></p>
         <div className="grid grid-cols-4 gap-6 max-w-xl mx-auto mt-6">
           {healthScores.map((c) => (
             <div key={c.label}>
-              <p style={{ fontSize: 11, fontWeight: 500, color: "#8B6914", marginBottom: 4 }}>{c.label}</p>
+              <p className="text-base" style={{ fontWeight: 500, color: "#8B6914", marginBottom: 4 }}>{c.label}</p>
               <div style={{ height: 6, background: "#E0D9C8", borderRadius: 3 }}>
                 <div className="progress-fill-animate" style={{ height: 6, background: c.color, borderRadius: 3, width: `${c.score}%` }} />
               </div>
-              <p className="fyn-metric" style={{ color: c.color, fontSize: 12, marginTop: 4, fontWeight: 600 }}>{c.score}/100</p>
+              <p className="fyn-metric text-sm" style={{ color: c.color, marginTop: 4, fontWeight: 600 }}>{c.score}/100</p>
             </div>
           ))}
         </div>
@@ -197,8 +197,8 @@ const Dashboard360Page = () => {
                   onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.10)"; e.currentTarget.style.borderColor = "#C41E1E"; }}
                   onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = t.border; }}
                 >
-                  <p style={{ fontSize: 12, color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>{m.label}</p>
-                  <p className="font-serif" style={{ fontSize: 28, fontWeight: 700, color: t.numColor }}>{m.value}</p>
+                  <p className="text-base" style={{ color: "rgba(26,16,8,0.50)", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>{m.label}</p>
+                  <p className="font-sans text-2xl" style={{ fontWeight: 700, color: t.numColor }}>{m.value}</p>
                   <p style={{ fontSize: 13, marginTop: 4, color: m.positive ? "#16A34A" : "#C41E1E" }}>{m.change}</p>
                   {/* Sparkline */}
                   <div className="absolute bottom-3 right-3" style={{ width: 64, height: 28 }}>

@@ -237,7 +237,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 ← Back to Cockpit
               </button>
             )}
-            <h1 className="text-fyn-ink font-serif text-lg">{pageTitle}</h1>
+            <h1 className="text-lg font-sans text-secondary-foreground">{pageTitle}</h1>
           </div>
 
           <div className="ml-auto flex items-center gap-4">
