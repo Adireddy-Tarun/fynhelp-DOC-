@@ -88,8 +88,8 @@ const ResourcesPage = () => {
   return (
     <Layout>
       <section className="bg-fyn-ink py-16">
-        <div className="fyn-container text-center">
-          <h1 className="text-3xl md:text-[48px] leading-tight text-white mb-4">FynHelp Resource Centre</h1>
+        <div className="fyn-container text-center font-sans">
+          <h1 className="text-3xl leading-tight text-white mb-4 font-serif md:text-7xl font-bold">FynHelp Resource Centre</h1>
           <p className="text-white/60 text-lg">Everything you need to get maximum value from your AI CFO.</p>
         </div>
       </section>
