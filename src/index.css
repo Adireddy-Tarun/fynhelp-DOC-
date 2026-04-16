@@ -9,7 +9,7 @@
     /* Core palette */
     --fyn-ink: 24 53% 7%;
     --fyn-red: 0 73% 44%;
-    --fyn-beige: 40 52% 91%;
+    --fyn-beige: 40 42% 87%;
     --fyn-gold: 38 74% 31%;
 
     /* Ink scale */
@@ -55,24 +55,24 @@
     --chart-5: 300 60% 26%;
 
     /* Shadcn tokens */
-    --background: 40 52% 91%;
+    --background: 40 42% 87%;
     --foreground: 24 53% 7%;
-    --card: 36 50% 96%;
+    --card: 0 0% 100%;
     --card-foreground: 24 53% 7%;
-    --popover: 40 52% 91%;
+    --popover: 40 42% 87%;
     --popover-foreground: 24 53% 7%;
     --primary: 0 73% 44%;
     --primary-foreground: 0 0% 100%;
     --secondary: 40 42% 86%;
     --secondary-foreground: 24 53% 7%;
     --muted: 40 42% 86%;
-    --muted-foreground: 24 53% 7% / 0.6;
+    --muted-foreground: 24 53% 7% / 0.65;
     --accent: 38 74% 31%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 73% 44%;
     --destructive-foreground: 0 0% 100%;
-    --border: 24 53% 7% / 0.08;
-    --input: 24 53% 7% / 0.08;
+    --border: 24 53% 7% / 0.10;
+    --input: 38 30% 55%;
     --ring: 0 73% 44%;
     --radius: 0.5rem;
 
