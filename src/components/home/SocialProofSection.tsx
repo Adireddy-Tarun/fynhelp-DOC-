@@ -47,7 +47,7 @@ export default function SocialProofSection() {
   return (
     <section className="bg-fyn-beige py-20" ref={ref}>
       <div className="fyn-container">
-        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up">What Businesses Say</span>
+        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up text-base">What Businesses Say</span>
         <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-12 reveal-up">
           The numbers speak. So do our customers.
         </h2>

@@ -22,8 +22,8 @@ export default function SuitesSection() {
   return (
     <section className="bg-fyn-beige py-24" ref={ref}>
       <div className="fyn-container">
-        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up">What FynHelp Does</span>
-        <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-3 reveal-up">
+        <span className="fyn-caption text-fyn-gold block mb-4 reveal-up text-base">What FynHelp Does</span>
+        <h2 className="text-3xl md:text-4xl leading-[1.2] text-fyn-ink mb-3 reveal-up font-serif lg:text-base font-bold text-justify">
           10 intelligence suites. 50+ modules. One AI connecting everything.
         </h2>
         <p className="text-fyn-ink/60 text-lg mb-12 max-w-3xl reveal-up" style={{ transitionDelay: "100ms" }}>
@@ -47,7 +47,7 @@ export default function SuitesSection() {
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.dot }} />
                 <span className="text-fyn-ink/50 text-[10px] fyn-caption">{s.modules} modules</span>
               </div>
-              <h3 className="font-display text-lg text-fyn-ink mb-2">{s.name}</h3>
+              <h3 className="text-lg text-fyn-ink mb-2 font-sans">{s.name}</h3>
               <p className="text-fyn-ink/55 text-sm leading-relaxed mb-3">{s.desc}</p>
               <div className="border-t border-fyn-ink/8 pt-3">
                 <Link to="/products" className="text-fyn-red text-sm font-medium hover:underline">Explore modules →</Link>

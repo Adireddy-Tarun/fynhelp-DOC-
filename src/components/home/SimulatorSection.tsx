@@ -29,8 +29,8 @@ export default function SimulatorSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left — Copy */}
           <div className="reveal-left">
-            <span className="fyn-caption text-fyn-gold block mb-4">Decision Simulator</span>
-            <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-6">
+            <span className="fyn-caption text-fyn-gold block mb-4 text-base">Decision Simulator</span>
+            <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-6 font-serif">
               Simulate every business decision before you make it.
             </h2>
             <p className="text-fyn-ink/65 text-lg leading-relaxed mb-8">
@@ -55,7 +55,7 @@ export default function SimulatorSection() {
               ))}
             </div>
 
-            <p className="text-fyn-ink/40 text-sm italic mb-6">
+            <p className="text-sm italic mb-6 text-secondary-foreground">
               These are real scenarios built by our CA team from 500+ SME interviews.
             </p>
             <Link to="/signup" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg hover-btn-primary">
