@@ -49,11 +49,59 @@ const CostPage = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <h3 className="text-fyn-ink text-lg mb-4 font-sans">Spend Breakdown</h3>
-...
+        <div className="flex justify-center">
+          <ResponsiveContainer width={220} height={220}>
+            <PieChart>
+              <Pie data={spendBreakdown} dataKey="value" cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                {spendBreakdown.map((c) => <Cell key={c.name} fill={c.color} />)}
+              </Pie>
+              <Tooltip formatter={(v: number) => [formatINR(v)]} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="mt-3 space-y-1">
+          {spendBreakdown.map((c) => (
+            <div key={c.name} className="flex items-center gap-2 text-sm">
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
+              <span className="flex-1 text-fyn-ink">{c.name}</span>
+              <span className="text-fyn-ink/50">{c.pct}%</span>
+              <span className="fyn-metric font-medium">{formatINR(c.value)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* MARGIN BY SEGMENT */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <h3 className="text-fyn-ink text-lg mb-4 font-sans">Gross Margin by Segment</h3>
-...
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
+                <th className="text-left py-2">Segment</th>
+                <th className="text-right py-2">Revenue</th>
+                <th className="text-right py-2">COGS %</th>
+                <th className="text-right py-2">Margin</th>
+              </tr>
+            </thead>
+            <tbody>
+              {marginBySegment.map((m) => (
+                <tr key={m.segment} className="border-b border-fyn-ink-10 last:border-0">
+                  <td className="py-3 text-fyn-ink font-medium">{m.segment}</td>
+                  <td className="py-3 text-right fyn-metric">{m.revenue}</td>
+                  <td className="py-3 text-right text-fyn-ink/60">{m.cogs}</td>
+                  <td className="py-3 text-right fyn-metric font-semibold text-[#1A6B3C]">{m.margin}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="bg-fyn-gold-light border border-fyn-gold/20 rounded-lg p-3 mt-4">
+          <p className="text-fyn-gold text-sm">💡 You make 17pp more margin on exports than domestic SME sales</p>
+        </div>
+      </div>
+    </div>
+
     {/* COST ANOMALY DETECTION */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 font-sans">
       <h3 className="text-fyn-ink text-lg mb-4 font-sans">Unusual Spending Detected</h3>
