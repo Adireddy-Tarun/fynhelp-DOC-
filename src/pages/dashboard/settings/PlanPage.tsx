@@ -38,7 +38,7 @@ const PlanPage = () => {
           <div className="space-y-2 mb-6">
             {[
               "All 50+ intelligence modules unlocked",
-              "Nidhi AI CFO — full functionality",
+              "Nidhi AI CFO: full functionality",
               "Unlimited bank connections",
               "All 5 Indian languages",
               "Priority support",
@@ -68,7 +68,7 @@ const PlanPage = () => {
       {/* Coming Soon Plans */}
       <div className="mb-8">
         <h3 className="font-serif text-3xl font-bold mb-2" style={{ color: "#1A1008" }}>Paid plans launching soon</h3>
-        <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>When we launch, Early Access members pay 30% less — forever.</p>
+        <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>When we launch, Early Access members pay 30% less. Forever.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map(plan => (

@@ -9,8 +9,8 @@ const AboutPage = () => (
           We're building the financial intelligence layer every Indian SME deserves, but couldn't afford a CFO.
         </h1>
         <div className="space-y-6 text-white/70 text-base leading-relaxed">
-          <p>India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
-          <p>FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
+          <p>India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence: no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
+          <p>FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built Nidhi, an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do. All for ₹1,999 a month.</p>
           <p>We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.</p>
         </div>
       </div>

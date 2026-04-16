@@ -206,7 +206,7 @@ const SolutionsPage = () => {
             One platform. Every financial problem an Indian SME faces. Solved.
           </h1>
           <p className="text-white/60 text-lg max-w-[700px] mx-auto">
-            FynHelp's intelligence suites are deeply interconnected — when Nidhi spots a cash crunch, she simultaneously checks your receivables for quick wins, your GST for refunds due, your payables for deferral options, and your working capital marketplace for financing.
+            FynHelp's intelligence suites are deeply interconnected. When Nidhi spots a cash crunch she simultaneously checks your receivables for quick wins, your GST for refunds due, your payables for deferral options, and your working capital marketplace for financing.
           </p>
         </div>
       </section>
@@ -218,7 +218,7 @@ const SolutionsPage = () => {
           <p className="text-fyn-ink/60 text-sm mb-12">Hover over any node to learn more. Click to explore the module.</p>
           <EcosystemMap />
           <p className="text-fyn-ink/60 text-base mt-8 max-w-lg mx-auto">
-            Every module feeds Nidhi. Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
+            Every module feeds Nidhi. Nidhi connects everything. You get one coherent answer, not 6 separate dashboards.
           </p>
         </div>
       </section>
