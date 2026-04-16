@@ -28,11 +28,11 @@ const SignUpPage = () => (
           { label: "GSTIN (optional)", type: "text", placeholder: "Enter for instant GST setup" },
         ].map((f) => (
           <div key={f.label}>
-            <label className="text-fyn-ink/70 text-sm mb-1 block">{f.label}</label>
+            <label className="mb-1 block text-secondary-foreground text-base">{f.label}</label>
             <input
               type={f.type}
               placeholder={f.placeholder}
-              className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-fyn-ink text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red"
+              className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
             />
           </div>
         ))}
@@ -49,7 +49,7 @@ const SignUpPage = () => (
           </div>
         </div>
 
-        <label className="flex items-start gap-2 text-fyn-ink/60 text-xs">
+        <label className="flex items-start gap-2 text-xs text-secondary-foreground">
           <input type="checkbox" className="mt-0.5 accent-[#C41E1E]" />
           I agree to FynHelp's Terms of Service and Privacy Policy. I understand my financial data is encrypted and stored in India.
         </label>
@@ -58,7 +58,7 @@ const SignUpPage = () => (
           Start My 15-Day Free Trial
         </button>
 
-        <p className="text-fyn-ink/50 text-sm text-center">
+        <p className="text-sm text-center text-secondary-foreground">
           Already have an account? <Link to="/signin" className="text-fyn-red hover:underline">Sign in →</Link>
         </p>
       </form>
