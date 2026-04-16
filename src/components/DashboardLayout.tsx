@@ -124,7 +124,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <span className="text-[13px] font-semibold text-white truncate">{profile?.full_name || "Business Owner"}</span>
           </div>
           <div className="flex items-center justify-between mt-1">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-[0.10em]"
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-[0.10em] text-primary-foreground"
               style={{ background: "rgba(139,105,20,0.20)", border: "1px solid rgba(139,105,20,0.40)", color: "#8B6914" }}>
               ★ EARLY ACCESS
             </span>
@@ -170,7 +170,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                     aria-label={item.label}
                   >
                     <Icon size={16} className="flex-shrink-0" />
-                    <span className="whitespace-nowrap">{item.label}</span>
+                    <span className="whitespace-nowrap text-primary-foreground font-sans font-light">{item.label}</span>
                     {item.badge && (
                       <span className="ml-auto text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0" style={{ background: "#C41E1E" }}>{item.badge}</span>
                     )}

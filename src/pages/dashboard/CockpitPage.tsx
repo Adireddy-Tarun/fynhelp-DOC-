@@ -131,7 +131,7 @@ const CockpitPage = () => {
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E" }}>N</div>
           <div>
             <p className="text-white font-serif text-lg">Good morning. Here's your business today.</p>
-            <p style={{ color: "#8B6914", fontSize: 13 }}>Last brief: Today 8:03 AM</p>
+            <p className="text-primary-foreground" style={{ color: "#8B6914", fontSize: 13 }}>Last brief: Today 8:03 AM</p>
           </div>
         </div>
         <Link to="/dashboard/nidhi" className="text-white text-[14px] font-medium px-4 py-2 rounded-lg hover-btn-primary" style={{ background: "#C41E1E" }}>
@@ -158,7 +158,7 @@ const CockpitPage = () => {
                 <p style={{ color: s.titleColor, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{a.title}</p>
                 {a.severity === "critical" && <span className="w-2.5 h-2.5 rounded-full pulse-ring flex-shrink-0 mt-1" style={{ background: "#C41E1E" }} />}
               </div>
-              <p style={{ color: "#1A1008", fontSize: 13, marginBottom: 8, opacity: 0.8 }}>{a.body}</p>
+              <p className="text-secondary-foreground" style={{ color: "#1A1008", fontSize: 13, marginBottom: 8, opacity: 0.8 }}>{a.body}</p>
               <Link to={a.action_url || "#"} style={{ color: s.ctaColor, fontSize: 13, fontWeight: 500, textDecoration: "underline" }}>
                 {a.severity === "critical" ? "Fix Now →" : a.severity === "warning" ? "Chase Now →" : "Review →"}
               </Link>
@@ -175,7 +175,7 @@ const CockpitPage = () => {
           onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
         >
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>CASH IN BANK TODAY</p>
-          <p className="font-serif" style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.cashBalance)}</p>
+          <p className="text-primary-foreground text-5xl font-sans" style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.cashBalance)}</p>
           <p style={{ color: "#4ADE80", fontSize: 12, marginTop: 4 }}>↑ ₹40K from yesterday</p>
         </div>
 
@@ -185,8 +185,8 @@ const CockpitPage = () => {
           onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
         >
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>RUNWAY</p>
-          <p className="font-serif" style={{ color: "#FCD34D", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{metrics.runway} days</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>At {formatINR(metrics.dailyBurn)} daily burn</p>
+          <p className="text-primary-foreground font-sans text-5xl" style={{ color: "#FCD34D", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{metrics.runway} days</p>
+          <p className="text-primary-foreground" style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>At {formatINR(metrics.dailyBurn)} daily burn</p>
           <div style={{ marginTop: 8, height: 4, background: "rgba(255,255,255,0.10)", borderRadius: 2 }}>
             <div className="progress-fill-animate" style={{ height: 4, background: "#FCD34D", borderRadius: 2, width: `${(metrics.runway / 180) * 100}%` }} />
           </div>
@@ -198,8 +198,8 @@ const CockpitPage = () => {
           onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
         >
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>RECEIVABLES OVERDUE</p>
-          <p className="font-serif" style={{ color: "#F87171", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.receivablesOverdue)}</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>4 customers · Avg 48 days</p>
+          <p className="text-5xl font-sans font-medium text-primary-foreground" style={{ color: "#F87171", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.receivablesOverdue)}</p>
+          <p className="text-primary-foreground" style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>4 customers · Avg 48 days</p>
           <p style={{ color: "rgba(255,255,255,0.40)", fontSize: 11, marginTop: 2 }}>← Oldest: 62 days</p>
         </div>
 
@@ -209,7 +209,7 @@ const CockpitPage = () => {
           onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
         >
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>DUE THIS WEEK</p>
-          <p className="font-serif" style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.dueThisWeek)}</p>
+          <p className="text-5xl font-sans font-medium text-primary-foreground" style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(metrics.dueThisWeek)}</p>
           <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>3 vendors · 1 TDS payment</p>
           <p style={{ color: "#FCD34D", fontSize: 11, marginTop: 2 }}>Next: Raj Textiles ₹3.4L · Thu</p>
         </div>
@@ -222,10 +222,10 @@ const CockpitPage = () => {
           {/* Cash flow chart */}
           <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Cash Flow — Last 90 Days</h3>
+              <h3 className="text-fyn-ink font-serif text-2xl" style={{ fontSize: 15 }}>Cash Flow — Last 90 Days</h3>
               <div className="flex gap-1">
                 {["30D", "90D", "6M", "1Y"].map((p) => (
-                  <button key={p} className="transition-colors" style={{
+                  <button key={p} className="transition-colors text-secondary-foreground mx-[5px]" style={{
                     fontSize: 13, padding: "4px 10px", borderRadius: 4,
                     background: p === "90D" ? "#C41E1E" : "transparent",
                     color: p === "90D" ? "#FFFFFF" : "rgba(26,16,8,0.40)",
@@ -234,7 +234,7 @@ const CockpitPage = () => {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={280}>
-              <AreaChart data={cashFlowData}>
+              <AreaChart data={cashFlowData} className="recharts-surface text-secondary-foreground">
                 <defs>
                   <linearGradient id="ckGreen" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#16A34A" stopOpacity={0.15} />
@@ -334,7 +334,7 @@ const CockpitPage = () => {
                 })()}
               </svg>
             </div>
-            <p className="font-serif" style={{ color: "#F59E0B", fontSize: 56, fontWeight: 700, lineHeight: 1 }}>{metrics.runway}</p>
+            <p className="text-primary-foreground text-5xl font-sans" style={{ color: "#F59E0B", fontSize: 56, fontWeight: 700, lineHeight: 1 }}>{metrics.runway}</p>
             <p style={{ color: "rgba(26,16,8,0.50)", fontSize: 14, marginTop: 4 }}>days of runway</p>
             <p style={{ color: "#8B6914", fontSize: 12, marginTop: 2 }}>At ₹23,846 daily burn</p>
             <div className="flex justify-center gap-4 mt-4" style={{ fontSize: 11 }}>
@@ -362,10 +362,10 @@ const CockpitPage = () => {
                   <p className="text-white" style={{ fontSize: 14, fontWeight: 600 }}>Nidhi's read on today</p>
                 </div>
               </div>
-              <p style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>Online · 8:03 AM</p>
+              <p className="text-destructive-foreground" style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>Online · 8:03 AM</p>
             </div>
             <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, lineHeight: 1.75, marginTop: 12 }}>
-              {brief?.content || "Your runway dropped 8 days this week — mainly due to a ₹4.2L vendor payment on Monday. ABC Electronics is your biggest lever: collecting their ₹8.4L overdue adds 15 days instantly. I'd prioritize that call this morning."}
+              {brief?.content || "Your runway dropped 8 days this week mainly due to a ₹4.2L vendor payment on Monday. ABC Electronics is your biggest lever: collecting their ₹8.4L overdue adds 15 days instantly. I'd prioritize that call this morning."}
             </p>
             <div className="flex gap-2 mt-[14px]">
               <input
