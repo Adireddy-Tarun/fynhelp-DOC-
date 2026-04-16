@@ -37,27 +37,27 @@ const ReceivablesPage = () => {
       {/* TOP METRICS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <p className="text-white/40 text-[13px] fyn-label">TOTAL OUTSTANDING</p>
-          <p className="text-white text-[28px] font-serif font-bold mt-1">₹22.1L</p>
+          <p className="text-[13px] fyn-label text-primary-foreground">TOTAL OUTSTANDING</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">₹22.1L</p>
         </div>
         <div className="bg-[#C41E1E] rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <p className="text-white/60 text-[13px] fyn-label">OVERDUE TODAY</p>
-          <p className="text-white text-[28px] font-serif font-bold mt-1">₹14.4L</p>
+          <p className="text-[13px] fyn-label text-primary-foreground">OVERDUE TODAY</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">₹14.4L</p>
         </div>
         <div className="bg-[#1A6B3C] rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <p className="text-white/60 text-[13px] fyn-label">COLLECTED MTD</p>
-          <p className="text-white text-[28px] font-serif font-bold mt-1">₹11.2L</p>
+          <p className="text-[13px] fyn-label text-primary-foreground">COLLECTED MTD</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">₹11.2L</p>
         </div>
         <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          <p className="text-fyn-ink/50 text-[13px] fyn-label">DSO</p>
-          <p className="text-fyn-ink text-[28px] font-serif font-bold mt-1">42 days</p>
+          <p className="text-[13px] fyn-label text-secondary-foreground">DSO</p>
+          <p className="text-fyn-ink text-[28px] font-bold mt-1 font-sans">42 days</p>
           <p className="text-[#8B5A00] text-xs mt-1">Industry avg 30 days — you are 12 days slower</p>
         </div>
       </div>
 
       {/* AGING FUNNEL */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-        <h3 className="text-fyn-ink font-serif text-lg mb-3">Aging Breakdown</h3>
+        <h3 className="font-serif text-lg mb-3 text-secondary-foreground">Aging Breakdown</h3>
         <div className="flex h-8 rounded-lg overflow-hidden mb-3 cursor-pointer">
           {agingBuckets.map((b) => (
             <div
@@ -87,7 +87,7 @@ const ReceivablesPage = () => {
       <div className="flex items-center justify-between mb-4 p-3 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg">
         <p className="text-fyn-ink text-sm">4 customers overdue → Total ₹14.4L</p>
         <div className="flex gap-2">
-          <button className="bg-[#25D366] text-white text-xs px-3 py-1.5 rounded flex items-center gap-1 hover:opacity-90">📱 WhatsApp all overdue</button>
+          <button className="text-white text-xs px-3 py-1.5 rounded flex items-center gap-1 hover:opacity-90 bg-secondary-foreground">📱WhatsApp all overdue</button>
           <button className="bg-[#1A4A8B] text-white text-xs px-3 py-1.5 rounded flex items-center gap-1 hover:opacity-90">✉ Email all overdue</button>
         </div>
       </div>
@@ -95,29 +95,29 @@ const ReceivablesPage = () => {
       {/* MSME RIGHTS BANNER */}
       <div className="bg-[#FEF3E2] border border-[#8B5A00] rounded-lg p-4 mb-6">
         <p className="text-fyn-ink text-sm font-medium">⚖ Section 43B(h) Rights: Large corporate buyers must pay within 45 days.</p>
-        <p className="text-fyn-ink/60 text-xs mt-1">2 of your invoices may qualify for legal protection. <button className="text-[#8B5A00] font-medium hover:underline">Send legal notice →</button></p>
+        <p className="text-xs mt-1 text-secondary-foreground">2 of your invoices may qualify for legal protection. <button className="text-[#8B5A00] font-medium hover:underline">Send legal notice →</button></p>
       </div>
 
       {/* RECEIVABLES TABLE */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink font-serif text-lg">All Receivables</h3>
-          <button className="text-fyn-ink/50 text-xs border border-fyn-ink-10 px-3 py-1.5 rounded hover:bg-fyn-ink/5 transition-colors">Export to Excel</button>
+          <button className="text-xs border border-fyn-ink-10 px-3 py-1.5 rounded hover:bg-fyn-ink/5 transition-colors text-secondary-foreground">Export to Excel</button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
                 <th className="text-left py-2"><input type="checkbox" aria-label="Select all" /></th>
-                <th className="text-left py-2">Customer</th>
-                <th className="text-left py-2">Invoice</th>
-                <th className="text-left py-2">Due Date</th>
-                <th className="text-right py-2">Amount</th>
-                <th className="text-right py-2">Outstanding</th>
-                <th className="text-right py-2">Days Overdue</th>
-                <th className="text-right py-2">Risk</th>
-                <th className="text-right py-2">Last Chase</th>
-                <th className="text-right py-2">Actions</th>
+                <th className="text-left py-2 text-secondary-foreground">Customer</th>
+                <th className="text-left py-2 text-secondary-foreground">Invoice</th>
+                <th className="text-left py-2 text-secondary-foreground">Due Date</th>
+                <th className="text-right py-2 text-secondary-foreground">Amount</th>
+                <th className="text-right py-2 text-secondary-foreground">Outstanding</th>
+                <th className="text-right py-2 text-secondary-foreground">Days Overdue</th>
+                <th className="text-right py-2 text-secondary-foreground">Risk</th>
+                <th className="text-right py-2 text-secondary-foreground">Last Chase</th>
+                <th className="text-right py-2 text-secondary-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
