@@ -33,30 +33,30 @@ const VendorsPage = () => (
     {/* TOP KPIs */}
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-        <p className="text-white/40 text-[13px] fyn-label">TOTAL VENDORS</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">24</p>
-        <p className="text-white/40 text-xs">active</p>
+        <p className="text-white/40 text-[13px] fyn-label font-sans">TOTAL VENDORS</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">24</p>
+        <p className="text-white/40 font-sans text-sm">active</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-        <p className="text-white/40 text-[13px] fyn-label">TOTAL PAYABLES</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹8.7L</p>
+        <p className="text-white/40 text-[13px] fyn-label font-sans">TOTAL PAYABLES</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹8.7L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-        <p className="text-white/40 text-[13px] fyn-label">AVG DPO</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">28 days</p>
-        <p className="text-[#1A6B3C] text-xs mt-1">Industry avg 35 — you pay fast</p>
+        <p className="text-white/40 text-[13px] fyn-label font-sans">AVG DPO</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">28 days</p>
+        <p className="text-[#1A6B3C] mt-1 text-sm">Industry avg 35 — you pay fast</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
-        <p className="text-white/40 text-[13px] fyn-label">AT-RISK VENDORS</p>
-        <p className="text-[#8B5A00] text-[28px] font-serif font-bold mt-1">3</p>
-        <p className="text-[#8B5A00] text-xs mt-1">GST non-compliant</p>
+        <p className="text-white/40 text-[13px] fyn-label font-sans">AT-RISK VENDORS</p>
+        <p className="text-[#8B5A00] text-[28px] font-bold mt-1 font-sans">3</p>
+        <p className="text-[#8B5A00] mt-1 text-sm">GST non-compliant</p>
       </div>
     </div>
 
     {/* VENDOR SPEND CHART */}
     <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-      <h3 className="text-fyn-ink font-serif text-lg mb-4">Top Vendors by Spend (3 months)</h3>
-      <ResponsiveContainer width="100%" height={250}>
+      <h3 className="text-fyn-ink text-lg mb-4 font-sans">Top Vendors by Spend (3 months)</h3>
+      <ResponsiveContainer width="100%" height={250} className="font-sans text-sm">
         <BarChart data={topVendors} layout="vertical" margin={{ left: 100 }}>
           <XAxis type="number" tickFormatter={(v) => formatINR(v)} tick={{ fontSize: 10 }} />
           <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={90} />
