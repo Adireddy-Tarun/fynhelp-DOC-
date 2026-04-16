@@ -207,39 +207,39 @@ const PricingPage = () => {
               const features = planFeatures[p.name];
               const isDark = p.featured;
               return (
-                <div key={p.name} className={`rounded-lg p-6 flex flex-col ${isDark ? "bg-fyn-ink ring-2 ring-fyn-red text-white relative" : "bg-fyn-beige-dark border border-fyn-ink-10"}`}>
+                <div key={p.name} className={`rounded-lg p-6 flex-col flex items-start justify-start text-left ${isDark ? "bg-fyn-ink ring-2 ring-fyn-red text-white relative" : "bg-fyn-beige-dark border border-fyn-ink-10"}`}>
                   {p.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-fyn-red text-white text-xs px-3 py-0.5 rounded-full fyn-label">MOST POPULAR</span>}
                   <h3 className="font-serif text-xl mb-1">{p.name}</h3>
                   <p className="fyn-metric text-2xl font-bold text-primary">{p.price}{p.price !== "Custom" && <span className="text-sm text-primary font-bold font-sans opacity-100">/month</span>}</p>
                   {p.annual && <p className="opacity-50 text-xs mb-3">{p.annual} — save 17%</p>}
                   <p className="opacity-60 text-sm mb-4">{p.desc}</p>
                   {p.name === "Enterprise" && <p className="opacity-40 text-xs mb-4">Starting from ₹2,50,000/month for CA firms managing 50+ clients</p>}
-                  <Link to="/signup" className={`block text-center py-3 rounded-lg font-medium mb-4 ${p.name === "Enterprise" ? "border-[1.5px] border-current" : "bg-fyn-red text-white hover:opacity-90"}`}>
+                  <Link to="/signup" className={`block text-center py-3 font-medium mb-4 ${p.name === "Enterprise" ? "border-[1.5px] border-current rounded-none px-[10px]" : "bg-fyn-red text-white hover:opacity-90 rounded-lg"}`}>
                     {p.name === "Enterprise" ? "Talk to Sales" : "Start Free Trial"}
                   </Link>
 
                   {/* Feature list */}
-                  <div style={{ borderTop: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(26,16,8,0.10)", paddingTop: 16, marginTop: "auto" }}>
+                  <div className="py-[12px]" style={{ borderTop: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(26,16,8,0.10)", paddingTop: 16, marginTop: "auto" }}>
                     {features.prefix && (
-                      <p className="fyn-caption text-fyn-gold text-[11px] mb-3">{features.prefix}</p>
+                      <p className="fyn-caption text-fyn-gold mb-3 font-sans font-bold text-sm">{features.prefix}</p>
                     )}
                     {!features.prefix && (
-                      <p className="fyn-caption text-fyn-gold text-[11px] mb-3">What's included</p>
+                      <p className="fyn-caption text-fyn-gold mb-3 text-sm font-sans">What's included</p>
                     )}
                     <ul className="space-y-2">
                       {features.included.map((f) => (
-                        <li key={f} className="flex gap-2 items-start" style={{ minHeight: 16 }}>
+                        <li key={f} className="flex gap-2 items-start text-accent opacity-100 text-base font-sans font-extrabold" style={{ minHeight: 16 }}>
                           <span className="text-fyn-success text-sm flex-shrink-0 mt-0.5">✓</span>
-                          <span className={`text-[13px] leading-snug ${isDark ? "text-white/80 font-medium" : "text-fyn-ink/80"}`}>{f}</span>
+                          <span className={`text-[13px] leading-snug ${isDark ? "font-medium opacity-100 text-primary" : "text-fyn-ink/80"}`}>{f}</span>
                         </li>
                       ))}
                     </ul>
                     {features.excluded && (
                       <ul className="space-y-2 mt-3 pt-3" style={{ borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(26,16,8,0.06)" }}>
                         {features.excluded.map((f) => (
-                          <li key={f} className="flex gap-2 items-start" style={{ minHeight: 16 }}>
+                          <li key={f} className="flex gap-2 items-start text-accent opacity-100 text-base font-sans font-extrabold" style={{ minHeight: 16 }}>
                             <span className={`text-sm flex-shrink-0 mt-0.5 ${isDark ? "text-white/30" : "text-fyn-ink/30"}`}>×</span>
-                            <span className={`text-[13px] leading-snug ${isDark ? "text-white/30" : "text-fyn-ink/30"}`}>{f}</span>
+                            <span className={`text-[13px] leading-snug ${isDark ? "font-medium opacity-100 text-primary" : "text-fyn-ink/30"}`}>{f}</span>
                           </li>
                         ))}
                       </ul>
