@@ -29,26 +29,26 @@ const CostPage = () => (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">TOTAL SPEND MTD</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹14.2L</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹14.2L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">GROSS MARGIN</p>
-        <p className="text-[#1A6B3C] text-[28px] font-serif font-bold mt-1">34%</p>
+        <p className="text-[#1A6B3C] text-[28px] font-bold mt-1 font-sans">34%</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">COGS</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹12.1L</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹12.1L</p>
       </div>
       <div className="bg-fyn-ink rounded-lg p-5 hover:-translate-y-0.5 hover:shadow-lg transition-all">
         <p className="text-white/40 text-[13px] fyn-label">COST PER UNIT</p>
-        <p className="text-white text-[28px] font-serif font-bold mt-1">₹842</p>
+        <p className="text-white text-[28px] font-bold mt-1 font-sans">₹842</p>
       </div>
     </div>
 
     {/* SPEND BREAKDOWN */}
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Spend Breakdown</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Spend Breakdown</h3>
         <div className="flex justify-center">
           <ResponsiveContainer width={220} height={220}>
             <PieChart>
@@ -73,7 +73,7 @@ const CostPage = () => (
 
       {/* MARGIN BY SEGMENT */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-        <h3 className="text-fyn-ink font-serif text-lg mb-4">Gross Margin by Segment</h3>
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Gross Margin by Segment</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -103,12 +103,12 @@ const CostPage = () => (
     </div>
 
     {/* COST ANOMALY DETECTION */}
-    <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-      <h3 className="text-fyn-ink font-serif text-lg mb-4">Unusual Spending Detected</h3>
+    <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 font-sans">
+      <h3 className="text-fyn-ink text-lg mb-4 font-sans">Unusual Spending Detected</h3>
       <div className="space-y-3">
         {anomalies.map((a, i) => (
           <div key={i} className="border-l-4 border-l-[#8B5A00] bg-fyn-beige rounded-lg p-4 hover:-translate-y-0.5 hover:shadow-md transition-all">
-            <p className="text-fyn-ink text-sm font-medium">{a.desc}</p>
+            <p className="text-fyn-ink font-medium font-sans text-base">{a.desc}</p>
             <div className="flex items-center gap-3 mt-2">
               <span className="fyn-metric text-sm font-semibold text-[#C41E1E]">{formatINR(a.amount)}</span>
               <button className="text-fyn-red text-xs font-medium hover:underline">Review transaction →</button>
