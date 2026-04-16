@@ -75,7 +75,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         {/* LEFT — Software Selection */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3" style={{ color: "hsl(var(--fyn-gold))" }}>
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3 text-secondary-foreground">
             Your accounting software
           </p>
 
@@ -88,7 +88,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
                 <div key={sw.id}>
                   <button
                     onClick={() => toggle(sw.id)}
-                    className="w-full h-[72px] flex items-center gap-3 px-4 rounded-lg border-[1.5px] text-left transition-all duration-200"
+                    className="w-full h-[72px] flex items-center gap-3 px-4 rounded-lg border-[1.5px] text-left transition-all duration-200 text-secondary-foreground"
                     style={{
                       borderColor: selected ? "#C41E1E" : "hsl(var(--fyn-ink) / 0.10)",
                       background: selected ? "#FDF2F1" : "#FFFFFF",
@@ -103,7 +103,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold" style={{ color: "hsl(var(--fyn-ink))" }}>{sw.name}</p>
-                      <p className="text-xs" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>{sw.sub}</p>
+                      <p className="text-xs text-secondary-foreground">{sw.sub}</p>
                     </div>
                     {sw.badge && (
                       <span
@@ -160,7 +160,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium" style={{ color: "hsl(var(--fyn-ink))" }}>Skip for now</p>
-                <p className="text-xs" style={{ color: "hsl(var(--fyn-ink) / 0.40)" }}>You can connect anytime from Settings</p>
+                <p className="text-xs text-secondary-foreground">You can connect anytime from Settings</p>
               </div>
             </button>
           </div>
@@ -169,7 +169,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
         {/* RIGHT — Sync status panel */}
         <div className="lg:sticky lg:top-32 self-start">
           <h3 className="text-[15px] font-semibold mb-1" style={{ color: "hsl(var(--fyn-ink))" }}>Syncing from</h3>
-          <p className="text-xs mb-4" style={{ color: "hsl(var(--fyn-gold))" }}>
+          <p className="text-xs mb-4 text-accent">
             {selectedSoftware.length} source{selectedSoftware.length !== 1 ? "s" : ""} connected
           </p>
 
@@ -181,7 +181,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
                 <line x1="14" y1="26" x2="28" y2="26" stroke="hsl(var(--fyn-ink) / 0.15)" strokeWidth="1.5" />
                 <line x1="14" y1="30" x2="22" y2="30" stroke="hsl(var(--fyn-ink) / 0.15)" strokeWidth="1.5" />
               </svg>
-              <p className="text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.40)" }}>
+              <p className="text-sm text-secondary-foreground">
                 Select your accounting software to begin.
               </p>
             </div>
@@ -231,7 +231,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
           ← Back to banks
         </button>
         <div className="flex items-center gap-4">
-          <button onClick={() => { setSkipSelected(true); onContinue(); }} className="text-[13px] hover:underline" style={{ color: "hsl(var(--fyn-ink) / 0.40)" }}>
+          <button onClick={() => { setSkipSelected(true); onContinue(); }} className="text-[13px] hover:underline text-secondary-foreground">
             I'll set this up later →
           </button>
           <button
