@@ -58,10 +58,10 @@ export default function IntegrationsSection() {
                   const featured = typeof item === "object" && "featured" in item && item.featured;
                   return (
                     <div key={i} className="flex items-center gap-2 hover-scale-icon cursor-default">
-                      <span className="text-fyn-ink/60 text-sm font-medium">{name}</span>
+                      <span className="text-fyn-ink/80 text-sm font-medium">{name}</span>
                       {badge && (
                         <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
-                          featured ? "bg-fyn-gold text-white" : "bg-fyn-ink/8 text-fyn-ink/40"
+                          featured ? "bg-fyn-gold text-white" : "bg-fyn-ink/12 text-fyn-ink/60"
                         }`}>{badge}</span>
                       )}
                       {i < row.items.length - 1 && <span className="text-fyn-ink/10 ml-2">|</span>}
@@ -69,7 +69,7 @@ export default function IntegrationsSection() {
                   );
                 })}
               </div>
-              {row.extra && <p className="text-fyn-ink/40 text-xs mt-3 italic">{row.extra}</p>}
+              {row.extra && <p className="text-fyn-ink/60 text-xs mt-3 italic">{row.extra}</p>}
             </div>
           ))}
         </div>

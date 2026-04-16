@@ -24,7 +24,7 @@ export default function NidhiSection() {
               </div>
               <div>
                 <p className="text-white font-display text-2xl">Nidhi</p>
-                <p className="text-fyn-gold fyn-caption text-xs">AI CFO · FynHelp</p>
+                <p className="text-fyn-gold fyn-caption text-xs font-semibold">AI CFO · FynHelp</p>
               </div>
               <div className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full bg-fyn-success/20">
                 <span className="w-2 h-2 rounded-full bg-fyn-success pulse-dot" />
@@ -34,7 +34,7 @@ export default function NidhiSection() {
 
             <div className="space-y-3">
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/30 text-[10px] mb-1">Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">Nidhi</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   Good morning. Your cash runway is 52 days at ₹23,846 daily burn.
                   That's 8 days less than last week — burn accelerated due to Diwali
@@ -42,18 +42,18 @@ export default function NidhiSection() {
                 </p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/30 text-[10px] mb-1">Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">Nidhi</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   ABC Electronics owes ₹8.4L and is 62 days overdue. Collecting this
                   today adds 15 days to your runway. Want me to draft a reminder?
                 </p>
               </div>
               <div className="bg-fyn-red-tint rounded-lg p-4 ml-8">
-                <p className="text-white/30 text-[10px] mb-1">You</p>
+                <p className="text-white/50 text-[10px] mb-1">You</p>
                 <p className="text-white/80 text-sm">What should I do today?</p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/30 text-[10px] mb-1">Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">Nidhi</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   Three actions with highest impact:<br/>
                   1. Chase ABC Electronics (₹8.4L, 62 days) — adds 15 days runway.<br/>
