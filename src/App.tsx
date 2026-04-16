@@ -38,9 +38,10 @@ import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
 import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
 import NotificationsPage from "./pages/dashboard/settings/NotificationsPage.tsx";
-import PlanPage from "./pages/dashboard/settings/PlanPage.tsx";
-import PaymentsPage from "./pages/dashboard/settings/PaymentsPage.tsx";
-import BillingHistoryPage from "./pages/dashboard/settings/BillingHistoryPage.tsx";
+import BillingPage from "./pages/dashboard/settings/BillingPage.tsx";
+import IntegrationsPage from "./pages/dashboard/settings/IntegrationsPage.tsx";
+import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.tsx";
+import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -88,9 +89,10 @@ const App = () => (
               <Route path="profile" element={<ProfilePage />} />
               <Route path="security" element={<SecurityPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
-              <Route path="plan" element={<PlanPage />} />
-              <Route path="payments" element={<PaymentsPage />} />
-              <Route path="billing-history" element={<BillingHistoryPage />} />
+              <Route path="billing" element={<BillingPage />} />
+              <Route path="integrations" element={<IntegrationsPage />} />
+              <Route path="business" element={<BusinessProfilePage />} />
+              <Route path="team" element={<TeamAccessPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

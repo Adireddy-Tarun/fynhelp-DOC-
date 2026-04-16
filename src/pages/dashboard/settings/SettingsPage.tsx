@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import GlobalBackBar from "@/components/GlobalBackBar";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { User, Lock, Bell, Globe, Building2, Users, Plug, Star, CreditCard, Receipt } from "lucide-react";
+import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard } from "lucide-react";
 
 const settingsNav = [
   {
@@ -24,9 +24,7 @@ const settingsNav = [
   {
     title: "BILLING",
     items: [
-      { label: "Plan & Subscription", icon: Star, href: "/dashboard/settings/plan" },
-      { label: "Payment Methods", icon: CreditCard, href: "/dashboard/settings/payments" },
-      { label: "Billing History", icon: Receipt, href: "/dashboard/settings/billing-history" },
+      { label: "Billing", icon: CreditCard, href: "/dashboard/settings/billing" },
     ],
   },
 ];
