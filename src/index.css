@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-variant-numeric: tabular-nums;
+}
+
 @layer base {
   :root {
     /* Core palette */

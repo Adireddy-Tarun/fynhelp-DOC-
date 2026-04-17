@@ -20,7 +20,7 @@ const solutions = [
     title: "Never run out of cash again",
     slug: "cash-liquidity",
     problem: "The #1 cause of SME failure is cash flow management — not profitability. Most business owners only know their bank balance, not their runway.",
-    solution: "Nidhi computes your exact runway every morning from live bank data via RBI's Account Aggregator. She models your next 90 days using invoice due dates, vendor payment schedules, and payroll commitments.",
+    solution: "AI CFO Nidhi computes your exact runway every morning from live bank data via RBI's Account Aggregator. She models your next 90 days using invoice due dates, vendor payment schedules, and payroll commitments.",
     modules: ["Financial Health Score", "Cash Flow Projection", "Burn Acceleration", "Liquidity Alerts"],
     before: "Average time to detect cash crisis: 14 days after it begins",
     after: "Average time to detect cash crisis: 62 days before it begins",
@@ -31,7 +31,7 @@ const solutions = [
     title: "Stop losing money to customers who aren't paying",
     slug: "collections-revenue",
     problem: "The average Indian SME has 42 days of receivables sitting unpaid — working capital locked in invoices, not in your bank.",
-    solution: "Nidhi scores every customer on payment reliability. She automatically drafts WhatsApp payment reminders and enforces your Section 43B(h) rights.",
+    solution: "AI CFO Nidhi scores every customer on payment reliability. She automatically drafts WhatsApp payment reminders and enforces your Section 43B(h) rights.",
     modules: ["Receivables AI", "Default Prediction", "Customer Risk Score", "Collections Automation"],
     before: "Average DSO for Indian SMEs: 42 days",
     after: "FynHelp customers average DSO: 28 days",
@@ -42,7 +42,7 @@ const solutions = [
     title: "Stop fearing GST notices",
     slug: "gst-compliance",
     problem: "Indian SMEs collectively lose thousands of crores in unclaimed ITC every year because their vendors don't file on time.",
-    solution: "On the 14th of every month, Nidhi automatically pulls your ITC data and matches it against every purchase invoice. Mismatches are flagged instantly.",
+    solution: "On the 14th of every month, AI CFO Nidhi automatically pulls your ITC data and matches it against every purchase invoice. Mismatches are flagged instantly.",
     modules: ["ITC Reconciliation", "Notice Risk Scorer", "Smart Filing Calendar", "Vendor GST Health"],
     before: "₹3.2L average annual ITC loss per SME",
     after: "74% of ITC losses prevented with vendor monitoring",
@@ -90,7 +90,7 @@ function EcosystemMap() {
           );
         })}
 
-        {/* Center Nidhi */}
+        {/* Center AI CFO Nidhi */}
         <g
           onMouseEnter={() => setHoveredNode("nidhi")}
           onMouseLeave={() => setHoveredNode(null)}
@@ -98,7 +98,7 @@ function EcosystemMap() {
         >
           <circle cx="200" cy="200" r="40" fill="#C41E1E"
             style={{ transform: hoveredNode === "nidhi" ? "scale(1.1)" : "scale(1)", transformOrigin: "200px 200px", transition: "transform 300ms" }} />
-          <text x="200" y="205" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" style={{ pointerEvents: "none" }}>Nidhi</text>
+          <text x="200" y="205" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" style={{ pointerEvents: "none" }}>AI CFO Nidhi</text>
         </g>
 
         {/* Satellite nodes */}
@@ -173,7 +173,7 @@ function EcosystemMap() {
           style={{ left: "50%", top: "28%", transform: "translate(-50%, -100%)", animation: "fade-in 200ms ease-out", zIndex: 20 }}
         >
           <div style={{ background: "hsl(24 53% 7%)", borderRadius: 8, padding: "12px 16px", maxWidth: 240, boxShadow: "0 8px 32px rgba(26,16,8,0.25)" }}>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, color: "#FFFFFF", marginBottom: 4 }}>Nidhi AI CFO</p>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, color: "#FFFFFF", marginBottom: 4 }}>AI CFO Nidhi AI CFO</p>
             <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>
               Connects all modules and synthesises them into one coherent recommendation for your business.
             </p>
@@ -206,7 +206,7 @@ const SolutionsPage = () => {
             One platform. Every financial problem an Indian SME faces. Solved.
           </h1>
           <p className="text-white/60 text-lg max-w-[700px] mx-auto">
-            FynHelp's intelligence suites are deeply interconnected — when Nidhi spots a cash crunch, she simultaneously checks your receivables for quick wins, your GST for refunds due, your payables for deferral options, and your working capital marketplace for financing.
+            FynHelp's intelligence suites are deeply interconnected — when AI CFO Nidhi spots a cash crunch, she simultaneously checks your receivables for quick wins, your GST for refunds due, your payables for deferral options, and your working capital marketplace for financing.
           </p>
         </div>
       </section>
@@ -218,7 +218,7 @@ const SolutionsPage = () => {
           <p className="text-fyn-ink/60 text-sm mb-12">Hover over any node to learn more. Click to explore the module.</p>
           <EcosystemMap />
           <p className="text-fyn-ink/60 text-base mt-8 max-w-lg mx-auto">
-            Every module feeds Nidhi. Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
+            Every module feeds AI CFO Nidhi. AI CFO Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
           </p>
         </div>
       </section>

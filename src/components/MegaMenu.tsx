@@ -28,7 +28,7 @@ const megaSuites = [
 ];
 
 const keyFeatures = [
-  { name: "Nidhi AI CFO", desc: "Your AI-powered financial advisor", featured: true, href: "/products" },
+  { name: "AI CFO Nidhi AI CFO", desc: "Your AI-powered financial advisor", featured: true, href: "/products" },
   { name: "Decision Simulator", desc: "Model any business scenario", href: "/products/simulator" },
   { name: "GST Intelligence", desc: "ITC protection and compliance", href: "/products/gst-tax" },
   { name: "CA Partner Program", desc: "White-label for accountants", href: "/products/ca-partner" },
@@ -145,7 +145,7 @@ export default function MegaMenu({ open, onClose }: MegaMenuProps) {
               <span style={{ position: "absolute", top: 8, right: 8, fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 9, color: "#C41E1E", background: "rgba(196,30,30,0.1)", padding: "2px 6px", borderRadius: 3 }}>Featured</span>
               <div className="flex items-center gap-2 mb-1">
                 <div className="rounded-full" style={{ width: 6, height: 6, background: "#C41E1E" }} />
-                <p className="text-sm text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, margin: 0 }}>Nidhi AI CFO</p>
+                <p className="text-sm text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, margin: 0 }}>AI CFO Nidhi AI CFO</p>
               </div>
               <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 11, color: "rgba(255,255,255,0.50)", margin: 0 }}>Your AI-powered financial advisor</p>
             </Link>

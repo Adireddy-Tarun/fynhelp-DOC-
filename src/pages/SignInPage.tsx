@@ -7,7 +7,7 @@ const SignInPage = () => (
     <div className="bg-fyn-ink p-12 flex flex-col justify-center">
       <FynLogo variant="light" />
       <h2 className="text-white font-serif text-3xl mt-8 mb-4">Welcome back.</h2>
-      <p className="text-white/60">Nidhi has been watching your numbers.</p>
+      <p className="text-white/60">AI CFO Nidhi has been watching your numbers.</p>
     </div>
 
     {/* Right */}

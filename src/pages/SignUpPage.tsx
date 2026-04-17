@@ -9,7 +9,7 @@ const SignUpPage = () => (
       <h2 className="text-white font-serif text-3xl mt-8 mb-4">Your 15-day free trial starts now.</h2>
       <p className="text-white/60 mb-8">No credit card. Setup in 10 minutes. Cancel anytime.</p>
       <ul className="space-y-3 text-white/70 text-sm">
-        <li>✓ Nidhi starts monitoring your cash from day one</li>
+        <li>✓ AI CFO Nidhi starts monitoring your cash from day one</li>
         <li>✓ Connect your bank via RBI Account Aggregator — no credentials shared</li>
         <li>✓ Trusted by 10,000+ Indian businesses</li>
       </ul>

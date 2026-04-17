@@ -10,7 +10,7 @@ const AboutPage = () => (
         </h1>
         <div className="space-y-6 text-white/70 text-base leading-relaxed">
           <p className="font-sans text-lg">India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
-          <p className="font-sans text-lg">FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
+          <p className="font-sans text-lg">FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built AI CFO Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
           <p className="font-sans text-lg">We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.</p>
         </div>
       </div>
@@ -89,7 +89,7 @@ const AboutPage = () => (
       <div className="fyn-container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Accuracy above all", desc: "We'd rather say 'I don't know' than give a wrong number. Every metric Nidhi speaks is traceable to its source." },
+            { title: "Accuracy above all", desc: "We'd rather say 'I don't know' than give a wrong number. Every metric AI CFO Nidhi speaks is traceable to its source." },
             { title: "Plain language always", desc: "If a business owner can't understand it, we haven't done our job. No jargon. No complexity for its own sake." },
             { title: "Indian by design", desc: "We built for Tally, for GST, for Diwali seasonality, for Gujarati traders and Tamil manufacturers." },
             { title: "Action, not information", desc: "A good insight has a recommendation attached. We don't build dashboards. We build advisors." },

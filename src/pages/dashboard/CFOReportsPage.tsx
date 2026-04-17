@@ -53,7 +53,7 @@ const CFOReportsPage = () => {
             <div>
               <label className="text-fyn-ink/60 text-xs fyn-label block mb-2">Include sections</label>
               <div className="space-y-1">
-                {["P&L narrative", "Cash flow analysis", "GST compliance status", "Receivables aging", "Workforce metrics", "Nidhi recommendations"].map((s) => (
+                {["P&L narrative", "Cash flow analysis", "GST compliance status", "Receivables aging", "Workforce metrics", "AI CFO Nidhi recommendations"].map((s) => (
                   <label key={s} className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" defaultChecked className="accent-[#C41E1E]" />
                     <span className="text-fyn-ink/70 text-sm">{s}</span>

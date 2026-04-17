@@ -264,7 +264,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
             </button>
           ) : (
             <div className="text-xs max-w-sm" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-              <p className="mb-2">Without bank data, Nidhi's cash insights will be limited. You can connect anytime from Settings → Integrations.</p>
+              <p className="mb-2">Without bank data, AI CFO Nidhi's cash insights will be limited. You can connect anytime from Settings → Integrations.</p>
               <div className="flex gap-3">
                 <button onClick={onSkip} className="text-[13px] font-medium hover:underline" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>Connect later</button>
                 <button onClick={() => setShowSkipWarning(false)} className="text-[13px] font-medium hover:underline" style={{ color: "hsl(var(--fyn-red))" }}>Actually, let me connect now</button>

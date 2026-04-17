@@ -208,7 +208,7 @@ export default function ProductsPage() {
             50+ modules. One AI connecting everything.
           </h1>
           <p className="text-secondary-foreground font-sans" style={{ fontSize: 18, maxWidth: 720, margin: "0 auto", lineHeight: 1.7 }}>
-            FynHelp's intelligence modules are not independent features — they are interconnected systems that feed a single intelligence engine: Nidhi. Every module's output is an input into Nidhi's reasoning.
+            FynHelp's intelligence modules are not independent features — they are interconnected systems that feed a single intelligence engine: AI CFO Nidhi. Every module's output is an input into AI CFO Nidhi's reasoning.
           </p>
         </div>
       </section>
@@ -304,7 +304,7 @@ export default function ProductsPage() {
                       </ul>
                     </div>
                     <p className="text-fyn-ink/80 text-[12px] leading-snug mb-3">
-                      <span className="text-fyn-gold fyn-caption text-[10px]">Nidhi: </span>{m.nidhi}
+                      <span className="text-fyn-gold fyn-caption text-[10px]">AI CFO Nidhi: </span>{m.nidhi}
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {m.sources.map((src) => (

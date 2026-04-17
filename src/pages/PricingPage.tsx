@@ -4,15 +4,15 @@ import { Link } from "react-router-dom";
 
 const faqs = [
   { q: "Is my financial data safe with FynHelp?", a: "Yes. We are ISO 27001 compliant (in progress). All data is encrypted at rest with AES-256 and in transit with TLS 1.3. We store your data on AWS Mumbai servers (ap-south-1) for Indian data residency. We never share your data with third parties without your explicit consent." },
-  { q: "Does FynHelp replace my CA?", a: "No — and we never will. Nidhi organises your data, catches mismatches, prepares your filing drafts, and flags risks — so when your CA sits down, they spend 10 minutes reviewing instead of 3 hours computing." },
-  { q: "How does the 15-day free trial work?", a: "Sign up, connect your bank (2 minutes via Account Aggregator) and tell us your GSTIN. Nidhi starts working immediately. No credit card required. After 15 days, choose the plan that fits." },
+  { q: "Does FynHelp replace my CA?", a: "No — and we never will. AI CFO Nidhi organises your data, catches mismatches, prepares your filing drafts, and flags risks — so when your CA sits down, they spend 10 minutes reviewing instead of 3 hours computing." },
+  { q: "How does the 15-day free trial work?", a: "Sign up, connect your bank (2 minutes via Account Aggregator) and tell us your GSTIN. AI CFO Nidhi starts working immediately. No credit card required. After 15 days, choose the plan that fits." },
   { q: "Which Indian banks are supported?", a: "Via RBI's Account Aggregator: HDFC, ICICI, SBI, Axis, Kotak, Yes Bank, IndusInd, PNB, BOB, Canara, Union Bank, UCO, and 20+ more. For banks not yet on AA, upload PDF bank statements." },
   { q: "Does FynHelp work with Tally?", a: "Yes. FynHelp has a dedicated Tally Prime connector — it installs a lightweight agent and syncs your ledger data every 2 hours. Works with Tally 9, Tally ERP 9, and Tally Prime." },
-  { q: "In which languages does Nidhi speak?", a: "English and Hindi (all plans), Gujarati and Tamil (Growth+), and Marathi (Pro+). More languages are on our roadmap." },
+  { q: "In which languages does AI CFO Nidhi speak?", a: "English and Hindi (all plans), Gujarati and Tamil (Growth+), and Marathi (Pro+). More languages are on our roadmap." },
   { q: "Can multiple people access FynHelp?", a: "Yes. Invite your CA (read-only, free), your accountant (read + data entry), and team members with module-specific access. User management on Growth and above." },
   { q: "What happens to my data if I cancel?", a: "Export all your data in Excel and JSON formats before cancelling. After cancellation, data is retained for 90 days, then permanently deleted." },
   { q: "What happens to my data if there's a billing dispute?", a: "Your data and your account are never held hostage over billing disputes. If there is a billing dispute, your account remains fully active while the dispute is resolved. In the event of cancellation for any reason, you will always have 30 days to export all your data in full before anything is deleted." },
-  { q: "Does FynHelp provide any guarantees on Nidhi's accuracy?", a: "Yes. FynHelp publishes a monthly accuracy report measuring Nidhi against a golden dataset of known-answer questions. Our accuracy target is 95%+. Every Nidhi response includes a data provenance note showing which data sources were used and when they were last updated. We believe in radical transparency about what our AI knows and when it learned it." },
+  { q: "Does FynHelp provide any guarantees on AI CFO Nidhi's accuracy?", a: "Yes. FynHelp publishes a monthly accuracy report measuring AI CFO Nidhi against a golden dataset of known-answer questions. Our accuracy target is 95%+. Every AI CFO Nidhi response includes a data provenance note showing which data sources were used and when they were last updated. We believe in radical transparency about what our AI knows and when it learned it." },
 ];
 
 const planFeatures: Record<string, { included: string[]; excluded?: string[]; prefix?: string }> = {
@@ -22,7 +22,7 @@ const planFeatures: Record<string, { included: string[]; excluded?: string[]; pr
       "Cash flow projection — 30-day forecast with AA bank data",
       "GST filing calendar — your specific deadlines, 14/7/3/0-day alerts",
       "Basic ITC monitoring — up to 100 invoices per month",
-      "Nidhi morning brief — daily 8AM brief in English",
+      "AI CFO Nidhi morning brief — daily 8AM brief in English",
       "1 bank account via Account Aggregator",
       "Bank statement PDF parser — all Indian bank formats",
       "WhatsApp alerts for critical cash thresholds",
@@ -45,7 +45,7 @@ const planFeatures: Record<string, { included: string[]; excluded?: string[]; pr
       "Vendor GST health monitoring — score all your suppliers",
       "HR & Workforce Intelligence — all 10 modules",
       "Decision Simulator — credit terms, hiring, pricing, GST delay scenarios",
-      "Nidhi in Hindi + Gujarati (in addition to English)",
+      "AI CFO Nidhi in Hindi + Gujarati (in addition to English)",
       "WhatsApp daily brief + all alert categories",
       "Account Aggregator — up to 5 bank accounts",
       "Tally Prime ODBC + Zoho Books + QuickBooks India",
@@ -62,7 +62,7 @@ const planFeatures: Record<string, { included: string[]; excluded?: string[]; pr
       "Decision Simulator — all 8 scenarios including M&A and capex",
       "Market & Growth Intelligence — industry benchmarking, credit rating simulator, export opportunity scoring",
       "Banking & Fintech Intelligence — multi-bank aggregation, loan eligibility scoring",
-      "Nidhi in all 5 languages: English, Hindi, Gujarati, Tamil, Marathi",
+      "AI CFO Nidhi in all 5 languages: English, Hindi, Gujarati, Tamil, Marathi",
       "Unlimited bank accounts",
       "All payroll software integrations (Keka, GreytHR, Razorpay Payroll)",
       "CA white-label workspace (your CA manages your account)",
@@ -123,7 +123,7 @@ const PricingPage = () => {
         <div className="fyn-container text-center">
           <span className="fyn-label text-fyn-gold text-[13px] block mb-4">TRANSPARENT PRICING</span>
           <h1 className="text-3xl md:text-[48px] leading-tight text-white mb-4">Simple, fair pricing for every Indian SME.</h1>
-          <p className="text-white/60 text-lg">The cost of a real CFO: ₹30–50L/year. The cost of Nidhi: from ₹1,999/month.</p>
+          <p className="text-white/60 text-lg">The cost of a real CFO: ₹30–50L/year. The cost of AI CFO Nidhi: from ₹1,999/month.</p>
         </div>
       </section>
 
