@@ -1,29 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { COLORS, PageWrap, PageHeader, Card, Chip, PrimaryBtn, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
+import { COLORS, PageWrap, PageHeader, Card, Chip, PrimaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
 import { toast } from "sonner";
-
-const ALL_CLIENTS = [
-  { id: "1", name: "Mehta Textiles", industry: "Textile", turnover: "₹12Cr", health: 38, cash: "Critical", filing: 3, itc: "₹3.2L", report: "Never" },
-  { id: "2", name: "Sharma & Sons", industry: "Trading", turnover: "₹8Cr", health: 42, cash: "Critical", filing: 2, itc: "₹1.8L", report: "12 days ago" },
-  { id: "3", name: "Patel Manufacturing", industry: "Manufacturing", turnover: "₹24Cr", health: 71, cash: "Watch", filing: 5, itc: "₹0.6L", report: "3 days ago" },
-  { id: "4", name: "Delhi Distributors", industry: "Trading", turnover: "₹18Cr", health: 64, cash: "Watch", filing: 2, itc: "₹0.9L", report: "8 days ago" },
-  { id: "5", name: "Anand Trading Co.", industry: "Trading", turnover: "₹6Cr", health: 78, cash: "Safe", filing: 12, itc: "₹0.3L", report: "Yesterday" },
-  { id: "6", name: "Surat Fabrics", industry: "Textile", turnover: "₹15Cr", health: 82, cash: "Safe", filing: 6, itc: "₹0.2L", report: "2 days ago" },
-  { id: "7", name: "Nair Healthcare", industry: "Healthcare", turnover: "₹10Cr", health: 75, cash: "Safe", filing: 4, itc: "₹0.4L", report: "5 days ago" },
-  { id: "8", name: "Iyer Consulting", industry: "IT", turnover: "₹4Cr", health: 88, cash: "Safe", filing: 8, itc: "₹0.1L", report: "Yesterday" },
-];
+import { useCAClients } from "@/hooks/useCAClients";
 
 export default function CAClientsPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>([]);
+  const { clients, loading, error } = useCAClients();
   const toggle = (id: string) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
 
   return (
     <PageWrap>
       <PageHeader
         title="Client Portfolio"
-        sub={`${ALL_CLIENTS.length} active clients`}
+        sub={loading ? "Loading…" : `${clients.length} active client${clients.length === 1 ? "" : "s"}`}
         right={<div className="flex gap-2"><GhostLink>Export</GhostLink><PrimaryBtn size="sm" onClick={() => navigate("/ca/clients/add")}>+ Add client</PrimaryBtn></div>}
       />
 
@@ -46,8 +37,19 @@ export default function CAClientsPage() {
             <th className="py-2">Health</th><th className="py-2">Cash</th><th className="py-2">Next Filing</th><th className="py-2">ITC Risk</th><th className="py-2">Last Report</th><th className="py-2"></th>
           </tr></thead>
           <tbody>
-            {ALL_CLIENTS.map((c) => (
-              <tr key={c.id} className="cursor-pointer hover:bg-[#F8F6F1]" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${c.id}`)}>
+            {loading && (
+              <tr><td colSpan={10} className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.50)" }}>Loading clients…</td></tr>
+            )}
+            {!loading && error && (
+              <tr><td colSpan={10} className="py-8 text-center text-sm" style={{ color: COLORS.red }}>{error}</td></tr>
+            )}
+            {!loading && !error && clients.length === 0 && (
+              <tr><td colSpan={10} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
+                No clients yet. <button onClick={() => navigate("/ca/clients/add")} className="font-medium underline" style={{ color: COLORS.red }}>Add your first client</button>
+              </td></tr>
+            )}
+            {!loading && clients.map((c) => (
+              <tr key={c.id} className="cursor-pointer hover:bg-[#F8F6F1]" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${c.business_id}`)}>
                 <td className="py-3" onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={selected.includes(c.id)} onChange={() => toggle(c.id)} /></td>
                 <td className="py-3 font-medium">{c.name}</td>
                 <td className="py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{c.industry}</td>

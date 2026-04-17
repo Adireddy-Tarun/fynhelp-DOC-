@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCAAuth } from "@/contexts/CAAuthContext";
-import { COLORS, PageWrap, Card, MetricCard, Chip, PrimaryBtn, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
+import { COLORS, PageWrap, Card, MetricCard, Chip, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
+import { useCAClients } from "@/hooks/useCAClients";
 
 const PRIORITY_ACTIONS = [
   { client: "Mehta Textiles", desc: "ITC at risk ₹3.2L. 4 vendor mismatches. GSTR-3B due Apr 20.", time: "12 min ago", severity: "critical", action: "Review ITC →", path: "/ca/itc-recon" },
@@ -29,19 +30,18 @@ const FILINGS = {
   ],
 };
 
-const CLIENTS = [
-  { id: "1", name: "Mehta Textiles", industry: "Textile", turnover: "₹12Cr", health: 38, cash: "Critical", filing: 3, itc: "₹3.2L", report: "Never" },
-  { id: "2", name: "Sharma & Sons", industry: "Trading", turnover: "₹8Cr", health: 42, cash: "Critical", filing: 2, itc: "₹1.8L", report: "12 days ago" },
-  { id: "3", name: "Patel Manufacturing", industry: "Manufacturing", turnover: "₹24Cr", health: 71, cash: "Watch", filing: 5, itc: "₹0.6L", report: "3 days ago" },
-  { id: "4", name: "Delhi Distributors", industry: "Trading", turnover: "₹18Cr", health: 64, cash: "Watch", filing: 2, itc: "₹0.9L", report: "8 days ago" },
-  { id: "5", name: "Anand Trading Co.", industry: "Trading", turnover: "₹6Cr", health: 78, cash: "Safe", filing: 12, itc: "₹0.3L", report: "Yesterday" },
-  { id: "6", name: "Surat Fabrics", industry: "Textile", turnover: "₹15Cr", health: 82, cash: "Safe", filing: 6, itc: "₹0.2L", report: "2 days ago" },
-];
-
 export default function CADashboardPage() {
   const { caFirm } = useCAAuth();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<string>("All");
+  const { clients, loading } = useCAClients();
+
+  const stats = useMemo(() => {
+    const total = clients.length;
+    const attention = clients.filter((c) => c.health < 50 || c.cash === "Critical").length;
+    const filings = clients.filter((c) => c.filing < 7).length;
+    return { total, attention, filings };
+  }, [clients]);
 
   return (
     <>
@@ -50,7 +50,7 @@ export default function CADashboardPage() {
         <div>
           <div className="text-white text-[18px] font-semibold">Good morning, {caFirm?.firm_name || "Partner"}.</div>
           <div className="text-[14px]" style={{ color: "rgba(255,255,255,0.65)" }}>
-            You have <span style={{ color: COLORS.redSoft }} className="font-semibold">8 clients</span> needing attention today and <span style={{ color: COLORS.amberSoft }} className="font-semibold">12 filings</span> due this week.
+            You have <span style={{ color: COLORS.redSoft }} className="font-semibold">{stats.attention} client{stats.attention === 1 ? "" : "s"}</span> needing attention today and <span style={{ color: COLORS.amberSoft }} className="font-semibold">{stats.filings} filing{stats.filings === 1 ? "" : "s"}</span> due this week.
           </div>
         </div>
         <button
@@ -65,10 +65,10 @@ export default function CADashboardPage() {
       <PageWrap>
         {/* Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <MetricCard label="Total Clients" value="47" sub="3 added this month" subColor={COLORS.greenSoft} />
-          <MetricCard label="Needs Attention" value="8" valueColor={COLORS.redSoft} sub="ITC risk, overdue, compliance" onClick={() => navigate("/ca/clients")} />
-          <MetricCard label="Filings This Week" value="12" valueColor={COLORS.amberSoft} sub="3 due tomorrow — priority" onClick={() => navigate("/ca/filing-calendar")} />
-          <MetricCard label="ITC At Risk" value="₹68.4L" valueColor={COLORS.redSoft} sub="14 clients have mismatches" onClick={() => navigate("/ca/itc-recon")} />
+          <MetricCard label="Total Clients" value={loading ? "—" : String(stats.total)} sub={`${stats.total} active in portfolio`} subColor={COLORS.greenSoft} />
+          <MetricCard label="Needs Attention" value={loading ? "—" : String(stats.attention)} valueColor={COLORS.redSoft} sub="Health below 50 or critical cash" onClick={() => navigate("/ca/clients")} />
+          <MetricCard label="Filings This Week" value={loading ? "—" : String(stats.filings)} valueColor={COLORS.amberSoft} sub="Due in next 7 days" onClick={() => navigate("/ca/filing-calendar")} />
+          <MetricCard label="ITC At Risk" value="—" valueColor={COLORS.redSoft} sub="BACKEND: aggregate gst_itc_lines" onClick={() => navigate("/ca/itc-recon")} />
         </div>
 
         {/* Priority + Filing ticker */}
@@ -162,8 +162,16 @@ export default function CADashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {CLIENTS.map((c) => (
-                  <tr key={c.id} className="cursor-pointer hover:bg-[#F8F6F1]" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${c.id}`)}>
+                {loading && (
+                  <tr><td colSpan={10} className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.50)" }}>Loading clients…</td></tr>
+                )}
+                {!loading && clients.length === 0 && (
+                  <tr><td colSpan={10} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
+                    No clients yet. <button onClick={() => navigate("/ca/clients/add")} className="font-medium underline" style={{ color: COLORS.red }}>Add your first client</button>
+                  </td></tr>
+                )}
+                {!loading && clients.map((c) => (
+                  <tr key={c.id} className="cursor-pointer hover:bg-[#F8F6F1]" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${c.business_id}`)}>
                     <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}><input type="checkbox" /></td>
                     <td className="px-2 py-3 font-medium">{c.name}</td>
                     <td className="px-2 py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{c.industry}</td>
@@ -171,7 +179,7 @@ export default function CADashboardPage() {
                     <td className="px-2 py-3"><HealthScoreBadge score={c.health} /></td>
                     <td className="px-2 py-3"><Chip tone={c.cash === "Safe" ? "green" : c.cash === "Watch" ? "amber" : "red"}>{c.cash}</Chip></td>
                     <td className="px-2 py-3 text-[13px] font-medium" style={{ color: c.filing < 3 ? COLORS.red : c.filing < 7 ? COLORS.amber : "rgba(26,16,8,0.60)" }}>{c.filing}d</td>
-                    <td className="px-2 py-3 text-[13px] font-semibold" style={{ color: c.itc.replace(/[^\d.]/g, "") > "1" ? COLORS.red : "rgba(26,16,8,0.65)" }}>{c.itc}</td>
+                    <td className="px-2 py-3 text-[13px] font-semibold">{c.itc}</td>
                     <td className="px-2 py-3 text-[13px]" style={{ color: c.report === "Never" ? COLORS.red : "rgba(26,16,8,0.60)" }}>{c.report}</td>
                     <td className="px-2 py-3 text-right">
                       <span className="text-[12px] font-medium" style={{ color: COLORS.red }}>Open →</span>
