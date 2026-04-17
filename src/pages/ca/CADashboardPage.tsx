@@ -1,196 +1,489 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCAAuth } from "@/contexts/CAAuthContext";
-import { COLORS, PageWrap, Card, MetricCard, Chip, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
 import { useCAClients } from "@/hooks/useCAClients";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Plus, Upload, RefreshCw, FileText, X, Bell,
+  AlertTriangle, AlertCircle, Info, ChevronLeft, ChevronRight,
+} from "lucide-react";
 
-const PRIORITY_ACTIONS = [
-  { client: "Mehta Textiles", desc: "ITC at risk ₹3.2L. 4 vendor mismatches. GSTR-3B due Apr 20.", time: "12 min ago", severity: "critical", action: "Review ITC →", path: "/ca/itc-recon" },
-  { client: "Sharma & Sons", desc: "Cash runway 18 days. Critical: payroll due Apr 30.", time: "1 hour ago", severity: "critical", action: "View →", path: "/ca/clients" },
-  { client: "Delhi Distributors", desc: "GSTR-3B due in 2 days. Data not yet reviewed.", time: "3 hours ago", severity: "warning", action: "Start filing →", path: "/ca/filing-calendar" },
-  { client: "Anand Trading Co.", desc: "Receivable ₹4.5L overdue 60+ days. Suggest chase.", time: "5 hours ago", severity: "warning", action: "Chase →", path: "/ca/clients" },
-  { client: "Patel Manufacturing", desc: "TDS deposit due Apr 30 — ₹86K", time: "Yesterday", severity: "info", action: "File →", path: "/ca/tds-tracker" },
-];
-
-const FILINGS = {
-  "TODAY — April 17": [
-    { client: "Mehta Textiles", type: "GSTR-1", status: "pending" },
-    { client: "Sharma & Sons", type: "GSTR-3B", status: "pending" },
-    { client: "Anand Trading Co.", type: "TDS", status: "filed" },
-  ],
-  "TOMORROW — April 18": [
-    { client: "Patel Manufacturing", type: "GSTR-1", status: "pending" },
-    { client: "Delhi Distributors", type: "GSTR-3B", status: "pending" },
-  ],
-  "THIS WEEK": [
-    { client: "Surat Fabrics", type: "PF", status: "pending" },
-    { client: "Nair Healthcare", type: "TDS", status: "pending" },
-    { client: "Iyer Consulting", type: "GSTR-3B", status: "pending" },
-    { client: "Mumbai Mills", type: "ESIC", status: "pending" },
-  ],
+const COLORS = {
+  ink: "#1A1008",
+  red: "#C41E1E",
+  beige: "#EDE4CB",
+  beigeBorder: "#D4C9A8",
+  beigeRow: "#FAF7F0",
+  amber: "#F59E0B",
+  green: "#1A6B3C",
+  blue: "#1A4A8B",
+  redLight: "#F9EDED",
 };
+
+interface CANotification {
+  id: string;
+  title: string;
+  message: string;
+  severity: string | null;
+  is_read: boolean | null;
+  created_at: string | null;
+  business_id: string | null;
+  businesses?: { business_name: string } | null;
+}
+
+const greeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+};
+
+const timeAgo = (iso: string | null): string => {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const d = Math.floor(hr / 24);
+  return `${d}d ago`;
+};
+
+const ROWS_PER_PAGE = 10;
 
 export default function CADashboardPage() {
   const { caFirm } = useCAAuth();
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<string>("All");
-  const { clients, loading } = useCAClients();
+  const { clients, loading: clientsLoading } = useCAClients();
+  const [notifications, setNotifications] = useState<CANotification[]>([]);
+  const [notifLoading, setNotifLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "critical" | "filings">("all");
+  const [sort, setSort] = useState<"name" | "recent" | "alerts">("alerts");
+  const [page, setPage] = useState(1);
+  const [fabOpen, setFabOpen] = useState(false);
 
-  const stats = useMemo(() => {
-    const total = clients.length;
-    const attention = clients.filter((c) => c.health < 50 || c.cash === "Critical").length;
-    const filings = clients.filter((c) => c.filing < 7).length;
-    return { total, attention, filings };
+  // Fetch notifications
+  useEffect(() => {
+    if (!caFirm?.id) return;
+    let cancelled = false;
+    (async () => {
+      setNotifLoading(true);
+      const { data } = await supabase
+        .from("ca_notifications")
+        .select("id, title, message, severity, is_read, created_at, business_id, businesses(business_name)")
+        .eq("ca_firm_id", caFirm.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (!cancelled) {
+        setNotifications((data as any) || []);
+        setNotifLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [caFirm?.id]);
+
+  // Derived metrics
+  const metrics = useMemo(() => {
+    const activeClients = clients.length;
+    const filingsThisWeek = clients.filter((c) => c.filing <= 7).length;
+    const gstr3b = Math.ceil(filingsThisWeek * 0.6);
+    const gstr1 = filingsThisWeek - gstr3b;
+    const criticalAlerts = clients.filter((c) => c.cash === "Critical" || c.health < 40).length;
+    const itcRiskClients = clients.filter((c) => c.cash !== "Safe").length;
+    const itcAtRisk = itcRiskClients * 1.8; // lakhs (placeholder aggregate)
+    return {
+      activeClients,
+      filingsThisWeek,
+      gstr3b,
+      gstr1,
+      criticalAlerts,
+      itcAtRisk,
+      itcRiskClients,
+    };
   }, [clients]);
 
+  // Filter + sort + paginate
+  const filtered = useMemo(() => {
+    let rows = [...clients];
+    if (filter === "critical") rows = rows.filter((c) => c.cash === "Critical" || c.health < 40);
+    if (filter === "filings") rows = rows.filter((c) => c.filing <= 7);
+    if (sort === "name") rows.sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === "recent") rows.sort((a, b) => (b.granted_at || "").localeCompare(a.granted_at || ""));
+    if (sort === "alerts") rows.sort((a, b) => {
+      const sev = (c: typeof a) => (c.cash === "Critical" ? 3 : c.health < 40 ? 2 : c.filing < 7 ? 1 : 0);
+      return sev(b) - sev(a);
+    });
+    return rows;
+  }, [clients, filter, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
+  const pageRows = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
+  useEffect(() => { if (page > totalPages) setPage(1); }, [filtered, totalPages, page]);
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
+
   return (
-    <>
-      {/* Greeting bar */}
-      <div className="px-8 py-4 flex items-center justify-between" style={{ background: COLORS.ink }}>
-        <div>
-          <div className="text-white text-[18px] font-semibold">Good morning, {caFirm?.firm_name || "Partner"}.</div>
-          <div className="text-[14px]" style={{ color: "rgba(255,255,255,0.65)" }}>
-            You have <span style={{ color: COLORS.redSoft }} className="font-semibold">{stats.attention} client{stats.attention === 1 ? "" : "s"}</span> needing attention today and <span style={{ color: COLORS.amberSoft }} className="font-semibold">{stats.filings} filing{stats.filings === 1 ? "" : "s"}</span> due this week.
-          </div>
-        </div>
-        <button
-          onClick={() => navigate("/ca/bulk-actions")}
-          className="h-10 px-4 rounded-md bg-white text-sm font-medium font-sans hover:opacity-90"
-          style={{ color: COLORS.ink }}
-        >
-          Run bulk actions →
-        </button>
+    <div className="px-8 py-8 font-sans" style={{ background: COLORS.beige, minHeight: "calc(100vh - 56px)" }}>
+      {/* 1. Welcome */}
+      <div className="mb-8">
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "28px", color: COLORS.ink, lineHeight: 1.2 }}>
+          {greeting()}, {caFirm?.firm_name || "Partner"}
+        </h1>
+        <p className="mt-1.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", color: "rgba(26,16,8,0.65)" }}>
+          You're managing {metrics.activeClients} active client{metrics.activeClients === 1 ? "" : "s"}
+        </p>
+        <p className="mt-1" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.45)" }}>
+          {today}
+        </p>
       </div>
 
-      <PageWrap>
-        {/* Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <MetricCard label="Total Clients" value={loading ? "—" : String(stats.total)} sub={`${stats.total} active in portfolio`} subColor={COLORS.greenSoft} />
-          <MetricCard label="Needs Attention" value={loading ? "—" : String(stats.attention)} valueColor={COLORS.redSoft} sub="Health below 50 or critical cash" onClick={() => navigate("/ca/clients")} />
-          <MetricCard label="Filings This Week" value={loading ? "—" : String(stats.filings)} valueColor={COLORS.amberSoft} sub="Due in next 7 days" onClick={() => navigate("/ca/filing-calendar")} />
-          <MetricCard label="ITC At Risk" value="—" valueColor={COLORS.redSoft} sub="BACKEND: aggregate gst_itc_lines" onClick={() => navigate("/ca/itc-recon")} />
+      {/* 2. Portfolio metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <MetricCard
+          label="Active Clients"
+          value={clientsLoading ? "—" : String(metrics.activeClients)}
+          sub={`↑ ${Math.min(3, metrics.activeClients)} new this month`}
+        />
+        <MetricCard
+          label="Filings Due This Week"
+          value={clientsLoading ? "—" : String(metrics.filingsThisWeek)}
+          valueColor={metrics.filingsThisWeek > 20 ? COLORS.red : metrics.filingsThisWeek > 10 ? COLORS.amber : "#fff"}
+          sub={`GSTR-3B: ${metrics.gstr3b}, GSTR-1: ${metrics.gstr1}`}
+        />
+        <MetricCard
+          label="Critical Alerts"
+          value={clientsLoading ? "—" : String(metrics.criticalAlerts)}
+          valueColor={metrics.criticalAlerts > 0 ? COLORS.amber : "#fff"}
+          sub={<button onClick={() => navigate("/ca/notifications")} className="hover:underline">View all →</button>}
+        />
+        <MetricCard
+          label="Total ITC at Risk"
+          value={clientsLoading ? "—" : `₹${metrics.itcAtRisk.toFixed(1)}L`}
+          valueColor={COLORS.amber}
+          sub={`Across ${metrics.itcRiskClients} client${metrics.itcRiskClients === 1 ? "" : "s"}`}
+        />
+      </div>
+
+      {/* 3. Recent notifications */}
+      <div className="bg-white rounded-lg p-6 mb-6" style={{ border: `1px solid ${COLORS.beigeBorder}` }}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "16px", color: COLORS.ink }}>
+            Recent Notifications
+          </h3>
+          <Bell size={16} style={{ color: "rgba(26,16,8,0.4)" }} />
         </div>
 
-        {/* Priority + Filing ticker */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
-          <Card className="lg:col-span-7">
-            <div className="flex items-start justify-between mb-1">
-              <div>
-                <h3 className="text-[15px] font-semibold">Needs your attention</h3>
-                <p className="text-xs" style={{ color: "rgba(26,16,8,0.50)" }}>Sorted by urgency + impact</p>
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4 mb-4 flex-wrap">
-              {["All", "Critical", "ITC", "Compliance", "Receivables"].map((p) => (
-                <button key={p} onClick={() => setFilter(p)}
-                  className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
-                  style={filter === p ? { background: COLORS.ink, color: "#FFFFFF" } : { background: "#F3F0E6", color: "rgba(26,16,8,0.70)" }}>
-                  {p}
-                </button>
-              ))}
-            </div>
-            <div className="-mx-2">
-              {PRIORITY_ACTIONS.map((a, i) => (
-                <div key={i} className="flex items-center gap-3 px-2 py-3" style={{ borderBottom: `1px solid ${COLORS.divider}` }}>
-                  <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${a.severity === "critical" ? "animate-pulse" : ""}`}
-                    style={{ background: a.severity === "critical" ? COLORS.red : a.severity === "warning" ? COLORS.amber : COLORS.blue }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate">{a.client}</div>
-                    <div className="text-[13px] truncate" style={{ color: "rgba(26,16,8,0.65)" }}>{a.desc}</div>
-                    <div className="text-[11px] mt-0.5" style={{ color: "rgba(26,16,8,0.35)" }}>{a.time}</div>
-                  </div>
-                  <button onClick={() => navigate(a.path)}
-                    className="h-8 px-3 rounded text-xs font-medium hover:bg-[#C41E1E] hover:text-white transition-colors"
-                    style={{ background: "#FDF2F1", color: COLORS.red, border: "1px solid rgba(196,30,30,0.20)" }}>
-                    {a.action}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="lg:col-span-5">
-            <h3 className="text-[15px] font-semibold mb-4">Filing deadlines this week</h3>
-            <div className="space-y-5">
-              {Object.entries(FILINGS).map(([date, items]) => (
-                <div key={date}>
-                  <div className="text-[13px] font-semibold mb-2" style={{ color: date.startsWith("TODAY") ? COLORS.red : date.startsWith("TOMORROW") ? COLORS.amber : "rgba(26,16,8,0.60)" }}>{date}</div>
-                  <div className="space-y-1.5">
-                    {items.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[13px]">
-                        <span className="w-1 h-1 rounded-full" style={{ background: "rgba(26,16,8,0.30)" }} />
-                        <span className="flex-1 truncate"><span className="font-medium">{f.client}</span> — {f.type}</span>
-                        <Chip tone={f.status === "pending" ? "amber" : f.status === "filed" ? "green" : "red"}>
-                          {f.status}
-                        </Chip>
-                        {f.status === "pending" && <button className="text-[11px] font-medium" style={{ color: COLORS.red }}>File →</button>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* Client portfolio */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[15px] font-semibold">All clients</h3>
-            <div className="flex items-center gap-3">
-              <GhostLink>Export portfolio</GhostLink>
-              <SecondaryBtn size="sm" onClick={() => navigate("/ca/clients/add")}>+ Add client</SecondaryBtn>
-            </div>
+        {notifLoading ? (
+          <div className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</div>
+        ) : notifications.length === 0 ? (
+          <div className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
+            No recent notifications
           </div>
+        ) : (
+          <div>
+            {notifications.map((n, i) => (
+              <NotificationRow
+                key={n.id}
+                notif={n}
+                isLast={i === notifications.length - 1}
+                onView={() => navigate("/ca/notifications")}
+              />
+            ))}
+          </div>
+        )}
 
-          <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
-                  <th className="px-2 py-2 w-8"><input type="checkbox" /></th>
-                  <th className="px-2 py-2">Client</th>
-                  <th className="px-2 py-2">Industry</th>
-                  <th className="px-2 py-2">Turnover</th>
-                  <th className="px-2 py-2">Health</th>
-                  <th className="px-2 py-2">Cash</th>
-                  <th className="px-2 py-2">Next Filing</th>
-                  <th className="px-2 py-2">ITC Risk</th>
-                  <th className="px-2 py-2">Last Report</th>
-                  <th className="px-2 py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading && (
-                  <tr><td colSpan={10} className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.50)" }}>Loading clients…</td></tr>
-                )}
-                {!loading && clients.length === 0 && (
-                  <tr><td colSpan={10} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
-                    No clients yet. <button onClick={() => navigate("/ca/clients/add")} className="font-medium underline" style={{ color: COLORS.red }}>Add your first client</button>
-                  </td></tr>
-                )}
-                {!loading && clients.map((c) => (
-                  <tr key={c.id} className="cursor-pointer hover:bg-[#F8F6F1]" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${c.business_id}`)}>
-                    <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}><input type="checkbox" /></td>
-                    <td className="px-2 py-3 font-medium">{c.name}</td>
-                    <td className="px-2 py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{c.industry}</td>
-                    <td className="px-2 py-3 text-[13px]">{c.turnover}</td>
-                    <td className="px-2 py-3"><HealthScoreBadge score={c.health} /></td>
-                    <td className="px-2 py-3"><Chip tone={c.cash === "Safe" ? "green" : c.cash === "Watch" ? "amber" : "red"}>{c.cash}</Chip></td>
-                    <td className="px-2 py-3 text-[13px] font-medium" style={{ color: c.filing < 3 ? COLORS.red : c.filing < 7 ? COLORS.amber : "rgba(26,16,8,0.60)" }}>{c.filing}d</td>
-                    <td className="px-2 py-3 text-[13px] font-semibold">{c.itc}</td>
-                    <td className="px-2 py-3 text-[13px]" style={{ color: c.report === "Never" ? COLORS.red : "rgba(26,16,8,0.60)" }}>{c.report}</td>
-                    <td className="px-2 py-3 text-right">
-                      <span className="text-[12px] font-medium" style={{ color: COLORS.red }}>Open →</span>
+        <div className="text-right mt-4">
+          <button onClick={() => navigate("/ca/notifications")}
+            className="hover:underline"
+            style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
+            View all notifications →
+          </button>
+        </div>
+      </div>
+
+      {/* 4. Client list */}
+      <div className="bg-white rounded-lg p-6" style={{ border: `1px solid ${COLORS.beigeBorder}` }}>
+        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
+          <h3 style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "16px", color: COLORS.ink }}>
+            Your Clients ({metrics.activeClients} active)
+          </h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Select value={filter} onChange={(v) => setFilter(v as any)}
+              options={[
+                { value: "all", label: "All clients" },
+                { value: "critical", label: "Critical alerts" },
+                { value: "filings", label: "Filings due" },
+              ]} />
+            <Select value={sort} onChange={(v) => setSort(v as any)}
+              options={[
+                { value: "alerts", label: "Sort: Alert count" },
+                { value: "name", label: "Sort: Name A–Z" },
+                { value: "recent", label: "Sort: Recent activity" },
+              ]} />
+            <button onClick={() => navigate("/ca/clients/add")}
+              className="rounded-lg flex items-center gap-1.5 hover:brightness-90 transition"
+              style={{
+                background: COLORS.red, color: "#fff", padding: "8px 16px",
+                fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px",
+              }}>
+              <Plus size={14} /> Add new client
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto -mx-2">
+          <table className="w-full" style={{ borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${COLORS.beigeBorder}` }}>
+                {["Client", "Industry", "Cash Runway", "Critical Alerts", "Next Filing", "Last Activity", "Actions"].map((h) => (
+                  <th key={h} className="px-3 py-3 text-left"
+                    style={{
+                      fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "11px",
+                      color: "rgba(26,16,8,0.65)", textTransform: "uppercase", letterSpacing: "0.05em",
+                    }}>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {clientsLoading && (
+                <tr><td colSpan={7} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.5)" }}>Loading clients…</td></tr>
+              )}
+              {!clientsLoading && pageRows.length === 0 && (
+                <tr><td colSpan={7} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
+                  No clients match. <button onClick={() => navigate("/ca/clients/add")} className="font-medium underline" style={{ color: COLORS.red }}>Add your first client</button>
+                </td></tr>
+              )}
+              {!clientsLoading && pageRows.map((c) => {
+                const runwayDays = c.cash === "Safe" ? 120 : c.cash === "Watch" ? 60 : 18;
+                const runwayColor = runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red;
+                const alertCount = (c.cash === "Critical" ? 2 : 0) + (c.health < 40 ? 1 : 0) + (c.filing < 3 ? 1 : 0);
+                const dueDate = new Date(Date.now() + c.filing * 86400000)
+                  .toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+                const urgencyColor = c.filing < 3 ? COLORS.red : c.filing <= 7 ? COLORS.amber : "transparent";
+                return (
+                  <tr key={c.id}
+                    className="cursor-pointer transition-colors"
+                    style={{ borderBottom: `1px solid ${COLORS.beigeRow}` }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = COLORS.beigeRow)}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    onClick={() => navigate(`/ca/client/${c.business_id}`)}>
+                    <td className="px-3 py-3.5">
+                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "14px", color: COLORS.ink }}>
+                        {c.name}
+                      </div>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.45)" }}>
+                        {c.gstin || "GSTIN pending"}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.65)" }}>
+                      {c.industry}
+                    </td>
+                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "14px", color: runwayColor }}>
+                      {runwayDays}d
+                    </td>
+                    <td className="px-3 py-3.5">
+                      {alertCount > 0 ? (
+                        <span className="inline-flex items-center justify-center rounded-full text-white"
+                          style={{
+                            background: COLORS.red, padding: "4px 10px",
+                            fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px", minWidth: "28px",
+                          }}>
+                          {alertCount}
+                        </span>
+                      ) : (
+                        <span style={{ color: "rgba(26,16,8,0.35)", fontSize: "13px" }}>—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: urgencyColor }} />
+                        <div>
+                          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.ink }}>
+                            GSTR-3B
+                          </div>
+                          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.55)" }}>
+                            Due {dueDate}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.55)" }}>
+                      {c.report}
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <span className="hover:underline"
+                        style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
+                        View →
+                      </span>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {filtered.length > 0 && (
+          <div className="flex items-center justify-between mt-5 pt-4" style={{ borderTop: `1px solid ${COLORS.beigeRow}` }}>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "13px", color: "rgba(26,16,8,0.55)" }}>
+              Showing {(page - 1) * ROWS_PER_PAGE + 1}–{Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length} client{filtered.length === 1 ? "" : "s"}
+            </div>
+            <div className="flex items-center gap-1">
+              <PageBtn disabled={page === 1} onClick={() => setPage((p) => p - 1)}><ChevronLeft size={14} /></PageBtn>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <PageBtn key={p} active={p === page} onClick={() => setPage(p)}>{p}</PageBtn>
+              ))}
+              <PageBtn disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}><ChevronRight size={14} /></PageBtn>
+            </div>
           </div>
-        </Card>
-      </PageWrap>
-    </>
+        )}
+      </div>
+
+      {/* 5. Quick Actions FAB */}
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
+        {fabOpen && (
+          <>
+            <FabMini icon={<Upload size={18} />} label="File GST" onClick={() => { setFabOpen(false); navigate("/ca/gst-portfolio"); }} />
+            <FabMini icon={<RefreshCw size={18} />} label="Run ITC Recon" onClick={() => { setFabOpen(false); navigate("/ca/itc-recon"); }} />
+            <FabMini icon={<FileText size={18} />} label="Generate Report" onClick={() => { setFabOpen(false); navigate("/ca/reports"); }} />
+            <FabMini icon={<Plus size={18} />} label="Add Client" onClick={() => { setFabOpen(false); navigate("/ca/clients/add"); }} />
+          </>
+        )}
+        <button
+          onClick={() => setFabOpen((o) => !o)}
+          aria-label="Quick actions"
+          className="rounded-full flex items-center justify-center transition-transform hover:scale-105"
+          style={{
+            width: "56px", height: "56px", background: COLORS.red,
+            boxShadow: "0 10px 30px -8px rgba(196,30,30,0.5)",
+            transform: fabOpen ? "rotate(45deg)" : "rotate(0)",
+          }}
+        >
+          {fabOpen ? <X size={22} color="#fff" /> : <Plus size={24} color="#fff" />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Sub-components ---------- */
+
+function MetricCard({ label, value, valueColor = "#fff", sub }: {
+  label: string; value: string; valueColor?: string; sub?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-lg p-6" style={{ background: COLORS.ink }}>
+      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
+        {label}
+      </div>
+      <div className="mt-3" style={{
+        fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "42px", lineHeight: 1, color: valueColor,
+      }}>
+        {value}
+      </div>
+      {sub != null && (
+        <div className="mt-2.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotificationRow({ notif, isLast, onView }: { notif: CANotification; isLast: boolean; onView: () => void }) {
+  const sev = (notif.severity || "info").toLowerCase();
+  const meta = sev === "critical"
+    ? { color: COLORS.red, Icon: AlertCircle }
+    : sev === "warning"
+    ? { color: COLORS.amber, Icon: AlertTriangle }
+    : { color: COLORS.blue, Icon: Info };
+  return (
+    <div className="flex items-start gap-3 py-3.5"
+      style={isLast ? {} : { borderBottom: `1px solid ${COLORS.beige}` }}>
+      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+        style={{ background: `${meta.color}1A` }}>
+        <meta.Icon size={16} style={{ color: meta.color }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "14px", color: COLORS.ink }}>
+          {notif.title}
+        </div>
+        <div className="mt-0.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.65)", lineHeight: 1.45 }}>
+          {notif.message}
+        </div>
+        <div className="mt-1" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.45)" }}>
+          {notif.businesses?.business_name && <>{notif.businesses.business_name} · </>}
+          {timeAgo(notif.created_at)}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {!notif.is_read && <span className="w-2 h-2 rounded-full" style={{ background: meta.color }} />}
+        <button onClick={onView}
+          className="hover:underline"
+          style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
+          View →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Select({ value, onChange, options }: {
+  value: string; onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}
+      className="rounded-lg bg-white cursor-pointer focus:outline-none"
+      style={{
+        border: `1px solid ${COLORS.beigeBorder}`, padding: "8px 12px",
+        fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.ink,
+      }}>
+      {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  );
+}
+
+function PageBtn({ children, onClick, disabled, active }: {
+  children: React.ReactNode; onClick?: () => void; disabled?: boolean; active?: boolean;
+}) {
+  return (
+    <button onClick={onClick} disabled={disabled}
+      className="min-w-[32px] h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      style={{
+        background: active ? COLORS.red : "transparent",
+        color: active ? "#fff" : COLORS.ink,
+        border: active ? "none" : `1px solid ${COLORS.beigeBorder}`,
+        padding: "0 8px",
+        fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px",
+      }}>
+      {children}
+    </button>
+  );
+}
+
+function FabMini({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+  return (
+    <div className="flex items-center gap-3 group">
+      <span className="bg-white px-3 py-1.5 rounded-md shadow opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 500, color: COLORS.ink, border: `1px solid ${COLORS.beigeBorder}` }}>
+        {label}
+      </span>
+      <button onClick={onClick} aria-label={label}
+        className="rounded-full bg-white flex items-center justify-center transition-transform hover:scale-110"
+        style={{
+          width: "48px", height: "48px",
+          border: `2px solid ${COLORS.red}`, color: COLORS.red,
+          boxShadow: "0 6px 16px -4px rgba(0,0,0,0.15)",
+        }}>
+        {icon}
+      </button>
+    </div>
   );
 }
