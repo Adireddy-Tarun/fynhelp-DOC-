@@ -48,6 +48,25 @@ import IntegrationsPage from "./pages/dashboard/settings/IntegrationsPage.tsx";
 import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.tsx";
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { CAAuthProvider } from "@/contexts/CAAuthContext";
+import CALayout from "@/components/ca/CALayout";
+import CALoginPage from "./pages/ca/CALoginPage";
+import CARegisterPage from "./pages/ca/CARegisterPage";
+import CADashboardPage from "./pages/ca/CADashboardPage";
+import CAClientsPage from "./pages/ca/CAClientsPage";
+import CAAddClientPage from "./pages/ca/CAAddClientPage";
+import CAClientDetailPage from "./pages/ca/CAClientDetailPage";
+import CAFilingCalendarPage from "./pages/ca/CAFilingCalendarPage";
+import CAGstPortfolioPage from "./pages/ca/CAGstPortfolioPage";
+import CATdsTrackerPage from "./pages/ca/CATdsTrackerPage";
+import CACompliancePage from "./pages/ca/CACompliancePage";
+import CAItcReconPage from "./pages/ca/CAItcReconPage";
+import CAReportsPage from "./pages/ca/CAReportsPage";
+import CABulkActionsPage from "./pages/ca/CABulkActionsPage";
+import CAPortfolioHealthPage from "./pages/ca/CAPortfolioHealthPage";
+import CARevenuePage from "./pages/ca/CARevenuePage";
+import CANotificationsPage from "./pages/ca/CANotificationsPage";
+import CASettingsPage from "./pages/ca/CASettingsPage";
 
 const queryClient = new QueryClient();
 

@@ -147,6 +147,296 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_activity_log: {
+        Row: {
+          action_type: string
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+        }
+        Insert: {
+          action_type: string
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+        }
+        Update: {
+          action_type?: string
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_activity_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_activity_log_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_client_access: {
+        Row: {
+          access_level: string | null
+          business_id: string
+          ca_firm_id: string
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          business_id: string
+          ca_firm_id: string
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_access_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_access_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_firm_members: {
+        Row: {
+          ca_firm_id: string
+          created_at: string | null
+          id: string
+          invited_email: string
+          role: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string | null
+          id?: string
+          invited_email: string
+          role?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string | null
+          id?: string
+          invited_email?: string
+          role?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_firm_members_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_firms: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          email: string | null
+          firm_name: string
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          logo_url: string | null
+          max_clients: number | null
+          membership_number: string | null
+          notification_prefs: Json | null
+          phone: string | null
+          plan_type: string | null
+          state: string | null
+          updated_at: string | null
+          user_id: string
+          whatsapp_phone: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          firm_name: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          max_clients?: number | null
+          membership_number?: string | null
+          notification_prefs?: Json | null
+          phone?: string | null
+          plan_type?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id: string
+          whatsapp_phone?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          firm_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          max_clients?: number | null
+          membership_number?: string | null
+          notification_prefs?: Json | null
+          phone?: string | null
+          plan_type?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string
+          whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
+      ca_notifications: {
+        Row: {
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          severity: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          severity?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          severity?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_notifications_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_reports_log: {
+        Row: {
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string | null
+          file_url: string | null
+          id: string
+          period: string | null
+          report_type: string
+          sent_to: string | null
+          status: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          period?: string | null
+          report_type: string
+          sent_to?: string | null
+          status?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          period?: string | null
+          report_type?: string
+          sent_to?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_reports_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_reports_log_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_events: {
         Row: {
           business_id: string
@@ -711,6 +1001,7 @@ export type Database = {
     }
     Functions: {
       get_user_business_id: { Args: never; Returns: string }
+      get_user_ca_firm_id: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
