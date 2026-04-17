@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import GlobalBackBar from "@/components/GlobalBackBar";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star } from "lucide-react";
+import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase } from "lucide-react";
 
 const settingsNav = [
   {
@@ -18,6 +18,7 @@ const settingsNav = [
     items: [
       { label: "Business Profile", icon: Building2, href: "/dashboard/settings/business" },
       { label: "Team & Access", icon: Users, href: "/dashboard/settings/team" },
+      { label: "CA Access", icon: Briefcase, href: "/dashboard/settings/ca-access" },
       { label: "Integrations", icon: Plug, href: "/dashboard/settings/integrations" },
     ],
   },

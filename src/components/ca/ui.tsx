@@ -101,15 +101,16 @@ export function PrimaryBtn({ children, onClick, full, size = "md", disabled, typ
   );
 }
 
-export function SecondaryBtn({ children, onClick, full, size = "md", type = "button" }: {
-  children: ReactNode; onClick?: () => void; full?: boolean; size?: "sm" | "md" | "lg"; type?: "button" | "submit";
+export function SecondaryBtn({ children, onClick, full, size = "md", type = "button", disabled }: {
+  children: ReactNode; onClick?: () => void; full?: boolean; size?: "sm" | "md" | "lg"; type?: "button" | "submit"; disabled?: boolean;
 }) {
   const h = size === "sm" ? "h-8 px-3 text-xs" : size === "lg" ? "h-12 px-6 text-base" : "h-10 px-4 text-sm";
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${h} rounded-md font-medium font-sans bg-white transition-colors hover:bg-[#F8F6F1] ${full ? "w-full" : ""}`}
+      disabled={disabled}
+      className={`${h} rounded-md font-medium font-sans bg-white transition-colors hover:bg-[#F8F6F1] disabled:opacity-50 ${full ? "w-full" : ""}`}
       style={{ border: `1px solid ${COLORS.caBorder}`, color: COLORS.ink }}
     >
       {children}
