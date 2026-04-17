@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, Check } from "lucide-react";
-import { FynLogo } from "@/components/FynLogo";
+import FynLogo from "@/components/FynLogo";
 
 const FEATURES = [
   "Portfolio dashboard — 50+ clients at a glance",
