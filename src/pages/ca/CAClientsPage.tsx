@@ -248,7 +248,7 @@ export default function CAClientsPage() {
           ].map(([label, fn]) => (
             <button key={label as string} onClick={fn as any}
               className="h-8 px-3 rounded-lg text-xs font-medium border border-white/40 text-white hover:bg-white/10">
-              {label}
+              {label as string}
             </button>
           ))}
         </div>
@@ -406,7 +406,7 @@ export default function CAClientsPage() {
                             <button key={l as string}
                               onClick={() => { (fn as any)(); setActionsOpenFor(null); }}
                               className="w-full text-left px-3 py-2 text-sm hover:bg-[#FAF7F0]" style={{ color: COLORS.ink }}>
-                              {l}
+                              {l as string}
                             </button>
                           ))}
                           <div className="my-1" style={{ borderTop: `1px solid ${COLORS.divider}` }} />
