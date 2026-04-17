@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCAAuth } from "@/contexts/CAAuthContext";
-import { COLORS, PageWrap, Card, MetricCard, Chip, PrimaryBtn, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
+import { COLORS, PageWrap, Card, MetricCard, Chip, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
+import { useCAClients } from "@/hooks/useCAClients";
 
 const PRIORITY_ACTIONS = [
   { client: "Mehta Textiles", desc: "ITC at risk ₹3.2L. 4 vendor mismatches. GSTR-3B due Apr 20.", time: "12 min ago", severity: "critical", action: "Review ITC →", path: "/ca/itc-recon" },
@@ -29,19 +30,18 @@ const FILINGS = {
   ],
 };
 
-const CLIENTS = [
-  { id: "1", name: "Mehta Textiles", industry: "Textile", turnover: "₹12Cr", health: 38, cash: "Critical", filing: 3, itc: "₹3.2L", report: "Never" },
-  { id: "2", name: "Sharma & Sons", industry: "Trading", turnover: "₹8Cr", health: 42, cash: "Critical", filing: 2, itc: "₹1.8L", report: "12 days ago" },
-  { id: "3", name: "Patel Manufacturing", industry: "Manufacturing", turnover: "₹24Cr", health: 71, cash: "Watch", filing: 5, itc: "₹0.6L", report: "3 days ago" },
-  { id: "4", name: "Delhi Distributors", industry: "Trading", turnover: "₹18Cr", health: 64, cash: "Watch", filing: 2, itc: "₹0.9L", report: "8 days ago" },
-  { id: "5", name: "Anand Trading Co.", industry: "Trading", turnover: "₹6Cr", health: 78, cash: "Safe", filing: 12, itc: "₹0.3L", report: "Yesterday" },
-  { id: "6", name: "Surat Fabrics", industry: "Textile", turnover: "₹15Cr", health: 82, cash: "Safe", filing: 6, itc: "₹0.2L", report: "2 days ago" },
-];
-
 export default function CADashboardPage() {
   const { caFirm } = useCAAuth();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<string>("All");
+  const { clients, loading } = useCAClients();
+
+  const stats = useMemo(() => {
+    const total = clients.length;
+    const attention = clients.filter((c) => c.health < 50 || c.cash === "Critical").length;
+    const filings = clients.filter((c) => c.filing < 7).length;
+    return { total, attention, filings };
+  }, [clients]);
 
   return (
     <>
