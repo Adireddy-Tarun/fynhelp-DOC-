@@ -3,19 +3,50 @@ import { useNavigate } from "react-router-dom";
 import { Search, Check } from "lucide-react";
 import { COLORS, PageWrap, PageHeader, Card, PrimaryBtn, SecondaryBtn } from "@/components/ca/ui";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useCAAuth } from "@/contexts/CAAuthContext";
+
+const GSTIN_RX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 export default function CAAddClientPage() {
   const navigate = useNavigate();
+  const { caFirm } = useCAAuth();
   const [step, setStep] = useState(1);
+  const [gstin, setGstin] = useState("");
   const [email, setEmail] = useState("");
-  const [found, setFound] = useState<{ name: string; gstin: string; industry: string } | null>(null);
+  const [message, setMessage] = useState("");
   const [access, setAccess] = useState("read_only");
+  const [validated, setValidated] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
-  const search = () => {
-    // BACKEND: SELECT businesses JOIN auth.users WHERE email
-    if (email.includes("@")) setFound({ name: "Demo Trading Pvt Ltd", gstin: "29ABCDE1234F1Z5", industry: "Trading" });
-    else toast.error("Enter a valid email");
+  const validateAndContinue = () => {
+    const clean = gstin.trim().toUpperCase();
+    if (!GSTIN_RX.test(clean)) {
+      toast.error("Enter a valid 15-character GSTIN");
+      return;
+    }
+    setGstin(clean);
+    setValidated(true);
+    setStep(2);
+  };
+
+  const sendRequest = async () => {
+    if (!caFirm?.id) { toast.error("CA firm not loaded"); return; }
+    setSubmitting(true);
+    const { error } = await supabase.from("ca_access_requests").insert({
+      ca_firm_id: caFirm.id,
+      target_gstin: gstin,
+      target_email: email.trim() || null,
+      access_level: access,
+      message: message.trim() || null,
+      status: "pending",
+    });
+    setSubmitting(false);
+    if (error) { toast.error(error.message); return; }
+    // BACKEND: trigger Resend email to business owner here (edge function)
+    setDone(true);
+    toast.success("Request sent");
   };
 
   if (done) {
@@ -27,7 +58,7 @@ export default function CAAddClientPage() {
           </div>
           <h2 className="text-[22px] font-bold mb-2">Access request sent</h2>
           <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>
-            {found?.name} will receive an email to approve your access. They appear in your portfolio once approved.
+            The business owner of GSTIN <span className="font-mono">{gstin}</span> will see your request in their settings and can approve or reject it.
           </p>
           <PrimaryBtn onClick={() => navigate("/ca/clients")}>Back to portfolio</PrimaryBtn>
         </Card>
@@ -44,7 +75,7 @@ export default function CAAddClientPage() {
           <div key={s} className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
               style={{ background: step >= s ? COLORS.red : "#E5E0CD", color: step >= s ? "#FFFFFF" : "rgba(26,16,8,0.50)" }}>{s}</div>
-            <span className="text-xs font-medium">{s === 1 ? "Find" : s === 2 ? "Access" : "Send"}</span>
+            <span className="text-xs font-medium">{s === 1 ? "Identify" : s === 2 ? "Access" : "Send"}</span>
             {s < 3 && <div className="w-12 h-px" style={{ background: COLORS.caBorder }} />}
           </div>
         ))}
@@ -53,24 +84,27 @@ export default function CAAddClientPage() {
       <Card className="max-w-2xl">
         {step === 1 && (
           <>
-            <h3 className="text-[15px] font-semibold mb-3">Find client by email</h3>
-            <div className="flex gap-2">
-              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@example.com"
-                className="flex-1 h-10 px-3 rounded text-sm" style={{ border: `1px solid ${COLORS.caBorder}` }} />
-              <PrimaryBtn onClick={search}><Search size={14} className="inline mr-1" />Search</PrimaryBtn>
-            </div>
-
-            {found && (
-              <div className="mt-5 p-4 rounded" style={{ background: COLORS.caSurface, border: `1px solid ${COLORS.caBorder}` }}>
-                <div className="text-sm font-semibold">{found.name}</div>
-                <div className="text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.60)" }}>{found.gstin}</div>
-                <div className="text-[12px] mb-3" style={{ color: "rgba(26,16,8,0.60)" }}>{found.industry}</div>
-                <div className="flex gap-2">
-                  <PrimaryBtn size="sm" onClick={() => setStep(2)}>Confirm</PrimaryBtn>
-                  <SecondaryBtn size="sm" onClick={() => setFound(null)}>Search again</SecondaryBtn>
-                </div>
-              </div>
-            )}
+            <h3 className="text-[15px] font-semibold mb-1">Identify the client by GSTIN</h3>
+            <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>
+              The business owner registered on FynHelp under this GSTIN will receive your request.
+            </p>
+            <label className="block text-[12px] font-medium mb-1.5">GSTIN</label>
+            <input
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value.toUpperCase())}
+              placeholder="29ABCDE1234F1Z5"
+              className="w-full h-10 px-3 rounded text-sm font-mono mb-3"
+              style={{ border: `1px solid ${COLORS.caBorder}` }}
+            />
+            <label className="block text-[12px] font-medium mb-1.5">Owner email (optional)</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="owner@business.com"
+              className="w-full h-10 px-3 rounded text-sm mb-4"
+              style={{ border: `1px solid ${COLORS.caBorder}` }}
+            />
+            <PrimaryBtn onClick={validateAndContinue}><Search size={14} className="inline mr-1" />Continue</PrimaryBtn>
           </>
         )}
 
@@ -105,12 +139,21 @@ export default function CAAddClientPage() {
           <>
             <h3 className="text-[15px] font-semibold mb-2">Send access request</h3>
             <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>
-              {found?.name} must approve your access. They'll get an email with your firm's name and the access level you selected.
+              The business owner for <span className="font-mono">{gstin}</span> must approve your request. Add an optional note explaining who you are.
             </p>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Hi — I'm your CA at Mehta & Associates, requesting view access to manage your GST filings."
+              rows={3}
+              className="w-full p-3 rounded text-sm mb-4"
+              style={{ border: `1px solid ${COLORS.caBorder}` }}
+            />
             <div className="flex gap-2">
-              <SecondaryBtn onClick={() => setStep(2)}>Back</SecondaryBtn>
-              {/* BACKEND: POST /api/ca/request-access */}
-              <PrimaryBtn onClick={() => { setDone(true); toast.success("Request sent"); }}>Send access request →</PrimaryBtn>
+              <SecondaryBtn onClick={() => setStep(2)} disabled={submitting}>Back</SecondaryBtn>
+              <PrimaryBtn onClick={sendRequest} disabled={submitting}>
+                {submitting ? "Sending…" : "Send access request →"}
+              </PrimaryBtn>
             </div>
           </>
         )}
