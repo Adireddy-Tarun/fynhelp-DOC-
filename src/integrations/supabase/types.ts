@@ -147,6 +147,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_access_requests: {
+        Row: {
+          access_level: string
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          id: string
+          message: string | null
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          target_email: string | null
+          target_gstin: string
+          updated_at: string
+        }
+        Insert: {
+          access_level?: string
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          target_email?: string | null
+          target_gstin: string
+          updated_at?: string
+        }
+        Update: {
+          access_level?: string
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          target_email?: string | null
+          target_gstin?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ca_activity_log: {
         Row: {
           action_type: string
