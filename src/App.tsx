@@ -34,6 +34,11 @@ import CustomersPage from "./pages/dashboard/CustomersPage.tsx";
 import CostPage from "./pages/dashboard/CostPage.tsx";
 import CompliancePage from "./pages/dashboard/CompliancePage.tsx";
 import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
+import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
+import WorkingCapitalPage from "./pages/dashboard/WorkingCapitalPage.tsx";
+import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
+import BankingPage from "./pages/dashboard/BankingPage.tsx";
+import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
 import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
@@ -84,6 +89,11 @@ const App = () => (
             <Route path="/dashboard/cost" element={<CostPage />} />
             <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
+            <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
+            <Route path="/dashboard/working-capital" element={<WorkingCapitalPage />} />
+            <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
+            <Route path="/dashboard/banking" element={<BankingPage />} />
+            <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />

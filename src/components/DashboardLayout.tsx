@@ -8,6 +8,7 @@ import {
   CalendarDays, Users, IndianRupee, Building2, UserCheck, PieChart,
   Shield, ClipboardCheck, FileText, History, Plug, Settings,
   CreditCard, UsersRound, LogOut, Search, Bell, Menu, X,
+  BarChart3, Landmark, Briefcase, TrendingUpDown,
 } from "lucide-react";
 
 interface NavItem {
@@ -36,6 +37,7 @@ const navSections: NavSection[] = [
       { label: "360 Dashboard", href: "/dashboard/360", icon: Grid3X3 },
       { label: "Cash Flow", href: "/dashboard/cash-flow", icon: TrendingUp },
       { label: "Runway", href: "/dashboard/runway", icon: Gauge },
+      { label: "Working Capital", href: "/dashboard/working-capital", icon: TrendingUpDown },
     ],
   },
   {
@@ -63,6 +65,7 @@ const navSections: NavSection[] = [
     title: "WORKFORCE",
     items: [
       { label: "HR Intelligence", href: "/dashboard/hr", icon: Users },
+      { label: "Payroll Planner", href: "/dashboard/payroll", icon: IndianRupee },
     ],
   },
   {
@@ -85,6 +88,24 @@ const navSections: NavSection[] = [
     items: [
       { label: "CFO Reports", href: "/dashboard/reports", icon: FileText },
       { label: "Simulations", href: "/dashboard/simulator", icon: History },
+    ],
+  },
+  {
+    title: "GROWTH",
+    items: [
+      { label: "Market & Growth", href: "/dashboard/market-growth", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "BANKING",
+    items: [
+      { label: "Banking & Fintech", href: "/dashboard/banking", icon: Landmark },
+    ],
+  },
+  {
+    title: "CA PARTNER",
+    items: [
+      { label: "CA Partner Hub", href: "/dashboard/ca-partner", icon: Briefcase },
     ],
   },
   {
