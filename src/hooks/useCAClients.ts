@@ -15,6 +15,7 @@ export interface CAClientRow {
   report: string;
   notes: string | null;
   granted_at: string | null;
+  gstin: string | null;
 }
 
 const fmtTurnover = (range: string | null) => range || "—";
@@ -74,7 +75,7 @@ export function useCAClients() {
       // Step 2: get businesses (RLS may filter — relies on additional policy)
       const { data: biz, error: e2 } = await supabase
         .from("businesses")
-        .select("id, business_name, industry, turnover_range, plan")
+        .select("id, business_name, industry, turnover_range, plan, gstin")
         .in("id", ids);
 
       if (e2) {
@@ -98,6 +99,7 @@ export function useCAClients() {
           report: reportLabel(a.granted_at),
           notes: a.notes,
           granted_at: a.granted_at,
+          gstin: (b as any)?.gstin ?? null,
         };
       });
       if (!cancelled) {
