@@ -19,7 +19,7 @@ const quickPrompts = [
 const initialMessages: Message[] = [
   {
     role: "nidhi",
-    content: "Good morning! I'm Nidhi, your AI CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 8 days from last week\n• ABC Electronics owes ₹8.4L, now 62 days overdue\n• Your GSTR-3B is due in 8 days — data is ready for review\n\nWhat would you like to know?",
+    content: "Good morning! I'm AI CFO Nidhi, your AI CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 8 days from last week\n• ABC Electronics owes ₹8.4L, now 62 days overdue\n• Your GSTR-3B is due in 8 days — data is ready for review\n\nWhat would you like to know?",
     timestamp: "8:03 AM",
   },
 ];
@@ -89,7 +89,7 @@ const NidhiChatPage = () => {
         <div className="flex items-center gap-3 px-8 flex-shrink-0" style={{ height: 64, background: "#1A1008" }}>
           <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
           <div className="flex-1">
-            <p className="text-white font-serif" style={{ fontSize: 16 }}>Nidhi</p>
+            <p className="text-white font-serif" style={{ fontSize: 16 }}>AI CFO Nidhi</p>
             <p style={{ color: "#4ADE80", fontSize: 12 }}>● Live — monitoring your business</p>
           </div>
           <div className="flex gap-1">
@@ -151,7 +151,7 @@ const NidhiChatPage = () => {
                   {m.role === "nidhi" && (
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-                      <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>Nidhi</span>
+                      <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>AI CFO Nidhi</span>
                       <span style={{ color: "rgba(26,16,8,0.30)", fontSize: 12 }}>{m.timestamp}</span>
                     </div>
                   )}
@@ -185,7 +185,7 @@ const NidhiChatPage = () => {
                 <div style={{ maxWidth: "70%" }}>
                   <div className="flex items-center gap-2 mb-1">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-                    <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>Nidhi</span>
+                    <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>AI CFO Nidhi</span>
                   </div>
                   <div
                     className="whitespace-pre-wrap"
@@ -246,7 +246,7 @@ const NidhiChatPage = () => {
                 sendMessage();
               }
             }}
-            placeholder="Ask Nidhi anything about your business..."
+            placeholder="Ask AI CFO Nidhi anything about your business..."
             className="flex-1 outline-none"
             style={{
               height: 48,
@@ -259,7 +259,7 @@ const NidhiChatPage = () => {
             }}
             onFocus={e => { e.currentTarget.style.borderColor = "#C41E1E"; }}
             onBlur={e => { e.currentTarget.style.borderColor = "#E0D9C8"; }}
-            aria-label="Message Nidhi"
+            aria-label="Message AI CFO Nidhi"
           />
           <button
             onClick={sendMessage}

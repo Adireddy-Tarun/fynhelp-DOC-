@@ -27,8 +27,8 @@ const navSections: NavSection[] = [
   {
     title: "NIDHI",
     items: [
-      { label: "Nidhi Cockpit", href: "/dashboard/cockpit", icon: LayoutDashboard },
-      { label: "Talk to Nidhi", href: "/dashboard/nidhi", icon: MessageCircle },
+      { label: "AI CFO Nidhi Cockpit", href: "/dashboard/cockpit", icon: LayoutDashboard },
+      { label: "Talk to AI CFO Nidhi", href: "/dashboard/nidhi", icon: MessageCircle },
     ],
   },
   {

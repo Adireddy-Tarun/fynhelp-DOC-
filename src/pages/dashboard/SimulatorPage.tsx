@@ -103,7 +103,7 @@ const SimulatorPage = () => {
             </div>
             <div>
               <p className="text-fyn-ink text-sm font-medium">Auto-fill from my live data</p>
-              <p className="text-fyn-ink/40 text-xs">Nidhi reads your bank, books, and GST to pre-fill inputs</p>
+              <p className="text-fyn-ink/40 text-xs">AI CFO Nidhi reads your bank, books, and GST to pre-fill inputs</p>
             </div>
           </div>
 
@@ -268,7 +268,7 @@ const SimulatorPage = () => {
                 <path d="M70 75 L85 55 L100 70" stroke="#C41E1E" strokeWidth="2" fill="none" />
               </svg>
               <p className="text-fyn-ink/40 text-sm mt-4">Choose a scenario and set your inputs.</p>
-              <p className="text-fyn-ink/30 text-sm">Nidhi will model the exact cash impact using your live data.</p>
+              <p className="text-fyn-ink/30 text-sm">AI CFO Nidhi will model the exact cash impact using your live data.</p>
             </div>
           ) : (
             <div className="animate-in fade-in duration-300">
@@ -312,7 +312,7 @@ const SimulatorPage = () => {
 
               {/* Recommendations */}
               <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
-                <h4 className="text-fyn-ink font-serif text-lg mb-3">Nidhi's Recommendation</h4>
+                <h4 className="text-fyn-ink font-serif text-lg mb-3">AI CFO Nidhi's Recommendation</h4>
                 <p className="text-fyn-ink/70 text-sm leading-relaxed">
                   {scenario === "credit" && creditDays > 45
                     ? `Extending credit to ${creditDays} days creates a ${formatINR(cashGap)} cash gap. I'd recommend counter-proposing ${Math.min(creditDays, 45)} days with a 2% early payment discount. This keeps your runway above 45 days.`

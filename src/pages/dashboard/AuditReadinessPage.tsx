@@ -142,7 +142,7 @@ const AuditReadinessPage = () => {
       {/* DOCUMENT VAULT */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink text-lg font-sans">Documents Nidhi Recommends You Keep Ready</h3>
+          <h3 className="text-fyn-ink text-lg font-sans">Documents AI CFO Nidhi Recommends You Keep Ready</h3>
           <span className="text-fyn-gold text-sm fyn-metric">{doneCount} of {documents.length} ready ({Math.round(doneCount / documents.length * 100)}%)</span>
         </div>
         <div className="space-y-2">

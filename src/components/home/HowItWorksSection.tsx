@@ -18,9 +18,9 @@ const steps = [
     detail: "Your GSTIN unlocks: business detail lookup, 12-month filing history, ITC reconciliation with GSTR-2B, personalised compliance calendar with YOUR due dates, and vendor GSTIN validation. We are a GST Suvidha Provider (GSP) certified platform.",
   },
   {
-    title: "Nidhi delivers your first brief",
+    title: "AI CFO Nidhi delivers your first brief",
     sub: "Within minutes — and every morning after",
-    detail: "Nidhi assembles your financial picture: cash from bank, receivables from books, GST from portal. She computes 50+ metrics, identifies your top 3 risks, and delivers a plain-language brief. Every morning at 8 AM, you wake up to a message from your AI CFO.",
+    detail: "AI CFO Nidhi assembles your financial picture: cash from bank, receivables from books, GST from portal. She computes 50+ metrics, identifies your top 3 risks, and delivers a plain-language brief. Every morning at 8 AM, you wake up to a message from your AI CFO.",
   },
 ];
 

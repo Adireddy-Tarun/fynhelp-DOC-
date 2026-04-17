@@ -125,7 +125,7 @@ const CockpitPage = () => {
 
   return (
     <DashboardLayout>
-      {/* Nidhi header */}
+      {/* AI CFO Nidhi header */}
       <div className="rounded-xl p-5 mb-6 flex items-center justify-between" style={{ background: "#1A1008" }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E" }}>N</div>
@@ -135,7 +135,7 @@ const CockpitPage = () => {
           </div>
         </div>
         <Link to="/dashboard/nidhi" className="text-white text-[14px] font-medium px-4 py-2 rounded-lg hover-btn-primary" style={{ background: "#C41E1E" }}>
-          Ask Nidhi →
+          Ask AI CFO Nidhi →
         </Link>
       </div>
 
@@ -353,13 +353,13 @@ const CockpitPage = () => {
             </div>
           </div>
 
-          {/* Nidhi insight */}
+          {/* AI CFO Nidhi insight */}
           <div className="rounded-[10px]" style={{ background: "#1A1008", padding: "20px 24px" }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 16 }}>N</div>
                 <div>
-                  <p className="text-white" style={{ fontSize: 14, fontWeight: 600 }}>Nidhi's read on today</p>
+                  <p className="text-white" style={{ fontSize: 14, fontWeight: 600 }}>AI CFO Nidhi's read on today</p>
                 </div>
               </div>
               <p className="text-destructive-foreground" style={{ color: "rgba(255,255,255,0.40)", fontSize: 11 }}>Online · 8:03 AM</p>
@@ -371,7 +371,7 @@ const CockpitPage = () => {
               <input
                 value={nidhiInput}
                 onChange={e => setNidhiInput(e.target.value)}
-                placeholder="Ask Nidhi a follow-up..."
+                placeholder="Ask AI CFO Nidhi a follow-up..."
                 className="flex-1 outline-none"
                 style={{
                   height: 40,
@@ -382,7 +382,7 @@ const CockpitPage = () => {
                   color: "#FFFFFF",
                   fontSize: 13,
                 }}
-                aria-label="Ask Nidhi"
+                aria-label="Ask AI CFO Nidhi"
               />
               <button className="transition-all hover:brightness-90" style={{ width: 40, height: 40, background: "#C41E1E", borderRadius: 6, color: "#FFFFFF", fontSize: 16, fontWeight: 700 }}>→</button>
             </div>

@@ -65,7 +65,7 @@ export default function CAClientDetailPage() {
             </div>
 
             <Card dark>
-              <div className="text-[10px] font-medium uppercase tracking-[0.12em] mb-2" style={{ color: COLORS.gold }}>Nidhi's latest brief</div>
+              <div className="text-[10px] font-medium uppercase tracking-[0.12em] mb-2" style={{ color: COLORS.gold }}>AI CFO Nidhi's latest brief</div>
               <div className="text-[14px] mb-3" style={{ color: "rgba(255,255,255,0.85)" }}>
                 Mehta Textiles is in a tight spot this month. Cash will only last 18 days at current burn. Three customer payments overdue 30+ days — chasing those would extend runway by 12 days. ITC mismatches with Raj Textiles and Surat Fabrics need immediate vendor follow-up.
               </div>

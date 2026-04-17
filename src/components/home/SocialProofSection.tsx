@@ -2,7 +2,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const testimonials = [
   {
-    quote: "Nidhi told me I'd run out of cash in 34 days — 5 weeks before my CA would have even noticed. I collected from 3 clients that week and avoided what would have been a complete shutdown.",
+    quote: "AI CFO Nidhi told me I'd run out of cash in 34 days — 5 weeks before my CA would have even noticed. I collected from 3 clients that week and avoided what would have been a complete shutdown.",
     initials: "RM", name: "Rajesh Mehta", company: "Mehta Textile Traders, Surat", size: "₹18 Crore turnover business",
     impact: "Crisis averted · ₹24L collected · Runway +22 days", impactBg: "bg-fyn-success-bg", impactText: "text-fyn-success",
   },
@@ -12,7 +12,7 @@ const testimonials = [
     impact: "₹4.2L ITC recovered · Notice risk: 74→18", impactBg: "bg-fyn-success-bg", impactText: "text-fyn-success",
   },
   {
-    quote: "I used to spend 3 hours every Monday trying to understand my finances. Nidhi's morning brief is 3 sentences. In Hindi. I know everything in 30 seconds.",
+    quote: "I used to spend 3 hours every Monday trying to understand my finances. AI CFO Nidhi's morning brief is 3 sentences. In Hindi. I know everything in 30 seconds.",
     initials: "KS", name: "Karthik Sundaram", company: "KS Engineering Components, Chennai", size: "₹8 Crore manufacturing business",
     impact: "12 hrs/month saved · CA relationship improved", impactBg: "bg-fyn-info-bg", impactText: "text-fyn-info",
   },

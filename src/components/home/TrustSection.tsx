@@ -13,8 +13,8 @@ const blocks = [
   },
   {
     icon: "🛡️",
-    title: "Nidhi never sees your personal information",
-    desc: "When Nidhi reasons about your business, she works with anonymised metrics. Customer names appear as 'Customer_01', vendors as 'Vendor_03'. Real names, GSTINs, and account numbers are masked before any AI call. This is an architectural constraint, not a policy.",
+    title: "AI CFO Nidhi never sees your personal information",
+    desc: "When AI CFO Nidhi reasons about your business, she works with anonymised metrics. Customer names appear as 'Customer_01', vendors as 'Vendor_03'. Real names, GSTINs, and account numbers are masked before any AI call. This is an architectural constraint, not a policy.",
   },
   {
     icon: "✓",

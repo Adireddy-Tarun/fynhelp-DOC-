@@ -191,7 +191,7 @@ function LeftColumn() {
           color: "rgba(255,255,255,0.70)", lineHeight: 1.75, maxWidth: 500, marginTop: 24,
         }}
       >
-        Meet Nidhi — the AI CFO built for Indian business. She monitors your cash, protects your GST,
+        Meet AI CFO Nidhi — the AI CFO built for Indian business. She monitors your cash, protects your GST,
         predicts your risks, and tells you exactly what to do — in your language, every morning.
       </p>
 
@@ -218,7 +218,7 @@ function LeftColumn() {
           cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8,
           transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)",
         }}>
-          Watch Nidhi in action
+          Watch AI CFO Nidhi in action
         </button>
       </div>
 
@@ -238,7 +238,7 @@ function LeftColumn() {
       <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
         <div className="flex flex-wrap items-center text-primary-foreground" style={{ gap: 8 }}>
           <span className="text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
-            Nidhi speaks:
+            AI CFO Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
             <span key={lang} className="text-sm mx-[5px]" style={{
@@ -253,7 +253,7 @@ function LeftColumn() {
   );
 }
 
-/* ── Right Column (Nidhi mockup) ── */
+/* ── Right Column (AI CFO Nidhi mockup) ── */
 interface RightColumnProps {
   displayedMsgs: Msg[];
   showTyping: boolean;
@@ -284,7 +284,7 @@ function RightColumn({ displayedMsgs, showTyping, showSuggestions, showFollowUp,
           <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(196,30,30,0.6)" }} />
           <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(139,90,0,0.6)" }} />
           <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(26,107,60,0.6)" }} />
-          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginLeft: 8, fontFamily: "'Inter', sans-serif" }}>FynHelp · Nidhi Cockpit</span>
+          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginLeft: 8, fontFamily: "'Inter', sans-serif" }}>FynHelp · AI CFO Nidhi Cockpit</span>
         </div>
 
         {/* Mini metrics */}
@@ -317,7 +317,7 @@ function RightColumn({ displayedMsgs, showTyping, showSuggestions, showFollowUp,
                     <div className="flex items-center justify-center" style={{ width: 20, height: 20, borderRadius: "50%", background: "#C41E1E" }}>
                       <span style={{ color: "#FFFFFF", fontSize: 9, fontWeight: 700 }}>N</span>
                     </div>
-                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>Nidhi</span>
+                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>AI CFO Nidhi</span>
                   </div>
                 )}
                 <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-line" }}>{msg.text}</p>
@@ -333,7 +333,7 @@ function RightColumn({ displayedMsgs, showTyping, showSuggestions, showFollowUp,
                 <div className="flex items-center justify-center" style={{ width: 20, height: 20, borderRadius: "50%", background: "#C41E1E" }}>
                   <span style={{ color: "#FFFFFF", fontSize: 9, fontWeight: 700 }}>N</span>
                 </div>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>Nidhi</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>AI CFO Nidhi</span>
               </div>
               <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-line" }}>{followUp.text}</p>
               <div className="flex gap-2 mt-3">

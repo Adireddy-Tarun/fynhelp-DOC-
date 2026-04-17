@@ -97,7 +97,7 @@ const OnboardingPage = () => {
               </button>
             )}
             <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Tell us about your business</h1>
-            <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>This helps Nidhi personalize your financial intelligence.</p>
+            <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>This helps AI CFO Nidhi personalize your financial intelligence.</p>
             <div className="space-y-4">
               {[
                 { key: "business_type", label: "Business type", options: ["Pvt Ltd", "LLP", "Proprietorship", "Partnership"] },
@@ -160,7 +160,7 @@ const OnboardingPage = () => {
 
         {step === 3 && (
           <div className="max-w-2xl">
-            <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Nidhi is ready. Here's what she's found.</h1>
+            <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>AI CFO Nidhi is ready. Here's what she's found.</h1>
             <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
               {selectedBanks.length > 0
                 ? `We've connected ${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""} and are ready to start monitoring.`
@@ -183,7 +183,7 @@ const OnboardingPage = () => {
               </div>
               <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: "hsl(var(--fyn-red))" }}>N</div>
-                <p className="text-primary-foreground text-base">Welcome! I'm Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.</p>
+                <p className="text-primary-foreground text-base">Welcome! I'm AI CFO Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.</p>
               </div>
             </div>
 
