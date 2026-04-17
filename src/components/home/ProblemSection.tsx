@@ -16,7 +16,7 @@ export default function ProblemSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div>
             <span className="fyn-caption text-fyn-gold block mb-4 reveal-up text-base">The Problem</span>
-            <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-fyn-ink mb-6 reveal-left font-serif">
+            <h2 className="text-3xl md:text-4xl leading-[1.2] text-fyn-ink mb-6 reveal-left font-sans font-semibold lg:text-3xl">
               India's 63 million businesses are making ₹Crore decisions with zero financial intelligence.
             </h2>
             <p className="text-fyn-ink/70 text-lg leading-relaxed mb-4 reveal-left" style={{ transitionDelay: "100ms" }}>
@@ -38,7 +38,7 @@ export default function ProblemSection() {
             {stats.map((s) => (
               <div key={s.num} className={`${s.bg} ${s.text} rounded-lg p-7 hover-card`}>
                 <div className="h-1 w-10 bg-fyn-red rounded mb-4" />
-                <p className="font-display text-4xl font-bold mb-2">{s.num}</p>
+                <p className="text-4xl font-bold mb-2 font-sans">{s.num}</p>
                 <p className="font-semibold text-sm mb-2 opacity-90">{s.title}</p>
                 <p className="text-sm leading-relaxed opacity-70">{s.desc}</p>
               </div>
