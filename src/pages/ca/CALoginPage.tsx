@@ -67,7 +67,7 @@ export default function CALoginPage() {
         style={{ background: "#1A1008", color: "#fff", minHeight: "280px" }}
       >
         <div>
-          <FynLogo theme="dark" />
+          <FynLogo variant="light" showTagline={false} className="" />
         </div>
 
         <div className="my-8 md:my-0 max-w-md">
