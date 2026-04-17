@@ -73,6 +73,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <CAAuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -123,10 +124,33 @@ const App = () => (
               <Route path="business" element={<BusinessProfilePage />} />
               <Route path="team" element={<TeamAccessPage />} />
             </Route>
+            {/* CA Partner Portal */}
+            <Route path="/ca/login" element={<CALoginPage />} />
+            <Route path="/ca/register" element={<CARegisterPage />} />
+            <Route path="/ca" element={<CALayout />}>
+              <Route path="dashboard" element={<CADashboardPage />} />
+              <Route path="clients" element={<CAClientsPage />} />
+              <Route path="clients/add" element={<CAAddClientPage />} />
+              <Route path="client/:id" element={<CAClientDetailPage />} />
+              <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
+              <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
+              <Route path="tds-tracker" element={<CATdsTrackerPage />} />
+              <Route path="compliance" element={<CACompliancePage />} />
+              <Route path="itc-recon" element={<CAItcReconPage />} />
+              <Route path="reports" element={<CAReportsPage />} />
+              <Route path="bulk-actions" element={<CABulkActionsPage />} />
+              <Route path="portfolio-health" element={<CAPortfolioHealthPage />} />
+              <Route path="revenue" element={<CARevenuePage />} />
+              <Route path="notifications" element={<CANotificationsPage />} />
+              <Route path="settings" element={<CASettingsPage />} />
+              <Route path="settings/team" element={<CASettingsPage />} />
+              <Route path="settings/billing" element={<CASettingsPage />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </CAAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
