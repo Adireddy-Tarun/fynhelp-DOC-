@@ -47,6 +47,7 @@ import BillingPage from "./pages/dashboard/settings/BillingPage.tsx";
 import IntegrationsPage from "./pages/dashboard/settings/IntegrationsPage.tsx";
 import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.tsx";
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
+import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
@@ -123,6 +124,7 @@ const App = () => (
               <Route path="integrations" element={<IntegrationsPage />} />
               <Route path="business" element={<BusinessProfilePage />} />
               <Route path="team" element={<TeamAccessPage />} />
+              <Route path="ca-access" element={<CAAccessPage />} />
             </Route>
             {/* CA Partner Portal */}
             <Route path="/ca/login" element={<CALoginPage />} />
