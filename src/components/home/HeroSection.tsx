@@ -177,9 +177,9 @@ function LeftColumn() {
           marginBottom: 0,
         }}
       >
-        <span className="text-primary-foreground font-serif" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
-        <span className="font-serif text-primary mx-[5px]" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
-        <span className="text-primary-foreground font-serif" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
+        <span className="text-primary-foreground font-sans" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
+        <span className="text-primary mx-[5px] font-sans" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
+        <span className="text-primary-foreground font-sans" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
       </h1>
 
       {/* Subheadline */}
@@ -231,7 +231,7 @@ function LeftColumn() {
           color: "rgba(255,255,255,0.40)", marginTop: 12,
         }}
       >
-        No credit card · Setup in 10 min · Works with Tally
+        No credit card · Setup in 10 min · Works with All Accounting Softwares!
       </p>
 
       {/* Language pills */}
@@ -241,7 +241,7 @@ function LeftColumn() {
             AI CFO Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
-            <span key={lang} className="text-sm mx-[5px]" style={{
+            <span key={lang} className="text-sm mx-[5px] text-primary-foreground" style={{
               border: "1px solid rgba(139,105,20,0.3)", borderRadius: 100, padding: "4px 12px",
               fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "#8B6914",
               background: "rgba(139,105,20,0.08)",
