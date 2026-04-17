@@ -146,6 +146,8 @@ const App = () => (
               <Route path="notifications" element={<CANotificationsPage />} />
               <Route path="settings" element={<CASettingsPage />} />
               <Route path="settings/team" element={<CASettingsPage />} />
+              <Route path="settings/notifications" element={<CASettingsPage />} />
+              <Route path="settings/defaults" element={<CASettingsPage />} />
               <Route path="settings/billing" element={<CASettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
