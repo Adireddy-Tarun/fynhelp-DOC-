@@ -431,14 +431,71 @@ export type Database = {
           },
         ]
       }
+      ca_report_schedules: {
+        Row: {
+          ca_firm_id: string
+          clients: Json | null
+          created_at: string
+          day_of_month: number | null
+          delivery: Json | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          last_generated_at: string | null
+          next_generation_at: string | null
+          report_name: string | null
+          report_type: string
+          scope: string | null
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          clients?: Json | null
+          created_at?: string
+          day_of_month?: number | null
+          delivery?: Json | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          last_generated_at?: string | null
+          next_generation_at?: string | null
+          report_name?: string | null
+          report_type: string
+          scope?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          clients?: Json | null
+          created_at?: string
+          day_of_month?: number | null
+          delivery?: Json | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          last_generated_at?: string | null
+          next_generation_at?: string | null
+          report_name?: string | null
+          report_type?: string
+          scope?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ca_reports_log: {
         Row: {
           business_id: string | null
           ca_firm_id: string
           created_at: string | null
+          file_path: string | null
+          file_size: number | null
           file_url: string | null
+          generated_by_user_id: string | null
           id: string
           period: string | null
+          period_end: string | null
+          period_start: string | null
+          report_name: string | null
           report_type: string
           sent_to: string | null
           status: string | null
@@ -447,9 +504,15 @@ export type Database = {
           business_id?: string | null
           ca_firm_id: string
           created_at?: string | null
+          file_path?: string | null
+          file_size?: number | null
           file_url?: string | null
+          generated_by_user_id?: string | null
           id?: string
           period?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_name?: string | null
           report_type: string
           sent_to?: string | null
           status?: string | null
@@ -458,9 +521,15 @@ export type Database = {
           business_id?: string | null
           ca_firm_id?: string
           created_at?: string | null
+          file_path?: string | null
+          file_size?: number | null
           file_url?: string | null
+          generated_by_user_id?: string | null
           id?: string
           period?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_name?: string | null
           report_type?: string
           sent_to?: string | null
           status?: string | null
