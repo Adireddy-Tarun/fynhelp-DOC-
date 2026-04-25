@@ -384,7 +384,7 @@ const DataImportPage = () => {
       <div className="mb-6">
         <h1 className="font-serif text-3xl text-fyn-ink mb-2">Import Your Data</h1>
         <p className="text-fyn-ink/60">
-          Upload bank statements, invoices, and expenses in CSV format. We'll automatically categorize and sync to your dashboard.
+          Upload bank statements, invoices, and expenses as CSV or XLSX. We'll automatically categorize and sync to your dashboard.
         </p>
       </div>
 
