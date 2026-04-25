@@ -63,7 +63,7 @@ const CompliancePage = () => {
     enabled: !!businessId,
   });
 
-  const { data: tdsFilings, isLoading: loadingTds } = useQuery({
+  const { data: tdsFilings, isLoading: loadingTds, isFetching: fetchingTds } = useQuery({
     queryKey: ["compliance-tds", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
