@@ -21,8 +21,19 @@ const CompliancePage = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId] });
-    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId] });
+  const [fromDate, setFromDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    return d;
+  });
+  const [toDate, setToDate] = useState<Date>(() => new Date());
+  const fromStr = format(fromDate, "yyyy-MM-dd");
+  const toStr = format(toDate, "yyyy-MM-dd");
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] });
+    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] });
     setIsRefreshing(false);
   };
   useEffect(() => {
