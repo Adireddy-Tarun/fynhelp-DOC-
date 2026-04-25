@@ -281,8 +281,11 @@ const CompliancePage = () => {
           </div>
 
           {/* TDS */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS</p>
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
+              TDS FILINGS
+              {fetchingTds && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+            </p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
             </p>
