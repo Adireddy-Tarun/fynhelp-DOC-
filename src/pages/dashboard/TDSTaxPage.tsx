@@ -204,7 +204,7 @@ const TDSTaxPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {tdsFilings.map((f, i) => {
+                {visibleFilings.map((f, i) => {
                   const badge = getStatusStyle(f);
                   return (
                     <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
