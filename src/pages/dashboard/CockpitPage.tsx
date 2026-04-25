@@ -323,12 +323,19 @@ const CockpitPage = () => {
       {/* Quick shortcut: Data Import — Bloomberg/data-dense */}
       <Link
         to="/dashboard/data-import"
-        className="group block mb-6 transition-all duration-150 hover:-translate-y-px"
-        style={{
-          background: "hsl(var(--fyn-beige-card))",
-          border: "1px solid hsl(var(--fyn-ink-10))",
-          borderLeft: "3px solid hsl(var(--fyn-red))",
-        }}
+        className="group block mb-6 outline-none
+                   border border-l-[3px]
+                   border-[hsl(var(--fyn-ink-10))] border-l-[hsl(var(--fyn-red))]
+                   bg-[hsl(var(--fyn-beige-card))]
+                   transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out
+                   hover:-translate-y-px
+                   hover:bg-[hsl(var(--fyn-beige-deep))]
+                   hover:border-[hsl(var(--fyn-ink-20))]
+                   hover:border-l-[hsl(var(--fyn-red-dark))]
+                   hover:shadow-[0_4px_0_-2px_hsl(var(--fyn-red)/0.18),0_8px_20px_-12px_hsl(var(--fyn-ink)/0.25)]
+                   focus-visible:ring-2 focus-visible:ring-[hsl(var(--fyn-red))]
+                   focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--fyn-beige))]
+                   active:translate-y-0 active:shadow-none active:bg-[hsl(var(--fyn-beige-dark))]"
       >
         <div className="flex items-stretch">
           {/* Mono label rail */}
