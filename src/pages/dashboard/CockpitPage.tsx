@@ -674,7 +674,7 @@ const CockpitPage = () => {
               </div>
               <div className="text-center rounded-lg p-3" style={{ background: "#FDEAEA", border: "1px solid #C41E1E" }}>
                 <p className="font-mono text-xl font-bold" style={{ color: "#C41E1E" }}>{formatINR(Number(itcRow?.itc_at_risk || 0))}</p>
-                <FynLabel className="mt-1" style={{ color: "#C41E1E" } as any}>ITC AT RISK</FynLabel>
+                <p className="text-fyn-tiny font-medium uppercase tracking-[0.06em] mt-1" style={{ color: "#C41E1E" }}>ITC AT RISK</p>
               </div>
               <div className="text-center rounded-lg p-3" style={{ background: "#FEF3E2" }}>
                 <p className="font-mono text-xl font-bold" style={{ color: "#F59E0B" }}>{noticeRisk?.score ?? "—"}{noticeRisk ? "/100" : ""}</p>
