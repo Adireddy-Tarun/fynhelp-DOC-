@@ -6,6 +6,20 @@ import { useQuery } from "@tanstack/react-query";
 import { formatINR, getDaysOverdueColor } from "@/lib/indian-format";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  FynCard,
+  FynButton,
+  FynBadge,
+  FynTable,
+  FynTH,
+  FynTR,
+  FynTD,
+  FynLabel,
+  FynSearchInput,
+  FynSelect,
+} from "@/components/dashboard/ui";
 
 const REFETCH_MS = 30000;
 
@@ -25,12 +39,16 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const EmptyHint = ({ text }: { text: string }) => (
-  <p style={{ color: "rgba(26,16,8,0.45)", fontSize: 13, fontStyle: "italic" }}>{text}</p>
+  <p className="text-fyn-ink/45 text-fyn-small italic">{text}</p>
 );
+
+type ReceivablesFilter = "all" | "overdue" | "current";
 
 const CockpitPage = () => {
   const { businessId } = useAuth();
   const [nidhiInput, setNidhiInput] = useState("");
+  const [recSearch, setRecSearch] = useState("");
+  const [recFilter, setRecFilter] = useState<ReceivablesFilter>("all");
 
   // Bank balances
   const { data: bankAccounts = [], isLoading: bankLoading, error: bankError } = useQuery({
@@ -80,7 +98,7 @@ const CockpitPage = () => {
     refetchInterval: REFETCH_MS,
   });
 
-  // Receivables (overdue, top 5)
+  // Receivables (outstanding, top 5 — filtered/searched client-side below)
   const { data: receivables = [], isLoading: recLoading } = useQuery({
     queryKey: ["receivables-top", businessId],
     queryFn: async () => {
@@ -238,18 +256,25 @@ const CockpitPage = () => {
 
   const runwayColor = runwayDays >= 180 ? "#16A34A" : runwayDays >= 90 ? "#16A34A" : runwayDays >= 30 ? "#F59E0B" : "#DC2626";
 
-  const alertStyles: Record<string, { bg: string; border: string; titleColor: string; ctaColor: string }> = {
-    critical: { bg: "#FDEAEA", border: "#C41E1E", titleColor: "#C41E1E", ctaColor: "#C41E1E" },
-    warning: { bg: "#FEF3E2", border: "#8B5A00", titleColor: "#8B5A00", ctaColor: "#8B5A00" },
-    info: { bg: "#EAF0FB", border: "#1A4A8B", titleColor: "#1A4A8B", ctaColor: "#1A4A8B" },
-  };
-
   const daysOverdue = (dueDate: string) => {
     const d = Math.floor((Date.now() - new Date(dueDate).getTime()) / 86400000);
     return d > 0 ? d : 0;
   };
   const getDaysLeft = (dateStr: string) =>
     Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
+
+  // Filtered + searched receivables for the table
+  const visibleReceivables = useMemo(() => {
+    const q = recSearch.trim().toLowerCase();
+    return receivables.filter((r: any) => {
+      const days = daysOverdue(r.due_date || "");
+      if (recFilter === "overdue" && days <= 0) return false;
+      if (recFilter === "current" && days > 0) return false;
+      if (!q) return true;
+      const hay = `${r.customer_name || ""} ${r.invoice_number || ""}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [receivables, recSearch, recFilter]);
 
   const hasAnyData =
     bankAccounts.length > 0 ||
@@ -258,60 +283,73 @@ const CockpitPage = () => {
     payables.length > 0 ||
     alerts.length > 0;
 
+  // Alert severity → FynBadge tone
+  const alertTone = (sev: string): "danger" | "warning" | "neutral" =>
+    sev === "critical" ? "danger" : sev === "warning" ? "warning" : "neutral";
+  const alertAccent: Record<string, { bg: string; border: string; titleColor: string; ctaColor: string }> = {
+    critical: { bg: "#FDEAEA", border: "#C41E1E", titleColor: "#C41E1E", ctaColor: "#C41E1E" },
+    warning: { bg: "#FEF3E2", border: "#8B5A00", titleColor: "#8B5A00", ctaColor: "#8B5A00" },
+    info: { bg: "#EAF0FB", border: "#1A4A8B", titleColor: "#1A4A8B", ctaColor: "#1A4A8B" },
+  };
+
   return (
     <DashboardLayout>
-      {/* AI CFO Nidhi header */}
-      <div className="rounded-xl p-5 mb-6 flex items-center justify-between" style={{ background: "#1A1008" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E" }}>N</div>
+      {/* AI CFO Nidhi header — intentional dark hero (out of FynCard scope) */}
+      <div className="rounded-xl p-5 mb-fyn-md flex items-center justify-between bg-fyn-ink">
+        <div className="flex items-center gap-fyn-sm">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-fyn-red">N</div>
           <div>
             <p className="text-white font-serif text-lg">Good morning. Here's your business today.</p>
-            <p style={{ color: "#8B6914", fontSize: 13 }}>{brief ? `Last brief: ${new Date(brief.created_at).toLocaleString("en-IN")}` : "No brief yet"}</p>
+            <p className="text-fyn-tiny" style={{ color: "#8B6914" }}>
+              {brief ? `Last brief: ${new Date(brief.created_at).toLocaleString("en-IN")}` : "No brief yet"}
+            </p>
           </div>
         </div>
-        <Link to="/dashboard/nidhi" className="text-white text-[14px] font-medium px-4 py-2 rounded-lg hover-btn-primary" style={{ background: "#C41E1E" }}>
-          Ask AI CFO Nidhi →
-        </Link>
+        <FynButton asChild-disabled className="bg-fyn-red text-white hover:bg-fyn-red-dark px-4 py-2">
+          <Link to="/dashboard/nidhi" className="text-white">Ask AI CFO Nidhi →</Link>
+        </FynButton>
       </div>
 
       {bankError && (
-        <div className="rounded-lg mb-6 p-4" style={{ background: "#FDEAEA", border: "1px solid #C41E1E", color: "#C41E1E", fontSize: 14 }}>
+        <FynCard className="mb-fyn-md border-l-4 border-l-fyn-red bg-[#FDEAEA] text-[#C41E1E] text-fyn-small">
           Unable to load data. Please refresh.
-        </div>
+        </FynCard>
       )}
 
       {!hasAnyData && !bankLoading && !txLoading && !recLoading && (
-        <div className="rounded-lg mb-6 p-6 text-center" style={{ background: "#FFFFFF", border: "1px dashed rgba(26,16,8,0.2)" }}>
-          <p style={{ color: "#1A1008", fontSize: 16, fontWeight: 600, marginBottom: 6 }}>No data yet</p>
-          <p style={{ color: "rgba(26,16,8,0.6)", fontSize: 14, marginBottom: 14 }}>Connect a bank account or import transactions to see your cockpit come alive.</p>
-          <Link to="/dashboard/banking" className="inline-block text-white px-4 py-2 rounded-lg" style={{ background: "#C41E1E", fontSize: 14, fontWeight: 500 }}>
-            Connect Bank →
-          </Link>
-        </div>
+        <FynCard className="mb-fyn-md text-center border-dashed">
+          <p className="text-fyn-ink text-base font-semibold mb-1.5">No data yet</p>
+          <p className="text-fyn-ink/60 text-fyn-small mb-fyn-md">
+            Connect a bank account or import transactions to see your cockpit come alive.
+          </p>
+          <FynButton asChild-disabled>
+            <Link to="/dashboard/banking" className="text-white">Connect Bank →</Link>
+          </FynButton>
+        </FynCard>
       )}
 
       {/* Alert strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-fyn-md mb-fyn-md">
         {alerts.length === 0 && (
-          <div className="md:col-span-3 rounded-lg p-4" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+          <FynCard className="md:col-span-3">
             <EmptyHint text="No active alerts." />
-          </div>
+          </FynCard>
         )}
         {alerts.map((a: any) => {
-          const s = alertStyles[a.severity] || alertStyles.info;
+          const s = alertAccent[a.severity] || alertAccent.info;
           return (
             <div
               key={a.id}
               className="rounded-lg transition-all duration-250 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
               style={{ background: s.bg, borderLeft: `4px solid ${s.border}`, padding: "16px 20px", minHeight: 72 }}
             >
-              <div className="flex items-start justify-between">
-                <p style={{ color: s.titleColor, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{a.title}</p>
-                {a.severity === "critical" && <span className="w-2.5 h-2.5 rounded-full pulse-ring flex-shrink-0 mt-1" style={{ background: "#C41E1E" }} />}
+              <div className="flex items-start justify-between mb-fyn-xs">
+                <p className="text-fyn-small font-semibold" style={{ color: s.titleColor }}>{a.title}</p>
+                <FynBadge tone={alertTone(a.severity)}>{a.severity}</FynBadge>
               </div>
-              <p style={{ color: "#1A1008", fontSize: 13, marginBottom: 8, opacity: 0.8 }}>{a.body}</p>
+              <p className="text-fyn-ink text-fyn-small opacity-80 mb-fyn-sm">{a.body}</p>
               {a.action_url && (
-                <Link to={a.action_url} style={{ color: s.ctaColor, fontSize: 13, fontWeight: 500, textDecoration: "underline" }}>
+                <Link to={a.action_url} className="text-fyn-small font-medium underline" style={{ color: s.ctaColor }}>
                   {a.severity === "critical" ? "Fix Now →" : a.severity === "warning" ? "Review →" : "View →"}
                 </Link>
               )}
@@ -320,10 +358,10 @@ const CockpitPage = () => {
         })}
       </div>
 
-      {/* Quick shortcut: Data Import — Bloomberg/data-dense */}
+      {/* Quick shortcut: Data Import — Bloomberg/data-dense (intentional bespoke) */}
       <Link
         to="/dashboard/data-import"
-        className="group block mb-6 outline-none
+        className="group block mb-fyn-md outline-none
                    border border-l-[3px]
                    border-[hsl(var(--fyn-ink-10))] border-l-[hsl(var(--fyn-red))]
                    bg-[hsl(var(--fyn-beige-card))]
@@ -338,18 +376,11 @@ const CockpitPage = () => {
                    active:translate-y-0 active:shadow-none active:bg-[hsl(var(--fyn-beige-dark))]"
       >
         <div className="flex items-stretch">
-          {/* Mono rail — Tiny scale: .fyn-label (Inter 500, 12px, 0.08em, uppercase) */}
-          <div
-            className="hidden sm:flex items-center px-3 fyn-label
-                       bg-[hsl(var(--fyn-ink))] text-[hsl(var(--fyn-beige))]"
-          >
+          <div className="hidden sm:flex items-center px-3 fyn-label bg-[hsl(var(--fyn-ink))] text-[hsl(var(--fyn-beige))]">
             Data · Import
           </div>
-
-          {/* Body */}
           <div className="flex-1 flex items-center justify-between px-4 py-3 gap-4 md:gap-6">
             <div className="flex items-center gap-3 min-w-0">
-              {/* Icon tile */}
               <div
                 className="w-9 h-9 flex items-center justify-center flex-shrink-0
                            bg-[hsl(var(--fyn-beige))]
@@ -358,58 +389,27 @@ const CockpitPage = () => {
                            text-[hsl(var(--fyn-red))]"
                 aria-hidden
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="square"
-                  strokeLinejoin="miter"
-                  shapeRendering="crispEdges"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
                   <path d="M12 3v11" />
                   <path d="M7 9l5 5 5-5" />
                   <path d="M4 18v2h16v-2" />
                 </svg>
               </div>
-
               <div className="min-w-0">
-                {/* H3 — Playfair (inherited from base h3), 18px / 1.2 */}
-                <h3 className="font-serif font-bold truncate text-[18px] leading-[1.2]
-                               text-[hsl(var(--fyn-ink))]">
+                <h3 className="font-serif font-bold truncate text-[18px] leading-[1.2] text-[hsl(var(--fyn-ink))]">
                   Import Data
                 </h3>
-                {/* Body — Inter 400, 14px / 1.5 */}
-                <p className="truncate mt-1 text-[14px] leading-[1.5]
-                              text-[hsl(var(--fyn-ink)/0.60)]">
+                <p className="truncate mt-1 text-[14px] leading-[1.5] text-[hsl(var(--fyn-ink)/0.60)]">
                   Bank statements, invoices, and expenses — CSV or XLSX
                 </p>
               </div>
             </div>
-
-            {/* Right-side stats + CTA */}
             <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
-              {/* Stats — md+ only */}
               <div className="hidden md:block text-right">
-                {/* Tiny label */}
-                <p className="fyn-label text-[hsl(var(--fyn-ink)/0.40)]">
-                  Formats
-                </p>
-                {/* Mono numeric/data — .fyn-mono base (13px) */}
-                <p className="fyn-mono mt-1 font-semibold text-[hsl(var(--fyn-ink))]">
-                  .csv · .xlsx
-                </p>
+                <p className="fyn-label text-[hsl(var(--fyn-ink)/0.40)]">Formats</p>
+                <p className="fyn-mono mt-1 font-semibold text-[hsl(var(--fyn-ink))]">.csv · .xlsx</p>
               </div>
-
-              {/* Divider */}
-              <span
-                aria-hidden
-                className="hidden md:inline-block w-px h-8 bg-[hsl(var(--fyn-ink-10))]"
-              />
-
-              {/* CTA — Tiny label scale */}
+              <span aria-hidden className="hidden md:inline-block w-px h-8 bg-[hsl(var(--fyn-ink-10))]" />
               <div
                 className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5
                            fyn-label
@@ -426,54 +426,54 @@ const CockpitPage = () => {
         </div>
       </Link>
 
-      {/* Key metrics row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Key metrics row — 4 dark KPI tiles (intentional Bloomberg variant; FynCard is light-surface only) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-fyn-md mb-fyn-md">
         {/* Cash in Bank */}
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>CASH IN BANK</p>
-          <p style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>
-            {bankLoading ? "…" : formatINR(cashBalance)}
-          </p>
-          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 4 }}>{bankAccounts.length} account{bankAccounts.length === 1 ? "" : "s"}</p>
+        <div className="rounded-lg bg-fyn-ink px-6 py-5">
+          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">CASH IN BANK</p>
+          <p className="text-white text-[36px] font-bold mt-1">{bankLoading ? "…" : formatINR(cashBalance)}</p>
+          <p className="text-white/60 text-fyn-tiny mt-1">{bankAccounts.length} account{bankAccounts.length === 1 ? "" : "s"}</p>
         </div>
 
         {/* Runway */}
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>RUNWAY</p>
-          <p style={{ color: runwayColor, fontSize: 36, fontWeight: 700, marginTop: 4 }}>
+        <div className="rounded-lg bg-fyn-ink px-6 py-5">
+          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">RUNWAY</p>
+          <p className="text-[36px] font-bold mt-1" style={{ color: runwayColor }}>
             {dailyBurn > 0 ? `${runwayDays.toFixed(0)} days` : "—"}
           </p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>
+          <p className="text-white/60 text-fyn-tiny mt-1">
             At {dailyBurn > 0 ? formatINR(Math.round(dailyBurn)) : "₹0"} daily burn
           </p>
-          <div style={{ marginTop: 8, height: 4, background: "rgba(255,255,255,0.10)", borderRadius: 2 }}>
-            <div style={{ height: 4, background: runwayColor, borderRadius: 2, width: `${Math.min(100, (runwayDays / 180) * 100)}%` }} />
+          <div className="mt-2 h-1 bg-white/10 rounded-sm">
+            <div className="h-1 rounded-sm" style={{ background: runwayColor, width: `${Math.min(100, (runwayDays / 180) * 100)}%` }} />
           </div>
         </div>
 
         {/* Receivables Overdue */}
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>RECEIVABLES OVERDUE</p>
-          <p style={{ color: receivablesOverdue > 0 ? "#F87171" : "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(receivablesOverdue)}</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>{receivables.filter((r: any) => r.due_date && new Date(r.due_date).getTime() < Date.now()).length} customers</p>
+        <div className="rounded-lg bg-fyn-ink px-6 py-5">
+          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">RECEIVABLES OVERDUE</p>
+          <p className="text-[36px] font-bold mt-1" style={{ color: receivablesOverdue > 0 ? "#F87171" : "#FFFFFF" }}>{formatINR(receivablesOverdue)}</p>
+          <p className="text-white/60 text-fyn-tiny mt-1">
+            {receivables.filter((r: any) => r.due_date && new Date(r.due_date).getTime() < Date.now()).length} customers
+          </p>
         </div>
 
         {/* Due This Week */}
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase" }}>PAYABLES DUE / 7D</p>
-          <p style={{ color: "#FFFFFF", fontSize: 36, fontWeight: 700, marginTop: 4 }}>{formatINR(dueThisWeek)}</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>Total payables: {formatINR(totalPayables)}</p>
+        <div className="rounded-lg bg-fyn-ink px-6 py-5">
+          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">PAYABLES DUE / 7D</p>
+          <p className="text-white text-[36px] font-bold mt-1">{formatINR(dueThisWeek)}</p>
+          <p className="text-white/60 text-fyn-tiny mt-1">Total payables: {formatINR(totalPayables)}</p>
         </div>
       </div>
 
       {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-fyn-lg">
         {/* Left - 60% */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-fyn-lg">
           {/* Cash flow chart */}
-          <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-fyn-ink font-serif text-2xl" style={{ fontSize: 15 }}>Cash Flow — Last 180 Days</h3>
+          <FynCard>
+            <div className="flex items-center justify-between mb-fyn-md">
+              <h3 className="text-fyn-ink font-serif text-fyn-h3">Cash Flow — Last 180 Days</h3>
             </div>
             {cashFlowData.length === 0 ? (
               <div style={{ height: 280 }} className="flex items-center justify-center">
@@ -500,57 +500,82 @@ const CockpitPage = () => {
                 </AreaChart>
               </ResponsiveContainer>
             )}
-            <div className="flex gap-6 mt-3">
-              <span className="flex items-center gap-1.5" style={{ fontSize: 13 }}>
+            <div className="flex gap-fyn-lg mt-fyn-sm text-fyn-small">
+              <span className="flex items-center gap-1.5">
                 <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#16A34A" }} /> Money In
               </span>
-              <span className="flex items-center gap-1.5" style={{ fontSize: 13 }}>
+              <span className="flex items-center gap-1.5">
                 <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#DC2626" }} /> Money Out
               </span>
             </div>
-          </div>
+          </FynCard>
 
           {/* Receivables table */}
-          <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <h3 className="text-fyn-ink font-serif mb-4" style={{ fontSize: 15 }}>Top Outstanding Receivables</h3>
+          <FynCard>
+            <div className="flex items-center justify-between mb-fyn-md gap-fyn-sm flex-wrap">
+              <h3 className="text-fyn-ink font-serif text-fyn-h3">Top Outstanding Receivables</h3>
+              <div className="flex items-center gap-fyn-sm">
+                <div className="w-56">
+                  <FynSearchInput
+                    value={recSearch}
+                    onChange={(e) => setRecSearch(e.target.value)}
+                    placeholder="Search customer or invoice…"
+                  />
+                </div>
+                <FynSelect
+                  value={recFilter}
+                  onChange={(e) => setRecFilter(e.target.value as ReceivablesFilter)}
+                  className="w-40"
+                  aria-label="Filter receivables"
+                >
+                  <option value="all">All</option>
+                  <option value="overdue">Overdue only</option>
+                  <option value="current">Current only</option>
+                </FynSelect>
+              </div>
+            </div>
             {receivables.length === 0 ? (
               <EmptyHint text="No outstanding receivables." />
+            ) : visibleReceivables.length === 0 ? (
+              <EmptyHint text="No receivables match your filter." />
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
-                      <th className="text-left py-2" style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", textTransform: "uppercase", fontWeight: 500 }}>Customer</th>
-                      <th className="text-left py-2" style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", textTransform: "uppercase", fontWeight: 500 }}>Invoice</th>
-                      <th className="text-right py-2" style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", textTransform: "uppercase", fontWeight: 500 }}>Amount</th>
-                      <th className="text-right py-2" style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", textTransform: "uppercase", fontWeight: 500 }}>Days Overdue</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {receivables.map((r: any, i: number) => {
-                      const days = daysOverdue(r.due_date || "");
-                      return (
-                        <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}>
-                          <td className="py-3" style={{ fontSize: 14, fontWeight: 600, color: "#1A1008" }}>{r.customer_name}</td>
-                          <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{r.invoice_number || "—"}</td>
-                          <td className="py-3 text-right fyn-metric" style={{ fontSize: 14 }}>{formatINR(r.outstanding || r.amount)}</td>
-                          <td className={`py-3 text-right fyn-metric ${getDaysOverdueColor(days)}`} style={{ fontSize: 14 }}>{days > 0 ? `${days}d` : "Current"}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <FynTable>
+                <thead>
+                  <FynTR className="hover:bg-transparent">
+                    <FynTH>Customer</FynTH>
+                    <FynTH>Invoice</FynTH>
+                    <FynTH align="right">Amount</FynTH>
+                    <FynTH align="right">Days Overdue</FynTH>
+                  </FynTR>
+                </thead>
+                <tbody>
+                  {visibleReceivables.map((r: any) => {
+                    const days = daysOverdue(r.due_date || "");
+                    return (
+                      <FynTR key={r.id}>
+                        <FynTD className="text-fyn-ink font-semibold">{r.customer_name}</FynTD>
+                        <FynTD>{r.invoice_number || "—"}</FynTD>
+                        <FynTD align="right" mono>{formatINR(r.outstanding || r.amount)}</FynTD>
+                        <FynTD align="right" mono className={cn("text-fyn-small", getDaysOverdueColor(days))}>
+                          {days > 0 ? `${days}d` : "Current"}
+                        </FynTD>
+                      </FynTR>
+                    );
+                  })}
+                </tbody>
+              </FynTable>
             )}
-            <Link to="/dashboard/receivables" style={{ color: "#C41E1E", fontSize: 14, fontWeight: 500 }} className="hover:underline mt-3 inline-block">View all receivables →</Link>
-          </div>
+            <Link to="/dashboard/receivables" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
+              View all receivables →
+            </Link>
+          </FynCard>
         </div>
 
         {/* Right - 40% */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-fyn-lg">
           {/* Runway gauge */}
-          <div className="rounded-lg p-5 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <h3 className="text-fyn-ink font-serif mb-4" style={{ fontSize: 15 }}>Cash Runway</h3>
+          <FynCard className="text-center">
+            <h3 className="text-fyn-ink font-serif mb-fyn-md text-fyn-h3">Cash Runway</h3>
             <div className="relative mx-auto" style={{ width: 280, height: 160 }}>
               <svg viewBox="0 0 280 160" className="w-full">
                 <path d="M 20 145 A 120 120 0 0 1 53 35" fill="none" stroke="#DC2626" strokeWidth="20" strokeLinecap="round" />
@@ -570,39 +595,44 @@ const CockpitPage = () => {
                 })()}
               </svg>
             </div>
-            <p style={{ color: runwayColor, fontSize: 56, fontWeight: 700, lineHeight: 1 }}>
+            <p className="text-[56px] font-bold leading-none" style={{ color: runwayColor }}>
               {dailyBurn > 0 ? runwayDays.toFixed(0) : "—"}
             </p>
-            <p style={{ color: "rgba(26,16,8,0.50)", fontSize: 14, marginTop: 4 }}>days of runway</p>
-            <p style={{ color: "#8B6914", fontSize: 12, marginTop: 2 }}>
+            <p className="text-fyn-ink/50 text-fyn-small mt-1">days of runway</p>
+            <p className="text-fyn-tiny mt-0.5" style={{ color: "#8B6914" }}>
               Monthly burn: {monthlyBurn > 0 ? formatINR(Math.round(monthlyBurn)) : "—"}
             </p>
-          </div>
+          </FynCard>
 
-          {/* Nidhi insight */}
-          <div className="rounded-[10px]" style={{ background: "#1A1008", padding: "20px 24px" }}>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 16 }}>N</div>
-              <p className="text-white" style={{ fontSize: 14, fontWeight: 600 }}>AI CFO Nidhi's read on today</p>
+          {/* Nidhi insight — intentional dark surface (out of FynCard scope) */}
+          <div className="rounded-[10px] bg-fyn-ink px-6 py-5">
+            <div className="flex items-center gap-fyn-sm">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-fyn-red text-base">N</div>
+              <p className="text-white text-fyn-small font-semibold">AI CFO Nidhi's read on today</p>
             </div>
-            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, lineHeight: 1.75, marginTop: 12 }}>
+            <p className="text-white/85 text-fyn-small leading-[1.75] mt-fyn-sm">
               {brief?.content || "No brief generated yet. Ask Nidhi a question to get started."}
             </p>
-            <div className="flex gap-2 mt-[14px]">
+            <div className="flex gap-2 mt-3.5">
               <input
                 value={nidhiInput}
-                onChange={e => setNidhiInput(e.target.value)}
+                onChange={(e) => setNidhiInput(e.target.value)}
                 placeholder="Ask AI CFO Nidhi a follow-up..."
-                className="flex-1 outline-none"
-                style={{ height: 40, padding: "10px 14px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.20)", borderRadius: 6, color: "#FFFFFF", fontSize: 13 }}
+                className="flex-1 outline-none h-10 px-3.5 bg-white/10 border border-white/20 rounded-md text-white text-fyn-small placeholder:text-white/40 focus:ring-2 focus:ring-fyn-red focus:border-transparent"
+                aria-label="Ask AI CFO Nidhi a follow-up"
               />
-              <button className="transition-all hover:brightness-90" style={{ width: 40, height: 40, background: "#C41E1E", borderRadius: 6, color: "#FFFFFF", fontSize: 16, fontWeight: 700 }}>→</button>
+              <FynButton
+                aria-label="Send to AI CFO Nidhi"
+                className="w-10 h-10 px-0 py-0 justify-center"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </FynButton>
             </div>
           </div>
 
           {/* Filing Calendar */}
-          <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <h3 className="text-fyn-ink font-serif mb-3" style={{ fontSize: 15 }}>Filing Calendar (Next 30 days)</h3>
+          <FynCard>
+            <h3 className="text-fyn-ink font-serif mb-fyn-sm text-fyn-h3">Filing Calendar (Next 30 days)</h3>
             {compliance.length === 0 ? (
               <EmptyHint text="No upcoming filings in the next 30 days." />
             ) : (
@@ -610,41 +640,45 @@ const CockpitPage = () => {
                 {compliance.map((c: any) => {
                   const daysLeft = getDaysLeft(c.due_date);
                   const dotColor = daysLeft <= 3 ? "#DC2626" : daysLeft <= 7 ? "#F59E0B" : daysLeft <= 14 ? "#8B6914" : "rgba(26,16,8,0.30)";
-                  const badgeBg = daysLeft <= 3 ? "#FDEAEA" : daysLeft <= 7 ? "#FEF3E2" : "rgba(26,16,8,0.06)";
-                  const badgeColor = daysLeft <= 3 ? "#C41E1E" : daysLeft <= 7 ? "#8B5A00" : "rgba(26,16,8,0.50)";
+                  const tone: "danger" | "warning" | "neutral" =
+                    daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warning" : "neutral";
                   return (
-                    <div key={c.id} className="flex items-center gap-3 rounded-lg" style={{ padding: "8px 10px", height: 36 }}>
+                    <div key={c.id} className="flex items-center gap-fyn-sm rounded-lg px-2.5 py-2 h-9">
                       <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${daysLeft <= 3 ? "pulse-ring" : ""}`} style={{ background: dotColor }} />
-                      <span className="flex-1" style={{ color: "#1A1008", fontSize: 13, fontWeight: 500 }}>{c.filing_name}</span>
-                      <span style={{ fontSize: 12, color: "rgba(26,16,8,0.60)" }}>{c.due_date}</span>
-                      <span className="rounded-full fyn-metric" style={{ background: badgeBg, color: badgeColor, fontSize: 12, fontWeight: daysLeft <= 3 ? 700 : 500, padding: "2px 8px" }}>{daysLeft > 0 ? `${daysLeft}d` : "Due"}</span>
+                      <span className="flex-1 text-fyn-ink text-fyn-small font-medium">{c.filing_name}</span>
+                      <span className="text-fyn-tiny text-fyn-ink/60">{c.due_date}</span>
+                      <FynBadge tone={tone}>{daysLeft > 0 ? `${daysLeft}d` : "Due"}</FynBadge>
                     </div>
                   );
                 })}
               </div>
             )}
-            <Link to="/dashboard/filing-calendar" style={{ color: "#C41E1E", fontSize: 14, fontWeight: 500 }} className="hover:underline mt-3 inline-block">View full calendar →</Link>
-          </div>
+            <Link to="/dashboard/filing-calendar" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
+              View full calendar →
+            </Link>
+          </FynCard>
 
           {/* GST Health */}
-          <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-            <h3 className="text-fyn-ink font-serif mb-3" style={{ fontSize: 15 }}>GST Health</h3>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center rounded-lg" style={{ background: "#DCFCE7", padding: "12px 8px" }}>
-                <p className="fyn-metric" style={{ color: "#16A34A", fontSize: 20, fontWeight: 700 }}>{formatINR(Number(itcRow?.itc_safe || 0))}</p>
-                <p style={{ color: "#16A34A", fontSize: 11, fontWeight: 500, textTransform: "uppercase", marginTop: 4 }}>ITC SAFE</p>
+          <FynCard>
+            <h3 className="text-fyn-ink font-serif mb-fyn-sm text-fyn-h3">GST Health</h3>
+            <div className="grid grid-cols-3 gap-fyn-sm">
+              <div className="text-center rounded-lg p-3" style={{ background: "#DCFCE7" }}>
+                <p className="font-mono text-xl font-bold" style={{ color: "#16A34A" }}>{formatINR(Number(itcRow?.itc_safe || 0))}</p>
+                <FynLabel className="mt-1" style={{ color: "#16A34A" } as any}>ITC SAFE</FynLabel>
               </div>
-              <div className="text-center rounded-lg" style={{ background: "#FDEAEA", border: "1px solid #C41E1E", padding: "12px 8px" }}>
-                <p className="fyn-metric" style={{ color: "#C41E1E", fontSize: 20, fontWeight: 700 }}>{formatINR(Number(itcRow?.itc_at_risk || 0))}</p>
-                <p style={{ color: "#C41E1E", fontSize: 11, fontWeight: 600, textTransform: "uppercase", marginTop: 4 }}>ITC AT RISK</p>
+              <div className="text-center rounded-lg p-3" style={{ background: "#FDEAEA", border: "1px solid #C41E1E" }}>
+                <p className="font-mono text-xl font-bold" style={{ color: "#C41E1E" }}>{formatINR(Number(itcRow?.itc_at_risk || 0))}</p>
+                <FynLabel className="mt-1" style={{ color: "#C41E1E" } as any}>ITC AT RISK</FynLabel>
               </div>
-              <div className="text-center rounded-lg" style={{ background: "#FEF3E2", padding: "12px 8px" }}>
-                <p className="fyn-metric" style={{ color: "#F59E0B", fontSize: 20, fontWeight: 700 }}>{noticeRisk?.score ?? "—"}{noticeRisk ? "/100" : ""}</p>
-                <p style={{ color: "rgba(26,16,8,0.50)", fontSize: 11, fontWeight: 500, textTransform: "uppercase", marginTop: 4 }}>NOTICE RISK</p>
+              <div className="text-center rounded-lg p-3" style={{ background: "#FEF3E2" }}>
+                <p className="font-mono text-xl font-bold" style={{ color: "#F59E0B" }}>{noticeRisk?.score ?? "—"}{noticeRisk ? "/100" : ""}</p>
+                <FynLabel className="mt-1">NOTICE RISK</FynLabel>
               </div>
             </div>
-            <Link to="/dashboard/gst" style={{ color: "#C41E1E", fontSize: 14, fontWeight: 500 }} className="hover:underline mt-3 inline-block">View GST Intelligence →</Link>
-          </div>
+            <Link to="/dashboard/gst" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
+              View GST Intelligence →
+            </Link>
+          </FynCard>
         </div>
       </div>
     </DashboardLayout>
