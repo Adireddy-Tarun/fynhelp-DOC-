@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle } from "lucide-react";
+import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", buf);
