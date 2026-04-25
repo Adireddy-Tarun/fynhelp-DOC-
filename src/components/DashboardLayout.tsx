@@ -253,25 +253,49 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               <button onClick={() => setSidebarOpen(false)} className="text-white"><X size={20} /></button>
             </div>
             <nav className="py-2 px-2 space-y-3">
-              {navSections.map((section) => (
-                <div key={section.title}>
-                  <p className="text-white/20 fyn-label text-[10px] px-2 mb-1">{section.title}</p>
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.label + item.href}
-                        to={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className="flex items-center gap-2.5 px-2 py-1.5 rounded text-white/50 hover:text-white"
-                        style={{ fontSize: 13, fontWeight: 500 }}
-                      >
-                        <Icon size={16} className="flex-shrink-0" /><span className="whitespace-nowrap">{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ))}
+              {navSections.map((section) => {
+                const sectionActive = section.items.some((i) => isActive(i.href));
+                return (
+                  <div key={section.title}>
+                    <p
+                      className="fyn-label text-[10px] px-2 mb-1"
+                      style={{ color: sectionActive ? "#8B6914" : "rgba(255,255,255,0.20)" }}
+                    >
+                      {section.title}
+                    </p>
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={item.label + item.href}
+                          to={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className="flex items-center gap-2.5 px-2 py-1.5 rounded"
+                          style={{
+                            fontSize: 13,
+                            fontWeight: active ? 600 : 500,
+                            background: active ? "rgba(196,30,30,0.18)" : "transparent",
+                            borderLeft: active ? "3px solid #C41E1E" : "3px solid transparent",
+                            color: active ? "#FFFFFF" : "rgba(255,255,255,0.55)",
+                          }}
+                        >
+                          <Icon size={16} className="flex-shrink-0" />
+                          <span className="whitespace-nowrap">{item.label}</span>
+                          {active && (
+                            <span
+                              aria-hidden
+                              className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ background: "#8B6914" }}
+                            />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </nav>
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setSidebarOpen(false)} />
