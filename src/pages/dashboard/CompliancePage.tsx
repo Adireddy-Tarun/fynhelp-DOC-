@@ -175,6 +175,23 @@ const CompliancePage = () => {
             <p className="text-fyn-ink/60 text-xs mt-2">
               Based on {totalFilings} filings (last 3 months)
             </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {totalOverdue > 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#C41E1E]/10 text-[#C41E1E] text-xs font-medium px-2 py-1 rounded">
+                  ● {totalOverdue} overdue
+                </span>
+              )}
+              {totalDueSoon > 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#8B5A00]/10 text-[#8B5A00] text-xs font-medium px-2 py-1 rounded">
+                  ● {totalDueSoon} due in 7 days
+                </span>
+              )}
+              {totalOverdue === 0 && totalDueSoon === 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#1A6B3C]/10 text-[#1A6B3C] text-xs font-medium px-2 py-1 rounded">
+                  ● All clear
+                </span>
+              )}
+            </div>
           </div>
 
           {/* GST */}
