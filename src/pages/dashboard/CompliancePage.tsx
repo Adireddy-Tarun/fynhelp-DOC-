@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-type FilingRow = { status: string; due_date: string; filed_date?: string | null };
+type FilingRow = { status: string; due_date: string | null; filed_date?: string | null };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
