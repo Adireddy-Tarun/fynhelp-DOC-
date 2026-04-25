@@ -113,8 +113,9 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
   const acceptFile = (f: File | undefined | null) => {
     if (!f) return;
-    if (!f.name.toLowerCase().endsWith(".csv")) {
-      toast.error("Please upload a CSV file");
+    const n = f.name.toLowerCase();
+    if (!n.endsWith(".csv") && !n.endsWith(".xlsx") && !n.endsWith(".xls")) {
+      toast.error("Please upload a CSV or XLSX file");
       return;
     }
     setFile(f);
