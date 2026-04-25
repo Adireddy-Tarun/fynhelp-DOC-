@@ -41,31 +41,35 @@ const CompliancePage = () => {
 
   const { data: gstFilings, isLoading: loadingGst } = useQuery({
     queryKey: ["compliance-gst", businessId],
-    queryFn: async (): Promise<FilingRow[]> => {
+    queryFn: async (): Promise<any[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("gst_filings" as never)
-        .select("status, due_date")
+        .select("status, due_date, filed_date, return_type, filing_period")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
-      return ((data as unknown) as FilingRow[]) || [];
+        .gte("due_date", threeMonthsAgo)
+        .order("due_date", { ascending: false });
+      return ((data as unknown) as any[]) || [];
     },
     enabled: !!businessId,
   });
 
   const { data: tdsFilings, isLoading: loadingTds } = useQuery({
     queryKey: ["compliance-tds", businessId],
-    queryFn: async (): Promise<FilingRow[]> => {
+    queryFn: async (): Promise<any[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
-        .select("status, due_date")
+        .select("status, due_date, filed_date, form_type, quarter")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
-      return ((data as unknown) as FilingRow[]) || [];
+        .gte("due_date", threeMonthsAgo)
+        .order("due_date", { ascending: false });
+      return ((data as unknown) as any[]) || [];
     },
     enabled: !!businessId,
   });
+
+  const [openTable, setOpenTable] = useState<"gst" | "tds" | null>(null);
 
   const isLoading = loadingGst || loadingTds;
   const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
@@ -132,33 +136,87 @@ const CompliancePage = () => {
           </div>
 
           {/* GST */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS</p>
+          <button
+            type="button"
+            onClick={() => setOpenTable(openTable === "gst" ? null : "gst")}
+            className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 text-left hover:border-fyn-ink/30 transition-colors"
+          >
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS {openTable === "gst" ? "▾" : "▸"}</p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
-            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time · click to view</p>
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
                 style={{ width: gstTotal > 0 ? `${(gstFiled / gstTotal) * 100}%` : "0%" }}
               />
             </div>
-          </div>
+          </button>
 
           {/* TDS */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS</p>
+          <button
+            type="button"
+            onClick={() => setOpenTable(openTable === "tds" ? null : "tds")}
+            className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 text-left hover:border-fyn-ink/30 transition-colors"
+          >
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS {openTable === "tds" ? "▾" : "▸"}</p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
             </p>
-            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time · click to view</p>
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
                 style={{ width: tdsTotal > 0 ? `${(tdsFiled / tdsTotal) * 100}%` : "0%" }}
               />
             </div>
+          </button>
+        </div>
+      )}
+
+      {!isLoading && openTable && (
+        <div className="mt-4 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-fyn-ink-10 flex items-center justify-between">
+            <h3 className="text-fyn-ink font-serif text-lg">
+              {openTable === "gst" ? "GST Filings" : "TDS Filings"} (last 3 months)
+            </h3>
+            <button onClick={() => setOpenTable(null)} className="text-fyn-ink/60 text-sm hover:text-fyn-ink">Close ✕</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-fyn-ink/50 text-[11px] uppercase tracking-wide">
+                  <th className="py-3 px-6">{openTable === "gst" ? "Return / Period" : "Form / Quarter"}</th>
+                  <th className="py-3 px-6">Due Date</th>
+                  <th className="py-3 px-6">Filed Date</th>
+                  <th className="py-3 px-6">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(openTable === "gst" ? gstFilings : tdsFilings)?.map((f: any, i: number) => {
+                  const statusColor =
+                    f.status === "filed" ? "bg-[#1A6B3C]/10 text-[#1A6B3C]" :
+                    f.status === "overdue" || f.status === "late" ? "bg-[#C41E1E]/10 text-[#C41E1E]" :
+                    "bg-[#8B5A00]/10 text-[#8B5A00]";
+                  return (
+                    <tr key={i} className="border-t border-fyn-ink-10">
+                      <td className="py-3 px-6 font-medium">
+                        {openTable === "gst" ? `${f.return_type} · ${f.filing_period}` : `${f.form_type} · ${f.quarter}`}
+                      </td>
+                      <td className="py-3 px-6">{f.due_date}</td>
+                      <td className="py-3 px-6">{f.filed_date || "—"}</td>
+                      <td className="py-3 px-6">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${statusColor}`}>{f.status}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {(openTable === "gst" ? gstFilings : tdsFilings)?.length === 0 && (
+                  <tr><td colSpan={4} className="py-6 px-6 text-center text-fyn-ink/50">No filings in this window.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
