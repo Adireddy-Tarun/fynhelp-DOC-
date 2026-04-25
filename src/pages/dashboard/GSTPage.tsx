@@ -33,12 +33,31 @@ const GSTPage = () => {
   const fromFilter = isValidDate(fromParam) ? (fromParam as string) : null;
   const toFilter = isValidDate(toParam) ? (toParam as string) : null;
   const hasDateFilter = !!(fromFilter || toFilter);
+  type Bucket = "on-time" | "late" | "overdue" | "pending" | "unknown";
+  const validBuckets = ["on-time", "late", "overdue", "pending", "unknown"] as const;
+  const bucketParam = searchParams.get("bucket");
+  const bucketFilter: Bucket | null =
+    bucketParam && (validBuckets as readonly string[]).includes(bucketParam)
+      ? (bucketParam as Bucket)
+      : null;
+  const bucketMeta: Record<Bucket, { label: string; color: string }> = {
+    "on-time": { label: "On time", color: "#1A6B3C" },
+    late: { label: "Filed late", color: "#8B5A00" },
+    overdue: { label: "Overdue", color: "#C41E1E" },
+    pending: { label: "Pending", color: "#1A1008" },
+    unknown: { label: "Unknown", color: "#475569" },
+  };
   const fmtRange = (s: string) =>
     new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
   const clearDateFilter = () => {
     const next = new URLSearchParams(searchParams);
     next.delete("from");
     next.delete("to");
+    setSearchParams(next, { replace: true });
+  };
+  const clearBucketFilter = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("bucket");
     setSearchParams(next, { replace: true });
   };
   const [businessId, setBusinessId] = useState<string | null>(null);
