@@ -111,6 +111,7 @@ const navSections: NavSection[] = [
   {
     title: "SETTINGS",
     items: [
+      { label: "Profile", href: "/dashboard/settings/profile", icon: UserCheck },
       { label: "Integrations", href: "/dashboard/settings/integrations", icon: Plug },
       { label: "Business Profile", href: "/dashboard/settings/business", icon: Settings },
       { label: "Team & Access", href: "/dashboard/settings/team", icon: UsersRound },
