@@ -595,6 +595,54 @@ export type Database = {
           },
         ]
       }
+      csv_uploads: {
+        Row: {
+          business_id: string
+          created_at: string
+          error_message: string | null
+          file_hash: string | null
+          file_name: string
+          file_size: number
+          id: string
+          max_date: string | null
+          min_date: string | null
+          row_count: number
+          status: string
+          upload_type: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          error_message?: string | null
+          file_hash?: string | null
+          file_name: string
+          file_size?: number
+          id?: string
+          max_date?: string | null
+          min_date?: string | null
+          row_count?: number
+          status?: string
+          upload_type: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          error_message?: string | null
+          file_hash?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          max_date?: string | null
+          min_date?: string | null
+          row_count?: number
+          status?: string
+          upload_type?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       gst_itc_lines: {
         Row: {
           business_id: string
