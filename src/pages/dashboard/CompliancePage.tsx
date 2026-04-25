@@ -79,6 +79,25 @@ const CompliancePage = () => {
   const tdsFiled = tdsFilings?.filter((f) => f.status === "filed").length || 0;
   const tdsTotal = tdsFilings?.length || 0;
 
+  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed)
+  const today = new Date().toISOString().split("T")[0];
+  const sevenDaysOut = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().split("T")[0];
+  })();
+  const countUrgency = (rows: FilingRow[] = []) => {
+    const overdue = rows.filter((r) => r.status !== "filed" && r.due_date < today).length;
+    const dueSoon = rows.filter(
+      (r) => r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
+    ).length;
+    return { overdue, dueSoon };
+  };
+  const gstUrgency = countUrgency(gstFilings || []);
+  const tdsUrgency = countUrgency(tdsFilings || []);
+  const totalOverdue = gstUrgency.overdue + tdsUrgency.overdue;
+  const totalDueSoon = gstUrgency.dueSoon + tdsUrgency.dueSoon;
+
   const isEmpty = !isLoading && totalFilings === 0;
 
   const scoreColor =
@@ -156,6 +175,23 @@ const CompliancePage = () => {
             <p className="text-fyn-ink/60 text-xs mt-2">
               Based on {totalFilings} filings (last 3 months)
             </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {totalOverdue > 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#C41E1E]/10 text-[#C41E1E] text-xs font-medium px-2 py-1 rounded">
+                  ● {totalOverdue} overdue
+                </span>
+              )}
+              {totalDueSoon > 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#8B5A00]/10 text-[#8B5A00] text-xs font-medium px-2 py-1 rounded">
+                  ● {totalDueSoon} due in 7 days
+                </span>
+              )}
+              {totalOverdue === 0 && totalDueSoon === 0 && (
+                <span className="inline-flex items-center gap-1 bg-[#1A6B3C]/10 text-[#1A6B3C] text-xs font-medium px-2 py-1 rounded">
+                  ● All clear
+                </span>
+              )}
+            </div>
           </div>
 
           {/* GST */}
@@ -165,6 +201,20 @@ const CompliancePage = () => {
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            {(gstUrgency.overdue > 0 || gstUrgency.dueSoon > 0) && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {gstUrgency.overdue > 0 && (
+                  <span className="bg-[#C41E1E]/10 text-[#C41E1E] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {gstUrgency.overdue} overdue
+                  </span>
+                )}
+                {gstUrgency.dueSoon > 0 && (
+                  <span className="bg-[#8B5A00]/10 text-[#8B5A00] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {gstUrgency.dueSoon} due soon
+                  </span>
+                )}
+              </div>
+            )}
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
@@ -180,6 +230,20 @@ const CompliancePage = () => {
               {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            {(tdsUrgency.overdue > 0 || tdsUrgency.dueSoon > 0) && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {tdsUrgency.overdue > 0 && (
+                  <span className="bg-[#C41E1E]/10 text-[#C41E1E] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {tdsUrgency.overdue} overdue
+                  </span>
+                )}
+                {tdsUrgency.dueSoon > 0 && (
+                  <span className="bg-[#8B5A00]/10 text-[#8B5A00] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {tdsUrgency.dueSoon} due soon
+                  </span>
+                )}
+              </div>
+            )}
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
