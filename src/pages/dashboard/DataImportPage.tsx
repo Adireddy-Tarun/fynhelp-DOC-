@@ -471,7 +471,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   };
 
   return (
-    <Card className="p-6 flex flex-col h-full">
+    <Card data-upload-zone={type} className="p-6 flex flex-col h-full scroll-mt-24">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
