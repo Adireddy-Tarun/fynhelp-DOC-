@@ -7,15 +7,18 @@ import GlobalBackBar from "@/components/GlobalBackBar";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { formatINR } from "@/lib/indian-format";
 
-type PayrollRecord = {
+type PayrollSnapshot = {
   id: string;
   business_id: string;
   month: string;
-  total_payroll: number | null;
-  headcount: number | null;
-  pf_due: number | null;
-  esic_due: number | null;
-  next_payroll_date: string | null;
+  total_gross: number | null;
+  total_net: number | null;
+  total_deductions: number | null;
+  employee_count: number | null;
+  pf_total: number | null;
+  esic_total: number | null;
+  tds_total: number | null;
+  processed_date: string | null;
 };
 
 const PayrollPlannerPage = () => {
@@ -38,31 +41,30 @@ const PayrollPlannerPage = () => {
 
   const { data: payrollSnapshots, isLoading } = useQuery({
     queryKey: ["payroll-snapshots", businessId],
-    queryFn: async (): Promise<PayrollRecord[]> => {
+    queryFn: async (): Promise<PayrollSnapshot[]> => {
       if (!businessId) return [];
       const { data } = await supabase
-        .from("payroll_records")
+        .from("payroll_snapshots" as never)
         .select("*")
         .eq("business_id", businessId)
         .order("month", { ascending: false })
         .limit(12);
-      return (data as PayrollRecord[]) || [];
+      return ((data as unknown) as PayrollSnapshot[]) || [];
     },
     enabled: !!businessId,
   });
 
   const currentMonth = payrollSnapshots?.[0];
-  const totalPayroll = Number(currentMonth?.total_payroll || 0);
-  const employeeCount = Number(currentMonth?.headcount || 0);
+  const totalPayroll = Number(currentMonth?.total_gross || 0);
+  const employeeCount = Number(currentMonth?.employee_count || 0);
   const avgPerEmployee = employeeCount > 0 ? totalPayroll / employeeCount : 0;
 
-  // Last 6 months in chronological order
-  const trendData = [...(payrollSnapshots || [])]
+  const chartData = [...(payrollSnapshots || [])]
     .slice(0, 6)
     .reverse()
-    .map((p) => ({
-      month: p.month,
-      payroll: Number(p.total_payroll || 0),
+    .map((s) => ({
+      month: new Date(s.month + "-01").toLocaleDateString("en-IN", { month: "short" }),
+      payroll: Number(s.total_gross || 0),
     }));
 
   const isEmpty = !isLoading && (!payrollSnapshots || payrollSnapshots.length === 0);
@@ -83,7 +85,7 @@ const PayrollPlannerPage = () => {
           <p className="text-white text-[28px] font-bold mt-1 font-sans">{employeeCount}</p>
         </div>
         <div className="bg-fyn-ink rounded-lg p-5">
-          <p className="text-white/40 text-[13px] fyn-label">AVG PER EMPLOYEE</p>
+          <p className="text-white/40 text-[13px] fyn-label">AVERAGE PER EMPLOYEE</p>
           <p className="text-white text-[28px] font-bold mt-1 font-sans">{formatINR(Math.round(avgPerEmployee))}</p>
         </div>
       </div>
@@ -114,15 +116,15 @@ const PayrollPlannerPage = () => {
       )}
 
       {/* TREND CHART */}
-      {!isLoading && trendData.length > 0 && (
+      {!isLoading && chartData.length > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
           <h3 className="text-fyn-ink font-serif text-lg mb-4">Payroll Trend (Last 6 Months)</h3>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+              <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.1)" />
                 <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" fontSize={12} />
-                <YAxis stroke="rgba(26,16,8,0.5)" fontSize={12} tickFormatter={(v) => `₹${(v / 100000).toFixed(1)}L`} />
+                <YAxis stroke="rgba(26,16,8,0.5)" fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
                 <Tooltip
                   formatter={(v: number) => formatINR(v)}
                   contentStyle={{ background: "#1A1008", border: "none", borderRadius: 6, color: "#fff" }}
