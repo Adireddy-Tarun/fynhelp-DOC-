@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-type FilingRow = { status: string; due_date: string; filed_date?: string | null };
+type FilingRow = { status: string; due_date: string | null; filed_date?: string | null };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const CompliancePage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [breakdownFilter, setBreakdownFilter] = useState<"on-time" | "late" | "overdue" | "pending" | null>(null);
+  const [breakdownFilter, setBreakdownFilter] = useState<"on-time" | "late" | "overdue" | "pending" | "unknown" | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
@@ -98,38 +98,66 @@ const CompliancePage = () => {
   const allFilings = [...(gstFilings || []).map(f => ({ ...f, _src: "GST" as const })), ...(tdsFilings || []).map(f => ({ ...f, _src: "TDS" as const }))];
   const totalFilings = allFilings.length;
 
-  // Breakdown: on-time = filed AND filed_date <= due_date; late = filed but after due; overdue = not filed and past due; pending = not filed, not yet due
+  // Classification rules (mutually exclusive, exhaustive over rows with a known due_date):
+  //   on-time = filed AND filed_date present AND filed_date ≤ due_date
+  //   late    = filed AND (filed_date missing OR filed_date > due_date)
+  //   overdue = not filed AND due_date < today
+  //   pending = not filed AND due_date ≥ today
+  //   unknown = due_date missing  → excluded from score denominator
   const todayStr = new Date().toISOString().split("T")[0];
-  const isOnTime = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date <= f.due_date;
-  const isLate = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date > f.due_date;
-  const isOverdueNotFiled = (f: FilingRow) => f.status !== "filed" && f.due_date < todayStr;
-  const isPending = (f: FilingRow) => f.status !== "filed" && f.due_date >= todayStr;
+  const isFiledStatus = (f: FilingRow) => f.status === "filed";
+  const isUnknown = (f: FilingRow) => !f.due_date;
+  const isOnTime = (f: FilingRow) =>
+    !isUnknown(f) && isFiledStatus(f) && !!f.filed_date && f.filed_date <= (f.due_date as string);
+  const isLate = (f: FilingRow) =>
+    !isUnknown(f) && isFiledStatus(f) && (!f.filed_date || (f.filed_date as string) > (f.due_date as string));
+  const isOverdueNotFiled = (f: FilingRow) =>
+    !isUnknown(f) && !isFiledStatus(f) && (f.due_date as string) < todayStr;
+  const isPending = (f: FilingRow) =>
+    !isUnknown(f) && !isFiledStatus(f) && (f.due_date as string) >= todayStr;
 
   const daysBetween = (a: string, b: string) => {
     const ms = new Date(a).getTime() - new Date(b).getTime();
     return Math.round(ms / (1000 * 60 * 60 * 24));
   };
   const explainFiling = (f: FilingRow) => {
+    if (isUnknown(f)) {
+      return {
+        label: "Unknown",
+        color: "#475569",
+        rule: "due_date missing",
+        detail: "No due date on record; excluded from score.",
+      };
+    }
+    const due = f.due_date as string;
     if (isOnTime(f)) {
-      const diff = daysBetween(f.due_date, f.filed_date!);
+      const diff = daysBetween(due, f.filed_date!);
       return {
         label: "On time",
         color: "#1A6B3C",
-        rule: "filed_date ≤ due_date",
+        rule: "filed AND filed_date ≤ due_date",
         detail: `Filed ${diff === 0 ? "exactly on" : `${diff} day${diff === 1 ? "" : "s"} before`} the due date.`,
       };
     }
     if (isLate(f)) {
-      const diff = daysBetween(f.filed_date!, f.due_date);
+      if (!f.filed_date) {
+        return {
+          label: "Filed late",
+          color: "#8B5A00",
+          rule: "filed AND filed_date missing",
+          detail: "Marked filed but the filed date is missing — counted as late.",
+        };
+      }
+      const diff = daysBetween(f.filed_date, due);
       return {
         label: "Filed late",
         color: "#8B5A00",
-        rule: "filed_date > due_date",
+        rule: "filed AND filed_date > due_date",
         detail: `Filed ${diff} day${diff === 1 ? "" : "s"} after the due date.`,
       };
     }
     if (isOverdueNotFiled(f)) {
-      const diff = daysBetween(todayStr, f.due_date);
+      const diff = daysBetween(todayStr, due);
       return {
         label: "Overdue",
         color: "#C41E1E",
@@ -137,7 +165,7 @@ const CompliancePage = () => {
         detail: `Not yet filed; due date passed ${diff} day${diff === 1 ? "" : "s"} ago.`,
       };
     }
-    const diff = daysBetween(f.due_date, todayStr);
+    const diff = daysBetween(due, todayStr);
     return {
       label: "Pending",
       color: "#1A1008",
@@ -150,25 +178,27 @@ const CompliancePage = () => {
   const lateCount = allFilings.filter(isLate).length;
   const overdueCount = allFilings.filter(isOverdueNotFiled).length;
   const pendingCount = allFilings.filter(isPending).length;
-  const filedOnTime = onTimeCount;
-  const complianceScore = totalFilings > 0 ? Math.round((filedOnTime / totalFilings) * 100) : 0;
+  const unknownCount = allFilings.filter(isUnknown).length;
+  // Score denominator excludes unknowns so the formula matches the visible breakdown.
+  const scoredTotal = onTimeCount + lateCount + overdueCount + pendingCount;
+  const complianceScore = scoredTotal > 0 ? Math.round((onTimeCount / scoredTotal) * 100) : 0;
 
   const gstFiled = gstFilings?.filter((f) => f.status === "filed").length || 0;
   const gstTotal = gstFilings?.length || 0;
   const tdsFiled = tdsFilings?.filter((f) => f.status === "filed").length || 0;
   const tdsTotal = tdsFilings?.length || 0;
 
-  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed)
-  const today = new Date().toISOString().split("T")[0];
+  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed). Skip rows without a due_date.
+  const today = todayStr;
   const sevenDaysOut = (() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
     return d.toISOString().split("T")[0];
   })();
   const countUrgency = (rows: FilingRow[] = []) => {
-    const overdue = rows.filter((r) => r.status !== "filed" && r.due_date < today).length;
+    const overdue = rows.filter((r) => !!r.due_date && r.status !== "filed" && r.due_date < today).length;
     const dueSoon = rows.filter(
-      (r) => r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
+      (r) => !!r.due_date && r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
     ).length;
     return { overdue, dueSoon };
   };
@@ -459,8 +489,13 @@ const CompliancePage = () => {
             <div>
               <p className="text-fyn-ink/40 text-[12px] fyn-label mb-1">HEALTH SCORE BREAKDOWN</p>
               <p className="text-fyn-ink/70 text-xs font-mono">
-                Score = on-time ÷ total × 100 = {onTimeCount} ÷ {totalFilings} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
+                Score = on-time ÷ scored × 100 = {onTimeCount} ÷ {scoredTotal} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
               </p>
+              {unknownCount > 0 && (
+                <p className="text-fyn-ink/50 text-[11px] mt-1">
+                  {unknownCount} filing{unknownCount === 1 ? "" : "s"} excluded (missing due_date).
+                </p>
+              )}
             </div>
             {breakdownFilter && (
               <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
@@ -469,14 +504,16 @@ const CompliancePage = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          <div className={cn("grid grid-cols-2 gap-2 mb-4", unknownCount > 0 ? "md:grid-cols-5" : "md:grid-cols-4") }>
             {[
               { key: "on-time" as const, label: "On time", count: onTimeCount, color: "#1A6B3C" },
               { key: "late" as const, label: "Filed late", count: lateCount, color: "#8B5A00" },
               { key: "overdue" as const, label: "Overdue", count: overdueCount, color: "#C41E1E" },
               { key: "pending" as const, label: "Pending", count: pendingCount, color: "#1A1008" },
+              ...(unknownCount > 0 ? [{ key: "unknown" as const, label: "Unknown", count: unknownCount, color: "#475569" }] : []),
             ].map((b) => {
               const active = breakdownFilter === b.key;
+              const denom = b.key === "unknown" ? totalFilings : scoredTotal;
               return (
                 <button
                   key={b.key}
@@ -489,7 +526,7 @@ const CompliancePage = () => {
                   <p className="text-[10px] uppercase tracking-wide" style={{ color: b.color }}>{b.label}</p>
                   <p className="text-2xl font-bold font-sans mt-1" style={{ color: b.color }}>{b.count}</p>
                   <p className="text-fyn-ink/40 text-[10px] mt-1">
-                    {totalFilings > 0 ? Math.round((b.count / totalFilings) * 100) : 0}% of total
+                    {denom > 0 ? Math.round((b.count / denom) * 100) : 0}% {b.key === "unknown" ? "of all rows" : "of scored"}
                   </p>
                 </button>
               );
@@ -534,9 +571,10 @@ const CompliancePage = () => {
                         breakdownFilter === "on-time" ? isOnTime(f) :
                         breakdownFilter === "late" ? isLate(f) :
                         breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                        breakdownFilter === "unknown" ? isUnknown(f) :
                         isPending(f)
                       )
-                      .sort((a, b) => (a.due_date < b.due_date ? 1 : -1))
+                      .sort((a, b) => ((a.due_date || "") < (b.due_date || "") ? 1 : -1))
                       .map((f, i) => {
                         const rowKey = `${f._src}-${i}-${f.due_date}`;
                         const expanded = expandedRow === rowKey;
@@ -590,6 +628,7 @@ const CompliancePage = () => {
                       breakdownFilter === "on-time" ? isOnTime(f) :
                       breakdownFilter === "late" ? isLate(f) :
                       breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                      breakdownFilter === "unknown" ? isUnknown(f) :
                       isPending(f)
                     ).length === 0 && (
                       <tr><td colSpan={5} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
