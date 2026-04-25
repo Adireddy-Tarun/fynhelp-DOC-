@@ -10,6 +10,18 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import {
+  FynCard,
+  FynButton,
+  FynBadge,
+  FynTable,
+  FynTH,
+  FynTR,
+  FynTD,
+  FynLabel,
+  FynLoading,
+  FynEmpty,
+} from "@/components/dashboard/ui";
 
 type FilingRow = { status: string; due_date: string | null; filed_date?: string | null };
 
@@ -291,14 +303,15 @@ const CompliancePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
-        <span className="text-fyn-ink/60 text-xs mr-1">Period:</span>
+      {/* Period + refresh controls. Calendar pickers stay on shadcn Button (date-picker primitives, out of scope). */}
+      <div className="flex flex-wrap items-center justify-end gap-fyn-sm mb-fyn-md">
+        <span className="text-fyn-ink/60 text-fyn-tiny mr-1">Period:</span>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               disabled={controlsLocked}
-              className={cn("h-9 justify-start text-left font-normal text-sm", !fromDate && "text-muted-foreground")}
+              className={cn("h-9 justify-start text-left font-normal text-fyn-small", !fromDate && "text-muted-foreground")}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {fromDate ? format(fromDate, "dd MMM yyyy") : "From"}
@@ -315,13 +328,13 @@ const CompliancePage = () => {
             />
           </PopoverContent>
         </Popover>
-        <span className="text-fyn-ink/40 text-xs">→</span>
+        <span className="text-fyn-ink/40 text-fyn-tiny">→</span>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               disabled={controlsLocked}
-              className={cn("h-9 justify-start text-left font-normal text-sm", !toDate && "text-muted-foreground")}
+              className={cn("h-9 justify-start text-left font-normal text-fyn-small", !toDate && "text-muted-foreground")}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {toDate ? format(toDate, "dd MMM yyyy") : "To"}
@@ -338,54 +351,48 @@ const CompliancePage = () => {
             />
           </PopoverContent>
         </Popover>
-        <button
+        <FynButton
+          variant="secondary"
           onClick={handleRefresh}
           disabled={controlsLocked || !businessId}
-          className="inline-flex items-center gap-2 bg-fyn-ink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-fyn-ink text-white border-fyn-ink hover:bg-fyn-ink/90 hover:text-white"
         >
           <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
           {controlsLocked ? "Refreshing..." : "Refresh"}
-        </button>
+        </FynButton>
       </div>
       {lastUpdated && (
-        <div className="flex justify-end -mt-2 mb-4">
-          <span className="text-fyn-ink/50 text-xs">
+        <div className="flex justify-end -mt-2 mb-fyn-md">
+          <span className="text-fyn-ink/50 text-fyn-tiny">
             Last updated {format(lastUpdated, "dd MMM yyyy, HH:mm:ss")}
           </span>
         </div>
       )}
-      {isLoading && (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-32 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />
-          ))}
-        </div>
-      )}
+      {isLoading && <FynLoading rows={3} />}
 
       {isEmpty && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
-          <h3 className="text-fyn-ink text-xl font-serif mb-2">No Compliance Data</h3>
-          <p className="text-fyn-ink/60 text-sm mb-6">
-            Connect your accounting system to track compliance health
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard/settings/integrations")}
-              className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
-            >
-              Connect Accounting →
-            </button>
-            <button
-              onClick={handleRefresh}
-              disabled={controlsLocked || !businessId}
-              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
-              {controlsLocked ? "Retrying..." : "Retry"}
-            </button>
-          </div>
+        <>
+          <FynEmpty
+            title="No Compliance Data"
+            description="Connect your accounting system to track compliance health"
+            action={
+              <div className="flex items-center justify-center gap-fyn-sm">
+                <FynButton onClick={() => navigate("/dashboard/settings/integrations")}>
+                  Connect Accounting →
+                </FynButton>
+                <FynButton
+                  variant="secondary"
+                  onClick={handleRefresh}
+                  disabled={controlsLocked || !businessId}
+                >
+                  <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
+                  {controlsLocked ? "Retrying..." : "Retry"}
+                </FynButton>
+              </div>
+            }
+          />
           <TroubleshootingCard navigate={navigate} missingGst missingTds />
-        </div>
+        </>
       )}
 
       {!isLoading && totalFilings > 0 && (gstTotal === 0 || tdsTotal === 0) && (
@@ -405,13 +412,13 @@ const CompliancePage = () => {
             return (
               <div
                 className={cn(
-                  "mb-3 flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-xs",
+                  "mb-fyn-sm flex items-center justify-between gap-fyn-sm rounded-lg border px-fyn-sm py-2 text-fyn-tiny",
                   tdsConnected
                     ? "bg-[#1A6B3C]/5 border-[#1A6B3C]/20 text-[#1A6B3C]"
                     : "bg-[#8B5A00]/5 border-[#8B5A00]/20 text-[#8B5A00]"
                 )}
               >
-                <span className="inline-flex items-center gap-2 font-medium">
+                <span className="inline-flex items-center gap-fyn-sm font-medium">
                   <span
                     className={cn(
                       "inline-block w-2 h-2 rounded-full",
@@ -447,161 +454,147 @@ const CompliancePage = () => {
               </span>
             </div>
           )}
-          <div className={cn("grid grid-cols-1 lg:grid-cols-3 gap-4 transition-opacity", isFetching && "opacity-70")}>
+          <div className={cn("grid grid-cols-1 lg:grid-cols-3 gap-fyn-md transition-opacity", isFetching && "opacity-70")}>
             {/* SCORE CARD */}
-            <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 lg:col-span-1">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">COMPLIANCE HEALTH SCORE</p>
-            <p className="text-[48px] font-bold font-sans leading-none" style={{ color: scoreColor }}>
-              {complianceScore}%
-            </p>
-            <p className="text-fyn-ink/60 text-xs mt-2">
-              Based on {totalFilings} filings (last 3 months)
-            </p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {totalOverdue > 0 && (
-                <span className="inline-flex items-center gap-1 bg-[#C41E1E]/10 text-[#C41E1E] text-xs font-medium px-2 py-1 rounded">
-                  ● {totalOverdue} overdue
-                </span>
-              )}
-              {totalDueSoon > 0 && (
-                <span className="inline-flex items-center gap-1 bg-[#8B5A00]/10 text-[#8B5A00] text-xs font-medium px-2 py-1 rounded">
-                  ● {totalDueSoon} due in 7 days
-                </span>
-              )}
-              {totalOverdue === 0 && totalDueSoon === 0 && (
-                <span className="inline-flex items-center gap-1 bg-[#1A6B3C]/10 text-[#1A6B3C] text-xs font-medium px-2 py-1 rounded">
-                  ● All clear
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* GST */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
-              GST FILINGS
-              {fetchingGst && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
-            </p>
-            {gstTotal === 0 && !fetchingGst ? (
-              <div className="mt-1">
-                {gstConnected ? (
-                  <>
-                    <p className="text-fyn-ink text-[28px] font-bold font-sans">0<span className="text-fyn-ink/40 text-lg font-normal">/0</span></p>
-                    <p className="text-fyn-ink/60 text-xs mt-2">No filings in this date range</p>
-                    <span className="inline-flex items-center gap-1 mt-3 bg-[#1A6B3C]/10 text-[#1A6B3C] text-[10px] font-medium px-2 py-0.5 rounded">
-                      ● GST connected
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-fyn-ink/60 text-xs mb-2">No GST filings tracked yet.</p>
-                    <p className="text-fyn-ink/70 text-[11px] fyn-label mb-1.5">YOU'LL NEED</p>
-                    <ul className="text-fyn-ink/70 text-xs space-y-1 mb-3">
-                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>15-character GSTIN</span></li>
-                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Filing frequency (monthly or QRMP)</span></li>
-                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>GST portal username (for OTP sync)</span></li>
-                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Authorised signatory mobile / email</span></li>
-                    </ul>
-                    <button
-                      onClick={() => navigate("/onboarding?step=gst")}
-                      className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
-                    >
-                      Connect GST →
-                    </button>
-                  </>
+            <FynCard className="lg:col-span-1">
+              <FynLabel className="mb-fyn-sm">COMPLIANCE HEALTH SCORE</FynLabel>
+              <p className="text-[48px] font-bold font-sans leading-none" style={{ color: scoreColor }}>
+                {complianceScore}%
+              </p>
+              <p className="text-fyn-ink/60 text-fyn-tiny mt-fyn-sm">
+                Based on {totalFilings} filings (last 3 months)
+              </p>
+              <div className="flex flex-wrap gap-fyn-sm mt-fyn-sm">
+                {totalOverdue > 0 && (
+                  <FynBadge tone="danger">● {totalOverdue} overdue</FynBadge>
+                )}
+                {totalDueSoon > 0 && (
+                  <FynBadge tone="warning">● {totalDueSoon} due in 7 days</FynBadge>
+                )}
+                {totalOverdue === 0 && totalDueSoon === 0 && (
+                  <FynBadge tone="success">● All clear</FynBadge>
                 )}
               </div>
-            ) : (
-              <>
-                <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingGst && "opacity-40")}>
-                  {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
-                </p>
-                <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
-                {(gstUrgency.overdue > 0 || gstUrgency.dueSoon > 0) && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {gstUrgency.overdue > 0 && (
-                      <span className="bg-[#C41E1E]/10 text-[#C41E1E] text-[10px] font-medium px-2 py-0.5 rounded">
-                        {gstUrgency.overdue} overdue
-                      </span>
-                    )}
-                    {gstUrgency.dueSoon > 0 && (
-                      <span className="bg-[#8B5A00]/10 text-[#8B5A00] text-[10px] font-medium px-2 py-0.5 rounded">
-                        {gstUrgency.dueSoon} due soon
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
-                  <div
-                    className="bg-[#1A6B3C] h-2 rounded-full transition-all"
-                    style={{ width: gstTotal > 0 ? `${(gstFiled / gstTotal) * 100}%` : "0%" }}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+            </FynCard>
 
-          {/* TDS */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
-              TDS FILINGS
-              {fetchingTds && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
-            </p>
-            {tdsTotal === 0 && !fetchingTds ? (
-              <div className="mt-1">
-                <p className="text-fyn-ink/60 text-xs mb-2">No TDS / TRACES filings tracked yet.</p>
-                <p className="text-fyn-ink/70 text-[11px] fyn-label mb-1.5">WHAT WE'LL IMPORT</p>
-                <ul className="text-fyn-ink/70 text-xs space-y-1 mb-2">
-                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Form 24Q / 26Q / 27Q quarterly returns</span></li>
-                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Challan numbers, ARNs &amp; deposit dates</span></li>
-                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Default notices &amp; demand status from TRACES</span></li>
-                </ul>
-                <p className="text-fyn-ink/50 text-[11px] mb-3">Auto-syncs daily · manual refresh anytime</p>
-                <button
-                  onClick={() => navigate("/onboarding?step=tds")}
-                  className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
-                >
-                  Connect TDS →
-                </button>
-              </div>
-            ) : (
-              <>
-                <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingTds && "opacity-40")}>
-                  {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
-                </p>
-                <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
-                {(tdsUrgency.overdue > 0 || tdsUrgency.dueSoon > 0) && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {tdsUrgency.overdue > 0 && (
-                      <span className="bg-[#C41E1E]/10 text-[#C41E1E] text-[10px] font-medium px-2 py-0.5 rounded">
-                        {tdsUrgency.overdue} overdue
-                      </span>
-                    )}
-                    {tdsUrgency.dueSoon > 0 && (
-                      <span className="bg-[#8B5A00]/10 text-[#8B5A00] text-[10px] font-medium px-2 py-0.5 rounded">
-                        {tdsUrgency.dueSoon} due soon
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
-                  <div
-                    className="bg-[#1A6B3C] h-2 rounded-full transition-all"
-                    style={{ width: tdsTotal > 0 ? `${(tdsFiled / tdsTotal) * 100}%` : "0%" }}
-                  />
+            {/* GST */}
+            <FynCard className="relative">
+              <FynLabel className="mb-fyn-sm flex items-center gap-fyn-sm">
+                GST FILINGS
+                {fetchingGst && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+              </FynLabel>
+              {gstTotal === 0 && !fetchingGst ? (
+                <div className="mt-1">
+                  {gstConnected ? (
+                    <>
+                      <p className="text-fyn-ink text-[28px] font-bold font-sans">0<span className="text-fyn-ink/40 text-lg font-normal">/0</span></p>
+                      <p className="text-fyn-ink/60 text-fyn-tiny mt-fyn-sm">No filings in this date range</p>
+                      <FynBadge tone="success" className="mt-fyn-sm">● GST connected</FynBadge>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-fyn-ink/60 text-fyn-tiny mb-fyn-sm">No GST filings tracked yet.</p>
+                      <FynLabel className="mb-1.5">YOU'LL NEED</FynLabel>
+                      <ul className="text-fyn-ink/70 text-fyn-tiny space-y-1 mb-fyn-sm">
+                        <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>15-character GSTIN</span></li>
+                        <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Filing frequency (monthly or QRMP)</span></li>
+                        <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>GST portal username (for OTP sync)</span></li>
+                        <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Authorised signatory mobile / email</span></li>
+                      </ul>
+                      <FynButton
+                        variant="secondary"
+                        onClick={() => navigate("/onboarding?step=gst")}
+                        className="bg-fyn-ink text-white border-fyn-ink hover:bg-fyn-ink/90 hover:text-white px-fyn-sm py-1.5 text-fyn-tiny"
+                      >
+                        Connect GST →
+                      </FynButton>
+                    </>
+                  )}
                 </div>
-              </>
-            )}
+              ) : (
+                <>
+                  <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingGst && "opacity-40")}>
+                    {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
+                  </p>
+                  <p className="text-fyn-ink/60 text-fyn-tiny mt-fyn-sm">filed on time</p>
+                  {(gstUrgency.overdue > 0 || gstUrgency.dueSoon > 0) && (
+                    <div className="flex flex-wrap gap-1.5 mt-fyn-sm">
+                      {gstUrgency.overdue > 0 && (
+                        <FynBadge tone="danger">{gstUrgency.overdue} overdue</FynBadge>
+                      )}
+                      {gstUrgency.dueSoon > 0 && (
+                        <FynBadge tone="warning">{gstUrgency.dueSoon} due soon</FynBadge>
+                      )}
+                    </div>
+                  )}
+                  <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-fyn-sm">
+                    <div
+                      className="bg-[#1A6B3C] h-2 rounded-full transition-all"
+                      style={{ width: gstTotal > 0 ? `${(gstFiled / gstTotal) * 100}%` : "0%" }}
+                    />
+                  </div>
+                </>
+              )}
+            </FynCard>
+
+            {/* TDS */}
+            <FynCard className="relative">
+              <FynLabel className="mb-fyn-sm flex items-center gap-fyn-sm">
+                TDS FILINGS
+                {fetchingTds && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+              </FynLabel>
+              {tdsTotal === 0 && !fetchingTds ? (
+                <div className="mt-1">
+                  <p className="text-fyn-ink/60 text-fyn-tiny mb-fyn-sm">No TDS / TRACES filings tracked yet.</p>
+                  <FynLabel className="mb-1.5">WHAT WE'LL IMPORT</FynLabel>
+                  <ul className="text-fyn-ink/70 text-fyn-tiny space-y-1 mb-fyn-sm">
+                    <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Form 24Q / 26Q / 27Q quarterly returns</span></li>
+                    <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Challan numbers, ARNs &amp; deposit dates</span></li>
+                    <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Default notices &amp; demand status from TRACES</span></li>
+                  </ul>
+                  <p className="text-fyn-ink/50 text-[11px] mb-fyn-sm">Auto-syncs daily · manual refresh anytime</p>
+                  <FynButton
+                    variant="secondary"
+                    onClick={() => navigate("/onboarding?step=tds")}
+                    className="bg-fyn-ink text-white border-fyn-ink hover:bg-fyn-ink/90 hover:text-white px-fyn-sm py-1.5 text-fyn-tiny"
+                  >
+                    Connect TDS →
+                  </FynButton>
+                </div>
+              ) : (
+                <>
+                  <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingTds && "opacity-40")}>
+                    {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
+                  </p>
+                  <p className="text-fyn-ink/60 text-fyn-tiny mt-fyn-sm">filed on time</p>
+                  {(tdsUrgency.overdue > 0 || tdsUrgency.dueSoon > 0) && (
+                    <div className="flex flex-wrap gap-1.5 mt-fyn-sm">
+                      {tdsUrgency.overdue > 0 && (
+                        <FynBadge tone="danger">{tdsUrgency.overdue} overdue</FynBadge>
+                      )}
+                      {tdsUrgency.dueSoon > 0 && (
+                        <FynBadge tone="warning">{tdsUrgency.dueSoon} due soon</FynBadge>
+                      )}
+                    </div>
+                  )}
+                  <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-fyn-sm">
+                    <div
+                      className="bg-[#1A6B3C] h-2 rounded-full transition-all"
+                      style={{ width: tdsTotal > 0 ? `${(tdsFiled / tdsTotal) * 100}%` : "0%" }}
+                    />
+                  </div>
+                </>
+              )}
+            </FynCard>
           </div>
-        </div>
         </div>
       )}
 
       {!isLoading && businessId && gstTotal === 0 && tdsTotal === 0 && (
-        <div className="text-center mt-3">
+        <div className="text-center mt-fyn-sm">
           <button
             onClick={() => navigate("/dashboard/settings/integrations")}
-            className="text-fyn-ink/70 hover:text-fyn-ink text-xs underline underline-offset-2"
+            className="text-fyn-ink/70 hover:text-fyn-ink text-fyn-tiny underline underline-offset-2"
           >
             Or manage all integrations →
           </button>
@@ -609,11 +602,11 @@ const CompliancePage = () => {
       )}
 
       {!isLoading && totalFilings > 0 && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
-          <div className="flex items-start justify-between mb-3">
+        <FynCard className="mt-fyn-md">
+          <div className="flex items-start justify-between mb-fyn-sm">
             <div>
-              <p className="text-fyn-ink/40 text-[12px] fyn-label mb-1">HEALTH SCORE BREAKDOWN</p>
-              <p className="text-fyn-ink/70 text-xs font-mono">
+              <FynLabel className="mb-1">HEALTH SCORE BREAKDOWN</FynLabel>
+              <p className="text-fyn-ink/70 text-fyn-tiny font-mono">
                 Score = on-time ÷ scored × 100 = {onTimeCount} ÷ {scoredTotal} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
               </p>
               {unknownCount > 0 && (
@@ -622,7 +615,7 @@ const CompliancePage = () => {
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-fyn-sm">
               {breakdownFilter && (() => {
                 const bucketLabel: Record<string, string> = {
                   "on-time": "on-time",
@@ -740,45 +733,48 @@ const CompliancePage = () => {
                 };
                 return (
                   <>
-                    <button
+                    <FynButton
+                      variant="secondary"
                       onClick={handleExport}
                       disabled={rows.length === 0}
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-fyn-tiny px-2.5 py-1.5"
                       title={`Export ${rows.length} ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
                     >
                       <Download className="h-3.5 w-3.5" />
                       Export breakdown CSV ({rows.length})
-                    </button>
-                    <button
+                    </FynButton>
+                    <FynButton
+                      variant="secondary"
                       onClick={handleExportReasonsCsv}
                       disabled={rows.length === 0}
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-fyn-tiny px-2.5 py-1.5"
                       title={`Export ${rows.length} explained ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
                     >
                       <Download className="h-3.5 w-3.5" />
                       Export reasons CSV
-                    </button>
-                    <button
+                    </FynButton>
+                    <FynButton
+                      variant="secondary"
                       onClick={handleExportReasonsPdf}
                       disabled={rows.length === 0}
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-fyn-tiny px-2.5 py-1.5"
                       title={`Export ${rows.length} explained ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as PDF`}
                     >
                       <Download className="h-3.5 w-3.5" />
                       Export reasons PDF
-                    </button>
+                    </FynButton>
                   </>
                 );
               })()}
               {breakdownFilter && (
-                <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
+                <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-fyn-tiny hover:text-fyn-ink">
                   Clear filter ✕
                 </button>
               )}
             </div>
           </div>
 
-          <div className={cn("grid grid-cols-2 gap-2 mb-4", unknownCount > 0 ? "md:grid-cols-5" : "md:grid-cols-4") }>
+          <div className={cn("grid grid-cols-2 gap-fyn-sm mb-fyn-md", unknownCount > 0 ? "md:grid-cols-5" : "md:grid-cols-4") }>
             {[
               { key: "on-time" as const, label: "On time", count: onTimeCount, color: "#1A6B3C" },
               { key: "late" as const, label: "Filed late", count: lateCount, color: "#8B5A00" },
@@ -793,8 +789,8 @@ const CompliancePage = () => {
                   key={b.key}
                   onClick={() => setBreakdownFilter(active ? null : b.key)}
                   className={cn(
-                    "text-left border rounded-md p-3 transition-colors",
-                    active ? "border-fyn-ink bg-white/60" : "border-fyn-ink-10 hover:border-fyn-ink/30 bg-white/30"
+                    "text-left border rounded-md p-fyn-sm transition-colors",
+                    active ? "border-fyn-ink bg-fyn-beige-card" : "border-fyn-ink-10 hover:border-fyn-ink/30 bg-fyn-beige-card/60"
                   )}
                 >
                   <p className="text-[10px] uppercase tracking-wide" style={{ color: b.color }}>{b.label}</p>
@@ -808,12 +804,12 @@ const CompliancePage = () => {
           </div>
 
           {breakdownFilter && (
-            <div className="border-t border-fyn-ink-10 pt-3">
-              <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-                <p className="text-fyn-ink/60 text-xs">
+            <div className="border-t border-fyn-ink-10 pt-fyn-sm">
+              <div className="flex items-center justify-between mb-fyn-sm gap-fyn-sm flex-wrap">
+                <p className="text-fyn-ink/60 text-fyn-tiny">
                   Filings classified as <span className="font-medium text-fyn-ink">{breakdownFilter}</span>:
                 </p>
-                <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-fyn-sm text-fyn-tiny">
                   <button
                     onClick={() => {
                       const qs = new URLSearchParams({ from: fromStr, to: toStr });
@@ -836,16 +832,16 @@ const CompliancePage = () => {
                   </button>
                 </div>
               </div>
-              <div ref={breakdownTableRef} className="overflow-x-auto">
-                <table className="w-full text-sm">
+              <div ref={breakdownTableRef}>
+                <FynTable>
                   <thead>
-                    <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
-                      <th className="py-2 w-6"></th>
-                      <th className="py-2">Source</th>
-                      <th className="py-2">Due Date</th>
-                      <th className="py-2">Filed Date</th>
-                      <th className="py-2">Status</th>
-                    </tr>
+                    <FynTR className="hover:bg-transparent">
+                      <FynTH className="w-6"></FynTH>
+                      <FynTH>Source</FynTH>
+                      <FynTH>Due Date</FynTH>
+                      <FynTH>Filed Date</FynTH>
+                      <FynTH>Status</FynTH>
+                    </FynTR>
                   </thead>
                   <tbody>
                     {allFilings
@@ -863,19 +859,18 @@ const CompliancePage = () => {
                         const exp = explainFiling(f);
                         return (
                           <Fragment key={rowKey}>
-                            <tr
-                              key={rowKey}
-                              className="border-t border-fyn-ink-10 cursor-pointer hover:bg-white/40"
+                            <FynTR
+                              className="cursor-pointer"
                               onClick={() => setExpandedRow(expanded ? null : rowKey)}
                             >
-                              <td className="py-2 text-fyn-ink/50">
+                              <FynTD className="text-fyn-ink/50 w-6">
                                 {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-                              </td>
-                              <td className="py-2 font-medium">{f._src}</td>
-                              <td className="py-2">{f.due_date}</td>
-                              <td className="py-2">{f.filed_date || "—"}</td>
-                              <td className="py-2">{f.status}</td>
-                            </tr>
+                              </FynTD>
+                              <FynTD className="text-fyn-ink font-medium">{f._src}</FynTD>
+                              <FynTD>{f.due_date}</FynTD>
+                              <FynTD>{f.filed_date || "—"}</FynTD>
+                              <FynTD>{f.status}</FynTD>
+                            </FynTR>
                             {expanded && (() => {
                               // Delta vs due date: filed_date if available, else today (for not-yet-filed rows).
                               // Negative = before due (good), positive = after due (bad), zero = exactly on due.
@@ -904,11 +899,11 @@ const CompliancePage = () => {
                                 return { sign: "0d", color: "#8B5A00", text: `${refLabel} exactly on due date` };
                               })();
                               return (
-                                <tr key={`${rowKey}-exp`} className="bg-white/30">
-                                  <td></td>
-                                  <td colSpan={4} className="py-3 pr-3">
-                                    <div className="text-xs space-y-1.5">
-                                      <p className="flex flex-wrap items-center gap-2">
+                                <FynTR key={`${rowKey}-exp`} className="bg-fyn-beige-card/50 hover:bg-fyn-beige-card/50">
+                                  <FynTD></FynTD>
+                                  <td colSpan={4} className="px-fyn-md py-fyn-sm">
+                                    <div className="text-fyn-tiny space-y-1.5">
+                                      <p className="flex flex-wrap items-center gap-fyn-sm">
                                         <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: `${exp.color}1A`, color: exp.color }}>
                                           {exp.label}
                                         </span>
@@ -936,7 +931,7 @@ const CompliancePage = () => {
                                       </p>
                                     </div>
                                   </td>
-                                </tr>
+                                </FynTR>
                               );
                             })()}
                           </Fragment>
@@ -960,36 +955,37 @@ const CompliancePage = () => {
                       return (
                         <tr>
                           <td colSpan={5} className="py-10">
-                            <div className="flex flex-col items-center text-center gap-3">
+                            <div className="flex flex-col items-center text-center gap-fyn-sm">
                               <div className="text-3xl" aria-hidden>{e.emoji}</div>
                               <div>
-                                <p className="text-fyn-ink text-sm font-medium">{e.title}</p>
-                                <p className="text-fyn-ink/60 text-xs mt-1 max-w-sm">{e.body}</p>
+                                <p className="text-fyn-ink text-fyn-small font-medium">{e.title}</p>
+                                <p className="text-fyn-ink/60 text-fyn-tiny mt-1 max-w-sm">{e.body}</p>
                               </div>
-                              <button
+                              <FynButton
+                                variant="secondary"
                                 onClick={() => setBreakdownFilter(null)}
-                                className="mt-1 inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/50 text-fyn-ink"
+                                className="text-fyn-tiny px-fyn-sm py-1.5"
                               >
                                 Reset filter
-                              </button>
+                              </FynButton>
                             </div>
                           </td>
                         </tr>
                       );
                     })()}
                   </tbody>
-                </table>
+                </FynTable>
               </div>
             </div>
           )}
-        </div>
+        </FynCard>
       )}
 
       {!isLoading && totalFilings > 0 && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
-          <p className="text-fyn-ink/40 text-[12px] fyn-label mb-4">
+        <FynCard className="mt-fyn-md">
+          <FynLabel className="mb-fyn-md">
             ON-TIME FILING RATE — LAST 3 MONTHS
-          </p>
+          </FynLabel>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
@@ -1023,10 +1019,10 @@ const CompliancePage = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-          <p className="text-fyn-ink/50 text-xs mt-3">
+          <p className="text-fyn-ink/50 text-fyn-tiny mt-fyn-sm">
             On-time = filed on or before due date. Months with no filings appear as gaps.
           </p>
-        </div>
+        </FynCard>
       )}
     </DashboardLayout>
   );
@@ -1069,16 +1065,11 @@ const TroubleshootingCard = ({ navigate, missingGst, missingTds, compact }: Trou
   ].filter((i) => i.show);
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-fyn-ink-10 bg-fyn-beige-dark",
-        compact ? "mt-4 p-4" : "mt-4 p-5 text-left"
-      )}
-    >
-      <p className="text-fyn-ink/40 text-[11px] fyn-label mb-2">WHY AM I MISSING FILINGS?</p>
+    <FynCard className={cn("mt-fyn-md text-left", compact ? "p-fyn-md" : undefined)}>
+      <FynLabel className="mb-fyn-sm">WHY AM I MISSING FILINGS?</FynLabel>
       <ul className="space-y-1.5">
         {items.map((i) => (
-          <li key={i.label} className="flex items-start gap-2 text-xs text-fyn-ink/80">
+          <li key={i.label} className="flex items-start gap-fyn-sm text-fyn-tiny text-fyn-ink/80">
             <span className="text-fyn-ink/40 mt-0.5">•</span>
             {i.href === "#" ? (
               <span>{i.label}</span>
@@ -1093,9 +1084,8 @@ const TroubleshootingCard = ({ navigate, missingGst, missingTds, compact }: Trou
           </li>
         ))}
       </ul>
-    </div>
+    </FynCard>
   );
 };
 
 export default CompliancePage;
-

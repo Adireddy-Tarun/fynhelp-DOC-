@@ -105,4 +105,18 @@ describe("Dashboard page snapshots — shared-primitive layout regression", () =
     await findByText(/No TDS Data/i);
     expect(container.firstChild).toMatchSnapshot();
   });
+
+  it("CompliancePage (empty state): FynEmpty + FynCard troubleshooting use brand tokens", async () => {
+    // profiles → business_id (so queries enable); businesses.gstin → null;
+    // gst_filings + tds_filings → empty → empty state renders with FynEmpty + TroubleshootingCard.
+    fromMock.mockImplementation((table: string) => {
+      if (table === "profiles") return makeQuery({ business_id: "biz-1" });
+      if (table === "businesses") return makeQuery({ gstin: null });
+      return makeQuery([]);
+    });
+    const { default: CompliancePage } = await import("../CompliancePage");
+    const { container, findByText } = renderPage(<CompliancePage />);
+    await findByText(/No Compliance Data/i);
+    expect(container.firstChild).toMatchSnapshot();
+  });
 });
