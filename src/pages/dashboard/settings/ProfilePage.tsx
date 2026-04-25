@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,8 +14,9 @@ const languages = [
 ];
 
 const ProfilePage = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, loading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     full_name: "",
@@ -26,6 +28,19 @@ const ProfilePage = () => {
     language_preference: "en",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Route guard flags (computed; redirects rendered after hooks)
+  const notSignedIn = !loading && !user;
+  const profileMissing = !loading && !!user && !profile;
+
+  useEffect(() => {
+    if (profileMissing) {
+      toast({
+        title: "Complete your profile",
+        description: "Finish setup to access your profile settings.",
+      });
+    }
+  }, [profileMissing, toast]);
 
   useEffect(() => {
     if (profile) {
@@ -41,6 +56,21 @@ const ProfilePage = () => {
       });
     }
   }, [profile]);
+
+  // Loading skeleton while auth resolves — prevents flash of redirect
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="h-6 w-40 rounded animate-pulse" style={{ background: "hsl(var(--fyn-ink-10))" }} />
+      </div>
+    );
+  }
+  if (notSignedIn) {
+    return <Navigate to="/signin?redirect=/dashboard/settings/profile" replace />;
+  }
+  if (profileMissing) {
+    return <Navigate to="/onboarding?redirect=/dashboard/settings/profile" replace />;
+  }
 
   const validate = () => {
     const errs: Record<string, string> = {};
