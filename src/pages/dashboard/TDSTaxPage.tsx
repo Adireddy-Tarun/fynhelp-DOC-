@@ -105,6 +105,21 @@ const TDSTaxPage = () => {
   const isEmpty = !isLoading && (!tdsFilings || tdsFilings.length === 0);
   const isFilteredEmpty = !isLoading && !isEmpty && hasDateFilter && visibleFilings.length === 0;
 
+  // Bucket classification — mirrors CompliancePage rules.
+  const todayStr = new Date().toISOString().split("T")[0];
+  const classifyBucket = (f: TdsFiling): Bucket => {
+    if (!f.due_date) return "unknown";
+    const filed = f.status === "filed";
+    if (filed && f.filed_date && f.filed_date <= f.due_date) return "on-time";
+    if (filed) return "late";
+    if (f.due_date < todayStr) return "overdue";
+    return "pending";
+  };
+  const matchesBucket = (f: TdsFiling) => !bucketFilter || classifyBucket(f) === bucketFilter;
+  const bucketMatchCount = bucketFilter ? visibleFilings.filter(matchesBucket).length : visibleFilings.length;
+  const isBucketEmpty =
+    !isLoading && !isEmpty && !isFilteredEmpty && !!bucketFilter && bucketMatchCount === 0;
+
   const getStatusStyle = (filing: TdsFiling) => {
     const isOverdue = new Date(filing.due_date) < now && filing.status === "pending";
     if (filing.status === "filed") return { label: "Filed", className: "bg-[#1A6B3C]/10 text-[#1A6B3C]" };
