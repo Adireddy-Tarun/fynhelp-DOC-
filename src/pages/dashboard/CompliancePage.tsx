@@ -105,6 +105,47 @@ const CompliancePage = () => {
   const isOverdueNotFiled = (f: FilingRow) => f.status !== "filed" && f.due_date < todayStr;
   const isPending = (f: FilingRow) => f.status !== "filed" && f.due_date >= todayStr;
 
+  const daysBetween = (a: string, b: string) => {
+    const ms = new Date(a).getTime() - new Date(b).getTime();
+    return Math.round(ms / (1000 * 60 * 60 * 24));
+  };
+  const explainFiling = (f: FilingRow) => {
+    if (isOnTime(f)) {
+      const diff = daysBetween(f.due_date, f.filed_date!);
+      return {
+        label: "On time",
+        color: "#1A6B3C",
+        rule: "filed_date ≤ due_date",
+        detail: `Filed ${diff === 0 ? "exactly on" : `${diff} day${diff === 1 ? "" : "s"} before`} the due date.`,
+      };
+    }
+    if (isLate(f)) {
+      const diff = daysBetween(f.filed_date!, f.due_date);
+      return {
+        label: "Filed late",
+        color: "#8B5A00",
+        rule: "filed_date > due_date",
+        detail: `Filed ${diff} day${diff === 1 ? "" : "s"} after the due date.`,
+      };
+    }
+    if (isOverdueNotFiled(f)) {
+      const diff = daysBetween(todayStr, f.due_date);
+      return {
+        label: "Overdue",
+        color: "#C41E1E",
+        rule: "status ≠ filed AND due_date < today",
+        detail: `Not yet filed; due date passed ${diff} day${diff === 1 ? "" : "s"} ago.`,
+      };
+    }
+    const diff = daysBetween(f.due_date, todayStr);
+    return {
+      label: "Pending",
+      color: "#1A1008",
+      rule: "status ≠ filed AND due_date ≥ today",
+      detail: `Not yet filed; ${diff === 0 ? "due today" : `due in ${diff} day${diff === 1 ? "" : "s"}`}.`,
+    };
+  };
+
   const onTimeCount = allFilings.filter(isOnTime).length;
   const lateCount = allFilings.filter(isLate).length;
   const overdueCount = allFilings.filter(isOverdueNotFiled).length;
