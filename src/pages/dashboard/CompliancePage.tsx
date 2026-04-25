@@ -428,7 +428,7 @@ const CompliancePage = () => {
         </div>
       )}
 
-      {!isLoading && totalFilings > 0 && gstTotal === 0 && tdsTotal === 0 && (
+      {!isLoading && businessId && gstTotal === 0 && tdsTotal === 0 && (
         <div className="text-center mt-3">
           <button
             onClick={() => navigate("/dashboard/settings/integrations")}
