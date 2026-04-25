@@ -19,8 +19,6 @@ const CompliancePage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
     d.setMonth(d.getMonth() - 3);
