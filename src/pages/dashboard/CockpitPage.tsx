@@ -71,8 +71,7 @@ const CockpitPage = () => {
     const channel = supabase.channel(`cockpit-live-${businessId}`);
     subs.forEach(({ table, queryKey }) => {
       channel.on(
-        // @ts-expect-error - postgres_changes payload typing
-        "postgres_changes",
+        "postgres_changes" as never,
         { event: "*", schema: "public", table, filter },
         () => {
           queryClient.invalidateQueries({ queryKey: [queryKey, businessId] });
