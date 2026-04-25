@@ -48,7 +48,7 @@ const CompliancePage = () => {
     fetchBusiness();
   }, []);
 
-  const { data: gstFilings, isLoading: loadingGst } = useQuery({
+  const { data: gstFilings, isLoading: loadingGst, isFetching: fetchingGst } = useQuery({
     queryKey: ["compliance-gst", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
@@ -63,7 +63,7 @@ const CompliancePage = () => {
     enabled: !!businessId,
   });
 
-  const { data: tdsFilings, isLoading: loadingTds } = useQuery({
+  const { data: tdsFilings, isLoading: loadingTds, isFetching: fetchingTds } = useQuery({
     queryKey: ["compliance-tds", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
@@ -249,9 +249,12 @@ const CompliancePage = () => {
           </div>
 
           {/* GST */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS</p>
-            <p className="text-fyn-ink text-[28px] font-bold font-sans">
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
+              GST FILINGS
+              {fetchingGst && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+            </p>
+            <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingGst && "opacity-40")}>
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
@@ -278,9 +281,12 @@ const CompliancePage = () => {
           </div>
 
           {/* TDS */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS</p>
-            <p className="text-fyn-ink text-[28px] font-bold font-sans">
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
+              TDS FILINGS
+              {fetchingTds && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+            </p>
+            <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingTds && "opacity-40")}>
               {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
