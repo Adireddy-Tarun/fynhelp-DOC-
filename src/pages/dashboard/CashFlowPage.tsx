@@ -1,132 +1,190 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
+import { supabase } from "@/integrations/supabase/client";
 import { formatINR } from "@/lib/indian-format";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  ReferenceLine, ReferenceArea
 } from "recharts";
 
-const cashFlowData = Array.from({ length: 120 }, (_, i) => {
-  const d = new Date();
-  d.setDate(d.getDate() - 90 + i);
-  const isFuture = i > 90;
-  return {
-    date: d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
-    cashIn: Math.round((15000 + Math.random() * 35000) * (isFuture ? 0.9 : 1)),
-    cashOut: Math.round((18000 + Math.random() * 25000) * (isFuture ? 0.95 : 1)),
-    isFuture,
-  };
-});
-
-const moneyInCategories = [
-  { cat: "Customer Payments", amount: 1420000, pct: 77, trend: "↑ 8%", positive: true },
-  { cat: "Advance Receipts", amount: 280000, pct: 15, trend: "↓ 2%", positive: false },
-  { cat: "Other Income", amount: 140000, pct: 8, trend: "→ 0%", positive: true },
-];
-
-const moneyOutCategories = [
-  { cat: "Supplier Payments", amount: 680000, pct: 44, trend: "↑ 12%", positive: false, color: "#C41E1E" },
-  { cat: "Payroll", amount: 420000, pct: 27, trend: "→ 0%", positive: true, color: "#8B5A00" },
-  { cat: "GST / TDS", amount: 210000, pct: 13, trend: "↓ 1%", positive: true, color: "#1A4A8B" },
-  { cat: "Rent & Overhead", amount: 140000, pct: 9, trend: "→ 0%", positive: true, color: "#6B21A8" },
-  { cat: "Loan EMI", amount: 80000, pct: 5, trend: "→ 0%", positive: true, color: "#374151" },
-  { cat: "Other", amount: 30000, pct: 2, trend: "↑ 1%", positive: false, color: "#6B7280" },
-];
-
-const transactions = [
-  { date: "Apr 12", desc: "Payment from Kumar Fabrics", cat: "Revenue", bank: "HDFC CA", amount: 55000, dir: "in", balance: 1240000 },
-  { date: "Apr 11", desc: "Raj Textiles — raw material", cat: "COGS", bank: "HDFC CA", amount: 120000, dir: "out", balance: 1185000 },
-  { date: "Apr 10", desc: "HDFC Bank interest", cat: "Finance", bank: "HDFC CA", amount: 1200, dir: "in", balance: 1305000 },
-  { date: "Apr 9", desc: "Office rent — April", cat: "Overhead", bank: "HDFC CA", amount: 45000, dir: "out", balance: 1303800 },
-  { date: "Apr 8", desc: "Partial payment — Sharma & Sons", cat: "Revenue", bank: "ICICI CA", amount: 100000, dir: "in", balance: 1348800 },
-  { date: "Apr 7", desc: "Internet & phone bills", cat: "Overhead", bank: "HDFC CA", amount: 8500, dir: "out", balance: 1248800 },
-  { date: "Apr 6", desc: "GST Payment — March", cat: "GST", bank: "HDFC CA", amount: 86000, dir: "out", balance: 1257300 },
-  { date: "Apr 5", desc: "Chennai Trading Co", cat: "Revenue", bank: "ICICI CA", amount: 190000, dir: "in", balance: 1343300 },
-  { date: "Apr 4", desc: "Staff salaries — March", cat: "Payroll", bank: "HDFC CA", amount: 420000, dir: "out", balance: 1153300 },
-  { date: "Apr 3", desc: "Delhi Distributors advance", cat: "Revenue", bank: "HDFC CA", amount: 50000, dir: "in", balance: 1573300 },
-];
-
-const catChipStyles: Record<string, { bg: string; color: string }> = {
-  Revenue: { bg: "#DCFCE7", color: "#16A34A" },
-  COGS: { bg: "#FDEAEA", color: "#C41E1E" },
-  Finance: { bg: "#FEF3E2", color: "#8B5A00" },
-  Overhead: { bg: "#F3E8FF", color: "#6B21A8" },
-  Payroll: { bg: "#EAF0FB", color: "#1A4A8B" },
-  GST: { bg: "#FEF3E2", color: "#8B5A00" },
-  Other: { bg: "#F1F5F9", color: "#475569" },
+type MonthlyFlow = { month: string; inflow: number; outflow: number; net: number };
+type Txn = {
+  id: string;
+  date: string;
+  amount: number;
+  direction: string;
+  description: string | null;
+  category: string | null;
+  counterparty: string | null;
 };
 
-const periods = ["30D", "90D", "6M", "1Y"];
+const periods = ["30D", "90D", "6M", "1Y"] as const;
 
 const CashFlowPage = () => {
-  const [activePeriod, setActivePeriod] = useState("90D");
+  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [activePeriod, setActivePeriod] = useState<typeof periods[number]>("90D");
   const [dirFilter, setDirFilter] = useState<"all" | "in" | "out">("all");
+  const [search, setSearch] = useState("");
 
-  const filteredTxns = transactions.filter(t => dirFilter === "all" || t.dir === dirFilter);
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("business_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.business_id) setBusinessId(data.business_id);
+    };
+    fetchBusiness();
+  }, []);
+
+  // Monthly cash flow (last 12 months)
+  const { data: monthlyFlow, isLoading } = useQuery<MonthlyFlow[]>({
+    queryKey: ["cash-flow-monthly", businessId],
+    queryFn: async () => {
+      if (!businessId) return [];
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      const { data } = await supabase
+        .from("transactions")
+        .select("amount, date, direction")
+        .eq("business_id", businessId)
+        .gte("date", twelveMonthsAgo.toISOString().split("T")[0])
+        .order("date", { ascending: true });
+      if (!data) return [];
+
+      const monthly: Record<string, { inflow: number; outflow: number }> = {};
+      data.forEach((t) => {
+        const month = t.date.substring(0, 7);
+        if (!monthly[month]) monthly[month] = { inflow: 0, outflow: 0 };
+        if (t.direction === "credit") monthly[month].inflow += Number(t.amount);
+        else monthly[month].outflow += Number(t.amount);
+      });
+
+      return Object.entries(monthly)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, d]) => ({
+          month: new Date(month + "-01").toLocaleDateString("en-IN", { month: "short", year: "2-digit" }),
+          inflow: d.inflow,
+          outflow: d.outflow,
+          net: d.inflow - d.outflow,
+        }));
+    },
+    enabled: !!businessId,
+  });
+
+  // Recent transactions
+  const { data: transactions } = useQuery<Txn[]>({
+    queryKey: ["cash-flow-transactions", businessId],
+    queryFn: async () => {
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("transactions")
+        .select("id, date, amount, direction, description, category, counterparty")
+        .eq("business_id", businessId)
+        .order("date", { ascending: false })
+        .limit(50);
+      return (data as Txn[]) || [];
+    },
+    enabled: !!businessId,
+  });
+
+  const currentMonthData = monthlyFlow?.[monthlyFlow.length - 1];
+  const totalInflow = currentMonthData?.inflow || 0;
+  const totalOutflow = currentMonthData?.outflow || 0;
+  const netCashFlow = currentMonthData?.net || 0;
+
+  const filteredTxns = (transactions || []).filter((t) => {
+    if (dirFilter === "in" && t.direction !== "credit") return false;
+    if (dirFilter === "out" && t.direction === "credit") return false;
+    if (search && !(t.description || "").toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const isEmpty = !isLoading && (!monthlyFlow || monthlyFlow.length === 0);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
-    const cashIn = payload.find((p: any) => p.dataKey === "cashIn")?.value || 0;
-    const cashOut = payload.find((p: any) => p.dataKey === "cashOut")?.value || 0;
-    const net = cashIn - cashOut;
+    const inflow = payload.find((p: any) => p.dataKey === "inflow")?.value || 0;
+    const outflow = payload.find((p: any) => p.dataKey === "outflow")?.value || 0;
+    const net = inflow - outflow;
     return (
       <div style={{ background: "#1A1008", borderRadius: 8, padding: "12px 16px", border: "none" }}>
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 6 }}>{label}</p>
-        <p style={{ color: "#4ADE80", fontSize: 14, fontWeight: 600 }}>In: ₹{cashIn.toLocaleString("en-IN")}</p>
-        <p style={{ color: "#F87171", fontSize: 14, fontWeight: 600 }}>Out: ₹{cashOut.toLocaleString("en-IN")}</p>
+        <p style={{ color: "#4ADE80", fontSize: 14, fontWeight: 600 }}>In: ₹{inflow.toLocaleString("en-IN")}</p>
+        <p style={{ color: "#F87171", fontSize: 14, fontWeight: 600 }}>Out: ₹{outflow.toLocaleString("en-IN")}</p>
         <p style={{ color: net >= 0 ? "#FFFFFF" : "#F87171", fontSize: 14, fontWeight: 600 }}>Net: ₹{net.toLocaleString("en-IN")}</p>
       </div>
     );
   };
 
+  // LOADING
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 120 }} />
+          ))}
+        </div>
+        <div className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 380 }} />
+      </DashboardLayout>
+    );
+  }
+
+  // EMPTY STATE
+  if (isEmpty) {
+    return (
+      <DashboardLayout>
+        <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+          <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 64, height: 64, background: "#F4EDDA", border: "1px solid #1A1008", boxShadow: "inset 0 -2px 0 0 #C41E1E", color: "#C41E1E" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
+              <path d="M3 3v18h18M7 14l4-4 4 4 6-6" />
+            </svg>
+          </div>
+          <h2 className="font-serif text-fyn-ink" style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>No Cash Flow Data</h2>
+          <p style={{ fontSize: 14, color: "rgba(26,16,8,0.60)", marginBottom: 20 }}>
+            Upload your bank statements to see cash flow analysis
+          </p>
+          <Link
+            to="/dashboard/data-import"
+            className="inline-flex items-center gap-2 transition-colors hover:opacity-90"
+            style={{ background: "#C41E1E", color: "#FFFFFF", padding: "10px 20px", borderRadius: 6, fontSize: 14, fontWeight: 500 }}
+          >
+            Upload Bank Statement →
+          </Link>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      {/* TOP METRICS ROW */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="rounded-lg transition-all duration-250 hover:-translate-y-[3px] cursor-pointer" style={{ background: "#1A1008", padding: "20px 24px" }}
-          onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.25)"; }}
-          onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
-        >
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>BALANCE TODAY</p>
-          <p className="font-sans text-3xl text-fyn-success" style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹12.4L</p>
-          <p style={{ color: "#16A34A", fontSize: 13, marginTop: 4 }}>↑ ₹40K from yesterday</p>
-          <p style={{ color: "#8B6914", fontSize: 11, marginTop: 2 }}>HDFC CA · synced 12 min ago</p>
+      {/* TOP METRICS — current month real data */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Inflow (This Month)</p>
+          <p style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹{totalInflow.toLocaleString("en-IN")}</p>
         </div>
-        <div className="rounded-lg transition-all duration-250 hover:-translate-y-[3px] cursor-pointer" style={{ background: "#1A1008", padding: "20px 24px" }}
-          onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.25)"; }}
-          onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
-        >
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>DAILY BURN</p>
-          <p className="font-sans text-3xl text-primary" style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹23,846</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginTop: 4 }}>30-day rolling average</p>
-          <p style={{ color: "#DC2626", fontSize: 13, marginTop: 2 }}>↑ 8% from last month</p>
+        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Outflow (This Month)</p>
+          <p style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹{totalOutflow.toLocaleString("en-IN")}</p>
         </div>
-        <div className="rounded-lg transition-all duration-250 hover:-translate-y-[3px] cursor-pointer" style={{ background: "#1A1008", padding: "20px 24px" }}
-          onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.25)"; }}
-          onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
-        >
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>RUNWAY</p>
-          <p className="font-sans text-3xl text-primary-foreground" style={{ color: "#F59E0B", fontSize: 28, fontWeight: 700, marginTop: 4 }}>52 days</p>
-          <div style={{ marginTop: 8, height: 6, background: "rgba(255,255,255,0.10)", borderRadius: 3 }}>
-            <div className="progress-fill-animate" style={{ height: 6, borderRadius: 3, background: "#F59E0B", width: `${(52 / 180) * 100}%` }} />
-          </div>
-          <p style={{ color: "rgba(255,255,255,0.40)", fontSize: 11, marginTop: 4 }}>Green &gt;90 · Amber 30-90 · Red &lt;30</p>
-        </div>
-        <div className="rounded-lg transition-all duration-250 hover:-translate-y-[3px] cursor-pointer" style={{ background: "#1A1008", padding: "20px 24px" }}
-          onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(26,16,8,0.25)"; }}
-          onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}
-        >
-          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>30-DAY NET</p>
-          <p className="font-sans text-3xl text-fyn-success" style={{ color: "#16A34A", fontSize: 28, fontWeight: 700, marginTop: 4 }}>+₹2.8L</p>
-          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginTop: 4 }}>Cash in minus cash out</p>
-          <p style={{ color: "#16A34A", fontSize: 13, marginTop: 2 }}>vs last month: +12%</p>
+        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+          <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Net Cash Flow</p>
+          <p style={{ color: netCashFlow >= 0 ? "#16A34A" : "#F87171", fontSize: 28, fontWeight: 700, marginTop: 4 }}>
+            {netCashFlow >= 0 ? "+" : ""}₹{netCashFlow.toLocaleString("en-IN")}
+          </p>
         </div>
       </div>
 
-      {/* CASH FLOW CHART */}
+      {/* CHART */}
       <div className="rounded-lg p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-sans" style={{ fontSize: 15 }}>Cash Flow — Last 90 Days + 30-Day Forecast</h3>
+          <h3 className="text-fyn-ink font-sans" style={{ fontSize: 15, fontWeight: 600 }}>Monthly Cash Flow — Last 12 Months</h3>
           <div className="flex gap-1">
             {periods.map((p) => (
               <button
@@ -143,95 +201,52 @@ const CashFlowPage = () => {
           </div>
         </div>
         <ResponsiveContainer width="100%" height={320}>
-          <AreaChart data={cashFlowData}>
+          <AreaChart data={monthlyFlow}>
             <defs>
               <linearGradient id="cfGreen" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#16A34A" stopOpacity={0.15} />
+                <stop offset="0%" stopColor="#16A34A" stopOpacity={0.18} />
                 <stop offset="100%" stopColor="#16A34A" stopOpacity={0.01} />
               </linearGradient>
               <linearGradient id="cfRed" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#DC2626" stopOpacity={0.12} />
+                <stop offset="0%" stopColor="#DC2626" stopOpacity={0.14} />
                 <stop offset="100%" stopColor="#DC2626" stopOpacity={0.01} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} interval={14} />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} />
             <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceArea x1={cashFlowData[90]?.date} x2={cashFlowData[119]?.date} fill="#8B6914" fillOpacity={0.06} />
-            <ReferenceLine y={50000} stroke="#DC2626" strokeDasharray="4 4" label={{ value: "Danger ₹50K", fill: "#DC2626", fontSize: 10 }} />
-            <Area type="monotone" dataKey="cashIn" stroke="#16A34A" strokeWidth={2} fill="url(#cfGreen)" />
-            <Area type="monotone" dataKey="cashOut" stroke="#DC2626" strokeWidth={2} fill="url(#cfRed)" />
+            <Area type="monotone" dataKey="inflow" stroke="#16A34A" strokeWidth={2} fill="url(#cfGreen)" />
+            <Area type="monotone" dataKey="outflow" stroke="#DC2626" strokeWidth={2} fill="url(#cfRed)" />
+            <Area type="monotone" dataKey="net" stroke="#1A1008" strokeWidth={2} fill="none" />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex gap-6 mt-3">
           <span className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 500 }}>
-            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#16A34A" }} /> Money In
+            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#16A34A" }} /> Inflow
           </span>
           <span className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 500 }}>
-            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#DC2626" }} /> Money Out
+            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#DC2626" }} /> Outflow
           </span>
-          <span className="flex items-center gap-1.5" style={{ fontSize: 13 }}>
-            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "rgba(139,105,20,0.10)" }} /> Forecast Zone
+          <span className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 500 }}>
+            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#1A1008" }} /> Net
           </span>
         </div>
       </div>
 
-      {/* MONEY FLOW BREAKDOWN */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-          <h3 className="font-sans" style={{ fontSize: 15, fontWeight: 600, color: "#1A1008", marginBottom: 16 }}>Money In — ₹18.4L total</h3>
-          <div className="h-6 flex rounded-lg overflow-hidden mb-4">
-            {moneyInCategories.map((c, i) => (
-              <div key={i} className="h-full" style={{ width: `${c.pct}%`, background: "#16A34A", opacity: 1 - i * 0.25 }} />
-            ))}
-          </div>
-          <div className="space-y-2">
-            {moneyInCategories.map((c) => (
-              <div key={c.cat} className="flex items-center gap-3" style={{ fontSize: 14 }}>
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#16A34A" }} />
-                <span className="flex-1 text-fyn-ink">{c.cat}</span>
-                <span className="text-fyn-ink fyn-metric" style={{ fontWeight: 600 }}>{formatINR(c.amount)}</span>
-                <span className="opacity-100" style={{ color: "rgba(26,16,8,0.40)", width: 40, textAlign: "right" }}>{c.pct}%</span>
-                <span style={{ width: 48, textAlign: "right", fontSize: 13, color: c.positive ? "#16A34A" : "#DC2626" }}>{c.trend}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-          <h3 className="font-sans" style={{ fontSize: 15, fontWeight: 600, color: "#1A1008", marginBottom: 16 }}>Money Out — ₹15.6L total</h3>
-          <div className="h-6 flex rounded-lg overflow-hidden mb-4">
-            {moneyOutCategories.map((c) => (
-              <div key={c.cat} className="h-full" style={{ width: `${c.pct}%`, background: c.color }} />
-            ))}
-          </div>
-          <div className="space-y-2">
-            {moneyOutCategories.map((c) => (
-              <div key={c.cat} className="flex items-center gap-3" style={{ fontSize: 14 }}>
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: c.color }} />
-                <span className="flex-1 text-fyn-ink">{c.cat}</span>
-                <span className="text-fyn-ink fyn-metric" style={{ fontWeight: 600 }}>{formatINR(c.amount)}</span>
-                <span className="opacity-100" style={{ color: "rgba(26,16,8,0.40)", width: 40, textAlign: "right" }}>{c.pct}%</span>
-                <span style={{ width: 48, textAlign: "right", fontSize: 13, color: c.positive ? "#16A34A" : "#DC2626" }}>{c.trend}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* TRANSACTION HISTORY */}
+      {/* TRANSACTIONS */}
       <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Transaction History</h3>
-          <button className="flex items-center gap-2 transition-all hover:bg-[#1A1008] hover:text-white" style={{ border: "1px solid #1A1008", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 500 }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 1v8M3 6l4 4 4-4M1 13h12"/></svg>
-            Export to Excel
-          </button>
+          <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Transactions</h3>
         </div>
 
-        {/* Filter bar */}
         <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-lg" style={{ background: "#FAF7F0" }}>
-          <input placeholder="Search description..." className="outline-none flex-1 min-w-[160px]" style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search description..."
+            className="outline-none flex-1 min-w-[160px]"
+            style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }}
+          />
           <div className="flex gap-1">
             {(["all", "in", "out"] as const).map((d) => (
               <button
@@ -250,42 +265,47 @@ const CashFlowPage = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
-                {["Date", "Description", "Category", "Bank", "Amount", "Balance"].map(h => (
-                  <th key={h} className={`py-2 ${h === "Amount" || h === "Balance" ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTxns.map((t, i) => {
-                const chip = catChipStyles[t.cat] || { bg: "#F1F5F9", color: "#475569" };
-                return (
-                  <tr
-                    key={i}
-                    className="transition-colors cursor-pointer"
-                    style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#F4EDDA"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = i % 2 === 0 ? "#FFFFFF" : "#FAF7F0"; }}
-                  >
-                    <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{t.date}</td>
-                    <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.desc}</td>
-                    <td className="py-3">
-                      <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: chip.bg, color: chip.color }}>{t.cat}</span>
-                    </td>
-                    <td className="py-3 text-accent" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.bank}</td>
-                    <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: t.dir === "in" ? "#16A34A" : "#DC2626" }}>
-                      {t.dir === "in" ? "+" : "-"}{formatINR(t.amount)}
-                    </td>
-                    <td className="py-3 text-right fyn-metric" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{formatINR(t.balance)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {filteredTxns.length === 0 ? (
+          <div className="py-12 text-center" style={{ fontSize: 14, color: "rgba(26,16,8,0.50)" }}>
+            No transactions match the current filter.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
+                  {["Date", "Description", "Category", "Counterparty", "Amount"].map((h) => (
+                    <th key={h} className={`py-2 ${h === "Amount" ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTxns.map((t, i) => {
+                  const isIn = t.direction === "credit";
+                  const dateLabel = new Date(t.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+                  return (
+                    <tr
+                      key={t.id}
+                      style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
+                    >
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{dateLabel}</td>
+                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.description || "—"}</td>
+                      <td className="py-3">
+                        {t.category ? (
+                          <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: "#F1F5F9", color: "#475569" }}>{t.category}</span>
+                        ) : <span style={{ fontSize: 12, color: "rgba(26,16,8,0.30)" }}>—</span>}
+                      </td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.counterparty || "—"}</td>
+                      <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: isIn ? "#16A34A" : "#DC2626" }}>
+                        {isIn ? "+" : "-"}{formatINR(Number(t.amount))}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
