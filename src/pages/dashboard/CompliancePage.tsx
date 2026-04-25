@@ -539,7 +539,14 @@ const CompliancePage = () => {
             </p>
             {tdsTotal === 0 && !fetchingTds ? (
               <div className="mt-1">
-                <p className="text-fyn-ink/60 text-xs mb-3">No TDS / TRACES filings tracked yet.</p>
+                <p className="text-fyn-ink/60 text-xs mb-2">No TDS / TRACES filings tracked yet.</p>
+                <p className="text-fyn-ink/70 text-[11px] fyn-label mb-1.5">WHAT WE'LL IMPORT</p>
+                <ul className="text-fyn-ink/70 text-xs space-y-1 mb-2">
+                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Form 24Q / 26Q / 27Q quarterly returns</span></li>
+                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Challan numbers, ARNs &amp; deposit dates</span></li>
+                  <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Default notices &amp; demand status from TRACES</span></li>
+                </ul>
+                <p className="text-fyn-ink/50 text-[11px] mb-3">Auto-syncs daily · manual refresh anytime</p>
                 <button
                   onClick={() => navigate("/onboarding?step=tds")}
                   className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
