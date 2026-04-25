@@ -164,9 +164,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     const interval = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 200);
 
     try {
-      const text = await file.text();
-      const { rows } = parseCSV(text);
-      if (rows.length === 0) throw new Error("CSV has no data rows");
+      const rows = await parseFile(file);
+      if (rows.length === 0) throw new Error("File has no data rows");
 
       if (type === "bank") {
         const records = rows.map(r => {
