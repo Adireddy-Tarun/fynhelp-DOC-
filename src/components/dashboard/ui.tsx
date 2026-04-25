@@ -14,7 +14,8 @@
  *   - text-fyn-h1 / h2 / h3 / body / small / tiny / metric  type scale
  *   - p-fyn-lg / gap-fyn-lg ...                              spacing scale
  */
-import { ReactNode, HTMLAttributes, ButtonHTMLAttributes } from "react";
+import { ReactNode, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ── Layout ───────────────────────────────────────────── */
