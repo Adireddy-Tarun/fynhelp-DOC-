@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatINR, getDaysOverdueColor } from "@/lib/indian-format";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
@@ -47,9 +47,44 @@ type ReceivablesFilter = "all" | "overdue" | "current";
 
 const CockpitPage = () => {
   const { businessId } = useAuth();
+  const queryClient = useQueryClient();
   const [nidhiInput, setNidhiInput] = useState("");
   const [recSearch, setRecSearch] = useState("");
   const [recFilter, setRecFilter] = useState<ReceivablesFilter>("all");
+
+  // Live updates: subscribe to row changes for this business and invalidate
+  // the matching React Query caches so the cockpit refreshes instantly when
+  // invoices, payments, alerts, or bank balances change.
+  useEffect(() => {
+    if (!businessId) return;
+
+    const filter = `business_id=eq.${businessId}`;
+    const subs: { table: string; queryKey: string }[] = [
+      { table: "receivables", queryKey: "receivables-top" },
+      { table: "payables", queryKey: "payables" },
+      { table: "alerts", queryKey: "alerts" },
+      { table: "bank_accounts", queryKey: "bank-accounts" },
+      { table: "transactions", queryKey: "transactions-180" },
+      { table: "compliance_events", queryKey: "compliance-upcoming" },
+    ];
+
+    const channel = supabase.channel(`cockpit-live-${businessId}`);
+    subs.forEach(({ table, queryKey }) => {
+      channel.on(
+        "postgres_changes" as never,
+        { event: "*", schema: "public", table, filter },
+        () => {
+          queryClient.invalidateQueries({ queryKey: [queryKey, businessId] });
+        }
+      );
+    });
+    channel.subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [businessId, queryClient]);
+
 
   // Bank balances
   const { data: bankAccounts = [], isLoading: bankLoading, error: bankError } = useQuery({
