@@ -60,7 +60,7 @@ const CompliancePage = () => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
-        .select("status, due_date")
+        .select("status, due_date, filed_date")
         .eq("business_id", businessId)
         .gte("due_date", threeMonthsAgo);
       return ((data as unknown) as FilingRow[]) || [];
