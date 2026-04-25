@@ -497,11 +497,63 @@ const CompliancePage = () => {
                 </p>
               )}
             </div>
-            {breakdownFilter && (
-              <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
-                Clear filter ✕
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {breakdownFilter && (() => {
+                const bucketLabel: Record<string, string> = {
+                  "on-time": "on-time",
+                  late: "late",
+                  overdue: "overdue",
+                  pending: "pending",
+                  unknown: "unknown",
+                };
+                const matchesBucket = (f: typeof allFilings[number]) =>
+                  breakdownFilter === "on-time" ? isOnTime(f) :
+                  breakdownFilter === "late" ? isLate(f) :
+                  breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                  breakdownFilter === "unknown" ? isUnknown(f) :
+                  isPending(f);
+                const rows = allFilings.filter(matchesBucket);
+                const handleExport = () => {
+                  const escape = (v: string | null | undefined) => {
+                    const s = v == null ? "" : String(v);
+                    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+                  };
+                  const header = ["Source", "Due date", "Filed date", "Status"];
+                  const body = rows.map((f) => [
+                    escape(f._src),
+                    escape(f.due_date),
+                    escape(f.filed_date ?? ""),
+                    escape(f.status),
+                  ].join(","));
+                  const csv = [header.join(","), ...body].join("\n");
+                  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `compliance-${breakdownFilter}-${format(new Date(), "yyyy-MM-dd")}.csv`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                };
+                return (
+                  <button
+                    onClick={handleExport}
+                    disabled={rows.length === 0}
+                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={`Export ${rows.length} ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export breakdown CSV ({rows.length})
+                  </button>
+                );
+              })()}
+              {breakdownFilter && (
+                <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
+                  Clear filter ✕
+                </button>
+              )}
+            </div>
           </div>
 
           <div className={cn("grid grid-cols-2 gap-2 mb-4", unknownCount > 0 ? "md:grid-cols-5" : "md:grid-cols-4") }>
