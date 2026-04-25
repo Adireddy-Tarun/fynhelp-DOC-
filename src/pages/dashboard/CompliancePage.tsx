@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
-type FilingRow = { status: string; due_date: string };
+type FilingRow = { status: string; due_date: string; filed_date?: string | null };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
