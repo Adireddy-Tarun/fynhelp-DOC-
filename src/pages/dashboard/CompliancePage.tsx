@@ -682,9 +682,35 @@ const CompliancePage = () => {
                       breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
                       breakdownFilter === "unknown" ? isUnknown(f) :
                       isPending(f)
-                    ).length === 0 && (
-                      <tr><td colSpan={5} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
-                    )}
+                    ).length === 0 && (() => {
+                      const empty: Record<string, { title: string; body: string; emoji: string }> = {
+                        "on-time": { emoji: "🎯", title: "No on-time filings in this range", body: "Nothing was filed on or before its due date for the selected period." },
+                        late: { emoji: "✅", title: "No late filings — nice work", body: "Every filed return for this period went out on time." },
+                        overdue: { emoji: "🎉", title: "No overdue filings", body: "All past-due returns have been filed. You're caught up." },
+                        pending: { emoji: "📭", title: "No upcoming pending filings", body: "Nothing is due later in the selected window." },
+                        unknown: { emoji: "✨", title: "No rows missing a due date", body: "Every filing in this period has a valid due date on record." },
+                      };
+                      const e = empty[breakdownFilter ?? "pending"];
+                      return (
+                        <tr>
+                          <td colSpan={5} className="py-10">
+                            <div className="flex flex-col items-center text-center gap-3">
+                              <div className="text-3xl" aria-hidden>{e.emoji}</div>
+                              <div>
+                                <p className="text-fyn-ink text-sm font-medium">{e.title}</p>
+                                <p className="text-fyn-ink/60 text-xs mt-1 max-w-sm">{e.body}</p>
+                              </div>
+                              <button
+                                onClick={() => setBreakdownFilter(null)}
+                                className="mt-1 inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/50 text-fyn-ink"
+                              >
+                                Reset filter
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })()}
                   </tbody>
                 </table>
               </div>
