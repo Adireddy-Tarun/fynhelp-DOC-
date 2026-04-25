@@ -98,38 +98,66 @@ const CompliancePage = () => {
   const allFilings = [...(gstFilings || []).map(f => ({ ...f, _src: "GST" as const })), ...(tdsFilings || []).map(f => ({ ...f, _src: "TDS" as const }))];
   const totalFilings = allFilings.length;
 
-  // Breakdown: on-time = filed AND filed_date <= due_date; late = filed but after due; overdue = not filed and past due; pending = not filed, not yet due
+  // Classification rules (mutually exclusive, exhaustive over rows with a known due_date):
+  //   on-time = filed AND filed_date present AND filed_date ≤ due_date
+  //   late    = filed AND (filed_date missing OR filed_date > due_date)
+  //   overdue = not filed AND due_date < today
+  //   pending = not filed AND due_date ≥ today
+  //   unknown = due_date missing  → excluded from score denominator
   const todayStr = new Date().toISOString().split("T")[0];
-  const isOnTime = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date <= f.due_date;
-  const isLate = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date > f.due_date;
-  const isOverdueNotFiled = (f: FilingRow) => f.status !== "filed" && f.due_date < todayStr;
-  const isPending = (f: FilingRow) => f.status !== "filed" && f.due_date >= todayStr;
+  const isFiledStatus = (f: FilingRow) => f.status === "filed";
+  const isUnknown = (f: FilingRow) => !f.due_date;
+  const isOnTime = (f: FilingRow) =>
+    !isUnknown(f) && isFiledStatus(f) && !!f.filed_date && f.filed_date <= (f.due_date as string);
+  const isLate = (f: FilingRow) =>
+    !isUnknown(f) && isFiledStatus(f) && (!f.filed_date || (f.filed_date as string) > (f.due_date as string));
+  const isOverdueNotFiled = (f: FilingRow) =>
+    !isUnknown(f) && !isFiledStatus(f) && (f.due_date as string) < todayStr;
+  const isPending = (f: FilingRow) =>
+    !isUnknown(f) && !isFiledStatus(f) && (f.due_date as string) >= todayStr;
 
   const daysBetween = (a: string, b: string) => {
     const ms = new Date(a).getTime() - new Date(b).getTime();
     return Math.round(ms / (1000 * 60 * 60 * 24));
   };
   const explainFiling = (f: FilingRow) => {
+    if (isUnknown(f)) {
+      return {
+        label: "Unknown",
+        color: "#475569",
+        rule: "due_date missing",
+        detail: "No due date on record; excluded from score.",
+      };
+    }
+    const due = f.due_date as string;
     if (isOnTime(f)) {
-      const diff = daysBetween(f.due_date, f.filed_date!);
+      const diff = daysBetween(due, f.filed_date!);
       return {
         label: "On time",
         color: "#1A6B3C",
-        rule: "filed_date ≤ due_date",
+        rule: "filed AND filed_date ≤ due_date",
         detail: `Filed ${diff === 0 ? "exactly on" : `${diff} day${diff === 1 ? "" : "s"} before`} the due date.`,
       };
     }
     if (isLate(f)) {
-      const diff = daysBetween(f.filed_date!, f.due_date);
+      if (!f.filed_date) {
+        return {
+          label: "Filed late",
+          color: "#8B5A00",
+          rule: "filed AND filed_date missing",
+          detail: "Marked filed but the filed date is missing — counted as late.",
+        };
+      }
+      const diff = daysBetween(f.filed_date, due);
       return {
         label: "Filed late",
         color: "#8B5A00",
-        rule: "filed_date > due_date",
+        rule: "filed AND filed_date > due_date",
         detail: `Filed ${diff} day${diff === 1 ? "" : "s"} after the due date.`,
       };
     }
     if (isOverdueNotFiled(f)) {
-      const diff = daysBetween(todayStr, f.due_date);
+      const diff = daysBetween(todayStr, due);
       return {
         label: "Overdue",
         color: "#C41E1E",
@@ -137,7 +165,7 @@ const CompliancePage = () => {
         detail: `Not yet filed; due date passed ${diff} day${diff === 1 ? "" : "s"} ago.`,
       };
     }
-    const diff = daysBetween(f.due_date, todayStr);
+    const diff = daysBetween(due, todayStr);
     return {
       label: "Pending",
       color: "#1A1008",
