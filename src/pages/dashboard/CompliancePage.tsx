@@ -489,7 +489,7 @@ const CompliancePage = () => {
             <div>
               <p className="text-fyn-ink/40 text-[12px] fyn-label mb-1">HEALTH SCORE BREAKDOWN</p>
               <p className="text-fyn-ink/70 text-xs font-mono">
-                Score = on-time ÷ scored ÷ × 100 = {onTimeCount} ÷ {scoredTotal} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
+                Score = on-time ÷ scored × 100 = {onTimeCount} ÷ {scoredTotal} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
               </p>
               {unknownCount > 0 && (
                 <p className="text-fyn-ink/50 text-[11px] mt-1">
