@@ -36,6 +36,7 @@ const CompliancePage = () => {
         queryClient.refetchQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] }),
         queryClient.refetchQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] }),
       ]);
+      setLastUpdated(new Date());
     } finally {
       setIsRefreshing(false);
     }
