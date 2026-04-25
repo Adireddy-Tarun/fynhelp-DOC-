@@ -340,43 +340,39 @@ const CockpitPage = () => {
         <div className="flex items-stretch">
           {/* Mono label rail */}
           <div
-            className="flex items-center px-3 font-mono"
-            style={{
-              background: "hsl(var(--fyn-ink))",
-              color: "hsl(var(--fyn-beige))",
-              fontSize: 10,
-              letterSpacing: "0.18em",
-            }}
+            className="hidden sm:flex items-center px-3 font-mono text-[10px] tracking-[0.18em] uppercase
+                       bg-[hsl(var(--fyn-ink))] text-[hsl(var(--fyn-beige))]"
           >
             DATA · IMPORT
           </div>
 
           {/* Body */}
-          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-6">
+          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-4 md:gap-6">
             <div className="flex items-center gap-3 min-w-0">
+              {/* Icon tile — Bloomberg square: ink frame, beige fill, red stroke + bottom accent */}
               <div
-                className="w-9 h-9 flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: "hsl(var(--fyn-red) / 0.08)",
-                  border: "1px solid hsl(var(--fyn-red) / 0.25)",
-                  color: "hsl(var(--fyn-red))",
-                }}
+                className="w-9 h-9 flex items-center justify-center flex-shrink-0
+                           bg-[hsl(var(--fyn-beige))]
+                           border border-[hsl(var(--fyn-ink))]
+                           shadow-[inset_0_-2px_0_0_hsl(var(--fyn-red))]
+                           text-[hsl(var(--fyn-red))]"
                 aria-hidden
               >
-                {/* Brand import glyph: tray + arrow-in */}
+                {/* Import glyph: stroke 2, square caps/joins — matches card 1px borders */}
                 <svg
-                  width="18"
-                  height="18"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.75"
+                  strokeWidth="2"
                   strokeLinecap="square"
                   strokeLinejoin="miter"
+                  shapeRendering="crispEdges"
                 >
                   <path d="M12 3v11" />
                   <path d="M7 9l5 5 5-5" />
-                  <path d="M4 17v3h16v-3" />
+                  <path d="M4 18v2h16v-2" />
                 </svg>
               </div>
 
