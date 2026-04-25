@@ -445,7 +445,6 @@ const CockpitPage = () => {
               </div>
             </div>
           </div>
-          </div>
         </div>
       </Link>
 
