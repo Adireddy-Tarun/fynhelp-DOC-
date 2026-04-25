@@ -504,7 +504,7 @@ const CompliancePage = () => {
                                 </td>
                               </tr>
                             )}
-                          </>
+                          </Fragment>
                         );
                       })}
                     {allFilings.filter((f) =>
