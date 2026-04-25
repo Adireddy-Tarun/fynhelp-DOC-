@@ -14,7 +14,8 @@
  *   - text-fyn-h1 / h2 / h3 / body / small / tiny / metric  type scale
  *   - p-fyn-lg / gap-fyn-lg ...                              spacing scale
  */
-import { ReactNode, HTMLAttributes, ButtonHTMLAttributes } from "react";
+import { ReactNode, HTMLAttributes, ButtonHTMLAttributes, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ── Layout ───────────────────────────────────────────── */
@@ -156,6 +157,84 @@ export function FynTD({ children, align = "left", mono, className }: { children?
     >
       {children}
     </td>
+  );
+}
+
+/* ── Form inputs ──────────────────────────────────────── */
+
+const inputBase =
+  "w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-body text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
+
+export const FynInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
+  function FynInput({ className, type = "text", ...rest }, ref) {
+    return <input ref={ref} type={type} className={cn(inputBase, className)} {...rest} />;
+  }
+);
+
+export const FynSelect = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(
+  function FynSelect({ className, children, ...rest }, ref) {
+    return (
+      <select
+        ref={ref}
+        className={cn(inputBase, "appearance-none bg-no-repeat bg-[right_12px_center] pr-10", className)}
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231A1008' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e\")",
+        }}
+        {...rest}
+      >
+        {children}
+      </select>
+    );
+  }
+);
+
+export const FynTextarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  function FynTextarea({ className, rows = 4, ...rest }, ref) {
+    return <textarea ref={ref} rows={rows} className={cn(inputBase, "resize-y", className)} {...rest} />;
+  }
+);
+
+export const FynSearchInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
+  function FynSearchInput({ className, placeholder = "Search…", ...rest }, ref) {
+    return (
+      <div className="relative w-full">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fyn-ink-40 pointer-events-none" />
+        <input
+          ref={ref}
+          type="search"
+          placeholder={placeholder}
+          className={cn(inputBase, "pl-9", className)}
+          {...rest}
+        />
+      </div>
+    );
+  }
+);
+
+export function FynField({
+  label,
+  hint,
+  error,
+  children,
+  className,
+}: {
+  label?: ReactNode;
+  hint?: ReactNode;
+  error?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("space-y-fyn-xs", className)}>
+      {label && <label className="block text-fyn-small font-medium text-fyn-ink-60">{label}</label>}
+      {children}
+      {error ? (
+        <p className="text-fyn-tiny text-fyn-danger">{error}</p>
+      ) : hint ? (
+        <p className="text-fyn-tiny text-fyn-ink-45">{hint}</p>
+      ) : null}
+    </div>
   );
 }
 
