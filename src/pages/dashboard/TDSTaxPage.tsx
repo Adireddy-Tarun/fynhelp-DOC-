@@ -7,12 +7,17 @@ import { formatINR } from "@/lib/indian-format";
 
 type TdsFiling = {
   id: string;
-  quarter: string | null;
-  form_type: string | null;
+  business_id: string;
+  quarter: string;
+  form_type: string;
   due_date: string;
+  filed_date: string | null;
+  status: string;
   total_tds_deducted: number | null;
   total_tds_deposited: number | null;
-  status: string | null;
+  acknowledgement_number: string | null;
+  challan_number: string | null;
+  notes: string | null;
 };
 
 const TDSTaxPage = () => {
@@ -36,8 +41,14 @@ const TDSTaxPage = () => {
   const { data: tdsFilings, isLoading } = useQuery({
     queryKey: ["tds-filings", businessId],
     queryFn: async (): Promise<TdsFiling[]> => {
-      // tds_filings table not yet provisioned — return empty until backend is ready
-      return [];
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("tds_filings" as never)
+        .select("*")
+        .eq("business_id", businessId)
+        .order("due_date", { ascending: false })
+        .limit(12);
+      return ((data as unknown) as TdsFiling[]) || [];
     },
     enabled: !!businessId,
   });
@@ -49,6 +60,13 @@ const TDSTaxPage = () => {
   const totalDeposited = tdsFilings?.reduce((sum, f) => sum + Number(f.total_tds_deposited || 0), 0) || 0;
 
   const isEmpty = !isLoading && (!tdsFilings || tdsFilings.length === 0);
+
+  const getStatusStyle = (filing: TdsFiling) => {
+    const isOverdue = new Date(filing.due_date) < now && filing.status === "pending";
+    if (filing.status === "filed") return { label: "Filed", className: "bg-[#1A6B3C]/10 text-[#1A6B3C]" };
+    if (isOverdue) return { label: "Late", className: "bg-[#C41E1E]/10 text-[#C41E1E]" };
+    return { label: "Pending", className: "bg-gray-100 text-gray-500" };
+  };
 
   return (
     <DashboardLayout>
@@ -92,7 +110,7 @@ const TDSTaxPage = () => {
           </p>
           <button
             onClick={() => navigate("/dashboard/settings/integrations")}
-            className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
+            className="bg-[#C41E1E] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
           >
             Connect Accounting →
           </button>
@@ -102,7 +120,7 @@ const TDSTaxPage = () => {
       {/* TABLE */}
       {!isLoading && tdsFilings && tdsFilings.length > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-          <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Filings</h3>
+          <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Returns</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -113,27 +131,28 @@ const TDSTaxPage = () => {
                   <th className="text-right py-2">TDS Deducted</th>
                   <th className="text-right py-2">TDS Deposited</th>
                   <th className="text-center py-2">Status</th>
+                  <th className="text-left py-2">ACK Number</th>
                 </tr>
               </thead>
               <tbody>
-                {tdsFilings.map((f, i) => (
-                  <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
-                    <td className="py-3 text-fyn-ink font-medium">{f.quarter || "—"}</td>
-                    <td className="py-3 text-fyn-ink/70">{f.form_type || "—"}</td>
-                    <td className="py-3 text-fyn-ink/70 fyn-metric">{new Date(f.due_date).toLocaleDateString("en-IN")}</td>
-                    <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deducted || 0))}</td>
-                    <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deposited || 0))}</td>
-                    <td className="py-3 text-center">
-                      <span className={`text-[11px] px-2 py-0.5 rounded ${
-                        f.status === "filed" ? "bg-[#1A6B3C]/10 text-[#1A6B3C]" :
-                        f.status === "late" ? "bg-[#C41E1E]/10 text-[#C41E1E]" :
-                        "bg-gray-100 text-gray-500"
-                      }`}>
-                        {f.status || "pending"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {tdsFilings.map((f, i) => {
+                  const badge = getStatusStyle(f);
+                  return (
+                    <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
+                      <td className="py-3 text-fyn-ink font-medium">{f.quarter}</td>
+                      <td className="py-3 text-fyn-ink/70">{f.form_type}</td>
+                      <td className="py-3 text-fyn-ink/70 fyn-metric">
+                        {new Date(f.due_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                      </td>
+                      <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deducted || 0))}</td>
+                      <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deposited || 0))}</td>
+                      <td className="py-3 text-center">
+                        <span className={`text-[11px] px-2 py-0.5 rounded ${badge.className}`}>{badge.label}</span>
+                      </td>
+                      <td className="py-3 text-fyn-ink/70 fyn-metric">{f.acknowledgement_number || "—"}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
