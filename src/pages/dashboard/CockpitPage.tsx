@@ -670,7 +670,7 @@ const CockpitPage = () => {
             <div className="grid grid-cols-3 gap-fyn-sm">
               <div className="text-center rounded-lg p-3" style={{ background: "#DCFCE7" }}>
                 <p className="font-mono text-xl font-bold" style={{ color: "#16A34A" }}>{formatINR(Number(itcRow?.itc_safe || 0))}</p>
-                <FynLabel className="mt-1" style={{ color: "#16A34A" } as any}>ITC SAFE</FynLabel>
+                <p className="text-fyn-tiny font-medium uppercase tracking-[0.06em] mt-1" style={{ color: "#16A34A" }}>ITC SAFE</p>
               </div>
               <div className="text-center rounded-lg p-3" style={{ background: "#FDEAEA", border: "1px solid #C41E1E" }}>
                 <p className="font-mono text-xl font-bold" style={{ color: "#C41E1E" }}>{formatINR(Number(itcRow?.itc_at_risk || 0))}</p>
