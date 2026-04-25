@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -22,6 +22,21 @@ type TdsFiling = {
 
 const TDSTaxPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fromParam = searchParams.get("from");
+  const toParam = searchParams.get("to");
+  const isValidDate = (s: string | null) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const fromFilter = isValidDate(fromParam) ? (fromParam as string) : null;
+  const toFilter = isValidDate(toParam) ? (toParam as string) : null;
+  const hasDateFilter = !!(fromFilter || toFilter);
+  const fmtRange = (s: string) =>
+    new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  const clearDateFilter = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("from");
+    next.delete("to");
+    setSearchParams(next, { replace: true });
+  };
   const [businessId, setBusinessId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,12 +69,22 @@ const TDSTaxPage = () => {
   });
 
   const now = new Date();
-  const upcomingFilings = tdsFilings?.filter((f) => new Date(f.due_date) >= now && f.status === "pending") || [];
-  const overdueFilings = tdsFilings?.filter((f) => new Date(f.due_date) < now && f.status === "pending") || [];
-  const totalDeducted = tdsFilings?.reduce((sum, f) => sum + Number(f.total_tds_deducted || 0), 0) || 0;
-  const totalDeposited = tdsFilings?.reduce((sum, f) => sum + Number(f.total_tds_deposited || 0), 0) || 0;
+  const inRange = (d: string | null | undefined) => {
+    if (!d) return false;
+    if (fromFilter && d < fromFilter) return false;
+    if (toFilter && d > toFilter) return false;
+    return true;
+  };
+  const visibleFilings = hasDateFilter
+    ? (tdsFilings || []).filter((f) => inRange(f.due_date))
+    : tdsFilings || [];
+  const upcomingFilings = visibleFilings.filter((f) => new Date(f.due_date) >= now && f.status === "pending");
+  const overdueFilings = visibleFilings.filter((f) => new Date(f.due_date) < now && f.status === "pending");
+  const totalDeducted = visibleFilings.reduce((sum, f) => sum + Number(f.total_tds_deducted || 0), 0);
+  const totalDeposited = visibleFilings.reduce((sum, f) => sum + Number(f.total_tds_deposited || 0), 0);
 
   const isEmpty = !isLoading && (!tdsFilings || tdsFilings.length === 0);
+  const isFilteredEmpty = !isLoading && !isEmpty && hasDateFilter && visibleFilings.length === 0;
 
   const getStatusStyle = (filing: TdsFiling) => {
     const isOverdue = new Date(filing.due_date) < now && filing.status === "pending";
@@ -70,6 +95,21 @@ const TDSTaxPage = () => {
 
   return (
     <DashboardLayout>
+      {hasDateFilter && (
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-2 bg-fyn-beige-card border border-fyn-ink-10 rounded-md text-xs">
+          <span className="text-fyn-ink/70">
+            Showing filings due
+            {fromFilter && <> from <span className="text-fyn-ink font-medium">{fmtRange(fromFilter)}</span></>}
+            {toFilter && <> to <span className="text-fyn-ink font-medium">{fmtRange(toFilter)}</span></>}.
+          </span>
+          <button
+            onClick={clearDateFilter}
+            className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+          >
+            Clear date filter ✕
+          </button>
+        </div>
+      )}
       {/* TOP METRICS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-fyn-ink rounded-lg p-5">
@@ -117,8 +157,37 @@ const TDSTaxPage = () => {
         </div>
       )}
 
+      {/* FILTERED EMPTY STATE — has data overall, but date range returned nothing */}
+      {isFilteredEmpty && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-10 text-center">
+          <div className="text-3xl mb-3" aria-hidden>📅</div>
+          <h3 className="text-fyn-ink text-lg font-serif mb-1">No TDS filings in this date range</h3>
+          <p className="text-fyn-ink/60 text-xs mb-5 max-w-md mx-auto">
+            You have {tdsFilings?.length || 0} TDS filing{(tdsFilings?.length || 0) === 1 ? "" : "s"} on record, but none fall between
+            {fromFilter && <> <span className="text-fyn-ink">{fmtRange(fromFilter)}</span></>}
+            {fromFilter && toFilter && " and"}
+            {toFilter && <> <span className="text-fyn-ink">{fmtRange(toFilter)}</span></>}.
+            Try widening the period or clear the filter.
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={clearDateFilter}
+              className="bg-fyn-ink text-white px-4 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
+            >
+              Clear date filter
+            </button>
+            <button
+              onClick={() => navigate("/dashboard/compliance")}
+              className="border border-fyn-ink/20 text-fyn-ink px-4 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/5 transition-colors"
+            >
+              Back to Compliance
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* TABLE */}
-      {!isLoading && tdsFilings && tdsFilings.length > 0 && (
+      {!isLoading && visibleFilings.length > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
           <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Returns</h3>
           <div className="overflow-x-auto">
@@ -135,7 +204,7 @@ const TDSTaxPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {tdsFilings.map((f, i) => {
+                {visibleFilings.map((f, i) => {
                   const badge = getStatusStyle(f);
                   return (
                     <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
