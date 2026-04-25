@@ -325,9 +325,12 @@ const CockpitPage = () => {
           <p className="text-fyn-ink/60 text-fyn-small mb-fyn-md">
             Connect a bank account or import transactions to see your cockpit come alive.
           </p>
-          <FynButton asChild-disabled>
-            <Link to="/dashboard/banking" className="text-white">Connect Bank →</Link>
-          </FynButton>
+          <Link
+            to="/dashboard/banking"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-fyn-body font-medium rounded-md bg-fyn-red text-white hover:bg-fyn-red-dark transition-colors"
+          >
+            Connect Bank →
+          </Link>
         </FynCard>
       )}
 
