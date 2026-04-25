@@ -409,8 +409,9 @@ const CockpitPage = () => {
             </div>
 
             {/* Right-side stats + CTA */}
-            <div className="hidden md:flex items-center gap-6">
-              <div className="text-right">
+            <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
+              {/* Stats — desktop only (keeps mobile dense) */}
+              <div className="hidden md:block text-right">
                 <p
                   className="font-mono fyn-label"
                   style={{
@@ -436,8 +437,9 @@ const CockpitPage = () => {
                 </p>
               </div>
 
+              {/* CTA — visible on all breakpoints; compact on mobile, full label md+ */}
               <div
-                className="flex items-center gap-2 px-3 py-1.5 font-mono fyn-label transition-colors"
+                className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5 font-mono fyn-label transition-colors"
                 style={{
                   background: "hsl(var(--fyn-red) / 0.08)",
                   border: "1px solid hsl(var(--fyn-red))",
@@ -447,8 +449,10 @@ const CockpitPage = () => {
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
                 }}
+                aria-label="Open Data Import"
               >
-                Open <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                <span className="hidden sm:inline">Open</span>
+                <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </div>
             </div>
           </div>
