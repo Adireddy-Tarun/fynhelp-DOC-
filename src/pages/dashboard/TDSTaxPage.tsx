@@ -95,6 +95,21 @@ const TDSTaxPage = () => {
 
   return (
     <DashboardLayout>
+      {hasDateFilter && (
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-2 bg-fyn-beige-card border border-fyn-ink-10 rounded-md text-xs">
+          <span className="text-fyn-ink/70">
+            Showing filings due
+            {fromFilter && <> from <span className="text-fyn-ink font-medium">{fmtRange(fromFilter)}</span></>}
+            {toFilter && <> to <span className="text-fyn-ink font-medium">{fmtRange(toFilter)}</span></>}.
+          </span>
+          <button
+            onClick={clearDateFilter}
+            className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+          >
+            Clear date filter ✕
+          </button>
+        </div>
+      )}
       {/* TOP METRICS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-fyn-ink rounded-lg p-5">
