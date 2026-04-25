@@ -559,8 +559,16 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="gap-2 sm:gap-2">
             <AlertDialogCancel onClick={cancelDuplicate}>Cancel</AlertDialogCancel>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={replaceDuplicate}
+              className="border-fyn-ink/20"
+            >
+              Replace previous data
+            </Button>
             <AlertDialogAction
               onClick={confirmDuplicate}
               className="bg-fyn-red hover:bg-fyn-red/90 text-white"
