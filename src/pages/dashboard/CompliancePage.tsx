@@ -48,35 +48,31 @@ const CompliancePage = () => {
     fetchBusiness();
   }, []);
 
-  const threeMonthsAgo = (() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 3);
-    return d.toISOString().split("T")[0];
-  })();
-
   const { data: gstFilings, isLoading: loadingGst } = useQuery({
-    queryKey: ["compliance-gst", businessId],
+    queryKey: ["compliance-gst", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("gst_filings" as never)
         .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
+        .gte("due_date", fromStr)
+        .lte("due_date", toStr);
       return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
   });
 
   const { data: tdsFilings, isLoading: loadingTds } = useQuery({
-    queryKey: ["compliance-tds", businessId],
+    queryKey: ["compliance-tds", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
         .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
+        .gte("due_date", fromStr)
+        .lte("due_date", toStr);
       return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
