@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, CalendarIcon } from "lucide-react";
+import { RefreshCw, CalendarIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -20,6 +20,7 @@ const CompliancePage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [breakdownFilter, setBreakdownFilter] = useState<"on-time" | "late" | "overdue" | "pending" | null>(null);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
@@ -103,6 +104,47 @@ const CompliancePage = () => {
   const isLate = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date > f.due_date;
   const isOverdueNotFiled = (f: FilingRow) => f.status !== "filed" && f.due_date < todayStr;
   const isPending = (f: FilingRow) => f.status !== "filed" && f.due_date >= todayStr;
+
+  const daysBetween = (a: string, b: string) => {
+    const ms = new Date(a).getTime() - new Date(b).getTime();
+    return Math.round(ms / (1000 * 60 * 60 * 24));
+  };
+  const explainFiling = (f: FilingRow) => {
+    if (isOnTime(f)) {
+      const diff = daysBetween(f.due_date, f.filed_date!);
+      return {
+        label: "On time",
+        color: "#1A6B3C",
+        rule: "filed_date ≤ due_date",
+        detail: `Filed ${diff === 0 ? "exactly on" : `${diff} day${diff === 1 ? "" : "s"} before`} the due date.`,
+      };
+    }
+    if (isLate(f)) {
+      const diff = daysBetween(f.filed_date!, f.due_date);
+      return {
+        label: "Filed late",
+        color: "#8B5A00",
+        rule: "filed_date > due_date",
+        detail: `Filed ${diff} day${diff === 1 ? "" : "s"} after the due date.`,
+      };
+    }
+    if (isOverdueNotFiled(f)) {
+      const diff = daysBetween(todayStr, f.due_date);
+      return {
+        label: "Overdue",
+        color: "#C41E1E",
+        rule: "status ≠ filed AND due_date < today",
+        detail: `Not yet filed; due date passed ${diff} day${diff === 1 ? "" : "s"} ago.`,
+      };
+    }
+    const diff = daysBetween(f.due_date, todayStr);
+    return {
+      label: "Pending",
+      color: "#1A1008",
+      rule: "status ≠ filed AND due_date ≥ today",
+      detail: `Not yet filed; ${diff === 0 ? "due today" : `due in ${diff} day${diff === 1 ? "" : "s"}`}.`,
+    };
+  };
 
   const onTimeCount = allFilings.filter(isOnTime).length;
   const lateCount = allFilings.filter(isLate).length;
@@ -400,6 +442,7 @@ const CompliancePage = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
+                      <th className="py-2 w-6"></th>
                       <th className="py-2">Source</th>
                       <th className="py-2">Due Date</th>
                       <th className="py-2">Filed Date</th>
@@ -415,21 +458,62 @@ const CompliancePage = () => {
                         isPending(f)
                       )
                       .sort((a, b) => (a.due_date < b.due_date ? 1 : -1))
-                      .map((f, i) => (
-                        <tr key={i} className="border-t border-fyn-ink-10">
-                          <td className="py-2 font-medium">{f._src}</td>
-                          <td className="py-2">{f.due_date}</td>
-                          <td className="py-2">{f.filed_date || "—"}</td>
-                          <td className="py-2">{f.status}</td>
-                        </tr>
-                      ))}
+                      .map((f, i) => {
+                        const rowKey = `${f._src}-${i}-${f.due_date}`;
+                        const expanded = expandedRow === rowKey;
+                        const exp = explainFiling(f);
+                        return (
+                          <Fragment key={rowKey}>
+                            <tr
+                              key={rowKey}
+                              className="border-t border-fyn-ink-10 cursor-pointer hover:bg-white/40"
+                              onClick={() => setExpandedRow(expanded ? null : rowKey)}
+                            >
+                              <td className="py-2 text-fyn-ink/50">
+                                {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                              </td>
+                              <td className="py-2 font-medium">{f._src}</td>
+                              <td className="py-2">{f.due_date}</td>
+                              <td className="py-2">{f.filed_date || "—"}</td>
+                              <td className="py-2">{f.status}</td>
+                            </tr>
+                            {expanded && (
+                              <tr key={`${rowKey}-exp`} className="bg-white/30">
+                                <td></td>
+                                <td colSpan={4} className="py-3 pr-3">
+                                  <div className="text-xs space-y-1.5">
+                                    <p>
+                                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium mr-2" style={{ background: `${exp.color}1A`, color: exp.color }}>
+                                        {exp.label}
+                                      </span>
+                                      <span className="text-fyn-ink/70">{exp.detail}</span>
+                                    </p>
+                                    <p className="font-mono text-fyn-ink/60">
+                                      Rule: <span className="text-fyn-ink">{exp.rule}</span>
+                                    </p>
+                                    <p className="font-mono text-fyn-ink/60">
+                                      due_date = <span className="text-fyn-ink">{f.due_date}</span>
+                                      {"  ·  "}
+                                      filed_date = <span className="text-fyn-ink">{f.filed_date || "null"}</span>
+                                      {"  ·  "}
+                                      status = <span className="text-fyn-ink">{f.status}</span>
+                                      {"  ·  "}
+                                      today = <span className="text-fyn-ink">{todayStr}</span>
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        );
+                      })}
                     {allFilings.filter((f) =>
                       breakdownFilter === "on-time" ? isOnTime(f) :
                       breakdownFilter === "late" ? isLate(f) :
                       breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
                       isPending(f)
                     ).length === 0 && (
-                      <tr><td colSpan={4} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
+                      <tr><td colSpan={5} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
                     )}
                   </tbody>
                 </table>
