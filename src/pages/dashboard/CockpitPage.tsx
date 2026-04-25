@@ -17,6 +17,7 @@ import {
   FynTR,
   FynTD,
   FynLabel,
+  FynInput,
   FynSearchInput,
   FynSelect,
 } from "@/components/dashboard/ui";
@@ -620,12 +621,12 @@ const CockpitPage = () => {
               {brief?.content || "No brief generated yet. Ask Nidhi a question to get started."}
             </p>
             <div className="flex gap-2 mt-3.5">
-              <input
+              <FynInput
                 value={nidhiInput}
                 onChange={(e) => setNidhiInput(e.target.value)}
                 placeholder="Ask AI CFO Nidhi a follow-up..."
-                className="flex-1 outline-none h-10 px-3.5 bg-white/10 border border-white/20 rounded-md text-white text-fyn-small placeholder:text-white/40 focus:ring-2 focus:ring-fyn-red focus:border-transparent"
                 aria-label="Ask AI CFO Nidhi a follow-up"
+                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40 text-fyn-small"
               />
               <FynButton
                 aria-label="Send to AI CFO Nidhi"
