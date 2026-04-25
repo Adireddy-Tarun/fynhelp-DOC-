@@ -45,8 +45,14 @@ const GSTPage = () => {
   const { data: gstFilings, isLoading } = useQuery({
     queryKey: ["gst-filings", businessId],
     queryFn: async (): Promise<GSTFiling[]> => {
-      // gst_filings table not yet provisioned — return empty until backend is ready
-      return [];
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("gst_filings" as never)
+        .select("*")
+        .eq("business_id", businessId)
+        .order("due_date", { ascending: false })
+        .limit(12);
+      return ((data as unknown) as GSTFiling[]) || [];
     },
     enabled: !!businessId,
   });
