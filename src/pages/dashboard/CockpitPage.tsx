@@ -320,27 +320,99 @@ const CockpitPage = () => {
         })}
       </div>
 
-      {/* Quick shortcut: Data Import */}
+      {/* Quick shortcut: Data Import — Bloomberg/data-dense */}
       <Link
         to="/dashboard/data-import"
-        className="rounded-lg mb-6 p-4 flex items-center justify-between transition-all duration-250 hover:-translate-y-0.5 hover:shadow-lg"
-        style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderLeft: "4px solid #C41E1E" }}
+        className="group block mb-6 transition-all duration-150 hover:-translate-y-px"
+        style={{
+          background: "hsl(var(--fyn-beige-card))",
+          border: "1px solid hsl(var(--fyn-ink-10))",
+          borderLeft: "3px solid hsl(var(--fyn-red))",
+        }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-stretch">
+          {/* Mono label rail */}
           <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "#FDEAEA", color: "#C41E1E", fontSize: 20 }}
+            className="flex items-center px-3 font-mono"
+            style={{
+              background: "hsl(var(--fyn-ink))",
+              color: "hsl(var(--fyn-beige))",
+              fontSize: 10,
+              letterSpacing: "0.18em",
+            }}
           >
-            ⬆
+            DATA · IMPORT
           </div>
-          <div>
-            <p style={{ color: "#1A1008", fontSize: 14, fontWeight: 600 }}>Import Data</p>
-            <p style={{ color: "rgba(26,16,8,0.6)", fontSize: 12 }}>
-              Upload bank statements, invoices, or expenses (CSV / XLSX)
-            </p>
+
+          {/* Body */}
+          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-6">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="w-9 h-9 flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: "hsl(var(--fyn-red) / 0.08)",
+                  border: "1px solid hsl(var(--fyn-red) / 0.25)",
+                  color: "hsl(var(--fyn-red))",
+                }}
+                aria-hidden
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" strokeLinejoin="miter">
+                  <path d="M12 3v12" />
+                  <path d="M6 9l6-6 6 6" />
+                  <path d="M4 21h16" />
+                </svg>
+              </div>
+
+              <div className="min-w-0">
+                <p
+                  className="font-serif truncate"
+                  style={{ color: "hsl(var(--fyn-ink))", fontSize: 15, lineHeight: 1.2 }}
+                >
+                  Import Data
+                </p>
+                <p
+                  className="font-mono truncate"
+                  style={{ color: "hsl(var(--fyn-ink) / 0.55)", fontSize: 11, letterSpacing: "0.04em", marginTop: 2 }}
+                >
+                  BANK · INVOICES · EXPENSES &nbsp;·&nbsp; CSV / XLSX
+                </p>
+              </div>
+            </div>
+
+            {/* Right-side stats + CTA */}
+            <div className="hidden md:flex items-center gap-6">
+              <div className="text-right">
+                <p
+                  className="font-mono"
+                  style={{ color: "hsl(var(--fyn-ink) / 0.40)", fontSize: 9, letterSpacing: "0.18em" }}
+                >
+                  FORMATS
+                </p>
+                <p
+                  className="font-mono"
+                  style={{ color: "hsl(var(--fyn-ink))", fontSize: 13, fontWeight: 600 }}
+                >
+                  .csv · .xlsx
+                </p>
+              </div>
+
+              <div
+                className="flex items-center gap-2 px-3 py-1.5 transition-colors"
+                style={{
+                  background: "hsl(var(--fyn-red) / 0.08)",
+                  border: "1px solid hsl(var(--fyn-red))",
+                  color: "hsl(var(--fyn-red))",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Open <span className="transition-transform group-hover:translate-x-0.5">→</span>
+              </div>
+            </div>
           </div>
         </div>
-        <span style={{ color: "#C41E1E", fontSize: 13, fontWeight: 500 }}>Open Data Import →</span>
       </Link>
 
       {/* Key metrics row */}
