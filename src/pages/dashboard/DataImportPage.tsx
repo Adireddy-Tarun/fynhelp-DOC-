@@ -85,17 +85,37 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const meta = TYPE_META[type];
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
+  const acceptFile = (f: File | undefined | null) => {
     if (!f) return;
     if (!f.name.toLowerCase().endsWith(".csv")) {
       toast.error("Please upload a CSV file");
       return;
     }
     setFile(f);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    acceptFile(e.target.files?.[0]);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!uploading) setIsDragging(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (uploading) return;
+    const f = e.dataTransfer.files?.[0];
+    acceptFile(f);
   };
 
   const today = () => new Date().toISOString().slice(0, 10);
@@ -198,14 +218,26 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
   return (
     <Card className="p-6 flex flex-col h-full">
-      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[260px]">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`flex-1 flex flex-col items-center justify-center text-center min-h-[260px] rounded-lg transition-colors border-2 border-dashed ${
+          isDragging
+            ? "border-fyn-red bg-fyn-red/5"
+            : "border-transparent"
+        }`}
+      >
         {!file && !uploading && (
           <>
             <div className="w-12 h-12 rounded-full bg-fyn-beige flex items-center justify-center mb-3 text-fyn-ink">
               {meta.icon}
             </div>
             <h3 className="font-serif text-lg text-fyn-ink mb-1">{meta.title}</h3>
-            <p className="text-sm text-fyn-ink/60 mb-4">{meta.description}</p>
+            <p className="text-sm text-fyn-ink/60 mb-1">{meta.description}</p>
+            <p className="text-xs text-fyn-ink/50 mb-4">
+              {isDragging ? "Drop your CSV here" : "Drag & drop a CSV, or"}
+            </p>
             <input
               ref={inputRef}
               type="file"
