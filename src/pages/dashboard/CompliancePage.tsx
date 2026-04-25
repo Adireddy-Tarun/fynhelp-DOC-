@@ -84,6 +84,32 @@ const CompliancePage = () => {
   const scoreColor =
     complianceScore > 80 ? "#1A6B3C" : complianceScore > 50 ? "#8B5A00" : "#C41E1E";
 
+  // Build 3-month on-time % trend per source
+  const trendData = (() => {
+    const months: { key: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+        label: d.toLocaleDateString("en-IN", { month: "short" }),
+      });
+    }
+    const rate = (rows: FilingRow[], monthKey: string) => {
+      const inMonth = rows.filter((r) => r.due_date?.startsWith(monthKey));
+      if (inMonth.length === 0) return null;
+      const onTime = inMonth.filter(
+        (r) => r.status === "filed" && r.filed_date && r.filed_date <= r.due_date
+      ).length;
+      return Math.round((onTime / inMonth.length) * 100);
+    };
+    return months.map((m) => ({
+      month: m.label,
+      GST: rate(gstFilings || [], m.key),
+      TDS: rate(tdsFilings || [], m.key),
+    }));
+  })();
+
   return (
     <DashboardLayout>
       <div className="flex justify-end mb-4">
