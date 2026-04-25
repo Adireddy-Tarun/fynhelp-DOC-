@@ -683,8 +683,23 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
                     {h.status}
                   </span>
                 </td>
-                <td className="py-3 text-right text-fyn-ink/60">
-                  {new Date(h.created_at).toLocaleString("en-IN")}
+                <td className="py-3 text-right text-fyn-ink/60 whitespace-nowrap">
+                  <div className="inline-flex items-center gap-3 justify-end">
+                    <span>{new Date(h.created_at).toLocaleString("en-IN")}</span>
+                    {h.status === "failed" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.info(`Re-select "${h.file_name}" to retry`);
+                          triggerRetry(h.upload_type);
+                        }}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-fyn-red hover:underline"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" />
+                        Retry
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
