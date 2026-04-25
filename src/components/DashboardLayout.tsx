@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import FynLogo from "@/components/FynLogo";
+import ProfileCompletionBadge from "@/components/ProfileCompletionBadge";
 import {
   LayoutDashboard, MessageCircle, Grid3X3, TrendingUp, Gauge,
   Zap, ArrowDownCircle, ArrowUpCircle, FileCheck, Calculator,
