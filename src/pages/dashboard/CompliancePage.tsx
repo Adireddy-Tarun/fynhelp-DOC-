@@ -379,6 +379,46 @@ const CompliancePage = () => {
 
       {!isLoading && totalFilings > 0 && (
         <div className="relative">
+          {/* TDS / TRACES connection banner */}
+          {(() => {
+            const tdsConnected = tdsTotal > 0;
+            return (
+              <div
+                className={cn(
+                  "mb-3 flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-xs",
+                  tdsConnected
+                    ? "bg-[#1A6B3C]/5 border-[#1A6B3C]/20 text-[#1A6B3C]"
+                    : "bg-[#8B5A00]/5 border-[#8B5A00]/20 text-[#8B5A00]"
+                )}
+              >
+                <span className="inline-flex items-center gap-2 font-medium">
+                  <span
+                    className={cn(
+                      "inline-block w-2 h-2 rounded-full",
+                      tdsConnected ? "bg-[#1A6B3C]" : "bg-[#8B5A00]"
+                    )}
+                  />
+                  {tdsConnected
+                    ? `TDS / TRACES connected · ${tdsTotal} filing${tdsTotal === 1 ? "" : "s"} tracked`
+                    : "TDS / TRACES disconnected · no filings synced yet"}
+                </span>
+                <button
+                  onClick={tdsConnected ? handleRefresh : () => navigate("/onboarding?step=tds")}
+                  disabled={tdsConnected && controlsLocked}
+                  className="inline-flex items-center gap-1 font-medium hover:underline disabled:opacity-50 disabled:no-underline"
+                >
+                  {tdsConnected ? (
+                    <>
+                      <RefreshCw className={cn("h-3 w-3", controlsLocked && "animate-spin")} />
+                      {controlsLocked ? "Refreshing…" : "Refresh card"}
+                    </>
+                  ) : (
+                    <>Connect TDS →</>
+                  )}
+                </button>
+              </div>
+            );
+          })()}
           {isFetching && (
             <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-end p-2">
               <span className="inline-flex items-center gap-1.5 bg-fyn-beige-card/95 border border-fyn-ink-10 text-fyn-ink/70 text-[11px] font-medium px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm">
