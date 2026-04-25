@@ -273,9 +273,15 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               <Bell size={18} />
               <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: "#C41E1E" }}>3</span>
             </button>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: "#C41E1E" }}>
+            <Link
+              to="/dashboard/settings/profile"
+              aria-label="Open profile"
+              title="Profile"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold transition-transform hover:scale-105"
+              style={{ background: "#C41E1E" }}
+            >
               {profile?.full_name?.[0] || "U"}
-            </div>
+            </Link>
           </div>
         </header>
 
