@@ -86,6 +86,13 @@ const CompliancePage = () => {
   });
 
   const isLoading = loadingGst || loadingTds;
+  const isFetching = fetchingGst || fetchingTds;
+
+  useEffect(() => {
+    if (!isFetching && (gstFilings || tdsFilings) && !lastUpdated) {
+      setLastUpdated(new Date());
+    }
+  }, [isFetching, gstFilings, tdsFilings, lastUpdated]);
   const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
   const totalFilings = allFilings.length;
   const filedOnTime = allFilings.filter((f) => f.status === "filed").length;
