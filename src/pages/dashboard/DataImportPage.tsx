@@ -304,7 +304,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         {uploading && (
           <div className="w-full space-y-3">
             <Progress value={progress} className="h-2" />
-            <p className="text-sm text-fyn-ink/70">Processing CSV… {progress}%</p>
+            <p className="text-sm text-fyn-ink/70">Processing file… {progress}%</p>
           </div>
         )}
       </div>
