@@ -845,7 +845,6 @@ const CompliancePage = () => {
                                 </tr>
                               );
                             })()}
-                            )}
                           </Fragment>
                         );
                       })}
