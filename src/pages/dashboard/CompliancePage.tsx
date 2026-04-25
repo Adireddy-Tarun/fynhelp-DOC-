@@ -628,6 +628,7 @@ const CompliancePage = () => {
                       breakdownFilter === "on-time" ? isOnTime(f) :
                       breakdownFilter === "late" ? isLate(f) :
                       breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                      breakdownFilter === "unknown" ? isUnknown(f) :
                       isPending(f)
                     ).length === 0 && (
                       <tr><td colSpan={5} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
