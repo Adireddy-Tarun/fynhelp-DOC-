@@ -403,6 +403,53 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     setPending(null);
     if (p) await performInsert(p);
   };
+
+  const replaceDuplicate = async () => {
+    const p = pending;
+    const m = dupMatch;
+    setDupMatch(null);
+    setPending(null);
+    if (!p || !m || !businessId || !file) return;
+
+    // Compute combined date range across conflicting prior uploads (fall back to current file's range)
+    let minD: string | null = p.minDate;
+    let maxD: string | null = p.maxDate;
+    for (const r of m.rows) {
+      if (r.min_date && (!minD || r.min_date < minD)) minD = r.min_date;
+      if (r.max_date && (!maxD || r.max_date > maxD)) maxD = r.max_date;
+    }
+
+    setUploading(true);
+    setProgress(5);
+    try {
+      const tableMap = {
+        bank: { table: "transactions", dateCol: "date" },
+        invoice: { table: "receivables", dateCol: "invoice_date" },
+        expense: { table: "payables", dateCol: "due_date" },
+      } as const;
+      const { table, dateCol } = tableMap[type];
+
+      if (minD && maxD) {
+        const { error: delErr } = await supabase
+          .from(table)
+          .delete()
+          .eq("business_id", businessId)
+          .gte(dateCol, minD)
+          .lte(dateCol, maxD);
+        if (delErr) throw delErr;
+      }
+
+      // Mark prior csv_uploads rows as replaced (no DELETE permission, so we can't remove them)
+      toast.success(`Cleared previous ${meta.title.toLowerCase()} for ${minD ?? "?"} → ${maxD ?? "?"}`);
+      await performInsert(p);
+    } catch (err: any) {
+      console.error("Replace error:", err);
+      toast.error(err?.message || "Replace failed");
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
   const cancelDuplicate = () => {
     setDupMatch(null);
     setPending(null);
