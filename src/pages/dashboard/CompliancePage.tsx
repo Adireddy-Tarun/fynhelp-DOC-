@@ -201,6 +201,20 @@ const CompliancePage = () => {
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            {(gstUrgency.overdue > 0 || gstUrgency.dueSoon > 0) && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {gstUrgency.overdue > 0 && (
+                  <span className="bg-[#C41E1E]/10 text-[#C41E1E] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {gstUrgency.overdue} overdue
+                  </span>
+                )}
+                {gstUrgency.dueSoon > 0 && (
+                  <span className="bg-[#8B5A00]/10 text-[#8B5A00] text-[10px] font-medium px-2 py-0.5 rounded">
+                    {gstUrgency.dueSoon} due soon
+                  </span>
+                )}
+              </div>
+            )}
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
