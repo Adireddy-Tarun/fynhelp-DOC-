@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle } from "lucide-react";
+import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", buf);
@@ -118,6 +118,15 @@ interface UploadZoneProps {
   onSuccess: () => void;
 }
 
+// Shared registry so the upload-history "Retry" button can reopen the right picker
+const zoneOpeners: Partial<Record<ImportType, () => void>> = {};
+const triggerRetry = (type: ImportType) => {
+  document
+    .querySelector<HTMLElement>(`[data-upload-zone="${type}"]`)
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => zoneOpeners[type]?.(), 250);
+};
+
 interface DupMatch {
   reason: "hash" | "date_overlap";
   rows: Array<{
@@ -144,6 +153,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [dupMatch, setDupMatch] = useState<DupMatch | null>(null);
   const [pending, setPending] = useState<PendingUpload | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    zoneOpeners[type] = () => inputRef.current?.click();
+    return () => { delete zoneOpeners[type]; };
+  }, [type]);
   const meta = TYPE_META[type];
 
   const acceptFile = (f: File | undefined | null) => {
@@ -457,7 +471,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   };
 
   return (
-    <Card className="p-6 flex flex-col h-full">
+    <Card data-upload-zone={type} className="p-6 flex flex-col h-full scroll-mt-24">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -669,8 +683,23 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
                     {h.status}
                   </span>
                 </td>
-                <td className="py-3 text-right text-fyn-ink/60">
-                  {new Date(h.created_at).toLocaleString("en-IN")}
+                <td className="py-3 text-right text-fyn-ink/60 whitespace-nowrap">
+                  <div className="inline-flex items-center gap-3 justify-end">
+                    <span>{new Date(h.created_at).toLocaleString("en-IN")}</span>
+                    {h.status === "failed" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast.info(`Re-select "${h.file_name}" to retry`);
+                          triggerRetry(h.upload_type);
+                        }}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-fyn-red hover:underline"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" />
+                        Retry
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
