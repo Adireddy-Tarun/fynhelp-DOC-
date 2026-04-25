@@ -157,8 +157,37 @@ const TDSTaxPage = () => {
         </div>
       )}
 
+      {/* FILTERED EMPTY STATE — has data overall, but date range returned nothing */}
+      {isFilteredEmpty && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-10 text-center">
+          <div className="text-3xl mb-3" aria-hidden>📅</div>
+          <h3 className="text-fyn-ink text-lg font-serif mb-1">No TDS filings in this date range</h3>
+          <p className="text-fyn-ink/60 text-xs mb-5 max-w-md mx-auto">
+            You have {tdsFilings?.length || 0} TDS filing{(tdsFilings?.length || 0) === 1 ? "" : "s"} on record, but none fall between
+            {fromFilter && <> <span className="text-fyn-ink">{fmtRange(fromFilter)}</span></>}
+            {fromFilter && toFilter && " and"}
+            {toFilter && <> <span className="text-fyn-ink">{fmtRange(toFilter)}</span></>}.
+            Try widening the period or clear the filter.
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={clearDateFilter}
+              className="bg-fyn-ink text-white px-4 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
+            >
+              Clear date filter
+            </button>
+            <button
+              onClick={() => navigate("/dashboard/compliance")}
+              className="border border-fyn-ink/20 text-fyn-ink px-4 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/5 transition-colors"
+            >
+              Back to Compliance
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* TABLE */}
-      {!isLoading && tdsFilings && tdsFilings.length > 0 && (
+      {!isLoading && visibleFilings.length > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
           <h3 className="text-fyn-ink font-serif text-lg mb-4">TDS Returns</h3>
           <div className="overflow-x-auto">
