@@ -118,6 +118,15 @@ interface UploadZoneProps {
   onSuccess: () => void;
 }
 
+// Shared registry so the upload-history "Retry" button can reopen the right picker
+const zoneOpeners: Partial<Record<ImportType, () => void>> = {};
+const triggerRetry = (type: ImportType) => {
+  document
+    .querySelector<HTMLElement>(`[data-upload-zone="${type}"]`)
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => zoneOpeners[type]?.(), 250);
+};
+
 interface DupMatch {
   reason: "hash" | "date_overlap";
   rows: Array<{
