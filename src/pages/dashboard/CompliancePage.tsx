@@ -444,7 +444,14 @@ const CompliancePage = () => {
                   </>
                 ) : (
                   <>
-                    <p className="text-fyn-ink/60 text-xs mb-3">No GST filings tracked yet.</p>
+                    <p className="text-fyn-ink/60 text-xs mb-2">No GST filings tracked yet.</p>
+                    <p className="text-fyn-ink/70 text-[11px] fyn-label mb-1.5">YOU'LL NEED</p>
+                    <ul className="text-fyn-ink/70 text-xs space-y-1 mb-3">
+                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>15-character GSTIN</span></li>
+                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Filing frequency (monthly or QRMP)</span></li>
+                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>GST portal username (for OTP sync)</span></li>
+                      <li className="flex items-start gap-1.5"><span className="text-fyn-ink/40 mt-0.5">•</span><span>Authorised signatory mobile / email</span></li>
+                    </ul>
                     <button
                       onClick={() => navigate("/onboarding?step=gst")}
                       className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
