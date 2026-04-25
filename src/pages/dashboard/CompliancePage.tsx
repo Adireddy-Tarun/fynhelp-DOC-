@@ -41,31 +41,35 @@ const CompliancePage = () => {
 
   const { data: gstFilings, isLoading: loadingGst } = useQuery({
     queryKey: ["compliance-gst", businessId],
-    queryFn: async (): Promise<FilingRow[]> => {
+    queryFn: async (): Promise<any[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("gst_filings" as never)
-        .select("status, due_date")
+        .select("status, due_date, filed_date, return_type, filing_period")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
-      return ((data as unknown) as FilingRow[]) || [];
+        .gte("due_date", threeMonthsAgo)
+        .order("due_date", { ascending: false });
+      return ((data as unknown) as any[]) || [];
     },
     enabled: !!businessId,
   });
 
   const { data: tdsFilings, isLoading: loadingTds } = useQuery({
     queryKey: ["compliance-tds", businessId],
-    queryFn: async (): Promise<FilingRow[]> => {
+    queryFn: async (): Promise<any[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
-        .select("status, due_date")
+        .select("status, due_date, filed_date, form_type, quarter")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
-      return ((data as unknown) as FilingRow[]) || [];
+        .gte("due_date", threeMonthsAgo)
+        .order("due_date", { ascending: false });
+      return ((data as unknown) as any[]) || [];
     },
     enabled: !!businessId,
   });
+
+  const [openTable, setOpenTable] = useState<"gst" | "tds" | null>(null);
 
   const isLoading = loadingGst || loadingTds;
   const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
