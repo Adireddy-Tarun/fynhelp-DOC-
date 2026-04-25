@@ -178,25 +178,27 @@ const CompliancePage = () => {
   const lateCount = allFilings.filter(isLate).length;
   const overdueCount = allFilings.filter(isOverdueNotFiled).length;
   const pendingCount = allFilings.filter(isPending).length;
-  const filedOnTime = onTimeCount;
-  const complianceScore = totalFilings > 0 ? Math.round((filedOnTime / totalFilings) * 100) : 0;
+  const unknownCount = allFilings.filter(isUnknown).length;
+  // Score denominator excludes unknowns so the formula matches the visible breakdown.
+  const scoredTotal = onTimeCount + lateCount + overdueCount + pendingCount;
+  const complianceScore = scoredTotal > 0 ? Math.round((onTimeCount / scoredTotal) * 100) : 0;
 
   const gstFiled = gstFilings?.filter((f) => f.status === "filed").length || 0;
   const gstTotal = gstFilings?.length || 0;
   const tdsFiled = tdsFilings?.filter((f) => f.status === "filed").length || 0;
   const tdsTotal = tdsFilings?.length || 0;
 
-  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed)
-  const today = new Date().toISOString().split("T")[0];
+  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed). Skip rows without a due_date.
+  const today = todayStr;
   const sevenDaysOut = (() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
     return d.toISOString().split("T")[0];
   })();
   const countUrgency = (rows: FilingRow[] = []) => {
-    const overdue = rows.filter((r) => r.status !== "filed" && r.due_date < today).length;
+    const overdue = rows.filter((r) => !!r.due_date && r.status !== "filed" && r.due_date < today).length;
     const dueSoon = rows.filter(
-      (r) => r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
+      (r) => !!r.due_date && r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
     ).length;
     return { overdue, dueSoon };
   };
