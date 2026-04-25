@@ -93,9 +93,21 @@ const CompliancePage = () => {
       setLastUpdated(new Date());
     }
   }, [isFetching, gstFilings, tdsFilings, lastUpdated]);
-  const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
+  const allFilings = [...(gstFilings || []).map(f => ({ ...f, _src: "GST" as const })), ...(tdsFilings || []).map(f => ({ ...f, _src: "TDS" as const }))];
   const totalFilings = allFilings.length;
-  const filedOnTime = allFilings.filter((f) => f.status === "filed").length;
+
+  // Breakdown: on-time = filed AND filed_date <= due_date; late = filed but after due; overdue = not filed and past due; pending = not filed, not yet due
+  const todayStr = new Date().toISOString().split("T")[0];
+  const isOnTime = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date <= f.due_date;
+  const isLate = (f: FilingRow) => f.status === "filed" && !!f.filed_date && f.filed_date > f.due_date;
+  const isOverdueNotFiled = (f: FilingRow) => f.status !== "filed" && f.due_date < todayStr;
+  const isPending = (f: FilingRow) => f.status !== "filed" && f.due_date >= todayStr;
+
+  const onTimeCount = allFilings.filter(isOnTime).length;
+  const lateCount = allFilings.filter(isLate).length;
+  const overdueCount = allFilings.filter(isOverdueNotFiled).length;
+  const pendingCount = allFilings.filter(isPending).length;
+  const filedOnTime = onTimeCount;
   const complianceScore = totalFilings > 0 ? Math.round((filedOnTime / totalFilings) * 100) : 0;
 
   const gstFiled = gstFilings?.filter((f) => f.status === "filed").length || 0;
