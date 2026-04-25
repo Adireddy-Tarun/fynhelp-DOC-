@@ -298,11 +298,11 @@ const CompliancePage = () => {
             </button>
             <button
               onClick={handleRefresh}
-              disabled={isRefreshing || !businessId}
-              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50"
+              disabled={controlsLocked || !businessId}
+              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-              {isRefreshing ? "Retrying..." : "Retry"}
+              <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
+              {controlsLocked ? "Retrying..." : "Retry"}
             </button>
           </div>
         </div>
