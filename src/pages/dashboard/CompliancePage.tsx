@@ -82,6 +82,8 @@ const CompliancePage = () => {
       setIsRefreshing(false);
     }
   };
+  const [gstConnected, setGstConnected] = useState(false);
+
   useEffect(() => {
     const fetchBusiness = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -91,7 +93,15 @@ const CompliancePage = () => {
         .select("business_id")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (data?.business_id) setBusinessId(data.business_id);
+      if (data?.business_id) {
+        setBusinessId(data.business_id);
+        const { data: biz } = await supabase
+          .from("businesses")
+          .select("gstin")
+          .eq("id", data.business_id)
+          .maybeSingle();
+        if (biz?.gstin && biz.gstin.trim().length > 0) setGstConnected(true);
+      }
     };
     fetchBusiness();
   }, []);
@@ -424,13 +434,25 @@ const CompliancePage = () => {
             </p>
             {gstTotal === 0 && !fetchingGst ? (
               <div className="mt-1">
-                <p className="text-fyn-ink/60 text-xs mb-3">No GST filings tracked yet.</p>
-                <button
-                  onClick={() => navigate("/onboarding?step=gst")}
-                  className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
-                >
-                  Connect GST →
-                </button>
+                {gstConnected ? (
+                  <>
+                    <p className="text-fyn-ink text-[28px] font-bold font-sans">0<span className="text-fyn-ink/40 text-lg font-normal">/0</span></p>
+                    <p className="text-fyn-ink/60 text-xs mt-2">No filings in this date range</p>
+                    <span className="inline-flex items-center gap-1 mt-3 bg-[#1A6B3C]/10 text-[#1A6B3C] text-[10px] font-medium px-2 py-0.5 rounded">
+                      ● GST connected
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-fyn-ink/60 text-xs mb-3">No GST filings tracked yet.</p>
+                    <button
+                      onClick={() => navigate("/onboarding?step=gst")}
+                      className="inline-flex items-center gap-1 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors"
+                    >
+                      Connect GST →
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <>
