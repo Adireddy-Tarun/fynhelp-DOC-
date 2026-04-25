@@ -408,7 +408,6 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     setPending(null);
     toast.info("Upload cancelled — no duplicate data inserted");
   };
-  };
 
   return (
     <Card className="p-6 flex flex-col h-full">
