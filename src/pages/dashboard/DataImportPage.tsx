@@ -162,9 +162,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     setProgress(10);
 
     const interval = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 200);
+    let rowCount = 0;
 
     try {
       const rows = await parseFile(file);
+      rowCount = rows.length;
       if (rows.length === 0) throw new Error("File has no data rows");
 
       if (type === "bank") {
@@ -218,6 +220,17 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         if (error) throw error;
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("csv_uploads").insert({
+        business_id: businessId,
+        uploaded_by: user?.id ?? null,
+        upload_type: type,
+        file_name: file.name,
+        file_size: file.size,
+        row_count: rowCount,
+        status: "success",
+      });
+
       clearInterval(interval);
       setProgress(100);
       toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
@@ -232,7 +245,21 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     } catch (err: any) {
       clearInterval(interval);
       console.error("Upload error:", err);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from("csv_uploads").insert({
+          business_id: businessId,
+          uploaded_by: user?.id ?? null,
+          upload_type: type,
+          file_name: file.name,
+          file_size: file.size,
+          row_count: rowCount,
+          status: "failed",
+          error_message: String(err?.message || err).slice(0, 500),
+        });
+      } catch {}
       toast.error(err?.message || "Upload failed");
+      onSuccess();
       setUploading(false);
       setProgress(0);
     }
