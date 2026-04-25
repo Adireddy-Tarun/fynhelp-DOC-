@@ -600,9 +600,12 @@ export type Database = {
           business_id: string
           created_at: string
           error_message: string | null
+          file_hash: string | null
           file_name: string
           file_size: number
           id: string
+          max_date: string | null
+          min_date: string | null
           row_count: number
           status: string
           upload_type: string
@@ -612,9 +615,12 @@ export type Database = {
           business_id: string
           created_at?: string
           error_message?: string | null
+          file_hash?: string | null
           file_name: string
           file_size?: number
           id?: string
+          max_date?: string | null
+          min_date?: string | null
           row_count?: number
           status?: string
           upload_type: string
@@ -624,9 +630,12 @@ export type Database = {
           business_id?: string
           created_at?: string
           error_message?: string | null
+          file_hash?: string | null
           file_name?: string
           file_size?: number
           id?: string
+          max_date?: string | null
+          min_date?: string | null
           row_count?: number
           status?: string
           upload_type?: string
