@@ -742,7 +742,7 @@ const CompliancePage = () => {
                   </button>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div ref={breakdownTableRef} className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
