@@ -339,59 +339,101 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   );
 };
 
+const TYPE_LABEL: Record<ImportType, string> = {
+  bank: "Bank Statement",
+  invoice: "Invoice",
+  expense: "Expense",
+};
+
+const formatBytes = (b: number) => {
+  if (!b) return "—";
+  if (b < 1024) return `${b} B`;
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
+  return `${(b / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+interface UploadRow {
+  id: string;
+  upload_type: ImportType;
+  file_name: string;
+  file_size: number;
+  row_count: number;
+  status: string;
+  error_message: string | null;
+  created_at: string;
+}
+
 const UploadHistory = ({ businessId }: { businessId: string | null }) => {
-  // Aggregate recent inserts across the three tables as a stand-in history
-  const { data: history = [] } = useQuery({
-    queryKey: ["import-history", businessId],
+  const { data: history = [], isLoading } = useQuery({
+    queryKey: ["csv-uploads", businessId],
     queryFn: async () => {
-      if (!businessId) return [];
-      const [tx, rec, pay] = await Promise.all([
-        supabase.from("transactions").select("created_at").eq("business_id", businessId).order("created_at", { ascending: false }).limit(1),
-        supabase.from("receivables").select("created_at").eq("business_id", businessId).order("created_at", { ascending: false }).limit(1),
-        supabase.from("payables").select("created_at").eq("business_id", businessId).order("created_at", { ascending: false }).limit(1),
-      ]);
-      const [txCount, recCount, payCount] = await Promise.all([
-        supabase.from("transactions").select("*", { count: "exact", head: true }).eq("business_id", businessId),
-        supabase.from("receivables").select("*", { count: "exact", head: true }).eq("business_id", businessId),
-        supabase.from("payables").select("*", { count: "exact", head: true }).eq("business_id", businessId),
-      ]);
-      return [
-        { type: "Bank Transactions", count: txCount.count || 0, last: tx.data?.[0]?.created_at },
-        { type: "Invoices (Receivables)", count: recCount.count || 0, last: rec.data?.[0]?.created_at },
-        { type: "Expenses (Payables)", count: payCount.count || 0, last: pay.data?.[0]?.created_at },
-      ];
+      if (!businessId) return [] as UploadRow[];
+      const { data, error } = await supabase
+        .from("csv_uploads")
+        .select("id, upload_type, file_name, file_size, row_count, status, error_message, created_at")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data || []) as UploadRow[];
     },
     enabled: !!businessId,
   });
 
   return (
     <Card className="p-6">
-      <h3 className="font-serif text-lg text-fyn-ink mb-4">Data Summary</h3>
+      <h3 className="font-serif text-lg text-fyn-ink mb-4">Upload History</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-fyn-ink/10 text-left text-xs uppercase text-fyn-ink/50">
-              <th className="py-2 font-medium">Dataset</th>
-              <th className="py-2 font-medium text-right">Total Records</th>
-              <th className="py-2 font-medium text-right">Last Updated</th>
+              <th className="py-2 font-medium">File</th>
+              <th className="py-2 font-medium">Type</th>
+              <th className="py-2 font-medium text-right">Size</th>
+              <th className="py-2 font-medium text-right">Rows</th>
+              <th className="py-2 font-medium">Status</th>
+              <th className="py-2 font-medium text-right">Uploaded</th>
             </tr>
           </thead>
           <tbody>
+            {history.length === 0 && (
+              <tr>
+                <td colSpan={6} className="py-8 text-center text-fyn-ink/50">
+                  {isLoading ? "Loading…" : "No uploads yet. Drop a file above to get started."}
+                </td>
+              </tr>
+            )}
             {history.map(h => (
-              <tr key={h.type} className="border-b border-fyn-ink/5">
-                <td className="py-3 text-fyn-ink font-medium">{h.type}</td>
-                <td className="py-3 text-right tabular-nums">{h.count}</td>
+              <tr key={h.id} className="border-b border-fyn-ink/5">
+                <td className="py-3 text-fyn-ink font-medium truncate max-w-[260px]" title={h.file_name}>
+                  <span className="inline-flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-fyn-ink/50" />
+                    {h.file_name}
+                  </span>
+                </td>
+                <td className="py-3 text-fyn-ink/70">{TYPE_LABEL[h.upload_type] ?? h.upload_type}</td>
+                <td className="py-3 text-right tabular-nums text-fyn-ink/70">{formatBytes(h.file_size)}</td>
+                <td className="py-3 text-right tabular-nums">{h.row_count}</td>
+                <td className="py-3">
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs ${
+                      h.status === "success"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-fyn-red/10 text-fyn-red"
+                    }`}
+                    title={h.error_message || undefined}
+                  >
+                    {h.status}
+                  </span>
+                </td>
                 <td className="py-3 text-right text-fyn-ink/60">
-                  {h.last ? new Date(h.last).toLocaleString("en-IN") : "—"}
+                  {new Date(h.created_at).toLocaleString("en-IN")}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-fyn-ink/40 mt-3">
-        Detailed per-file upload history requires a `csv_uploads` table — let me know if you want one added.
-      </p>
     </Card>
   );
 };
