@@ -19,7 +19,20 @@ const CompliancePage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [breakdownFilter, setBreakdownFilter] = useState<"on-time" | "late" | "overdue" | "pending" | "unknown" | null>(null);
+  const BREAKDOWN_FILTER_KEY = "compliance:breakdownFilter";
+  type BreakdownFilter = "on-time" | "late" | "overdue" | "pending" | "unknown" | null;
+  const isValidFilter = (v: unknown): v is Exclude<BreakdownFilter, null> =>
+    v === "on-time" || v === "late" || v === "overdue" || v === "pending" || v === "unknown";
+  const [breakdownFilter, setBreakdownFilter] = useState<BreakdownFilter>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = window.localStorage.getItem(BREAKDOWN_FILTER_KEY);
+    return isValidFilter(stored) ? stored : null;
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (breakdownFilter) window.localStorage.setItem(BREAKDOWN_FILTER_KEY, breakdownFilter);
+    else window.localStorage.removeItem(BREAKDOWN_FILTER_KEY);
+  }, [breakdownFilter]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
