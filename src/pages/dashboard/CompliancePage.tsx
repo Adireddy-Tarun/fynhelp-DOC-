@@ -489,8 +489,13 @@ const CompliancePage = () => {
             <div>
               <p className="text-fyn-ink/40 text-[12px] fyn-label mb-1">HEALTH SCORE BREAKDOWN</p>
               <p className="text-fyn-ink/70 text-xs font-mono">
-                Score = on-time ÷ total × 100 = {onTimeCount} ÷ {totalFilings} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
+                Score = on-time ÷ scored ÷ × 100 = {onTimeCount} ÷ {scoredTotal} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
               </p>
+              {unknownCount > 0 && (
+                <p className="text-fyn-ink/50 text-[11px] mt-1">
+                  {unknownCount} filing{unknownCount === 1 ? "" : "s"} excluded (missing due_date).
+                </p>
+              )}
             </div>
             {breakdownFilter && (
               <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
@@ -499,14 +504,16 @@ const CompliancePage = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          <div className={cn("grid grid-cols-2 gap-2 mb-4", unknownCount > 0 ? "md:grid-cols-5" : "md:grid-cols-4") }>
             {[
               { key: "on-time" as const, label: "On time", count: onTimeCount, color: "#1A6B3C" },
               { key: "late" as const, label: "Filed late", count: lateCount, color: "#8B5A00" },
               { key: "overdue" as const, label: "Overdue", count: overdueCount, color: "#C41E1E" },
               { key: "pending" as const, label: "Pending", count: pendingCount, color: "#1A1008" },
+              ...(unknownCount > 0 ? [{ key: "unknown" as const, label: "Unknown", count: unknownCount, color: "#475569" }] : []),
             ].map((b) => {
               const active = breakdownFilter === b.key;
+              const denom = b.key === "unknown" ? totalFilings : scoredTotal;
               return (
                 <button
                   key={b.key}
@@ -519,7 +526,7 @@ const CompliancePage = () => {
                   <p className="text-[10px] uppercase tracking-wide" style={{ color: b.color }}>{b.label}</p>
                   <p className="text-2xl font-bold font-sans mt-1" style={{ color: b.color }}>{b.count}</p>
                   <p className="text-fyn-ink/40 text-[10px] mt-1">
-                    {totalFilings > 0 ? Math.round((b.count / totalFilings) * 100) : 0}% of total
+                    {denom > 0 ? Math.round((b.count / denom) * 100) : 0}% {b.key === "unknown" ? "of all rows" : "of scored"}
                   </p>
                 </button>
               );
