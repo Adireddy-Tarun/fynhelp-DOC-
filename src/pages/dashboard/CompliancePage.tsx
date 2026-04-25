@@ -18,6 +18,7 @@ const CompliancePage = () => {
   const queryClient = useQueryClient();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
@@ -35,6 +36,7 @@ const CompliancePage = () => {
         queryClient.refetchQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] }),
         queryClient.refetchQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] }),
       ]);
+      setLastUpdated(new Date());
     } finally {
       setIsRefreshing(false);
     }
@@ -84,6 +86,13 @@ const CompliancePage = () => {
   });
 
   const isLoading = loadingGst || loadingTds;
+  const isFetching = fetchingGst || fetchingTds;
+
+  useEffect(() => {
+    if (!isFetching && (gstFilings || tdsFilings) && !lastUpdated) {
+      setLastUpdated(new Date());
+    }
+  }, [isFetching, gstFilings, tdsFilings, lastUpdated]);
   const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
   const totalFilings = allFilings.length;
   const filedOnTime = allFilings.filter((f) => f.status === "filed").length;
@@ -200,6 +209,13 @@ const CompliancePage = () => {
           {isRefreshing ? "Refreshing..." : "Refresh"}
         </button>
       </div>
+      {lastUpdated && (
+        <div className="flex justify-end -mt-2 mb-4">
+          <span className="text-fyn-ink/50 text-xs">
+            Last updated {format(lastUpdated, "dd MMM yyyy, HH:mm:ss")}
+          </span>
+        </div>
+      )}
       {isLoading && (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
