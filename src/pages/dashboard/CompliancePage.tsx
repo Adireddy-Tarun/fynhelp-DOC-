@@ -141,7 +141,51 @@ const CompliancePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
+        <span className="text-fyn-ink/60 text-xs mr-1">Period:</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn("h-9 justify-start text-left font-normal text-sm", !fromDate && "text-muted-foreground")}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {fromDate ? format(fromDate, "dd MMM yyyy") : "From"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={fromDate}
+              onSelect={(d) => d && setFromDate(d)}
+              disabled={(d) => d > toDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+        <span className="text-fyn-ink/40 text-xs">→</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn("h-9 justify-start text-left font-normal text-sm", !toDate && "text-muted-foreground")}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {toDate ? format(toDate, "dd MMM yyyy") : "To"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={toDate}
+              onSelect={(d) => d && setToDate(d)}
+              disabled={(d) => d < fromDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || !businessId}
