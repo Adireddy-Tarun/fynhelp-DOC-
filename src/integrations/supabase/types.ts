@@ -1122,6 +1122,57 @@ export type Database = {
           },
         ]
       }
+      tds_filings: {
+        Row: {
+          acknowledgement_number: string | null
+          business_id: string
+          challan_number: string | null
+          created_at: string
+          due_date: string
+          filed_date: string | null
+          form_type: string
+          id: string
+          notes: string | null
+          quarter: string
+          status: string
+          total_tds_deducted: number | null
+          total_tds_deposited: number | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledgement_number?: string | null
+          business_id: string
+          challan_number?: string | null
+          created_at?: string
+          due_date: string
+          filed_date?: string | null
+          form_type: string
+          id?: string
+          notes?: string | null
+          quarter: string
+          status?: string
+          total_tds_deducted?: number | null
+          total_tds_deposited?: number | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledgement_number?: string | null
+          business_id?: string
+          challan_number?: string | null
+          created_at?: string
+          due_date?: string
+          filed_date?: string | null
+          form_type?: string
+          id?: string
+          notes?: string | null
+          quarter?: string
+          status?: string
+          total_tds_deducted?: number | null
+          total_tds_deposited?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
