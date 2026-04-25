@@ -208,6 +208,8 @@ const CompliancePage = () => {
     }));
   })();
 
+  const controlsLocked = isRefreshing || isFetching;
+
   return (
     <DashboardLayout>
       <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
