@@ -260,8 +260,19 @@ const TDSTaxPage = () => {
               <tbody>
                 {visibleFilings.map((f, i) => {
                   const badge = getStatusStyle(f);
+                  const isMatch = matchesBucket(f);
+                  const dim = !!bucketFilter && !isMatch;
+                  const baseBg = i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white";
                   return (
-                    <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
+                    <tr
+                      key={f.id}
+                      className={`border-b border-fyn-ink-10 last:border-0 ${dim ? "opacity-40" : ""} ${baseBg}`}
+                      style={
+                        bucketFilter && isMatch
+                          ? { boxShadow: `inset 3px 0 0 0 ${bucketMeta[bucketFilter].color}` }
+                          : undefined
+                      }
+                    >
                       <td className="py-3 text-fyn-ink font-medium">{f.quarter}</td>
                       <td className="py-3 text-fyn-ink/70">{f.form_type}</td>
                       <td className="py-3 text-fyn-ink/70 fyn-metric">
@@ -276,6 +287,14 @@ const TDSTaxPage = () => {
                     </tr>
                   );
                 })}
+                {isBucketEmpty && (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-fyn-ink/60 text-xs">
+                      No filings match the <span className="font-medium" style={{ color: bucketMeta[bucketFilter!].color }}>{bucketMeta[bucketFilter!].label}</span> bucket in this date range.{" "}
+                      <button onClick={clearBucketFilter} className="underline underline-offset-2 hover:text-fyn-ink">Clear bucket</button>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
