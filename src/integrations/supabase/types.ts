@@ -700,6 +700,63 @@ export type Database = {
         }
         Relationships: []
       }
+      gst_filings: {
+        Row: {
+          acknowledgement_number: string | null
+          arn_number: string | null
+          business_id: string
+          created_at: string
+          due_date: string
+          filed_date: string | null
+          filing_period: string
+          id: string
+          input_tax_credit: number | null
+          notes: string | null
+          output_tax: number | null
+          return_type: string
+          status: string
+          tax_payable: number | null
+          taxable_sales: number | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledgement_number?: string | null
+          arn_number?: string | null
+          business_id: string
+          created_at?: string
+          due_date: string
+          filed_date?: string | null
+          filing_period: string
+          id?: string
+          input_tax_credit?: number | null
+          notes?: string | null
+          output_tax?: number | null
+          return_type: string
+          status?: string
+          tax_payable?: number | null
+          taxable_sales?: number | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledgement_number?: string | null
+          arn_number?: string | null
+          business_id?: string
+          created_at?: string
+          due_date?: string
+          filed_date?: string | null
+          filing_period?: string
+          id?: string
+          input_tax_credit?: number | null
+          notes?: string | null
+          output_tax?: number | null
+          return_type?: string
+          status?: string
+          tax_payable?: number | null
+          taxable_sales?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gst_itc_lines: {
         Row: {
           business_id: string
