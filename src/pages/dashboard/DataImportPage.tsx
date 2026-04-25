@@ -442,7 +442,7 @@ const DataImportPage = () => {
   const { businessId } = useAuth();
   const qc = useQueryClient();
   const refreshAll = () => {
-    qc.invalidateQueries({ queryKey: ["import-history", businessId] });
+    qc.invalidateQueries({ queryKey: ["csv-uploads", businessId] });
     qc.invalidateQueries({ queryKey: ["transactions-180", businessId] });
     qc.invalidateQueries({ queryKey: ["receivables-top", businessId] });
     qc.invalidateQueries({ queryKey: ["payables", businessId] });
