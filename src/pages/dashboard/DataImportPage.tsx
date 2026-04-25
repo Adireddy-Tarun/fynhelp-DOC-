@@ -58,23 +58,44 @@ const pick = (row: Record<string, string>, keys: string[]) => {
 const TYPE_META: Record<ImportType, { title: string; description: string; icon: JSX.Element; sample: string }> = {
   bank: {
     title: "Bank Statements",
-    description: "CSV with columns: Date, Description, Debit, Credit (or Amount)",
+    description: "CSV/XLSX with columns: Date, Description, Debit, Credit (or Amount)",
     icon: <Building className="w-6 h-6" />,
     sample: "Date, Description, Debit, Credit",
   },
   invoice: {
     title: "Invoices (Receivables)",
-    description: "CSV with: Customer, Invoice Number, Date, Due Date, Amount",
+    description: "CSV/XLSX with: Customer, Invoice Number, Date, Due Date, Amount",
     icon: <Receipt className="w-6 h-6" />,
     sample: "Customer, Invoice Number, Date, Due Date, Amount",
   },
   expense: {
     title: "Expenses (Payables)",
-    description: "CSV with: Vendor, Invoice Number, Date, Due Date, Amount",
+    description: "CSV/XLSX with: Vendor, Invoice Number, Date, Due Date, Amount",
     icon: <Wallet className="w-6 h-6" />,
     sample: "Vendor, Invoice Number, Date, Due Date, Amount",
   },
 };
+
+async function parseFile(file: File): Promise<Record<string, string>[]> {
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".csv")) {
+    const text = await file.text();
+    return parseCSV(text).rows;
+  }
+  if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    if (!ws) return [];
+    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "", raw: false });
+    return rows.map(r => {
+      const out: Record<string, string> = {};
+      for (const k of Object.keys(r)) out[k.trim()] = String(r[k] ?? "").trim();
+      return out;
+    });
+  }
+  throw new Error("Unsupported file type. Upload CSV or XLSX.");
+}
 
 interface UploadZoneProps {
   type: ImportType;
