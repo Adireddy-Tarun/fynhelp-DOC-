@@ -340,27 +340,19 @@ const CockpitPage = () => {
         <div className="flex items-stretch">
           {/* Mono label rail */}
           <div
-            className="flex items-center px-3 font-mono"
-            style={{
-              background: "hsl(var(--fyn-ink))",
-              color: "hsl(var(--fyn-beige))",
-              fontSize: 10,
-              letterSpacing: "0.18em",
-            }}
+            className="hidden sm:flex items-center px-3 font-mono text-[10px] tracking-[0.18em] uppercase
+                       bg-[hsl(var(--fyn-ink))] text-[hsl(var(--fyn-beige))]"
           >
             DATA · IMPORT
           </div>
 
           {/* Body */}
-          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-6">
+          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-4 md:gap-6">
             <div className="flex items-center gap-3 min-w-0">
               <div
-                className="w-9 h-9 flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: "hsl(var(--fyn-red) / 0.08)",
-                  border: "1px solid hsl(var(--fyn-red) / 0.25)",
-                  color: "hsl(var(--fyn-red))",
-                }}
+                className="w-9 h-9 flex items-center justify-center flex-shrink-0
+                           bg-[hsl(var(--fyn-red)/0.08)] text-[hsl(var(--fyn-red))]
+                           border border-[hsl(var(--fyn-red)/0.25)]"
                 aria-hidden
               >
                 {/* Brand import glyph: tray + arrow-in */}
@@ -382,26 +374,14 @@ const CockpitPage = () => {
 
               <div className="min-w-0">
                 <h3
-                  className="font-serif truncate"
-                  style={{
-                    color: "hsl(var(--fyn-ink))",
-                    fontSize: 16,
-                    fontWeight: 600,
-                    lineHeight: 1.2,
-                    letterSpacing: "-0.005em",
-                  }}
+                  className="font-serif truncate text-base font-semibold leading-tight tracking-tight
+                             text-[hsl(var(--fyn-ink))]"
                 >
                   Import Data
                 </h3>
                 <p
-                  className="font-mono truncate fyn-label"
-                  style={{
-                    color: "hsl(var(--fyn-ink) / 0.55)",
-                    fontSize: 10,
-                    letterSpacing: "0.18em",
-                    marginTop: 4,
-                    textTransform: "uppercase",
-                  }}
+                  className="font-mono fyn-label truncate mt-1 text-[10px] tracking-[0.18em] uppercase
+                             text-[hsl(var(--fyn-ink)/0.55)]"
                 >
                   Bank · Invoices · Expenses &nbsp;·&nbsp; CSV / XLSX
                 </p>
@@ -413,42 +393,32 @@ const CockpitPage = () => {
               {/* Stats — desktop only (keeps mobile dense) */}
               <div className="hidden md:block text-right">
                 <p
-                  className="font-mono fyn-label"
-                  style={{
-                    color: "hsl(var(--fyn-ink) / 0.40)",
-                    fontSize: 10,
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                  }}
+                  className="font-mono fyn-label text-[10px] tracking-[0.18em] uppercase
+                             text-[hsl(var(--fyn-ink)/0.40)]"
                 >
                   Formats
                 </p>
                 <p
-                  className="font-mono"
-                  style={{
-                    color: "hsl(var(--fyn-ink))",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    marginTop: 2,
-                    letterSpacing: "0.02em",
-                  }}
+                  className="font-mono mt-0.5 text-[13px] font-semibold tracking-wide
+                             text-[hsl(var(--fyn-ink))]"
                 >
                   .csv · .xlsx
                 </p>
               </div>
 
+              {/* Divider — uses ink-10 token */}
+              <span
+                aria-hidden
+                className="hidden md:inline-block w-px h-8 bg-[hsl(var(--fyn-ink-10))]"
+              />
+
               {/* CTA — visible on all breakpoints; compact on mobile, full label md+ */}
               <div
-                className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5 font-mono fyn-label transition-colors"
-                style={{
-                  background: "hsl(var(--fyn-red) / 0.08)",
-                  border: "1px solid hsl(var(--fyn-red))",
-                  color: "hsl(var(--fyn-red))",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                }}
+                className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5
+                           font-mono fyn-label text-[11px] font-semibold tracking-[0.18em] uppercase
+                           bg-[hsl(var(--fyn-red)/0.08)] text-[hsl(var(--fyn-red))]
+                           border border-[hsl(var(--fyn-red))]
+                           transition-colors"
                 aria-label="Open Data Import"
               >
                 <span className="hidden sm:inline">Open</span>
