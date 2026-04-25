@@ -513,11 +513,11 @@ const CompliancePage = () => {
                   breakdownFilter === "unknown" ? isUnknown(f) :
                   isPending(f);
                 const rows = allFilings.filter(matchesBucket);
+                const escape = (v: string | null | undefined) => {
+                  const s = v == null ? "" : String(v);
+                  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+                };
                 const handleExport = () => {
-                  const escape = (v: string | null | undefined) => {
-                    const s = v == null ? "" : String(v);
-                    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-                  };
                   const header = ["Source", "Due date", "Filed date", "Status"];
                   const body = rows.map((f) => [
                     escape(f._src),
@@ -536,16 +536,113 @@ const CompliancePage = () => {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
                 };
+                const handleExportReasonsCsv = () => {
+                  const header = ["Source", "Due date", "Filed date", "Status", "Classification", "Rule", "Explanation"];
+                  const body = rows.map((f) => {
+                    const exp = explainFiling(f);
+                    return [
+                      escape(f._src),
+                      escape(f.due_date),
+                      escape(f.filed_date ?? ""),
+                      escape(f.status),
+                      escape(exp.label),
+                      escape(exp.rule),
+                      escape(exp.detail),
+                    ].join(",");
+                  });
+                  const csv = [header.join(","), ...body].join("\n");
+                  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `compliance-${breakdownFilter}-reasons-${format(new Date(), "yyyy-MM-dd")}.csv`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                };
+                const escapeHtml = (v: string | null | undefined) => {
+                  const s = v == null ? "" : String(v);
+                  return s
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+                };
+                const handleExportReasonsPdf = () => {
+                  const today = format(new Date(), "dd MMM yyyy");
+                  const rowsHtml = rows.map((f) => {
+                    const exp = explainFiling(f);
+                    return `<tr>
+                      <td>${escapeHtml(f._src)}</td>
+                      <td>${escapeHtml(f.due_date)}</td>
+                      <td>${escapeHtml(f.filed_date ?? "—")}</td>
+                      <td>${escapeHtml(f.status)}</td>
+                      <td><span class="lbl" style="background:${exp.color}1A;color:${exp.color}">${escapeHtml(exp.label)}</span></td>
+                      <td><code>${escapeHtml(exp.rule)}</code></td>
+                      <td>${escapeHtml(exp.detail)}</td>
+                    </tr>`;
+                  }).join("");
+                  const html = `<!doctype html><html><head><meta charset="utf-8" />
+                    <title>Compliance reasons — ${escapeHtml(bucketLabel[breakdownFilter])} — ${today}</title>
+                    <style>
+                      body { font-family: Inter, system-ui, -apple-system, sans-serif; color: #1A1008; padding: 24px; }
+                      h1 { font-family: Georgia, serif; font-size: 20px; margin: 0 0 4px; }
+                      .meta { color: rgba(26,16,8,0.6); font-size: 12px; margin-bottom: 16px; }
+                      table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                      th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(26,16,8,0.1); vertical-align: top; }
+                      th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(26,16,8,0.5); }
+                      code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; }
+                      .lbl { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+                      @media print { body { padding: 12mm; } }
+                    </style></head><body>
+                    <h1>Compliance — ${escapeHtml(bucketLabel[breakdownFilter])} reasons</h1>
+                    <p class="meta">${rows.length} filing${rows.length === 1 ? "" : "s"} · Period ${escapeHtml(fromStr)} to ${escapeHtml(toStr)} · Generated ${today}</p>
+                    <table>
+                      <thead><tr>
+                        <th>Source</th><th>Due date</th><th>Filed date</th><th>Status</th>
+                        <th>Classification</th><th>Rule</th><th>Explanation</th>
+                      </tr></thead>
+                      <tbody>${rowsHtml}</tbody>
+                    </table>
+                    <script>window.addEventListener('load', () => setTimeout(() => window.print(), 250));<\/script>
+                    </body></html>`;
+                  const w = window.open("", "_blank", "noopener,noreferrer");
+                  if (!w) return;
+                  w.document.open();
+                  w.document.write(html);
+                  w.document.close();
+                };
                 return (
-                  <button
-                    onClick={handleExport}
-                    disabled={rows.length === 0}
-                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
-                    title={`Export ${rows.length} ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Export breakdown CSV ({rows.length})
-                  </button>
+                  <>
+                    <button
+                      onClick={handleExport}
+                      disabled={rows.length === 0}
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`Export ${rows.length} ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Export breakdown CSV ({rows.length})
+                    </button>
+                    <button
+                      onClick={handleExportReasonsCsv}
+                      disabled={rows.length === 0}
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`Export ${rows.length} explained ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as CSV`}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Export reasons CSV
+                    </button>
+                    <button
+                      onClick={handleExportReasonsPdf}
+                      disabled={rows.length === 0}
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 border border-fyn-ink-10 rounded hover:border-fyn-ink/30 hover:bg-white/40 text-fyn-ink disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`Export ${rows.length} explained ${bucketLabel[breakdownFilter]} filing${rows.length === 1 ? "" : "s"} as PDF`}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Export reasons PDF
+                    </button>
+                  </>
                 );
               })()}
               {breakdownFilter && (
