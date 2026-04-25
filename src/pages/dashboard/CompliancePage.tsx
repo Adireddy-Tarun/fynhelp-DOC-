@@ -350,6 +350,97 @@ const CompliancePage = () => {
 
       {!isLoading && totalFilings > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <p className="text-fyn-ink/40 text-[12px] fyn-label mb-1">HEALTH SCORE BREAKDOWN</p>
+              <p className="text-fyn-ink/70 text-xs font-mono">
+                Score = on-time ÷ total × 100 = {onTimeCount} ÷ {totalFilings} × 100 = <span className="font-bold" style={{ color: scoreColor }}>{complianceScore}%</span>
+              </p>
+            </div>
+            {breakdownFilter && (
+              <button onClick={() => setBreakdownFilter(null)} className="text-fyn-ink/60 text-xs hover:text-fyn-ink">
+                Clear filter ✕
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+            {[
+              { key: "on-time" as const, label: "On time", count: onTimeCount, color: "#1A6B3C" },
+              { key: "late" as const, label: "Filed late", count: lateCount, color: "#8B5A00" },
+              { key: "overdue" as const, label: "Overdue", count: overdueCount, color: "#C41E1E" },
+              { key: "pending" as const, label: "Pending", count: pendingCount, color: "#1A1008" },
+            ].map((b) => {
+              const active = breakdownFilter === b.key;
+              return (
+                <button
+                  key={b.key}
+                  onClick={() => setBreakdownFilter(active ? null : b.key)}
+                  className={cn(
+                    "text-left border rounded-md p-3 transition-colors",
+                    active ? "border-fyn-ink bg-white/60" : "border-fyn-ink-10 hover:border-fyn-ink/30 bg-white/30"
+                  )}
+                >
+                  <p className="text-[10px] uppercase tracking-wide" style={{ color: b.color }}>{b.label}</p>
+                  <p className="text-2xl font-bold font-sans mt-1" style={{ color: b.color }}>{b.count}</p>
+                  <p className="text-fyn-ink/40 text-[10px] mt-1">
+                    {totalFilings > 0 ? Math.round((b.count / totalFilings) * 100) : 0}% of total
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          {breakdownFilter && (
+            <div className="border-t border-fyn-ink-10 pt-3">
+              <p className="text-fyn-ink/60 text-xs mb-2">
+                Filings classified as <span className="font-medium text-fyn-ink">{breakdownFilter}</span>:
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
+                      <th className="py-2">Source</th>
+                      <th className="py-2">Due Date</th>
+                      <th className="py-2">Filed Date</th>
+                      <th className="py-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allFilings
+                      .filter((f) =>
+                        breakdownFilter === "on-time" ? isOnTime(f) :
+                        breakdownFilter === "late" ? isLate(f) :
+                        breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                        isPending(f)
+                      )
+                      .sort((a, b) => (a.due_date < b.due_date ? 1 : -1))
+                      .map((f, i) => (
+                        <tr key={i} className="border-t border-fyn-ink-10">
+                          <td className="py-2 font-medium">{f._src}</td>
+                          <td className="py-2">{f.due_date}</td>
+                          <td className="py-2">{f.filed_date || "—"}</td>
+                          <td className="py-2">{f.status}</td>
+                        </tr>
+                      ))}
+                    {allFilings.filter((f) =>
+                      breakdownFilter === "on-time" ? isOnTime(f) :
+                      breakdownFilter === "late" ? isLate(f) :
+                      breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                      isPending(f)
+                    ).length === 0 && (
+                      <tr><td colSpan={4} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!isLoading && totalFilings > 0 && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
           <p className="text-fyn-ink/40 text-[12px] fyn-label mb-4">
             ON-TIME FILING RATE — LAST 3 MONTHS
           </p>
