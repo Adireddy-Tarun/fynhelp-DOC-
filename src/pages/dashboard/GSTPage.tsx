@@ -150,6 +150,26 @@ const GSTPage = () => {
           </button>
         </div>
       )}
+      {bucketFilter && (
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-2 border rounded-md text-xs"
+          style={{ background: `${bucketMeta[bucketFilter].color}0F`, borderColor: `${bucketMeta[bucketFilter].color}40` }}
+        >
+          <span className="text-fyn-ink/80 inline-flex items-center gap-2">
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ background: bucketMeta[bucketFilter].color }}
+              aria-hidden
+            />
+            Highlighting <span className="font-medium" style={{ color: bucketMeta[bucketFilter].color }}>{bucketMeta[bucketFilter].label}</span> rows ({bucketMatchCount} of {visibleFilings.length})
+          </span>
+          <button
+            onClick={clearBucketFilter}
+            className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+          >
+            Clear bucket ✕
+          </button>
+        </div>
+      )}
       {/* TOP METRICS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-fyn-ink rounded-lg p-5">
