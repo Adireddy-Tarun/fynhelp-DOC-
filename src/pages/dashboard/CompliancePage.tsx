@@ -384,7 +384,17 @@ const CompliancePage = () => {
               {controlsLocked ? "Retrying..." : "Retry"}
             </button>
           </div>
+          <TroubleshootingCard navigate={navigate} missingGst missingTds />
         </div>
+      )}
+
+      {!isLoading && totalFilings > 0 && (gstTotal === 0 || tdsTotal === 0) && (
+        <TroubleshootingCard
+          navigate={navigate}
+          missingGst={gstTotal === 0}
+          missingTds={tdsTotal === 0}
+          compact
+        />
       )}
 
       {!isLoading && totalFilings > 0 && (
