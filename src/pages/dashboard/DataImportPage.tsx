@@ -258,19 +258,19 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             <h3 className="font-serif text-lg text-fyn-ink mb-1">{meta.title}</h3>
             <p className="text-sm text-fyn-ink/60 mb-1">{meta.description}</p>
             <p className="text-xs text-fyn-ink/50 mb-4">
-              {isDragging ? "Drop your CSV here" : "Drag & drop a CSV, or"}
+              {isDragging ? "Drop your file here" : "Drag & drop a CSV or XLSX, or"}
             </p>
             <input
               ref={inputRef}
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls"
               onChange={handleFileSelect}
               className="hidden"
               id={`csv-${type}`}
             />
             <label htmlFor={`csv-${type}`}>
               <Button asChild variant="outline" className="cursor-pointer">
-                <span><Upload className="w-4 h-4 mr-2" /> Select CSV File</span>
+                <span><Upload className="w-4 h-4 mr-2" /> Select File</span>
               </Button>
             </label>
             <p className="text-xs text-fyn-ink/40 mt-3">Expected: {meta.sample}</p>
