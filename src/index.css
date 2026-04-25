@@ -347,7 +347,10 @@
   .text-fyn-ink { color: hsl(24 53% 7%); }
   .text-fyn-ink-80 { color: hsl(24 53% 7% / 0.80); }
   .text-fyn-ink-60 { color: hsl(24 53% 7% / 0.60); }
+  .text-fyn-ink-45 { color: hsl(24 53% 7% / 0.45); }
   .text-fyn-ink-40 { color: hsl(24 53% 7% / 0.40); }
+  .bg-fyn-ink-05 { background-color: hsl(24 53% 7% / 0.05); }
+  .bg-fyn-ink-02 { background-color: hsl(24 53% 7% / 0.02); }
   .text-fyn-red { color: hsl(0 73% 44%); }
   .text-fyn-red-dark { color: hsl(0 73% 36%); }
   .text-fyn-gold { color: hsl(38 74% 31%); }
