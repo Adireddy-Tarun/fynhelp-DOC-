@@ -209,6 +209,13 @@ const CompliancePage = () => {
           {isRefreshing ? "Refreshing..." : "Refresh"}
         </button>
       </div>
+      {lastUpdated && (
+        <div className="flex justify-end -mt-2 mb-4">
+          <span className="text-fyn-ink/50 text-xs">
+            Last updated {format(lastUpdated, "dd MMM yyyy, HH:mm:ss")}
+          </span>
+        </div>
+      )}
       {isLoading && (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
