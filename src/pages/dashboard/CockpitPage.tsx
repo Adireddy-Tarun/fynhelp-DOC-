@@ -356,25 +356,47 @@ const CockpitPage = () => {
                 }}
                 aria-hidden
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="square" strokeLinejoin="miter">
-                  <path d="M12 3v12" />
-                  <path d="M6 9l6-6 6 6" />
-                  <path d="M4 21h16" />
+                {/* Brand import glyph: tray + arrow-in */}
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
+                >
+                  <path d="M12 3v11" />
+                  <path d="M7 9l5 5 5-5" />
+                  <path d="M4 17v3h16v-3" />
                 </svg>
               </div>
 
               <div className="min-w-0">
-                <p
+                <h3
                   className="font-serif truncate"
-                  style={{ color: "hsl(var(--fyn-ink))", fontSize: 15, lineHeight: 1.2 }}
+                  style={{
+                    color: "hsl(var(--fyn-ink))",
+                    fontSize: 16,
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.005em",
+                  }}
                 >
                   Import Data
-                </p>
+                </h3>
                 <p
-                  className="font-mono truncate"
-                  style={{ color: "hsl(var(--fyn-ink) / 0.55)", fontSize: 11, letterSpacing: "0.04em", marginTop: 2 }}
+                  className="font-mono truncate fyn-label"
+                  style={{
+                    color: "hsl(var(--fyn-ink) / 0.55)",
+                    fontSize: 10,
+                    letterSpacing: "0.18em",
+                    marginTop: 4,
+                    textTransform: "uppercase",
+                  }}
                 >
-                  BANK · INVOICES · EXPENSES &nbsp;·&nbsp; CSV / XLSX
+                  Bank · Invoices · Expenses &nbsp;·&nbsp; CSV / XLSX
                 </p>
               </div>
             </div>
@@ -383,34 +405,46 @@ const CockpitPage = () => {
             <div className="hidden md:flex items-center gap-6">
               <div className="text-right">
                 <p
-                  className="font-mono"
-                  style={{ color: "hsl(var(--fyn-ink) / 0.40)", fontSize: 9, letterSpacing: "0.18em" }}
+                  className="font-mono fyn-label"
+                  style={{
+                    color: "hsl(var(--fyn-ink) / 0.40)",
+                    fontSize: 10,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                  }}
                 >
-                  FORMATS
+                  Formats
                 </p>
                 <p
                   className="font-mono"
-                  style={{ color: "hsl(var(--fyn-ink))", fontSize: 13, fontWeight: 600 }}
+                  style={{
+                    color: "hsl(var(--fyn-ink))",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    marginTop: 2,
+                    letterSpacing: "0.02em",
+                  }}
                 >
                   .csv · .xlsx
                 </p>
               </div>
 
               <div
-                className="flex items-center gap-2 px-3 py-1.5 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 font-mono fyn-label transition-colors"
                 style={{
                   background: "hsl(var(--fyn-red) / 0.08)",
                   border: "1px solid hsl(var(--fyn-red))",
                   color: "hsl(var(--fyn-red))",
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 600,
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.18em",
                   textTransform: "uppercase",
                 }}
               >
                 Open <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </Link>
