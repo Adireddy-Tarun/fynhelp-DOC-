@@ -53,7 +53,8 @@ vi.mock("@/contexts/AuthContext", () => ({
 // Helper: returns a chainable Supabase query stub that resolves to `data`.
 const makeQuery = (data: unknown) => {
   const result = { data, error: null };
-  const chain: Record<string, unknown> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chain: any = {};
   const passthrough = () => chain;
   ["select", "eq", "order", "limit", "gte", "lte", "in", "neq"].forEach((m) => {
     chain[m] = vi.fn(passthrough);
@@ -61,9 +62,8 @@ const makeQuery = (data: unknown) => {
   chain.maybeSingle = vi.fn().mockResolvedValue(result);
   chain.single = vi.fn().mockResolvedValue(result);
   // Awaiting the chain itself resolves to the result (mirrors Supabase behaviour).
-  (chain as unknown as PromiseLike<typeof result>).then = (
-    onfulfilled?: (value: typeof result) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled);
+  chain.then = (onfulfilled?: (value: typeof result) => unknown) =>
+    Promise.resolve(result).then(onfulfilled);
   return chain;
 };
 
