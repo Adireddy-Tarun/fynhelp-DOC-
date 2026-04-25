@@ -128,9 +128,16 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isCockpit = location.pathname === "/dashboard/cockpit";
 
+  // Normalize current path (drop trailing slash, lowercase) for robust active matching
+  const currentPath = location.pathname.replace(/\/+$/, "").toLowerCase() || "/";
+  const isActive = (href: string) => {
+    const normalized = href.replace(/\/+$/, "").toLowerCase();
+    return currentPath === normalized;
+  };
+
   const pageTitle = navSections
     .flatMap((s) => s.items)
-    .find((i) => i.href === location.pathname)?.label || "Dashboard";
+    .find((i) => isActive(i.href))?.label || "Dashboard";
 
   return (
     <div className="min-h-screen flex" style={{ background: "#EDE4CB" }}>
@@ -158,50 +165,75 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         </div>
 
         <nav className="flex-1 py-2 px-2 space-y-4 overflow-y-auto">
-          {navSections.map((section) => (
-            <div key={section.title}>
-              <p className="text-white/20 fyn-label text-[10px] px-2 mb-1">{section.title}</p>
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const active = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.label + item.href}
-                    to={item.href}
-                    className="flex items-center gap-2.5 px-2 py-1.5 rounded transition-all duration-150 border-0"
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 500,
-                      background: active ? "rgba(196,30,30,0.15)" : "transparent",
-                      borderLeft: active ? "3px solid #C41E1E" : "3px solid transparent",
-                      color: active ? "#FFFFFF" : "rgba(255,255,255,0.50)",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.85)";
-                        e.currentTarget.style.transform = "translateX(2px)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.50)";
-                        e.currentTarget.style.transform = "translateX(0)";
-                      }
-                    }}
-                    aria-label={item.label}
-                  >
-                    <Icon size={16} className="flex-shrink-0" />
-                    <span className="whitespace-nowrap text-primary-foreground font-sans font-light">{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0" style={{ background: "#C41E1E" }}>{item.badge}</span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+          {navSections.map((section) => {
+            const sectionActive = section.items.some((i) => isActive(i.href));
+            return (
+              <div key={section.title}>
+                <p
+                  className="fyn-label text-[10px] px-2 mb-1 transition-colors"
+                  style={{ color: sectionActive ? "#8B6914" : "rgba(255,255,255,0.20)" }}
+                >
+                  {section.title}
+                </p>
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.label + item.href}
+                      to={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className="flex items-center gap-2.5 px-2 py-1.5 rounded transition-all duration-150 border-0"
+                      style={{
+                        fontSize: 13,
+                        fontWeight: active ? 600 : 500,
+                        background: active ? "rgba(196,30,30,0.18)" : "transparent",
+                        borderLeft: active ? "3px solid #C41E1E" : "3px solid transparent",
+                        color: active ? "#FFFFFF" : "rgba(255,255,255,0.50)",
+                        boxShadow: active ? "inset 0 0 0 1px rgba(196,30,30,0.25)" : "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!active) {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                          e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+                          e.currentTarget.style.transform = "translateX(2px)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!active) {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "rgba(255,255,255,0.50)";
+                          e.currentTarget.style.transform = "translateX(0)";
+                        }
+                      }}
+                      aria-label={item.label}
+                    >
+                      <Icon size={16} className="flex-shrink-0" style={{ color: active ? "#FFFFFF" : undefined }} />
+                      <span
+                        className="whitespace-nowrap font-sans"
+                        style={{
+                          color: active ? "#FFFFFF" : undefined,
+                          fontWeight: active ? 600 : 300,
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                      {active && (
+                        <span
+                          aria-hidden
+                          className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ background: "#8B6914" }}
+                        />
+                      )}
+                      {!active && item.badge && (
+                        <span className="ml-auto text-white text-[9px] px-1.5 py-0.5 rounded fyn-label flex-shrink-0" style={{ background: "#C41E1E" }}>{item.badge}</span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="p-4 border-t border-white/10">
@@ -221,25 +253,49 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               <button onClick={() => setSidebarOpen(false)} className="text-white"><X size={20} /></button>
             </div>
             <nav className="py-2 px-2 space-y-3">
-              {navSections.map((section) => (
-                <div key={section.title}>
-                  <p className="text-white/20 fyn-label text-[10px] px-2 mb-1">{section.title}</p>
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.label + item.href}
-                        to={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className="flex items-center gap-2.5 px-2 py-1.5 rounded text-white/50 hover:text-white"
-                        style={{ fontSize: 13, fontWeight: 500 }}
-                      >
-                        <Icon size={16} className="flex-shrink-0" /><span className="whitespace-nowrap">{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ))}
+              {navSections.map((section) => {
+                const sectionActive = section.items.some((i) => isActive(i.href));
+                return (
+                  <div key={section.title}>
+                    <p
+                      className="fyn-label text-[10px] px-2 mb-1"
+                      style={{ color: sectionActive ? "#8B6914" : "rgba(255,255,255,0.20)" }}
+                    >
+                      {section.title}
+                    </p>
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={item.label + item.href}
+                          to={item.href}
+                          onClick={() => setSidebarOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className="flex items-center gap-2.5 px-2 py-1.5 rounded"
+                          style={{
+                            fontSize: 13,
+                            fontWeight: active ? 600 : 500,
+                            background: active ? "rgba(196,30,30,0.18)" : "transparent",
+                            borderLeft: active ? "3px solid #C41E1E" : "3px solid transparent",
+                            color: active ? "#FFFFFF" : "rgba(255,255,255,0.55)",
+                          }}
+                        >
+                          <Icon size={16} className="flex-shrink-0" />
+                          <span className="whitespace-nowrap">{item.label}</span>
+                          {active && (
+                            <span
+                              aria-hidden
+                              className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ background: "#8B6914" }}
+                            />
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </nav>
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setSidebarOpen(false)} />
