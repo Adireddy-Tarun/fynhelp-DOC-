@@ -17,6 +17,7 @@ import {
   FynTR,
   FynTD,
   FynLabel,
+  FynInput,
   FynSearchInput,
   FynSelect,
 } from "@/components/dashboard/ui";
