@@ -22,6 +22,21 @@ type TdsFiling = {
 
 const TDSTaxPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fromParam = searchParams.get("from");
+  const toParam = searchParams.get("to");
+  const isValidDate = (s: string | null) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const fromFilter = isValidDate(fromParam) ? (fromParam as string) : null;
+  const toFilter = isValidDate(toParam) ? (toParam as string) : null;
+  const hasDateFilter = !!(fromFilter || toFilter);
+  const fmtRange = (s: string) =>
+    new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  const clearDateFilter = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("from");
+    next.delete("to");
+    setSearchParams(next, { replace: true });
+  };
   const [businessId, setBusinessId] = useState<string | null>(null);
 
   useEffect(() => {
