@@ -249,8 +249,11 @@ const CompliancePage = () => {
           </div>
 
           {/* GST */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS</p>
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 relative">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2 flex items-center gap-2">
+              GST FILINGS
+              {fetchingGst && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
+            </p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
