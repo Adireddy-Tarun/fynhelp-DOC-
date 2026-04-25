@@ -20,10 +20,29 @@
     --fyn-ink-95: 24 53% 7% / 0.95;
     --fyn-ink-80: 24 53% 7% / 0.80;
     --fyn-ink-60: 24 53% 7% / 0.60;
+    --fyn-ink-45: 24 53% 7% / 0.45;
     --fyn-ink-40: 24 53% 7% / 0.40;
     --fyn-ink-20: 24 53% 7% / 0.20;
     --fyn-ink-10: 24 53% 7% / 0.10;
     --fyn-ink-05: 24 53% 7% / 0.05;
+    --fyn-ink-02: 24 53% 7% / 0.02;
+
+    /* Type scale (px / line-height) */
+    --fyn-type-display: 48px;
+    --fyn-type-h1: 32px;
+    --fyn-type-h2: 24px;
+    --fyn-type-h3: 18px;
+    --fyn-type-body: 14px;
+    --fyn-type-small: 13px;
+    --fyn-type-tiny: 12px;
+
+    /* Spacing scale */
+    --fyn-space-xs: 4px;
+    --fyn-space-sm: 8px;
+    --fyn-space-md: 16px;
+    --fyn-space-lg: 24px;
+    --fyn-space-xl: 32px;
+    --fyn-space-2xl: 48px;
 
     /* Red scale */
     --fyn-red-dark: 0 73% 36%;
