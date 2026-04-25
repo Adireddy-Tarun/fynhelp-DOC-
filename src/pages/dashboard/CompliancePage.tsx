@@ -463,7 +463,7 @@ const CompliancePage = () => {
                         const expanded = expandedRow === rowKey;
                         const exp = explainFiling(f);
                         return (
-                          <>
+                          <Fragment key={rowKey}>
                             <tr
                               key={rowKey}
                               className="border-t border-fyn-ink-10 cursor-pointer hover:bg-white/40"
