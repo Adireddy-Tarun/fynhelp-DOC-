@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, CalendarIcon, ChevronDown, ChevronRight, Download } from "lucide-react";
@@ -34,6 +34,32 @@ const CompliancePage = () => {
     else window.localStorage.removeItem(BREAKDOWN_FILTER_KEY);
   }, [breakdownFilter]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const breakdownTableRef = useRef<HTMLDivElement | null>(null);
+
+  // Collapse any expanded row when the breakdown filter changes (or clears).
+  useEffect(() => {
+    setExpandedRow(null);
+  }, [breakdownFilter]);
+
+  // Collapse on outside click / Escape key while a row is expanded.
+  useEffect(() => {
+    if (!expandedRow) return;
+    const onPointer = (e: MouseEvent | TouchEvent) => {
+      const el = breakdownTableRef.current;
+      if (el && !el.contains(e.target as Node)) setExpandedRow(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpandedRow(null);
+    };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("touchstart", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("touchstart", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [expandedRow]);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
@@ -716,7 +742,7 @@ const CompliancePage = () => {
                   </button>
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div ref={breakdownTableRef} className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
