@@ -254,7 +254,7 @@ const CompliancePage = () => {
               GST FILINGS
               {fetchingGst && <RefreshCw className="h-3 w-3 animate-spin text-fyn-ink/40" />}
             </p>
-            <p className="text-fyn-ink text-[28px] font-bold font-sans">
+            <p className={cn("text-fyn-ink text-[28px] font-bold font-sans transition-opacity", fetchingGst && "opacity-40")}>
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
             <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
