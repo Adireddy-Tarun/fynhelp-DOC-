@@ -109,6 +109,22 @@ const GSTPage = () => {
   const isEmpty = !isLoading && (!gstFilings || gstFilings.length === 0);
   const isFilteredEmpty = !isLoading && !isEmpty && hasDateFilter && visibleFilings.length === 0;
 
+  // Bucket classification — must mirror the rules used in CompliancePage so a highlighted
+  // bucket here matches the same rows counted there.
+  const todayStr = new Date().toISOString().split("T")[0];
+  const classifyBucket = (f: GSTFiling): Bucket => {
+    if (!f.due_date) return "unknown";
+    const filed = f.status === "filed";
+    if (filed && f.filed_date && f.filed_date <= f.due_date) return "on-time";
+    if (filed) return "late";
+    if (f.due_date < todayStr) return "overdue";
+    return "pending";
+  };
+  const matchesBucket = (f: GSTFiling) => !bucketFilter || classifyBucket(f) === bucketFilter;
+  const bucketMatchCount = bucketFilter ? visibleFilings.filter(matchesBucket).length : visibleFilings.length;
+  const isBucketEmpty =
+    !isLoading && !isEmpty && !isFilteredEmpty && !!bucketFilter && bucketMatchCount === 0;
+
   const getStatusStyle = (filing: GSTFiling) => {
     const dueDate = new Date(filing.due_date);
     const isOverdue = dueDate < now && filing.status === "pending";
