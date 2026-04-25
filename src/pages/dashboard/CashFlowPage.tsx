@@ -32,11 +32,11 @@ const CashFlowPage = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       const { data } = await supabase
-        .from("businesses")
-        .select("id")
-        .eq("id", (await supabase.from("profiles").select("business_id").eq("user_id", user.id).maybeSingle()).data?.business_id || "")
+        .from("profiles")
+        .select("business_id")
+        .eq("user_id", user.id)
         .maybeSingle();
-      if (data) setBusinessId(data.id);
+      if (data?.business_id) setBusinessId(data.business_id);
     };
     fetchBusiness();
   }, []);
