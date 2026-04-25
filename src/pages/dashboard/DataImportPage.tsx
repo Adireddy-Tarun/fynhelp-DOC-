@@ -85,17 +85,37 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const meta = TYPE_META[type];
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
+  const acceptFile = (f: File | undefined | null) => {
     if (!f) return;
     if (!f.name.toLowerCase().endsWith(".csv")) {
       toast.error("Please upload a CSV file");
       return;
     }
     setFile(f);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    acceptFile(e.target.files?.[0]);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!uploading) setIsDragging(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (uploading) return;
+    const f = e.dataTransfer.files?.[0];
+    acceptFile(f);
   };
 
   const today = () => new Date().toISOString().slice(0, 10);
