@@ -218,14 +218,26 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
   return (
     <Card className="p-6 flex flex-col h-full">
-      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[260px]">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`flex-1 flex flex-col items-center justify-center text-center min-h-[260px] rounded-lg transition-colors border-2 border-dashed ${
+          isDragging
+            ? "border-fyn-red bg-fyn-red/5"
+            : "border-transparent"
+        }`}
+      >
         {!file && !uploading && (
           <>
             <div className="w-12 h-12 rounded-full bg-fyn-beige flex items-center justify-center mb-3 text-fyn-ink">
               {meta.icon}
             </div>
             <h3 className="font-serif text-lg text-fyn-ink mb-1">{meta.title}</h3>
-            <p className="text-sm text-fyn-ink/60 mb-4">{meta.description}</p>
+            <p className="text-sm text-fyn-ink/60 mb-1">{meta.description}</p>
+            <p className="text-xs text-fyn-ink/50 mb-4">
+              {isDragging ? "Drop your CSV here" : "Drag & drop a CSV, or"}
+            </p>
             <input
               ref={inputRef}
               type="file"
