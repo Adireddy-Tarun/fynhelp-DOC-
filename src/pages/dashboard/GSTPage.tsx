@@ -73,12 +73,22 @@ const GSTPage = () => {
   });
 
   const now = new Date();
-  const upcomingFilings = gstFilings?.filter((f) => new Date(f.due_date) >= now && f.status === "pending") || [];
-  const overdueFilings = gstFilings?.filter((f) => new Date(f.due_date) < now && f.status === "pending") || [];
-  const totalTaxPayable = gstFilings?.reduce((sum, f) => sum + Number(f.tax_payable || 0), 0) || 0;
-  const totalInputCredit = gstFilings?.reduce((sum, f) => sum + Number(f.input_tax_credit || 0), 0) || 0;
+  const inRange = (d: string | null | undefined) => {
+    if (!d) return false;
+    if (fromFilter && d < fromFilter) return false;
+    if (toFilter && d > toFilter) return false;
+    return true;
+  };
+  const visibleFilings = hasDateFilter
+    ? (gstFilings || []).filter((f) => inRange(f.due_date))
+    : gstFilings || [];
+  const upcomingFilings = visibleFilings.filter((f) => new Date(f.due_date) >= now && f.status === "pending");
+  const overdueFilings = visibleFilings.filter((f) => new Date(f.due_date) < now && f.status === "pending");
+  const totalTaxPayable = visibleFilings.reduce((sum, f) => sum + Number(f.tax_payable || 0), 0);
+  const totalInputCredit = visibleFilings.reduce((sum, f) => sum + Number(f.input_tax_credit || 0), 0);
 
   const isEmpty = !isLoading && (!gstFilings || gstFilings.length === 0);
+  const isFilteredEmpty = !isLoading && !isEmpty && hasDateFilter && visibleFilings.length === 0;
 
   const getStatusStyle = (filing: GSTFiling) => {
     const dueDate = new Date(filing.due_date);
