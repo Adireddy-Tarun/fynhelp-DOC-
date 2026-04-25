@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -8,8 +9,16 @@ type FilingRow = { status: string; due_date: string };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId] });
+    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId] });
+    setIsRefreshing(false);
+  };
   useEffect(() => {
     const fetchBusiness = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -76,6 +85,16 @@ const CompliancePage = () => {
 
   return (
     <DashboardLayout>
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleRefresh}
+          disabled={isRefreshing || !businessId}
+          className="inline-flex items-center gap-2 bg-fyn-ink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          {isRefreshing ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
       {isLoading && (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
