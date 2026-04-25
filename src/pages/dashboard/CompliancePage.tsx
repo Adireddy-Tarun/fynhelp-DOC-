@@ -435,6 +435,7 @@ const CompliancePage = () => {
             )}
           </div>
         </div>
+        </div>
       )}
 
       {!isLoading && businessId && gstTotal === 0 && tdsTotal === 0 && (
