@@ -197,18 +197,76 @@ const TDSTaxPage = () => {
 
       {/* EMPTY STATE */}
       {isEmpty && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
-          <h3 className="text-fyn-ink text-xl font-serif mb-2">No TDS Data</h3>
-          <p className="text-fyn-ink/60 text-sm mb-6">
-            TDS filings will appear here once you connect your accounting system
-          </p>
-          <button
-            onClick={() => navigate("/dashboard/settings/integrations")}
-            className="bg-[#C41E1E] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Connect Accounting →
-          </button>
-        </div>
+        <>
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
+            <h3 className="text-fyn-ink text-xl font-serif mb-2">No TDS Data</h3>
+            <p className="text-fyn-ink/60 text-sm mb-6">
+              TDS filings will appear here once you connect your accounting system
+            </p>
+            <button
+              onClick={() => navigate("/dashboard/settings/integrations")}
+              className="bg-[#C41E1E] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Connect Accounting →
+            </button>
+          </div>
+
+          {/* YOU'LL NEED — pre-connect checklist */}
+          <div className="mt-4 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
+            <p className="text-fyn-ink/40 text-[11px] fyn-label mb-3">YOU'LL NEED</p>
+            <p className="text-fyn-ink/70 text-xs mb-4">
+              Keep these handy before you start the TDS / TRACES connection — it takes about 2 minutes.
+            </p>
+            <ul className="space-y-2.5 text-sm">
+              {[
+                {
+                  title: "TAN (Tax Deduction Account Number)",
+                  desc: "10-character alphanumeric ID issued by the Income Tax Department.",
+                },
+                {
+                  title: "TRACES login credentials",
+                  desc: "Your registered user ID and password for tracesportal.gov.in.",
+                },
+                {
+                  title: "Latest challan details (CIN)",
+                  desc: "BSR code, challan serial number, and deposit date for one recent payment — used to verify the link.",
+                },
+                {
+                  title: "Authorised signatory PAN",
+                  desc: "PAN of the deductor / authorised signatory registered on TRACES.",
+                },
+                {
+                  title: "Registered mobile / email for OTP",
+                  desc: "TRACES sends a one-time OTP to the contact on file to authorise the connection.",
+                },
+              ].map((item) => (
+                <li key={item.title} className="flex items-start gap-3">
+                  <span
+                    className="mt-0.5 flex-shrink-0 w-4 h-4 rounded border border-fyn-ink/20 flex items-center justify-center text-[10px] text-fyn-ink/40"
+                    aria-hidden="true"
+                  >
+                    ☐
+                  </span>
+                  <div>
+                    <p className="text-fyn-ink font-medium font-sans">{item.title}</p>
+                    <p className="text-fyn-ink/60 text-xs">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="text-fyn-ink/50 text-[11px] mt-4">
+              Don't have TRACES access yet?{" "}
+              <a
+                href="https://contents.tdscpc.gov.in/en/deductor-registration.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-fyn-red hover:underline"
+              >
+                Register as a deductor →
+              </a>
+            </p>
+          </div>
+        </>
       )}
 
       {/* FILTERED EMPTY STATE — has data overall, but date range returned nothing */}
