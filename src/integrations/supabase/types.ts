@@ -643,6 +643,63 @@ export type Database = {
         }
         Relationships: []
       }
+      employees: {
+        Row: {
+          created_at: string
+          ctc_annual: number | null
+          date_of_exit: string | null
+          date_of_joining: string | null
+          department: string | null
+          designation: string | null
+          email: string | null
+          esic_number: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          org_id: string
+          pf_number: string | null
+          salary_monthly: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ctc_annual?: number | null
+          date_of_exit?: string | null
+          date_of_joining?: string | null
+          department?: string | null
+          designation?: string | null
+          email?: string | null
+          esic_number?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          org_id: string
+          pf_number?: string | null
+          salary_monthly?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ctc_annual?: number | null
+          date_of_exit?: string | null
+          date_of_joining?: string | null
+          department?: string | null
+          designation?: string | null
+          email?: string | null
+          esic_number?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          org_id?: string
+          pf_number?: string | null
+          salary_monthly?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gst_itc_lines: {
         Row: {
           business_id: string
