@@ -30,9 +30,14 @@ const CompliancePage = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] });
-    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] });
-    setIsRefreshing(false);
+    try {
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] }),
+        queryClient.refetchQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] }),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
   useEffect(() => {
     const fetchBusiness = async () => {
