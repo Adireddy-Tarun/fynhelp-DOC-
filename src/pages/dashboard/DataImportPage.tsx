@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,23 +58,44 @@ const pick = (row: Record<string, string>, keys: string[]) => {
 const TYPE_META: Record<ImportType, { title: string; description: string; icon: JSX.Element; sample: string }> = {
   bank: {
     title: "Bank Statements",
-    description: "CSV with columns: Date, Description, Debit, Credit (or Amount)",
+    description: "CSV/XLSX with columns: Date, Description, Debit, Credit (or Amount)",
     icon: <Building className="w-6 h-6" />,
     sample: "Date, Description, Debit, Credit",
   },
   invoice: {
     title: "Invoices (Receivables)",
-    description: "CSV with: Customer, Invoice Number, Date, Due Date, Amount",
+    description: "CSV/XLSX with: Customer, Invoice Number, Date, Due Date, Amount",
     icon: <Receipt className="w-6 h-6" />,
     sample: "Customer, Invoice Number, Date, Due Date, Amount",
   },
   expense: {
     title: "Expenses (Payables)",
-    description: "CSV with: Vendor, Invoice Number, Date, Due Date, Amount",
+    description: "CSV/XLSX with: Vendor, Invoice Number, Date, Due Date, Amount",
     icon: <Wallet className="w-6 h-6" />,
     sample: "Vendor, Invoice Number, Date, Due Date, Amount",
   },
 };
+
+async function parseFile(file: File): Promise<Record<string, string>[]> {
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".csv")) {
+    const text = await file.text();
+    return parseCSV(text).rows;
+  }
+  if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    if (!ws) return [];
+    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "", raw: false });
+    return rows.map(r => {
+      const out: Record<string, string> = {};
+      for (const k of Object.keys(r)) out[k.trim()] = String(r[k] ?? "").trim();
+      return out;
+    });
+  }
+  throw new Error("Unsupported file type. Upload CSV or XLSX.");
+}
 
 interface UploadZoneProps {
   type: ImportType;
@@ -91,8 +113,9 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
   const acceptFile = (f: File | undefined | null) => {
     if (!f) return;
-    if (!f.name.toLowerCase().endsWith(".csv")) {
-      toast.error("Please upload a CSV file");
+    const n = f.name.toLowerCase();
+    if (!n.endsWith(".csv") && !n.endsWith(".xlsx") && !n.endsWith(".xls")) {
+      toast.error("Please upload a CSV or XLSX file");
       return;
     }
     setFile(f);
@@ -141,9 +164,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     const interval = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 200);
 
     try {
-      const text = await file.text();
-      const { rows } = parseCSV(text);
-      if (rows.length === 0) throw new Error("CSV has no data rows");
+      const rows = await parseFile(file);
+      if (rows.length === 0) throw new Error("File has no data rows");
 
       if (type === "bank") {
         const records = rows.map(r => {
@@ -236,19 +258,19 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             <h3 className="font-serif text-lg text-fyn-ink mb-1">{meta.title}</h3>
             <p className="text-sm text-fyn-ink/60 mb-1">{meta.description}</p>
             <p className="text-xs text-fyn-ink/50 mb-4">
-              {isDragging ? "Drop your CSV here" : "Drag & drop a CSV, or"}
+              {isDragging ? "Drop your file here" : "Drag & drop a CSV or XLSX, or"}
             </p>
             <input
               ref={inputRef}
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls"
               onChange={handleFileSelect}
               className="hidden"
               id={`csv-${type}`}
             />
             <label htmlFor={`csv-${type}`}>
               <Button asChild variant="outline" className="cursor-pointer">
-                <span><Upload className="w-4 h-4 mr-2" /> Select CSV File</span>
+                <span><Upload className="w-4 h-4 mr-2" /> Select File</span>
               </Button>
             </label>
             <p className="text-xs text-fyn-ink/40 mt-3">Expected: {meta.sample}</p>
@@ -282,7 +304,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         {uploading && (
           <div className="w-full space-y-3">
             <Progress value={progress} className="h-2" />
-            <p className="text-sm text-fyn-ink/70">Processing CSV… {progress}%</p>
+            <p className="text-sm text-fyn-ink/70">Processing file… {progress}%</p>
           </div>
         )}
       </div>
@@ -362,7 +384,7 @@ const DataImportPage = () => {
       <div className="mb-6">
         <h1 className="font-serif text-3xl text-fyn-ink mb-2">Import Your Data</h1>
         <p className="text-fyn-ink/60">
-          Upload bank statements, invoices, and expenses in CSV format. We'll automatically categorize and sync to your dashboard.
+          Upload bank statements, invoices, and expenses as CSV or XLSX. We'll automatically categorize and sync to your dashboard.
         </p>
       </div>
 
