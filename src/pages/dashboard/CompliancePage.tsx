@@ -4,8 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
-type FilingRow = { status: string; due_date: string };
+type FilingRow = { status: string; due_date: string; filed_date?: string | null };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
@@ -41,35 +42,31 @@ const CompliancePage = () => {
 
   const { data: gstFilings, isLoading: loadingGst } = useQuery({
     queryKey: ["compliance-gst", businessId],
-    queryFn: async (): Promise<any[]> => {
+    queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("gst_filings" as never)
-        .select("status, due_date, filed_date, return_type, filing_period")
+        .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo)
-        .order("due_date", { ascending: false });
-      return ((data as unknown) as any[]) || [];
+        .gte("due_date", threeMonthsAgo);
+      return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
   });
 
   const { data: tdsFilings, isLoading: loadingTds } = useQuery({
     queryKey: ["compliance-tds", businessId],
-    queryFn: async (): Promise<any[]> => {
+    queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
-        .select("status, due_date, filed_date, form_type, quarter")
+        .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo)
-        .order("due_date", { ascending: false });
-      return ((data as unknown) as any[]) || [];
+        .gte("due_date", threeMonthsAgo);
+      return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
   });
-
-  const [openTable, setOpenTable] = useState<"gst" | "tds" | null>(null);
 
   const isLoading = loadingGst || loadingTds;
   const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
@@ -86,6 +83,32 @@ const CompliancePage = () => {
 
   const scoreColor =
     complianceScore > 80 ? "#1A6B3C" : complianceScore > 50 ? "#8B5A00" : "#C41E1E";
+
+  // Build 3-month on-time % trend per source
+  const trendData = (() => {
+    const months: { key: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+        label: d.toLocaleDateString("en-IN", { month: "short" }),
+      });
+    }
+    const rate = (rows: FilingRow[], monthKey: string) => {
+      const inMonth = rows.filter((r) => r.due_date?.startsWith(monthKey));
+      if (inMonth.length === 0) return null;
+      const onTime = inMonth.filter(
+        (r) => r.status === "filed" && r.filed_date && r.filed_date <= r.due_date
+      ).length;
+      return Math.round((onTime / inMonth.length) * 100);
+    };
+    return months.map((m) => ({
+      month: m.label,
+      GST: rate(gstFilings || [], m.key),
+      TDS: rate(tdsFilings || [], m.key),
+    }));
+  })();
 
   return (
     <DashboardLayout>
@@ -107,62 +130,18 @@ const CompliancePage = () => {
         </div>
       )}
 
-      {!isLoading && (gstTotal === 0 || tdsTotal === 0) && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mb-4">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="text-fyn-ink text-lg font-serif mb-1">
-                {isEmpty ? "No Compliance Data Yet" : "Some Sources Missing"}
-              </h3>
-              <p className="text-fyn-ink/60 text-sm">
-                Your health score uses GST and TDS filings from the last 3 months. Connect the missing sources below.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* GST source */}
-            <div className="border border-fyn-ink-10 rounded-lg p-4 flex items-center justify-between bg-white/40">
-              <div>
-                <p className="text-fyn-ink font-medium text-sm">GST Portal</p>
-                <p className={`text-xs mt-1 ${gstTotal === 0 ? "text-[#C41E1E]" : "text-[#1A6B3C]"}`}>
-                  {gstTotal === 0 ? "Not connected — 0 filings" : `Connected · ${gstTotal} filings`}
-                </p>
-              </div>
-              {gstTotal === 0 && (
-                <button
-                  onClick={() => navigate("/onboarding?step=gst")}
-                  className="bg-fyn-ink text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors whitespace-nowrap"
-                >
-                  Connect GST →
-                </button>
-              )}
-            </div>
-            {/* TDS source */}
-            <div className="border border-fyn-ink-10 rounded-lg p-4 flex items-center justify-between bg-white/40">
-              <div>
-                <p className="text-fyn-ink font-medium text-sm">TDS / TRACES</p>
-                <p className={`text-xs mt-1 ${tdsTotal === 0 ? "text-[#C41E1E]" : "text-[#1A6B3C]"}`}>
-                  {tdsTotal === 0 ? "Not connected — 0 filings" : `Connected · ${tdsTotal} filings`}
-                </p>
-              </div>
-              {tdsTotal === 0 && (
-                <button
-                  onClick={() => navigate("/onboarding?step=tds")}
-                  className="bg-fyn-ink text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors whitespace-nowrap"
-                >
-                  Connect TDS →
-                </button>
-              )}
-            </div>
-          </div>
-          {isEmpty && (
-            <button
-              onClick={() => navigate("/dashboard/settings/integrations")}
-              className="mt-4 text-fyn-ink/70 text-xs underline hover:text-fyn-ink"
-            >
-              Or manage all integrations →
-            </button>
-          )}
+      {isEmpty && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
+          <h3 className="text-fyn-ink text-xl font-serif mb-2">No Compliance Data</h3>
+          <p className="text-fyn-ink/60 text-sm mb-6">
+            Connect your accounting system to track compliance health
+          </p>
+          <button
+            onClick={() => navigate("/dashboard/settings/integrations")}
+            className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
+          >
+            Connect Accounting →
+          </button>
         </div>
       )}
 
@@ -180,88 +159,78 @@ const CompliancePage = () => {
           </div>
 
           {/* GST */}
-          <button
-            type="button"
-            onClick={() => setOpenTable(openTable === "gst" ? null : "gst")}
-            className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 text-left hover:border-fyn-ink/30 transition-colors"
-          >
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS {openTable === "gst" ? "▾" : "▸"}</p>
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS</p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
             </p>
-            <p className="text-fyn-ink/60 text-xs mt-2">filed on time · click to view</p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
                 style={{ width: gstTotal > 0 ? `${(gstFiled / gstTotal) * 100}%` : "0%" }}
               />
             </div>
-          </button>
+          </div>
 
           {/* TDS */}
-          <button
-            type="button"
-            onClick={() => setOpenTable(openTable === "tds" ? null : "tds")}
-            className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 text-left hover:border-fyn-ink/30 transition-colors"
-          >
-            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS {openTable === "tds" ? "▾" : "▸"}</p>
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS</p>
             <p className="text-fyn-ink text-[28px] font-bold font-sans">
               {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
             </p>
-            <p className="text-fyn-ink/60 text-xs mt-2">filed on time · click to view</p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
             <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
               <div
                 className="bg-[#1A6B3C] h-2 rounded-full transition-all"
                 style={{ width: tdsTotal > 0 ? `${(tdsFiled / tdsTotal) * 100}%` : "0%" }}
               />
             </div>
-          </button>
+          </div>
         </div>
       )}
 
-      {!isLoading && openTable && (
-        <div className="mt-4 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-fyn-ink-10 flex items-center justify-between">
-            <h3 className="text-fyn-ink font-serif text-lg">
-              {openTable === "gst" ? "GST Filings" : "TDS Filings"} (last 3 months)
-            </h3>
-            <button onClick={() => setOpenTable(null)} className="text-fyn-ink/60 text-sm hover:text-fyn-ink">Close ✕</button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-fyn-ink/50 text-[11px] uppercase tracking-wide">
-                  <th className="py-3 px-6">{openTable === "gst" ? "Return / Period" : "Form / Quarter"}</th>
-                  <th className="py-3 px-6">Due Date</th>
-                  <th className="py-3 px-6">Filed Date</th>
-                  <th className="py-3 px-6">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(openTable === "gst" ? gstFilings : tdsFilings)?.map((f: any, i: number) => {
-                  const statusColor =
-                    f.status === "filed" ? "bg-[#1A6B3C]/10 text-[#1A6B3C]" :
-                    f.status === "overdue" || f.status === "late" ? "bg-[#C41E1E]/10 text-[#C41E1E]" :
-                    "bg-[#8B5A00]/10 text-[#8B5A00]";
-                  return (
-                    <tr key={i} className="border-t border-fyn-ink-10">
-                      <td className="py-3 px-6 font-medium">
-                        {openTable === "gst" ? `${f.return_type} · ${f.filing_period}` : `${f.form_type} · ${f.quarter}`}
-                      </td>
-                      <td className="py-3 px-6">{f.due_date}</td>
-                      <td className="py-3 px-6">{f.filed_date || "—"}</td>
-                      <td className="py-3 px-6">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${statusColor}`}>{f.status}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {(openTable === "gst" ? gstFilings : tdsFilings)?.length === 0 && (
-                  <tr><td colSpan={4} className="py-6 px-6 text-center text-fyn-ink/50">No filings in this window.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      {!isLoading && totalFilings > 0 && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
+          <p className="text-fyn-ink/40 text-[12px] fyn-label mb-4">
+            ON-TIME FILING RATE — LAST 3 MONTHS
+          </p>
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
+              <XAxis dataKey="month" stroke="#1A1008" fontSize={12} />
+              <YAxis
+                domain={[0, 100]}
+                tickFormatter={(v) => `${v}%`}
+                stroke="#1A1008"
+                fontSize={12}
+              />
+              <Tooltip
+                formatter={(v: number | null) => (v === null ? "No filings" : `${v}%`)}
+                contentStyle={{ background: "#F4EDDA", border: "1px solid rgba(26,16,8,0.1)" }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="GST"
+                stroke="#1A6B3C"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="TDS"
+                stroke="#8B6914"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                connectNulls
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          <p className="text-fyn-ink/50 text-xs mt-3">
+            On-time = filed on or before due date. Months with no filings appear as gaps.
+          </p>
         </div>
       )}
     </DashboardLayout>
