@@ -18,6 +18,7 @@ const CompliancePage = () => {
   const queryClient = useQueryClient();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
