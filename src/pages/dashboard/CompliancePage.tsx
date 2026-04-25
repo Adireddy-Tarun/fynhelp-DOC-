@@ -79,6 +79,25 @@ const CompliancePage = () => {
   const tdsFiled = tdsFilings?.filter((f) => f.status === "filed").length || 0;
   const tdsTotal = tdsFilings?.length || 0;
 
+  // Urgency: count overdue (past due, not filed) and due soon (≤7 days, not filed)
+  const today = new Date().toISOString().split("T")[0];
+  const sevenDaysOut = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().split("T")[0];
+  })();
+  const countUrgency = (rows: FilingRow[] = []) => {
+    const overdue = rows.filter((r) => r.status !== "filed" && r.due_date < today).length;
+    const dueSoon = rows.filter(
+      (r) => r.status !== "filed" && r.due_date >= today && r.due_date <= sevenDaysOut
+    ).length;
+    return { overdue, dueSoon };
+  };
+  const gstUrgency = countUrgency(gstFilings || []);
+  const tdsUrgency = countUrgency(tdsFilings || []);
+  const totalOverdue = gstUrgency.overdue + tdsUrgency.overdue;
+  const totalDueSoon = gstUrgency.dueSoon + tdsUrgency.dueSoon;
+
   const isEmpty = !isLoading && totalFilings === 0;
 
   const scoreColor =
