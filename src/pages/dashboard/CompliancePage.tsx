@@ -82,6 +82,8 @@ const CompliancePage = () => {
       setIsRefreshing(false);
     }
   };
+  const [gstConnected, setGstConnected] = useState(false);
+
   useEffect(() => {
     const fetchBusiness = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -91,7 +93,15 @@ const CompliancePage = () => {
         .select("business_id")
         .eq("user_id", user.id)
         .maybeSingle();
-      if (data?.business_id) setBusinessId(data.business_id);
+      if (data?.business_id) {
+        setBusinessId(data.business_id);
+        const { data: biz } = await supabase
+          .from("businesses")
+          .select("gstin")
+          .eq("id", data.business_id)
+          .maybeSingle();
+        if (biz?.gstin && biz.gstin.trim().length > 0) setGstConnected(true);
+      }
     };
     fetchBusiness();
   }, []);
