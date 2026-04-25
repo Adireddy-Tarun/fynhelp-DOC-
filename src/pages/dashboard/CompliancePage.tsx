@@ -20,6 +20,7 @@ const CompliancePage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [breakdownFilter, setBreakdownFilter] = useState<"on-time" | "late" | "overdue" | "pending" | null>(null);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState<Date>(() => {
     const d = new Date();
