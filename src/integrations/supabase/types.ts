@@ -940,6 +940,54 @@ export type Database = {
           },
         ]
       }
+      payroll_snapshots: {
+        Row: {
+          business_id: string
+          created_at: string
+          employee_count: number | null
+          esic_total: number | null
+          id: string
+          month: string
+          pf_total: number | null
+          processed_date: string | null
+          tds_total: number | null
+          total_deductions: number | null
+          total_gross: number | null
+          total_net: number | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          employee_count?: number | null
+          esic_total?: number | null
+          id?: string
+          month: string
+          pf_total?: number | null
+          processed_date?: string | null
+          tds_total?: number | null
+          total_deductions?: number | null
+          total_gross?: number | null
+          total_net?: number | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          employee_count?: number | null
+          esic_total?: number | null
+          id?: string
+          month?: string
+          pf_total?: number | null
+          processed_date?: string | null
+          tds_total?: number | null
+          total_deductions?: number | null
+          total_gross?: number | null
+          total_net?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
