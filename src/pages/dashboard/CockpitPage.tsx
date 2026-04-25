@@ -305,9 +305,12 @@ const CockpitPage = () => {
             </p>
           </div>
         </div>
-        <FynButton asChild-disabled className="bg-fyn-red text-white hover:bg-fyn-red-dark px-4 py-2">
-          <Link to="/dashboard/nidhi" className="text-white">Ask AI CFO Nidhi →</Link>
-        </FynButton>
+        <Link
+          to="/dashboard/nidhi"
+          className="inline-flex items-center gap-2 px-4 py-2 text-fyn-body font-medium rounded-md bg-fyn-red text-white hover:bg-fyn-red-dark transition-colors"
+        >
+          Ask AI CFO Nidhi →
+        </Link>
       </div>
 
       {bankError && (
