@@ -128,9 +128,16 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isCockpit = location.pathname === "/dashboard/cockpit";
 
+  // Normalize current path (drop trailing slash, lowercase) for robust active matching
+  const currentPath = location.pathname.replace(/\/+$/, "").toLowerCase() || "/";
+  const isActive = (href: string) => {
+    const normalized = href.replace(/\/+$/, "").toLowerCase();
+    return currentPath === normalized;
+  };
+
   const pageTitle = navSections
     .flatMap((s) => s.items)
-    .find((i) => i.href === location.pathname)?.label || "Dashboard";
+    .find((i) => isActive(i.href))?.label || "Dashboard";
 
   return (
     <div className="min-h-screen flex" style={{ background: "#EDE4CB" }}>
