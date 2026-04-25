@@ -442,6 +442,7 @@ const CompliancePage = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-fyn-ink/50 text-[11px] uppercase">
+                      <th className="py-2 w-6"></th>
                       <th className="py-2">Source</th>
                       <th className="py-2">Due Date</th>
                       <th className="py-2">Filed Date</th>
@@ -457,21 +458,62 @@ const CompliancePage = () => {
                         isPending(f)
                       )
                       .sort((a, b) => (a.due_date < b.due_date ? 1 : -1))
-                      .map((f, i) => (
-                        <tr key={i} className="border-t border-fyn-ink-10">
-                          <td className="py-2 font-medium">{f._src}</td>
-                          <td className="py-2">{f.due_date}</td>
-                          <td className="py-2">{f.filed_date || "—"}</td>
-                          <td className="py-2">{f.status}</td>
-                        </tr>
-                      ))}
+                      .map((f, i) => {
+                        const rowKey = `${f._src}-${i}-${f.due_date}`;
+                        const expanded = expandedRow === rowKey;
+                        const exp = explainFiling(f);
+                        return (
+                          <>
+                            <tr
+                              key={rowKey}
+                              className="border-t border-fyn-ink-10 cursor-pointer hover:bg-white/40"
+                              onClick={() => setExpandedRow(expanded ? null : rowKey)}
+                            >
+                              <td className="py-2 text-fyn-ink/50">
+                                {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                              </td>
+                              <td className="py-2 font-medium">{f._src}</td>
+                              <td className="py-2">{f.due_date}</td>
+                              <td className="py-2">{f.filed_date || "—"}</td>
+                              <td className="py-2">{f.status}</td>
+                            </tr>
+                            {expanded && (
+                              <tr key={`${rowKey}-exp`} className="bg-white/30">
+                                <td></td>
+                                <td colSpan={4} className="py-3 pr-3">
+                                  <div className="text-xs space-y-1.5">
+                                    <p>
+                                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium mr-2" style={{ background: `${exp.color}1A`, color: exp.color }}>
+                                        {exp.label}
+                                      </span>
+                                      <span className="text-fyn-ink/70">{exp.detail}</span>
+                                    </p>
+                                    <p className="font-mono text-fyn-ink/60">
+                                      Rule: <span className="text-fyn-ink">{exp.rule}</span>
+                                    </p>
+                                    <p className="font-mono text-fyn-ink/60">
+                                      due_date = <span className="text-fyn-ink">{f.due_date}</span>
+                                      {"  ·  "}
+                                      filed_date = <span className="text-fyn-ink">{f.filed_date || "null"}</span>
+                                      {"  ·  "}
+                                      status = <span className="text-fyn-ink">{f.status}</span>
+                                      {"  ·  "}
+                                      today = <span className="text-fyn-ink">{todayStr}</span>
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </>
+                        );
+                      })}
                     {allFilings.filter((f) =>
                       breakdownFilter === "on-time" ? isOnTime(f) :
                       breakdownFilter === "late" ? isLate(f) :
                       breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
                       isPending(f)
                     ).length === 0 && (
-                      <tr><td colSpan={4} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
+                      <tr><td colSpan={5} className="py-4 text-center text-fyn-ink/50">None.</td></tr>
                     )}
                   </tbody>
                 </table>
