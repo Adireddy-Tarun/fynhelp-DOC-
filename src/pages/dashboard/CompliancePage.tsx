@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 type FilingRow = { status: string; due_date: string; filed_date?: string | null };
 
@@ -14,10 +19,19 @@ const CompliancePage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const [fromDate, setFromDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    return d;
+  });
+  const [toDate, setToDate] = useState<Date>(() => new Date());
+  const fromStr = format(fromDate, "yyyy-MM-dd");
+  const toStr = format(toDate, "yyyy-MM-dd");
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId] });
-    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId] });
+    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId, fromStr, toStr] });
+    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId, fromStr, toStr] });
     setIsRefreshing(false);
   };
   useEffect(() => {
@@ -34,35 +48,31 @@ const CompliancePage = () => {
     fetchBusiness();
   }, []);
 
-  const threeMonthsAgo = (() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 3);
-    return d.toISOString().split("T")[0];
-  })();
-
   const { data: gstFilings, isLoading: loadingGst } = useQuery({
-    queryKey: ["compliance-gst", businessId],
+    queryKey: ["compliance-gst", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("gst_filings" as never)
         .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
+        .gte("due_date", fromStr)
+        .lte("due_date", toStr);
       return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
   });
 
   const { data: tdsFilings, isLoading: loadingTds } = useQuery({
-    queryKey: ["compliance-tds", businessId],
+    queryKey: ["compliance-tds", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
       const { data } = await supabase
         .from("tds_filings" as never)
         .select("status, due_date, filed_date")
         .eq("business_id", businessId)
-        .gte("due_date", threeMonthsAgo);
+        .gte("due_date", fromStr)
+        .lte("due_date", toStr);
       return ((data as unknown) as FilingRow[]) || [];
     },
     enabled: !!businessId,
@@ -131,7 +141,51 @@ const CompliancePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-end mb-4">
+      <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
+        <span className="text-fyn-ink/60 text-xs mr-1">Period:</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn("h-9 justify-start text-left font-normal text-sm", !fromDate && "text-muted-foreground")}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {fromDate ? format(fromDate, "dd MMM yyyy") : "From"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={fromDate}
+              onSelect={(d) => d && setFromDate(d)}
+              disabled={(d) => d > toDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+        <span className="text-fyn-ink/40 text-xs">→</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn("h-9 justify-start text-left font-normal text-sm", !toDate && "text-muted-foreground")}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {toDate ? format(toDate, "dd MMM yyyy") : "To"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={toDate}
+              onSelect={(d) => d && setToDate(d)}
+              disabled={(d) => d < fromDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
         <button
           onClick={handleRefresh}
           disabled={isRefreshing || !businessId}
