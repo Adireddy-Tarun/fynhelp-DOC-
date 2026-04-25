@@ -208,6 +208,8 @@ const CompliancePage = () => {
     }));
   })();
 
+  const controlsLocked = isRefreshing || isFetching;
+
   return (
     <DashboardLayout>
       <div className="flex flex-wrap items-center justify-end gap-2 mb-4">
@@ -216,6 +218,7 @@ const CompliancePage = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
+              disabled={controlsLocked}
               className={cn("h-9 justify-start text-left font-normal text-sm", !fromDate && "text-muted-foreground")}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -238,6 +241,7 @@ const CompliancePage = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
+              disabled={controlsLocked}
               className={cn("h-9 justify-start text-left font-normal text-sm", !toDate && "text-muted-foreground")}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -257,11 +261,11 @@ const CompliancePage = () => {
         </Popover>
         <button
           onClick={handleRefresh}
-          disabled={isRefreshing || !businessId}
-          className="inline-flex items-center gap-2 bg-fyn-ink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors disabled:opacity-50"
+          disabled={controlsLocked || !businessId}
+          className="inline-flex items-center gap-2 bg-fyn-ink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Refreshing..." : "Refresh"}
+          <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
+          {controlsLocked ? "Refreshing..." : "Refresh"}
         </button>
       </div>
       {lastUpdated && (
@@ -294,11 +298,11 @@ const CompliancePage = () => {
             </button>
             <button
               onClick={handleRefresh}
-              disabled={isRefreshing || !businessId}
-              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50"
+              disabled={controlsLocked || !businessId}
+              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-              {isRefreshing ? "Retrying..." : "Retry"}
+              <RefreshCw className={`h-4 w-4 ${controlsLocked ? "animate-spin" : ""}`} />
+              {controlsLocked ? "Retrying..." : "Retry"}
             </button>
           </div>
         </div>
