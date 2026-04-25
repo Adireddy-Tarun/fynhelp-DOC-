@@ -305,9 +305,18 @@ const CompliancePage = () => {
       )}
 
       {!isLoading && totalFilings > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* SCORE CARD */}
-          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 lg:col-span-1">
+        <div className="relative">
+          {isFetching && (
+            <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-end p-2">
+              <span className="inline-flex items-center gap-1.5 bg-fyn-beige-card/95 border border-fyn-ink-10 text-fyn-ink/70 text-[11px] font-medium px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm">
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Updating…
+              </span>
+            </div>
+          )}
+          <div className={cn("grid grid-cols-1 lg:grid-cols-3 gap-4 transition-opacity", isFetching && "opacity-70")}>
+            {/* SCORE CARD */}
+            <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 lg:col-span-1">
             <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">COMPLIANCE HEALTH SCORE</p>
             <p className="text-[48px] font-bold font-sans leading-none" style={{ color: scoreColor }}>
               {complianceScore}%
@@ -425,6 +434,7 @@ const CompliancePage = () => {
               </>
             )}
           </div>
+        </div>
         </div>
       )}
 
