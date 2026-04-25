@@ -48,7 +48,7 @@ const CompliancePage = () => {
     fetchBusiness();
   }, []);
 
-  const { data: gstFilings, isLoading: loadingGst } = useQuery({
+  const { data: gstFilings, isLoading: loadingGst, isFetching: fetchingGst } = useQuery({
     queryKey: ["compliance-gst", businessId, fromStr, toStr],
     queryFn: async (): Promise<FilingRow[]> => {
       if (!businessId) return [];
