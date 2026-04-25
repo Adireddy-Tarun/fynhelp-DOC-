@@ -729,13 +729,21 @@ const CompliancePage = () => {
                 </p>
                 <div className="flex items-center gap-3 text-xs">
                   <button
-                    onClick={() => navigate(`/dashboard/gst?from=${fromStr}&to=${toStr}`)}
+                    onClick={() => {
+                      const qs = new URLSearchParams({ from: fromStr, to: toStr });
+                      if (breakdownFilter) qs.set("bucket", breakdownFilter);
+                      navigate(`/dashboard/gst?${qs.toString()}`);
+                    }}
                     className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
                   >
                     View full GST page →
                   </button>
                   <button
-                    onClick={() => navigate(`/dashboard/tds-tax?from=${fromStr}&to=${toStr}`)}
+                    onClick={() => {
+                      const qs = new URLSearchParams({ from: fromStr, to: toStr });
+                      if (breakdownFilter) qs.set("bucket", breakdownFilter);
+                      navigate(`/dashboard/tds-tax?${qs.toString()}`);
+                    }}
                     className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
                   >
                     View full TDS page →

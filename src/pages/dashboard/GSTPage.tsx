@@ -33,12 +33,31 @@ const GSTPage = () => {
   const fromFilter = isValidDate(fromParam) ? (fromParam as string) : null;
   const toFilter = isValidDate(toParam) ? (toParam as string) : null;
   const hasDateFilter = !!(fromFilter || toFilter);
+  type Bucket = "on-time" | "late" | "overdue" | "pending" | "unknown";
+  const validBuckets = ["on-time", "late", "overdue", "pending", "unknown"] as const;
+  const bucketParam = searchParams.get("bucket");
+  const bucketFilter: Bucket | null =
+    bucketParam && (validBuckets as readonly string[]).includes(bucketParam)
+      ? (bucketParam as Bucket)
+      : null;
+  const bucketMeta: Record<Bucket, { label: string; color: string }> = {
+    "on-time": { label: "On time", color: "#1A6B3C" },
+    late: { label: "Filed late", color: "#8B5A00" },
+    overdue: { label: "Overdue", color: "#C41E1E" },
+    pending: { label: "Pending", color: "#1A1008" },
+    unknown: { label: "Unknown", color: "#475569" },
+  };
   const fmtRange = (s: string) =>
     new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
   const clearDateFilter = () => {
     const next = new URLSearchParams(searchParams);
     next.delete("from");
     next.delete("to");
+    setSearchParams(next, { replace: true });
+  };
+  const clearBucketFilter = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("bucket");
     setSearchParams(next, { replace: true });
   };
   const [businessId, setBusinessId] = useState<string | null>(null);
@@ -90,6 +109,22 @@ const GSTPage = () => {
   const isEmpty = !isLoading && (!gstFilings || gstFilings.length === 0);
   const isFilteredEmpty = !isLoading && !isEmpty && hasDateFilter && visibleFilings.length === 0;
 
+  // Bucket classification — must mirror the rules used in CompliancePage so a highlighted
+  // bucket here matches the same rows counted there.
+  const todayStr = new Date().toISOString().split("T")[0];
+  const classifyBucket = (f: GSTFiling): Bucket => {
+    if (!f.due_date) return "unknown";
+    const filed = f.status === "filed";
+    if (filed && f.filed_date && f.filed_date <= f.due_date) return "on-time";
+    if (filed) return "late";
+    if (f.due_date < todayStr) return "overdue";
+    return "pending";
+  };
+  const matchesBucket = (f: GSTFiling) => !bucketFilter || classifyBucket(f) === bucketFilter;
+  const bucketMatchCount = bucketFilter ? visibleFilings.filter(matchesBucket).length : visibleFilings.length;
+  const isBucketEmpty =
+    !isLoading && !isEmpty && !isFilteredEmpty && !!bucketFilter && bucketMatchCount === 0;
+
   const getStatusStyle = (filing: GSTFiling) => {
     const dueDate = new Date(filing.due_date);
     const isOverdue = dueDate < now && filing.status === "pending";
@@ -112,6 +147,26 @@ const GSTPage = () => {
             className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
           >
             Clear date filter ✕
+          </button>
+        </div>
+      )}
+      {bucketFilter && (
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-2 border rounded-md text-xs"
+          style={{ background: `${bucketMeta[bucketFilter].color}0F`, borderColor: `${bucketMeta[bucketFilter].color}40` }}
+        >
+          <span className="text-fyn-ink/80 inline-flex items-center gap-2">
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ background: bucketMeta[bucketFilter].color }}
+              aria-hidden
+            />
+            Highlighting <span className="font-medium" style={{ color: bucketMeta[bucketFilter].color }}>{bucketMeta[bucketFilter].label}</span> rows ({bucketMatchCount} of {visibleFilings.length})
+          </span>
+          <button
+            onClick={clearBucketFilter}
+            className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+          >
+            Clear bucket ✕
           </button>
         </div>
       )}
@@ -218,8 +273,19 @@ const GSTPage = () => {
               <tbody>
                 {visibleFilings.map((f, i) => {
                   const badge = getStatusStyle(f);
+                  const isMatch = matchesBucket(f);
+                  const dim = !!bucketFilter && !isMatch;
+                  const baseBg = i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white";
                   return (
-                    <tr key={f.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
+                    <tr
+                      key={f.id}
+                      className={`border-b border-fyn-ink-10 last:border-0 ${dim ? "opacity-40" : ""} ${baseBg}`}
+                      style={
+                        bucketFilter && isMatch
+                          ? { boxShadow: `inset 3px 0 0 0 ${bucketMeta[bucketFilter].color}` }
+                          : undefined
+                      }
+                    >
                       <td className="py-3 text-fyn-ink font-medium">{f.return_type}</td>
                       <td className="py-3 text-fyn-ink/70">{f.filing_period}</td>
                       <td className="py-3 text-fyn-ink/70 fyn-metric">
@@ -235,6 +301,14 @@ const GSTPage = () => {
                     </tr>
                   );
                 })}
+                {isBucketEmpty && (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-fyn-ink/60 text-xs">
+                      No filings match the <span className="font-medium" style={{ color: bucketMeta[bucketFilter!].color }}>{bucketMeta[bucketFilter!].label}</span> bucket in this date range.{" "}
+                      <button onClick={clearBucketFilter} className="underline underline-offset-2 hover:text-fyn-ink">Clear bucket</button>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
