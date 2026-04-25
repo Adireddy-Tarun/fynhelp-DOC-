@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,9 +14,30 @@ const languages = [
 ];
 
 const ProfilePage = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, loading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+
+  // Route guard: wait for auth to settle, then redirect missing-profile users to setup
+  const profileMissing = !loading && !!user && !profile;
+
+  useEffect(() => {
+    if (profileMissing) {
+      toast({
+        title: "Complete your profile",
+        description: "Finish setup to access your profile settings.",
+      });
+    }
+  }, [profileMissing, toast]);
+
+  if (!loading && !user) {
+    return <Navigate to="/signin?redirect=/dashboard/settings/profile" replace />;
+  }
+  if (profileMissing) {
+    return <Navigate to="/onboarding?redirect=/dashboard/settings/profile" replace />;
+  }
+
   const [form, setForm] = useState({
     full_name: "",
     display_name: "",
