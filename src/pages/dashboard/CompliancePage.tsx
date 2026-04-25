@@ -285,12 +285,22 @@ const CompliancePage = () => {
           <p className="text-fyn-ink/60 text-sm mb-6">
             Connect your accounting system to track compliance health
           </p>
-          <button
-            onClick={() => navigate("/dashboard/settings/integrations")}
-            className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
-          >
-            Connect Accounting →
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => navigate("/dashboard/settings/integrations")}
+              className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
+            >
+              Connect Accounting →
+            </button>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing || !businessId}
+              className="inline-flex items-center gap-2 border border-fyn-ink/20 text-fyn-ink px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/5 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              {isRefreshing ? "Retrying..." : "Retry"}
+            </button>
+          </div>
         </div>
       )}
 
