@@ -428,6 +428,17 @@ const CompliancePage = () => {
         </div>
       )}
 
+      {!isLoading && totalFilings > 0 && gstTotal === 0 && tdsTotal === 0 && (
+        <div className="text-center mt-3">
+          <button
+            onClick={() => navigate("/dashboard/settings/integrations")}
+            className="text-fyn-ink/70 hover:text-fyn-ink text-xs underline underline-offset-2"
+          >
+            Or manage all integrations →
+          </button>
+        </div>
+      )}
+
       {!isLoading && totalFilings > 0 && (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
           <div className="flex items-start justify-between mb-3">
