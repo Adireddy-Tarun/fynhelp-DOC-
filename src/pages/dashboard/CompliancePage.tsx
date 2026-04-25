@@ -435,9 +435,25 @@ const CompliancePage = () => {
 
           {breakdownFilter && (
             <div className="border-t border-fyn-ink-10 pt-3">
-              <p className="text-fyn-ink/60 text-xs mb-2">
-                Filings classified as <span className="font-medium text-fyn-ink">{breakdownFilter}</span>:
-              </p>
+              <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+                <p className="text-fyn-ink/60 text-xs">
+                  Filings classified as <span className="font-medium text-fyn-ink">{breakdownFilter}</span>:
+                </p>
+                <div className="flex items-center gap-3 text-xs">
+                  <button
+                    onClick={() => navigate(`/dashboard/gst?from=${fromStr}&to=${toStr}`)}
+                    className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+                  >
+                    View full GST page →
+                  </button>
+                  <button
+                    onClick={() => navigate(`/dashboard/tds-tax?from=${fromStr}&to=${toStr}`)}
+                    className="text-fyn-ink/70 hover:text-fyn-ink underline underline-offset-2"
+                  >
+                    View full TDS page →
+                  </button>
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
