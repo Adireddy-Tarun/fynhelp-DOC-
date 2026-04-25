@@ -107,18 +107,62 @@ const CompliancePage = () => {
         </div>
       )}
 
-      {isEmpty && (
-        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
-          <h3 className="text-fyn-ink text-xl font-serif mb-2">No Compliance Data</h3>
-          <p className="text-fyn-ink/60 text-sm mb-6">
-            Connect your accounting system to track compliance health
-          </p>
-          <button
-            onClick={() => navigate("/dashboard/settings/integrations")}
-            className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
-          >
-            Connect Accounting →
-          </button>
+      {!isLoading && (gstTotal === 0 || tdsTotal === 0) && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mb-4">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-fyn-ink text-lg font-serif mb-1">
+                {isEmpty ? "No Compliance Data Yet" : "Some Sources Missing"}
+              </h3>
+              <p className="text-fyn-ink/60 text-sm">
+                Your health score uses GST and TDS filings from the last 3 months. Connect the missing sources below.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* GST source */}
+            <div className="border border-fyn-ink-10 rounded-lg p-4 flex items-center justify-between bg-white/40">
+              <div>
+                <p className="text-fyn-ink font-medium text-sm">GST Portal</p>
+                <p className={`text-xs mt-1 ${gstTotal === 0 ? "text-[#C41E1E]" : "text-[#1A6B3C]"}`}>
+                  {gstTotal === 0 ? "Not connected — 0 filings" : `Connected · ${gstTotal} filings`}
+                </p>
+              </div>
+              {gstTotal === 0 && (
+                <button
+                  onClick={() => navigate("/onboarding?step=gst")}
+                  className="bg-fyn-ink text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors whitespace-nowrap"
+                >
+                  Connect GST →
+                </button>
+              )}
+            </div>
+            {/* TDS source */}
+            <div className="border border-fyn-ink-10 rounded-lg p-4 flex items-center justify-between bg-white/40">
+              <div>
+                <p className="text-fyn-ink font-medium text-sm">TDS / TRACES</p>
+                <p className={`text-xs mt-1 ${tdsTotal === 0 ? "text-[#C41E1E]" : "text-[#1A6B3C]"}`}>
+                  {tdsTotal === 0 ? "Not connected — 0 filings" : `Connected · ${tdsTotal} filings`}
+                </p>
+              </div>
+              {tdsTotal === 0 && (
+                <button
+                  onClick={() => navigate("/onboarding?step=tds")}
+                  className="bg-fyn-ink text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-fyn-ink/90 transition-colors whitespace-nowrap"
+                >
+                  Connect TDS →
+                </button>
+              )}
+            </div>
+          </div>
+          {isEmpty && (
+            <button
+              onClick={() => navigate("/dashboard/settings/integrations")}
+              className="mt-4 text-fyn-ink/70 text-xs underline hover:text-fyn-ink"
+            >
+              Or manage all integrations →
+            </button>
+          )}
         </div>
       )}
 
