@@ -320,6 +320,29 @@ const CockpitPage = () => {
         })}
       </div>
 
+      {/* Quick shortcut: Data Import */}
+      <Link
+        to="/dashboard/data-import"
+        className="rounded-lg mb-6 p-4 flex items-center justify-between transition-all duration-250 hover:-translate-y-0.5 hover:shadow-lg"
+        style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderLeft: "4px solid #C41E1E" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: "#FDEAEA", color: "#C41E1E", fontSize: 20 }}
+          >
+            ⬆
+          </div>
+          <div>
+            <p style={{ color: "#1A1008", fontSize: 14, fontWeight: 600 }}>Import Data</p>
+            <p style={{ color: "rgba(26,16,8,0.6)", fontSize: 12 }}>
+              Upload bank statements, invoices, or expenses (CSV / XLSX)
+            </p>
+          </div>
+        </div>
+        <span style={{ color: "#C41E1E", fontSize: 13, fontWeight: 500 }}>Open Data Import →</span>
+      </Link>
+
       {/* Key metrics row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Cash in Bank */}
