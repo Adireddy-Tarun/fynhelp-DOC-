@@ -384,7 +384,17 @@ const CompliancePage = () => {
               {controlsLocked ? "Retrying..." : "Retry"}
             </button>
           </div>
+          <TroubleshootingCard navigate={navigate} missingGst missingTds />
         </div>
+      )}
+
+      {!isLoading && totalFilings > 0 && (gstTotal === 0 || tdsTotal === 0) && (
+        <TroubleshootingCard
+          navigate={navigate}
+          missingGst={gstTotal === 0}
+          missingTds={tdsTotal === 0}
+          compact
+        />
       )}
 
       {!isLoading && totalFilings > 0 && (
@@ -1022,4 +1032,70 @@ const CompliancePage = () => {
   );
 };
 
+type TroubleshootingCardProps = {
+  navigate: (path: string) => void;
+  missingGst: boolean;
+  missingTds: boolean;
+  compact?: boolean;
+};
+
+const TroubleshootingCard = ({ navigate, missingGst, missingTds, compact }: TroubleshootingCardProps) => {
+  const items: { label: string; href: string; show: boolean }[] = [
+    {
+      label: "Verify your GSTIN in Business Profile",
+      href: "/dashboard/settings/business-profile",
+      show: missingGst,
+    },
+    {
+      label: "Re-link the GST portal connection",
+      href: "/onboarding?step=gst",
+      show: missingGst,
+    },
+    {
+      label: "Add your TAN and re-link TRACES",
+      href: "/onboarding?step=tds",
+      show: missingTds,
+    },
+    {
+      label: "Check accounting integration sync status",
+      href: "/dashboard/settings/integrations",
+      show: missingGst || missingTds,
+    },
+    {
+      label: "Confirm the selected date range covers a filing period",
+      href: "#",
+      show: true,
+    },
+  ].filter((i) => i.show);
+
+  return (
+    <div
+      className={cn(
+        "rounded-lg border border-fyn-ink-10 bg-fyn-beige-dark",
+        compact ? "mt-4 p-4" : "mt-4 p-5 text-left"
+      )}
+    >
+      <p className="text-fyn-ink/40 text-[11px] fyn-label mb-2">WHY AM I MISSING FILINGS?</p>
+      <ul className="space-y-1.5">
+        {items.map((i) => (
+          <li key={i.label} className="flex items-start gap-2 text-xs text-fyn-ink/80">
+            <span className="text-fyn-ink/40 mt-0.5">•</span>
+            {i.href === "#" ? (
+              <span>{i.label}</span>
+            ) : (
+              <button
+                onClick={() => navigate(i.href)}
+                className="text-left hover:text-fyn-ink hover:underline transition-colors"
+              >
+                {i.label} →
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 export default CompliancePage;
+
