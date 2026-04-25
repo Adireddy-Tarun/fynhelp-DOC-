@@ -9,8 +9,16 @@ type FilingRow = { status: string; due_date: string };
 
 const CompliancePage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["compliance-gst", businessId] });
+    await queryClient.invalidateQueries({ queryKey: ["compliance-tds", businessId] });
+    setIsRefreshing(false);
+  };
   useEffect(() => {
     const fetchBusiness = async () => {
       const { data: { user } } = await supabase.auth.getUser();
