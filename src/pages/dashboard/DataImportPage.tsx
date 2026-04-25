@@ -118,11 +118,31 @@ interface UploadZoneProps {
   onSuccess: () => void;
 }
 
+interface DupMatch {
+  reason: "hash" | "date_overlap";
+  rows: Array<{
+    file_name: string;
+    created_at: string;
+    row_count: number;
+    min_date: string | null;
+    max_date: string | null;
+  }>;
+}
+
+interface PendingUpload {
+  rows: Record<string, string>[];
+  hash: string;
+  minDate: string | null;
+  maxDate: string | null;
+}
+
 const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [dupMatch, setDupMatch] = useState<DupMatch | null>(null);
+  const [pending, setPending] = useState<PendingUpload | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const meta = TYPE_META[type];
 
@@ -161,7 +181,6 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     if (!s) return today();
     const d = new Date(s);
     if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-    // dd/mm/yyyy fallback
     const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
     if (m) {
       const [, dd, mm, yy] = m;
@@ -171,19 +190,31 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     return today();
   };
 
-  const uploadFile = async () => {
+  const computeRange = (rows: Record<string, string>[]): { minDate: string | null; maxDate: string | null } => {
+    const keys =
+      type === "bank" ? ["Date", "Transaction Date"] :
+      type === "invoice" ? ["Date", "Invoice Date"] :
+      ["Due Date", "Date"];
+    let min: string | null = null;
+    let max: string | null = null;
+    for (const r of rows) {
+      const raw = pick(r, keys);
+      if (!raw) continue;
+      const d = toDate(raw);
+      if (!min || d < min) min = d;
+      if (!max || d > max) max = d;
+    }
+    return { minDate: min, maxDate: max };
+  };
+
+  const performInsert = async (p: PendingUpload) => {
     if (!file || !businessId) return;
     setUploading(true);
     setProgress(10);
-
-    const interval = setInterval(() => setProgress(p => Math.min(p + 8, 85)), 200);
-    let rowCount = 0;
+    const interval = setInterval(() => setProgress(prev => Math.min(prev + 8, 85)), 200);
+    const rows = p.rows;
 
     try {
-      const rows = await parseFile(file);
-      rowCount = rows.length;
-      if (rows.length === 0) throw new Error("File has no data rows");
-
       if (type === "bank") {
         const records = rows.map(r => {
           const debit = num(pick(r, ["Debit", "Withdrawal", "Out"]));
@@ -242,17 +273,20 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         upload_type: type,
         file_name: file.name,
         file_size: file.size,
-        row_count: rowCount,
+        row_count: rows.length,
         status: "success",
+        file_hash: p.hash,
+        min_date: p.minDate,
+        max_date: p.maxDate,
       });
 
       clearInterval(interval);
       setProgress(100);
       toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
       onSuccess();
-
       setTimeout(() => {
         setFile(null);
+        setPending(null);
         setUploading(false);
         setProgress(0);
         if (inputRef.current) inputRef.current.value = "";
@@ -268,9 +302,12 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
           upload_type: type,
           file_name: file.name,
           file_size: file.size,
-          row_count: rowCount,
+          row_count: rows.length,
           status: "failed",
           error_message: String(err?.message || err).slice(0, 500),
+          file_hash: p.hash,
+          min_date: p.minDate,
+          max_date: p.maxDate,
         });
       } catch {}
       toast.error(err?.message || "Upload failed");
@@ -278,6 +315,99 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
       setUploading(false);
       setProgress(0);
     }
+  };
+
+  const uploadFile = async () => {
+    if (!file || !businessId) return;
+    setUploading(true);
+    setProgress(5);
+
+    try {
+      const buf = await file.arrayBuffer();
+      const hash = await sha256Hex(buf);
+
+      // Re-parse from buffer so we don't read the file twice
+      let rows: Record<string, string>[];
+      const lname = file.name.toLowerCase();
+      if (lname.endsWith(".csv")) {
+        rows = parseCSV(new TextDecoder().decode(buf)).rows;
+      } else {
+        const wb = XLSX.read(buf, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const raw = ws ? XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "", raw: false }) : [];
+        rows = raw.map(r => {
+          const out: Record<string, string> = {};
+          for (const k of Object.keys(r)) out[k.trim()] = String(r[k] ?? "").trim();
+          return out;
+        });
+      }
+      if (rows.length === 0) throw new Error("File has no data rows");
+
+      const { minDate, maxDate } = computeRange(rows);
+      const pendingUpload: PendingUpload = { rows, hash, minDate, maxDate };
+
+      // Duplicate check 1: exact file hash for this business
+      const { data: hashHits } = await supabase
+        .from("csv_uploads")
+        .select("file_name, created_at, row_count, min_date, max_date")
+        .eq("business_id", businessId)
+        .eq("file_hash", hash)
+        .eq("status", "success")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (hashHits && hashHits.length > 0) {
+        setPending(pendingUpload);
+        setDupMatch({ reason: "hash", rows: hashHits });
+        setUploading(false);
+        setProgress(0);
+        return;
+      }
+
+      // Duplicate check 2: overlapping date range for the same upload type
+      if (minDate && maxDate) {
+        const { data: rangeHits } = await supabase
+          .from("csv_uploads")
+          .select("file_name, created_at, row_count, min_date, max_date")
+          .eq("business_id", businessId)
+          .eq("upload_type", type)
+          .eq("status", "success")
+          .not("min_date", "is", null)
+          .not("max_date", "is", null)
+          .lte("min_date", maxDate)
+          .gte("max_date", minDate)
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        if (rangeHits && rangeHits.length > 0) {
+          setPending(pendingUpload);
+          setDupMatch({ reason: "date_overlap", rows: rangeHits });
+          setUploading(false);
+          setProgress(0);
+          return;
+        }
+      }
+
+      await performInsert(pendingUpload);
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      toast.error(err?.message || "Upload failed");
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  const confirmDuplicate = async () => {
+    const p = pending;
+    setDupMatch(null);
+    setPending(null);
+    if (p) await performInsert(p);
+  };
+  const cancelDuplicate = () => {
+    setDupMatch(null);
+    setPending(null);
+    toast.info("Upload cancelled — no duplicate data inserted");
+  };
   };
 
   return (
