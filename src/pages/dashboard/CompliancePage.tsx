@@ -241,6 +241,7 @@ const CompliancePage = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
+              disabled={controlsLocked}
               className={cn("h-9 justify-start text-left font-normal text-sm", !toDate && "text-muted-foreground")}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
