@@ -782,32 +782,69 @@ const CompliancePage = () => {
                               <td className="py-2">{f.filed_date || "—"}</td>
                               <td className="py-2">{f.status}</td>
                             </tr>
-                            {expanded && (
-                              <tr key={`${rowKey}-exp`} className="bg-white/30">
-                                <td></td>
-                                <td colSpan={4} className="py-3 pr-3">
-                                  <div className="text-xs space-y-1.5">
-                                    <p>
-                                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium mr-2" style={{ background: `${exp.color}1A`, color: exp.color }}>
-                                        {exp.label}
-                                      </span>
-                                      <span className="text-fyn-ink/70">{exp.detail}</span>
-                                    </p>
-                                    <p className="font-mono text-fyn-ink/60">
-                                      Rule: <span className="text-fyn-ink">{exp.rule}</span>
-                                    </p>
-                                    <p className="font-mono text-fyn-ink/60">
-                                      due_date = <span className="text-fyn-ink">{f.due_date}</span>
-                                      {"  ·  "}
-                                      filed_date = <span className="text-fyn-ink">{f.filed_date || "null"}</span>
-                                      {"  ·  "}
-                                      status = <span className="text-fyn-ink">{f.status}</span>
-                                      {"  ·  "}
-                                      today = <span className="text-fyn-ink">{todayStr}</span>
-                                    </p>
-                                  </div>
-                                </td>
-                              </tr>
+                            {expanded && (() => {
+                              // Delta vs due date: filed_date if available, else today (for not-yet-filed rows).
+                              // Negative = before due (good), positive = after due (bad), zero = exactly on due.
+                              const ref = f.filed_date || todayStr;
+                              const hasDue = !!f.due_date;
+                              const delta = hasDue ? daysBetween(ref, f.due_date as string) : null;
+                              const refLabel = f.filed_date ? "filed" : "today";
+                              const badge = (() => {
+                                if (delta === null) {
+                                  return { sign: "?", color: "#475569", text: "no due date" };
+                                }
+                                if (delta < 0) {
+                                  return {
+                                    sign: `−${Math.abs(delta)}d`,
+                                    color: "#1A6B3C",
+                                    text: `${refLabel} ${Math.abs(delta)} day${Math.abs(delta) === 1 ? "" : "s"} before due`,
+                                  };
+                                }
+                                if (delta > 0) {
+                                  return {
+                                    sign: `+${delta}d`,
+                                    color: "#C41E1E",
+                                    text: `${refLabel} ${delta} day${delta === 1 ? "" : "s"} after due`,
+                                  };
+                                }
+                                return { sign: "0d", color: "#8B5A00", text: `${refLabel} exactly on due date` };
+                              })();
+                              return (
+                                <tr key={`${rowKey}-exp`} className="bg-white/30">
+                                  <td></td>
+                                  <td colSpan={4} className="py-3 pr-3">
+                                    <div className="text-xs space-y-1.5">
+                                      <p className="flex flex-wrap items-center gap-2">
+                                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: `${exp.color}1A`, color: exp.color }}>
+                                          {exp.label}
+                                        </span>
+                                        <span
+                                          className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-semibold border"
+                                          style={{ background: `${badge.color}14`, color: badge.color, borderColor: `${badge.color}40` }}
+                                          title={badge.text}
+                                          aria-label={badge.text}
+                                        >
+                                          {badge.sign}
+                                        </span>
+                                        <span className="text-fyn-ink/70">{exp.detail}</span>
+                                      </p>
+                                      <p className="font-mono text-fyn-ink/60">
+                                        Rule: <span className="text-fyn-ink">{exp.rule}</span>
+                                      </p>
+                                      <p className="font-mono text-fyn-ink/60">
+                                        due_date = <span className="text-fyn-ink">{f.due_date}</span>
+                                        {"  ·  "}
+                                        filed_date = <span className="text-fyn-ink">{f.filed_date || "null"}</span>
+                                        {"  ·  "}
+                                        status = <span className="text-fyn-ink">{f.status}</span>
+                                        {"  ·  "}
+                                        today = <span className="text-fyn-ink">{todayStr}</span>
+                                      </p>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })()}
                             )}
                           </Fragment>
                         );
