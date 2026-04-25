@@ -1,124 +1,150 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 
-const complianceMatrix = [
-  { section: "GST", items: [
-    { obligation: "GSTR-1", regulator: "GSTN", freq: "Monthly", lastFiled: "Apr 11", nextDue: "May 11", daysLeft: 26, status: "Filed" },
-    { obligation: "GSTR-3B", regulator: "GSTN", freq: "Monthly", lastFiled: "—", nextDue: "Apr 20", daysLeft: 5, status: "Pending" },
-    { obligation: "GSTR-9", regulator: "GSTN", freq: "Annual", lastFiled: "Dec 31", nextDue: "Dec 31", daysLeft: 261, status: "Future" },
-  ]},
-  { section: "Income Tax", items: [
-    { obligation: "Advance Tax Q1", regulator: "IT Dept", freq: "Quarterly", lastFiled: "—", nextDue: "Jun 15", daysLeft: 61, status: "Future" },
-    { obligation: "TDS Return Q4", regulator: "IT Dept", freq: "Quarterly", lastFiled: "—", nextDue: "May 31", daysLeft: 46, status: "Pending" },
-    { obligation: "ITR Filing", regulator: "IT Dept", freq: "Annual", lastFiled: "—", nextDue: "Jul 31", daysLeft: 107, status: "Future" },
-  ]},
-  { section: "Corporate", items: [
-    { obligation: "MGT-7 (Annual Return)", regulator: "MCA", freq: "Annual", lastFiled: "Sep 30", nextDue: "Sep 30", daysLeft: 168, status: "Future" },
-    { obligation: "AOC-4 (Financial Stmt)", regulator: "MCA", freq: "Annual", lastFiled: "Oct 31", nextDue: "Oct 31", daysLeft: 198, status: "Future" },
-    { obligation: "DIR-3 KYC", regulator: "MCA", freq: "Annual", lastFiled: "Sep 30", nextDue: "Sep 30", daysLeft: 168, status: "Future" },
-  ]},
-  { section: "Labour", items: [
-    { obligation: "PF ECR", regulator: "EPFO", freq: "Monthly", lastFiled: "—", nextDue: "Apr 15", daysLeft: 0, status: "DUE TODAY" },
-    { obligation: "ESIC Return", regulator: "ESIC", freq: "Monthly", lastFiled: "—", nextDue: "Apr 15", daysLeft: 0, status: "DUE TODAY" },
-    { obligation: "Professional Tax", regulator: "State", freq: "Monthly", lastFiled: "—", nextDue: "Apr 30", daysLeft: 15, status: "Pending" },
-  ]},
-];
+type FilingRow = { status: string; due_date: string };
 
-const statusStyles: Record<string, string> = {
-  Filed: "bg-[#1A6B3C]/10 text-[#1A6B3C]",
-  Pending: "bg-amber-100 text-[#8B5A00]",
-  "DUE TODAY": "bg-[#C41E1E]/10 text-[#C41E1E] font-semibold",
-  Future: "bg-gray-100 text-gray-500",
-  Overdue: "bg-[#C41E1E] text-white",
-};
+const CompliancePage = () => {
+  const navigate = useNavigate();
+  const [businessId, setBusinessId] = useState<string | null>(null);
 
-const sectionColors: Record<string, string> = {
-  GST: "text-[#C41E1E]",
-  "Income Tax": "text-[#1A4A8B]",
-  Corporate: "text-[#6B21A8]",
-  Labour: "text-[#1A6B3C]",
-};
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("business_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.business_id) setBusinessId(data.business_id);
+    };
+    fetchBusiness();
+  }, []);
 
-const CompliancePage = () => (
-  <DashboardLayout>
-    {/* OVERALL SCORE */}
-    <div className="bg-fyn-ink rounded-xl p-8 mb-6 text-center">
-      <p className="text-xs fyn-label mb-2 font-sans text-primary-foreground">OVERALL COMPLIANCE SCORE</p>
-      <p className="text-[#8B5A00] text-[72px] font-bold leading-none font-sans">72</p>
-      <p className="text-base text-primary-foreground">/100 — Good but 3 issues</p>
-      <div className="grid grid-cols-4 gap-4 max-w-xl mx-auto mt-6">
-        {[
-          { label: "GST", score: 68, color: "#8B5A00" },
-          { label: "Tax", score: 81, color: "#1A6B3C" },
-          { label: "Corporate", score: 72, color: "#8B5A00" },
-          { label: "Labour", score: 71, color: "#8B5A00" },
-        ].map((c) => (
-          <div key={c.label}>
-            <p className="text-sm mb-1 text-primary-foreground">{c.label}</p>
-            <div className="h-2 bg-white/10 rounded-full"><div className="h-2 rounded-full" style={{ width: `${c.score}%`, background: c.color }} /></div>
-            <p className="text-xs mt-1 fyn-metric text-primary-foreground">{c.score}/100</p>
+  const threeMonthsAgo = (() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    return d.toISOString().split("T")[0];
+  })();
+
+  const { data: gstFilings, isLoading: loadingGst } = useQuery({
+    queryKey: ["compliance-gst", businessId],
+    queryFn: async (): Promise<FilingRow[]> => {
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("gst_filings" as never)
+        .select("status, due_date")
+        .eq("business_id", businessId)
+        .gte("due_date", threeMonthsAgo);
+      return ((data as unknown) as FilingRow[]) || [];
+    },
+    enabled: !!businessId,
+  });
+
+  const { data: tdsFilings, isLoading: loadingTds } = useQuery({
+    queryKey: ["compliance-tds", businessId],
+    queryFn: async (): Promise<FilingRow[]> => {
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("tds_filings" as never)
+        .select("status, due_date")
+        .eq("business_id", businessId)
+        .gte("due_date", threeMonthsAgo);
+      return ((data as unknown) as FilingRow[]) || [];
+    },
+    enabled: !!businessId,
+  });
+
+  const isLoading = loadingGst || loadingTds;
+  const allFilings = [...(gstFilings || []), ...(tdsFilings || [])];
+  const totalFilings = allFilings.length;
+  const filedOnTime = allFilings.filter((f) => f.status === "filed").length;
+  const complianceScore = totalFilings > 0 ? Math.round((filedOnTime / totalFilings) * 100) : 0;
+
+  const gstFiled = gstFilings?.filter((f) => f.status === "filed").length || 0;
+  const gstTotal = gstFilings?.length || 0;
+  const tdsFiled = tdsFilings?.filter((f) => f.status === "filed").length || 0;
+  const tdsTotal = tdsFilings?.length || 0;
+
+  const isEmpty = !isLoading && totalFilings === 0;
+
+  const scoreColor =
+    complianceScore > 80 ? "#1A6B3C" : complianceScore > 50 ? "#8B5A00" : "#C41E1E";
+
+  return (
+    <DashboardLayout>
+      {isLoading && (
+        <div className="space-y-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-32 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {isEmpty && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
+          <h3 className="text-fyn-ink text-xl font-serif mb-2">No Compliance Data</h3>
+          <p className="text-fyn-ink/60 text-sm mb-6">
+            Connect your accounting system to track compliance health
+          </p>
+          <button
+            onClick={() => navigate("/dashboard/settings/integrations")}
+            className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fyn-ink/90 transition-colors"
+          >
+            Connect Accounting →
+          </button>
+        </div>
+      )}
+
+      {!isLoading && totalFilings > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* SCORE CARD */}
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 lg:col-span-1">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">COMPLIANCE HEALTH SCORE</p>
+            <p className="text-[48px] font-bold font-sans leading-none" style={{ color: scoreColor }}>
+              {complianceScore}%
+            </p>
+            <p className="text-fyn-ink/60 text-xs mt-2">
+              Based on {totalFilings} filings (last 3 months)
+            </p>
           </div>
-        ))}
-      </div>
-    </div>
 
-    {/* COMPLIANCE MATRIX */}
-    <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-      <h3 className="text-fyn-ink text-lg mb-4 font-sans">Compliance Matrix — All Obligations</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-fyn-ink/40 text-xs fyn-label border-b border-fyn-ink-10">
-              <th className="text-left py-2">Obligation</th>
-              <th className="text-left py-2">Regulator</th>
-              <th className="text-center py-2">Frequency</th>
-              <th className="text-left py-2">Last Filed</th>
-              <th className="text-left py-2">Next Due</th>
-              <th className="text-right py-2">Days Left</th>
-              <th className="text-center py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {complianceMatrix.map((section) => (
-              <>
-                <tr key={section.section} className="bg-fyn-beige">
-                  <td colSpan={7} className={`py-2 px-2 font-semibold text-xs fyn-label ${sectionColors[section.section]}`}>
-                    {section.section.toUpperCase()}
-                  </td>
-                </tr>
-                {section.items.map((item) => {
-                  const isOverdue = item.daysLeft < 0;
-                  const isDueToday = item.daysLeft === 0;
-                  const isUrgent = item.daysLeft > 0 && item.daysLeft <= 7;
-                  return (
-                    <tr
-                      key={item.obligation}
-                      className={`border-b border-fyn-ink-10 hover:bg-fyn-beige-deep transition-colors ${
-                        isOverdue ? "bg-[#FDEAEA]" : isDueToday ? "bg-[#FEF3E2]" : ""
-                      }`}
-                    >
-                      <td className="py-3 text-fyn-ink font-medium">{item.obligation}</td>
-                      <td className="py-3 text-xs text-secondary-foreground">{item.regulator}</td>
-                      <td className="py-3 text-center text-xs text-secondary-foreground">{item.freq}</td>
-                      <td className="py-3 text-xs text-secondary-foreground">{item.lastFiled}</td>
-                      <td className="py-3 text-fyn-ink text-xs font-medium">{item.nextDue}</td>
-                      <td className={`py-3 text-right fyn-metric text-xs ${isOverdue || isDueToday ? "text-[#C41E1E] font-bold" : isUrgent ? "text-[#8B5A00] font-semibold" : "text-secondary-foreground"}`}>
-                        {isDueToday ? "TODAY" : item.daysLeft < 0 ? `${Math.abs(item.daysLeft)}d overdue` : `${item.daysLeft}d`}
-                      </td>
-                      <td className="py-3 text-center">
-                        <span className={`text-[11px] px-2 py-0.5 rounded ${statusStyles[item.status] || "bg-gray-100 text-gray-500"}`}>
-                          {item.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </DashboardLayout>
-);
+          {/* GST */}
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">GST FILINGS</p>
+            <p className="text-fyn-ink text-[28px] font-bold font-sans">
+              {gstFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{gstTotal}</span>
+            </p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
+              <div
+                className="bg-[#1A6B3C] h-2 rounded-full transition-all"
+                style={{ width: gstTotal > 0 ? `${(gstFiled / gstTotal) * 100}%` : "0%" }}
+              />
+            </div>
+          </div>
+
+          {/* TDS */}
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6">
+            <p className="text-fyn-ink/40 text-[12px] fyn-label mb-2">TDS FILINGS</p>
+            <p className="text-fyn-ink text-[28px] font-bold font-sans">
+              {tdsFiled}<span className="text-fyn-ink/40 text-lg font-normal">/{tdsTotal}</span>
+            </p>
+            <p className="text-fyn-ink/60 text-xs mt-2">filed on time</p>
+            <div className="w-full bg-fyn-ink/10 rounded-full h-2 mt-3">
+              <div
+                className="bg-[#1A6B3C] h-2 rounded-full transition-all"
+                style={{ width: tdsTotal > 0 ? `${(tdsFiled / tdsTotal) * 100}%` : "0%" }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </DashboardLayout>
+  );
+};
 
 export default CompliancePage;
