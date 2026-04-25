@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 
 const areas = [
@@ -81,6 +81,41 @@ const barColors: Record<string, string> = {
 const AuditReadinessPage = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const doneCount = documents.filter((d) => d.done).length;
+  const rowRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const toggleSection = (title: string) => {
+    setExpandedSection(expandedSection === title ? null : title);
+  };
+
+  const handleRowKeyDown = (e: KeyboardEvent<HTMLButtonElement>, index: number, title: string) => {
+    switch (e.key) {
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        toggleSection(title);
+        break;
+      case "ArrowDown": {
+        e.preventDefault();
+        const next = (index + 1) % checkSections.length;
+        rowRefs.current[next]?.focus();
+        break;
+      }
+      case "ArrowUp": {
+        e.preventDefault();
+        const prev = (index - 1 + checkSections.length) % checkSections.length;
+        rowRefs.current[prev]?.focus();
+        break;
+      }
+      case "Home":
+        e.preventDefault();
+        rowRefs.current[0]?.focus();
+        break;
+      case "End":
+        e.preventDefault();
+        rowRefs.current[checkSections.length - 1]?.focus();
+        break;
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -112,30 +147,49 @@ const AuditReadinessPage = () => {
       {/* WHAT AUDITORS CHECK */}
       <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
         <h3 className="text-fyn-ink text-lg mb-4 font-sans">What Auditors Check</h3>
-        <div className="space-y-2">
-          {checkSections.map((s) => (
-            <div key={s.title} className="border border-fyn-ink-10 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setExpandedSection(expandedSection === s.title ? null : s.title)}
-                className="w-full flex items-center justify-between p-4 hover:bg-fyn-beige transition-colors text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`text-[10px] px-2 py-0.5 rounded ${priorityColors[s.priority]}`}>{s.priority}</span>
-                  <span className="text-fyn-ink font-medium text-sm font-sans">{s.title}</span>
-                </div>
-                <span className="text-fyn-ink/30">{expandedSection === s.title ? "▲" : "▼"}</span>
-              </button>
-              {expandedSection === s.title && (
-                <div className="px-4 pb-4 space-y-2 text-sm">
-                  <p className="text-fyn-ink/60"><strong>What they check:</strong> {s.what}</p>
-                  <p className="text-fyn-ink/60"><strong>Your status:</strong> {s.yourStatus}</p>
-                  {s.action && (
-                    <button className="text-fyn-red text-sm font-medium hover:underline mt-1">{s.action}</button>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+        <p className="sr-only">
+          Use Enter or Space to expand a row. Use Up and Down arrow keys to move between rows. Home and End jump to the first or last row.
+        </p>
+        <div className="space-y-2" role="list">
+          {checkSections.map((s, index) => {
+            const panelId = `audit-row-panel-${index}`;
+            const buttonId = `audit-row-button-${index}`;
+            const isOpen = expandedSection === s.title;
+            return (
+              <div key={s.title} role="listitem" className="border border-fyn-ink-10 rounded-lg overflow-hidden">
+                <button
+                  ref={(el) => (rowRefs.current[index] = el)}
+                  id={buttonId}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => toggleSection(s.title)}
+                  onKeyDown={(e) => handleRowKeyDown(e, index, s.title)}
+                  className="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`text-[10px] px-2 py-0.5 rounded ${priorityColors[s.priority]}`}>{s.priority}</span>
+                    <span className="text-fyn-ink font-medium text-sm font-sans">{s.title}</span>
+                  </div>
+                  <span aria-hidden="true" className="text-fyn-ink/30">{isOpen ? "▲" : "▼"}</span>
+                </button>
+                {isOpen && (
+                  <div
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={buttonId}
+                    className="px-4 pb-4 space-y-2 text-sm"
+                  >
+                    <p className="text-fyn-ink/60"><strong>What they check:</strong> {s.what}</p>
+                    <p className="text-fyn-ink/60"><strong>Your status:</strong> {s.yourStatus}</p>
+                    {s.action && (
+                      <button className="text-fyn-red text-sm font-medium hover:underline mt-1">{s.action}</button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
