@@ -571,9 +571,10 @@ const CompliancePage = () => {
                         breakdownFilter === "on-time" ? isOnTime(f) :
                         breakdownFilter === "late" ? isLate(f) :
                         breakdownFilter === "overdue" ? isOverdueNotFiled(f) :
+                        breakdownFilter === "unknown" ? isUnknown(f) :
                         isPending(f)
                       )
-                      .sort((a, b) => (a.due_date < b.due_date ? 1 : -1))
+                      .sort((a, b) => ((a.due_date || "") < (b.due_date || "") ? 1 : -1))
                       .map((f, i) => {
                         const rowKey = `${f._src}-${i}-${f.due_date}`;
                         const expanded = expandedRow === rowKey;
