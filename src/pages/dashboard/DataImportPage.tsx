@@ -153,6 +153,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [dupMatch, setDupMatch] = useState<DupMatch | null>(null);
   const [pending, setPending] = useState<PendingUpload | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    zoneOpeners[type] = () => inputRef.current?.click();
+    return () => { delete zoneOpeners[type]; };
+  }, [type]);
   const meta = TYPE_META[type];
 
   const acceptFile = (f: File | undefined | null) => {
