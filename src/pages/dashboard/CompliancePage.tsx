@@ -189,6 +189,50 @@ const CompliancePage = () => {
           </div>
         </div>
       )}
+
+      {!isLoading && totalFilings > 0 && (
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mt-4">
+          <p className="text-fyn-ink/40 text-[12px] fyn-label mb-4">
+            ON-TIME FILING RATE — LAST 3 MONTHS
+          </p>
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
+              <XAxis dataKey="month" stroke="#1A1008" fontSize={12} />
+              <YAxis
+                domain={[0, 100]}
+                tickFormatter={(v) => `${v}%`}
+                stroke="#1A1008"
+                fontSize={12}
+              />
+              <Tooltip
+                formatter={(v: number | null) => (v === null ? "No filings" : `${v}%`)}
+                contentStyle={{ background: "#F4EDDA", border: "1px solid rgba(26,16,8,0.1)" }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="GST"
+                stroke="#1A6B3C"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="TDS"
+                stroke="#8B6914"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                connectNulls
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          <p className="text-fyn-ink/50 text-xs mt-3">
+            On-time = filed on or before due date. Months with no filings appear as gaps.
+          </p>
+        </div>
+      )}
     </DashboardLayout>
   );
 };
