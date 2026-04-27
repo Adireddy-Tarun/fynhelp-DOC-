@@ -25,8 +25,8 @@ SET search_path = public, extensions;
 
 -- 6 helper privilege tests + 9 trigger privilege tests +
 -- (13 owned tables * 2) DELETE policy tests +
--- 13 immutable-table tests + 2 behavioural tests
-SELECT plan(56);
+-- 13 immutable-table tests + 4 behavioural tests
+SELECT plan(58);
 
 -- -----------------------------------------------------------------------------
 -- 1. Helper function privileges (must be callable by authenticated only)
@@ -180,15 +180,58 @@ END $$;
 
 -- -----------------------------------------------------------------------------
 -- 5. Behavioural test: cross-tenant DELETE is blocked by RLS.
---    Picks two existing tenants from the DB; emits skip() if fewer than 2
---    are present (typical in a fresh project).
+--
+-- Spoofs the request that PostgREST would send for an authenticated user by
+-- setting ALL JWT-related GUCs that auth.uid() / auth.role() / auth.jwt()
+-- consult on this Supabase instance:
+--   - role             (Postgres role)  -> SET LOCAL ROLE authenticated
+--   - request.jwt.claim.sub             -> read first by auth.uid()
+--   - request.jwt.claim.role            -> read first by auth.role()
+--   - request.jwt.claims (full JSON)    -> fallback used by auth.jwt()
+--
+-- Picks two existing tenants from the DB; emits skip() if fewer than 2 are
+-- present (typical in a fresh project).
 -- -----------------------------------------------------------------------------
+
+-- Reusable JWT-spoof helper: matches PostgREST's GUC layout exactly.
+CREATE OR REPLACE FUNCTION pg_temp.spoof_jwt(_user_id uuid)
+RETURNS void LANGUAGE plpgsql AS $$
+DECLARE
+  claims jsonb := jsonb_build_object(
+    'sub',  _user_id::text,
+    'role', 'authenticated',
+    'aud',  'authenticated',
+    'iss',  'supabase',
+    -- 1-hour lifetime, in seconds since epoch
+    'iat',  extract(epoch FROM now())::int,
+    'exp',  extract(epoch FROM now())::int + 3600
+  );
+BEGIN
+  PERFORM set_config('role',                      'authenticated', true);
+  PERFORM set_config('request.jwt.claim.sub',     _user_id::text,  true);
+  PERFORM set_config('request.jwt.claim.role',    'authenticated', true);
+  PERFORM set_config('request.jwt.claim.aud',     'authenticated', true);
+  PERFORM set_config('request.jwt.claims',        claims::text,    true);
+END $$;
+
+CREATE OR REPLACE FUNCTION pg_temp.reset_jwt()
+RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM set_config('request.jwt.claim.sub',  '', true);
+  PERFORM set_config('request.jwt.claim.role', '', true);
+  PERFORM set_config('request.jwt.claim.aud',  '', true);
+  PERFORM set_config('request.jwt.claims',     '', true);
+  RESET ROLE;
+END $$;
+
 DO $$
 DECLARE
   user_a uuid;
   biz_a  uuid;
   biz_b  uuid;
   rec_b  uuid;
+  resolved_uid uuid;
+  resolved_business uuid;
   deleted_count int;
 BEGIN
   SELECT p.user_id, p.business_id INTO user_a, biz_a
@@ -205,7 +248,7 @@ BEGIN
   IF user_a IS NULL OR biz_b IS NULL THEN
     PERFORM skip(
       'cross-tenant DELETE: needs >=2 tenants in DB',
-      2
+      4
     );
     RETURN;
   END IF;
@@ -214,18 +257,30 @@ BEGIN
   INSERT INTO public.receivables (id, business_id, customer_name, amount)
   VALUES (rec_b, biz_b, '__pgtap_rls_test__', 1);
 
-  -- Switch to tenant A's identity.
-  SET LOCAL ROLE authenticated;
-  PERFORM set_config(
-    'request.jwt.claims',
-    json_build_object('sub', user_a::text, 'role', 'authenticated')::text,
-    true
+  -- Switch to the spoofed authenticated user.
+  PERFORM pg_temp.spoof_jwt(user_a);
+
+  -- Sanity-check the spoof: auth.uid() and the SECURITY DEFINER helper
+  -- must resolve to tenant A before we trust the DELETE assertion.
+  resolved_uid := auth.uid();
+  resolved_business := public.get_user_business_id();
+
+  PERFORM is(
+    resolved_uid,
+    user_a,
+    'auth.uid() resolves to spoofed tenant A user'
+  );
+  PERFORM is(
+    resolved_business,
+    biz_a,
+    'get_user_business_id() returns tenant A business'
   );
 
+  -- Attempt the cross-tenant DELETE.
   DELETE FROM public.receivables WHERE id = rec_b;
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
 
-  RESET ROLE;
+  PERFORM pg_temp.reset_jwt();
 
   PERFORM is(
     deleted_count,
