@@ -452,15 +452,15 @@ export function downloadReportPdf(
         pageBreak();
       }
 
-      doc.setFont("times", "bold");
+      doc.setFont(isSimple ? "helvetica" : "times", "bold");
       doc.setFontSize(13);
-      doc.setTextColor(...BRAND.ink);
+      doc.setTextColor(...inkColor);
       doc.text(block.text, margin, y);
       y += headingHeight;
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
-      doc.setTextColor(...BRAND.ink);
+      doc.setTextColor(...inkColor);
     } else if (block.kind === "para") {
       if (block.height <= remaining()) {
         renderPara(block.lines);
