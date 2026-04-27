@@ -209,13 +209,7 @@ export function downloadReportPdf(report: ReportLike) {
   const lineHeight = 16;
   const paragraphGap = 8;
 
-  const ensureSpace = (needed: number) => {
-    if (y + needed > contentBottom) {
-      doc.addPage();
-      drawHeader();
-      y = contentTop;
-    }
-  };
+
 
   // Render a line of text with numeric tokens (currency, %, dates, plain
   // numbers) in courier so digits align like Inter's tabular-nums.
