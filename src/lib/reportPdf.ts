@@ -497,8 +497,9 @@ export function downloadReportPdf(
     drawFooter(i, pageCount);
   }
 
+  const suffix = isSimple ? "simple" : "branded";
   const filename = `fynhelp-cfo-report-${
     report.brief_date || report.id || "report"
-  }.pdf`.replace(/[^a-z0-9.\-_]/gi, "_");
+  }-${suffix}.pdf`.replace(/[^a-z0-9.\-_]/gi, "_");
   doc.save(filename);
 }
