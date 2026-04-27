@@ -24,8 +24,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Download } from "lucide-react";
+import { ChevronDown, Download, FileText, Sparkles } from "lucide-react";
 import { downloadReportPdf } from "@/lib/reportPdf";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const CFOReportsPage = () => {
   const navigate = useNavigate();
