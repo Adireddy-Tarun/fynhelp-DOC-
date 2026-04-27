@@ -200,6 +200,15 @@ const CFOReportsPage = () => {
                       {report.delivered ? "Delivered" : "Ready"}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-right">
+                    <button
+                      onClick={() => downloadReportPdf(report)}
+                      className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      PDF
+                    </button>
+                  </TableCell>
                 </TableRow>
               );
             })}
