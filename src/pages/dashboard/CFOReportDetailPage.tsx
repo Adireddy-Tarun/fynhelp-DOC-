@@ -30,21 +30,28 @@ const CFOReportDetailPage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleCopyShareLink = async () => {
+const handleCopyShareLink = async () => {
     if (!id) return;
     const url = `${window.location.origin}/dashboard/reports/${id}`;
+
+    const fallbackCopy = () => {
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const success = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return success;
+    };
+
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(url);
       } else {
-        const ta = document.createElement("textarea");
-        ta.value = url;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
+        const ok = fallbackCopy();
+        if (!ok) throw new Error("Fallback copy failed");
       }
       setCopied(true);
       toast({
@@ -52,10 +59,16 @@ const CFOReportDetailPage = () => {
         description: "Share link copied to clipboard.",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } catch (err: unknown) {
+      const isPermissionDenied =
+        err instanceof Error &&
+        (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
+
       toast({
-        title: "Could not copy link",
-        description: url,
+        title: isPermissionDenied ? "Permission blocked" : "Could not copy link",
+        description: isPermissionDenied
+          ? "Clipboard access is blocked. Please allow clipboard permissions in your browser settings, or copy the URL manually."
+          : "Unable to copy to clipboard. Please copy the URL manually.",
         variant: "destructive",
       });
     }
