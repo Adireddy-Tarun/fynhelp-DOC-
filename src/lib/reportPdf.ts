@@ -419,14 +419,12 @@ export function downloadReportPdf(
   };
 
   const renderListItem = (item: ListItem) => {
-    // Keep marker glued to the first line; subsequent wrapped lines are
-    // hanging-indented to align with the first line's text.
     for (let li = 0; li < item.lines.length; li++) {
       if (y + lineHeight > contentBottom) pageBreak();
       if (li === 0) {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
-        doc.setTextColor(...BRAND.ink);
+        doc.setTextColor(...inkColor);
         doc.text(item.marker, margin + bulletIndent, y);
       }
       drawTabularLine(item.lines[li], margin + textIndent, y);
