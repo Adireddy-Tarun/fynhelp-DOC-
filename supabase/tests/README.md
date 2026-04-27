@@ -1,16 +1,14 @@
-# Database security tests
+# Database & realtime security tests
 
-Two equivalent suites. Use **pgTAP** in CI; the plain-SQL version is kept
-as a zero-dependency fallback.
+Three suites:
 
-## Files
-
-| File | Format | Run with |
+| File | Layer tested | Run with |
 |---|---|---|
-| `security_regression.test.sql` | pgTAP (TAP output) | `pg_prove` or `supabase test db` |
-| `security_regression.sql`      | plain SQL `RAISE EXCEPTION` | `psql -f` |
+| `security_regression.test.sql` | DB schema + RLS (pgTAP) | `pg_prove` or `supabase test db` |
+| `security_regression.sql`      | DB schema + RLS (plain SQL fallback) | `psql -f` |
+| `realtime_isolation.test.ts`   | **Realtime broker authorization** (Deno) | `deno test --allow-net --allow-env` |
 
-Both verify the same invariants:
+The pgTAP suite verifies the same invariants as the plain-SQL one:
 
 1. `get_user_business_id()` and `get_user_ca_firm_id()` are **callable by
    `authenticated` only** — not by `anon` or `PUBLIC`.
