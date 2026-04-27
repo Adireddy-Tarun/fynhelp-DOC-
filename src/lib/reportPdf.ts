@@ -251,70 +251,161 @@ export function downloadReportPdf(report: ReportLike) {
     doc.setFont("helvetica", "normal");
   };
 
-  // Split into paragraphs (preserve blank lines as spacing)
-  const rawParagraphs = bodyText.split(/\n\s*\n/);
+  // ---------- Block parsing ----------
+  // Recognises:
+  //   #, ##, ### headings   → "heading"
+  //   -, *, • prefixed lines → unordered "list" item
+  //   1. 2. ... prefixed     → ordered "list" item
+  //   everything else        → "para" (paragraph, joined across single newlines)
+  // Consecutive list items become a single "list" block so we can keep
+  // consistent indentation and pre-measure the whole list for pagination.
 
+  type ListItem = { marker: string; lines: string[]; height: number };
   type Block =
     | { kind: "heading"; text: string; height: number }
-    | { kind: "para"; lines: string[]; height: number };
+    | { kind: "para"; lines: string[]; height: number }
+    | { kind: "list"; items: ListItem[]; height: number };
 
-  const headingHeight = lineHeight + 4; // matches render advance below
+  const headingHeight = lineHeight + 4;
   const usablePageHeight = contentBottom - contentTop;
 
-  // Pre-measure every block so we can make page-break decisions before
-  // committing any text to the page. This guarantees no paragraph (or any of
-  // its lines) is ever rendered into the footer band.
+  // Layout constants for lists
+  const bulletGutter = 16; // space between marker and text
+  const bulletIndent = 0;  // outer indent of the list block
+
+  const isBulletLine = (s: string) => /^\s*([-*•]|\d{1,2}[.)])\s+/.test(s);
+  const parseBullet = (s: string): { marker: string; text: string } => {
+    const m = s.match(/^\s*([-*•]|\d{1,2}[.)])\s+(.*)$/);
+    if (!m) return { marker: "•", text: s };
+    const raw = m[1];
+    // Normalise "-" / "*" to "•" for visual consistency; keep numbers as-is.
+    const marker = /^\d/.test(raw) ? raw : "•";
+    return { marker, text: m[2] };
+  };
+
+  const measureLines = (text: string, width: number): string[] => {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    return doc.splitTextToSize(text, width) as string[];
+  };
+
+  // First pass: split into logical units separated by blank lines, but treat
+  // each line within a unit individually so we can pull out bullet runs.
+  const sourceLines = bodyText.split(/\n/);
   const blocks: Block[] = [];
-  for (const rawPara of rawParagraphs) {
-    const para = rawPara.replace(/\n/g, " ").trim();
-    if (!para) continue;
+
+  let paraBuffer: string[] = [];
+  let listBuffer: ListItem[] = [];
+
+  const flushPara = () => {
+    if (paraBuffer.length === 0) return;
+    const text = paraBuffer.join(" ").trim();
+    paraBuffer = [];
+    if (!text) return;
 
     const isHeading =
-      /^#{1,3}\s+/.test(para) ||
-      (para.length <= 80 &&
-        !/[.!?]$/.test(para) &&
-        para === para.replace(/\s+/g, " "));
+      /^#{1,3}\s+/.test(text) ||
+      (text.length <= 80 &&
+        !/[.!?]$/.test(text) &&
+        text === text.replace(/\s+/g, " "));
 
-    if (isHeading && para.length <= 120) {
+    if (isHeading && text.length <= 120) {
       blocks.push({
         kind: "heading",
-        text: para.replace(/^#{1,3}\s+/, ""),
+        text: text.replace(/^#{1,3}\s+/, ""),
         height: headingHeight,
+      });
+      return;
+    }
+
+    const lines = measureLines(text, usable);
+    blocks.push({ kind: "para", lines, height: lines.length * lineHeight });
+  };
+
+  const flushList = () => {
+    if (listBuffer.length === 0) return;
+    const items = listBuffer;
+    listBuffer = [];
+    const totalHeight = items.reduce((sum, it) => sum + it.height, 0);
+    blocks.push({ kind: "list", items, height: totalHeight });
+  };
+
+  const textIndent = bulletIndent + bulletGutter;
+  const bulletTextWidth = usable - textIndent;
+
+  for (const rawLine of sourceLines) {
+    const line = rawLine.replace(/\s+$/, "");
+
+    if (line.trim() === "") {
+      flushPara();
+      flushList();
+      continue;
+    }
+
+    if (isBulletLine(line)) {
+      flushPara();
+      const { marker, text } = parseBullet(line);
+      const wrapped = measureLines(text, bulletTextWidth);
+      listBuffer.push({
+        marker,
+        lines: wrapped,
+        height: wrapped.length * lineHeight,
       });
       continue;
     }
 
-    // Measure body lines using the actual body font/size jsPDF will render.
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    const lines = doc.splitTextToSize(para, usable) as string[];
-    blocks.push({
-      kind: "para",
-      lines,
-      height: lines.length * lineHeight,
-    });
+    // Non-bullet, non-blank: end any open list, accumulate into paragraph.
+    flushList();
+    paraBuffer.push(line.trim());
   }
+  flushPara();
+  flushList();
 
+  // ---------- Pagination + rendering ----------
   const pageBreak = () => {
     doc.addPage();
     drawHeader();
     y = contentTop;
   };
-
   const remaining = () => contentBottom - y;
+
+  const renderPara = (lines: string[]) => {
+    for (const line of lines) {
+      if (y + lineHeight > contentBottom) pageBreak();
+      drawTabularLine(line, margin, y);
+      y += lineHeight;
+    }
+  };
+
+  const renderListItem = (item: ListItem) => {
+    // Keep marker glued to the first line; subsequent wrapped lines are
+    // hanging-indented to align with the first line's text.
+    for (let li = 0; li < item.lines.length; li++) {
+      if (y + lineHeight > contentBottom) pageBreak();
+      if (li === 0) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(...BRAND.ink);
+        doc.text(item.marker, margin + bulletIndent, y);
+      }
+      drawTabularLine(item.lines[li], margin + textIndent, y);
+      y += lineHeight;
+    }
+  };
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
 
     if (block.kind === "heading") {
-      // Keep heading with its next block — never orphan.
       const next = blocks[i + 1];
       const glueHeight =
         block.height +
         (next
           ? next.kind === "para"
-            ? Math.min(next.height, lineHeight * 2) // at least 2 lines of next para
-            : next.height
+            ? Math.min(next.height, lineHeight * 2)
+            : next.kind === "list"
+              ? Math.min(next.height, next.items[0]?.height ?? lineHeight)
+              : next.height
           : 0);
       if (glueHeight > remaining() && glueHeight <= usablePageHeight) {
         pageBreak();
@@ -331,36 +422,30 @@ export function downloadReportPdf(report: ReportLike) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
       doc.setTextColor(...BRAND.ink);
-      continue;
-    }
-
-    // Paragraph: if it fits entirely on the current page, render as a unit.
-    // If it fits on a fresh page but not here, push to a new page.
-    // If it's taller than one page, render line-by-line with safe breaks.
-    if (block.height <= remaining()) {
-      for (const line of block.lines) {
-        drawTabularLine(line, margin, y);
-        y += lineHeight;
-      }
-    } else if (block.height <= usablePageHeight) {
-      pageBreak();
-      for (const line of block.lines) {
-        drawTabularLine(line, margin, y);
-        y += lineHeight;
+    } else if (block.kind === "para") {
+      if (block.height <= remaining()) {
+        renderPara(block.lines);
+      } else if (block.height <= usablePageHeight) {
+        pageBreak();
+        renderPara(block.lines);
+      } else {
+        renderPara(block.lines); // line-by-line with safe breaks
       }
     } else {
-      // Oversized paragraph — must split. Break only at line boundaries and
-      // never let a line cross into the footer band.
-      for (const line of block.lines) {
-        if (y + lineHeight > contentBottom) {
+      // List: keep each item together when possible (avoid splitting an item
+      // across pages unless it's larger than a single page).
+      for (const item of block.items) {
+        if (item.height <= remaining()) {
+          renderListItem(item);
+        } else if (item.height <= usablePageHeight) {
           pageBreak();
+          renderListItem(item);
+        } else {
+          renderListItem(item);
         }
-        drawTabularLine(line, margin, y);
-        y += lineHeight;
       }
     }
 
-    // Inter-paragraph gap — only if it doesn't push past the footer.
     if (i < blocks.length - 1) {
       y = Math.min(y + paragraphGap, contentBottom);
     }
