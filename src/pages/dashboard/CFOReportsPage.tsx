@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   Table,
@@ -12,6 +12,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import { Download } from "lucide-react";
 
@@ -82,7 +94,56 @@ const downloadReportPdf = (report: any) => {
 
 const CFOReportsPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [briefDate, setBriefDate] = useState(
+    () => new Date().toISOString().slice(0, 10)
+  );
+  const [content, setContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const resetForm = () => {
+    setBriefDate(new Date().toISOString().slice(0, 10));
+    setContent("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!businessId) return;
+    if (!content.trim()) {
+      toast({
+        title: "Content required",
+        description: "Please describe what the report should cover.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("nidhi_briefs").insert({
+      business_id: businessId,
+      brief_date: briefDate,
+      content: content.trim(),
+      delivered: false,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast({
+        title: "Could not start report",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Report generation started",
+      description: "Your CFO report has been queued.",
+    });
+    setOpen(false);
+    resetForm();
+    queryClient.invalidateQueries({ queryKey: ["cfo-reports", businessId] });
+  };
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -121,6 +182,65 @@ const CFOReportsPage = () => {
     );
   }
 
+  const newReportDialog = (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) resetForm();
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>New CFO Report</DialogTitle>
+          <DialogDescription>
+            Describe what this report should cover. Generation will start
+            immediately and the list will refresh.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="brief-date">Brief date</Label>
+            <Input
+              id="brief-date"
+              type="date"
+              value={briefDate}
+              onChange={(e) => setBriefDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="brief-content">What should this report cover?</Label>
+            <Textarea
+              id="brief-content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="e.g. Monthly cash flow summary, top spend categories, GST compliance status…"
+              rows={6}
+              required
+            />
+          </div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="px-4 py-2 rounded-md text-sm font-medium text-fyn-ink/70 hover:text-fyn-ink"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-fyn-red text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              {submitting ? "Starting…" : "Start generation"}
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (!reports || reports.length === 0) {
     return (
       <DashboardLayout>
@@ -132,12 +252,13 @@ const CFOReportsPage = () => {
             Nidhi will automatically generate CFO reports based on your data
           </p>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => setOpen(true)}
             className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             Generate Report
           </button>
         </div>
+        {newReportDialog}
       </DashboardLayout>
     );
   }
@@ -148,7 +269,7 @@ const CFOReportsPage = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink text-lg font-sans">CFO Reports</h3>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => setOpen(true)}
             className="bg-fyn-red text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             New Report
@@ -223,6 +344,7 @@ const CFOReportsPage = () => {
           </TableBody>
         </Table>
       </div>
+      {newReportDialog}
     </DashboardLayout>
   );
 };
