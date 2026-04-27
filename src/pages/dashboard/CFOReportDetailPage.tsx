@@ -29,10 +29,22 @@ const CFOReportDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showFallbackInput, setShowFallbackInput] = useState(false);
+  const fallbackInputRef = useRef<HTMLInputElement>(null);
 
-const handleCopyShareLink = async () => {
+  const shareUrl = id ? `${window.location.origin}/dashboard/reports/${id}` : "";
+
+  const showManualFallback = () => {
+    setShowFallbackInput(true);
+    setTimeout(() => {
+      fallbackInputRef.current?.focus();
+      fallbackInputRef.current?.select();
+    }, 50);
+  };
+
+  const handleCopyShareLink = async () => {
     if (!id) return;
-    const url = `${window.location.origin}/dashboard/reports/${id}`;
+    const url = shareUrl;
 
     const fallbackCopy = () => {
       const ta = document.createElement("textarea");
@@ -54,6 +66,7 @@ const handleCopyShareLink = async () => {
         if (!ok) throw new Error("Fallback copy failed");
       }
       setCopied(true);
+      setShowFallbackInput(false);
       toast({
         title: "Link copied",
         description: "Share link copied to clipboard.",
@@ -64,11 +77,13 @@ const handleCopyShareLink = async () => {
         err instanceof Error &&
         (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
 
+      showManualFallback();
+
       toast({
         title: isPermissionDenied ? "Permission blocked" : "Could not copy link",
         description: isPermissionDenied
-          ? "Clipboard access is blocked. Please allow clipboard permissions in your browser settings, or copy the URL manually."
-          : "Unable to copy to clipboard. Please copy the URL manually.",
+          ? "Clipboard access is blocked. Use the input below to select and copy the URL manually."
+          : "Unable to copy automatically. Use the input below to copy the URL manually.",
         variant: "destructive",
       });
     }
