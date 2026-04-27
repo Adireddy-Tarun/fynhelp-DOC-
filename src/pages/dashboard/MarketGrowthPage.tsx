@@ -1,173 +1,159 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
-import GlobalBackBar from "@/components/GlobalBackBar";
+import { Card } from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-// BACKEND: benchmark_data WHERE industry + turnover_slab match
-const benchmarks = [
-  { metric: "Gross Margin", you: "34%", avg: "31%", status: "↑ Better", color: "#166534" },
-  { metric: "DSO", you: "42d", avg: "30d", status: "↑ Slower", color: "#C41E1E" },
-  { metric: "Revenue Growth", you: "8%", avg: "12%", status: "↓ Below", color: "#8B5A00" },
-  { metric: "Cost/Revenue", you: "66%", avg: "69%", status: "↑ Better", color: "#166534" },
-];
+const MarketGrowthPage = () => {
+  const navigate = useNavigate();
+  const [businessId, setBusinessId] = useState<string | null>(null);
 
-// BACKEND: compute credit factors from businesses + compliance + receivables
-const creditFactors = [
-  { sign: "↑", text: "Revenue consistency: helping score", color: "#166534" },
-  { sign: "↓", text: "High DSO: hurting score (-8 pts)", color: "#C41E1E" },
-  { sign: "↓", text: "2 late GST filings: hurting score (-5 pts)", color: "#C41E1E" },
-];
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("business_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.business_id) setBusinessId(data.business_id);
+    };
+    fetchBusiness();
+  }, []);
 
-const fundraiseChecks = [
-  { ok: true, text: "12 months financial data available" },
-  { ok: true, text: "GST filings regular (2 late — caution)" },
-  { ok: true, text: "Revenue growing month-on-month" },
-  { ok: false, text: "Working capital cycle > 45 days" },
-  { ok: false, text: "No audited financials on file" },
-];
+  const { data: receivables, isLoading } = useQuery({
+    queryKey: ["market-receivables", businessId],
+    queryFn: async () => {
+      if (!businessId) return [];
+      const { data } = await supabase
+        .from("receivables")
+        .select("*")
+        .eq("business_id", businessId)
+        .order("invoice_date", { ascending: true });
+      return data || [];
+    },
+    enabled: !!businessId,
+  });
 
-const signals = [
-  { title: "Cotton prices up 8% in Maharashtra", cat: "Raw Materials", source: "CBIC data", impact: "Affects your COGS", iColor: "#8B5A00", iBg: "#FFFBEB" },
-  { title: "GST ITC claims scrutiny increased", cat: "Compliance", source: "CBIC circular", impact: "Review your ITC position", iColor: "#991B1B", iBg: "#FEF2F2" },
-  { title: "MSME lending rates eased by RBI", cat: "Financing", source: "RBI", impact: "Check your loan eligibility", iColor: "#166534", iBg: "#F0FDF4" },
-];
+  if (isLoading || !businessId) {
+    return (
+      <DashboardLayout>
+        <div className="text-fyn-ink/60 text-sm">Loading market growth…</div>
+      </DashboardLayout>
+    );
+  }
 
-const Card = ({ children, className = "" }: any) => (
-  <div className={`rounded-lg p-6 ${className}`} style={{ background: "#FFFFFF", border: "1px solid #D4C9A8" }}>{children}</div>
-);
+  if (!receivables || receivables.length === 0) {
+    return (
+      <DashboardLayout>
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-10 text-center">
+          <h2 className="text-fyn-ink text-2xl font-sans font-semibold mb-2">
+            No Revenue Data
+          </h2>
+          <p className="text-fyn-ink/60 text-sm mb-6">
+            Upload invoices to track revenue growth
+          </p>
+          <button
+            onClick={() => navigate("/dashboard/data-import")}
+            className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
+          >
+            Upload Data →
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-export default function MarketGrowthPage() {
-  // BACKEND: if subscription_status = 'early_access' show full page (no gate)
+  const totalRevenue = receivables.reduce(
+    (sum, r: any) => sum + (Number(r.amount) || 0),
+    0
+  );
+
+  const byMonth = receivables.reduce((acc: Record<string, number>, r: any) => {
+    if (!r.invoice_date) return acc;
+    const month = String(r.invoice_date).substring(0, 7);
+    if (!acc[month]) acc[month] = 0;
+    acc[month] += Number(r.amount) || 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const months = Object.keys(byMonth).sort();
+  const chartData = months.map((month) => ({
+    month: new Date(month + "-01").toLocaleDateString("en-IN", {
+      month: "short",
+      year: "2-digit",
+    }),
+    revenue: byMonth[month],
+  }));
+
+  const lastMonth = months[months.length - 1];
+  const prevMonth = months[months.length - 2];
+  const growthRate =
+    prevMonth && byMonth[prevMonth] > 0
+      ? (((byMonth[lastMonth] - byMonth[prevMonth]) / byMonth[prevMonth]) * 100).toFixed(1)
+      : "0";
+  const growthPositive = parseFloat(growthRate) >= 0;
+
   return (
     <DashboardLayout>
-      <GlobalBackBar />
-      <div className="max-w-[1280px] mx-auto px-6 py-8 space-y-6 font-sans">
-        <div>
-          <h1 style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 28, color: "#1A1008" }}>Market & Growth Intelligence</h1>
-          <p className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 15, color: "rgba(26,16,8,0.60)" }}>
-            See where you stand in your industry. Know what you qualify for. Plan your next move.
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="bg-fyn-ink p-5 border-0">
+          <p className="text-white/40 text-[13px] fyn-label">TOTAL REVENUE</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">
+            ₹{totalRevenue.toLocaleString("en-IN")}
           </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Card 1: Benchmarking */}
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008" }}>Industry Benchmarking</h2>
-              <div className="flex gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase" style={{ background: "#C41E1E", color: "#FFF" }}>Pro+</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase" style={{ background: "#F4EDDA", color: "rgba(26,16,8,0.65)" }}>Monthly</span>
-              </div>
-            </div>
-            <table className="w-full" style={{ fontFamily: "Inter", fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid #F0EBD8" }}>
-                  {["Metric", "You", "Industry Avg", "Status"].map((h) => (
-                    <th key={h} className="text-left py-2 font-medium" style={{ color: "rgba(26,16,8,0.55)", fontSize: 11 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {benchmarks.map((b) => (
-                  <tr key={b.metric} style={{ borderBottom: "1px solid #F0EBD8" }}>
-                    <td className="py-2.5" style={{ color: "#1A1008" }}>{b.metric}</td>
-                    <td className="py-2.5" style={{ color: "#1A1008", fontWeight: 600 }}>{b.you}</td>
-                    <td className="py-2.5" style={{ color: "rgba(26,16,8,0.60)" }}>{b.avg}</td>
-                    <td className="py-2.5" style={{ color: b.color, fontWeight: 600 }}>{b.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="mt-3 text-xs" style={{ color: "rgba(26,16,8,0.45)" }}>Based on 500+ anonymised businesses in Textile & Trading, ₹5-25Cr segment.</p>
-          </Card>
-
-          {/* Card 2: Credit Rating */}
-          <Card>
-            <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Credit Rating Simulator</h2>
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs" style={{ color: "rgba(26,16,8,0.55)" }}>0</span>
-                <span style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 18, color: "#8B5A00" }}>68/100 · Good</span>
-                <span className="text-xs" style={{ color: "rgba(26,16,8,0.55)" }}>100</span>
-              </div>
-              <div className="w-full h-3 rounded-full relative" style={{ background: "#F0EBD8" }}>
-                <div className="h-full rounded-full" style={{ width: "68%", background: "linear-gradient(90deg, #DC2626, #F59E0B, #16A34A)" }} />
-                <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2" style={{ left: "calc(68% - 8px)", background: "#FFF", borderColor: "#1A1008" }} />
-              </div>
-            </div>
-            <div className="space-y-1.5 mb-3">
-              {creditFactors.map((f, i) => (
-                <p key={i} className="text-xs" style={{ color: "rgba(26,16,8,0.70)" }}>
-                  <span style={{ color: f.color, fontWeight: 700 }}>{f.sign}</span> {f.text}
-                </p>
-              ))}
-            </div>
-            <p className="text-xs mb-3 p-2 rounded" style={{ background: "#F0FDF4", color: "#166534" }}>If you collect all overdues: score → 74</p>
-            <p className="text-xs font-semibold mb-1" style={{ color: "#1A1008" }}>Loan eligibility at current score:</p>
-            <ul className="text-xs space-y-0.5" style={{ color: "rgba(26,16,8,0.70)" }}>
-              <li>Working capital: up to ₹18L</li>
-              <li>Term loan: up to ₹45L</li>
-              <li>CGTMSE: eligible</li>
-            </ul>
-            <button className="mt-3 px-3 py-1.5 rounded text-xs font-medium" style={{ background: "#FFFFFF", border: "1px solid #D4C9A8", color: "#1A1008" }}>Improve score →</button>
-          </Card>
-
-          {/* Card 3: Fundraise Readiness */}
-          <Card>
-            <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Fundraise Readiness</h2>
-            <p style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 28, color: "#8B5A00" }}>61<span className="text-base" style={{ color: "rgba(26,16,8,0.45)" }}>/100</span></p>
-            <div className="w-full h-2 rounded-full mt-2 mb-4" style={{ background: "#F0EBD8" }}>
-              <div className="h-full rounded-full" style={{ width: "61%", background: "#FCD34D" }} />
-            </div>
-            <div className="space-y-2">
-              {fundraiseChecks.map((c, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs">
-                  <span style={{ color: c.ok ? "#166534" : "#C41E1E", fontWeight: 700, fontSize: 14 }}>{c.ok ? "✓" : "✗"}</span>
-                  <span style={{ color: "rgba(26,16,8,0.70)" }}>{c.text}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-3 text-xs font-medium" style={{ color: "#1A1008" }}>3 of 5 investor requirements met</p>
-            <button className="mt-2 text-xs font-medium" style={{ color: "#C41E1E" }}>What investors check →</button>
-          </Card>
-
-          {/* Card 4: Export */}
-          <Card>
-            <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Export Opportunities</h2>
-            <p className="text-xs mb-3" style={{ color: "rgba(26,16,8,0.65)" }}>Based on your GSTIN and industry, you may qualify for these export incentives:</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #F0EBD8" }}>
-                <span className="text-xs font-medium" style={{ color: "#1A1008" }}>MEIS / RoDTEP</span>
-                <button className="text-xs font-medium" style={{ color: "#C41E1E" }}>Check eligibility →</button>
-              </div>
-              <div className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #F0EBD8" }}>
-                <span className="text-xs font-medium" style={{ color: "#1A1008" }}>GST Refund on Exports</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: "#F0FDF4", color: "#166534" }}>You qualify</span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-xs font-medium" style={{ color: "#1A1008" }}>ECGC Credit Insurance</span>
-                <button className="text-xs font-medium" style={{ color: "#C41E1E" }}>Learn more →</button>
-              </div>
-            </div>
-            <p className="mt-3 text-xs" style={{ color: "rgba(26,16,8,0.50)" }}>Export GST refund: you had ₹0 export transactions in last 6 months.</p>
-          </Card>
-        </div>
-
-        {/* Competitor signals */}
-        <Card>
-          <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Industry signals this month</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {signals.map((s) => (
-              <div key={s.title} className="rounded-lg p-4" style={{ border: "1px solid #E0D9C8" }}>
-                <p style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 13, color: "#1A1008", lineHeight: 1.4 }}>{s.title}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-medium" style={{ background: "#F4EDDA", color: "rgba(26,16,8,0.65)" }}>{s.cat}</span>
-                  <span className="text-[10px]" style={{ color: "rgba(26,16,8,0.45)" }}>{s.source}</span>
-                </div>
-                <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: s.iBg, color: s.iColor }}>{s.impact}</span>
-              </div>
-            ))}
-          </div>
         </Card>
+        <Card className="bg-fyn-ink p-5 border-0">
+          <p className="text-white/40 text-[13px] fyn-label">GROWTH RATE (MoM)</p>
+          <p
+            className="text-[28px] font-bold mt-1 font-sans"
+            style={{ color: growthPositive ? "#16A34A" : "#C41E1E" }}
+          >
+            {growthRate}%
+          </p>
+        </Card>
+        <Card className="bg-fyn-ink p-5 border-0">
+          <p className="text-white/40 text-[13px] fyn-label">TOTAL INVOICES</p>
+          <p className="text-white text-[28px] font-bold mt-1 font-sans">
+            {receivables.length}
+          </p>
+        </Card>
+      </div>
+
+      <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
+        <h3 className="text-fyn-ink text-lg mb-4 font-sans">Revenue Trend</h3>
+        <ResponsiveContainer width="100%" height={320}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#00000010" />
+            <XAxis dataKey="month" fontSize={12} />
+            <YAxis
+              tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}K`}
+              fontSize={12}
+            />
+            <Tooltip formatter={(v: number) => `₹${v.toLocaleString("en-IN")}`} />
+            <Line
+              type="monotone"
+              dataKey="revenue"
+              stroke="#C41E1E"
+              strokeWidth={2}
+              dot={{ r: 4 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </DashboardLayout>
   );
-}
+};
+
+export default MarketGrowthPage;
