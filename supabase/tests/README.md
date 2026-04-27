@@ -54,3 +54,44 @@ psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/security_regression
 ```
 
 Prints `OK: …` per assertion and exits non-zero on first failure.
+
+## Realtime isolation (Deno)
+
+Verifies the **WebSocket broker** never delivers a row from tenant B to a
+subscriber authenticated as tenant A. Required because Realtime authorization
+is enforced at a separate layer from table-level RLS — pgTAP cannot prove it.
+
+```bash
+SUPABASE_URL=https://<ref>.supabase.co \
+SUPABASE_PUBLISHABLE_KEY=<anon key>    \
+SUPABASE_SERVICE_ROLE_KEY=<svc key>    \  # auto-provisions test users
+deno test --allow-net --allow-env supabase/tests/realtime_isolation.test.ts
+```
+
+Or use pre-seeded accounts (skip service role):
+
+```bash
+TEST_USER_A_EMAIL=... TEST_USER_A_PASSWORD=... \
+TEST_USER_B_EMAIL=... TEST_USER_B_PASSWORD=... \
+SUPABASE_URL=...      SUPABASE_PUBLISHABLE_KEY=... \
+deno test --allow-net --allow-env supabase/tests/realtime_isolation.test.ts
+```
+
+The test:
+
+1. Acquires two confirmed users with **distinct** `profiles.business_id`
+   (preferring pre-seeded creds; otherwise auto-provisions via service role
+   and tags everything with `__rt_iso_test__` for cleanup).
+2. Signs each user in with the anon key, calls `realtime.setAuth(jwt)`, and
+   subscribes to `receivables` filtered by `business_id=eq.<own>`.
+3. INSERTs one tagged receivable per tenant.
+4. Waits up to 5 s and asserts:
+   - tenant A received its own row,
+   - tenant B received its own row,
+   - **neither tenant received any row whose `business_id` belongs to the
+     other tenant** (the cross-tenant assertion),
+   - tenant A never saw B's row id, and vice versa.
+5. Auto-cleans channels, sessions, and any provisioned users/businesses/rows.
+
+The test `ignore`s itself if neither pre-seeded creds nor the service role
+key are available — so CI without secrets won't false-fail.
