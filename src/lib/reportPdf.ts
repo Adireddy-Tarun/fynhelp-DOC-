@@ -247,7 +247,7 @@ export function downloadReportPdf(report: ReportLike) {
     const lines = doc.splitTextToSize(para, usable) as string[];
     for (const line of lines) {
       ensureSpace(lineHeight);
-      doc.text(line, margin, y);
+      drawTabularLine(line, margin, y);
       y += lineHeight;
     }
     y += paragraphGap;
