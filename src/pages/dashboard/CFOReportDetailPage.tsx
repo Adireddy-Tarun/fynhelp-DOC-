@@ -210,6 +210,55 @@ const CFOReportDetailPage = () => {
           </div>
         </div>
 
+        {showFallbackInput && (
+          <div className="mb-5 -mt-1 bg-fyn-beige border border-fyn-ink-10 rounded-md p-3">
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="share-url-fallback"
+                className="text-xs font-medium text-fyn-ink/70"
+              >
+                Copy this URL manually
+              </label>
+              <button
+                onClick={() => setShowFallbackInput(false)}
+                className="text-fyn-ink/50 hover:text-fyn-ink transition"
+                aria-label="Close manual copy"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                ref={fallbackInputRef}
+                id="share-url-fallback"
+                type="text"
+                value={shareUrl}
+                readOnly
+                onFocus={(e) => e.currentTarget.select()}
+                onClick={(e) => e.currentTarget.select()}
+                className="flex-1 bg-white border border-fyn-ink/15 rounded px-2.5 py-1.5 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
+              />
+              <button
+                onClick={() => {
+                  fallbackInputRef.current?.select();
+                  const ok = document.execCommand("copy");
+                  if (ok) {
+                    setCopied(true);
+                    toast({ title: "Link copied", description: "Share link copied to clipboard." });
+                    setTimeout(() => setCopied(false), 2000);
+                  }
+                }}
+                className="inline-flex items-center gap-1 bg-fyn-ink text-white px-2.5 py-1.5 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
+              >
+                <Copy className="w-3 h-3" />
+                Copy URL
+              </button>
+            </div>
+            <p className="text-[10px] text-fyn-ink/50 mt-1.5">
+              Tip: press Ctrl/Cmd + C after the URL is selected.
+            </p>
+          </div>
+        )}
         <div className="border-t border-fyn-ink-10 pt-5">
           <h2 className="fyn-label text-fyn-ink/50 text-xs mb-3">
             REPORT CONTENT
