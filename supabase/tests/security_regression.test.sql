@@ -305,14 +305,18 @@ DECLARE
   resolved_uid uuid;
   resolved_business uuid;
   deleted_count int;
+  updated_count int;
+  selected_count int;
+  surviving_name text;
   marker text := pg_temp.seed_marker();
+  attack_name constant text := '__pgtap_attack__';
 BEGIN
   SELECT * INTO user_a, biz_a, biz_b, did_seed
   FROM pg_temp.ensure_two_tenants();
 
   IF user_a IS NULL OR biz_b IS NULL THEN
     -- Should be unreachable; ensure_two_tenants() guarantees both.
-    PERFORM skip('cross-tenant DELETE: tenant setup failed', 4);
+    PERFORM skip('cross-tenant RLS: tenant setup failed', 10);
     RETURN;
   END IF;
 
@@ -321,11 +325,11 @@ BEGIN
   INSERT INTO public.receivables (id, business_id, customer_name, amount)
   VALUES (rec_b, biz_b, marker, 1);
 
-  -- Switch to the spoofed authenticated user.
+  -- Switch to the spoofed authenticated user (tenant A).
   PERFORM pg_temp.spoof_jwt(user_a);
 
   -- Sanity-check the spoof: auth.uid() and the SECURITY DEFINER helper
-  -- must resolve to tenant A before we trust the DELETE assertion.
+  -- must resolve to tenant A before we trust the cross-tenant assertions.
   resolved_uid := auth.uid();
   resolved_business := public.get_user_business_id();
 
@@ -340,10 +344,74 @@ BEGIN
     'get_user_business_id() returns tenant A business'
   );
 
-  -- Attempt the cross-tenant DELETE.
+  -- ---------------------------------------------------------------------------
+  -- SELECT: tenant A must NOT see tenant B's row.
+  -- RLS on SELECT silently filters rows out, so we assert invisibility three
+  -- ways: direct id lookup, business_id scan, and full-table count of B's id.
+  -- ---------------------------------------------------------------------------
+  SELECT count(*) INTO selected_count
+  FROM public.receivables WHERE id = rec_b;
+  PERFORM is(
+    selected_count,
+    0,
+    'tenant A cannot SELECT tenant B receivable by id (RLS hides it)'
+  );
+
+  SELECT count(*) INTO selected_count
+  FROM public.receivables WHERE business_id = biz_b;
+  PERFORM is(
+    selected_count,
+    0,
+    'tenant A cannot SELECT any rows scoped to tenant B business_id'
+  );
+
+  SELECT count(*) INTO selected_count
+  FROM public.receivables WHERE customer_name = marker AND business_id = biz_b;
+  PERFORM is(
+    selected_count,
+    0,
+    'tenant A SELECT cannot leak tenant B rows via marker filter'
+  );
+
+  -- ---------------------------------------------------------------------------
+  -- UPDATE: tenant A must NOT modify tenant B's row.
+  -- RLS makes the row invisible to UPDATE — the statement succeeds but
+  -- affects 0 rows. We additionally verify the row's contents are unchanged
+  -- by re-reading as the underlying owner (bypass RLS via reset).
+  -- ---------------------------------------------------------------------------
+  UPDATE public.receivables
+     SET customer_name = attack_name, amount = 999999
+   WHERE id = rec_b;
+  GET DIAGNOSTICS updated_count = ROW_COUNT;
+  PERFORM is(
+    updated_count,
+    0,
+    'tenant A UPDATE on tenant B receivable affects 0 rows (RLS blocks)'
+  );
+
+  -- Drop spoof to verify the row is untouched from a privileged vantage.
+  PERFORM pg_temp.reset_jwt();
+  SELECT customer_name INTO surviving_name
+  FROM public.receivables WHERE id = rec_b;
+  PERFORM is(
+    surviving_name,
+    marker,
+    'tenant B receivable customer_name unchanged after cross-tenant UPDATE'
+  );
+  PERFORM ok(
+    NOT EXISTS (
+      SELECT 1 FROM public.receivables
+      WHERE id = rec_b AND customer_name = attack_name
+    ),
+    'tenant B receivable shows no trace of tenant A UPDATE attempt'
+  );
+
+  -- ---------------------------------------------------------------------------
+  -- DELETE: tenant A must NOT delete tenant B's row.
+  -- ---------------------------------------------------------------------------
+  PERFORM pg_temp.spoof_jwt(user_a);
   DELETE FROM public.receivables WHERE id = rec_b;
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
-
   PERFORM pg_temp.reset_jwt();
 
   PERFORM is(
