@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
+import { downloadReportPdf } from "@/lib/reportPdf";
 
 const formatDate = (d?: string | null) =>
   d
@@ -15,56 +15,6 @@ const formatDate = (d?: string | null) =>
         year: "numeric",
       })
     : "—";
-
-const downloadReportPdf = (report: any) => {
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const margin = 48;
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const usable = pageWidth - margin * 2;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("CFO Report", margin, margin);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(110);
-  doc.text(`Brief date: ${formatDate(report.brief_date)}`, margin, margin + 22);
-  doc.text(`Generated: ${formatDate(report.created_at)}`, margin, margin + 36);
-  doc.text(
-    `Status: ${report.delivered ? "Delivered" : "Ready"}`,
-    margin,
-    margin + 50
-  );
-
-  doc.setDrawColor(220);
-  doc.line(margin, margin + 62, pageWidth - margin, margin + 62);
-
-  doc.setTextColor(20);
-  doc.setFontSize(11);
-  const body =
-    typeof report.content === "string" && report.content.trim().length > 0
-      ? report.content
-      : "(No content available for this report.)";
-  const lines = doc.splitTextToSize(body, usable) as string[];
-
-  let y = margin + 84;
-  for (const line of lines) {
-    if (y > pageHeight - margin) {
-      doc.addPage();
-      y = margin;
-    }
-    doc.text(line, margin, y);
-    y += 15;
-  }
-
-  const filename = `cfo-report-${report.brief_date || report.id}.pdf`.replace(
-    /[^a-z0-9.\-_]/gi,
-    "_"
-  );
-  doc.save(filename);
-};
 
 const CFOReportDetailPage = () => {
   const navigate = useNavigate();
