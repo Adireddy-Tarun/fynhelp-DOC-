@@ -30,7 +30,7 @@ export async function logRealtimeEvent(evt: RealtimeAuditEvent): Promise<void> {
     } = await supabase.auth.getUser();
     if (!user) return; // anon clients cannot insert per RLS — skip silently.
 
-    const { error } = await supabase.from("realtime_event_log").insert({
+    const payload = {
       emitted_by: user.id,
       channel_name: evt.channel_name,
       schema_name: "public",
@@ -41,7 +41,11 @@ export async function logRealtimeEvent(evt: RealtimeAuditEvent): Promise<void> {
       row_id: evt.row_id ?? null,
       context: evt.context ?? {},
       handler_status: evt.handler_status ?? "received",
-    });
+    };
+
+    const { error } = await supabase
+      .from("realtime_event_log")
+      .insert(payload as never);
 
     if (error) {
       // Most likely an RLS rejection (e.g. business_id mismatch). Surface it
