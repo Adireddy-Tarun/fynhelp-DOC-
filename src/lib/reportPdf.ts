@@ -258,25 +258,81 @@ export function downloadReportPdf(report: ReportLike) {
   };
 
   // Split into paragraphs (preserve blank lines as spacing)
-  const paragraphs = bodyText.split(/\n\s*\n/);
+  const rawParagraphs = bodyText.split(/\n\s*\n/);
 
-  for (const rawPara of paragraphs) {
+  type Block =
+    | { kind: "heading"; text: string; height: number }
+    | { kind: "para"; lines: string[]; height: number };
+
+  const headingHeight = lineHeight + 4; // matches render advance below
+  const usablePageHeight = contentBottom - contentTop;
+
+  // Pre-measure every block so we can make page-break decisions before
+  // committing any text to the page. This guarantees no paragraph (or any of
+  // its lines) is ever rendered into the footer band.
+  const blocks: Block[] = [];
+  for (const rawPara of rawParagraphs) {
     const para = rawPara.replace(/\n/g, " ").trim();
     if (!para) continue;
 
-    // Detect a heading-ish line: short, ends without period, or markdown #
     const isHeading =
       /^#{1,3}\s+/.test(para) ||
-      (para.length <= 80 && !/[.!?]$/.test(para) && para === para.replace(/\s+/g, " "));
+      (para.length <= 80 &&
+        !/[.!?]$/.test(para) &&
+        para === para.replace(/\s+/g, " "));
 
     if (isHeading && para.length <= 120) {
-      const headingText = para.replace(/^#{1,3}\s+/, "");
-      ensureSpace(lineHeight + 6);
+      blocks.push({
+        kind: "heading",
+        text: para.replace(/^#{1,3}\s+/, ""),
+        height: headingHeight,
+      });
+      continue;
+    }
+
+    // Measure body lines using the actual body font/size jsPDF will render.
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(para, usable) as string[];
+    blocks.push({
+      kind: "para",
+      lines,
+      height: lines.length * lineHeight,
+    });
+  }
+
+  const pageBreak = () => {
+    doc.addPage();
+    drawHeader();
+    y = contentTop;
+  };
+
+  const remaining = () => contentBottom - y;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+
+    if (block.kind === "heading") {
+      // Keep heading with its next block — never orphan.
+      const next = blocks[i + 1];
+      const glueHeight =
+        block.height +
+        (next
+          ? next.kind === "para"
+            ? Math.min(next.height, lineHeight * 2) // at least 2 lines of next para
+            : next.height
+          : 0);
+      if (glueHeight > remaining() && glueHeight <= usablePageHeight) {
+        pageBreak();
+      } else if (block.height > remaining()) {
+        pageBreak();
+      }
+
       doc.setFont("times", "bold");
       doc.setFontSize(13);
       doc.setTextColor(...BRAND.ink);
-      doc.text(headingText, margin, y);
-      y += lineHeight + 4;
+      doc.text(block.text, margin, y);
+      y += headingHeight;
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
@@ -284,13 +340,36 @@ export function downloadReportPdf(report: ReportLike) {
       continue;
     }
 
-    const lines = doc.splitTextToSize(para, usable) as string[];
-    for (const line of lines) {
-      ensureSpace(lineHeight);
-      drawTabularLine(line, margin, y);
-      y += lineHeight;
+    // Paragraph: if it fits entirely on the current page, render as a unit.
+    // If it fits on a fresh page but not here, push to a new page.
+    // If it's taller than one page, render line-by-line with safe breaks.
+    if (block.height <= remaining()) {
+      for (const line of block.lines) {
+        drawTabularLine(line, margin, y);
+        y += lineHeight;
+      }
+    } else if (block.height <= usablePageHeight) {
+      pageBreak();
+      for (const line of block.lines) {
+        drawTabularLine(line, margin, y);
+        y += lineHeight;
+      }
+    } else {
+      // Oversized paragraph — must split. Break only at line boundaries and
+      // never let a line cross into the footer band.
+      for (const line of block.lines) {
+        if (y + lineHeight > contentBottom) {
+          pageBreak();
+        }
+        drawTabularLine(line, margin, y);
+        y += lineHeight;
+      }
     }
-    y += paragraphGap;
+
+    // Inter-paragraph gap — only if it doesn't push past the footer.
+    if (i < blocks.length - 1) {
+      y = Math.min(y + paragraphGap, contentBottom);
+    }
   }
 
   // ---------- Footers across all pages ----------
