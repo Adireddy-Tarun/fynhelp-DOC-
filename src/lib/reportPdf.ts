@@ -129,18 +129,32 @@ export function downloadReportPdf(
   };
 
   const drawHeader = () => {
-    // Beige header band
+    if (isSimple) {
+      // Print-friendly: plain text header, no fills, no logo.
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(...inkColor);
+      doc.text("CFO Report", margin, 32);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...mutedColor);
+      const meta = `Brief: ${briefDateLabel}   Generated: ${generatedLabel}   Status: ${statusLabel}`;
+      doc.text(meta, margin, 46);
+
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.line(margin, headerHeight, pageWidth - margin, headerHeight);
+      return;
+    }
+
+    // Branded header (beige band, red bar, logo, tabular meta)
     doc.setFillColor(...BRAND.beigeDark);
     doc.rect(0, 0, pageWidth, headerHeight, "F");
-
-    // Red accent bar at left
     doc.setFillColor(...BRAND.red);
     doc.rect(0, 0, 6, headerHeight, "F");
-
-    // Brand logo (icon + wordmark + tagline)
     drawLogo(margin, (headerHeight - 36) / 2);
 
-    // Right-aligned meta — labels in helvetica, values in courier (tabular)
     const rightX = pageWidth - margin;
     const drawMetaRow = (label: string, value: string, ly: number) => {
       doc.setFont("courier", "normal");
@@ -157,7 +171,6 @@ export function downloadReportPdf(
     drawMetaRow("Generated", generatedLabel, 42);
     drawMetaRow("Status", statusLabel, 56);
 
-    // Hairline rule under header
     doc.setDrawColor(...BRAND.rule);
     doc.setLineWidth(0.5);
     doc.line(margin, headerHeight + 8, pageWidth - margin, headerHeight + 8);
