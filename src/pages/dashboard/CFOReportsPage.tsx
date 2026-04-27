@@ -201,13 +201,21 @@ const CFOReportsPage = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <button
-                      onClick={() => downloadReportPdf(report)}
-                      className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      PDF
-                    </button>
+                    <div className="inline-flex items-center gap-2 justify-end">
+                      <button
+                        onClick={() => navigate(`/dashboard/reports/${report.id}`)}
+                        className="text-fyn-red text-xs font-medium hover:underline"
+                      >
+                        View →
+                      </button>
+                      <button
+                        onClick={() => downloadReportPdf(report)}
+                        className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        PDF
+                      </button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

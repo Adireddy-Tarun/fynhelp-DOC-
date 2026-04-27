@@ -1,0 +1,185 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { jsPDF } from "jspdf";
+import { ArrowLeft, Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import DashboardLayout from "@/components/DashboardLayout";
+import { Badge } from "@/components/ui/badge";
+
+const formatDate = (d?: string | null) =>
+  d
+    ? new Date(d).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "—";
+
+const downloadReportPdf = (report: any) => {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const margin = 48;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const usable = pageWidth - margin * 2;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("CFO Report", margin, margin);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(110);
+  doc.text(`Brief date: ${formatDate(report.brief_date)}`, margin, margin + 22);
+  doc.text(`Generated: ${formatDate(report.created_at)}`, margin, margin + 36);
+  doc.text(
+    `Status: ${report.delivered ? "Delivered" : "Ready"}`,
+    margin,
+    margin + 50
+  );
+
+  doc.setDrawColor(220);
+  doc.line(margin, margin + 62, pageWidth - margin, margin + 62);
+
+  doc.setTextColor(20);
+  doc.setFontSize(11);
+  const body =
+    typeof report.content === "string" && report.content.trim().length > 0
+      ? report.content
+      : "(No content available for this report.)";
+  const lines = doc.splitTextToSize(body, usable) as string[];
+
+  let y = margin + 84;
+  for (const line of lines) {
+    if (y > pageHeight - margin) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text(line, margin, y);
+    y += 15;
+  }
+
+  const filename = `cfo-report-${report.brief_date || report.id}.pdf`.replace(
+    /[^a-z0-9.\-_]/gi,
+    "_"
+  );
+  doc.save(filename);
+};
+
+const CFOReportDetailPage = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [businessId, setBusinessId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBusiness = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("business_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data?.business_id) setBusinessId(data.business_id);
+    };
+    fetchBusiness();
+  }, []);
+
+  const { data: report, isLoading } = useQuery({
+    queryKey: ["cfo-report", id, businessId],
+    enabled: !!id && !!businessId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("nidhi_briefs")
+        .select("*")
+        .eq("id", id!)
+        .eq("business_id", businessId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  if (isLoading || !businessId) {
+    return (
+      <DashboardLayout>
+        <div className="text-fyn-ink/60 text-sm">Loading report…</div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!report) {
+    return (
+      <DashboardLayout>
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-10 text-center">
+          <h2 className="text-fyn-ink text-2xl font-sans font-semibold mb-2">
+            Report Not Found
+          </h2>
+          <p className="text-fyn-ink/60 text-sm mb-6">
+            This report doesn't exist or you don't have access to it.
+          </p>
+          <button
+            onClick={() => navigate("/dashboard/reports")}
+            className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
+          >
+            Back to Reports
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout>
+      <button
+        onClick={() => navigate("/dashboard/reports")}
+        className="inline-flex items-center gap-1.5 text-fyn-ink/70 hover:text-fyn-ink text-sm mb-4 transition"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to reports
+      </button>
+
+      <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h1 className="text-fyn-ink text-2xl font-sans font-semibold">
+              CFO Report
+            </h1>
+            <p className="text-fyn-ink/60 text-sm mt-1">
+              Brief date: {formatDate(report.brief_date)} · Generated{" "}
+              {formatDate(report.created_at)}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant={report.delivered ? "default" : "secondary"}>
+              {report.delivered ? "Delivered" : "Ready"}
+            </Badge>
+            <button
+              onClick={() => downloadReportPdf(report)}
+              className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
+            >
+              <Download className="w-3.5 h-3.5" />
+              PDF
+            </button>
+          </div>
+        </div>
+
+        <div className="border-t border-fyn-ink-10 pt-5">
+          <h2 className="fyn-label text-fyn-ink/50 text-xs mb-3">
+            REPORT CONTENT
+          </h2>
+          {typeof report.content === "string" && report.content.trim() ? (
+            <pre className="whitespace-pre-wrap font-sans text-fyn-ink text-sm leading-relaxed">
+              {report.content}
+            </pre>
+          ) : (
+            <p className="text-fyn-ink/50 text-sm italic">
+              No content available for this report.
+            </p>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default CFOReportDetailPage;
