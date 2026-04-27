@@ -183,14 +183,17 @@ END $$;
 --
 -- Spoofs the request that PostgREST would send for an authenticated user by
 -- setting ALL JWT-related GUCs that auth.uid() / auth.role() / auth.jwt()
--- consult on this Supabase instance:
---   - role             (Postgres role)  -> SET LOCAL ROLE authenticated
---   - request.jwt.claim.sub             -> read first by auth.uid()
---   - request.jwt.claim.role            -> read first by auth.role()
---   - request.jwt.claims (full JSON)    -> fallback used by auth.jwt()
+-- consult on this Supabase instance.
 --
--- Picks two existing tenants from the DB; emits skip() if fewer than 2 are
--- present (typical in a fresh project).
+-- Seeding strategy ("seed-or-reuse, then auto-clean"):
+--   * If the DB already has >=2 distinct tenants, reuse them — no writes.
+--   * Otherwise, synthesise 2 tenants tagged with marker '__pgtap_seed__'.
+--     - Temporarily drop profiles.user_id -> auth.users FK (the whole suite
+--       runs in BEGIN..ROLLBACK, so the FK reappears at COMMIT/ROLLBACK time).
+--     - Insert tagged businesses + profiles + a tagged receivable.
+--   * After the assertions run, the seed cleanup helper deletes ALL rows
+--     bearing the marker, in FK-safe order. The outer ROLLBACK is the final
+--     belt-and-braces guarantee — nothing seeded ever survives.
 -- -----------------------------------------------------------------------------
 
 -- Reusable JWT-spoof helper: matches PostgREST's GUC layout exactly.
@@ -202,7 +205,6 @@ DECLARE
     'role', 'authenticated',
     'aud',  'authenticated',
     'iss',  'supabase',
-    -- 1-hour lifetime, in seconds since epoch
     'iat',  extract(epoch FROM now())::int,
     'exp',  extract(epoch FROM now())::int + 3600
   );
@@ -224,16 +226,39 @@ BEGIN
   RESET ROLE;
 END $$;
 
-DO $$
+-- Marker used to identify and clean up everything we seed.
+CREATE OR REPLACE FUNCTION pg_temp.seed_marker() RETURNS text
+LANGUAGE sql IMMUTABLE AS $$ SELECT '__pgtap_seed__'::text $$;
+
+-- Removes every seeded row across all touched tables, FK-safe order.
+-- Idempotent: safe to call even if nothing was seeded.
+CREATE OR REPLACE FUNCTION pg_temp.cleanup_seeds() RETURNS void
+LANGUAGE plpgsql AS $$
 DECLARE
-  user_a uuid;
-  biz_a  uuid;
-  biz_b  uuid;
-  rec_b  uuid;
-  resolved_uid uuid;
-  resolved_business uuid;
-  deleted_count int;
+  marker text := pg_temp.seed_marker();
 BEGIN
+  -- Children first.
+  DELETE FROM public.receivables   WHERE customer_name = marker;
+  DELETE FROM public.profiles      WHERE full_name     = marker;
+  DELETE FROM public.businesses    WHERE business_name = marker;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Cleanup must never mask a test failure; just record it.
+    RAISE WARNING 'pg_temp.cleanup_seeds(): %', SQLERRM;
+END $$;
+
+-- Returns (user_a, biz_a, biz_b, did_seed). Seeds two tenants only if
+-- fewer than two are present. Tagged with seed_marker() for cleanup.
+CREATE OR REPLACE FUNCTION pg_temp.ensure_two_tenants(
+  OUT user_a uuid, OUT biz_a uuid, OUT biz_b uuid, OUT did_seed boolean
+) LANGUAGE plpgsql AS $$
+DECLARE
+  marker text := pg_temp.seed_marker();
+  user_b uuid;
+BEGIN
+  did_seed := false;
+
+  -- Try to reuse existing data.
   SELECT p.user_id, p.business_id INTO user_a, biz_a
   FROM public.profiles p
   WHERE p.business_id IS NOT NULL
@@ -245,17 +270,55 @@ BEGIN
   WHERE b.id IS DISTINCT FROM biz_a
   LIMIT 1;
 
-  IF user_a IS NULL OR biz_b IS NULL THEN
-    PERFORM skip(
-      'cross-tenant DELETE: needs >=2 tenants in DB',
-      4
-    );
+  IF user_a IS NOT NULL AND biz_b IS NOT NULL THEN
     RETURN;
   END IF;
 
+  -- Synthesise tenants. The whole suite runs in BEGIN..ROLLBACK, so
+  -- dropping the auth FK here is fully reverted at the end.
+  ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_user_id_fkey;
+
+  user_a := gen_random_uuid();
+  user_b := gen_random_uuid();
+  biz_a  := gen_random_uuid();
+  biz_b  := gen_random_uuid();
+
+  INSERT INTO public.businesses (id, business_name) VALUES
+    (biz_a, marker),
+    (biz_b, marker);
+
+  INSERT INTO public.profiles (user_id, business_id, full_name) VALUES
+    (user_a, biz_a, marker),
+    (user_b, biz_b, marker);
+
+  did_seed := true;
+END $$;
+
+DO $$
+DECLARE
+  user_a uuid;
+  biz_a  uuid;
+  biz_b  uuid;
+  did_seed boolean;
+  rec_b  uuid;
+  resolved_uid uuid;
+  resolved_business uuid;
+  deleted_count int;
+  marker text := pg_temp.seed_marker();
+BEGIN
+  SELECT * INTO user_a, biz_a, biz_b, did_seed
+  FROM pg_temp.ensure_two_tenants();
+
+  IF user_a IS NULL OR biz_b IS NULL THEN
+    -- Should be unreachable; ensure_two_tenants() guarantees both.
+    PERFORM skip('cross-tenant DELETE: tenant setup failed', 4);
+    RETURN;
+  END IF;
+
+  -- Tag the test row so cleanup_seeds() removes it even on early abort.
   rec_b := gen_random_uuid();
   INSERT INTO public.receivables (id, business_id, customer_name, amount)
-  VALUES (rec_b, biz_b, '__pgtap_rls_test__', 1);
+  VALUES (rec_b, biz_b, marker, 1);
 
   -- Switch to the spoofed authenticated user.
   PERFORM pg_temp.spoof_jwt(user_a);
@@ -291,6 +354,10 @@ BEGIN
     EXISTS (SELECT 1 FROM public.receivables WHERE id = rec_b),
     'tenant B receivable row survived cross-tenant DELETE attempt'
   );
+
+  -- Auto-clean. The outer ROLLBACK is the final safety net, but explicit
+  -- cleanup keeps the suite robust even when run with autocommit on.
+  PERFORM pg_temp.cleanup_seeds();
 END $$;
 
 -- -----------------------------------------------------------------------------
