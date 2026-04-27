@@ -123,14 +123,22 @@ export function downloadReportPdf(report: ReportLike) {
     // Brand logo (icon + wordmark + tagline)
     drawLogo(margin, (headerHeight - 36) / 2);
 
-    // Right-aligned meta
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...BRAND.muted);
+    // Right-aligned meta — labels in helvetica, values in courier (tabular)
     const rightX = pageWidth - margin;
-    doc.text(`Brief: ${briefDateLabel}`, rightX, 28, { align: "right" });
-    doc.text(`Generated: ${generatedLabel}`, rightX, 42, { align: "right" });
-    doc.text(`Status: ${statusLabel}`, rightX, 56, { align: "right" });
+    const drawMetaRow = (label: string, value: string, ly: number) => {
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...BRAND.ink);
+      doc.text(value, rightX, ly, { align: "right" });
+      const valueWidth = doc.getTextWidth(value);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...BRAND.muted);
+      doc.text(label, rightX - valueWidth - 4, ly, { align: "right" });
+    };
+    drawMetaRow("Brief", briefDateLabel, 28);
+    drawMetaRow("Generated", generatedLabel, 42);
+    drawMetaRow("Status", statusLabel, 56);
 
     // Hairline rule under header
     doc.setDrawColor(...BRAND.rule);
@@ -152,6 +160,9 @@ export function downloadReportPdf(report: ReportLike) {
     doc.setFontSize(8);
     doc.setTextColor(...BRAND.muted);
     doc.text("FynHelp · Confidential", margin, pageHeight - footerHeight + 18);
+    // Page number — tabular (courier) so "1 of 10" aligns across pages
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8);
     doc.text(
       `Page ${pageNum} of ${pageCount}`,
       pageWidth - margin,
@@ -206,6 +217,46 @@ export function downloadReportPdf(report: ReportLike) {
     }
   };
 
+  // Render a line of text with numeric tokens (currency, %, dates, plain
+  // numbers) in courier so digits align like Inter's tabular-nums.
+  // Matches: ₹/$/€ amounts, percentages, ISO dates, en-IN dates, integers,
+  // decimals, comma-grouped numbers, and lakh-style 1,23,456.
+  const NUM_TOKEN_RE =
+    /(?:[₹$€£]\s?\d[\d,]*(?:\.\d+)?|\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d[\d,]*(?:\.\d+)?%?)/g;
+
+  const drawTabularLine = (text: string, x: number, ly: number) => {
+    const segments: { text: string; tabular: boolean }[] = [];
+    let cursor = 0;
+    for (const match of text.matchAll(NUM_TOKEN_RE)) {
+      const start = match.index ?? 0;
+      if (start > cursor) {
+        segments.push({ text: text.slice(cursor, start), tabular: false });
+      }
+      segments.push({ text: match[0], tabular: true });
+      cursor = start + match[0].length;
+    }
+    if (cursor < text.length) {
+      segments.push({ text: text.slice(cursor), tabular: false });
+    }
+    if (segments.length === 0) {
+      doc.text(text, x, ly);
+      return;
+    }
+
+    let cx = x;
+    for (const seg of segments) {
+      if (seg.tabular) {
+        doc.setFont("courier", "normal");
+      } else {
+        doc.setFont("helvetica", "normal");
+      }
+      doc.text(seg.text, cx, ly);
+      cx += doc.getTextWidth(seg.text);
+    }
+    // Reset to body font for subsequent calls
+    doc.setFont("helvetica", "normal");
+  };
+
   // Split into paragraphs (preserve blank lines as spacing)
   const paragraphs = bodyText.split(/\n\s*\n/);
 
@@ -236,7 +287,7 @@ export function downloadReportPdf(report: ReportLike) {
     const lines = doc.splitTextToSize(para, usable) as string[];
     for (const line of lines) {
       ensureSpace(lineHeight);
-      doc.text(line, margin, y);
+      drawTabularLine(line, margin, y);
       y += lineHeight;
     }
     y += paragraphGap;
