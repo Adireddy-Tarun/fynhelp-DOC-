@@ -40,6 +40,7 @@ import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
 import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
 import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
+import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
 import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
@@ -117,6 +118,7 @@ const App = () => (
             <Route path="/dashboard/banking" element={<BankingPage />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
+            <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />
