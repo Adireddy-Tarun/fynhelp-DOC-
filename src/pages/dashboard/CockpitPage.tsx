@@ -8,6 +8,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logRealtimeEvent } from "@/lib/realtimeAudit";
 import {
   FynCard,
   FynButton,
@@ -68,12 +69,25 @@ const CockpitPage = () => {
       { table: "compliance_events", queryKey: "compliance-upcoming" },
     ];
 
-    const channel = supabase.channel(`cockpit-live-${businessId}`);
+    const channelName = `cockpit-live-${businessId}`;
+    const channel = supabase.channel(channelName);
     subs.forEach(({ table, queryKey }) => {
       channel.on(
         "postgres_changes" as never,
         { event: "*", schema: "public", table, filter },
-        () => {
+        (payload: any) => {
+          // Audit first (fire-and-forget), then refresh caches.
+          void logRealtimeEvent({
+            channel_name: channelName,
+            table_name: table,
+            event_type: (payload?.eventType ?? "*") as
+              | "INSERT" | "UPDATE" | "DELETE" | "*",
+            business_id: businessId,
+            row_id:
+              (payload?.new as any)?.id ?? (payload?.old as any)?.id ?? null,
+            context: { queryKey },
+            handler_status: "invalidated",
+          });
           queryClient.invalidateQueries({ queryKey: [queryKey, businessId] });
         }
       );
