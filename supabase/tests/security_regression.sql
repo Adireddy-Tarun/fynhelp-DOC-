@@ -184,6 +184,15 @@ DECLARE
   rec_b  uuid := gen_random_uuid();
   deleted_count int;
 BEGIN
+  -- Seed auth users (FK target for profiles.user_id).
+  INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password,
+                          created_at, updated_at)
+  VALUES
+    (user_a, '00000000-0000-0000-0000-000000000000', 'authenticated',
+     'authenticated', 'a@test.local', '', now(), now()),
+    (user_b, '00000000-0000-0000-0000-000000000000', 'authenticated',
+     'authenticated', 'b@test.local', '', now(), now());
+
   -- Seed minimal data as superuser (bypasses RLS).
   INSERT INTO public.businesses (id, business_name) VALUES
     (biz_a, 'Tenant A Co'),
