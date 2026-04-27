@@ -254,6 +254,13 @@ export function downloadReportPdf(
     /(?:[₹$€£]\s?\d[\d,]*(?:\.\d+)?|\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d[\d,]*(?:\.\d+)?%?)/g;
 
   const drawTabularLine = (text: string, x: number, ly: number) => {
+    // In simple mode, render the whole line in helvetica (no font switching)
+    // for maximum print compatibility and speed.
+    if (isSimple) {
+      doc.setFont("helvetica", "normal");
+      doc.text(text, x, ly);
+      return;
+    }
     const segments: { text: string; tabular: boolean }[] = [];
     let cursor = 0;
     for (const match of text.matchAll(NUM_TOKEN_RE)) {
@@ -282,7 +289,6 @@ export function downloadReportPdf(
       doc.text(seg.text, cx, ly);
       cx += doc.getTextWidth(seg.text);
     }
-    // Reset to body font for subsequent calls
     doc.setFont("helvetica", "normal");
   };
 
