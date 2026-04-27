@@ -143,13 +143,25 @@ export default function CANotificationsPage() {
   // ─── Realtime ─────
   useEffect(() => {
     if (!caFirm) return;
+    const channelName = `ca_notifs_${caFirm.id}`;
     const channel = supabase
-      .channel(`ca_notifs_${caFirm.id}`)
+      .channel(channelName)
       .on("postgres_changes", {
         event: "INSERT", schema: "public", table: "ca_notifications",
         filter: `ca_firm_id=eq.${caFirm.id}`,
       }, async (payload) => {
         const newRow = payload.new as Notif;
+        // Audit (fire-and-forget) before any side effects.
+        void logRealtimeEvent({
+          channel_name: channelName,
+          table_name: "ca_notifications",
+          event_type: "INSERT",
+          ca_firm_id: caFirm.id,
+          business_id: newRow.business_id ?? null,
+          row_id: (newRow as any).id ?? null,
+          context: { type: (newRow as any).type ?? null },
+          handler_status: "invalidated",
+        });
         // Fetch joined business
         let withBiz: Notif = { ...newRow, businesses: null };
         if (newRow.business_id) {
