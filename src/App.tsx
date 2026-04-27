@@ -118,6 +118,7 @@ const App = () => (
             <Route path="/dashboard/banking" element={<BankingPage />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
+            <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />
