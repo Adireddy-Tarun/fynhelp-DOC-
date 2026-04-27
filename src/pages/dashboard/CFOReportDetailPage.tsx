@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Check, Download, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { downloadReportPdf } from "@/lib/reportPdf";
+import { useToast } from "@/hooks/use-toast";
 
 const formatDate = (d?: string | null) =>
   d
@@ -18,8 +19,41 @@ const formatDate = (d?: string | null) =>
 
 const CFOReportDetailPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { id } = useParams<{ id: string }>();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyShareLink = async () => {
+    if (!id) return;
+    const url = `${window.location.origin}/dashboard/reports/${id}`;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      toast({
+        title: "Link copied",
+        description: "Share link copied to clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({
+        title: "Could not copy link",
+        description: url,
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -103,6 +137,17 @@ const CFOReportDetailPage = () => {
             <Badge variant={report.delivered ? "default" : "secondary"}>
               {report.delivered ? "Delivered" : "Ready"}
             </Badge>
+            <button
+              onClick={handleCopyShareLink}
+              className="inline-flex items-center gap-1.5 border border-fyn-ink/20 text-fyn-ink px-3 py-1.5 rounded-md text-xs font-medium hover:bg-fyn-ink/5 transition"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-fyn-success" />
+              ) : (
+                <Link2 className="w-3.5 h-3.5" />
+              )}
+              {copied ? "Copied" : "Copy share link"}
+            </button>
             <button
               onClick={() => downloadReportPdf(report)}
               className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
