@@ -217,6 +217,46 @@ export function downloadReportPdf(report: ReportLike) {
     }
   };
 
+  // Render a line of text with numeric tokens (currency, %, dates, plain
+  // numbers) in courier so digits align like Inter's tabular-nums.
+  // Matches: ₹/$/€ amounts, percentages, ISO dates, en-IN dates, integers,
+  // decimals, comma-grouped numbers, and lakh-style 1,23,456.
+  const NUM_TOKEN_RE =
+    /(?:[₹$€£]\s?\d[\d,]*(?:\.\d+)?|\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d[\d,]*(?:\.\d+)?%?)/g;
+
+  const drawTabularLine = (text: string, x: number, ly: number) => {
+    const segments: { text: string; tabular: boolean }[] = [];
+    let cursor = 0;
+    for (const match of text.matchAll(NUM_TOKEN_RE)) {
+      const start = match.index ?? 0;
+      if (start > cursor) {
+        segments.push({ text: text.slice(cursor, start), tabular: false });
+      }
+      segments.push({ text: match[0], tabular: true });
+      cursor = start + match[0].length;
+    }
+    if (cursor < text.length) {
+      segments.push({ text: text.slice(cursor), tabular: false });
+    }
+    if (segments.length === 0) {
+      doc.text(text, x, ly);
+      return;
+    }
+
+    let cx = x;
+    for (const seg of segments) {
+      if (seg.tabular) {
+        doc.setFont("courier", "normal");
+      } else {
+        doc.setFont("helvetica", "normal");
+      }
+      doc.text(seg.text, cx, ly);
+      cx += doc.getTextWidth(seg.text);
+    }
+    // Reset to body font for subsequent calls
+    doc.setFont("helvetica", "normal");
+  };
+
   // Split into paragraphs (preserve blank lines as spacing)
   const paragraphs = bodyText.split(/\n\s*\n/);
 
