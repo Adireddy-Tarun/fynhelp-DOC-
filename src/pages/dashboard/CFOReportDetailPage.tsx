@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, ChevronDown, Download, FileText, Link2, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Copy, Download, FileText, Link2, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
@@ -29,10 +29,22 @@ const CFOReportDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showFallbackInput, setShowFallbackInput] = useState(false);
+  const fallbackInputRef = useRef<HTMLInputElement>(null);
 
-const handleCopyShareLink = async () => {
+  const shareUrl = id ? `${window.location.origin}/dashboard/reports/${id}` : "";
+
+  const showManualFallback = () => {
+    setShowFallbackInput(true);
+    setTimeout(() => {
+      fallbackInputRef.current?.focus();
+      fallbackInputRef.current?.select();
+    }, 50);
+  };
+
+  const handleCopyShareLink = async () => {
     if (!id) return;
-    const url = `${window.location.origin}/dashboard/reports/${id}`;
+    const url = shareUrl;
 
     const fallbackCopy = () => {
       const ta = document.createElement("textarea");
@@ -54,6 +66,7 @@ const handleCopyShareLink = async () => {
         if (!ok) throw new Error("Fallback copy failed");
       }
       setCopied(true);
+      setShowFallbackInput(false);
       toast({
         title: "Link copied",
         description: "Share link copied to clipboard.",
@@ -64,11 +77,13 @@ const handleCopyShareLink = async () => {
         err instanceof Error &&
         (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
 
+      showManualFallback();
+
       toast({
         title: isPermissionDenied ? "Permission blocked" : "Could not copy link",
         description: isPermissionDenied
-          ? "Clipboard access is blocked. Please allow clipboard permissions in your browser settings, or copy the URL manually."
-          : "Unable to copy to clipboard. Please copy the URL manually.",
+          ? "Clipboard access is blocked. Use the input below to select and copy the URL manually."
+          : "Unable to copy automatically. Use the input below to copy the URL manually.",
         variant: "destructive",
       });
     }
@@ -195,6 +210,55 @@ const handleCopyShareLink = async () => {
           </div>
         </div>
 
+        {showFallbackInput && (
+          <div className="mb-5 -mt-1 bg-fyn-beige border border-fyn-ink-10 rounded-md p-3">
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="share-url-fallback"
+                className="text-xs font-medium text-fyn-ink/70"
+              >
+                Copy this URL manually
+              </label>
+              <button
+                onClick={() => setShowFallbackInput(false)}
+                className="text-fyn-ink/50 hover:text-fyn-ink transition"
+                aria-label="Close manual copy"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                ref={fallbackInputRef}
+                id="share-url-fallback"
+                type="text"
+                value={shareUrl}
+                readOnly
+                onFocus={(e) => e.currentTarget.select()}
+                onClick={(e) => e.currentTarget.select()}
+                className="flex-1 bg-white border border-fyn-ink/15 rounded px-2.5 py-1.5 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
+              />
+              <button
+                onClick={() => {
+                  fallbackInputRef.current?.select();
+                  const ok = document.execCommand("copy");
+                  if (ok) {
+                    setCopied(true);
+                    toast({ title: "Link copied", description: "Share link copied to clipboard." });
+                    setTimeout(() => setCopied(false), 2000);
+                  }
+                }}
+                className="inline-flex items-center gap-1 bg-fyn-ink text-white px-2.5 py-1.5 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
+              >
+                <Copy className="w-3 h-3" />
+                Copy URL
+              </button>
+            </div>
+            <p className="text-[10px] text-fyn-ink/50 mt-1.5">
+              Tip: press Ctrl/Cmd + C after the URL is selected.
+            </p>
+          </div>
+        )}
         <div className="border-t border-fyn-ink-10 pt-5">
           <h2 className="fyn-label text-fyn-ink/50 text-xs mb-3">
             REPORT CONTENT
