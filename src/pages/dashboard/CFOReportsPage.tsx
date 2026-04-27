@@ -344,6 +344,7 @@ const CFOReportsPage = () => {
           </TableBody>
         </Table>
       </div>
+      {newReportDialog}
     </DashboardLayout>
   );
 };
