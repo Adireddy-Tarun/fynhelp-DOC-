@@ -47,6 +47,70 @@ export function downloadReportPdf(report: ReportLike) {
   const statusLabel = report.delivered ? "Delivered" : "Ready";
 
   // ---------- Reusable chrome ----------
+  // Renders the FynHelp logo SVG (icon + wordmark + tagline) using jsPDF
+  // vector primitives. Mirrors src/components/FynLogo.tsx exactly:
+  // - 48x48 rounded beige square with ink border
+  // - Three ascending ink bars
+  // - Red trend line with red dot
+  // - "Fyn" ink + "Help" red serif wordmark
+  // - Gold "FIND YOUR NUMBERS" tagline
+  const drawLogo = (originX: number, originY: number) => {
+    const iconSize = 36; // pt — proportional to header band
+    const scale = iconSize / 48; // SVG viewBox is 48x48
+    const sx = (n: number) => originX + n * scale;
+    const sy = (n: number) => originY + n * scale;
+
+    // Rounded square background (beige with ink border)
+    doc.setFillColor(...BRAND.beige);
+    doc.setDrawColor(...BRAND.ink);
+    doc.setLineWidth(2 * scale);
+    doc.roundedRect(
+      sx(1),
+      sy(1),
+      46 * scale,
+      46 * scale,
+      4 * scale,
+      4 * scale,
+      "FD"
+    );
+
+    // Three ascending ink bars (rx=1)
+    doc.setFillColor(...BRAND.ink);
+    doc.roundedRect(sx(8), sy(32), 12 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
+    doc.roundedRect(sx(8), sy(25), 20 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
+    doc.roundedRect(sx(8), sy(18), 28 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
+
+    // Red trend line, round caps
+    doc.setDrawColor(...BRAND.red);
+    doc.setLineWidth(2 * scale);
+    doc.setLineCap("round");
+    doc.line(sx(14), sy(36), sx(36), sy(12));
+
+    // Red end dot (r=4)
+    doc.setFillColor(...BRAND.red);
+    doc.circle(sx(36), sy(12), 4 * scale, "F");
+    doc.setLineCap("butt");
+
+    // Wordmark "Fyn" (ink) + "Help" (red), serif
+    const wordmarkX = originX + iconSize + 10;
+    const wordmarkBaseline = originY + iconSize * 0.62;
+    doc.setFont("times", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(...BRAND.ink);
+    doc.text("Fyn", wordmarkX, wordmarkBaseline);
+    const fynWidth = doc.getTextWidth("Fyn");
+    doc.setTextColor(...BRAND.red);
+    doc.text("Help", wordmarkX + fynWidth, wordmarkBaseline);
+
+    // Gold tagline
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...BRAND.gold);
+    doc.setCharSpace(1.2);
+    doc.text("FIND YOUR NUMBERS", wordmarkX, wordmarkBaseline + 11);
+    doc.setCharSpace(0);
+  };
+
   const drawHeader = () => {
     // Beige header band
     doc.setFillColor(...BRAND.beigeDark);
@@ -56,17 +120,8 @@ export function downloadReportPdf(report: ReportLike) {
     doc.setFillColor(...BRAND.red);
     doc.rect(0, 0, 6, headerHeight, "F");
 
-    // Wordmark "FynHelp" — Georgia serif (jsPDF maps "times" to Times/Georgia-like serif)
-    doc.setFont("times", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(...BRAND.ink);
-    doc.text("FynHelp", margin, 36);
-
-    // Tagline
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...BRAND.gold);
-    doc.text("CFO Report", margin, 52);
+    // Brand logo (icon + wordmark + tagline)
+    drawLogo(margin, (headerHeight - 36) / 2);
 
     // Right-aligned meta
     doc.setFont("helvetica", "normal");
