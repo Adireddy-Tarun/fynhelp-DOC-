@@ -25,8 +25,8 @@ SET search_path = public, extensions;
 
 -- 6 helper privilege tests + 9 trigger privilege tests +
 -- (13 owned tables * 2) DELETE policy tests +
--- 13 immutable-table tests + 2 behavioural tests
-SELECT plan(56);
+-- 13 immutable-table tests + 4 behavioural tests
+SELECT plan(58);
 
 -- -----------------------------------------------------------------------------
 -- 1. Helper function privileges (must be callable by authenticated only)
