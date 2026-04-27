@@ -177,7 +177,7 @@ export function downloadReportPdf(
   };
 
   const drawFooter = (pageNum: number, pageCount: number) => {
-    doc.setDrawColor(...BRAND.rule);
+    doc.setDrawColor(isSimple ? 200 : BRAND.rule[0], isSimple ? 200 : BRAND.rule[1], isSimple ? 200 : BRAND.rule[2]);
     doc.setLineWidth(0.5);
     doc.line(
       margin,
@@ -188,10 +188,13 @@ export function downloadReportPdf(
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.setTextColor(...BRAND.muted);
-    doc.text("FynHelp · Confidential", margin, pageHeight - footerHeight + 18);
-    // Page number — tabular (courier) so "1 of 10" aligns across pages
-    doc.setFont("courier", "normal");
+    doc.setTextColor(...mutedColor);
+    doc.text(
+      isSimple ? "CFO Report" : "FynHelp · Confidential",
+      margin,
+      pageHeight - footerHeight + 18
+    );
+    doc.setFont(isSimple ? "helvetica" : "courier", "normal");
     doc.setFontSize(8);
     doc.text(
       `Page ${pageNum} of ${pageCount}`,
@@ -206,17 +209,19 @@ export function downloadReportPdf(
 
   // Title block
   let y = contentTop;
-  doc.setFont("times", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(...BRAND.ink);
+  doc.setFont(isSimple ? "helvetica" : "times", "bold");
+  doc.setFontSize(isSimple ? 16 : 22);
+  doc.setTextColor(...inkColor);
   doc.text("CFO Report", margin, y);
   y += 10;
 
-  // Red underline accent
-  doc.setDrawColor(...BRAND.red);
-  doc.setLineWidth(2);
-  doc.line(margin, y, margin + 48, y);
-  y += 22;
+  if (!isSimple) {
+    // Red underline accent (branded only)
+    doc.setDrawColor(...accentColor);
+    doc.setLineWidth(2);
+    doc.line(margin, y, margin + 48, y);
+  }
+  y += isSimple ? 12 : 22;
 
   if (report.brief_type) {
     doc.setFont("helvetica", "normal");
