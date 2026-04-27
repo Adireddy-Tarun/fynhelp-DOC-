@@ -40,6 +40,7 @@ import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
 import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
 import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
+import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
 import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
