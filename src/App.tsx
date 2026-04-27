@@ -29,6 +29,7 @@ import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import NidhiChatPage from "./pages/dashboard/NidhiChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
+import CFOReportDetailPage from "./pages/dashboard/CFOReportDetailPage.tsx";
 import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
 import CustomersPage from "./pages/dashboard/CustomersPage.tsx";
 import CostPage from "./pages/dashboard/CostPage.tsx";
