@@ -226,7 +226,7 @@ export function downloadReportPdf(
   if (report.brief_type) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(...BRAND.gold);
+    doc.setTextColor(...goldColor);
     doc.text(report.brief_type.toUpperCase(), margin, y);
     y += 18;
   }
@@ -234,7 +234,7 @@ export function downloadReportPdf(
   // Body — paragraph-aware pagination
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
-  doc.setTextColor(...BRAND.ink);
+  doc.setTextColor(...inkColor);
 
   const bodyText =
     typeof report.content === "string" && report.content.trim().length > 0
