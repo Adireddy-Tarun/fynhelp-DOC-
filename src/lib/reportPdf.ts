@@ -29,18 +29,35 @@ interface ReportLike {
   brief_type?: string | null;
 }
 
-export function downloadReportPdf(report: ReportLike) {
+export type ReportPdfVariant = "branded" | "simple";
+
+export function downloadReportPdf(
+  report: ReportLike,
+  variant: ReportPdfVariant = "branded"
+) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+  const isSimple = variant === "simple";
+
   const margin = 56;
   const usable = pageWidth - margin * 2;
 
-  const headerHeight = 72;
+  const headerHeight = isSimple ? 56 : 72;
   const footerHeight = 40;
-  const contentTop = headerHeight + 32;
+  const contentTop = headerHeight + (isSimple ? 16 : 32);
   const contentBottom = pageHeight - footerHeight - 16;
+
+  // In simple mode, force everything to black/grey for print friendliness.
+  const inkColor = isSimple ? ([0, 0, 0] as [number, number, number]) : BRAND.ink;
+  const accentColor = isSimple
+    ? ([0, 0, 0] as [number, number, number])
+    : BRAND.red;
+  const mutedColor = isSimple
+    ? ([90, 90, 90] as [number, number, number])
+    : BRAND.muted;
+  const goldColor = isSimple ? mutedColor : BRAND.gold;
 
   const briefDateLabel = formatDate(report.brief_date);
   const generatedLabel = formatDate(report.created_at);
