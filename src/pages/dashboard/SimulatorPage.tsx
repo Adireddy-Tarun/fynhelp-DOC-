@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   Table,
@@ -11,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+const PAGE_SIZE = 20;
 
 const SimulatorPage = () => {
   const navigate = useNavigate();
@@ -30,20 +32,33 @@ const SimulatorPage = () => {
     fetchBusiness();
   }, []);
 
-  const { data: simulations, isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["simulations", businessId],
-    queryFn: async () => {
+    enabled: !!businessId,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
       if (!businessId) return [];
+      const from = (pageParam as number) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       const { data } = await supabase
         .from("simulations")
         .select("*")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .range(from, to);
       return data || [];
     },
-    enabled: !!businessId,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PAGE_SIZE ? allPages.length : undefined,
   });
+
+  const simulations = data?.pages.flat() ?? [];
 
   if (isLoading || !businessId) {
     return (
@@ -53,7 +68,7 @@ const SimulatorPage = () => {
     );
   }
 
-  if (!simulations || simulations.length === 0) {
+  if (simulations.length === 0) {
     return (
       <DashboardLayout>
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-10 text-center">
@@ -135,6 +150,24 @@ const SimulatorPage = () => {
             })}
           </TableBody>
         </Table>
+
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-fyn-ink-10">
+          <p className="text-fyn-ink/60 text-xs">
+            Showing {simulations.length} simulation
+            {simulations.length === 1 ? "" : "s"}
+          </p>
+          {hasNextPage ? (
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="bg-fyn-ink text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              {isFetchingNextPage ? "Loading…" : "Load more"}
+            </button>
+          ) : (
+            <p className="text-fyn-ink/40 text-xs">All simulations loaded</p>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
