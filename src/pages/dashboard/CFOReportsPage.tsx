@@ -162,6 +162,7 @@ const CFOReportsPage = () => {
               <TableHead>Preview</TableHead>
               <TableHead>Generated</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
