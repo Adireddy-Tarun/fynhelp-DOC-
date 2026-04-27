@@ -269,7 +269,7 @@ const CFOReportsPage = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink text-lg font-sans">CFO Reports</h3>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => setOpen(true)}
             className="bg-fyn-red text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             New Report
