@@ -123,14 +123,22 @@ export function downloadReportPdf(report: ReportLike) {
     // Brand logo (icon + wordmark + tagline)
     drawLogo(margin, (headerHeight - 36) / 2);
 
-    // Right-aligned meta
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...BRAND.muted);
+    // Right-aligned meta — labels in helvetica, values in courier (tabular)
     const rightX = pageWidth - margin;
-    doc.text(`Brief: ${briefDateLabel}`, rightX, 28, { align: "right" });
-    doc.text(`Generated: ${generatedLabel}`, rightX, 42, { align: "right" });
-    doc.text(`Status: ${statusLabel}`, rightX, 56, { align: "right" });
+    const drawMetaRow = (label: string, value: string, ly: number) => {
+      doc.setFont("courier", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...BRAND.ink);
+      doc.text(value, rightX, ly, { align: "right" });
+      const valueWidth = doc.getTextWidth(value);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...BRAND.muted);
+      doc.text(label, rightX - valueWidth - 4, ly, { align: "right" });
+    };
+    drawMetaRow("Brief", briefDateLabel, 28);
+    drawMetaRow("Generated", generatedLabel, 42);
+    drawMetaRow("Status", statusLabel, 56);
 
     // Hairline rule under header
     doc.setDrawColor(...BRAND.rule);
@@ -152,6 +160,9 @@ export function downloadReportPdf(report: ReportLike) {
     doc.setFontSize(8);
     doc.setTextColor(...BRAND.muted);
     doc.text("FynHelp · Confidential", margin, pageHeight - footerHeight + 18);
+    // Page number — tabular (courier) so "1 of 10" aligns across pages
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8);
     doc.text(
       `Page ${pageNum} of ${pageCount}`,
       pageWidth - margin,
