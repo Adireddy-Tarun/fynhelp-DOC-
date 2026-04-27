@@ -29,18 +29,35 @@ interface ReportLike {
   brief_type?: string | null;
 }
 
-export function downloadReportPdf(report: ReportLike) {
+export type ReportPdfVariant = "branded" | "simple";
+
+export function downloadReportPdf(
+  report: ReportLike,
+  variant: ReportPdfVariant = "branded"
+) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
+  const isSimple = variant === "simple";
+
   const margin = 56;
   const usable = pageWidth - margin * 2;
 
-  const headerHeight = 72;
+  const headerHeight = isSimple ? 56 : 72;
   const footerHeight = 40;
-  const contentTop = headerHeight + 32;
+  const contentTop = headerHeight + (isSimple ? 16 : 32);
   const contentBottom = pageHeight - footerHeight - 16;
+
+  // In simple mode, force everything to black/grey for print friendliness.
+  const inkColor = isSimple ? ([0, 0, 0] as [number, number, number]) : BRAND.ink;
+  const accentColor = isSimple
+    ? ([0, 0, 0] as [number, number, number])
+    : BRAND.red;
+  const mutedColor = isSimple
+    ? ([90, 90, 90] as [number, number, number])
+    : BRAND.muted;
+  const goldColor = isSimple ? mutedColor : BRAND.gold;
 
   const briefDateLabel = formatDate(report.brief_date);
   const generatedLabel = formatDate(report.created_at);
@@ -112,18 +129,32 @@ export function downloadReportPdf(report: ReportLike) {
   };
 
   const drawHeader = () => {
-    // Beige header band
+    if (isSimple) {
+      // Print-friendly: plain text header, no fills, no logo.
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(...inkColor);
+      doc.text("CFO Report", margin, 32);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...mutedColor);
+      const meta = `Brief: ${briefDateLabel}   Generated: ${generatedLabel}   Status: ${statusLabel}`;
+      doc.text(meta, margin, 46);
+
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.line(margin, headerHeight, pageWidth - margin, headerHeight);
+      return;
+    }
+
+    // Branded header (beige band, red bar, logo, tabular meta)
     doc.setFillColor(...BRAND.beigeDark);
     doc.rect(0, 0, pageWidth, headerHeight, "F");
-
-    // Red accent bar at left
     doc.setFillColor(...BRAND.red);
     doc.rect(0, 0, 6, headerHeight, "F");
-
-    // Brand logo (icon + wordmark + tagline)
     drawLogo(margin, (headerHeight - 36) / 2);
 
-    // Right-aligned meta — labels in helvetica, values in courier (tabular)
     const rightX = pageWidth - margin;
     const drawMetaRow = (label: string, value: string, ly: number) => {
       doc.setFont("courier", "normal");
@@ -140,14 +171,13 @@ export function downloadReportPdf(report: ReportLike) {
     drawMetaRow("Generated", generatedLabel, 42);
     drawMetaRow("Status", statusLabel, 56);
 
-    // Hairline rule under header
     doc.setDrawColor(...BRAND.rule);
     doc.setLineWidth(0.5);
     doc.line(margin, headerHeight + 8, pageWidth - margin, headerHeight + 8);
   };
 
   const drawFooter = (pageNum: number, pageCount: number) => {
-    doc.setDrawColor(...BRAND.rule);
+    doc.setDrawColor(isSimple ? 200 : BRAND.rule[0], isSimple ? 200 : BRAND.rule[1], isSimple ? 200 : BRAND.rule[2]);
     doc.setLineWidth(0.5);
     doc.line(
       margin,
@@ -158,10 +188,13 @@ export function downloadReportPdf(report: ReportLike) {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.setTextColor(...BRAND.muted);
-    doc.text("FynHelp · Confidential", margin, pageHeight - footerHeight + 18);
-    // Page number — tabular (courier) so "1 of 10" aligns across pages
-    doc.setFont("courier", "normal");
+    doc.setTextColor(...mutedColor);
+    doc.text(
+      isSimple ? "CFO Report" : "FynHelp · Confidential",
+      margin,
+      pageHeight - footerHeight + 18
+    );
+    doc.setFont(isSimple ? "helvetica" : "courier", "normal");
     doc.setFontSize(8);
     doc.text(
       `Page ${pageNum} of ${pageCount}`,
@@ -176,22 +209,24 @@ export function downloadReportPdf(report: ReportLike) {
 
   // Title block
   let y = contentTop;
-  doc.setFont("times", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(...BRAND.ink);
+  doc.setFont(isSimple ? "helvetica" : "times", "bold");
+  doc.setFontSize(isSimple ? 16 : 22);
+  doc.setTextColor(...inkColor);
   doc.text("CFO Report", margin, y);
   y += 10;
 
-  // Red underline accent
-  doc.setDrawColor(...BRAND.red);
-  doc.setLineWidth(2);
-  doc.line(margin, y, margin + 48, y);
-  y += 22;
+  if (!isSimple) {
+    // Red underline accent (branded only)
+    doc.setDrawColor(...accentColor);
+    doc.setLineWidth(2);
+    doc.line(margin, y, margin + 48, y);
+  }
+  y += isSimple ? 12 : 22;
 
   if (report.brief_type) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(...BRAND.gold);
+    doc.setTextColor(...goldColor);
     doc.text(report.brief_type.toUpperCase(), margin, y);
     y += 18;
   }
@@ -199,7 +234,7 @@ export function downloadReportPdf(report: ReportLike) {
   // Body — paragraph-aware pagination
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
-  doc.setTextColor(...BRAND.ink);
+  doc.setTextColor(...inkColor);
 
   const bodyText =
     typeof report.content === "string" && report.content.trim().length > 0
@@ -219,6 +254,13 @@ export function downloadReportPdf(report: ReportLike) {
     /(?:[₹$€£]\s?\d[\d,]*(?:\.\d+)?|\d{1,2}\s+[A-Z][a-z]{2}\s+\d{4}|\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d[\d,]*(?:\.\d+)?%?)/g;
 
   const drawTabularLine = (text: string, x: number, ly: number) => {
+    // In simple mode, render the whole line in helvetica (no font switching)
+    // for maximum print compatibility and speed.
+    if (isSimple) {
+      doc.setFont("helvetica", "normal");
+      doc.text(text, x, ly);
+      return;
+    }
     const segments: { text: string; tabular: boolean }[] = [];
     let cursor = 0;
     for (const match of text.matchAll(NUM_TOKEN_RE)) {
@@ -247,7 +289,6 @@ export function downloadReportPdf(report: ReportLike) {
       doc.text(seg.text, cx, ly);
       cx += doc.getTextWidth(seg.text);
     }
-    // Reset to body font for subsequent calls
     doc.setFont("helvetica", "normal");
   };
 
@@ -378,14 +419,12 @@ export function downloadReportPdf(report: ReportLike) {
   };
 
   const renderListItem = (item: ListItem) => {
-    // Keep marker glued to the first line; subsequent wrapped lines are
-    // hanging-indented to align with the first line's text.
     for (let li = 0; li < item.lines.length; li++) {
       if (y + lineHeight > contentBottom) pageBreak();
       if (li === 0) {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
-        doc.setTextColor(...BRAND.ink);
+        doc.setTextColor(...inkColor);
         doc.text(item.marker, margin + bulletIndent, y);
       }
       drawTabularLine(item.lines[li], margin + textIndent, y);
@@ -413,15 +452,15 @@ export function downloadReportPdf(report: ReportLike) {
         pageBreak();
       }
 
-      doc.setFont("times", "bold");
+      doc.setFont(isSimple ? "helvetica" : "times", "bold");
       doc.setFontSize(13);
-      doc.setTextColor(...BRAND.ink);
+      doc.setTextColor(...inkColor);
       doc.text(block.text, margin, y);
       y += headingHeight;
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
-      doc.setTextColor(...BRAND.ink);
+      doc.setTextColor(...inkColor);
     } else if (block.kind === "para") {
       if (block.height <= remaining()) {
         renderPara(block.lines);
@@ -458,8 +497,9 @@ export function downloadReportPdf(report: ReportLike) {
     drawFooter(i, pageCount);
   }
 
+  const suffix = isSimple ? "simple" : "branded";
   const filename = `fynhelp-cfo-report-${
     report.brief_date || report.id || "report"
-  }.pdf`.replace(/[^a-z0-9.\-_]/gi, "_");
+  }-${suffix}.pdf`.replace(/[^a-z0-9.\-_]/gi, "_");
   doc.save(filename);
 }

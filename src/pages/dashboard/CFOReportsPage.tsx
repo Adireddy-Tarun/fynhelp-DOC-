@@ -24,8 +24,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Download } from "lucide-react";
+import { ChevronDown, Download, FileText, Sparkles } from "lucide-react";
 import { downloadReportPdf } from "@/lib/reportPdf";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const CFOReportsPage = () => {
   const navigate = useNavigate();
@@ -264,13 +270,31 @@ const CFOReportsPage = () => {
                       >
                         View →
                       </button>
-                      <button
-                        onClick={() => downloadReportPdf(report)}
-                        className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        PDF
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="inline-flex items-center gap-1.5 bg-fyn-ink text-white px-3 py-1.5 rounded-md text-xs font-medium hover:opacity-90 transition">
+                            <Download className="w-3.5 h-3.5" />
+                            PDF
+                            <ChevronDown className="w-3 h-3 opacity-70" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                          <DropdownMenuItem onClick={() => downloadReportPdf(report, "branded")}>
+                            <Sparkles className="w-3.5 h-3.5 mr-2 text-fyn-red" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium">Branded PDF</span>
+                              <span className="text-[10px] text-fyn-ink/50">FynHelp colors & logo</span>
+                            </div>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => downloadReportPdf(report, "simple")}>
+                            <FileText className="w-3.5 h-3.5 mr-2 text-fyn-ink/60" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium">Simple PDF</span>
+                              <span className="text-[10px] text-fyn-ink/50">Print-friendly, B&W</span>
+                            </div>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
