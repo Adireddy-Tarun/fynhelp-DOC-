@@ -58,24 +58,23 @@ const pageTitles: Record<string, string> = {
 };
 
 export default function CALayout() {
-  const { caFirm: realFirm, signOut } = useCAAuth();
+  const { caFirm, loading } = useCAAuth();
+  const { signOut } = useCAAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // TESTING MODE: auth disabled — fall back to mock firm if not logged in
-  const caFirm = realFirm ?? {
-    id: "test-firm",
-    firm_name: "Test CA Firm",
-    membership_number: "000000",
-    email: "test@fynhelp.com",
-    city: null,
-    state: null,
-    is_verified: true,
-    plan_type: "pro",
-    max_clients: 100,
-    logo_url: null,
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F0EBE0" }}>
+        <div className="text-sm" style={{ color: "#1A1008" }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (!caFirm) {
+    return <Navigate to="/ca/login" replace />;
+  }
 
   const title = pageTitles[location.pathname] ||
     (location.pathname.startsWith("/ca/client/") ? "Client Detail" : "CA Portal");

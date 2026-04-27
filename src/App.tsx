@@ -129,8 +129,8 @@ const App = () => (
               <Route path="ca-access" element={<CAAccessPage />} />
             </Route>
             {/* CA Partner Portal */}
-            <Route path="/ca/login" element={<CALayout />}><Route index element={<CADashboardPage />} /></Route>
-            <Route path="/ca/register" element={<CALayout />}><Route index element={<CADashboardPage />} /></Route>
+            <Route path="/ca/login" element={<CALoginPage />} />
+            <Route path="/ca/register" element={<CARegisterPage />} />
             <Route path="/ca" element={<CALayout />}>
               <Route path="dashboard" element={<CADashboardPage />} />
               <Route path="clients" element={<CAClientsPage />} />
