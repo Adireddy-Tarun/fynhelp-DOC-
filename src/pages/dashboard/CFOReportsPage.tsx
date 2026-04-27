@@ -94,7 +94,56 @@ const downloadReportPdf = (report: any) => {
 
 const CFOReportsPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [briefDate, setBriefDate] = useState(
+    () => new Date().toISOString().slice(0, 10)
+  );
+  const [content, setContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const resetForm = () => {
+    setBriefDate(new Date().toISOString().slice(0, 10));
+    setContent("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!businessId) return;
+    if (!content.trim()) {
+      toast({
+        title: "Content required",
+        description: "Please describe what the report should cover.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("nidhi_briefs").insert({
+      business_id: businessId,
+      brief_date: briefDate,
+      content: content.trim(),
+      delivered: false,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast({
+        title: "Could not start report",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Report generation started",
+      description: "Your CFO report has been queued.",
+    });
+    setOpen(false);
+    resetForm();
+    queryClient.invalidateQueries({ queryKey: ["cfo-reports", businessId] });
+  };
 
   useEffect(() => {
     const fetchBusiness = async () => {
