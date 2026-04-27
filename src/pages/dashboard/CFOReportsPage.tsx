@@ -182,6 +182,65 @@ const CFOReportsPage = () => {
     );
   }
 
+  const newReportDialog = (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) resetForm();
+      }}
+    >
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>New CFO Report</DialogTitle>
+          <DialogDescription>
+            Describe what this report should cover. Generation will start
+            immediately and the list will refresh.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="brief-date">Brief date</Label>
+            <Input
+              id="brief-date"
+              type="date"
+              value={briefDate}
+              onChange={(e) => setBriefDate(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="brief-content">What should this report cover?</Label>
+            <Textarea
+              id="brief-content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="e.g. Monthly cash flow summary, top spend categories, GST compliance status…"
+              rows={6}
+              required
+            />
+          </div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="px-4 py-2 rounded-md text-sm font-medium text-fyn-ink/70 hover:text-fyn-ink"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-fyn-red text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              {submitting ? "Starting…" : "Start generation"}
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (!reports || reports.length === 0) {
     return (
       <DashboardLayout>
@@ -193,12 +252,13 @@ const CFOReportsPage = () => {
             Nidhi will automatically generate CFO reports based on your data
           </p>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => setOpen(true)}
             className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             Generate Report
           </button>
         </div>
+        {newReportDialog}
       </DashboardLayout>
     );
   }
