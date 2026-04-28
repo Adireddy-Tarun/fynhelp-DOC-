@@ -90,6 +90,16 @@ const ResetPasswordPage = () => {
   const [resendEmail, setResendEmail] = useState("");
   const [resending, setResending] = useState(false);
   const [resentTo, setResentTo] = useState<string | null>(null);
+  const [linkFailure, setLinkFailure] = useState<LinkFailureReason | null>(null);
+  const resendInputRef = useRef<HTMLInputElement>(null);
+
+  const focusResendInput = () => {
+    // Defer to ensure the field is mounted in the DOM
+    setTimeout(() => {
+      resendInputRef.current?.focus();
+      resendInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  };
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
