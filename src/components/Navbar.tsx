@@ -65,7 +65,7 @@ const Navbar = () => {
               <div
                 key={l.href}
                 className="relative"
-                onMouseEnter={l.hasMega ? handleMegaEnter : undefined}
+                
               >
                 <Link
                   to={l.href}
