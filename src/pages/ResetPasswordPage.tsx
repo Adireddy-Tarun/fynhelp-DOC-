@@ -499,12 +499,17 @@ const ResetPasswordPage = () => {
                       </p>
                       <button
                         type="button"
-                        onClick={focusResendInput}
-                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity"
+                        onClick={handleRequestNewLink}
+                        disabled={resending}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                         style={{ fontSize: "var(--fyn-type-small)" }}
                       >
                         <Mail className="h-4 w-4" aria-hidden="true" />
-                        Request a new reset link
+                        {resending
+                          ? "Sending…"
+                          : isValidEmail(resendEmail)
+                          ? `Send a new link to ${resendEmail.trim()}`
+                          : "Request a new reset link"}
                       </button>
                     </div>
                   </div>
