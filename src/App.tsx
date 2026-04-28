@@ -13,9 +13,9 @@ import BlogArticlePage from "./pages/BlogArticlePage.tsx";
 import ResourcesPage from "./pages/ResourcesPage.tsx";
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
-import SignUpPage from "./pages/SignUpPage.tsx";
-import SignInPage from "./pages/SignInPage.tsx";
+import EarlyAccessPage from "./pages/EarlyAccessPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import DashboardGuard from "./components/DashboardGuard";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
@@ -93,8 +93,7 @@ const App = () => (
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/early-access" element={<EarlyAccessPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
