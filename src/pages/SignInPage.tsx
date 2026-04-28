@@ -314,18 +314,21 @@ const SignInPage = () => {
           </div>
 
           {showForgot && (
-            <div className="rounded-md border border-fyn-ink-10 bg-white/60 p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
+            <div className="rounded-lg border border-fyn-ink-10 bg-fyn-beige-card p-6 space-y-4">
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-fyn-ink">Reset your password</h3>
-                  <p className="text-xs text-secondary-foreground mt-0.5">
+                  <h3 className="font-serif text-fyn-ink" style={{ fontSize: "var(--fyn-type-h3)" }}>
+                    Reset your password
+                  </h3>
+                  <p className="text-fyn-ink-60 mt-1" style={{ fontSize: "var(--fyn-type-small)" }}>
                     Enter your account email and we'll send you a reset link.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowForgot(false)}
-                  className="text-xs text-secondary-foreground hover:text-fyn-ink"
+                  className="text-fyn-ink-60 hover:text-fyn-ink transition-colors"
+                  style={{ fontSize: "var(--fyn-type-small)" }}
                   aria-label="Close"
                 >
                   ✕
@@ -333,7 +336,11 @@ const SignInPage = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="forgot-email" className="text-xs block text-secondary-foreground">
+                <label
+                  htmlFor="forgot-email"
+                  className="block text-fyn-ink-80"
+                  style={{ fontSize: "var(--fyn-type-tiny)" }}
+                >
                   Email address
                 </label>
                 <input
@@ -349,11 +356,12 @@ const SignInPage = () => {
               {forgotMsg && (
                 <div
                   role="alert"
-                  className={`rounded-md p-2.5 text-xs border ${
+                  className={`rounded border p-3 ${
                     forgotMsg.type === "success"
-                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                      : "bg-fyn-red/10 text-fyn-red border-fyn-red/20"
+                      ? "bg-fyn-success-bg text-fyn-success border-fyn-success/20"
+                      : "bg-fyn-danger-bg text-fyn-red border-fyn-red/20"
                   }`}
+                  style={{ fontSize: "var(--fyn-type-tiny)" }}
                 >
                   {forgotMsg.text}
                 </div>
@@ -363,7 +371,8 @@ const SignInPage = () => {
                 type="button"
                 onClick={handleForgotSubmit}
                 disabled={forgotSending || !forgotEmailValid}
-                className="w-full bg-fyn-ink text-white py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="w-full bg-fyn-ink text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ fontSize: "var(--fyn-type-body)" }}
               >
                 {forgotSending ? "Sending reset link…" : "Send reset link"}
               </button>

@@ -30,7 +30,7 @@ const COMMON_WEAK = new Set([
 ]);
 
 const evaluateStrength = (pw: string, passedCount: number) => {
-  if (!pw) return { score: 0, label: "", color: "bg-fyn-ink/10" };
+  if (!pw) return { score: 0, label: "", color: "bg-fyn-ink-10" };
   if (COMMON_WEAK.has(pw.toLowerCase())) {
     return { score: 1, label: "Too common", color: "bg-fyn-red" };
   }
@@ -40,8 +40,8 @@ const evaluateStrength = (pw: string, passedCount: number) => {
   if (pw.length >= 18) score += 1;
   if (score <= 2) return { score: 1, label: "Weak", color: "bg-fyn-red" };
   if (score <= 4) return { score: 2, label: "Fair", color: "bg-fyn-gold" };
-  if (score <= 6) return { score: 3, label: "Strong", color: "bg-emerald-600" };
-  return { score: 4, label: "Excellent", color: "bg-emerald-600" };
+  if (score <= 6) return { score: 3, label: "Strong", color: "bg-fyn-success" };
+  return { score: 4, label: "Excellent", color: "bg-fyn-success" };
 };
 // --------------------------------------------------------------------------
 
@@ -177,30 +177,52 @@ const ResetPasswordPage = () => {
     navigate("/dashboard/cockpit", { replace: true });
   };
 
+  const inputClass =
+    "w-full h-[42px] px-4 pr-11 bg-fyn-beige-card border border-fyn-ink-10 rounded text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-fyn-red transition-colors disabled:opacity-60";
+
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-fyn-beige">
       <div className="bg-fyn-ink p-12 flex flex-col justify-center">
         <FynLogo variant="light" />
-        <h2 className="text-white font-serif text-3xl mt-8 mb-4">Set a new password.</h2>
-        <p className="text-white/60">
+        <h2
+          className="font-serif text-fyn-beige mt-8 mb-4"
+          style={{ fontSize: "var(--fyn-type-h1)", lineHeight: 1.15 }}
+        >
+          Set a new password.
+        </h2>
+        <p className="text-fyn-beige/60" style={{ fontSize: "var(--fyn-type-body)" }}>
           Use at least 10 characters with a mix of upper- and lowercase letters, a number, and a symbol.
         </p>
       </div>
 
       <div className="bg-fyn-beige p-12 flex flex-col justify-center">
-        <h2 className="text-fyn-ink font-serif text-2xl mb-6">Reset your password</h2>
+        <h2
+          className="font-serif text-fyn-ink mb-6"
+          style={{ fontSize: "var(--fyn-type-h2)", lineHeight: 1.2 }}
+        >
+          Reset your password
+        </h2>
 
         {!ready ? (
-          <p className="text-secondary-foreground text-sm">Verifying reset link…</p>
+          <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-body)" }}>
+            Verifying reset link…
+          </p>
         ) : !validSession ? (
           <div className="max-w-md space-y-4">
-            <div className="rounded-md p-3 text-sm bg-fyn-red/10 text-fyn-red border border-fyn-red/20">
+            <div
+              className="rounded border border-fyn-red/20 bg-fyn-danger-bg text-fyn-red p-3"
+              style={{ fontSize: "var(--fyn-type-small)" }}
+            >
               This reset link is invalid or has expired. Enter your email below to get a new link.
             </div>
 
             <form onSubmit={handleResend} className="space-y-3" noValidate>
               <div>
-                <label htmlFor="resend-email" className="text-sm mb-1 block text-secondary-foreground">
+                <label
+                  htmlFor="resend-email"
+                  className="block mb-1 text-fyn-ink-80"
+                  style={{ fontSize: "var(--fyn-type-small)" }}
+                >
                   Email address
                 </label>
                 <input
@@ -211,28 +233,32 @@ const ResetPasswordPage = () => {
                   onChange={(e) => setResendEmail(e.target.value)}
                   placeholder="you@company.com"
                   disabled={resending}
-                  className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground disabled:opacity-60"
+                  className={inputClass}
+                  style={{ fontSize: "var(--fyn-type-body)" }}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={resending || !resendEmail.trim()}
-                className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ fontSize: "var(--fyn-type-body)" }}
               >
                 {resending ? "Sending…" : "Resend reset link"}
               </button>
             </form>
 
             {resentTo && (
-              <p className="text-xs text-secondary-foreground">
-                If an account exists for <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
+              <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                If an account exists for{" "}
+                <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
               </p>
             )}
 
             <button
               onClick={() => navigate("/signin")}
-              className="text-sm text-secondary-foreground hover:text-fyn-ink underline underline-offset-2"
+              className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
+              style={{ fontSize: "var(--fyn-type-small)" }}
             >
               Back to sign in
             </button>
@@ -241,7 +267,11 @@ const ResetPasswordPage = () => {
           <form className="space-y-4 max-w-md" onSubmit={handleSubmit} noValidate>
             {/* New password */}
             <div>
-              <label htmlFor="reset-pw" className="text-sm mb-1 block text-secondary-foreground">
+              <label
+                htmlFor="reset-pw"
+                className="block mb-1 text-fyn-ink-80"
+                style={{ fontSize: "var(--fyn-type-small)" }}
+              >
                 New password
               </label>
               <div className="relative">
@@ -254,12 +284,13 @@ const ResetPasswordPage = () => {
                   placeholder="At least 10 characters"
                   aria-describedby="reset-pw-rules reset-pw-strength"
                   aria-invalid={pwTouched && (!allRulesPassed || isCommonWeak)}
-                  className="w-full h-[42px] px-4 pr-11 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+                  className={inputClass}
+                  style={{ fontSize: "var(--fyn-type-body)" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-secondary-foreground hover:text-fyn-ink"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-fyn-ink-60 hover:text-fyn-ink transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -274,17 +305,17 @@ const ResetPasswordPage = () => {
                       <div
                         key={i}
                         className={`h-1 flex-1 rounded-full transition-colors ${
-                          i <= strength.score ? strength.color : "bg-fyn-ink/10"
+                          i <= strength.score ? strength.color : "bg-fyn-ink-10"
                         }`}
                       />
                     ))}
                   </div>
-                  <p className="mt-1 text-xs text-secondary-foreground">
+                  <p className="mt-1 text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
                     Strength:{" "}
                     <span
                       className={`font-medium ${
                         strength.score >= 3
-                          ? "text-emerald-700"
+                          ? "text-fyn-success"
                           : strength.score === 2
                           ? "text-fyn-gold"
                           : "text-fyn-red"
@@ -304,13 +335,14 @@ const ResetPasswordPage = () => {
                 {ruleResults.map((r) => (
                   <li
                     key={r.key}
-                    className={`flex items-center gap-2 text-xs ${
+                    className={`flex items-center gap-2 ${
                       r.passed
-                        ? "text-emerald-700"
+                        ? "text-fyn-success"
                         : pwTouched
                         ? "text-fyn-red"
-                        : "text-secondary-foreground"
+                        : "text-fyn-ink-60"
                     }`}
+                    style={{ fontSize: "var(--fyn-type-tiny)" }}
                   >
                     {r.passed ? (
                       <Check className="w-3.5 h-3.5 flex-shrink-0" />
@@ -325,7 +357,11 @@ const ResetPasswordPage = () => {
 
             {/* Confirm password */}
             <div>
-              <label htmlFor="reset-confirm" className="text-sm mb-1 block text-secondary-foreground">
+              <label
+                htmlFor="reset-confirm"
+                className="block mb-1 text-fyn-ink-80"
+                style={{ fontSize: "var(--fyn-type-small)" }}
+              >
                 Confirm new password
               </label>
               <div className="relative">
@@ -338,31 +374,44 @@ const ResetPasswordPage = () => {
                   placeholder="Re-enter password"
                   aria-invalid={confirmTouched && confirm.length > 0 && !passwordsMatch}
                   aria-describedby="reset-confirm-hint"
-                  className="w-full h-[42px] px-4 pr-11 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+                  className={inputClass}
+                  style={{ fontSize: "var(--fyn-type-body)" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-secondary-foreground hover:text-fyn-ink"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-fyn-ink-60 hover:text-fyn-ink transition-colors"
                   aria-label={showConfirm ? "Hide password" : "Show password"}
                 >
                   {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {confirmTouched && confirm.length > 0 && !passwordsMatch && (
-                <p id="reset-confirm-hint" className="mt-1 text-xs text-fyn-red">
+                <p
+                  id="reset-confirm-hint"
+                  className="mt-1 text-fyn-red"
+                  style={{ fontSize: "var(--fyn-type-tiny)" }}
+                >
                   Passwords do not match.
                 </p>
               )}
               {confirm.length > 0 && passwordsMatch && (
-                <p id="reset-confirm-hint" className="mt-1 text-xs text-emerald-700 inline-flex items-center gap-1">
+                <p
+                  id="reset-confirm-hint"
+                  className="mt-1 text-fyn-success inline-flex items-center gap-1"
+                  style={{ fontSize: "var(--fyn-type-tiny)" }}
+                >
                   <Check className="w-3.5 h-3.5" /> Passwords match
                 </p>
               )}
             </div>
 
             {error && (
-              <div role="alert" className="rounded-md p-3 text-sm bg-fyn-red/10 text-fyn-red border border-fyn-red/20">
+              <div
+                role="alert"
+                className="rounded border border-fyn-red/20 bg-fyn-danger-bg text-fyn-red p-3"
+                style={{ fontSize: "var(--fyn-type-small)" }}
+              >
                 {error}
               </div>
             )}
@@ -370,7 +419,8 @@ const ResetPasswordPage = () => {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ fontSize: "var(--fyn-type-body)" }}
             >
               {submitting ? "Updating…" : "Update password"}
             </button>
