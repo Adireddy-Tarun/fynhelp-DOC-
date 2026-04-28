@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import FynLogo from "@/components/FynLogo";
 import ProfileCompletionBadge from "@/components/ProfileCompletionBadge";
-import SessionPersistenceBadge from "@/components/SessionPersistenceBadge";
 import {
   LayoutDashboard, MessageCircle, Grid3X3, TrendingUp, Gauge,
   Zap, ArrowDownCircle, ArrowUpCircle, FileCheck, Calculator,
@@ -331,7 +330,6 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               <Bell size={18} />
               <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style={{ background: "#C41E1E" }}>3</span>
             </button>
-            <SessionPersistenceBadge />
             <ProfileCompletionBadge />
             <Link
               to="/dashboard/settings/profile"

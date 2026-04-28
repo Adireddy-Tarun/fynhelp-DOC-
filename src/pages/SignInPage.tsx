@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+// hCaptcha site key. Provide via VITE_HCAPTCHA_SITE_KEY in env. The fallback is
+// hCaptcha's public test key — it always passes verification and is meant for
+// local/preview environments only. Replace in production.
+const HCAPTCHA_SITE_KEY =
+  (import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined) ||
+  "10000000-ffff-ffff-ffff-000000000001";
+const HCAPTCHA_IS_TEST_KEY = HCAPTCHA_SITE_KEY === "10000000-ffff-ffff-ffff-000000000001";
 
 const SignInPage = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +26,14 @@ const SignInPage = () => {
   // Refs for auto-focusing the first invalid field on submit.
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  // hCaptcha — required once the form enters cooldown (locked state). Solving
+  // the challenge clears the local cooldown and the token is also forwarded to
+  // Supabase, which validates it server-side when captcha is enabled in auth
+  // settings (so attackers can't bypass by patching the client).
+  const captchaRef = useRef<HCaptcha>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaSolved, setCaptchaSolved] = useState<boolean>(false);
 
   const focusField = (field: "email" | "password") => {
     const el = field === "email" ? emailRef.current : passwordRef.current;
@@ -144,87 +161,14 @@ const SignInPage = () => {
     ? "Password is required"
     : "Password must be at least 6 characters";
 
-  // Map a Supabase AuthError (or any thrown error) to an inline field message.
-  // Uses `code` and HTTP `status` first (stable across locales / Supabase versions),
-  // then falls back to message-substring heuristics.
-  const mapAuthError = (
-    err: { message?: string; code?: string; status?: number; name?: string } | null | undefined
-  ): { field: "email" | "password" | "form"; message: string; isCredential: boolean } => {
-    const code = (err?.code || "").toLowerCase();
-    const status = err?.status ?? 0;
-    const msg = (err?.message || "").toLowerCase();
-
-    // Bad credentials (Supabase: code "invalid_credentials" / legacy text "Invalid login credentials")
-    if (
-      code === "invalid_credentials" ||
-      code === "invalid_grant" ||
-      msg.includes("invalid login") ||
-      msg.includes("invalid credentials") ||
-      msg.includes("invalid email or password")
-    ) {
-      return {
-        field: "password",
-        message: "Incorrect email or password. Please try again.",
-        isCredential: true,
-      };
+  const resetCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaSolved(false);
+    try {
+      captchaRef.current?.resetCaptcha();
+    } catch {
+      /* widget may not be mounted yet */
     }
-
-    // Account exists but email not confirmed.
-    if (code === "email_not_confirmed" || msg.includes("email not confirmed")) {
-      return {
-        field: "email",
-        message: "Please confirm your email address before signing in. Check your inbox for the verification link.",
-        isCredential: false,
-      };
-    }
-
-    // No such user (older Supabase versions surface this distinctly).
-    if (code === "user_not_found" || msg.includes("user not found")) {
-      return {
-        field: "email",
-        message: "No account found with this email address.",
-        isCredential: true,
-      };
-    }
-
-    // Server-side rate limit.
-    if (code === "over_request_rate_limit" || status === 429 || msg.includes("rate limit")) {
-      return {
-        field: "form",
-        message: "Too many sign-in attempts. Please wait a moment and try again.",
-        isCredential: false,
-      };
-    }
-
-    // Network / fetch failure (no response from Supabase).
-    if (
-      err?.name === "AuthRetryableFetchError" ||
-      err?.name === "TypeError" ||
-      msg.includes("failed to fetch") ||
-      msg.includes("network")
-    ) {
-      return {
-        field: "form",
-        message: "Couldn't reach the server. Check your connection and try again.",
-        isCredential: false,
-      };
-    }
-
-    // Generic 4xx — treat as credential-ish so the user re-checks the password,
-    // but don't lie about which field is wrong.
-    if (status === 400 || status === 422) {
-      return {
-        field: "form",
-        message: err?.message || "We couldn't sign you in. Please double-check your details.",
-        isCredential: false,
-      };
-    }
-
-    return {
-      field: "form",
-      message: err?.message || "Something went wrong while signing in. Please try again.",
-      isCredential: false,
-    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -235,7 +179,7 @@ const SignInPage = () => {
     if (isLocked) {
       setAuthError({
         field: "form",
-        message: `Too many failed attempts. Please wait ${formatRemaining(cooldownRemaining)} before trying again, or use “Forgot password?”.`,
+        message: `Too many failed attempts. Please complete the security check below to continue, or wait ${formatRemaining(cooldownRemaining)}.`,
       });
       return;
     }
@@ -245,40 +189,51 @@ const SignInPage = () => {
       return;
     }
 
-    // ── Remember-me policy: write markers BEFORE the sign-in call so the
-    //    AuthContext enforcement (which can fire as soon as the SIGNED_IN
-    //    event arrives or on the very next reload) treats this tab as a
-    //    live, continuing browser session and never force-signs-out the
-    //    session we're about to receive.
-    try {
-      sessionStorage.setItem("fyn.tabAlive", "1");
-      localStorage.setItem("fyn.lastSeen", String(Date.now()));
-      localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
-      if (rememberMe) {
-        localStorage.removeItem("fyn.sessionOnly");
-      } else {
-        localStorage.setItem("fyn.sessionOnly", "1");
-      }
-    } catch {
-      /* storage may be unavailable in private mode — proceed anyway */
-    }
-
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const tokenForRequest = captchaToken ?? undefined;
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: tokenForRequest ? { captchaToken: tokenForRequest } : undefined,
+    });
     setLoading(false);
 
-    if (error) {
-      const mapped = mapAuthError(error);
+    // hCaptcha tokens are single-use — reset the widget after every submit.
+    resetCaptcha();
 
-      // Only credential-style failures count toward the local cooldown —
-      // not unconfirmed email, rate limits, or network errors.
-      if (mapped.isCredential) {
+    if (error) {
+      const msg = error.message?.toLowerCase() ?? "";
+      const isCredentialError =
+        msg.includes("invalid login") ||
+        msg.includes("invalid credentials") ||
+        msg.includes("user not found");
+
+      // Only count credential failures toward the cooldown — not e.g. unconfirmed email or network errors.
+      if (isCredentialError) {
         recordFailure();
       }
 
-      setAuthError({ field: mapped.field, message: mapped.message });
-      if (mapped.field === "email" || mapped.field === "password") {
-        focusField(mapped.field);
+      let errorField: "email" | "password" | "form" = "form";
+      if (msg.includes("captcha")) {
+        errorField = "form";
+        setAuthError({
+          field: "form",
+          message: "Captcha verification failed. Please try the security check again.",
+        });
+      } else if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+        errorField = "password";
+        setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
+      } else if (msg.includes("email not confirmed")) {
+        errorField = "email";
+        setAuthError({ field: "email", message: "Please confirm your email address before signing in." });
+      } else if (msg.includes("user not found")) {
+        errorField = "email";
+        setAuthError({ field: "email", message: "No account found with this email address." });
+      } else {
+        setAuthError({ field: "form", message: error.message });
+      }
+      if (errorField === "email" || errorField === "password") {
+        focusField(errorField);
       }
       return;
     }
@@ -286,14 +241,14 @@ const SignInPage = () => {
     // Successful sign-in — reset failure tracking.
     clearFailures();
 
-    // Re-affirm the tab markers post-success (defence in depth — covers the
-    // case where the writes above were swallowed by storage quota/private mode).
-    try {
-      sessionStorage.setItem("fyn.tabAlive", "1");
-      localStorage.setItem("fyn.lastSeen", String(Date.now()));
-    } catch {
-      /* ignore */
+    // Persist Remember me preference and enforce session-only mode if unchecked.
+    localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
+    if (rememberMe) {
+      localStorage.removeItem("fyn.sessionOnly");
+    } else {
+      localStorage.setItem("fyn.sessionOnly", "1");
     }
+    sessionStorage.setItem("fyn.tabAlive", "1");
   };
 
   const inputBase =
@@ -478,18 +433,59 @@ const SignInPage = () => {
             <div
               role="alert"
               aria-live="polite"
-              className="rounded-md p-3 text-sm bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30"
+              className="rounded-lg p-4 bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30 space-y-3"
             >
-              <div className="font-medium">Sign-in temporarily paused</div>
-              <div className="text-xs mt-1 text-secondary-foreground">
-                After {failCount} failed attempts, please wait{" "}
-                <span className="font-mono font-semibold text-fyn-ink">{formatRemaining(cooldownRemaining)}</span>{" "}
-                before trying again.{" "}
-                <button type="button" onClick={openForgot} className="text-fyn-red hover:underline">
-                  Reset your password
-                </button>{" "}
-                if you've forgotten it.
+              <div className="flex items-start gap-2">
+                <ShieldCheck size={16} className="text-fyn-gold mt-0.5 flex-shrink-0" aria-hidden="true" />
+                <div className="flex-1">
+                  <div className="font-medium" style={{ fontSize: "var(--fyn-type-body)" }}>
+                    Security check required
+                  </div>
+                  <div className="mt-1 text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                    After {failCount} failed attempts we've paused sign-in for{" "}
+                    <span className="font-mono font-semibold text-fyn-ink">
+                      {formatRemaining(cooldownRemaining)}
+                    </span>
+                    . Solve the challenge below to retry immediately, or use{" "}
+                    <button
+                      type="button"
+                      onClick={openForgot}
+                      className="text-fyn-red hover:underline"
+                    >
+                      Reset your password
+                    </button>{" "}
+                    if you've forgotten it.
+                  </div>
+                </div>
               </div>
+
+              <div className="flex justify-center">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={HCAPTCHA_SITE_KEY}
+                  theme="light"
+                  size="normal"
+                  onVerify={(token) => {
+                    setCaptchaToken(token);
+                    setCaptchaSolved(true);
+                    // Solving the challenge clears the local cooldown so the
+                    // user can retry immediately. Server-side captcha
+                    // verification (when enabled in Supabase auth) still
+                    // protects against scripted abuse.
+                    clearFailures();
+                    setAuthError(null);
+                  }}
+                  onExpire={resetCaptcha}
+                  onError={resetCaptcha}
+                />
+              </div>
+
+              {HCAPTCHA_IS_TEST_KEY && (
+                <p className="text-fyn-ink-45" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                  Dev mode: using hCaptcha's public test key. Set{" "}
+                  <code className="font-mono">VITE_HCAPTCHA_SITE_KEY</code> for production.
+                </p>
+              )}
             </div>
           )}
           {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
@@ -502,13 +498,13 @@ const SignInPage = () => {
 
           <button
             type="submit"
-            disabled={loading || isLocked}
+            disabled={loading || (isLocked && !captchaSolved)}
             aria-busy={loading}
             className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
-            {isLocked
-              ? `Try again in ${formatRemaining(cooldownRemaining)}`
+            {isLocked && !captchaSolved
+              ? "Complete the security check to continue"
               : loading
               ? "Signing in…"
               : "Sign In"}

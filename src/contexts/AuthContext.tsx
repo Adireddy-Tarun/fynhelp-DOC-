@@ -38,100 +38,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    // ──────────────────────────────────────────────────────────────────────
-    // "Remember me" enforcement
-    // ──────────────────────────────────────────────────────────────────────
-    // Goal: when the user signs in WITHOUT "Remember me", their session must
-    // NOT survive a browser close. It MUST survive a refresh / in-tab nav.
-    //
-    // Detection strategy (defence-in-depth, three independent signals):
-    //   1. sessionStorage marker `fyn.tabAlive` — present for the lifetime of
-    //      the tab, including refreshes. Absent on a brand new tab / after
-    //      browser close.
-    //   2. Performance Navigation API — `type === "reload"` is a definitive
-    //      signal that this load is a refresh (so we keep the session even
-    //      if sessionStorage was wiped, e.g. by extensions).
-    //   3. Heartbeat timestamp `fyn.lastSeen` in localStorage — updated every
-    //      few seconds while the tab is open. If it's older than the
-    //      stale-threshold on cold start AND remember-me is off, we force a
-    //      sign-out as a safe fallback (covers cases where both 1 and 2
-    //      misbehave, e.g. private browsing edge cases or BFCache quirks).
-    // ──────────────────────────────────────────────────────────────────────
-    const SESSION_ONLY_KEY = "fyn.sessionOnly";
-    const TAB_ALIVE_KEY = "fyn.tabAlive";
-    const LAST_SEEN_KEY = "fyn.lastSeen";
-    const STALE_THRESHOLD_MS = 90 * 1000; // 90s without heartbeat ⇒ cold start
-    const HEARTBEAT_INTERVAL_MS = 15 * 1000;
-
-    const isReloadNavigation = (): boolean => {
-      try {
-        const entries = performance.getEntriesByType?.("navigation") as
-          | PerformanceNavigationTiming[]
-          | undefined;
-        if (entries && entries.length > 0) {
-          return entries[0].type === "reload";
-        }
-        // Legacy fallback (deprecated but still present in some browsers)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const legacy = (performance as any).navigation;
-        if (legacy && typeof legacy.type === "number") {
-          return legacy.type === 1; // TYPE_RELOAD
-        }
-      } catch {
-        /* ignore */
-      }
-      return false;
-    };
-
-    const isFreshBrowserSession = (): boolean => {
-      let tabAlive = false;
-      let lastSeenFresh = false;
-      try {
-        tabAlive = sessionStorage.getItem(TAB_ALIVE_KEY) === "1";
-        const lastSeenRaw = localStorage.getItem(LAST_SEEN_KEY);
-        if (lastSeenRaw) {
-          const delta = Date.now() - Number(lastSeenRaw);
-          lastSeenFresh = Number.isFinite(delta) && delta >= 0 && delta < STALE_THRESHOLD_MS;
-        }
-      } catch {
-        /* storage may be unavailable in private mode */
-      }
-      // Treat as a continuation of the same browser session if ANY trusted
-      // signal says so. Otherwise it's a fresh start (browser close & reopen).
-      const continuation = tabAlive || isReloadNavigation() || lastSeenFresh;
-      return !continuation;
-    };
-
+    // "Remember me" enforcement:
+    // If the user signed in WITHOUT Remember me, we sign them out at the start
+    // of every new browser session (i.e. when sessionStorage was cleared).
+    // Refreshes within the same tab/browser session keep the session alive.
     const enforceRememberMe = async () => {
-      let sessionOnly = false;
-      try {
-        sessionOnly = localStorage.getItem(SESSION_ONLY_KEY) === "1";
-      } catch {
-        /* ignore */
-      }
+      const sessionOnly = localStorage.getItem("fyn.sessionOnly") === "1";
+      const tabAlive = sessionStorage.getItem("fyn.tabAlive") === "1";
 
-      if (sessionOnly && isFreshBrowserSession()) {
-        // Safe fallback: sign out before we surface any stale session to the app.
-        try {
-          await supabase.auth.signOut();
-        } catch {
-          /* ignore — proceed to clear local hints regardless */
-        }
-        try {
-          localStorage.removeItem(SESSION_ONLY_KEY);
-          localStorage.removeItem(LAST_SEEN_KEY);
-        } catch {
-          /* ignore */
-        }
+      if (sessionOnly && !tabAlive) {
+        await supabase.auth.signOut();
+        localStorage.removeItem("fyn.sessionOnly");
       }
-
-      // Mark this tab as alive and start heartbeat.
-      try {
-        sessionStorage.setItem(TAB_ALIVE_KEY, "1");
-        localStorage.setItem(LAST_SEEN_KEY, String(Date.now()));
-      } catch {
-        /* ignore */
-      }
+      sessionStorage.setItem("fyn.tabAlive", "1");
 
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
@@ -145,31 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     enforceRememberMe();
 
-    // Heartbeat — keeps `fyn.lastSeen` fresh so a refresh or short navigation
-    // is never mistaken for a browser-close.
-    const heartbeat = () => {
-      try {
-        localStorage.setItem(LAST_SEEN_KEY, String(Date.now()));
-      } catch {
-        /* ignore */
-      }
-    };
-    const heartbeatTimer = window.setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") heartbeat();
-    };
-    const onPageHide = () => heartbeat();
-    document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("pagehide", onPageHide);
-    window.addEventListener("beforeunload", onPageHide);
-
-    return () => {
-      subscription.unsubscribe();
-      window.clearInterval(heartbeatTimer);
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pagehide", onPageHide);
-      window.removeEventListener("beforeunload", onPageHide);
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchProfile = async (userId: string) => {
