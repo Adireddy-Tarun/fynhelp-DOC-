@@ -275,8 +275,9 @@ const CFOReportDetailPage = () => {
                 Copy URL
               </button>
             </div>
+            )}
             <p className="text-[10px] text-fyn-ink/50 mt-1.5">
-              Tip: press Ctrl/Cmd + C after the URL is selected.
+              {fallbackPreparing ? "Preparing the share URL…" : "Tip: press Ctrl/Cmd + C after the URL is selected."}
             </p>
           </div>
         )}
