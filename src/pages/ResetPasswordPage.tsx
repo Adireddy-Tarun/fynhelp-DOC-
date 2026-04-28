@@ -3,18 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
-import {
-  Check,
-  X,
-  Eye,
-  EyeOff,
-  MailWarning,
-  Mail,
-  Clock,
-  ShieldAlert,
-  RefreshCw,
-  HelpCircle,
-} from "lucide-react";
+import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
 import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
 
 // ---------------------------------------------------------------------------
@@ -154,68 +143,45 @@ const parseLinkFailureFromSupabaseError = (err: unknown): LinkFailureInfo | null
   };
 };
 
-// Password policy is shared with the sign-up form to keep rules in sync.
-import {
-  PASSWORD_RULES,
-  COMMON_WEAK_PASSWORDS,
-  evaluatePasswordStrength,
-} from "@/lib/passwordPolicy";
+// Password policy ----------------------------------------------------------
+type RuleKey = "length" | "upper" | "lower" | "digit" | "symbol" | "noSpaces";
 
-// ---------------------------------------------------------------------------
-// Failure-state matrix
-//
-// One row per LinkFailureReason so titles, descriptions, icons, and the
-// primary CTA stay perfectly consistent across all four states.
-// ---------------------------------------------------------------------------
-type LinkFailureAction = "request_new" | "try_again" | "contact_support";
-
-interface LinkFailureCopy {
-  badge: string;
-  title: string;
-  description: string;
-  Icon: typeof MailWarning;
-  primaryAction: LinkFailureAction;
-  primaryLabel: string;
+interface Rule {
+  key: RuleKey;
+  label: string;
+  test: (pw: string) => boolean;
 }
 
-const LINK_FAILURE_COPY: Record<LinkFailureReason, LinkFailureCopy> = {
-  expired: {
-    badge: "Link expired",
-    title: "This reset link has expired",
-    description:
-      "For your security, password reset links are valid for only a short time. Request a fresh link below — it'll arrive in your inbox within a minute.",
-    Icon: Clock,
-    primaryAction: "request_new",
-    primaryLabel: "Request a new reset link",
-  },
-  used: {
-    badge: "Link already used",
-    title: "This reset link has already been used",
-    description:
-      "Each reset link can only be opened once. If you didn't finish setting your password, request a new link below to try again.",
-    Icon: RefreshCw,
-    primaryAction: "request_new",
-    primaryLabel: "Request a new reset link",
-  },
-  invalid: {
-    badge: "Link invalid",
-    title: "This reset link isn't valid",
-    description:
-      "We couldn't verify this link. It may be malformed, from an older email, or have been tampered with in transit. Request a fresh link below to continue.",
-    Icon: ShieldAlert,
-    primaryAction: "request_new",
-    primaryLabel: "Request a new reset link",
-  },
-  unknown: {
-    badge: "Verification failed",
-    title: "We couldn't verify this reset link",
-    description:
-      "Something went wrong while checking your link. This is usually temporary — try opening the link again, or request a new one below.",
-    Icon: HelpCircle,
-    primaryAction: "try_again",
-    primaryLabel: "Try opening the link again",
-  },
+const RULES: Rule[] = [
+  { key: "length", label: "At least 10 characters", test: (p) => p.length >= 10 },
+  { key: "upper", label: "An uppercase letter (A–Z)", test: (p) => /[A-Z]/.test(p) },
+  { key: "lower", label: "A lowercase letter (a–z)", test: (p) => /[a-z]/.test(p) },
+  { key: "digit", label: "A number (0–9)", test: (p) => /\d/.test(p) },
+  { key: "symbol", label: "A symbol (e.g. ! @ # $ %)", test: (p) => /[^A-Za-z0-9]/.test(p) },
+  { key: "noSpaces", label: "No leading or trailing spaces", test: (p) => p.length === 0 || p === p.trim() },
+];
+
+const COMMON_WEAK = new Set([
+  "password", "password1", "password123", "qwerty", "qwerty123",
+  "12345678", "123456789", "1234567890", "letmein", "welcome",
+  "admin", "iloveyou", "abc12345", "monkey", "dragon",
+]);
+
+const evaluateStrength = (pw: string, passedCount: number) => {
+  if (!pw) return { score: 0, label: "", color: "bg-fyn-ink-10" };
+  if (COMMON_WEAK.has(pw.toLowerCase())) {
+    return { score: 1, label: "Too common", color: "bg-fyn-red" };
+  }
+  // Score = passed rules + a length bonus
+  let score = passedCount;
+  if (pw.length >= 14) score += 1;
+  if (pw.length >= 18) score += 1;
+  if (score <= 2) return { score: 1, label: "Weak", color: "bg-fyn-red" };
+  if (score <= 4) return { score: 2, label: "Fair", color: "bg-fyn-gold" };
+  if (score <= 6) return { score: 3, label: "Strong", color: "bg-fyn-success" };
+  return { score: 4, label: "Excellent", color: "bg-fyn-success" };
 };
+// --------------------------------------------------------------------------
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
@@ -235,6 +201,8 @@ const ResetPasswordPage = () => {
   const [linkFailure, setLinkFailure] = useState<LinkFailureReason | null>(null);
   const resendInputRef = useRef<HTMLInputElement>(null);
 
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
   const focusResendInput = () => {
     // Defer to ensure the field is mounted in the DOM
     setTimeout(() => {
@@ -243,12 +211,17 @@ const ResetPasswordPage = () => {
     }, 50);
   };
 
-  const handleResend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = resendEmail.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Enter a valid email address.");
-      return;
+  /**
+   * Send a fresh reset link. Used by both the form submit and the
+   * one-click "Request a new reset link" CTA in the failure card.
+   * Returns true on success so callers can update UI state.
+   */
+  const sendResetLink = async (rawEmail: string): Promise<boolean> => {
+    const email = rawEmail.trim();
+    if (!isValidEmail(email)) {
+      toast.error("Enter a valid email address to receive a new link.");
+      focusResendInput();
+      return false;
     }
     const toastId = "reset-resend";
     toast.loading("Sending a new reset link…", { id: toastId });
@@ -259,10 +232,35 @@ const ResetPasswordPage = () => {
     setResending(false);
     if (resendErr) {
       toast.error(resendErr.message || "Could not send reset link.", { id: toastId });
-      return;
+      return false;
     }
     setResentTo(email);
+    // Clear the current failure state so the user sees a clean "sent" confirmation
+    // instead of the same red failure card.
+    setLinkFailure(null);
     toast.success("If that email exists, a new reset link is on its way.", { id: toastId });
+    return true;
+  };
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendResetLink(resendEmail);
+  };
+
+  /**
+   * One-click handler for the failure card CTA. If the email field already
+   * has a valid value, send immediately. Otherwise focus the field so the
+   * user can type one in, then send.
+   */
+  const handleRequestNewLink = async () => {
+    if (isValidEmail(resendEmail)) {
+      await sendResetLink(resendEmail);
+      return;
+    }
+    focusResendInput();
+    toast.info("Enter your email below and we'll send a fresh link.", {
+      id: "reset-resend",
+    });
   };
 
   useEffect(() => {
@@ -379,15 +377,15 @@ const ResetPasswordPage = () => {
   }, []);
 
   const ruleResults = useMemo(
-    () => PASSWORD_RULES.map((r) => ({ ...r, passed: r.test(password) })),
+    () => RULES.map((r) => ({ ...r, passed: r.test(password) })),
     [password]
   );
   const passedCount = ruleResults.filter((r) => r.passed).length;
-  const allRulesPassed = passedCount === PASSWORD_RULES.length;
-  const isCommonWeak = !!password && COMMON_WEAK_PASSWORDS.has(password.toLowerCase());
+  const allRulesPassed = passedCount === RULES.length;
+  const isCommonWeak = !!password && COMMON_WEAK.has(password.toLowerCase());
   const passwordsMatch = password === confirm && confirm.length > 0;
   const strength = useMemo(
-    () => evaluatePasswordStrength(password, passedCount),
+    () => evaluateStrength(password, passedCount),
     [password, passedCount]
   );
   const canSubmit = allRulesPassed && !isCommonWeak && passwordsMatch && !submitting;
@@ -467,56 +465,51 @@ const ResetPasswordPage = () => {
           </p>
         ) : !validSession ? (
           (() => {
-            const copy = LINK_FAILURE_COPY[linkFailure ?? "invalid"];
-            const { Icon } = copy;
-            const handlePrimary = () => {
-              if (copy.primaryAction === "try_again") {
-                window.location.reload();
-              } else {
-                focusResendInput();
-              }
-            };
+            const isExpired = linkFailure === "expired";
+            const isUsed = linkFailure === "used";
+            const heading = isExpired
+              ? "This reset link has expired"
+              : isUsed
+              ? "This reset link has already been used"
+              : "This reset link is invalid";
+            const explainer = isExpired
+              ? "For your security, password reset links are valid for a short time. Request a new one below and we'll email it to you right away."
+              : isUsed
+              ? "Each reset link can only be used once. Request a new link below to set your password."
+              : "We couldn't verify this reset link. It may be malformed, already used, or sent from an old email. Request a fresh link below.";
             return (
               <div className="max-w-md space-y-5">
                 <div className="rounded-lg border border-fyn-red/20 bg-fyn-danger-bg p-4">
                   <div className="flex items-start gap-3">
-                    <div
-                      className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red"
-                      aria-hidden="true"
-                    >
-                      <Icon className="h-5 w-5" />
+                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red">
+                      <MailWarning className="h-5 w-5" aria-hidden="true" />
                     </div>
                     <div className="flex-1">
-                      <span
-                        className="inline-block rounded-full border border-fyn-red/30 bg-fyn-red/5 px-2 py-0.5 text-fyn-red font-medium uppercase tracking-wide"
-                        style={{ fontSize: "var(--fyn-type-tiny)" }}
-                      >
-                        {copy.badge}
-                      </span>
                       <h3
-                        className="mt-2 font-serif text-fyn-ink"
+                        className="font-serif text-fyn-ink"
                         style={{ fontSize: "var(--fyn-type-h3)", lineHeight: 1.25 }}
                       >
-                        {copy.title}
+                        {heading}
                       </h3>
                       <p
                         className="mt-1 text-fyn-ink-80"
                         style={{ fontSize: "var(--fyn-type-small)", lineHeight: 1.5 }}
                       >
-                        {copy.description}
+                        {explainer}
                       </p>
                       <button
                         type="button"
-                        onClick={handlePrimary}
-                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity"
+                        onClick={handleRequestNewLink}
+                        disabled={resending}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                         style={{ fontSize: "var(--fyn-type-small)" }}
                       >
-                        {copy.primaryAction === "try_again" ? (
-                          <RefreshCw className="h-4 w-4" aria-hidden="true" />
-                        ) : (
-                          <Mail className="h-4 w-4" aria-hidden="true" />
-                        )}
-                        {copy.primaryLabel}
+                        <Mail className="h-4 w-4" aria-hidden="true" />
+                        {resending
+                          ? "Sending…"
+                          : isValidEmail(resendEmail)
+                          ? `Send a new link to ${resendEmail.trim()}`
+                          : "Request a new reset link"}
                       </button>
                     </div>
                   </div>
