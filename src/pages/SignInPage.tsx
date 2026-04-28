@@ -144,6 +144,89 @@ const SignInPage = () => {
     ? "Password is required"
     : "Password must be at least 6 characters";
 
+  // Map a Supabase AuthError (or any thrown error) to an inline field message.
+  // Uses `code` and HTTP `status` first (stable across locales / Supabase versions),
+  // then falls back to message-substring heuristics.
+  const mapAuthError = (
+    err: { message?: string; code?: string; status?: number; name?: string } | null | undefined
+  ): { field: "email" | "password" | "form"; message: string; isCredential: boolean } => {
+    const code = (err?.code || "").toLowerCase();
+    const status = err?.status ?? 0;
+    const msg = (err?.message || "").toLowerCase();
+
+    // Bad credentials (Supabase: code "invalid_credentials" / legacy text "Invalid login credentials")
+    if (
+      code === "invalid_credentials" ||
+      code === "invalid_grant" ||
+      msg.includes("invalid login") ||
+      msg.includes("invalid credentials") ||
+      msg.includes("invalid email or password")
+    ) {
+      return {
+        field: "password",
+        message: "Incorrect email or password. Please try again.",
+        isCredential: true,
+      };
+    }
+
+    // Account exists but email not confirmed.
+    if (code === "email_not_confirmed" || msg.includes("email not confirmed")) {
+      return {
+        field: "email",
+        message: "Please confirm your email address before signing in. Check your inbox for the verification link.",
+        isCredential: false,
+      };
+    }
+
+    // No such user (older Supabase versions surface this distinctly).
+    if (code === "user_not_found" || msg.includes("user not found")) {
+      return {
+        field: "email",
+        message: "No account found with this email address.",
+        isCredential: true,
+      };
+    }
+
+    // Server-side rate limit.
+    if (code === "over_request_rate_limit" || status === 429 || msg.includes("rate limit")) {
+      return {
+        field: "form",
+        message: "Too many sign-in attempts. Please wait a moment and try again.",
+        isCredential: false,
+      };
+    }
+
+    // Network / fetch failure (no response from Supabase).
+    if (
+      err?.name === "AuthRetryableFetchError" ||
+      err?.name === "TypeError" ||
+      msg.includes("failed to fetch") ||
+      msg.includes("network")
+    ) {
+      return {
+        field: "form",
+        message: "Couldn't reach the server. Check your connection and try again.",
+        isCredential: false,
+      };
+    }
+
+    // Generic 4xx — treat as credential-ish so the user re-checks the password,
+    // but don't lie about which field is wrong.
+    if (status === 400 || status === 422) {
+      return {
+        field: "form",
+        message: err?.message || "We couldn't sign you in. Please double-check your details.",
+        isCredential: false,
+      };
+    }
+
+    return {
+      field: "form",
+      message: err?.message || "Something went wrong while signing in. Please try again.",
+      isCredential: false,
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
@@ -162,37 +245,40 @@ const SignInPage = () => {
       return;
     }
 
+    // ── Remember-me policy: write markers BEFORE the sign-in call so the
+    //    AuthContext enforcement (which can fire as soon as the SIGNED_IN
+    //    event arrives or on the very next reload) treats this tab as a
+    //    live, continuing browser session and never force-signs-out the
+    //    session we're about to receive.
+    try {
+      sessionStorage.setItem("fyn.tabAlive", "1");
+      localStorage.setItem("fyn.lastSeen", String(Date.now()));
+      localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
+      if (rememberMe) {
+        localStorage.removeItem("fyn.sessionOnly");
+      } else {
+        localStorage.setItem("fyn.sessionOnly", "1");
+      }
+    } catch {
+      /* storage may be unavailable in private mode — proceed anyway */
+    }
+
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
 
     if (error) {
-      const msg = error.message?.toLowerCase() ?? "";
-      const isCredentialError =
-        msg.includes("invalid login") ||
-        msg.includes("invalid credentials") ||
-        msg.includes("user not found");
+      const mapped = mapAuthError(error);
 
-      // Only count credential failures toward the cooldown — not e.g. unconfirmed email or network errors.
-      if (isCredentialError) {
+      // Only credential-style failures count toward the local cooldown —
+      // not unconfirmed email, rate limits, or network errors.
+      if (mapped.isCredential) {
         recordFailure();
       }
 
-      let errorField: "email" | "password" | "form" = "form";
-      if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
-        errorField = "password";
-        setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
-      } else if (msg.includes("email not confirmed")) {
-        errorField = "email";
-        setAuthError({ field: "email", message: "Please confirm your email address before signing in." });
-      } else if (msg.includes("user not found")) {
-        errorField = "email";
-        setAuthError({ field: "email", message: "No account found with this email address." });
-      } else {
-        setAuthError({ field: "form", message: error.message });
-      }
-      if (errorField === "email" || errorField === "password") {
-        focusField(errorField);
+      setAuthError({ field: mapped.field, message: mapped.message });
+      if (mapped.field === "email" || mapped.field === "password") {
+        focusField(mapped.field);
       }
       return;
     }
@@ -200,14 +286,14 @@ const SignInPage = () => {
     // Successful sign-in — reset failure tracking.
     clearFailures();
 
-    // Persist Remember me preference and enforce session-only mode if unchecked.
-    localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
-    if (rememberMe) {
-      localStorage.removeItem("fyn.sessionOnly");
-    } else {
-      localStorage.setItem("fyn.sessionOnly", "1");
+    // Re-affirm the tab markers post-success (defence in depth — covers the
+    // case where the writes above were swallowed by storage quota/private mode).
+    try {
+      sessionStorage.setItem("fyn.tabAlive", "1");
+      localStorage.setItem("fyn.lastSeen", String(Date.now()));
+    } catch {
+      /* ignore */
     }
-    sessionStorage.setItem("fyn.tabAlive", "1");
   };
 
   const inputBase =
