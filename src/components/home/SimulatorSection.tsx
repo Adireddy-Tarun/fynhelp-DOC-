@@ -58,7 +58,7 @@ export default function SimulatorSection() {
             <p className="text-sm italic mb-6 text-secondary-foreground">
               These are real scenarios built by our CA team from 500+ SME interviews.
             </p>
-            <Link to="/signup" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg hover-btn-primary">
+            <Link to="/early-access" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg hover-btn-primary">
               Try it with your data →
             </Link>
           </div>

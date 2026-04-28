@@ -379,14 +379,14 @@ export default function ProductsPage() {
             </p>
             <div className="space-y-3">
               <button
-                onClick={() => { setAuthModal(null); navigate("/signin"); }}
+                onClick={() => { setAuthModal(null); navigate("/early-access"); }}
                 className="w-full py-3 rounded-lg border border-fyn-ink text-fyn-ink font-medium hover:bg-fyn-ink hover:text-white"
                 style={{ transition: "all 250ms" }}
               >
                 Sign In
               </button>
               <button
-                onClick={() => { setAuthModal(null); navigate("/signup"); }}
+                onClick={() => { setAuthModal(null); navigate("/early-access"); }}
                 className="w-full py-3 rounded-lg bg-fyn-red text-white font-semibold hover:opacity-90"
                 style={{ transition: "all 250ms" }}
               >
