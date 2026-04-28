@@ -176,9 +176,9 @@ function EcosystemMap() {
             <line
               key={`${n.id}-line`}
               x1={sx} y1={sy} x2={ex} y2={ey}
-              stroke={isHovered ? "#C41E1E" : "#CCCCCC"}
+              stroke={isActive ? "#C41E1E" : "#CCCCCC"}
               strokeWidth={2}
-              strokeDasharray={isHovered ? "none" : "5 5"}
+              strokeDasharray={isActive ? "none" : "5 5"}
               style={{ transition: "stroke 250ms ease, stroke-dasharray 250ms ease" }}
             />
           );
