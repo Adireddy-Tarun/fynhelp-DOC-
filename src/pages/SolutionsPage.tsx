@@ -57,7 +57,7 @@ function EcosystemMap() {
 
   const handleNodeClick = (node: typeof nodes[0]) => {
     if (!user) {
-      navigate(`/early-access?return=${node.slug}`);
+      navigate(`/signin?return=${node.slug}`);
     } else {
       navigate(node.slug);
     }
@@ -191,7 +191,7 @@ const SolutionsPage = () => {
 
   const handleLearnMore = (dashSlug: string) => {
     if (!user) {
-      navigate(`/early-access?return=${dashSlug}`);
+      navigate(`/signin?return=${dashSlug}`);
     } else {
       navigate(dashSlug);
     }

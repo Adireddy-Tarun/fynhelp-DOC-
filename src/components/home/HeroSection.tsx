@@ -201,7 +201,7 @@ function LeftColumn() {
         style={{ gap: 16, marginTop: 36, animationDelay: "450ms", animationFillMode: "both" }}
       >
         <Link
-          to="/early-access"
+          to="/signup"
           style={{
             background: "#C41E1E", color: "#FFFFFF", padding: "14px 28px", borderRadius: 6,
             fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 15,

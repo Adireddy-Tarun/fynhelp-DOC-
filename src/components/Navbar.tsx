@@ -5,9 +5,13 @@ import MegaMenu from "./MegaMenu";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Product", href: "/products" },
+  { label: "Solutions", href: "/solutions" },
+  { label: "Products", href: "/products", hasMega: true },
   { label: "Pricing", href: "/pricing" },
+  { label: "Resources", href: "/resources" },
+  { label: "Blog", href: "/blog" },
+  { label: "Community", href: "/community" },
+  { label: "About", href: "/about" },
 ];
 
 const Navbar = () => {
@@ -65,7 +69,7 @@ const Navbar = () => {
               <div
                 key={l.href}
                 className="relative"
-                
+                onMouseEnter={l.hasMega ? handleMegaEnter : undefined}
               >
                 <Link
                   to={l.href}
@@ -83,10 +87,17 @@ const Navbar = () => {
 
           <div className="hidden lg:flex items-center gap-4">
             <Link
-              to="/early-access"
+              to="/signin"
+              className="nav-link-underline text-sm font-medium text-white/80 hover:text-white px-3 py-2"
+            >
+              Sign In
+            </Link>
+            <div className="w-px h-5 bg-white/20" />
+            <Link
+              to="/signup"
               className="bg-fyn-red text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover-btn-primary"
             >
-              Join Waitlist
+              Start Free Trial
             </Link>
           </div>
 
@@ -135,12 +146,13 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="mt-4 space-y-3">
+              <Link to="/signin" onClick={() => setMobileOpen(false)} className="block text-white/80 py-2 text-center">Sign In</Link>
               <Link
-                to="/early-access"
+                to="/signup"
                 onClick={() => setMobileOpen(false)}
                 className="block bg-fyn-red text-white text-center py-3 rounded-lg font-semibold"
               >
-                Join Waitlist
+                Start Free Trial
               </Link>
             </div>
           </div>

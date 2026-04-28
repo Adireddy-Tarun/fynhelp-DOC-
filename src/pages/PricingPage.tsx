@@ -41,7 +41,7 @@ export default function PricingPage() {
       localStorage.setItem("selected_plan", plan);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        navigate(`/early-access?plan=${plan}`);
+        navigate(`/signup?plan=${plan}`);
         return;
       }
       await createRazorpayCheckout(plan);

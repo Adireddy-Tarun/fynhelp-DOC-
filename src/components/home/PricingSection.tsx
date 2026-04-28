@@ -162,7 +162,7 @@ export default function PricingSection() {
                   p.featured ? "border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-white" : "border-white/30 text-white hover:bg-white hover:text-fyn-ink"
                 }`}>{p.cta}</button>
               ) : (
-                <Link to="/early-access" className={`block text-center py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                <Link to="/signup" className={`block text-center py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   p.featured ? "bg-fyn-red text-white hover-btn-primary" : "bg-fyn-red text-white hover-btn-primary"
                 }`}>{p.cta}</Link>
               )}
