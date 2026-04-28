@@ -83,6 +83,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <DashboardGuard>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/solutions" element={<SolutionsPage />} />
@@ -159,6 +160,7 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </DashboardGuard>
         </BrowserRouter>
       </TooltipProvider>
       </CAAuthProvider>
