@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+// hCaptcha site key. Provide via VITE_HCAPTCHA_SITE_KEY in env. The fallback is
+// hCaptcha's public test key — it always passes verification and is meant for
+// local/preview environments only. Replace in production.
+const HCAPTCHA_SITE_KEY =
+  (import.meta.env.VITE_HCAPTCHA_SITE_KEY as string | undefined) ||
+  "10000000-ffff-ffff-ffff-000000000001";
+const HCAPTCHA_IS_TEST_KEY = HCAPTCHA_SITE_KEY === "10000000-ffff-ffff-ffff-000000000001";
 
 const SignInPage = () => {
   const [email, setEmail] = useState("");
