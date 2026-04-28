@@ -11,7 +11,7 @@ export default function FinalCTASection() {
           Join 10,000+ Indian businesses who finally understand their finances.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <Link to="/signup" className="bg-white text-fyn-red font-semibold px-8 py-4 rounded-lg text-base hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+          <Link to="/early-access" className="bg-white text-fyn-red font-semibold px-8 py-4 rounded-lg text-base hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
             Start 15-Day Free Trial
           </Link>
           <button className="border-[1.5px] border-white text-white font-semibold px-8 py-4 rounded-lg text-base hover:bg-white/10 transition-all duration-200">
