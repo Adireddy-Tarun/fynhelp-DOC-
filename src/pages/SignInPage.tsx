@@ -338,12 +338,42 @@ const SignInPage = () => {
             </div>
           )}
 
+          {isLocked && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="rounded-md p-3 text-sm bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30"
+            >
+              <div className="font-medium">Sign-in temporarily paused</div>
+              <div className="text-xs mt-1 text-secondary-foreground">
+                After {failCount} failed attempts, please wait{" "}
+                <span className="font-mono font-semibold text-fyn-ink">{formatRemaining(cooldownRemaining)}</span>{" "}
+                before trying again.{" "}
+                <button type="button" onClick={openForgot} className="text-fyn-red hover:underline">
+                  Reset your password
+                </button>{" "}
+                if you've forgotten it.
+              </div>
+            </div>
+          )}
+          {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
+            <p className="text-xs text-fyn-red">
+              {FAIL_THRESHOLD - failCount === 1
+                ? "1 more failed attempt will temporarily lock sign-in."
+                : `${FAIL_THRESHOLD - failCount} more failed attempts will temporarily lock sign-in.`}
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60"
+            disabled={loading || isLocked}
+            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in…" : "Sign In"}
+            {isLocked
+              ? `Try again in ${formatRemaining(cooldownRemaining)}`
+              : loading
+              ? "Signing in…"
+              : "Sign In"}
           </button>
           <p className="text-sm text-center text-secondary-foreground">
             Don't have an account? <Link to="/signup" className="text-fyn-red hover:underline">Start free trial →</Link>
