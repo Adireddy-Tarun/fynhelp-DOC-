@@ -5,6 +5,7 @@ import { ArrowLeft, Check, ChevronDown, Copy, Download, FileText, Link2, Sparkle
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { downloadReportPdf } from "@/lib/reportPdf";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -30,16 +31,22 @@ const CFOReportDetailPage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showFallbackInput, setShowFallbackInput] = useState(false);
+  const [fallbackPreparing, setFallbackPreparing] = useState(false);
   const fallbackInputRef = useRef<HTMLInputElement>(null);
 
   const shareUrl = id ? `${window.location.origin}/dashboard/reports/${id}` : "";
 
   const showManualFallback = () => {
     setShowFallbackInput(true);
+    setFallbackPreparing(true);
+    // Brief skeleton so users get immediate visual feedback on slow networks/devices
     setTimeout(() => {
-      fallbackInputRef.current?.focus();
-      fallbackInputRef.current?.select();
-    }, 50);
+      setFallbackPreparing(false);
+      setTimeout(() => {
+        fallbackInputRef.current?.focus();
+        fallbackInputRef.current?.select();
+      }, 50);
+    }, 350);
   };
 
   const handleCopyShareLink = async () => {
@@ -67,6 +74,7 @@ const CFOReportDetailPage = () => {
       }
       setCopied(true);
       setShowFallbackInput(false);
+      setFallbackPreparing(false);
       toast({
         title: "Link copied",
         description: "Share link copied to clipboard.",
@@ -217,17 +225,30 @@ const CFOReportDetailPage = () => {
                 htmlFor="share-url-fallback"
                 className="text-xs font-medium text-fyn-ink/70"
               >
-                Copy this URL manually
+                {fallbackPreparing ? "Preparing URL…" : "Copy this URL manually"}
               </label>
               <button
-                onClick={() => setShowFallbackInput(false)}
+                onClick={() => {
+                  setShowFallbackInput(false);
+                  setFallbackPreparing(false);
+                }}
                 className="text-fyn-ink/50 hover:text-fyn-ink transition"
                 aria-label="Close manual copy"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
-<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+{fallbackPreparing ? (
+              <div
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+                aria-busy="true"
+                aria-live="polite"
+              >
+                <Skeleton className="flex-1 h-10 rounded bg-fyn-ink/10" />
+                <Skeleton className="h-10 w-full sm:w-24 rounded bg-fyn-ink/15 shrink-0" />
+              </div>
+            ) : (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <input
                 ref={fallbackInputRef}
                 id="share-url-fallback"
@@ -254,8 +275,9 @@ const CFOReportDetailPage = () => {
                 Copy URL
               </button>
             </div>
+            )}
             <p className="text-[10px] text-fyn-ink/50 mt-1.5">
-              Tip: press Ctrl/Cmd + C after the URL is selected.
+              {fallbackPreparing ? "Preparing the share URL…" : "Tip: press Ctrl/Cmd + C after the URL is selected."}
             </p>
           </div>
         )}
