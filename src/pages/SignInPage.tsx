@@ -161,6 +161,16 @@ const SignInPage = () => {
     ? "Password is required"
     : "Password must be at least 6 characters";
 
+  const resetCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaSolved(false);
+    try {
+      captchaRef.current?.resetCaptcha();
+    } catch {
+      /* widget may not be mounted yet */
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
@@ -169,7 +179,7 @@ const SignInPage = () => {
     if (isLocked) {
       setAuthError({
         field: "form",
-        message: `Too many failed attempts. Please wait ${formatRemaining(cooldownRemaining)} before trying again, or use “Forgot password?”.`,
+        message: `Too many failed attempts. Please complete the security check below to continue, or wait ${formatRemaining(cooldownRemaining)}.`,
       });
       return;
     }
@@ -180,8 +190,16 @@ const SignInPage = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const tokenForRequest = captchaToken ?? undefined;
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: tokenForRequest ? { captchaToken: tokenForRequest } : undefined,
+    });
     setLoading(false);
+
+    // hCaptcha tokens are single-use — reset the widget after every submit.
+    resetCaptcha();
 
     if (error) {
       const msg = error.message?.toLowerCase() ?? "";
@@ -196,7 +214,13 @@ const SignInPage = () => {
       }
 
       let errorField: "email" | "password" | "form" = "form";
-      if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+      if (msg.includes("captcha")) {
+        errorField = "form";
+        setAuthError({
+          field: "form",
+          message: "Captcha verification failed. Please try the security check again.",
+        });
+      } else if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
         errorField = "password";
         setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
       } else if (msg.includes("email not confirmed")) {
