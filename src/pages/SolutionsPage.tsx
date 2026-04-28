@@ -328,12 +328,35 @@ const SolutionsPage = () => {
       </section>
 
       {/* Interactive Ecosystem Map */}
-      <section className="bg-fyn-beige fyn-section">
+      <section style={{ background: "#F9F7F4", paddingTop: 80, paddingBottom: 80 }}>
         <div className="fyn-container text-center">
-          <h2 className="text-3xl text-fyn-ink mb-4">How the product ecosystem works together</h2>
-          <p className="text-fyn-ink/60 text-sm mb-12">Hover over any node to learn more. Click to explore the module.</p>
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontWeight: 700,
+              fontSize: 32,
+              color: "#2A2A2A",
+              marginBottom: 16,
+            }}
+          >
+            How the product ecosystem works together
+          </h2>
+          <p style={{ fontSize: 16, color: "#2A2A2A", opacity: 0.7, marginBottom: 40 }}>
+            Hover over any node to learn more. Click to explore the module.
+          </p>
           <EcosystemMap />
-          <p className="text-fyn-ink/60 text-base mt-8 max-w-lg mx-auto">
+          <p
+            style={{
+              fontSize: 16,
+              lineHeight: 1.6,
+              color: "#2A2A2A",
+              opacity: 0.8,
+              marginTop: 40,
+              maxWidth: 640,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
             Every module feeds AI CFO Nidhi. AI CFO Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
           </p>
         </div>
