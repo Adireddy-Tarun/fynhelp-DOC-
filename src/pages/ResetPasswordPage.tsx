@@ -14,17 +14,37 @@ const ResetPasswordPage = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const verifyToastId = "reset-verify";
+    toast.loading("Verifying your reset link…", { id: verifyToastId });
+    let resolved = false;
+
+    const resolve = (ok: boolean) => {
+      if (resolved) return;
+      resolved = true;
+      setReady(true);
+      if (ok) {
+        toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
+      } else {
+        toast.error("This reset link is invalid or has expired.", { id: verifyToastId });
+      }
+    };
+
     // Supabase v2 will pick up the recovery session from the URL hash automatically.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
         setValidSession(true);
-        setReady(true);
+        resolve(true);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setValidSession(true);
-      setReady(true);
+      if (session) {
+        setValidSession(true);
+        resolve(true);
+      } else {
+        // Give the auth state listener a brief window to fire from the URL hash.
+        setTimeout(() => resolve(false), 1200);
+      }
     });
 
     return () => sub.subscription.unsubscribe();
@@ -36,18 +56,31 @@ const ResetPasswordPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!passwordValid) return setError("Password must be at least 8 characters.");
-    if (!passwordsMatch) return setError("Passwords do not match.");
+    if (!passwordValid) {
+      const msg = "Password must be at least 8 characters.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+    if (!passwordsMatch) {
+      const msg = "Passwords do not match.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
 
+    const updateToastId = "reset-update";
+    toast.loading("Updating your password…", { id: updateToastId });
     setSubmitting(true);
     const { error: updateErr } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
 
     if (updateErr) {
       setError(updateErr.message);
+      toast.error(updateErr.message || "Could not update password.", { id: updateToastId });
       return;
     }
-    toast.success("Password updated. You're signed in.");
+    toast.success("Password updated. You're signed in.", { id: updateToastId });
     navigate("/dashboard/cockpit", { replace: true });
   };
 
