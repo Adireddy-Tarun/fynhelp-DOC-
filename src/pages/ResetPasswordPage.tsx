@@ -57,6 +57,31 @@ const ResetPasswordPage = () => {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [resendEmail, setResendEmail] = useState("");
+  const [resending, setResending] = useState(false);
+  const [resentTo, setResentTo] = useState<string | null>(null);
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = resendEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Enter a valid email address.");
+      return;
+    }
+    const toastId = "reset-resend";
+    toast.loading("Sending a new reset link…", { id: toastId });
+    setResending(true);
+    const { error: resendErr } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResending(false);
+    if (resendErr) {
+      toast.error(resendErr.message || "Could not send reset link.", { id: toastId });
+      return;
+    }
+    setResentTo(email);
+    toast.success("If that email exists, a new reset link is on its way.", { id: toastId });
+  };
 
   useEffect(() => {
     const verifyToastId = "reset-verify";
@@ -170,11 +195,44 @@ const ResetPasswordPage = () => {
         ) : !validSession ? (
           <div className="max-w-md space-y-4">
             <div className="rounded-md p-3 text-sm bg-fyn-red/10 text-fyn-red border border-fyn-red/20">
-              This reset link is invalid or has expired. Please request a new one from the sign-in page.
+              This reset link is invalid or has expired. Enter your email below to get a new link.
             </div>
+
+            <form onSubmit={handleResend} className="space-y-3" noValidate>
+              <div>
+                <label htmlFor="resend-email" className="text-sm mb-1 block text-secondary-foreground">
+                  Email address
+                </label>
+                <input
+                  id="resend-email"
+                  type="email"
+                  autoComplete="email"
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  disabled={resending}
+                  className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground disabled:opacity-60"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={resending || !resendEmail.trim()}
+                className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {resending ? "Sending…" : "Resend reset link"}
+              </button>
+            </form>
+
+            {resentTo && (
+              <p className="text-xs text-secondary-foreground">
+                If an account exists for <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
+              </p>
+            )}
+
             <button
               onClick={() => navigate("/signin")}
-              className="bg-fyn-red text-white py-3 px-5 rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
+              className="text-sm text-secondary-foreground hover:text-fyn-ink underline underline-offset-2"
             >
               Back to sign in
             </button>
