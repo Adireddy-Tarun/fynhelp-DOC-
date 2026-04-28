@@ -5,12 +5,99 @@ import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
 
-// Parse Supabase auth error info from the URL hash/query (set when a recovery
-// link is invalid or expired). Returns a normalized reason we can map to copy.
-type LinkFailureReason = "expired" | "invalid" | "used" | "unknown";
+// ---------------------------------------------------------------------------
+// Reset-link failure parsing
+//
+// Supabase can surface a failed recovery link in several places, depending on
+// the flow (implicit hash flow, PKCE `?code=` flow, server-redirected error,
+// or a thrown AuthApiError from getSession/exchangeCodeForSession/verifyOtp).
+//
+// We normalize all of those into a single LinkFailureReason so the UI only
+// has to render one of a small number of states.
+// ---------------------------------------------------------------------------
+export type LinkFailureReason = "expired" | "used" | "invalid" | "unknown";
 
-const parseLinkFailure = (): { reason: LinkFailureReason; description?: string } | null => {
+interface LinkFailureInfo {
+  reason: LinkFailureReason;
+  /** Raw Supabase error code, e.g. "otp_expired", "access_denied". */
+  code?: string;
+  /** Human-readable description from Supabase, decoded. */
+  description?: string;
+  /** Where the failure was detected — useful for logging/analytics. */
+  source: "url" | "supabase";
+}
+
+const decodeParam = (raw: string | null | undefined): string | undefined => {
+  if (!raw) return undefined;
+  // Supabase encodes spaces as `+` in error_description; URLSearchParams
+  // already decodes `%20` but leaves `+` in hash fragments alone in some
+  // browsers. Normalize both.
+  try {
+    return decodeURIComponent(raw.replace(/\+/g, " "));
+  } catch {
+    return raw.replace(/\+/g, " ");
+  }
+};
+
+const classifyFailure = (
+  code: string | undefined,
+  description: string | undefined,
+  status?: number
+): LinkFailureReason => {
+  const c = (code ?? "").toLowerCase();
+  const d = (description ?? "").toLowerCase();
+
+  // --- Expired -----------------------------------------------------------
+  if (
+    c === "otp_expired" ||
+    c === "token_expired" ||
+    c === "flow_state_expired" ||
+    c === "session_expired" ||
+    /\bexpired\b/.test(d) ||
+    /has expired/.test(d) ||
+    /no longer valid/.test(d)
+  ) {
+    return "expired";
+  }
+
+  // --- Already used / consumed ------------------------------------------
+  if (
+    c === "otp_consumed" ||
+    c === "token_consumed" ||
+    /already (been )?used/.test(d) ||
+    /consumed/.test(d) ||
+    /single[-\s]?use/.test(d)
+  ) {
+    return "used";
+  }
+
+  // --- Invalid (malformed, bad signature, wrong type, denied) -----------
+  if (
+    c === "access_denied" ||
+    c === "invalid_request" ||
+    c === "invalid_grant" ||
+    c === "validation_failed" ||
+    c === "bad_jwt" ||
+    c === "bad_oauth_callback" ||
+    c === "email_link_invalid" ||
+    c === "unauthorized_client" ||
+    /invalid/.test(d) ||
+    /malformed/.test(d) ||
+    /signature/.test(d) ||
+    /not found/.test(d) ||
+    status === 400 ||
+    status === 401 ||
+    status === 403
+  ) {
+    return "invalid";
+  }
+
+  return "unknown";
+};
+
+const parseLinkFailureFromUrl = (): LinkFailureInfo | null => {
   if (typeof window === "undefined") return null;
+
   const hash = window.location.hash.startsWith("#")
     ? window.location.hash.slice(1)
     : window.location.hash;
@@ -18,21 +105,41 @@ const parseLinkFailure = (): { reason: LinkFailureReason; description?: string }
   const queryParams = new URLSearchParams(window.location.search);
   const get = (k: string) => hashParams.get(k) ?? queryParams.get(k);
 
+  // Pull every field Supabase or an OAuth-style proxy may set.
   const error = get("error");
-  const errorCode = get("error_code");
-  const description = get("error_description")?.replace(/\+/g, " ") ?? undefined;
-  if (!error && !errorCode) return null;
+  const errorCode = get("error_code") ?? get("error_codes");
+  const message = get("message");
+  const description = decodeParam(get("error_description") ?? message);
 
-  if (errorCode === "otp_expired" || /expired/i.test(description ?? "")) {
-    return { reason: "expired", description };
-  }
-  if (errorCode === "access_denied") {
-    return { reason: "invalid", description };
-  }
-  if (/used/i.test(description ?? "")) {
-    return { reason: "used", description };
-  }
-  return { reason: "unknown", description };
+  if (!error && !errorCode && !description) return null;
+
+  return {
+    reason: classifyFailure(errorCode ?? error ?? undefined, description),
+    code: errorCode ?? error ?? undefined,
+    description,
+    source: "url",
+  };
+};
+
+const parseLinkFailureFromSupabaseError = (err: unknown): LinkFailureInfo | null => {
+  if (!err || typeof err !== "object") return null;
+  const anyErr = err as {
+    name?: string;
+    message?: string;
+    code?: string;
+    error_code?: string;
+    status?: number;
+  };
+  const code = anyErr.code ?? anyErr.error_code;
+  const description = anyErr.message;
+  const status = anyErr.status;
+  if (!code && !description && !status) return null;
+  return {
+    reason: classifyFailure(code, description, status),
+    code,
+    description,
+    source: "supabase",
+  };
 };
 
 // Password policy ----------------------------------------------------------
@@ -126,67 +233,102 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     const verifyToastId = "reset-verify";
     let resolved = false;
+    let unsub: (() => void) | undefined;
 
-    // 1) Detect explicit failure info in the URL first (Supabase appends
-    //    error_code=otp_expired etc. when the recovery link is bad).
-    const urlFailure = parseLinkFailure();
-    if (urlFailure) {
-      setLinkFailure(urlFailure.reason);
-      setReady(true);
+    const finish = (
+      ok: boolean,
+      failure?: LinkFailureInfo | null
+    ) => {
+      if (resolved) return;
       resolved = true;
+      setReady(true);
+      if (ok) {
+        setValidSession(true);
+        toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
+        return;
+      }
+      const reason = failure?.reason ?? "invalid";
+      setLinkFailure(reason);
       toast.error(
-        urlFailure.reason === "expired"
+        reason === "expired"
           ? "This reset link has expired."
-          : "This reset link is invalid.",
+          : reason === "used"
+          ? "This reset link has already been used."
+          : "This reset link is invalid or has expired.",
         { id: verifyToastId }
       );
-      // Clear the noisy hash/query so a refresh doesn't re-trigger the same toast.
+      // Clear the noisy hash/query so a refresh doesn't re-trigger toasts.
       try {
         window.history.replaceState(null, "", window.location.pathname);
       } catch {
         /* no-op */
       }
+    };
+
+    // 1) Explicit failure info encoded in the URL by Supabase / proxy.
+    const urlFailure = parseLinkFailureFromUrl();
+    if (urlFailure) {
+      finish(false, urlFailure);
       return;
     }
 
     toast.loading("Verifying your reset link…", { id: verifyToastId });
 
-    const resolve = (ok: boolean, reason: LinkFailureReason = "invalid") => {
-      if (resolved) return;
-      resolved = true;
-      setReady(true);
-      if (ok) {
-        toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
-      } else {
-        setLinkFailure(reason);
-        toast.error(
-          reason === "expired"
-            ? "This reset link has expired."
-            : "This reset link is invalid or has expired.",
-          { id: verifyToastId }
-        );
-      }
-    };
-
-    // Supabase v2 will pick up the recovery session from the URL hash automatically.
+    // 2) Listen for the recovery session that supabase-js populates from the
+    //    URL hash automatically (implicit flow).
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        setValidSession(true);
-        resolve(true);
+        finish(true);
       }
     });
+    unsub = () => sub.subscription.unsubscribe();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setValidSession(true);
-        resolve(true);
-      } else {
-        // Give the auth state listener a brief window to fire from the URL hash.
-        setTimeout(() => resolve(false), 1200);
+    const queryParams = new URLSearchParams(window.location.search);
+    const code = queryParams.get("code");
+    const tokenHash = queryParams.get("token_hash");
+    const type = queryParams.get("type");
+
+    const tryRecover = async () => {
+      // 3a) PKCE flow: ?code=... — exchange for a session.
+      if (code) {
+        const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
+        if (exErr) {
+          finish(false, parseLinkFailureFromSupabaseError(exErr));
+          return;
+        }
+        finish(true);
+        return;
       }
-    });
+      // 3b) Token-hash flow: ?token_hash=...&type=recovery
+      if (tokenHash && type) {
+        const { error: vErr } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type as "recovery",
+        });
+        if (vErr) {
+          finish(false, parseLinkFailureFromSupabaseError(vErr));
+          return;
+        }
+        finish(true);
+        return;
+      }
+      // 3c) Implicit hash flow: check for an existing session, otherwise
+      //     wait briefly for onAuthStateChange.
+      const { data, error: sessErr } = await supabase.auth.getSession();
+      if (sessErr) {
+        finish(false, parseLinkFailureFromSupabaseError(sessErr));
+        return;
+      }
+      if (data.session) {
+        finish(true);
+        return;
+      }
+      setTimeout(() => finish(false, { reason: "invalid", source: "supabase" }), 1200);
+    };
 
-    return () => sub.subscription.unsubscribe();
+    void tryRecover();
+
+    return () => unsub?.();
   }, []);
 
   const ruleResults = useMemo(
