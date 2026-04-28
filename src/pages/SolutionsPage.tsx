@@ -284,29 +284,46 @@ function EcosystemMap() {
       </svg>
 
       {/* Tooltip — outer node */}
-      {hoveredNode && hoveredNode !== "nidhi" && (() => {
-        const n = nodes.find((nd) => nd.id === hoveredNode);
+      {activeNode && activeNode !== "nidhi" && (() => {
+        const n = nodes.find((nd) => nd.id === activeNode);
         if (!n) return null;
         const rad = ((n.angle - 90) * Math.PI) / 180;
         // Position tooltip relative to container (700x700 viewBox mapped to %)
         const xPct = 50 + (RADIUS / 700) * 100 * Math.cos(rad);
         const yPct = 50 + (RADIUS / 700) * 100 * Math.sin(rad) - 8;
+        const isPinned = pinnedNode === n.id;
         return (
           <div
-            className="absolute pointer-events-none"
+            className="absolute"
             style={{
               left: `${xPct}%`, top: `${yPct}%`,
               transform: "translate(-50%, -100%)",
               animation: "fade-in 200ms ease-out",
               zIndex: 20,
+              pointerEvents: isPinned ? "auto" : "none",
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             <div style={{
               background: "hsl(24 53% 7%)", borderRadius: 8, padding: "12px 16px",
               maxWidth: 240, boxShadow: "0 8px 32px rgba(26,16,8,0.25)",
             }}>
               <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, color: "#FFFFFF", marginBottom: 4 }}>{n.label}</p>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>{n.title}</p>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: isPinned ? 10 : 0 }}>{n.title}</p>
+              {isPinned && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); navigateToNode(n); }}
+                  style={{
+                    background: "#C41E1E", color: "#FFFFFF",
+                    border: "none", borderRadius: 6, cursor: "pointer",
+                    padding: "6px 10px", fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600, fontSize: 12,
+                  }}
+                >
+                  Open module →
+                </button>
+              )}
             </div>
             <div style={{
               width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent",
@@ -317,7 +334,7 @@ function EcosystemMap() {
       })()}
 
       {/* Tooltip — center */}
-      {hoveredNode === "nidhi" && (
+      {activeNode === "nidhi" && (
         <div
           className="absolute pointer-events-none"
           style={{ left: "50%", top: "32%", transform: "translate(-50%, -100%)", animation: "fade-in 200ms ease-out", zIndex: 20 }}
