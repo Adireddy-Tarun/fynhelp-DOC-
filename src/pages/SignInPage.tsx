@@ -10,6 +10,7 @@ const SignInPage = () => {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [authError, setAuthError] = useState<{ field?: "email" | "password" | "form"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
 
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
@@ -82,7 +83,17 @@ const SignInPage = () => {
       } else {
         setAuthError({ field: "form", message: error.message });
       }
+      return;
     }
+
+    // Persist Remember me preference and enforce session-only mode if unchecked.
+    localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
+    if (rememberMe) {
+      localStorage.removeItem("fyn.sessionOnly");
+    } else {
+      localStorage.setItem("fyn.sessionOnly", "1");
+    }
+    sessionStorage.setItem("fyn.tabAlive", "1");
   };
 
   const inputBase =
