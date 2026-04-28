@@ -132,3 +132,6 @@ const PricingPage = () => {
       </section>
     </Layout>
   );
+};
+
+export default PricingPage;
