@@ -1472,6 +1472,51 @@ export type Database = {
           },
         ]
       }
+      waitlist: {
+        Row: {
+          company_name: string
+          company_size: string
+          company_type: string
+          created_at: string
+          email: string
+          id: string
+          is_converted: boolean
+          location: string
+          name: string
+          phone: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          company_size: string
+          company_type: string
+          created_at?: string
+          email: string
+          id?: string
+          is_converted?: boolean
+          location: string
+          name: string
+          phone: string
+          position: number
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          company_size?: string
+          company_type?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_converted?: boolean
+          location?: string
+          name?: string
+          phone?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       waitlist_signups: {
         Row: {
           business_name: string | null
