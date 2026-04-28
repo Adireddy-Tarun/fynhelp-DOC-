@@ -312,15 +312,15 @@ const ResetPasswordPage = () => {
   }, []);
 
   const ruleResults = useMemo(
-    () => RULES.map((r) => ({ ...r, passed: r.test(password) })),
+    () => PASSWORD_RULES.map((r) => ({ ...r, passed: r.test(password) })),
     [password]
   );
   const passedCount = ruleResults.filter((r) => r.passed).length;
-  const allRulesPassed = passedCount === RULES.length;
-  const isCommonWeak = !!password && COMMON_WEAK.has(password.toLowerCase());
+  const allRulesPassed = passedCount === PASSWORD_RULES.length;
+  const isCommonWeak = !!password && COMMON_WEAK_PASSWORDS.has(password.toLowerCase());
   const passwordsMatch = password === confirm && confirm.length > 0;
   const strength = useMemo(
-    () => evaluateStrength(password, passedCount),
+    () => evaluatePasswordStrength(password, passedCount),
     [password, passedCount]
   );
   const canSubmit = allRulesPassed && !isCommonWeak && passwordsMatch && !submitting;
