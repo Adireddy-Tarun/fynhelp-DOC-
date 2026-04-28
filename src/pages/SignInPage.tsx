@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck, CheckCircle2 } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 // hCaptcha site key. Provide via VITE_HCAPTCHA_SITE_KEY in env. The fallback is
@@ -76,11 +76,27 @@ const SignInPage = () => {
   const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - now) / 1000));
   const isLocked = cooldownRemaining > 0;
 
+  // True for one render cycle right after the cooldown timer hits 0, so we
+  // can show an explicit "Try again" panel instead of silently re-enabling
+  // the form. Cleared by the user clicking "Try again" or by typing.
+  const [cooldownJustExpired, setCooldownJustExpired] = useState(false);
+  const wasLockedRef = useRef(isLocked);
+
   useEffect(() => {
     if (!isLocked) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [isLocked]);
+
+  // Detect the lock → unlocked transition so we can prompt "Try again" without
+  // requiring a page refresh. Guarded by a ref so we only fire once per
+  // expiry, not on every render where isLocked is already false.
+  useEffect(() => {
+    if (wasLockedRef.current && !isLocked && cooldownUntil > 0) {
+      setCooldownJustExpired(true);
+    }
+    wasLockedRef.current = isLocked;
+  }, [isLocked, cooldownUntil]);
 
   const formatRemaining = (s: number) => {
     if (s >= 60) {
@@ -102,12 +118,14 @@ const SignInPage = () => {
       setCooldownUntil(until);
       setNow(Date.now());
       localStorage.setItem(COOLDOWN_KEY, String(until));
+      setCooldownJustExpired(false);
     }
   };
 
   const clearFailures = () => {
     setFailCount(0);
     setCooldownUntil(0);
+    setCooldownJustExpired(false);
     localStorage.removeItem(ATTEMPTS_KEY);
     localStorage.removeItem(COOLDOWN_KEY);
   };
@@ -282,6 +300,7 @@ const SignInPage = () => {
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (authError?.field === "email" || authError?.field === "password") setAuthError(null);
+                if (cooldownJustExpired) setCooldownJustExpired(false);
               }}
               onBlur={() => setTouched((t) => ({ ...t, email: true }))}
               placeholder="rajesh@example.com"
@@ -314,6 +333,7 @@ const SignInPage = () => {
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (authError?.field === "password") setAuthError(null);
+                if (cooldownJustExpired) setCooldownJustExpired(false);
               }}
               onBlur={() => setTouched((t) => ({ ...t, password: true }))}
               placeholder="Enter your password"
@@ -488,7 +508,43 @@ const SignInPage = () => {
               )}
             </div>
           )}
-          {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
+
+          {!isLocked && cooldownJustExpired && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="rounded-lg p-4 bg-fyn-success-bg text-fyn-success border border-fyn-success/20 flex items-start gap-3"
+            >
+              <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <div className="flex-1">
+                <div className="font-medium" style={{ fontSize: "var(--fyn-type-body)" }}>
+                  Cooldown ended — you can try again
+                </div>
+                <p className="mt-1 text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                  Double-check your password before retrying. Repeated failures will trigger a longer pause.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  // Securely reset post-cooldown state without ever escalating
+                  // privileges: only local UI flags + persisted counters are
+                  // cleared. The Supabase session is untouched.
+                  clearFailures();
+                  setAuthError(null);
+                  setCooldownJustExpired(false);
+                  // Hand focus back to the field most likely wrong (password).
+                  focusField("password");
+                }}
+                className="bg-fyn-success text-white px-3 py-1.5 rounded font-medium hover:opacity-90 transition-opacity flex-shrink-0"
+                style={{ fontSize: "var(--fyn-type-tiny)" }}
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!isLocked && !cooldownJustExpired && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
             <p className="text-xs text-fyn-red">
               {FAIL_THRESHOLD - failCount === 1
                 ? "1 more failed attempt will temporarily lock sign-in."
