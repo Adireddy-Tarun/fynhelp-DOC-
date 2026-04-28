@@ -1,9 +1,39 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
-import { Check, X, Eye, EyeOff } from "lucide-react";
+import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
+
+// Parse Supabase auth error info from the URL hash/query (set when a recovery
+// link is invalid or expired). Returns a normalized reason we can map to copy.
+type LinkFailureReason = "expired" | "invalid" | "used" | "unknown";
+
+const parseLinkFailure = (): { reason: LinkFailureReason; description?: string } | null => {
+  if (typeof window === "undefined") return null;
+  const hash = window.location.hash.startsWith("#")
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+  const hashParams = new URLSearchParams(hash);
+  const queryParams = new URLSearchParams(window.location.search);
+  const get = (k: string) => hashParams.get(k) ?? queryParams.get(k);
+
+  const error = get("error");
+  const errorCode = get("error_code");
+  const description = get("error_description")?.replace(/\+/g, " ") ?? undefined;
+  if (!error && !errorCode) return null;
+
+  if (errorCode === "otp_expired" || /expired/i.test(description ?? "")) {
+    return { reason: "expired", description };
+  }
+  if (errorCode === "access_denied") {
+    return { reason: "invalid", description };
+  }
+  if (/used/i.test(description ?? "")) {
+    return { reason: "used", description };
+  }
+  return { reason: "unknown", description };
+};
 
 // Password policy ----------------------------------------------------------
 type RuleKey = "length" | "upper" | "lower" | "digit" | "symbol" | "noSpaces";
@@ -60,6 +90,16 @@ const ResetPasswordPage = () => {
   const [resendEmail, setResendEmail] = useState("");
   const [resending, setResending] = useState(false);
   const [resentTo, setResentTo] = useState<string | null>(null);
+  const [linkFailure, setLinkFailure] = useState<LinkFailureReason | null>(null);
+  const resendInputRef = useRef<HTMLInputElement>(null);
+
+  const focusResendInput = () => {
+    // Defer to ensure the field is mounted in the DOM
+    setTimeout(() => {
+      resendInputRef.current?.focus();
+      resendInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  };
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,17 +125,46 @@ const ResetPasswordPage = () => {
 
   useEffect(() => {
     const verifyToastId = "reset-verify";
-    toast.loading("Verifying your reset link…", { id: verifyToastId });
     let resolved = false;
 
-    const resolve = (ok: boolean) => {
+    // 1) Detect explicit failure info in the URL first (Supabase appends
+    //    error_code=otp_expired etc. when the recovery link is bad).
+    const urlFailure = parseLinkFailure();
+    if (urlFailure) {
+      setLinkFailure(urlFailure.reason);
+      setReady(true);
+      resolved = true;
+      toast.error(
+        urlFailure.reason === "expired"
+          ? "This reset link has expired."
+          : "This reset link is invalid.",
+        { id: verifyToastId }
+      );
+      // Clear the noisy hash/query so a refresh doesn't re-trigger the same toast.
+      try {
+        window.history.replaceState(null, "", window.location.pathname);
+      } catch {
+        /* no-op */
+      }
+      return;
+    }
+
+    toast.loading("Verifying your reset link…", { id: verifyToastId });
+
+    const resolve = (ok: boolean, reason: LinkFailureReason = "invalid") => {
       if (resolved) return;
       resolved = true;
       setReady(true);
       if (ok) {
         toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
       } else {
-        toast.error("This reset link is invalid or has expired.", { id: verifyToastId });
+        setLinkFailure(reason);
+        toast.error(
+          reason === "expired"
+            ? "This reset link has expired."
+            : "This reset link is invalid or has expired.",
+          { id: verifyToastId }
+        );
       }
     };
 
@@ -208,61 +277,102 @@ const ResetPasswordPage = () => {
             Verifying reset link…
           </p>
         ) : !validSession ? (
-          <div className="max-w-md space-y-4">
-            <div
-              className="rounded border border-fyn-red/20 bg-fyn-danger-bg text-fyn-red p-3"
-              style={{ fontSize: "var(--fyn-type-small)" }}
-            >
-              This reset link is invalid or has expired. Enter your email below to get a new link.
-            </div>
+          (() => {
+            const isExpired = linkFailure === "expired";
+            const isUsed = linkFailure === "used";
+            const heading = isExpired
+              ? "This reset link has expired"
+              : isUsed
+              ? "This reset link has already been used"
+              : "This reset link is invalid";
+            const explainer = isExpired
+              ? "For your security, password reset links are valid for a short time. Request a new one below and we'll email it to you right away."
+              : isUsed
+              ? "Each reset link can only be used once. Request a new link below to set your password."
+              : "We couldn't verify this reset link. It may be malformed, already used, or sent from an old email. Request a fresh link below.";
+            return (
+              <div className="max-w-md space-y-5">
+                <div className="rounded-lg border border-fyn-red/20 bg-fyn-danger-bg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red">
+                      <MailWarning className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div className="flex-1">
+                      <h3
+                        className="font-serif text-fyn-ink"
+                        style={{ fontSize: "var(--fyn-type-h3)", lineHeight: 1.25 }}
+                      >
+                        {heading}
+                      </h3>
+                      <p
+                        className="mt-1 text-fyn-ink-80"
+                        style={{ fontSize: "var(--fyn-type-small)", lineHeight: 1.5 }}
+                      >
+                        {explainer}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={focusResendInput}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity"
+                        style={{ fontSize: "var(--fyn-type-small)" }}
+                      >
+                        <Mail className="h-4 w-4" aria-hidden="true" />
+                        Request a new reset link
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            <form onSubmit={handleResend} className="space-y-3" noValidate>
-              <div>
-                <label
-                  htmlFor="resend-email"
-                  className="block mb-1 text-fyn-ink-80"
+                <form onSubmit={handleResend} className="space-y-3" noValidate>
+                  <div>
+                    <label
+                      htmlFor="resend-email"
+                      className="block mb-1 text-fyn-ink-80"
+                      style={{ fontSize: "var(--fyn-type-small)" }}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="resend-email"
+                      ref={resendInputRef}
+                      type="email"
+                      autoComplete="email"
+                      value={resendEmail}
+                      onChange={(e) => setResendEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      disabled={resending}
+                      className={inputClass}
+                      style={{ fontSize: "var(--fyn-type-body)" }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={resending || !resendEmail.trim()}
+                    className="w-full bg-fyn-ink text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ fontSize: "var(--fyn-type-body)" }}
+                  >
+                    {resending ? "Sending…" : "Email me a new reset link"}
+                  </button>
+                </form>
+
+                {resentTo && (
+                  <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                    If an account exists for{" "}
+                    <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
+                  </p>
+                )}
+
+                <button
+                  onClick={() => navigate("/signin")}
+                  className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
                   style={{ fontSize: "var(--fyn-type-small)" }}
                 >
-                  Email address
-                </label>
-                <input
-                  id="resend-email"
-                  type="email"
-                  autoComplete="email"
-                  value={resendEmail}
-                  onChange={(e) => setResendEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  disabled={resending}
-                  className={inputClass}
-                  style={{ fontSize: "var(--fyn-type-body)" }}
-                />
+                  Back to sign in
+                </button>
               </div>
-
-              <button
-                type="submit"
-                disabled={resending || !resendEmail.trim()}
-                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{ fontSize: "var(--fyn-type-body)" }}
-              >
-                {resending ? "Sending…" : "Resend reset link"}
-              </button>
-            </form>
-
-            {resentTo && (
-              <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
-                If an account exists for{" "}
-                <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
-              </p>
-            )}
-
-            <button
-              onClick={() => navigate("/signin")}
-              className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
-              style={{ fontSize: "var(--fyn-type-small)" }}
-            >
-              Back to sign in
-            </button>
-          </div>
+            );
+          })()
         ) : (
           <form className="space-y-4 max-w-md" onSubmit={handleSubmit} noValidate>
             {/* New password */}
