@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
@@ -11,6 +11,64 @@ const SignInPage = () => {
   const [authError, setAuthError] = useState<{ field?: "email" | "password" | "form"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
+
+  // Client-side rate limiting after repeated failed sign-in attempts.
+  // After FAIL_THRESHOLD consecutive failures, the form is locked for a
+  // cooldown that grows with each additional failure. State is persisted
+  // so it survives page refreshes within the same browser.
+  const FAIL_THRESHOLD = 3;
+  const COOLDOWN_STEPS_SECONDS = [30, 60, 120, 300]; // after 3rd, 4th, 5th, 6th+ fail
+  const ATTEMPTS_KEY = "fyn.signinFails";
+  const COOLDOWN_KEY = "fyn.signinCooldownUntil";
+
+  const readNumber = (key: string) => {
+    const raw = localStorage.getItem(key);
+    const n = raw ? parseInt(raw, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const [failCount, setFailCount] = useState<number>(() => readNumber(ATTEMPTS_KEY));
+  const [cooldownUntil, setCooldownUntil] = useState<number>(() => readNumber(COOLDOWN_KEY));
+  const [now, setNow] = useState<number>(() => Date.now());
+
+  const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - now) / 1000));
+  const isLocked = cooldownRemaining > 0;
+
+  useEffect(() => {
+    if (!isLocked) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [isLocked]);
+
+  const formatRemaining = (s: number) => {
+    if (s >= 60) {
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return r ? `${m}m ${r}s` : `${m}m`;
+    }
+    return `${s}s`;
+  };
+
+  const recordFailure = () => {
+    const next = failCount + 1;
+    setFailCount(next);
+    localStorage.setItem(ATTEMPTS_KEY, String(next));
+    if (next >= FAIL_THRESHOLD) {
+      const stepIndex = Math.min(next - FAIL_THRESHOLD, COOLDOWN_STEPS_SECONDS.length - 1);
+      const seconds = COOLDOWN_STEPS_SECONDS[stepIndex];
+      const until = Date.now() + seconds * 1000;
+      setCooldownUntil(until);
+      setNow(Date.now());
+      localStorage.setItem(COOLDOWN_KEY, String(until));
+    }
+  };
+
+  const clearFailures = () => {
+    setFailCount(0);
+    setCooldownUntil(0);
+    localStorage.removeItem(ATTEMPTS_KEY);
+    localStorage.removeItem(COOLDOWN_KEY);
+  };
 
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
@@ -66,6 +124,14 @@ const SignInPage = () => {
     setSubmitAttempted(true);
     setAuthError(null);
 
+    if (isLocked) {
+      setAuthError({
+        field: "form",
+        message: `Too many failed attempts. Please wait ${formatRemaining(cooldownRemaining)} before trying again, or use “Forgot password?”.`,
+      });
+      return;
+    }
+
     if (!emailValid || !passwordValid) return;
 
     setLoading(true);
@@ -74,6 +140,16 @@ const SignInPage = () => {
 
     if (error) {
       const msg = error.message?.toLowerCase() ?? "";
+      const isCredentialError =
+        msg.includes("invalid login") ||
+        msg.includes("invalid credentials") ||
+        msg.includes("user not found");
+
+      // Only count credential failures toward the cooldown — not e.g. unconfirmed email or network errors.
+      if (isCredentialError) {
+        recordFailure();
+      }
+
       if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
         setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
       } else if (msg.includes("email not confirmed")) {
@@ -85,6 +161,9 @@ const SignInPage = () => {
       }
       return;
     }
+
+    // Successful sign-in — reset failure tracking.
+    clearFailures();
 
     // Persist Remember me preference and enforce session-only mode if unchecked.
     localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
@@ -259,12 +338,42 @@ const SignInPage = () => {
             </div>
           )}
 
+          {isLocked && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="rounded-md p-3 text-sm bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30"
+            >
+              <div className="font-medium">Sign-in temporarily paused</div>
+              <div className="text-xs mt-1 text-secondary-foreground">
+                After {failCount} failed attempts, please wait{" "}
+                <span className="font-mono font-semibold text-fyn-ink">{formatRemaining(cooldownRemaining)}</span>{" "}
+                before trying again.{" "}
+                <button type="button" onClick={openForgot} className="text-fyn-red hover:underline">
+                  Reset your password
+                </button>{" "}
+                if you've forgotten it.
+              </div>
+            </div>
+          )}
+          {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
+            <p className="text-xs text-fyn-red">
+              {FAIL_THRESHOLD - failCount === 1
+                ? "1 more failed attempt will temporarily lock sign-in."
+                : `${FAIL_THRESHOLD - failCount} more failed attempts will temporarily lock sign-in.`}
+            </p>
+          )}
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60"
+            disabled={loading || isLocked}
+            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in…" : "Sign In"}
+            {isLocked
+              ? `Try again in ${formatRemaining(cooldownRemaining)}`
+              : loading
+              ? "Signing in…"
+              : "Sign In"}
           </button>
           <p className="text-sm text-center text-secondary-foreground">
             Don't have an account? <Link to="/signup" className="text-fyn-red hover:underline">Start free trial →</Link>
