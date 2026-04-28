@@ -15,6 +15,7 @@ import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import SignInPage from "./pages/SignInPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
@@ -94,6 +95,7 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/signin" element={<SignInPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
