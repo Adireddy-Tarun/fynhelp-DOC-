@@ -244,13 +244,12 @@ function RightColumn({ displayedMsgs, showTyping, showSuggestions, showFollowUp,
       className="liquid-float"
       style={{
         position: "relative", zIndex: 10,
-        ...(mobile ? { maxWidth: 380, margin: "0 auto", width: "100%" } : {}),
+        maxWidth: 560, width: "100%", margin: "0 auto",
       }}
     >
       <div className="shadow-2xl" style={{
         background: "hsl(24 53% 7%)", border: "1px solid rgba(255,255,255,0.10)",
         borderRadius: 12, overflow: "hidden",
-        ...(mobile ? {} : { maxWidth: 520, marginLeft: "auto" }),
       }}>
         {/* Title bar */}
         <div className="flex items-center gap-2" style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
