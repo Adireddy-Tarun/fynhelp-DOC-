@@ -176,7 +176,12 @@ const SignInPage = () => {
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm cursor-pointer text-secondary-foreground">
-              <input type="checkbox" className="accent-[#C41E1E]" />
+              <input
+                type="checkbox"
+                className="accent-[#C41E1E]"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
               Remember me
             </label>
             <button
