@@ -7,14 +7,43 @@ import { z } from "npm:zod@3.23.8";
 
 const RESEND_API_URL = "https://api.resend.com";
 
-const BodySchema = z.object({
-  name: z.string().min(1).max(150),
-  email: z.string().email().max(255),
-  position: z.number().int().positive(),
-  companyType: z.string().max(100).optional(),
-  companySize: z.string().max(50).optional(),
-  location: z.string().max(150).optional(),
-});
+const BodySchema = z
+  .object({
+    name: z
+      .string({ required_error: "name is required", invalid_type_error: "name must be a string" })
+      .trim()
+      .min(1, "name cannot be empty")
+      .max(150, "name must be 150 characters or fewer"),
+    email: z
+      .string({ required_error: "email is required", invalid_type_error: "email must be a string" })
+      .trim()
+      .toLowerCase()
+      .email("email must be a valid email address")
+      .max(255, "email must be 255 characters or fewer"),
+    position: z
+      .number({ required_error: "position is required", invalid_type_error: "position must be a number" })
+      .int("position must be an integer")
+      .positive("position must be greater than 0")
+      .max(1_000_000, "position is out of range"),
+    companyType: z.string().trim().max(100, "companyType must be 100 characters or fewer").optional(),
+    companySize: z.string().trim().max(50, "companySize must be 50 characters or fewer").optional(),
+    location: z.string().trim().max(150, "location must be 150 characters or fewer").optional(),
+  })
+  .strict();
+
+type ErrorBody = {
+  error: string;
+  code: string;
+  fieldErrors?: Record<string, string[]>;
+  details?: unknown;
+};
+
+function jsonError(status: number, body: ErrorBody) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 function buildEmail(name: string, position: number) {
   const firstName = name.trim().split(/\s+/)[0] || "there";
@@ -108,23 +137,69 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return jsonError(405, {
+      error: `Method ${req.method} not allowed. Use POST.`,
+      code: "method_not_allowed",
+    });
+  }
+
   try {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
     if (!RESEND_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "RESEND_API_KEY is not configured." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      console.error("RESEND_API_KEY missing in environment");
+      return jsonError(500, {
+        error: "Email service is not configured.",
+        code: "missing_api_key",
+      });
     }
 
-    const json = await req.json().catch(() => ({}));
+    // Require a JSON body
+    const contentType = req.headers.get("content-type") ?? "";
+    if (!contentType.toLowerCase().includes("application/json")) {
+      return jsonError(415, {
+        error: "Content-Type must be application/json.",
+        code: "unsupported_media_type",
+      });
+    }
+
+    const rawText = await req.text();
+    if (!rawText.trim()) {
+      return jsonError(400, {
+        error: "Request body is empty. Expected a JSON object.",
+        code: "empty_body",
+      });
+    }
+
+    let json: unknown;
+    try {
+      json = JSON.parse(rawText);
+    } catch {
+      return jsonError(400, {
+        error: "Request body is not valid JSON.",
+        code: "invalid_json",
+      });
+    }
+
+    if (json === null || typeof json !== "object" || Array.isArray(json)) {
+      return jsonError(400, {
+        error: "Request body must be a JSON object.",
+        code: "invalid_body_shape",
+      });
+    }
+
     const parsed = BodySchema.safeParse(json);
     if (!parsed.success) {
-      return new Response(
-        JSON.stringify({ error: parsed.error.flatten().fieldErrors }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      const flat = parsed.error.flatten();
+      const firstField = Object.entries(flat.fieldErrors).find(([, msgs]) => msgs && msgs.length);
+      const summary = firstField
+        ? `${firstField[0]}: ${firstField[1]?.[0]}`
+        : flat.formErrors[0] ?? "Invalid request body.";
+      return jsonError(400, {
+        error: summary,
+        code: "validation_failed",
+        fieldErrors: flat.fieldErrors as Record<string, string[]>,
+      });
     }
 
     const { name, email, position } = parsed.data;
@@ -148,10 +223,11 @@ Deno.serve(async (req) => {
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       console.error("Resend error", response.status, data);
-      return new Response(
-        JSON.stringify({ error: `Email send failed [${response.status}]`, details: data }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonError(502, {
+        error: `Email provider rejected the request (status ${response.status}).`,
+        code: "email_send_failed",
+        details: data,
+      });
     }
 
     return new Response(JSON.stringify({ success: true, id: data?.id }), {
@@ -161,9 +237,6 @@ Deno.serve(async (req) => {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error("send-waitlist-email error", msg);
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonError(500, { error: "Unexpected server error.", code: "internal_error", details: msg });
   }
 });
