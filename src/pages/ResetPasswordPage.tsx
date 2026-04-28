@@ -57,6 +57,31 @@ const ResetPasswordPage = () => {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [resendEmail, setResendEmail] = useState("");
+  const [resending, setResending] = useState(false);
+  const [resentTo, setResentTo] = useState<string | null>(null);
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = resendEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Enter a valid email address.");
+      return;
+    }
+    const toastId = "reset-resend";
+    toast.loading("Sending a new reset link…", { id: toastId });
+    setResending(true);
+    const { error: resendErr } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResending(false);
+    if (resendErr) {
+      toast.error(resendErr.message || "Could not send reset link.", { id: toastId });
+      return;
+    }
+    setResentTo(email);
+    toast.success("If that email exists, a new reset link is on its way.", { id: toastId });
+  };
 
   useEffect(() => {
     const verifyToastId = "reset-verify";
