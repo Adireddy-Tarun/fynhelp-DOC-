@@ -10,6 +10,7 @@ const SignInPage = () => {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [authError, setAuthError] = useState<{ field?: "email" | "password" | "form"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
 
   // Forgot password state
   const [showForgot, setShowForgot] = useState(false);
@@ -82,7 +83,17 @@ const SignInPage = () => {
       } else {
         setAuthError({ field: "form", message: error.message });
       }
+      return;
     }
+
+    // Persist Remember me preference and enforce session-only mode if unchecked.
+    localStorage.setItem("fyn.rememberMe", rememberMe ? "1" : "0");
+    if (rememberMe) {
+      localStorage.removeItem("fyn.sessionOnly");
+    } else {
+      localStorage.setItem("fyn.sessionOnly", "1");
+    }
+    sessionStorage.setItem("fyn.tabAlive", "1");
   };
 
   const inputBase =
@@ -165,7 +176,12 @@ const SignInPage = () => {
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm cursor-pointer text-secondary-foreground">
-              <input type="checkbox" className="accent-[#C41E1E]" />
+              <input
+                type="checkbox"
+                className="accent-[#C41E1E]"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
               Remember me
             </label>
             <button
