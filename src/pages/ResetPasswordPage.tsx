@@ -1,9 +1,39 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
-import { Check, X, Eye, EyeOff } from "lucide-react";
+import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
+
+// Parse Supabase auth error info from the URL hash/query (set when a recovery
+// link is invalid or expired). Returns a normalized reason we can map to copy.
+type LinkFailureReason = "expired" | "invalid" | "used" | "unknown";
+
+const parseLinkFailure = (): { reason: LinkFailureReason; description?: string } | null => {
+  if (typeof window === "undefined") return null;
+  const hash = window.location.hash.startsWith("#")
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+  const hashParams = new URLSearchParams(hash);
+  const queryParams = new URLSearchParams(window.location.search);
+  const get = (k: string) => hashParams.get(k) ?? queryParams.get(k);
+
+  const error = get("error");
+  const errorCode = get("error_code");
+  const description = get("error_description")?.replace(/\+/g, " ") ?? undefined;
+  if (!error && !errorCode) return null;
+
+  if (errorCode === "otp_expired" || /expired/i.test(description ?? "")) {
+    return { reason: "expired", description };
+  }
+  if (errorCode === "access_denied") {
+    return { reason: "invalid", description };
+  }
+  if (/used/i.test(description ?? "")) {
+    return { reason: "used", description };
+  }
+  return { reason: "unknown", description };
+};
 
 // Password policy ----------------------------------------------------------
 type RuleKey = "length" | "upper" | "lower" | "digit" | "symbol" | "noSpaces";
