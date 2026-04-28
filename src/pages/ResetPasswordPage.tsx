@@ -233,67 +233,102 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     const verifyToastId = "reset-verify";
     let resolved = false;
+    let unsub: (() => void) | undefined;
 
-    // 1) Detect explicit failure info in the URL first (Supabase appends
-    //    error_code=otp_expired etc. when the recovery link is bad).
-    const urlFailure = parseLinkFailure();
-    if (urlFailure) {
-      setLinkFailure(urlFailure.reason);
-      setReady(true);
+    const finish = (
+      ok: boolean,
+      failure?: LinkFailureInfo | null
+    ) => {
+      if (resolved) return;
       resolved = true;
+      setReady(true);
+      if (ok) {
+        setValidSession(true);
+        toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
+        return;
+      }
+      const reason = failure?.reason ?? "invalid";
+      setLinkFailure(reason);
       toast.error(
-        urlFailure.reason === "expired"
+        reason === "expired"
           ? "This reset link has expired."
-          : "This reset link is invalid.",
+          : reason === "used"
+          ? "This reset link has already been used."
+          : "This reset link is invalid or has expired.",
         { id: verifyToastId }
       );
-      // Clear the noisy hash/query so a refresh doesn't re-trigger the same toast.
+      // Clear the noisy hash/query so a refresh doesn't re-trigger toasts.
       try {
         window.history.replaceState(null, "", window.location.pathname);
       } catch {
         /* no-op */
       }
+    };
+
+    // 1) Explicit failure info encoded in the URL by Supabase / proxy.
+    const urlFailure = parseLinkFailureFromUrl();
+    if (urlFailure) {
+      finish(false, urlFailure);
       return;
     }
 
     toast.loading("Verifying your reset link…", { id: verifyToastId });
 
-    const resolve = (ok: boolean, reason: LinkFailureReason = "invalid") => {
-      if (resolved) return;
-      resolved = true;
-      setReady(true);
-      if (ok) {
-        toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
-      } else {
-        setLinkFailure(reason);
-        toast.error(
-          reason === "expired"
-            ? "This reset link has expired."
-            : "This reset link is invalid or has expired.",
-          { id: verifyToastId }
-        );
-      }
-    };
-
-    // Supabase v2 will pick up the recovery session from the URL hash automatically.
+    // 2) Listen for the recovery session that supabase-js populates from the
+    //    URL hash automatically (implicit flow).
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        setValidSession(true);
-        resolve(true);
+        finish(true);
       }
     });
+    unsub = () => sub.subscription.unsubscribe();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setValidSession(true);
-        resolve(true);
-      } else {
-        // Give the auth state listener a brief window to fire from the URL hash.
-        setTimeout(() => resolve(false), 1200);
+    const queryParams = new URLSearchParams(window.location.search);
+    const code = queryParams.get("code");
+    const tokenHash = queryParams.get("token_hash");
+    const type = queryParams.get("type");
+
+    const tryRecover = async () => {
+      // 3a) PKCE flow: ?code=... — exchange for a session.
+      if (code) {
+        const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
+        if (exErr) {
+          finish(false, parseLinkFailureFromSupabaseError(exErr));
+          return;
+        }
+        finish(true);
+        return;
       }
-    });
+      // 3b) Token-hash flow: ?token_hash=...&type=recovery
+      if (tokenHash && type) {
+        const { error: vErr } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type as "recovery",
+        });
+        if (vErr) {
+          finish(false, parseLinkFailureFromSupabaseError(vErr));
+          return;
+        }
+        finish(true);
+        return;
+      }
+      // 3c) Implicit hash flow: check for an existing session, otherwise
+      //     wait briefly for onAuthStateChange.
+      const { data, error: sessErr } = await supabase.auth.getSession();
+      if (sessErr) {
+        finish(false, parseLinkFailureFromSupabaseError(sessErr));
+        return;
+      }
+      if (data.session) {
+        finish(true);
+        return;
+      }
+      setTimeout(() => finish(false, { reason: "invalid", source: "supabase" }), 1200);
+    };
 
-    return () => sub.subscription.unsubscribe();
+    void tryRecover();
+
+    return () => unsub?.();
   }, []);
 
   const ruleResults = useMemo(
