@@ -1,0 +1,328 @@
+import { useState, FormEvent } from "react";
+import { Link } from "react-router-dom";
+import Layout from "@/components/Layout";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Rocket, CheckCircle2 } from "lucide-react";
+import { z } from "zod";
+
+const COMPANY_TYPES = [
+  "E-commerce & D2C",
+  "SaaS & Technology",
+  "Manufacturing",
+  "Professional Services",
+  "Healthcare",
+  "Education",
+  "Retail",
+  "Other",
+];
+
+const COMPANY_SIZES = ["1-10", "10-50", "50-100", "100-250", "250+"];
+
+const waitlistSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Please enter a valid email").max(255),
+  phone: z.string().trim().min(7, "Please enter a valid phone number").max(20),
+  companyName: z.string().trim().min(1, "Company name is required").max(150),
+  companyType: z.string().refine((v) => COMPANY_TYPES.includes(v), "Please select a company type"),
+  companySize: z.string().refine((v) => COMPANY_SIZES.includes(v), "Please select a company size"),
+  location: z.string().trim().min(1, "Location is required").max(100),
+});
+
+type FormData = {
+  name: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  companyType: string;
+  companySize: string;
+  location: string;
+};
+
+const initialForm: FormData = {
+  name: "",
+  email: "",
+  phone: "",
+  companyName: "",
+  companyType: "",
+  companySize: "",
+  location: "",
+};
+
+export default function WaitlistPage() {
+  const [formData, setFormData] = useState<FormData>(initialForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [position, setPosition] = useState<number | null>(null);
+
+  const update = (field: keyof FormData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => setFormData((p) => ({ ...p, [field]: e.target.value }));
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const parsed = waitlistSchema.safeParse(formData);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      toast.error(first?.message ?? "Please fill in all fields correctly");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Check duplicate + get count via secure RPC
+      const { data: status, error: statusErr } = await supabase.rpc(
+        "check_waitlist_status",
+        { _email: parsed.data.email }
+      );
+      if (statusErr) throw statusErr;
+
+      const row = Array.isArray(status) ? status[0] : status;
+      if (row?.email_exists) {
+        toast.error("This email is already on the waitlist");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const newPosition = Number(row?.total_count ?? 0) + 1;
+
+      const { error: insertError } = await supabase.from("waitlist").insert({
+        name: parsed.data.name,
+        email: parsed.data.email.toLowerCase(),
+        phone: parsed.data.phone,
+        company_name: parsed.data.companyName,
+        company_type: parsed.data.companyType,
+        company_size: parsed.data.companySize,
+        location: parsed.data.location,
+        position: newPosition,
+        is_converted: false,
+      });
+      if (insertError) throw insertError;
+
+      // Fire-and-forget welcome email (don't block UX on email failure)
+      supabase.functions
+        .invoke("send-waitlist-email", {
+          body: {
+            name: parsed.data.name,
+            email: parsed.data.email.toLowerCase(),
+            position: newPosition,
+            companyType: parsed.data.companyType,
+            companySize: parsed.data.companySize,
+            location: parsed.data.location,
+          },
+        })
+        .catch((err) => console.warn("Welcome email failed:", err));
+
+      setPosition(newPosition);
+      setShowSuccess(true);
+      toast.success(`You're #${newPosition} on the waitlist!`);
+    } catch (error) {
+      console.error("Waitlist error:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Layout>
+      <main
+        className="min-h-screen py-16 px-6"
+        style={{
+          background:
+            "linear-gradient(180deg, #F9F7F4 0%, #FFFFFF 60%, #F9F7F4 100%)",
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: 600 }}>
+          {!showSuccess ? (
+            <>
+              <header className="text-center mb-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-fyn-red/10 text-fyn-red mb-6">
+                  <Rocket className="w-8 h-8" />
+                </div>
+                <h1
+                  className="font-serif font-bold text-fyn-ink mb-3"
+                  style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", lineHeight: 1.15 }}
+                >
+                  Be first in line when we launch
+                </h1>
+                <p className="text-fyn-ink/70 text-base md:text-lg">
+                  First 100 users get FYNHelp free for 6 months.
+                </p>
+              </header>
+
+              <form
+                onSubmit={handleSubmit}
+                className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8 space-y-5"
+              >
+                <Field label="Name" htmlFor="wl-name" required>
+                  <input
+                    id="wl-name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={update("name")}
+                    placeholder="Your full name"
+                    className={inputCls}
+                    maxLength={100}
+                  />
+                </Field>
+
+                <Field label="Email" htmlFor="wl-email" required>
+                  <input
+                    id="wl-email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={update("email")}
+                    placeholder="you@company.com"
+                    className={inputCls}
+                    maxLength={255}
+                  />
+                </Field>
+
+                <Field label="Phone Number" htmlFor="wl-phone" required>
+                  <input
+                    id="wl-phone"
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={update("phone")}
+                    placeholder="+91 98765 43210"
+                    className={inputCls}
+                    maxLength={20}
+                  />
+                </Field>
+
+                <Field label="Company Name" htmlFor="wl-company" required>
+                  <input
+                    id="wl-company"
+                    type="text"
+                    required
+                    value={formData.companyName}
+                    onChange={update("companyName")}
+                    placeholder="Your company name"
+                    className={inputCls}
+                    maxLength={150}
+                  />
+                </Field>
+
+                <Field label="Company Type" htmlFor="wl-ctype" required>
+                  <select
+                    id="wl-ctype"
+                    required
+                    value={formData.companyType}
+                    onChange={update("companyType")}
+                    className={inputCls}
+                  >
+                    <option value="">Select company type</option>
+                    {COMPANY_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label="Company Size" htmlFor="wl-csize" required>
+                  <select
+                    id="wl-csize"
+                    required
+                    value={formData.companySize}
+                    onChange={update("companySize")}
+                    className={inputCls}
+                  >
+                    <option value="">Select company size</option>
+                    {COMPANY_SIZES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label="Location / City" htmlFor="wl-loc" required>
+                  <input
+                    id="wl-loc"
+                    type="text"
+                    required
+                    value={formData.location}
+                    onChange={update("location")}
+                    placeholder="Bengaluru"
+                    className={inputCls}
+                    maxLength={100}
+                  />
+                </Field>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full font-semibold text-white py-3.5 rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ background: "#C41E1E" }}
+                >
+                  {isSubmitting ? "Joining…" : "Join the Waitlist →"}
+                </button>
+
+                <p className="text-xs text-fyn-ink/50 text-center pt-1">
+                  No spam. We'll only email you about FYNHelp launch updates.
+                </p>
+              </form>
+            </>
+          ) : (
+            <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-8 md:p-12 text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-fyn-success/10 text-fyn-success mb-6">
+                <CheckCircle2 className="w-12 h-12" strokeWidth={1.5} />
+              </div>
+              <h2 className="font-serif font-bold text-3xl md:text-4xl text-fyn-ink mb-3">
+                You're in! 🎉
+              </h2>
+              <p className="text-fyn-ink/70 text-base md:text-lg mb-2">
+                Check your email for next steps. We'll notify you when we launch.
+              </p>
+              {position !== null && position <= 100 && (
+                <p className="text-fyn-red font-semibold text-lg mb-8">
+                  You're founder #{position} of 100
+                </p>
+              )}
+              {position !== null && position > 100 && (
+                <p className="text-fyn-ink/60 text-sm mb-8">
+                  You're #{position} on the waitlist
+                </p>
+              )}
+              <Link
+                to="/"
+                className="inline-block bg-fyn-ink text-white font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Visit FYNHelp
+              </Link>
+            </div>
+          )}
+        </div>
+      </main>
+    </Layout>
+  );
+}
+
+const inputCls =
+  "w-full px-4 py-3 rounded-lg border border-fyn-ink/15 bg-white text-fyn-ink placeholder-fyn-ink/40 focus:outline-none focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/20 transition-all text-sm";
+
+function Field({
+  label,
+  htmlFor,
+  required,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={htmlFor}
+        className="block text-sm font-medium text-fyn-ink mb-1.5"
+      >
+        {label} {required && <span className="text-fyn-red">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}

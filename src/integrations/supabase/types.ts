@@ -1472,11 +1472,90 @@ export type Database = {
           },
         ]
       }
+      waitlist: {
+        Row: {
+          company_name: string
+          company_size: string
+          company_type: string
+          created_at: string
+          email: string
+          id: string
+          is_converted: boolean
+          location: string
+          name: string
+          phone: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          company_size: string
+          company_type: string
+          created_at?: string
+          email: string
+          id?: string
+          is_converted?: boolean
+          location: string
+          name: string
+          phone: string
+          position: number
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          company_size?: string
+          company_type?: string
+          created_at?: string
+          email?: string
+          id?: string
+          is_converted?: boolean
+          location?: string
+          name?: string
+          phone?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      waitlist_signups: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          source: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          source?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      check_waitlist_status: {
+        Args: { _email: string }
+        Returns: {
+          email_exists: boolean
+          total_count: number
+        }[]
+      }
       get_user_business_id: { Args: never; Returns: string }
       get_user_ca_firm_id: { Args: never; Returns: string }
       has_role: {
