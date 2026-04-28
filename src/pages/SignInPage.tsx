@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
@@ -13,6 +13,20 @@ const SignInPage = () => {
   const [loading, setLoading] = useState(false);
   const [slowAuth, setSlowAuth] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
+
+  // Refs for auto-focusing the first invalid field on submit.
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const focusField = (field: "email" | "password") => {
+    const el = field === "email" ? emailRef.current : passwordRef.current;
+    if (!el) return;
+    // Wait a tick so any error UI renders before scrolling.
+    requestAnimationFrame(() => {
+      el.focus({ preventScroll: true });
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
 
   useEffect(() => {
     if (!loading) {
@@ -143,7 +157,10 @@ const SignInPage = () => {
       return;
     }
 
-    if (!emailValid || !passwordValid) return;
+    if (!emailValid || !passwordValid) {
+      focusField(!emailValid ? "email" : "password");
+      return;
+    }
 
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -161,14 +178,21 @@ const SignInPage = () => {
         recordFailure();
       }
 
+      let errorField: "email" | "password" | "form" = "form";
       if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+        errorField = "password";
         setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
       } else if (msg.includes("email not confirmed")) {
+        errorField = "email";
         setAuthError({ field: "email", message: "Please confirm your email address before signing in." });
       } else if (msg.includes("user not found")) {
+        errorField = "email";
         setAuthError({ field: "email", message: "No account found with this email address." });
       } else {
         setAuthError({ field: "form", message: error.message });
+      }
+      if (errorField === "email" || errorField === "password") {
+        focusField(errorField);
       }
       return;
     }
@@ -210,6 +234,7 @@ const SignInPage = () => {
             </label>
             <input
               id="signin-email"
+              ref={emailRef}
               type="email"
               value={email}
               disabled={loading}
@@ -241,6 +266,7 @@ const SignInPage = () => {
             </label>
             <input
               id="signin-password"
+              ref={passwordRef}
               type="password"
               value={password}
               disabled={loading}
