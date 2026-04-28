@@ -1549,6 +1549,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_waitlist_status: {
+        Args: { _email: string }
+        Returns: {
+          email_exists: boolean
+          total_count: number
+        }[]
+      }
       get_user_business_id: { Args: never; Returns: string }
       get_user_ca_firm_id: { Args: never; Returns: string }
       has_role: {
