@@ -157,7 +157,10 @@ const SignInPage = () => {
       return;
     }
 
-    if (!emailValid || !passwordValid) return;
+    if (!emailValid || !passwordValid) {
+      focusField(!emailValid ? "email" : "password");
+      return;
+    }
 
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
