@@ -118,7 +118,7 @@ export default function HeroSection() {
 /* ── Left Column ── */
 function LeftColumn() {
   return (
-    <div className="bg-secondary-foreground" style={{ maxWidth: 640, position: "relative", zIndex: 10 }}>
+    <div style={{ maxWidth: 900, width: "100%", position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
       {/* Eyebrow pill */}
       <div
         className="inline-flex items-center gap-2 rounded-full animate-fade-in font-bold"
@@ -129,9 +129,9 @@ function LeftColumn() {
         }}
       >
         <span className="rounded-full pulse-ring" style={{ width: 6, height: 6, background: "#22C55E" }} />
-        <span className="text-primary-foreground" style={{
+        <span style={{
           fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 11,
-          letterSpacing: "0.1em", color: "#8B6914", textTransform: "uppercase" as const,
+          letterSpacing: "0.1em", color: "#FFFFFF", textTransform: "uppercase" as const,
         }}>
           India's Virtual CFO Platform
         </span>
@@ -150,18 +150,18 @@ function LeftColumn() {
           marginBottom: 0,
         }}
       >
-        <span className="text-primary-foreground font-sans" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
-        <span className="text-primary mx-[5px] font-sans" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
-        <span className="text-primary-foreground font-sans" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
+        <span className="font-sans" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
+        <span className="font-sans" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
+        <span className="font-sans" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
       </h1>
 
       {/* Subheadline */}
       <p
-        className="animate-fade-in text-primary-foreground"
+        className="animate-fade-in"
         style={{
           animationDelay: "300ms", animationFillMode: "both",
           fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 18,
-          color: "rgba(255,255,255,0.70)", lineHeight: 1.75, maxWidth: 500, marginTop: 24,
+          color: "rgba(255,255,255,0.70)", lineHeight: 1.75, maxWidth: 700, marginTop: 24,
         }}
       >
         Meet AI CFO Nidhi — the AI CFO built for Indian business. She monitors your cash, protects your GST,
@@ -170,7 +170,7 @@ function LeftColumn() {
 
       {/* CTAs */}
       <div
-        className="flex flex-col sm:flex-row items-start sm:items-center animate-fade-in"
+        className="flex flex-col sm:flex-row items-center justify-center animate-fade-in"
         style={{ gap: 16, marginTop: 36, animationDelay: "450ms", animationFillMode: "both" }}
       >
         <Link
@@ -184,7 +184,7 @@ function LeftColumn() {
         >
           Start Your 15-Day Free Trial →
         </Link>
-        <button className="text-primary-foreground" style={{
+        <button style={{
           background: "transparent", color: "#FFFFFF",
           border: "1.5px solid rgba(255,255,255,0.3)", padding: "14px 28px",
           borderRadius: 6, fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 15,
@@ -197,7 +197,7 @@ function LeftColumn() {
 
       {/* Trust line */}
       <p
-        className="animate-fade-in text-primary-foreground"
+        className="animate-fade-in"
         style={{
           animationDelay: "500ms", animationFillMode: "both",
           fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
@@ -209,14 +209,14 @@ function LeftColumn() {
 
       {/* Language pills */}
       <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
-        <div className="flex flex-wrap items-center text-primary-foreground" style={{ gap: 8 }}>
-          <span className="text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
+        <div className="flex flex-wrap items-center justify-center" style={{ gap: 8 }}>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
             AI CFO Nidhi speaks:
           </span>
           {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
-            <span key={lang} className="text-sm mx-[5px] text-primary-foreground" style={{
+            <span key={lang} className="text-sm mx-[5px]" style={{
               border: "1px solid rgba(139,105,20,0.3)", borderRadius: 100, padding: "4px 12px",
-              fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "#8B6914",
+              fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "#FFFFFF",
               background: "rgba(139,105,20,0.08)",
             }}>{lang}</span>
           ))}
