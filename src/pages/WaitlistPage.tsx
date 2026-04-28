@@ -100,23 +100,60 @@ export default function WaitlistPage() {
       });
       if (insertError) throw insertError;
 
-      // Fire-and-forget welcome email (don't block UX on email failure)
-      supabase.functions
-        .invoke("send-waitlist-email", {
-          body: {
-            name: parsed.data.name,
-            email: parsed.data.email.toLowerCase(),
-            position: newPosition,
-            companyType: parsed.data.companyType,
-            companySize: parsed.data.companySize,
-            location: parsed.data.location,
-          },
-        })
-        .catch((err) => console.warn("Welcome email failed:", err));
-
       setPosition(newPosition);
       setShowSuccess(true);
       toast.success(`You're #${newPosition} on the waitlist!`);
+
+      // Trigger welcome email and surface a follow-up toast based on the result
+      const emailToastId = toast.loading("Sending your welcome email…");
+      try {
+        const { data: emailData, error: emailError } = await supabase.functions.invoke(
+          "send-waitlist-email",
+          {
+            body: {
+              name: parsed.data.name,
+              email: parsed.data.email.toLowerCase(),
+              position: newPosition,
+              companyType: parsed.data.companyType,
+              companySize: parsed.data.companySize,
+              location: parsed.data.location,
+            },
+          }
+        );
+
+        if (emailError) {
+          // FunctionsHttpError exposes the response on .context — try to read the JSON body
+          let serverMsg: string | undefined;
+          try {
+            const ctx = (emailError as { context?: Response }).context;
+            if (ctx && typeof ctx.json === "function") {
+              const body = await ctx.clone().json();
+              serverMsg = body?.error;
+            }
+          } catch {
+            /* ignore */
+          }
+          console.warn("Welcome email failed:", emailError, serverMsg);
+          toast.error(serverMsg ?? "Welcome email failed to send. We'll retry shortly.", {
+            id: emailToastId,
+            description: "Your spot is saved — only the email had a hiccup.",
+          });
+        } else if (emailData && (emailData as { success?: boolean }).success === false) {
+          const msg = (emailData as { error?: string }).error ?? "Welcome email could not be sent.";
+          toast.error(msg, {
+            id: emailToastId,
+            description: "Your spot is saved — only the email had a hiccup.",
+          });
+        } else {
+          toast.success("Welcome email sent — check your inbox.", { id: emailToastId });
+        }
+      } catch (emailErr) {
+        console.warn("Welcome email error:", emailErr);
+        toast.error("Welcome email failed to send.", {
+          id: emailToastId,
+          description: "Your spot is saved — only the email had a hiccup.",
+        });
+      }
     } catch (error) {
       console.error("Waitlist error:", error);
       toast.error("Something went wrong. Please try again.");
