@@ -186,15 +186,15 @@ function EcosystemMap() {
 
         {/* Particles flowing inward — multiple per line, staggered */}
         {visible && nodes.map((n, ni) => {
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <g key={`${n.id}-particles`}>
               {Array.from({ length: PARTICLES_PER_LINE }).map((_, pi) => (
                 <circle
                   key={pi}
-                  r={isHovered ? 4 : 3}
+                  r={isActive ? 4 : 3}
                   fill="#C41E1E"
-                  opacity={isHovered ? 1 : 0.8}
+                  opacity={isActive ? 1 : 0.8}
                   style={{ transition: "r 250ms ease, opacity 250ms ease" }}
                 >
                   <animateMotion
