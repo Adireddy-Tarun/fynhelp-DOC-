@@ -234,6 +234,7 @@ const SignInPage = () => {
             </label>
             <input
               id="signin-email"
+              ref={emailRef}
               type="email"
               value={email}
               disabled={loading}
@@ -265,6 +266,7 @@ const SignInPage = () => {
             </label>
             <input
               id="signin-password"
+              ref={passwordRef}
               type="password"
               value={password}
               disabled={loading}
