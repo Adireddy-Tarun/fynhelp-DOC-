@@ -52,10 +52,14 @@ const solutions = [
 
 function EcosystemMap() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [pinnedNode, setPinnedNode] = useState<string | null>(null);
   const [visible, setVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Pinned wins over hover, so a tap holds the highlight on touch devices
+  const activeNode = pinnedNode ?? hoveredNode;
 
   // Pause animations when off-screen for perf
   useEffect(() => {
@@ -69,12 +73,35 @@ function EcosystemMap() {
     return () => obs.disconnect();
   }, []);
 
-  const handleNodeClick = (node: typeof nodes[0]) => {
+  // Dismiss pinned node when tapping/clicking outside the diagram
+  useEffect(() => {
+    if (!pinnedNode) return;
+    const handler = (e: MouseEvent | TouchEvent) => {
+      const el = containerRef.current;
+      if (el && e.target instanceof Node && !el.contains(e.target)) {
+        setPinnedNode(null);
+        setHoveredNode(null);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, [pinnedNode]);
+
+  const navigateToNode = (node: typeof nodes[0]) => {
     if (!user) {
       navigate(`/waitlist?return=${node.slug}`);
     } else {
       navigate(node.slug);
     }
+  };
+
+  const handleNodeTap = (node: typeof nodes[0]) => {
+    // Tap toggles the pinned highlight + tooltip; navigation happens via the tooltip link.
+    setPinnedNode((prev) => (prev === node.id ? null : node.id));
   };
 
   // Geometry — viewBox 700x700, center (350,350), outer radius 280, center r 60, outer r 40
@@ -144,14 +171,14 @@ function EcosystemMap() {
           const sy = oy + uy * OUTER_R;
           const ex = CENTER - ux * CENTER_R;
           const ey = CENTER - uy * CENTER_R;
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <line
               key={`${n.id}-line`}
               x1={sx} y1={sy} x2={ex} y2={ey}
-              stroke={isHovered ? "#C41E1E" : "#CCCCCC"}
+              stroke={isActive ? "#C41E1E" : "#CCCCCC"}
               strokeWidth={2}
-              strokeDasharray={isHovered ? "none" : "5 5"}
+              strokeDasharray={isActive ? "none" : "5 5"}
               style={{ transition: "stroke 250ms ease, stroke-dasharray 250ms ease" }}
             />
           );
@@ -159,15 +186,15 @@ function EcosystemMap() {
 
         {/* Particles flowing inward — multiple per line, staggered */}
         {visible && nodes.map((n, ni) => {
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <g key={`${n.id}-particles`}>
               {Array.from({ length: PARTICLES_PER_LINE }).map((_, pi) => (
                 <circle
                   key={pi}
-                  r={isHovered ? 4 : 3}
+                  r={isActive ? 4 : 3}
                   fill="#C41E1E"
-                  opacity={isHovered ? 1 : 0.8}
+                  opacity={isActive ? 1 : 0.8}
                   style={{ transition: "r 250ms ease, opacity 250ms ease" }}
                 >
                   <animateMotion
@@ -188,6 +215,10 @@ function EcosystemMap() {
         <g
           onMouseEnter={() => setHoveredNode("nidhi")}
           onMouseLeave={() => setHoveredNode(null)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setPinnedNode((prev) => (prev === "nidhi" ? null : "nidhi"));
+          }}
           style={{ cursor: "pointer" }}
         >
           <circle
@@ -195,7 +226,7 @@ function EcosystemMap() {
             fill="#C41E1E"
             style={{
               filter: "drop-shadow(0 0 18px rgba(196,30,30,0.45))",
-              transform: hoveredNode === "nidhi" ? "scale(1.06)" : "scale(1)",
+              transform: activeNode === "nidhi" ? "scale(1.06)" : "scale(1)",
               transformOrigin: `${CENTER}px ${CENTER}px`,
               transition: "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
             }}
@@ -215,30 +246,33 @@ function EcosystemMap() {
           const rad = ((n.angle - 90) * Math.PI) / 180;
           const x = CENTER + RADIUS * Math.cos(rad);
           const y = CENTER + RADIUS * Math.sin(rad);
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <g
               key={n.id}
               onMouseEnter={() => setHoveredNode(n.id)}
               onMouseLeave={() => setHoveredNode(null)}
-              onClick={() => handleNodeClick(n)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNodeTap(n);
+              }}
               style={{ cursor: "pointer" }}
             >
               <circle
                 cx={x} cy={y} r={OUTER_R}
-                fill={isHovered ? "#FFFFFF" : "#F5F1E8"}
-                stroke={isHovered ? "#C41E1E" : "rgba(26,16,8,0.18)"}
+                fill={isActive ? "#FFFFFF" : "#F5F1E8"}
+                stroke={isActive ? "#C41E1E" : "rgba(26,16,8,0.18)"}
                 strokeWidth={2}
                 style={{
                   filter: "drop-shadow(0 4px 10px rgba(26,16,8,0.10))",
-                  transform: isHovered ? "scale(1.1)" : "scale(1)",
+                  transform: isActive ? "scale(1.1)" : "scale(1)",
                   transformOrigin: `${x}px ${y}px`,
                   transition: "all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
               />
               <text
                 x={x} y={y + 5} textAnchor="middle"
-                fill={isHovered ? "#C41E1E" : "#2A2A2A"}
+                fill={isActive ? "#C41E1E" : "#2A2A2A"}
                 fontSize="14" fontWeight="500"
                 style={{ pointerEvents: "none", fontFamily: "'Inter', sans-serif", transition: "fill 250ms ease" }}
               >
@@ -250,29 +284,46 @@ function EcosystemMap() {
       </svg>
 
       {/* Tooltip — outer node */}
-      {hoveredNode && hoveredNode !== "nidhi" && (() => {
-        const n = nodes.find((nd) => nd.id === hoveredNode);
+      {activeNode && activeNode !== "nidhi" && (() => {
+        const n = nodes.find((nd) => nd.id === activeNode);
         if (!n) return null;
         const rad = ((n.angle - 90) * Math.PI) / 180;
         // Position tooltip relative to container (700x700 viewBox mapped to %)
         const xPct = 50 + (RADIUS / 700) * 100 * Math.cos(rad);
         const yPct = 50 + (RADIUS / 700) * 100 * Math.sin(rad) - 8;
+        const isPinned = pinnedNode === n.id;
         return (
           <div
-            className="absolute pointer-events-none"
+            className="absolute"
             style={{
               left: `${xPct}%`, top: `${yPct}%`,
               transform: "translate(-50%, -100%)",
               animation: "fade-in 200ms ease-out",
               zIndex: 20,
+              pointerEvents: isPinned ? "auto" : "none",
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             <div style={{
               background: "hsl(24 53% 7%)", borderRadius: 8, padding: "12px 16px",
               maxWidth: 240, boxShadow: "0 8px 32px rgba(26,16,8,0.25)",
             }}>
               <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, color: "#FFFFFF", marginBottom: 4 }}>{n.label}</p>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>{n.title}</p>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 1.5, marginBottom: isPinned ? 10 : 0 }}>{n.title}</p>
+              {isPinned && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); navigateToNode(n); }}
+                  style={{
+                    background: "#C41E1E", color: "#FFFFFF",
+                    border: "none", borderRadius: 6, cursor: "pointer",
+                    padding: "6px 10px", fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600, fontSize: 12,
+                  }}
+                >
+                  Open module →
+                </button>
+              )}
             </div>
             <div style={{
               width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent",
@@ -283,7 +334,7 @@ function EcosystemMap() {
       })()}
 
       {/* Tooltip — center */}
-      {hoveredNode === "nidhi" && (
+      {activeNode === "nidhi" && (
         <div
           className="absolute pointer-events-none"
           style={{ left: "50%", top: "32%", transform: "translate(-50%, -100%)", animation: "fade-in 200ms ease-out", zIndex: 20 }}
