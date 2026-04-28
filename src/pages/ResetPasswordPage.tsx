@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
+import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
 
 // ---------------------------------------------------------------------------
 // Reset-link failure parsing
