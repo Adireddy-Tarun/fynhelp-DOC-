@@ -93,7 +93,7 @@ export default function NidhiSection() {
               ))}
             </div>
 
-            <Link to="/signup" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg mt-10 hover-btn-primary">
+            <Link to="/waitlist" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg mt-10 hover-btn-primary">
               Talk to AI CFO Nidhi — free for 15 days →
             </Link>
           </div>

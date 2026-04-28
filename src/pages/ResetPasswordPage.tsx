@@ -556,7 +556,7 @@ const ResetPasswordPage = () => {
                 )}
 
                 <button
-                  onClick={() => navigate("/signin")}
+                  onClick={() => navigate("/waitlist")}
                   className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
                   style={{ fontSize: "var(--fyn-type-small)" }}
                 >
