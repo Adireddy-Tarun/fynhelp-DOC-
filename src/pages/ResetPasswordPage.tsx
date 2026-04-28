@@ -161,6 +161,62 @@ import {
   evaluatePasswordStrength,
 } from "@/lib/passwordPolicy";
 
+// ---------------------------------------------------------------------------
+// Failure-state matrix
+//
+// One row per LinkFailureReason so titles, descriptions, icons, and the
+// primary CTA stay perfectly consistent across all four states.
+// ---------------------------------------------------------------------------
+type LinkFailureAction = "request_new" | "try_again" | "contact_support";
+
+interface LinkFailureCopy {
+  badge: string;
+  title: string;
+  description: string;
+  Icon: typeof MailWarning;
+  primaryAction: LinkFailureAction;
+  primaryLabel: string;
+}
+
+const LINK_FAILURE_COPY: Record<LinkFailureReason, LinkFailureCopy> = {
+  expired: {
+    badge: "Link expired",
+    title: "This reset link has expired",
+    description:
+      "For your security, password reset links are valid for only a short time. Request a fresh link below — it'll arrive in your inbox within a minute.",
+    Icon: Clock,
+    primaryAction: "request_new",
+    primaryLabel: "Request a new reset link",
+  },
+  used: {
+    badge: "Link already used",
+    title: "This reset link has already been used",
+    description:
+      "Each reset link can only be opened once. If you didn't finish setting your password, request a new link below to try again.",
+    Icon: RefreshCw,
+    primaryAction: "request_new",
+    primaryLabel: "Request a new reset link",
+  },
+  invalid: {
+    badge: "Link invalid",
+    title: "This reset link isn't valid",
+    description:
+      "We couldn't verify this link. It may be malformed, from an older email, or have been tampered with in transit. Request a fresh link below to continue.",
+    Icon: ShieldAlert,
+    primaryAction: "request_new",
+    primaryLabel: "Request a new reset link",
+  },
+  unknown: {
+    badge: "Verification failed",
+    title: "We couldn't verify this reset link",
+    description:
+      "Something went wrong while checking your link. This is usually temporary — try opening the link again, or request a new one below.",
+    Icon: HelpCircle,
+    primaryAction: "try_again",
+    primaryLabel: "Try opening the link again",
+  },
+};
+
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
