@@ -215,6 +215,10 @@ function EcosystemMap() {
         <g
           onMouseEnter={() => setHoveredNode("nidhi")}
           onMouseLeave={() => setHoveredNode(null)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setPinnedNode((prev) => (prev === "nidhi" ? null : "nidhi"));
+          }}
           style={{ cursor: "pointer" }}
         >
           <circle
@@ -222,7 +226,7 @@ function EcosystemMap() {
             fill="#C41E1E"
             style={{
               filter: "drop-shadow(0 0 18px rgba(196,30,30,0.45))",
-              transform: hoveredNode === "nidhi" ? "scale(1.06)" : "scale(1)",
+              transform: activeNode === "nidhi" ? "scale(1.06)" : "scale(1)",
               transformOrigin: `${CENTER}px ${CENTER}px`,
               transition: "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
             }}
@@ -242,30 +246,33 @@ function EcosystemMap() {
           const rad = ((n.angle - 90) * Math.PI) / 180;
           const x = CENTER + RADIUS * Math.cos(rad);
           const y = CENTER + RADIUS * Math.sin(rad);
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <g
               key={n.id}
               onMouseEnter={() => setHoveredNode(n.id)}
               onMouseLeave={() => setHoveredNode(null)}
-              onClick={() => handleNodeClick(n)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNodeTap(n);
+              }}
               style={{ cursor: "pointer" }}
             >
               <circle
                 cx={x} cy={y} r={OUTER_R}
-                fill={isHovered ? "#FFFFFF" : "#F5F1E8"}
-                stroke={isHovered ? "#C41E1E" : "rgba(26,16,8,0.18)"}
+                fill={isActive ? "#FFFFFF" : "#F5F1E8"}
+                stroke={isActive ? "#C41E1E" : "rgba(26,16,8,0.18)"}
                 strokeWidth={2}
                 style={{
                   filter: "drop-shadow(0 4px 10px rgba(26,16,8,0.10))",
-                  transform: isHovered ? "scale(1.1)" : "scale(1)",
+                  transform: isActive ? "scale(1.1)" : "scale(1)",
                   transformOrigin: `${x}px ${y}px`,
                   transition: "all 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
               />
               <text
                 x={x} y={y + 5} textAnchor="middle"
-                fill={isHovered ? "#C41E1E" : "#2A2A2A"}
+                fill={isActive ? "#C41E1E" : "#2A2A2A"}
                 fontSize="14" fontWeight="500"
                 style={{ pointerEvents: "none", fontFamily: "'Inter', sans-serif", transition: "fill 250ms ease" }}
               >
