@@ -212,6 +212,7 @@ const SignInPage = () => {
               id="signin-email"
               type="email"
               value={email}
+              disabled={loading}
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (authError?.field === "email" || authError?.field === "password") setAuthError(null);
@@ -220,7 +221,7 @@ const SignInPage = () => {
               placeholder="rajesh@example.com"
               aria-invalid={showEmailError || authError?.field === "email"}
               aria-describedby="signin-email-error"
-              className={`${inputBase} ${showEmailError || authError?.field === "email" ? inputErr : inputOk}`}
+              className={`${inputBase} ${showEmailError || authError?.field === "email" ? inputErr : inputOk} disabled:opacity-60 disabled:cursor-not-allowed`}
             />
             {showEmailError && (
               <p id="signin-email-error" className="mt-1 text-xs text-fyn-red">
@@ -242,6 +243,7 @@ const SignInPage = () => {
               id="signin-password"
               type="password"
               value={password}
+              disabled={loading}
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (authError?.field === "password") setAuthError(null);
@@ -250,7 +252,7 @@ const SignInPage = () => {
               placeholder="Enter your password"
               aria-invalid={showPasswordError || authError?.field === "password"}
               aria-describedby="signin-password-error"
-              className={`${inputBase} ${showPasswordError || authError?.field === "password" ? inputErr : inputOk}`}
+              className={`${inputBase} ${showPasswordError || authError?.field === "password" ? inputErr : inputOk} disabled:opacity-60 disabled:cursor-not-allowed`}
             />
             {showPasswordError && (
               <p id="signin-password-error" className="mt-1 text-xs text-fyn-red">
@@ -265,11 +267,12 @@ const SignInPage = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm cursor-pointer text-secondary-foreground">
+            <label className={`flex items-center gap-2 text-sm cursor-pointer text-secondary-foreground ${loading ? "opacity-60 cursor-not-allowed" : ""}`}>
               <input
                 type="checkbox"
                 className="accent-[#C41E1E]"
                 checked={rememberMe}
+                disabled={loading}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
               Remember me
@@ -277,7 +280,8 @@ const SignInPage = () => {
             <button
               type="button"
               onClick={openForgot}
-              className="text-fyn-red text-sm hover:underline"
+              disabled={loading}
+              className="text-fyn-red text-sm hover:underline disabled:opacity-60 disabled:cursor-not-allowed disabled:no-underline"
             >
               Forgot password?
             </button>
@@ -378,14 +382,29 @@ const SignInPage = () => {
           <button
             type="submit"
             disabled={loading || isLocked}
-            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+            aria-busy={loading}
+            className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
+            {loading && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
             {isLocked
               ? `Try again in ${formatRemaining(cooldownRemaining)}`
               : loading
               ? "Signing in…"
               : "Sign In"}
           </button>
+
+          {loading && (
+            <p
+              role="status"
+              aria-live="polite"
+              className="text-xs text-center text-secondary-foreground inline-flex items-center justify-center gap-1.5 w-full"
+            >
+              <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
+              {slowAuth
+                ? "Still working — secure servers can take a moment…"
+                : "Contacting secure server…"}
+            </p>
+          )}
           <p className="text-sm text-center text-secondary-foreground">
             Don't have an account? <Link to="/signup" className="text-fyn-red hover:underline">Start free trial →</Link>
           </p>
