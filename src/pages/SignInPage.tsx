@@ -178,14 +178,21 @@ const SignInPage = () => {
         recordFailure();
       }
 
+      let errorField: "email" | "password" | "form" = "form";
       if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+        errorField = "password";
         setAuthError({ field: "password", message: "Incorrect email or password. Please try again." });
       } else if (msg.includes("email not confirmed")) {
+        errorField = "email";
         setAuthError({ field: "email", message: "Please confirm your email address before signing in." });
       } else if (msg.includes("user not found")) {
+        errorField = "email";
         setAuthError({ field: "email", message: "No account found with this email address." });
       } else {
         setAuthError({ field: "form", message: error.message });
+      }
+      if (errorField === "email" || errorField === "password") {
+        focusField(errorField);
       }
       return;
     }
