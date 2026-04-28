@@ -11,7 +11,17 @@ const SignInPage = () => {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [authError, setAuthError] = useState<{ field?: "email" | "password" | "form"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [slowAuth, setSlowAuth] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
+
+  useEffect(() => {
+    if (!loading) {
+      setSlowAuth(false);
+      return;
+    }
+    const id = setTimeout(() => setSlowAuth(true), 2500);
+    return () => clearTimeout(id);
+  }, [loading]);
 
   // Client-side rate limiting after repeated failed sign-in attempts.
   // After FAIL_THRESHOLD consecutive failures, the form is locked for a
