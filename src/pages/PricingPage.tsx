@@ -1,143 +1,134 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 
-const features = [
-  "Full access to all 5 Intelligence Suites",
-  "AI CFO Nidhi (unlimited questions)",
-  "Unlimited users",
-  "Bank & Zoho integrations",
-  "Email & Slack alerts",
-  "CSV data import",
-  "Priority support",
+const TIERS = [
+  {
+    name: "Free Beta",
+    price: "₹0",
+    period: "for 6 months",
+    blurb: "First 1,000 users — free for 6 months.",
+    cta: "Join Waitlist →",
+    highlighted: true,
+    features: ["All 5 intelligence modules", "Up to 2 bank accounts", "GSTR & TDS calendar", "AI CFO Nidhi (basic)", "Email support"],
+  },
+  {
+    name: "Starter",
+    price: "₹2,999",
+    period: "/month",
+    blurb: "Coming soon.",
+    cta: "Join Waitlist →",
+    highlighted: false,
+    features: ["Everything in Free Beta", "Up to 5 bank accounts", "Receivables auto-chase", "Nidhi unlimited queries", "Priority email support"],
+  },
+  {
+    name: "Professional",
+    price: "₹9,999",
+    period: "/month",
+    blurb: "Coming soon.",
+    cta: "Join Waitlist →",
+    highlighted: false,
+    features: ["Everything in Starter", "Unlimited banks", "CA partner access", "Custom CFO reports", "WhatsApp + phone support"],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    blurb: "For larger teams & multi-entity.",
+    cta: "Request Access →",
+    highlighted: false,
+    features: ["Everything in Professional", "Multi-entity consolidation", "SSO & audit trails", "Dedicated success manager", "SLA-backed support"],
+  },
 ];
 
-const faqs = [
-  { q: "What happens after the free trial?", a: "Your card will be charged automatically. Cancel anytime before trial ends." },
-  { q: "Can I switch plans later?", a: "Yes, upgrade or downgrade anytime from Settings." },
-  { q: "What payment methods do you accept?", a: "Credit card, debit card, UPI, net banking via Razorpay." },
+const FAQS = [
+  { q: "When does FYNHelp launch?", a: "We're opening early access in waves. Join the waitlist and we'll email you the moment your slot is ready." },
+  { q: "Is it really free for the first 1,000 users?", a: "Yes — the first 1,000 founders get every paid feature free for 6 months in exchange for feedback." },
+  { q: "How does FYNHelp connect to my bank?", a: "Through RBI's Account Aggregator framework — you never share credentials, and access is revocable any time." },
+  { q: "Do I need a CA?", a: "No. FYNHelp works standalone, but if you have a CA, they can join via our partner portal." },
 ];
 
-async function createRazorpayCheckout(plan: "monthly" | "annual") {
-  // Placeholder: integrate Razorpay edge function here
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-  // TODO: call edge function to create order, then open Razorpay modal
-  console.log("Razorpay checkout for plan:", plan, "user:", user.id);
-  return { ok: true };
-}
-
-export default function PricingPage() {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState<string | null>(null);
-
-  const handleStartTrial = async (plan: "monthly" | "annual") => {
-    setLoading(plan);
-    try {
-      localStorage.setItem("selected_plan", plan);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate(`/signup?plan=${plan}`);
-        return;
-      }
-      await createRazorpayCheckout(plan);
-      navigate("/dashboard/cockpit");
-    } catch (e: any) {
-      toast({ title: "Checkout failed", description: e?.message ?? "Please try again.", variant: "destructive" });
-    } finally {
-      setLoading(null);
-    }
-  };
+const PricingPage = () => {
+  useEffect(() => {
+    document.title = "Pricing - Affordable AI CFO for Startups | FYNHelp";
+  }, []);
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-fyn-beige py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="font-serif font-bold text-4xl md:text-5xl text-fyn-ink mb-4">Choose Your Plan</h1>
-          <p className="text-lg text-fyn-ink/70">Start your 14-day free trial. No credit card required.</p>
+      <section className="bg-fyn-ink text-white py-20">
+        <div className="fyn-container text-center max-w-3xl">
+          <h1 className="font-serif text-4xl md:text-5xl mb-4">Simple, founder-friendly pricing</h1>
+          <p className="text-white/70 text-lg">Free for the first 1,000 users. Paid plans unlock as we scale.</p>
         </div>
       </section>
 
-      {/* Pricing cards */}
-      <section className="bg-fyn-beige-dark py-16 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Monthly */}
-          <div className="relative bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-8 flex flex-col">
-            <span className="absolute -top-3 left-8 bg-fyn-ink text-white text-xs font-medium px-3 py-1 rounded-full">
-              Most Flexible
-            </span>
-            <h3 className="font-serif font-bold text-2xl text-fyn-ink mb-2">Monthly</h3>
-            <div className="mb-6">
-              <span className="text-5xl font-bold text-fyn-ink">₹4,999</span>
-              <span className="text-fyn-ink/60 ml-1">/month</span>
-            </div>
-            <ul className="space-y-3 mb-8 flex-1">
-              {features.map((f) => (
-                <li key={f} className="flex gap-3 text-sm text-fyn-ink/80">
-                  <Check className="w-5 h-5 text-fyn-success shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleStartTrial("monthly")}
-              disabled={loading === "monthly"}
-              className="w-full bg-fyn-red text-white font-semibold py-3 rounded-lg hover:bg-fyn-red/90 transition-colors disabled:opacity-60"
-            >
-              {loading === "monthly" ? "Loading..." : "Start Free Trial"}
-            </button>
-          </div>
-
-          {/* Annual */}
-          <div className="relative bg-white rounded-2xl border-2 border-fyn-success shadow-lg shadow-fyn-success/10 p-8 flex flex-col">
-            <span className="absolute -top-3 left-8 bg-fyn-success text-white text-xs font-medium px-3 py-1 rounded-full">
-              Best Value — Save 17%
-            </span>
-            <h3 className="font-serif font-bold text-2xl text-fyn-ink mb-2">Annual</h3>
-            <div className="mb-1">
-              <span className="text-5xl font-bold text-fyn-ink">₹49,990</span>
-              <span className="text-fyn-ink/60 ml-1">/year</span>
-            </div>
-            <p className="text-sm text-fyn-success font-medium mb-1">Save ₹9,898 vs monthly</p>
-            <p className="text-sm text-fyn-ink/60 mb-6">(₹4,165/month)</p>
-            <ul className="space-y-3 mb-8 flex-1">
-              {features.map((f) => (
-                <li key={f} className="flex gap-3 text-sm text-fyn-ink/80">
-                  <Check className="w-5 h-5 text-fyn-success shrink-0 mt-0.5" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleStartTrial("annual")}
-              disabled={loading === "annual"}
-              className="w-full bg-fyn-red text-white font-semibold py-3 rounded-lg hover:bg-fyn-red/90 transition-colors shadow-md disabled:opacity-60"
-            >
-              {loading === "annual" ? "Loading..." : "Start Free Trial"}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="bg-fyn-beige py-16 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif font-bold text-3xl text-fyn-ink mb-8 text-center">Frequently Asked Questions</h2>
-          <div className="space-y-6">
-            {faqs.map((f) => (
-              <div key={f.q} className="bg-white rounded-lg border border-fyn-ink/10 p-6">
-                <h3 className="font-semibold text-fyn-ink mb-2">{f.q}</h3>
-                <p className="text-fyn-ink/70 text-sm leading-relaxed">{f.a}</p>
+      <section className="bg-fyn-beige py-20">
+        <div className="fyn-container">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {TIERS.map((t) => (
+              <div
+                key={t.name}
+                className={`bg-white rounded-xl p-7 flex flex-col border ${
+                  t.highlighted ? "border-fyn-red shadow-lg" : "border-fyn-ink/10"
+                }`}
+              >
+                {t.highlighted && (
+                  <span className="inline-block bg-fyn-red text-white text-[10px] uppercase tracking-wider font-semibold px-2 py-1 rounded mb-3 self-start">
+                    Best for early users
+                  </span>
+                )}
+                <h3 className="font-serif text-2xl text-fyn-ink mb-1">{t.name}</h3>
+                <p className="text-fyn-ink/60 text-xs mb-4">{t.blurb}</p>
+                <div className="mb-5">
+                  <span className="font-serif text-3xl text-fyn-ink">{t.price}</span>
+                  {t.period && <span className="text-fyn-ink/60 text-sm ml-1">{t.period}</span>}
+                </div>
+                <ul className="space-y-2 mb-6 flex-1">
+                  {t.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-fyn-ink/80">
+                      <Check size={15} className="text-fyn-red mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/early-access"
+                  className={`text-center py-3 rounded-lg font-semibold text-sm transition-opacity hover:opacity-90 ${
+                    t.highlighted ? "bg-fyn-red text-white" : "bg-fyn-ink text-white"
+                  }`}
+                >
+                  {t.cta}
+                </Link>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      <section className="bg-white py-20">
+        <div className="fyn-container max-w-3xl">
+          <h2 className="font-serif text-3xl text-fyn-ink mb-8 text-center">Frequently asked</h2>
+          <div className="space-y-4">
+            {FAQS.map((f) => (
+              <details key={f.q} className="bg-fyn-beige border border-fyn-ink/10 rounded-lg p-5 group">
+                <summary className="font-medium text-fyn-ink cursor-pointer list-none flex items-center justify-between">
+                  {f.q}
+                  <span className="text-fyn-red text-xl group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <p className="text-fyn-ink/70 text-sm mt-3 leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              to="/early-access"
+              className="bg-fyn-red text-white px-8 py-4 rounded-lg font-semibold inline-flex items-center gap-2 hover:opacity-90 transition-opacity"
+            >
+              Join Waitlist <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
-}
