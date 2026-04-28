@@ -433,18 +433,59 @@ const SignInPage = () => {
             <div
               role="alert"
               aria-live="polite"
-              className="rounded-md p-3 text-sm bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30"
+              className="rounded-lg p-4 bg-fyn-gold/10 text-fyn-ink border border-fyn-gold/30 space-y-3"
             >
-              <div className="font-medium">Sign-in temporarily paused</div>
-              <div className="text-xs mt-1 text-secondary-foreground">
-                After {failCount} failed attempts, please wait{" "}
-                <span className="font-mono font-semibold text-fyn-ink">{formatRemaining(cooldownRemaining)}</span>{" "}
-                before trying again.{" "}
-                <button type="button" onClick={openForgot} className="text-fyn-red hover:underline">
-                  Reset your password
-                </button>{" "}
-                if you've forgotten it.
+              <div className="flex items-start gap-2">
+                <ShieldCheck size={16} className="text-fyn-gold mt-0.5 flex-shrink-0" aria-hidden="true" />
+                <div className="flex-1">
+                  <div className="font-medium" style={{ fontSize: "var(--fyn-type-body)" }}>
+                    Security check required
+                  </div>
+                  <div className="mt-1 text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                    After {failCount} failed attempts we've paused sign-in for{" "}
+                    <span className="font-mono font-semibold text-fyn-ink">
+                      {formatRemaining(cooldownRemaining)}
+                    </span>
+                    . Solve the challenge below to retry immediately, or use{" "}
+                    <button
+                      type="button"
+                      onClick={openForgot}
+                      className="text-fyn-red hover:underline"
+                    >
+                      Reset your password
+                    </button>{" "}
+                    if you've forgotten it.
+                  </div>
+                </div>
               </div>
+
+              <div className="flex justify-center">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={HCAPTCHA_SITE_KEY}
+                  theme="light"
+                  size="normal"
+                  onVerify={(token) => {
+                    setCaptchaToken(token);
+                    setCaptchaSolved(true);
+                    // Solving the challenge clears the local cooldown so the
+                    // user can retry immediately. Server-side captcha
+                    // verification (when enabled in Supabase auth) still
+                    // protects against scripted abuse.
+                    clearFailures();
+                    setAuthError(null);
+                  }}
+                  onExpire={resetCaptcha}
+                  onError={resetCaptcha}
+                />
+              </div>
+
+              {HCAPTCHA_IS_TEST_KEY && (
+                <p className="text-fyn-ink-45" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                  Dev mode: using hCaptcha's public test key. Set{" "}
+                  <code className="font-mono">VITE_HCAPTCHA_SITE_KEY</code> for production.
+                </p>
+              )}
             </div>
           )}
           {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
@@ -457,13 +498,13 @@ const SignInPage = () => {
 
           <button
             type="submit"
-            disabled={loading || isLocked}
+            disabled={loading || (isLocked && !captchaSolved)}
             aria-busy={loading}
             className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
-            {isLocked
-              ? `Try again in ${formatRemaining(cooldownRemaining)}`
+            {isLocked && !captchaSolved
+              ? "Complete the security check to continue"
               : loading
               ? "Signing in…"
               : "Sign In"}
