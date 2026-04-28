@@ -1,42 +1,30 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { MessageSquare, Calculator, Users, Landmark } from "lucide-react";
 
-const suiteSlugMap: Record<string, string> = {
-  "Liquidity Intelligence": "liquidity",
-  "Revenue Intelligence": "revenue",
-  "Cost Intelligence": "cost",
-  "GST & Tax Intelligence": "gst-tax",
-  "Governance Intelligence": "governance",
-  "HR & Workforce": "hr-workforce",
-  "Decision Simulator": "simulator",
-  "Market & Growth": "market-growth",
-  "Banking & Fintech": "banking-fintech",
-  "CA Partner Ecosystem": "ca-partner",
-};
-
-const megaSuites = [
-  { name: "Liquidity Intelligence", desc: "Cash, runway, burn rate", color: "#C41E1E" },
-  { name: "Revenue Intelligence", desc: "Receivables, collections", color: "#1A4A8B" },
-  { name: "Cost Intelligence", desc: "Spend control, payables", color: "#1A6B3C" },
-  { name: "GST & Tax Intelligence", desc: "ITC, notice risk, filing", color: "#8B5A00" },
-  { name: "Governance Intelligence", desc: "ROC, compliance, audit", color: "#8B6914" },
-  { name: "HR & Workforce", desc: "Hiring, payroll, attrition", color: "#0F766E" },
-  { name: "Decision Simulator", desc: "What-if scenarios", color: "#C41E1E" },
-  { name: "Market & Growth", desc: "Benchmarks, credit rating", color: "#DC6B19" },
-  { name: "Banking & Fintech", desc: "Multi-bank, AA, UPI", color: "#1A4A8B" },
-  { name: "CA Partner Ecosystem", desc: "White-label for CAs", color: "#8B6914" },
+const intelligenceModules = [
+  { name: "Liquidity Intelligence", desc: "Know your runway before you run out", slug: "liquidity" },
+  { name: "Revenue Intelligence", desc: "Track MRR, ARR, and customer cohorts", slug: "revenue" },
+  { name: "Cost Intelligence", desc: "Optimize vendor spend and expenses", slug: "cost" },
+  { name: "GST & Tax Intelligence", desc: "Never miss deadlines, avoid penalties", slug: "gst-tax" },
+  { name: "Governance Intelligence", desc: "Board ready reports and audit trails", slug: "governance" },
+  { name: "HR & Workforce Intelligence", desc: "Payroll analytics and headcount ROI", slug: "hr-workforce" },
 ];
 
-const keyFeatures = [
-  { name: "AI CFO Nidhi AI CFO", desc: "Your AI-powered financial advisor", featured: true, href: "/products" },
-  { name: "Decision Simulator", desc: "Model any business scenario", href: "/products/simulator" },
-  { name: "GST Intelligence", desc: "ITC protection and compliance", href: "/products/gst-tax" },
-  { name: "CA Partner Program", desc: "White-label for accountants", href: "/products/ca-partner" },
-  { name: "Working Capital Marketplace", desc: "Access financing options", href: "/products" },
+const businessTypes = [
+  { name: "D2C & E-commerce", slug: "d2c-ecommerce" },
+  { name: "SaaS & Technology", slug: "saas-technology" },
+  { name: "Manufacturing", slug: "manufacturing" },
+  { name: "Professional Services", slug: "professional-services" },
+  { name: "Healthcare & Education", slug: "healthcare-education" },
 ];
 
-const industries = ["Textiles", "Manufacturing", "IT & Services", "Healthcare", "Exports"];
-const sizes = ["Under ₹5Cr", "₹5-50Cr", "₹50-200Cr", "₹200Cr+"];
+const platformFeatures = [
+  { name: "AI CFO Nidhi", desc: "Conversational financial intelligence", href: "/products", Icon: MessageSquare },
+  { name: "Decision Simulator", desc: "Model any business scenario", href: "/products/simulator", Icon: Calculator },
+  { name: "CA Partner Program", desc: "White label for accountants", href: "/products/ca-partner", Icon: Users },
+  { name: "Working Capital Marketplace", desc: "Access financing options", href: "/products", Icon: Landmark },
+];
 
 interface MegaMenuProps {
   open: boolean;
@@ -55,7 +43,6 @@ export default function MegaMenu({ open, onClose }: MegaMenuProps) {
         onClose();
       }
     };
-
     if (open) {
       document.addEventListener("keydown", handleEscape);
       document.addEventListener("mousedown", handleClickOutside);
@@ -69,148 +56,221 @@ export default function MegaMenu({ open, onClose }: MegaMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="hidden lg:block absolute left-0 w-full"
+      className="hidden lg:flex absolute left-0 w-full justify-center"
       style={{
         top: 72,
         zIndex: 1000,
         pointerEvents: open ? "auto" : "none",
       }}
+      aria-hidden={!open}
+      role="menu"
+      aria-label="Products menu"
     >
       <div
         style={{
-          background: "#1A1008",
-          borderTop: "2px solid #C41E1E",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: "0 16px 48px rgba(0,0,0,0.40)",
-          padding: "32px 96px 40px",
+          background: "#F9F7F4",
+          border: "1px solid #E5E5E5",
+          borderTop: "none",
+          borderRadius: "0 0 8px 8px",
+          boxShadow: "0 16px 40px rgba(26,16,8,0.12)",
+          padding: 32,
+          width: "min(1000px, calc(100vw - 48px))",
           opacity: open ? 1 : 0,
           transform: open ? "translateY(0)" : "translateY(-8px)",
           transition: open
-            ? "opacity 250ms ease-out, transform 250ms ease-out"
+            ? "opacity 300ms ease-out, transform 300ms ease-out"
             : "opacity 200ms ease-in, transform 200ms ease-in",
         }}
       >
+        {/* 3 columns */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "260px 280px 1fr",
-            gap: 0,
-            minHeight: 400,
+            gridTemplateColumns: "35fr 30fr 35fr",
+            gap: 40,
+            alignItems: "start",
           }}
         >
-          <div style={{ borderRight: "1px solid rgba(255,255,255,0.08)", paddingRight: 40 }}>
+          {/* Column 1 — Intelligence Modules */}
+          <div>
             <ColHeader>Intelligence Suites</ColHeader>
-            <div
-              style={{
-                maxHeight: 340,
-                overflowY: "auto",
-                scrollbarWidth: "thin",
-                scrollbarColor: "rgba(196,30,30,0.4) transparent",
-              }}
-            >
-              {megaSuites.map((s) => (
-                <Link
-                  key={s.name}
-                  to={`/products/${suiteSlugMap[s.name]}`}
-                  onClick={onClose}
-                  className="group flex items-start gap-2.5 rounded-md mb-0.5"
-                  style={{
-                    padding: "8px 10px",
-                    cursor: "pointer",
-                    textDecoration: "none",
-                    transition: "background 200ms",
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                >
-                  <div className="shrink-0 rounded-full" style={{ width: 7, height: 7, backgroundColor: s.color, marginTop: 5 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p className="group-hover:text-white" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "rgba(255,255,255,0.85)", margin: 0, lineHeight: 1.3 }}>{s.name}</p>
-                    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 11, color: "rgba(255,255,255,0.45)", margin: 0, marginTop: 1 }}>{s.desc}</p>
-                  </div>
-                  <span className="opacity-0 group-hover:opacity-100" style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: "#C41E1E", marginLeft: "auto", transform: "translateX(-4px)", transition: "opacity 200ms, transform 200ms", flexShrink: 0, marginTop: 2 }}>→</span>
-                </Link>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+              {intelligenceModules.map((m) => (
+                <li key={m.slug}>
+                  <Link
+                    to={`/solutions#${m.slug}`}
+                    onClick={onClose}
+                    role="menuitem"
+                    className="mega-row"
+                    style={{
+                      display: "block",
+                      padding: "10px 12px",
+                      borderRadius: 6,
+                      textDecoration: "none",
+                      transition: "background 200ms ease, padding-left 200ms ease",
+                      minHeight: 44,
+                    }}
+                  >
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 16, lineHeight: 1.5, color: "#1A1A1A", margin: 0 }}>
+                      {m.name}
+                    </p>
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, lineHeight: 1.5, color: "#666666", margin: 0, marginTop: 2 }}>
+                      {m.desc}
+                    </p>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div style={{ borderRight: "1px solid rgba(255,255,255,0.08)", paddingRight: 40, paddingLeft: 40 }}>
-            <ColHeader>Key Features</ColHeader>
-            <Link
-              to="/products"
-              onClick={onClose}
-              className="block mb-2 group"
-              style={{ background: "rgba(196,30,30,0.10)", border: "1px solid rgba(196,30,30,0.25)", borderRadius: 6, padding: "10px 12px", textDecoration: "none", position: "relative" }}
-            >
-              <span style={{ position: "absolute", top: 8, right: 8, fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 9, color: "#C41E1E", background: "rgba(196,30,30,0.1)", padding: "2px 6px", borderRadius: 3 }}>Featured</span>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="rounded-full" style={{ width: 6, height: 6, background: "#C41E1E" }} />
-                <p className="text-sm text-primary-foreground" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, margin: 0 }}>AI CFO Nidhi AI CFO</p>
-              </div>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 11, color: "rgba(255,255,255,0.50)", margin: 0 }}>Your AI-powered financial advisor</p>
-            </Link>
-            {keyFeatures.slice(1).map((f) => (
-              <Link
-                key={f.name}
-                to={f.href}
-                onClick={onClose}
-                className="group flex items-start gap-2.5 rounded-md mb-0.5"
-                style={{ padding: "8px 10px", textDecoration: "none", transition: "background 200ms" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-              >
-                <div style={{ flex: 1 }}>
-                  <p className="group-hover:text-white" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "rgba(255,255,255,0.85)", margin: 0 }}>{f.name}</p>
-                  <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 11, color: "rgba(255,255,255,0.45)", margin: 0, marginTop: 1 }}>{f.desc}</p>
-                </div>
-                <span className="opacity-0 group-hover:opacity-100" style={{ fontSize: 12, color: "#C41E1E", marginLeft: "auto", transform: "translateX(-4px)", transition: "opacity 200ms, transform 200ms", flexShrink: 0, marginTop: 2 }}>→</span>
-              </Link>
-            ))}
+          {/* Column 2 — By Business Type */}
+          <div>
+            <ColHeader>By Business Type</ColHeader>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+              {businessTypes.map((b) => (
+                <li key={b.slug}>
+                  <Link
+                    to={`/solutions?type=${b.slug}`}
+                    onClick={onClose}
+                    role="menuitem"
+                    className="mega-biz"
+                    style={{
+                      display: "block",
+                      padding: "12px",
+                      borderRadius: 6,
+                      textDecoration: "none",
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 500,
+                      fontSize: 16,
+                      lineHeight: 1.5,
+                      color: "#1A1A1A",
+                      transition: "color 200ms ease",
+                      minHeight: 44,
+                    }}
+                  >
+                    {b.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div style={{ paddingLeft: 40 }}>
-            <ColHeader>By Industry</ColHeader>
-            <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 24 }}>
-              {industries.map((i) => (
-                <Chip key={i} label={i} onClick={onClose} />
-              ))}
-            </div>
-            <ColHeader>By Business Size</ColHeader>
-            <div className="flex flex-wrap" style={{ gap: 6 }}>
-              {sizes.map((s) => (
-                <Chip key={s} label={s} onClick={onClose} />
-              ))}
-            </div>
+          {/* Column 3 — Platform Features */}
+          <div>
+            <ColHeader>Platform Features</ColHeader>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+              {platformFeatures.map((f) => {
+                const Icon = f.Icon;
+                return (
+                  <li key={f.name}>
+                    <Link
+                      to={f.href}
+                      onClick={onClose}
+                      role="menuitem"
+                      className="mega-card"
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "flex-start",
+                        background: "#FFFFFF",
+                        border: "1px solid #F0F0F0",
+                        borderRadius: 6,
+                        padding: 12,
+                        textDecoration: "none",
+                        transition: "border-color 200ms ease, box-shadow 200ms ease",
+                        minHeight: 44,
+                      }}
+                    >
+                      <Icon size={16} color="#C41E1E" style={{ marginTop: 3, flexShrink: 0 }} aria-hidden />
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 15, lineHeight: 1.5, color: "#1A1A1A", margin: 0 }}>
+                          {f.name}
+                        </p>
+                        <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, lineHeight: 1.5, color: "#666666", margin: 0, marginTop: 2 }}>
+                          {f.desc}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
 
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20, marginTop: 20, display: "flex", gap: 24, alignItems: "center" }}>
-          <Link to="/products" onClick={onClose} style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#C41E1E", textDecoration: "none", transition: "color 150ms" }} onMouseEnter={(e) => { e.currentTarget.style.color = "#FF4444"; e.currentTarget.style.textDecoration = "underline"; }} onMouseLeave={(e) => { e.currentTarget.style.color = "#C41E1E"; e.currentTarget.style.textDecoration = "none"; }}>All 50+ modules →</Link>
-          <Link to="/pricing" onClick={onClose} style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "rgba(255,255,255,0.60)", textDecoration: "none", transition: "color 150ms" }} onMouseEnter={(e) => { e.currentTarget.style.color = "#FFFFFF"; }} onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.60)"; }}>See pricing →</Link>
+        {/* Bottom bar */}
+        <div
+          style={{
+            marginTop: 32,
+            paddingTop: 20,
+            borderTop: "1px solid #E5E5E5",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          <Link
+            to="/solutions"
+            onClick={onClose}
+            className="mega-foot-link"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, color: "#C41E1E", textDecoration: "none" }}
+          >
+            View All 10 Intelligence Suites →
+          </Link>
+          <Link
+            to="/pricing"
+            onClick={onClose}
+            className="mega-foot-link"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, color: "#C41E1E", textDecoration: "none" }}
+          >
+            See Pricing →
+          </Link>
         </div>
       </div>
+
+      {/* Scoped hover/focus styles */}
+      <style>{`
+        .mega-row:hover, .mega-row:focus-visible {
+          background: #FFFFFF;
+          padding-left: 16px !important;
+        }
+        .mega-row:focus-visible,
+        .mega-biz:focus-visible,
+        .mega-card:focus-visible,
+        .mega-foot-link:focus-visible {
+          outline: 2px solid #C41E1E;
+          outline-offset: 2px;
+        }
+        .mega-biz:hover {
+          color: #C41E1E !important;
+        }
+        .mega-card:hover {
+          border-color: #C41E1E !important;
+          box-shadow: 0 4px 14px rgba(196,30,30,0.10);
+        }
+        .mega-foot-link:hover {
+          text-decoration: underline;
+        }
+      `}</style>
     </div>
   );
 }
 
 function ColHeader({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "#8B6914", paddingBottom: 8, borderBottom: "1px solid rgba(139,105,20,0.20)", margin: "0 0 16px 0" }}>
+    <p
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        fontWeight: 600,
+        fontSize: 14,
+        letterSpacing: "1px",
+        textTransform: "uppercase",
+        color: "#666666",
+        margin: "0 0 16px 0",
+      }}
+    >
       {children}
     </p>
-  );
-}
-
-function Chip({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <Link
-      to={`/products?filter=${encodeURIComponent(label.toLowerCase())}`}
-      onClick={onClick}
-      style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: 4, padding: "5px 12px", fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "rgba(255,255,255,0.70)", background: "transparent", textDecoration: "none", transition: "all 200ms" }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#C41E1E"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.background = "rgba(196,30,30,0.08)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.color = "rgba(255,255,255,0.70)"; e.currentTarget.style.background = "transparent"; }}
-    >
-      {label}
-    </Link>
   );
 }
