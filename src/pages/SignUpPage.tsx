@@ -140,21 +140,70 @@ const SignUpPage = () => {
             { key: "business_name", label: "Business name", type: "text", placeholder: "Mehta Textile Traders", required: true },
             { key: "mobile", label: "Mobile number", type: "tel", placeholder: "+91 98XXX XXXXX", required: true },
             { key: "email", label: "Email address", type: "email", placeholder: "rajesh@example.com", required: true },
-            { key: "password", label: "Password", type: "password", placeholder: "Create a strong password", required: true },
-            { key: "gstin", label: "GSTIN (optional)", type: "text", placeholder: "Enter for instant GST setup", required: false },
           ].map((f) => (
             <div key={f.key}>
               <label className="mb-1 block text-secondary-foreground text-base">{f.label}</label>
               <input
                 type={f.type}
                 required={f.required}
-                value={(form as any)[f.key]}
+                value={(form as Record<string, string | boolean>)[f.key] as string}
                 onChange={(e) => update(f.key, e.target.value)}
                 placeholder={f.placeholder}
                 className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
               />
             </div>
           ))}
+
+          {/* Password with strength meter + checklist */}
+          <div>
+            <label
+              htmlFor="signup-password"
+              className="mb-1 block text-secondary-foreground text-base"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="signup-password"
+                type={showPassword ? "text" : "password"}
+                required
+                autoComplete="new-password"
+                value={form.password}
+                onChange={(e) => update("password", e.target.value)}
+                onBlur={() => setPwTouched(true)}
+                placeholder="Create a strong password"
+                aria-describedby="signup-pw-strength signup-pw-rules"
+                aria-invalid={pwTouched && (!passwordPolicy.allRulesPassed || passwordPolicy.isCommonWeak)}
+                className="w-full h-[42px] px-4 pr-11 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-fyn-ink-60 hover:text-fyn-ink transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <PasswordStrengthMeter
+              password={form.password}
+              showFailures={pwTouched}
+              strengthId="signup-pw-strength"
+              rulesId="signup-pw-rules"
+            />
+          </div>
+
+          {/* GSTIN (optional) */}
+          <div>
+            <label className="mb-1 block text-secondary-foreground text-base">GSTIN (optional)</label>
+            <input
+              type="text"
+              value={form.gstin}
+              onChange={(e) => update("gstin", e.target.value)}
+              placeholder="Enter for instant GST setup"
+              className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+            />
+          </div>
 
           <label className="flex items-start gap-2 text-xs text-secondary-foreground">
             <input
