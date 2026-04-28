@@ -236,7 +236,7 @@ const CFOReportDetailPage = () => {
                 readOnly
                 onFocus={(e) => e.currentTarget.select()}
                 onClick={(e) => e.currentTarget.select()}
-                className="flex-1 bg-white border border-fyn-ink/15 rounded px-2.5 py-1.5 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
+                className="flex-1 bg-white border border-fyn-ink/15 rounded px-2.5 py-2.5 min-h-10 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
               />
               <button
                 onClick={() => {
@@ -248,7 +248,7 @@ const CFOReportDetailPage = () => {
                     setTimeout(() => setCopied(false), 2000);
                   }
                 }}
-                className="inline-flex items-center justify-center gap-1 bg-fyn-ink text-white px-2.5 py-1.5 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
+                className="inline-flex items-center justify-center gap-1 bg-fyn-ink text-white px-2.5 py-2.5 min-h-10 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
               >
                 <Copy className="w-3 h-3" />
                 Copy URL
