@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
@@ -13,6 +13,20 @@ const SignInPage = () => {
   const [loading, setLoading] = useState(false);
   const [slowAuth, setSlowAuth] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("fyn.rememberMe") !== "0");
+
+  // Refs for auto-focusing the first invalid field on submit.
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const focusField = (field: "email" | "password") => {
+    const el = field === "email" ? emailRef.current : passwordRef.current;
+    if (!el) return;
+    // Wait a tick so any error UI renders before scrolling.
+    requestAnimationFrame(() => {
+      el.focus({ preventScroll: true });
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
 
   useEffect(() => {
     if (!loading) {
