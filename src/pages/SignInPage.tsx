@@ -300,6 +300,7 @@ const SignInPage = () => {
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (authError?.field === "email" || authError?.field === "password") setAuthError(null);
+                if (cooldownJustExpired) setCooldownJustExpired(false);
               }}
               onBlur={() => setTouched((t) => ({ ...t, email: true }))}
               placeholder="rajesh@example.com"
@@ -332,6 +333,7 @@ const SignInPage = () => {
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (authError?.field === "password") setAuthError(null);
+                if (cooldownJustExpired) setCooldownJustExpired(false);
               }}
               onBlur={() => setTouched((t) => ({ ...t, password: true }))}
               placeholder="Enter your password"
