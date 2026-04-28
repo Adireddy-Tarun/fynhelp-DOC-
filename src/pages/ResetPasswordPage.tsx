@@ -277,45 +277,84 @@ const ResetPasswordPage = () => {
             Verifying reset link…
           </p>
         ) : !validSession ? (
-          <div className="max-w-md space-y-4">
-            <div
-              className="rounded border border-fyn-red/20 bg-fyn-danger-bg text-fyn-red p-3"
-              style={{ fontSize: "var(--fyn-type-small)" }}
-            >
-              This reset link is invalid or has expired. Enter your email below to get a new link.
-            </div>
+          (() => {
+            const isExpired = linkFailure === "expired";
+            const isUsed = linkFailure === "used";
+            const heading = isExpired
+              ? "This reset link has expired"
+              : isUsed
+              ? "This reset link has already been used"
+              : "This reset link is invalid";
+            const explainer = isExpired
+              ? "For your security, password reset links are valid for a short time. Request a new one below and we'll email it to you right away."
+              : isUsed
+              ? "Each reset link can only be used once. Request a new link below to set your password."
+              : "We couldn't verify this reset link. It may be malformed, already used, or sent from an old email. Request a fresh link below.";
+            return (
+              <div className="max-w-md space-y-5">
+                <div className="rounded-lg border border-fyn-red/20 bg-fyn-danger-bg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red">
+                      <MailWarning className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div className="flex-1">
+                      <h3
+                        className="font-serif text-fyn-ink"
+                        style={{ fontSize: "var(--fyn-type-h3)", lineHeight: 1.25 }}
+                      >
+                        {heading}
+                      </h3>
+                      <p
+                        className="mt-1 text-fyn-ink-80"
+                        style={{ fontSize: "var(--fyn-type-small)", lineHeight: 1.5 }}
+                      >
+                        {explainer}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={focusResendInput}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity"
+                        style={{ fontSize: "var(--fyn-type-small)" }}
+                      >
+                        <Mail className="h-4 w-4" aria-hidden="true" />
+                        Request a new reset link
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-            <form onSubmit={handleResend} className="space-y-3" noValidate>
-              <div>
-                <label
-                  htmlFor="resend-email"
-                  className="block mb-1 text-fyn-ink-80"
-                  style={{ fontSize: "var(--fyn-type-small)" }}
-                >
-                  Email address
-                </label>
-                <input
-                  id="resend-email"
-                  type="email"
-                  autoComplete="email"
-                  value={resendEmail}
-                  onChange={(e) => setResendEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  disabled={resending}
-                  className={inputClass}
-                  style={{ fontSize: "var(--fyn-type-body)" }}
-                />
-              </div>
+                <form onSubmit={handleResend} className="space-y-3" noValidate>
+                  <div>
+                    <label
+                      htmlFor="resend-email"
+                      className="block mb-1 text-fyn-ink-80"
+                      style={{ fontSize: "var(--fyn-type-small)" }}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="resend-email"
+                      ref={resendInputRef}
+                      type="email"
+                      autoComplete="email"
+                      value={resendEmail}
+                      onChange={(e) => setResendEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      disabled={resending}
+                      className={inputClass}
+                      style={{ fontSize: "var(--fyn-type-body)" }}
+                    />
+                  </div>
 
-              <button
-                type="submit"
-                disabled={resending || !resendEmail.trim()}
-                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{ fontSize: "var(--fyn-type-body)" }}
-              >
-                {resending ? "Sending…" : "Resend reset link"}
-              </button>
-            </form>
+                  <button
+                    type="submit"
+                    disabled={resending || !resendEmail.trim()}
+                    className="w-full bg-fyn-ink text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ fontSize: "var(--fyn-type-body)" }}
+                  >
+                    {resending ? "Sending…" : "Email me a new reset link"}
+                  </button>
+                </form>
 
             {resentTo && (
               <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
