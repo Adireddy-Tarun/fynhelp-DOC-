@@ -55,6 +55,42 @@ export type Database = {
           },
         ]
       }
+      auth_link_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          error_code: string | null
+          flow: string
+          id: string
+          reason: string
+          route: string | null
+          source: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          error_code?: string | null
+          flow?: string
+          id?: string
+          reason: string
+          route?: string | null
+          source?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          error_code?: string | null
+          flow?: string
+          id?: string
+          reason?: string
+          route?: string | null
+          source?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           account_number: string | null

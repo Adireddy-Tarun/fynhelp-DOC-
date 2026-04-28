@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
+import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
 
 // ---------------------------------------------------------------------------
 // Reset-link failure parsing
@@ -245,6 +246,11 @@ const ResetPasswordPage = () => {
       if (ok) {
         setValidSession(true);
         toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
+        reportAuthLinkEvent({
+          reason: "verified",
+          source: "supabase",
+          flow: "password_recovery",
+        });
         return;
       }
       const reason = failure?.reason ?? "invalid";
@@ -257,6 +263,13 @@ const ResetPasswordPage = () => {
           : "This reset link is invalid or has expired.",
         { id: verifyToastId }
       );
+      reportAuthLinkEvent({
+        reason,
+        source: failure?.source ?? "url",
+        flow: "password_recovery",
+        errorCode: failure?.code,
+        description: failure?.description,
+      });
       // Clear the noisy hash/query so a refresh doesn't re-trigger toasts.
       try {
         window.history.replaceState(null, "", window.location.pathname);
