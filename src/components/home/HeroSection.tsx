@@ -88,37 +88,12 @@ export default function HeroSection() {
       }} />
 
       <div
-        className="relative h-full"
-        style={{ zIndex: 10 }}
+        className="relative"
+        style={{ zIndex: 10, maxWidth: 1200, margin: "0 auto", padding: "120px 24px 80px" }}
       >
-        {/* Desktop: grid, Mobile: flex column */}
-        <div
-          className="hidden md:grid h-full items-center bg-secondary-foreground"
-          style={{
-            gridTemplateColumns: "1fr 1fr",
-            gap: 64,
-            padding: "0 96px",
-          }}
-        >
+        <div className="flex flex-col items-center text-center">
           <LeftColumn />
-          <RightColumn
-            displayedMsgs={displayedMsgs}
-            showTyping={showTyping}
-            showSuggestions={showSuggestions}
-            showFollowUp={showFollowUp}
-            demoComplete={demoComplete}
-            handleSuggestion={handleSuggestion}
-            runDemo={runDemo}
-          />
-        </div>
-
-        {/* Mobile */}
-        <div
-          className="flex md:hidden flex-col justify-center"
-          style={{ padding: "80px 24px 48px", minHeight: "100vh" }}
-        >
-          <LeftColumn />
-          <div className="mt-10">
+          <div className="mt-12 w-full flex justify-center">
             <RightColumn
               displayedMsgs={displayedMsgs}
               showTyping={showTyping}
@@ -127,7 +102,6 @@ export default function HeroSection() {
               demoComplete={demoComplete}
               handleSuggestion={handleSuggestion}
               runDemo={runDemo}
-              mobile
             />
           </div>
         </div>
