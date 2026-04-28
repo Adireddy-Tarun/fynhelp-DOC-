@@ -38,7 +38,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // "Remember me" enforcement:
+    // If the user signed in WITHOUT Remember me, we sign them out at the start
+    // of every new browser session (i.e. when sessionStorage was cleared).
+    // Refreshes within the same tab/browser session keep the session alive.
+    const enforceRememberMe = async () => {
+      const sessionOnly = localStorage.getItem("fyn.sessionOnly") === "1";
+      const tabAlive = sessionStorage.getItem("fyn.tabAlive") === "1";
+
+      if (sessionOnly && !tabAlive) {
+        await supabase.auth.signOut();
+        localStorage.removeItem("fyn.sessionOnly");
+      }
+      sessionStorage.setItem("fyn.tabAlive", "1");
+
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -46,7 +60,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setLoading(false);
       }
-    });
+    };
+
+    enforceRememberMe();
 
     return () => subscription.unsubscribe();
   }, []);
