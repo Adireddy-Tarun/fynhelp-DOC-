@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck, CheckCircle2 } from "lucide-react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 // hCaptcha site key. Provide via VITE_HCAPTCHA_SITE_KEY in env. The fallback is
@@ -506,7 +506,43 @@ const SignInPage = () => {
               )}
             </div>
           )}
-          {!isLocked && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
+
+          {!isLocked && cooldownJustExpired && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="rounded-lg p-4 bg-fyn-success-bg text-fyn-success border border-fyn-success/20 flex items-start gap-3"
+            >
+              <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <div className="flex-1">
+                <div className="font-medium" style={{ fontSize: "var(--fyn-type-body)" }}>
+                  Cooldown ended — you can try again
+                </div>
+                <p className="mt-1 text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                  Double-check your password before retrying. Repeated failures will trigger a longer pause.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  // Securely reset post-cooldown state without ever escalating
+                  // privileges: only local UI flags + persisted counters are
+                  // cleared. The Supabase session is untouched.
+                  clearFailures();
+                  setAuthError(null);
+                  setCooldownJustExpired(false);
+                  // Hand focus back to the field most likely wrong (password).
+                  focusField("password");
+                }}
+                className="bg-fyn-success text-white px-3 py-1.5 rounded font-medium hover:opacity-90 transition-opacity flex-shrink-0"
+                style={{ fontSize: "var(--fyn-type-tiny)" }}
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {!isLocked && !cooldownJustExpired && failCount >= FAIL_THRESHOLD - 1 && failCount > 0 && (
             <p className="text-xs text-fyn-red">
               {FAIL_THRESHOLD - failCount === 1
                 ? "1 more failed attempt will temporarily lock sign-in."
