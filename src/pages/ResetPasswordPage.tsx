@@ -51,6 +51,10 @@ const ResetPasswordPage = () => {
   const [validSession, setValidSession] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pwTouched, setPwTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -91,14 +95,37 @@ const ResetPasswordPage = () => {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const passwordValid = password.length >= 8;
+  const ruleResults = useMemo(
+    () => RULES.map((r) => ({ ...r, passed: r.test(password) })),
+    [password]
+  );
+  const passedCount = ruleResults.filter((r) => r.passed).length;
+  const allRulesPassed = passedCount === RULES.length;
+  const isCommonWeak = !!password && COMMON_WEAK.has(password.toLowerCase());
   const passwordsMatch = password === confirm && confirm.length > 0;
+  const strength = useMemo(
+    () => evaluateStrength(password, passedCount),
+    [password, passedCount]
+  );
+  const canSubmit = allRulesPassed && !isCommonWeak && passwordsMatch && !submitting;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!passwordValid) {
-      const msg = "Password must be at least 8 characters.";
+    setPwTouched(true);
+    setConfirmTouched(true);
+
+    if (isCommonWeak) {
+      const msg = "This password is too common. Please choose a less guessable one.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+    if (!allRulesPassed) {
+      const failed = ruleResults.find((r) => !r.passed);
+      const msg = failed
+        ? `Password doesn't meet all requirements (missing: ${failed.label.toLowerCase()}).`
+        : "Password doesn't meet all requirements.";
       setError(msg);
       toast.error(msg);
       return;
