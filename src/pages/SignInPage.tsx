@@ -11,6 +11,42 @@ const SignInPage = () => {
   const [authError, setAuthError] = useState<{ field?: "email" | "password" | "form"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSending, setForgotSending] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const forgotEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail);
+
+  const openForgot = () => {
+    setForgotEmail(email);
+    setForgotMsg(null);
+    setShowForgot(true);
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotMsg(null);
+    if (!forgotEmailValid) {
+      setForgotMsg({ type: "error", text: "Please enter a valid email address." });
+      return;
+    }
+    setForgotSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setForgotSending(false);
+    if (error) {
+      setForgotMsg({ type: "error", text: error.message });
+      return;
+    }
+    setForgotMsg({
+      type: "success",
+      text: `If an account exists for ${forgotEmail}, a password reset link is on its way. Check your inbox (and spam).`,
+    });
+  };
+
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const passwordValid = password.length >= 6;
 
@@ -132,8 +168,71 @@ const SignInPage = () => {
               <input type="checkbox" className="accent-[#C41E1E]" />
               Remember me
             </label>
-            <a href="#" className="text-fyn-red text-sm hover:underline">Forgot password?</a>
+            <button
+              type="button"
+              onClick={openForgot}
+              className="text-fyn-red text-sm hover:underline"
+            >
+              Forgot password?
+            </button>
           </div>
+
+          {showForgot && (
+            <div className="rounded-md border border-fyn-ink-10 bg-white/60 p-4 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-fyn-ink">Reset your password</h3>
+                  <p className="text-xs text-secondary-foreground mt-0.5">
+                    Enter your account email and we'll send you a reset link.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(false)}
+                  className="text-xs text-secondary-foreground hover:text-fyn-ink"
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="forgot-email" className="text-xs block text-secondary-foreground">
+                  Email address
+                </label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className={`${inputBase} ${forgotEmail && !forgotEmailValid ? inputErr : inputOk}`}
+                />
+              </div>
+
+              {forgotMsg && (
+                <div
+                  role="alert"
+                  className={`rounded-md p-2.5 text-xs border ${
+                    forgotMsg.type === "success"
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                      : "bg-fyn-red/10 text-fyn-red border-fyn-red/20"
+                  }`}
+                >
+                  {forgotMsg.text}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleForgotSubmit}
+                disabled={forgotSending || !forgotEmailValid}
+                className="w-full bg-fyn-ink text-white py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
+              >
+                {forgotSending ? "Sending reset link…" : "Send reset link"}
+              </button>
+            </div>
+          )}
 
           {authError?.field === "form" && (
             <div
