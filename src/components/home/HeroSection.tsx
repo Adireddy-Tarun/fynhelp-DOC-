@@ -79,7 +79,6 @@ export default function HeroSection() {
       style={{
         background: "#1A1008",
         minHeight: 720,
-        height: "100vh",
       }}
     >
       {/* Subtle radial glow */}
