@@ -27,6 +27,14 @@ const SignInPage = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  // hCaptcha — required once the form enters cooldown (locked state). Solving
+  // the challenge clears the local cooldown and the token is also forwarded to
+  // Supabase, which validates it server-side when captcha is enabled in auth
+  // settings (so attackers can't bypass by patching the client).
+  const captchaRef = useRef<HCaptcha>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaSolved, setCaptchaSolved] = useState<boolean>(false);
+
   const focusField = (field: "email" | "password") => {
     const el = field === "email" ? emailRef.current : passwordRef.current;
     if (!el) return;
