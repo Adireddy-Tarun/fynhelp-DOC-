@@ -76,11 +76,27 @@ const SignInPage = () => {
   const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - now) / 1000));
   const isLocked = cooldownRemaining > 0;
 
+  // True for one render cycle right after the cooldown timer hits 0, so we
+  // can show an explicit "Try again" panel instead of silently re-enabling
+  // the form. Cleared by the user clicking "Try again" or by typing.
+  const [cooldownJustExpired, setCooldownJustExpired] = useState(false);
+  const wasLockedRef = useRef(isLocked);
+
   useEffect(() => {
     if (!isLocked) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [isLocked]);
+
+  // Detect the lock → unlocked transition so we can prompt "Try again" without
+  // requiring a page refresh. Guarded by a ref so we only fire once per
+  // expiry, not on every render where isLocked is already false.
+  useEffect(() => {
+    if (wasLockedRef.current && !isLocked && cooldownUntil > 0) {
+      setCooldownJustExpired(true);
+    }
+    wasLockedRef.current = isLocked;
+  }, [isLocked, cooldownUntil]);
 
   const formatRemaining = (s: number) => {
     if (s >= 60) {
@@ -102,12 +118,14 @@ const SignInPage = () => {
       setCooldownUntil(until);
       setNow(Date.now());
       localStorage.setItem(COOLDOWN_KEY, String(until));
+      setCooldownJustExpired(false);
     }
   };
 
   const clearFailures = () => {
     setFailCount(0);
     setCooldownUntil(0);
+    setCooldownJustExpired(false);
     localStorage.removeItem(ATTEMPTS_KEY);
     localStorage.removeItem(COOLDOWN_KEY);
   };
