@@ -467,46 +467,56 @@ const ResetPasswordPage = () => {
           </p>
         ) : !validSession ? (
           (() => {
-            const isExpired = linkFailure === "expired";
-            const isUsed = linkFailure === "used";
-            const heading = isExpired
-              ? "This reset link has expired"
-              : isUsed
-              ? "This reset link has already been used"
-              : "This reset link is invalid";
-            const explainer = isExpired
-              ? "For your security, password reset links are valid for a short time. Request a new one below and we'll email it to you right away."
-              : isUsed
-              ? "Each reset link can only be used once. Request a new link below to set your password."
-              : "We couldn't verify this reset link. It may be malformed, already used, or sent from an old email. Request a fresh link below.";
+            const copy = LINK_FAILURE_COPY[linkFailure ?? "invalid"];
+            const { Icon } = copy;
+            const handlePrimary = () => {
+              if (copy.primaryAction === "try_again") {
+                window.location.reload();
+              } else {
+                focusResendInput();
+              }
+            };
             return (
               <div className="max-w-md space-y-5">
                 <div className="rounded-lg border border-fyn-red/20 bg-fyn-danger-bg p-4">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red">
-                      <MailWarning className="h-5 w-5" aria-hidden="true" />
+                    <div
+                      className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-fyn-red/10 text-fyn-red"
+                      aria-hidden="true"
+                    >
+                      <Icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
+                      <span
+                        className="inline-block rounded-full border border-fyn-red/30 bg-fyn-red/5 px-2 py-0.5 text-fyn-red font-medium uppercase tracking-wide"
+                        style={{ fontSize: "var(--fyn-type-tiny)" }}
+                      >
+                        {copy.badge}
+                      </span>
                       <h3
-                        className="font-serif text-fyn-ink"
+                        className="mt-2 font-serif text-fyn-ink"
                         style={{ fontSize: "var(--fyn-type-h3)", lineHeight: 1.25 }}
                       >
-                        {heading}
+                        {copy.title}
                       </h3>
                       <p
                         className="mt-1 text-fyn-ink-80"
                         style={{ fontSize: "var(--fyn-type-small)", lineHeight: 1.5 }}
                       >
-                        {explainer}
+                        {copy.description}
                       </p>
                       <button
                         type="button"
-                        onClick={focusResendInput}
+                        onClick={handlePrimary}
                         className="mt-3 inline-flex items-center gap-2 rounded-md bg-fyn-red px-3 py-2 text-fyn-beige hover:opacity-90 transition-opacity"
                         style={{ fontSize: "var(--fyn-type-small)" }}
                       >
-                        <Mail className="h-4 w-4" aria-hidden="true" />
-                        Request a new reset link
+                        {copy.primaryAction === "try_again" ? (
+                          <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Mail className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        {copy.primaryLabel}
                       </button>
                     </div>
                   </div>
