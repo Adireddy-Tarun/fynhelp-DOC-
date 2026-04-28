@@ -3,7 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
-import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
+import {
+  Check,
+  X,
+  Eye,
+  EyeOff,
+  MailWarning,
+  Mail,
+  Clock,
+  ShieldAlert,
+  RefreshCw,
+  HelpCircle,
+} from "lucide-react";
 import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
 
 // ---------------------------------------------------------------------------
