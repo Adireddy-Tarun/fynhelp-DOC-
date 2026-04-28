@@ -201,6 +201,8 @@ const ResetPasswordPage = () => {
   const [linkFailure, setLinkFailure] = useState<LinkFailureReason | null>(null);
   const resendInputRef = useRef<HTMLInputElement>(null);
 
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
   const focusResendInput = () => {
     // Defer to ensure the field is mounted in the DOM
     setTimeout(() => {
@@ -209,12 +211,17 @@ const ResetPasswordPage = () => {
     }, 50);
   };
 
-  const handleResend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = resendEmail.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Enter a valid email address.");
-      return;
+  /**
+   * Send a fresh reset link. Used by both the form submit and the
+   * one-click "Request a new reset link" CTA in the failure card.
+   * Returns true on success so callers can update UI state.
+   */
+  const sendResetLink = async (rawEmail: string): Promise<boolean> => {
+    const email = rawEmail.trim();
+    if (!isValidEmail(email)) {
+      toast.error("Enter a valid email address to receive a new link.");
+      focusResendInput();
+      return false;
     }
     const toastId = "reset-resend";
     toast.loading("Sending a new reset link…", { id: toastId });
@@ -225,10 +232,35 @@ const ResetPasswordPage = () => {
     setResending(false);
     if (resendErr) {
       toast.error(resendErr.message || "Could not send reset link.", { id: toastId });
-      return;
+      return false;
     }
     setResentTo(email);
+    // Clear the current failure state so the user sees a clean "sent" confirmation
+    // instead of the same red failure card.
+    setLinkFailure(null);
     toast.success("If that email exists, a new reset link is on its way.", { id: toastId });
+    return true;
+  };
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendResetLink(resendEmail);
+  };
+
+  /**
+   * One-click handler for the failure card CTA. If the email field already
+   * has a valid value, send immediately. Otherwise focus the field so the
+   * user can type one in, then send.
+   */
+  const handleRequestNewLink = async () => {
+    if (isValidEmail(resendEmail)) {
+      await sendResetLink(resendEmail);
+      return;
+    }
+    focusResendInput();
+    toast.info("Enter your email below and we'll send a fresh link.", {
+      id: "reset-resend",
+    });
   };
 
   useEffect(() => {
