@@ -31,6 +31,10 @@ const SignUpPage = () => {
     agree: false,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [pwTouched, setPwTouched] = useState(false);
+
+  const passwordPolicy = evaluatePasswordPolicy(form.password);
 
   useEffect(() => {
     if (selectedPlan) localStorage.setItem("selected_plan", selectedPlan);
@@ -42,6 +46,24 @@ const SignUpPage = () => {
     e.preventDefault();
     if (!form.agree) {
       toast({ title: "Please accept the terms to continue", variant: "destructive" });
+      return;
+    }
+    setPwTouched(true);
+    if (passwordPolicy.isCommonWeak) {
+      toast({
+        title: "Choose a stronger password",
+        description: "This password is too common — please pick something less guessable.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!passwordPolicy.allRulesPassed) {
+      const failed = passwordPolicy.rules.find((r) => !r.passed);
+      toast({
+        title: "Password doesn't meet all requirements",
+        description: failed ? `Missing: ${failed.label.toLowerCase()}.` : undefined,
+        variant: "destructive",
+      });
       return;
     }
     setSubmitting(true);
