@@ -1,6 +1,9 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
+import { evaluatePasswordPolicy } from "@/lib/passwordPolicy";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
