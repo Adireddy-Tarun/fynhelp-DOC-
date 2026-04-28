@@ -373,24 +373,17 @@ export default function ProductsPage() {
               aria-label="Close"
               style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", fontSize: 20 }}
             >×</button>
-            <h3 className="font-serif text-xl text-fyn-ink mb-2">Sign in to explore {authModal}</h3>
+            <h3 className="font-serif text-xl text-fyn-ink mb-2">Join the waitlist to explore {authModal}</h3>
             <p className="text-fyn-ink/60 text-sm mb-6">
-              FynHelp's {authModal} module is available free for 15 days. Sign in or create your account to start.
+              FynHelp's {authModal} module is launching soon. Join the waitlist — first 100 founders get 6 months free.
             </p>
             <div className="space-y-3">
-              <button
-                onClick={() => { setAuthModal(null); navigate("/waitlist"); }}
-                className="w-full py-3 rounded-lg border border-fyn-ink text-fyn-ink font-medium hover:bg-fyn-ink hover:text-white"
-                style={{ transition: "all 250ms" }}
-              >
-                Sign In
-              </button>
               <button
                 onClick={() => { setAuthModal(null); navigate("/waitlist"); }}
                 className="w-full py-3 rounded-lg bg-fyn-red text-white font-semibold hover:opacity-90"
                 style={{ transition: "all 250ms" }}
               >
-                Start Free Trial
+                Join the Waitlist →
               </button>
             </div>
           </div>
