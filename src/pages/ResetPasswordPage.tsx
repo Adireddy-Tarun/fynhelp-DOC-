@@ -245,6 +245,11 @@ const ResetPasswordPage = () => {
       if (ok) {
         setValidSession(true);
         toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
+        reportAuthLinkEvent({
+          reason: "verified",
+          source: "supabase",
+          flow: "password_recovery",
+        });
         return;
       }
       const reason = failure?.reason ?? "invalid";
@@ -257,6 +262,13 @@ const ResetPasswordPage = () => {
           : "This reset link is invalid or has expired.",
         { id: verifyToastId }
       );
+      reportAuthLinkEvent({
+        reason,
+        source: failure?.source ?? "url",
+        flow: "password_recovery",
+        errorCode: failure?.code,
+        description: failure?.description,
+      });
       // Clear the noisy hash/query so a refresh doesn't re-trigger toasts.
       try {
         window.history.replaceState(null, "", window.location.pathname);
