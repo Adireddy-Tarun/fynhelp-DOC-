@@ -157,7 +157,9 @@ const ResetPasswordPage = () => {
       <div className="bg-fyn-ink p-12 flex flex-col justify-center">
         <FynLogo variant="light" />
         <h2 className="text-white font-serif text-3xl mt-8 mb-4">Set a new password.</h2>
-        <p className="text-white/60">Choose something strong — at least 8 characters.</p>
+        <p className="text-white/60">
+          Use at least 10 characters with a mix of upper- and lowercase letters, a number, and a symbol.
+        </p>
       </div>
 
       <div className="bg-fyn-beige p-12 flex flex-col justify-center">
@@ -179,25 +181,126 @@ const ResetPasswordPage = () => {
           </div>
         ) : (
           <form className="space-y-4 max-w-md" onSubmit={handleSubmit} noValidate>
+            {/* New password */}
             <div>
-              <label className="text-sm mb-1 block text-secondary-foreground">New password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
-              />
+              <label htmlFor="reset-pw" className="text-sm mb-1 block text-secondary-foreground">
+                New password
+              </label>
+              <div className="relative">
+                <input
+                  id="reset-pw"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onBlur={() => setPwTouched(true)}
+                  placeholder="At least 10 characters"
+                  aria-describedby="reset-pw-rules reset-pw-strength"
+                  aria-invalid={pwTouched && (!allRulesPassed || isCommonWeak)}
+                  className="w-full h-[42px] px-4 pr-11 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-secondary-foreground hover:text-fyn-ink"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Strength meter */}
+              {password && (
+                <div id="reset-pw-strength" className="mt-2" aria-live="polite">
+                  <div className="flex gap-1" aria-hidden="true">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          i <= strength.score ? strength.color : "bg-fyn-ink/10"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-1 text-xs text-secondary-foreground">
+                    Strength:{" "}
+                    <span
+                      className={`font-medium ${
+                        strength.score >= 3
+                          ? "text-emerald-700"
+                          : strength.score === 2
+                          ? "text-fyn-gold"
+                          : "text-fyn-red"
+                      }`}
+                    >
+                      {strength.label}
+                    </span>
+                    {isCommonWeak && (
+                      <span className="text-fyn-red"> — this is a commonly used password.</span>
+                    )}
+                  </p>
+                </div>
+              )}
+
+              {/* Live checklist */}
+              <ul id="reset-pw-rules" className="mt-3 space-y-1">
+                {ruleResults.map((r) => (
+                  <li
+                    key={r.key}
+                    className={`flex items-center gap-2 text-xs ${
+                      r.passed
+                        ? "text-emerald-700"
+                        : pwTouched
+                        ? "text-fyn-red"
+                        : "text-secondary-foreground"
+                    }`}
+                  >
+                    {r.passed ? (
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" />
+                    ) : (
+                      <X className="w-3.5 h-3.5 flex-shrink-0 opacity-70" />
+                    )}
+                    <span>{r.label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
+
+            {/* Confirm password */}
             <div>
-              <label className="text-sm mb-1 block text-secondary-foreground">Confirm new password</label>
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                placeholder="Re-enter password"
-                className="w-full h-[42px] px-4 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
-              />
+              <label htmlFor="reset-confirm" className="text-sm mb-1 block text-secondary-foreground">
+                Confirm new password
+              </label>
+              <div className="relative">
+                <input
+                  id="reset-confirm"
+                  type={showConfirm ? "text" : "password"}
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  onBlur={() => setConfirmTouched(true)}
+                  placeholder="Re-enter password"
+                  aria-invalid={confirmTouched && confirm.length > 0 && !passwordsMatch}
+                  aria-describedby="reset-confirm-hint"
+                  className="w-full h-[42px] px-4 pr-11 bg-fyn-beige border border-fyn-ink-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red text-secondary-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-secondary-foreground hover:text-fyn-ink"
+                  aria-label={showConfirm ? "Hide password" : "Show password"}
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {confirmTouched && confirm.length > 0 && !passwordsMatch && (
+                <p id="reset-confirm-hint" className="mt-1 text-xs text-fyn-red">
+                  Passwords do not match.
+                </p>
+              )}
+              {confirm.length > 0 && passwordsMatch && (
+                <p id="reset-confirm-hint" className="mt-1 text-xs text-emerald-700 inline-flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" /> Passwords match
+                </p>
+              )}
             </div>
 
             {error && (
@@ -208,8 +311,8 @@ const ResetPasswordPage = () => {
 
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60"
+              disabled={!canSubmit}
+              className="w-full bg-fyn-red text-white py-3 rounded-lg font-medium text-base hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting ? "Updating…" : "Update password"}
             </button>
