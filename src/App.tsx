@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
-import WaitlistGuard from "@/components/WaitlistGuard";
 import Index from "./pages/Index.tsx";
 import SolutionsPage from "./pages/SolutionsPage.tsx";
 import ProductsPage from "./pages/ProductsPage.tsx";
@@ -14,7 +13,10 @@ import BlogArticlePage from "./pages/BlogArticlePage.tsx";
 import ResourcesPage from "./pages/ResourcesPage.tsx";
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
-import EarlyAccessPage from "./pages/EarlyAccessPage.tsx";
+import SignUpPage from "./pages/SignUpPage.tsx";
+import SignInPage from "./pages/SignInPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
@@ -41,7 +43,6 @@ import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
 import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
-import OnboardingPage from "./pages/OnboardingPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
 import SecurityPage from "./pages/dashboard/settings/SecurityPage.tsx";
@@ -78,102 +79,89 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CAAuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <WaitlistGuard>
-              <Routes>
-                {/* Public pre-launch routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/product" element={<ProductsPage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/early-access" element={<EarlyAccessPage />} />
-
-                {/* Marketing extras (kept) */}
-                <Route path="/solutions" element={<SolutionsPage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogArticlePage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-                <Route path="/community" element={<CommunityPage />} />
-                <Route path="/about" element={<AboutPage />} />
-
-                {/* Blocked routes — guard redirects to /early-access. Defined so the redirect runs cleanly. */}
-                <Route path="/onboarding" element={<OnboardingPage />} />
-                <Route path="/dashboard/cockpit" element={<CockpitPage />} />
-                <Route path="/dashboard/360" element={<Dashboard360Page />} />
-                <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
-                <Route path="/dashboard/runway" element={<RunwayPage />} />
-                <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
-                <Route path="/dashboard/payables" element={<PayablesPage />} />
-                <Route path="/dashboard/simulator" element={<SimulatorPage />} />
-                <Route path="/dashboard/gst" element={<GSTPage />} />
-                <Route path="/dashboard/tds-tax" element={<TDSTaxPage />} />
-                <Route path="/dashboard/hr" element={<HRPage />} />
-                <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
-                <Route path="/dashboard/nidhi" element={<NidhiChatPage />} />
-                <Route path="/dashboard/reports" element={<CFOReportsPage />} />
-                <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
-                <Route path="/dashboard/vendors" element={<VendorsPage />} />
-                <Route path="/dashboard/customers" element={<CustomersPage />} />
-                <Route path="/dashboard/cost" element={<CostPage />} />
-                <Route path="/dashboard/compliance" element={<CompliancePage />} />
-                <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
-                <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
-                <Route path="/dashboard/working-capital" element={<WorkingCapitalPage />} />
-                <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
-                <Route path="/dashboard/banking" element={<BankingPage />} />
-                <Route path="/dashboard/data-import" element={<DataImportPage />} />
-                <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
-                <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
-                <Route path="/dashboard/settings" element={<SettingsPage />}>
-                  <Route index element={null} />
-                  <Route path="profile" element={<ProfilePage />} />
-                  <Route path="security" element={<SecurityPage />} />
-                  <Route path="notifications" element={<NotificationsPage />} />
-                  <Route path="billing" element={<BillingPage />} />
-                  <Route path="integrations" element={<IntegrationsPage />} />
-                  <Route path="business" element={<BusinessProfilePage />} />
-                  <Route path="team" element={<TeamAccessPage />} />
-                  <Route path="ca-access" element={<CAAccessPage />} />
-                </Route>
-
-                {/* CA Partner Portal (kept; separate audience) */}
-                <Route path="/ca/login" element={<CALoginPage />} />
-                <Route path="/ca/register" element={<CARegisterPage />} />
-                <Route path="/ca" element={<CALayout />}>
-                  <Route path="dashboard" element={<CADashboardPage />} />
-                  <Route path="clients" element={<CAClientsPage />} />
-                  <Route path="clients/add" element={<CAAddClientPage />} />
-                  <Route path="client/:id" element={<CAClientDetailPage />} />
-                  <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
-                  <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
-                  <Route path="tds-tracker" element={<CATdsTrackerPage />} />
-                  <Route path="compliance" element={<CACompliancePage />} />
-                  <Route path="itc-recon" element={<CAItcReconPage />} />
-                  <Route path="reports" element={<CAReportsPage />} />
-                  <Route path="bulk-actions" element={<CABulkActionsPage />} />
-                  <Route path="portfolio-health" element={<CAPortfolioHealthPage />} />
-                  <Route path="revenue" element={<CARevenuePage />} />
-                  <Route path="notifications" element={<CANotificationsPage />} />
-                  <Route path="settings" element={<CASettingsPage />} />
-                  <Route path="settings/team" element={<CASettingsPage />} />
-                  <Route path="settings/notifications" element={<CASettingsPage />} />
-                  <Route path="settings/defaults" element={<CASettingsPage />} />
-                  <Route path="settings/billing" element={<CASettingsPage />} />
-                </Route>
-
-                {/* Legacy auth routes — guard redirects to /early-access */}
-                <Route path="/signin" element={<EarlyAccessPage />} />
-                <Route path="/signup" element={<EarlyAccessPage />} />
-                <Route path="/reset-password" element={<EarlyAccessPage />} />
-
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </WaitlistGuard>
-          </BrowserRouter>
-        </TooltipProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogArticlePage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/dashboard/cockpit" element={<CockpitPage />} />
+            <Route path="/dashboard/360" element={<Dashboard360Page />} />
+            <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
+            <Route path="/dashboard/runway" element={<RunwayPage />} />
+            <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
+            <Route path="/dashboard/payables" element={<PayablesPage />} />
+            <Route path="/dashboard/simulator" element={<SimulatorPage />} />
+            <Route path="/dashboard/gst" element={<GSTPage />} />
+            <Route path="/dashboard/tds-tax" element={<TDSTaxPage />} />
+            <Route path="/dashboard/hr" element={<HRPage />} />
+            <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
+            <Route path="/dashboard/nidhi" element={<NidhiChatPage />} />
+            <Route path="/dashboard/reports" element={<CFOReportsPage />} />
+            <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
+            <Route path="/dashboard/vendors" element={<VendorsPage />} />
+            <Route path="/dashboard/customers" element={<CustomersPage />} />
+            <Route path="/dashboard/cost" element={<CostPage />} />
+            <Route path="/dashboard/compliance" element={<CompliancePage />} />
+            <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
+            <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
+            <Route path="/dashboard/working-capital" element={<WorkingCapitalPage />} />
+            <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
+            <Route path="/dashboard/banking" element={<BankingPage />} />
+            <Route path="/dashboard/data-import" element={<DataImportPage />} />
+            <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
+            <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />}>
+              <Route index element={null} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="security" element={<SecurityPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="billing" element={<BillingPage />} />
+              <Route path="integrations" element={<IntegrationsPage />} />
+              <Route path="business" element={<BusinessProfilePage />} />
+              <Route path="team" element={<TeamAccessPage />} />
+              <Route path="ca-access" element={<CAAccessPage />} />
+            </Route>
+            {/* CA Partner Portal */}
+            <Route path="/ca/login" element={<CALoginPage />} />
+            <Route path="/ca/register" element={<CARegisterPage />} />
+            <Route path="/ca" element={<CALayout />}>
+              <Route path="dashboard" element={<CADashboardPage />} />
+              <Route path="clients" element={<CAClientsPage />} />
+              <Route path="clients/add" element={<CAAddClientPage />} />
+              <Route path="client/:id" element={<CAClientDetailPage />} />
+              <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
+              <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
+              <Route path="tds-tracker" element={<CATdsTrackerPage />} />
+              <Route path="compliance" element={<CACompliancePage />} />
+              <Route path="itc-recon" element={<CAItcReconPage />} />
+              <Route path="reports" element={<CAReportsPage />} />
+              <Route path="bulk-actions" element={<CABulkActionsPage />} />
+              <Route path="portfolio-health" element={<CAPortfolioHealthPage />} />
+              <Route path="revenue" element={<CARevenuePage />} />
+              <Route path="notifications" element={<CANotificationsPage />} />
+              <Route path="settings" element={<CASettingsPage />} />
+              <Route path="settings/team" element={<CASettingsPage />} />
+              <Route path="settings/notifications" element={<CASettingsPage />} />
+              <Route path="settings/defaults" element={<CASettingsPage />} />
+              <Route path="settings/billing" element={<CASettingsPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
       </CAAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
