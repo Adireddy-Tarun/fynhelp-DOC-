@@ -5,7 +5,7 @@ const corsHeaders = {
 };
 import { z } from "npm:zod@3.23.8";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+const RESEND_API_URL = "https://api.resend.com";
 
 const BodySchema = z.object({
   name: z.string().min(1).max(150),
@@ -109,18 +109,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
     if (!RESEND_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "RESEND_API_KEY is not configured. Connect Resend to enable welcome emails." }),
+        JSON.stringify({ error: "RESEND_API_KEY is not configured." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -137,12 +130,11 @@ Deno.serve(async (req) => {
     const { name, email, position } = parsed.data;
     const { subject, text, html } = buildEmail(name, position);
 
-    const response = await fetch(`${GATEWAY_URL}/emails`, {
+    const response = await fetch(`${RESEND_API_URL}/emails`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": RESEND_API_KEY,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: "Tarun & Nidhi <onboarding@resend.dev>",
