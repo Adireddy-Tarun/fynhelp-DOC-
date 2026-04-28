@@ -171,7 +171,7 @@ function EcosystemMap() {
           const sy = oy + uy * OUTER_R;
           const ex = CENTER - ux * CENTER_R;
           const ey = CENTER - uy * CENTER_R;
-          const isHovered = hoveredNode === n.id;
+          const isActive = activeNode === n.id;
           return (
             <line
               key={`${n.id}-line`}
