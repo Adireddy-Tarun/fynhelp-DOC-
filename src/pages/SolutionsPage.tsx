@@ -52,10 +52,14 @@ const solutions = [
 
 function EcosystemMap() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [pinnedNode, setPinnedNode] = useState<string | null>(null);
   const [visible, setVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Pinned wins over hover, so a tap holds the highlight on touch devices
+  const activeNode = pinnedNode ?? hoveredNode;
 
   // Pause animations when off-screen for perf
   useEffect(() => {
@@ -69,12 +73,35 @@ function EcosystemMap() {
     return () => obs.disconnect();
   }, []);
 
-  const handleNodeClick = (node: typeof nodes[0]) => {
+  // Dismiss pinned node when tapping/clicking outside the diagram
+  useEffect(() => {
+    if (!pinnedNode) return;
+    const handler = (e: MouseEvent | TouchEvent) => {
+      const el = containerRef.current;
+      if (el && e.target instanceof Node && !el.contains(e.target)) {
+        setPinnedNode(null);
+        setHoveredNode(null);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, [pinnedNode]);
+
+  const navigateToNode = (node: typeof nodes[0]) => {
     if (!user) {
       navigate(`/waitlist?return=${node.slug}`);
     } else {
       navigate(node.slug);
     }
+  };
+
+  const handleNodeTap = (node: typeof nodes[0]) => {
+    // Tap toggles the pinned highlight + tooltip; navigation happens via the tooltip link.
+    setPinnedNode((prev) => (prev === node.id ? null : node.id));
   };
 
   // Geometry — viewBox 700x700, center (350,350), outer radius 280, center r 60, outer r 40
