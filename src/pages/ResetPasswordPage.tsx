@@ -125,17 +125,46 @@ const ResetPasswordPage = () => {
 
   useEffect(() => {
     const verifyToastId = "reset-verify";
-    toast.loading("Verifying your reset link…", { id: verifyToastId });
     let resolved = false;
 
-    const resolve = (ok: boolean) => {
+    // 1) Detect explicit failure info in the URL first (Supabase appends
+    //    error_code=otp_expired etc. when the recovery link is bad).
+    const urlFailure = parseLinkFailure();
+    if (urlFailure) {
+      setLinkFailure(urlFailure.reason);
+      setReady(true);
+      resolved = true;
+      toast.error(
+        urlFailure.reason === "expired"
+          ? "This reset link has expired."
+          : "This reset link is invalid.",
+        { id: verifyToastId }
+      );
+      // Clear the noisy hash/query so a refresh doesn't re-trigger the same toast.
+      try {
+        window.history.replaceState(null, "", window.location.pathname);
+      } catch {
+        /* no-op */
+      }
+      return;
+    }
+
+    toast.loading("Verifying your reset link…", { id: verifyToastId });
+
+    const resolve = (ok: boolean, reason: LinkFailureReason = "invalid") => {
       if (resolved) return;
       resolved = true;
       setReady(true);
       if (ok) {
         toast.success("Reset link verified. Choose a new password.", { id: verifyToastId });
       } else {
-        toast.error("This reset link is invalid or has expired.", { id: verifyToastId });
+        setLinkFailure(reason);
+        toast.error(
+          reason === "expired"
+            ? "This reset link has expired."
+            : "This reset link is invalid or has expired.",
+          { id: verifyToastId }
+        );
       }
     };
 
