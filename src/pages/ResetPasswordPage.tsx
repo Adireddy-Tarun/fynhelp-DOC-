@@ -356,21 +356,23 @@ const ResetPasswordPage = () => {
                   </button>
                 </form>
 
-            {resentTo && (
-              <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
-                If an account exists for{" "}
-                <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
-              </p>
-            )}
+                {resentTo && (
+                  <p className="text-fyn-ink-60" style={{ fontSize: "var(--fyn-type-tiny)" }}>
+                    If an account exists for{" "}
+                    <span className="font-medium text-fyn-ink">{resentTo}</span>, a new reset link has been sent. Check your inbox and spam folder.
+                  </p>
+                )}
 
-            <button
-              onClick={() => navigate("/signin")}
-              className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
-              style={{ fontSize: "var(--fyn-type-small)" }}
-            >
-              Back to sign in
-            </button>
-          </div>
+                <button
+                  onClick={() => navigate("/signin")}
+                  className="text-fyn-ink-60 hover:text-fyn-ink underline underline-offset-2 transition-colors"
+                  style={{ fontSize: "var(--fyn-type-small)" }}
+                >
+                  Back to sign in
+                </button>
+              </div>
+            );
+          })()
         ) : (
           <form className="space-y-4 max-w-md" onSubmit={handleSubmit} noValidate>
             {/* New password */}
