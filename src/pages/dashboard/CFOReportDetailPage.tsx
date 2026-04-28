@@ -227,7 +227,7 @@ const CFOReportDetailPage = () => {
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="flex items-center gap-2">
+<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <input
                 ref={fallbackInputRef}
                 id="share-url-fallback"
@@ -248,7 +248,7 @@ const CFOReportDetailPage = () => {
                     setTimeout(() => setCopied(false), 2000);
                   }
                 }}
-                className="inline-flex items-center gap-1 bg-fyn-ink text-white px-2.5 py-1.5 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
+                className="inline-flex items-center justify-center gap-1 bg-fyn-ink text-white px-2.5 py-1.5 rounded text-xs font-medium hover:opacity-90 transition shrink-0"
               >
                 <Copy className="w-3 h-3" />
                 Copy URL
