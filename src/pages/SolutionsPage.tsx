@@ -3,16 +3,19 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 
-const nodes = [
-  { id: "liquidity", label: "Liquidity", angle: 0, slug: "/dashboard/cash-flow", title: "Real-time cash runway, burn rate, and working capital intelligence. Updated every 6 hours.", dashSlug: "cash-flow" },
-  { id: "revenue", label: "Revenue", angle: 45, slug: "/dashboard/receivables", title: "Receivables AI, default prediction, and automated collections. Know who won't pay before they don't.", dashSlug: "receivables" },
-  { id: "gst", label: "GST", angle: 90, slug: "/dashboard/gst", title: "ITC reconciliation, notice risk scoring, vendor compliance. Protect ₹3.2L average annual ITC loss.", dashSlug: "gst" },
-  { id: "governance", label: "Governance", angle: 135, slug: "/dashboard/cockpit", title: "50+ compliance obligations tracked. ROC, FEMA, MCA — nothing falls through the cracks.", dashSlug: "cockpit" },
-  { id: "hr", label: "HR", angle: 180, slug: "/dashboard/hr", title: "Hiring forecast, payroll cash planning, attrition risk. Know when you can afford to grow.", dashSlug: "hr" },
-  { id: "simulator", label: "Simulator", angle: 225, slug: "/dashboard/simulator", title: "8 what-if scenarios. Credit terms, hiring, pricing, capex — modelled against your live data.", dashSlug: "simulator" },
-  { id: "market", label: "Market", angle: 270, slug: "/dashboard/360", title: "Industry benchmarks, credit rating simulation, fundraise readiness. Know where you stand.", dashSlug: "360" },
-  { id: "banking", label: "Banking", angle: 315, slug: "/dashboard/cockpit", title: "Multi-bank aggregation via RBI AA framework. All accounts, one intelligent view.", dashSlug: "cockpit" },
-];
+import { SUITES } from "@/data/suiteStatus";
+
+// Ecosystem nodes derived from the shared suite registry.
+// 10 modules around AI CFO Nidhi at the center.
+const nodes = SUITES.map((s, i) => ({
+  id: s.id,
+  label: s.shortLabel,
+  angle: (360 / SUITES.length) * i, // evenly distributed around the circle
+  slug: s.href,
+  title: s.description,
+  status: s.status,
+  quarter: s.quarter,
+}));
 
 const solutions = [
   {
