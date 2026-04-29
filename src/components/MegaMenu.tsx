@@ -100,9 +100,9 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
             <ColHeader>Intelligence Suites</ColHeader>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
               {intelligenceModules.map((m) => (
-                <li key={m.slug}>
+                <li key={m.name}>
                   <Link
-                    to={`/solutions#${m.slug}`}
+                    to={m.to}
                     onClick={onClose}
                     role="menuitem"
                     className="mega-row"
