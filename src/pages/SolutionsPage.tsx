@@ -415,7 +415,7 @@ const SolutionsPage = () => {
 
       {/* Solution deep dives */}
       {solutions.map((s) => (
-        <section key={s.title} className={`${s.bg} fyn-section`}>
+        <section key={s.title} id={s.slug} className={`${s.bg} fyn-section scroll-mt-24`}>
           <div className="fyn-container max-w-3xl font-bold">
             <h2 className={`text-3xl ${s.text} mb-4`}>{s.title}</h2>
             <p className={`${s.sub} mb-6 leading-relaxed`}>{s.problem}</p>
