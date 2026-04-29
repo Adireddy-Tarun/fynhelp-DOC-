@@ -283,7 +283,7 @@ export default function AdminResourcesPage() {
         {loading ? (
           <FynLoading rows={4} />
         ) : rows.length === 0 ? (
-          <FynEmpty title="No resources yet" body="Create your first downloadable template." />
+          <FynEmpty title="No resources yet" description="Create your first downloadable template." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-md">
             {rows.map((row) => (
