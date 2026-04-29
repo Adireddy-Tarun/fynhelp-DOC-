@@ -3,12 +3,12 @@ import { useEffect, useRef } from "react";
 import { MessageSquare, Calculator, Users, Landmark } from "lucide-react";
 
 const intelligenceModules = [
-  { name: "Liquidity Intelligence", desc: "Know your runway before you run out", slug: "liquidity" },
-  { name: "Revenue Intelligence", desc: "Track MRR, ARR, and customer cohorts", slug: "revenue" },
-  { name: "Cost Intelligence", desc: "Optimize vendor spend and expenses", slug: "cost" },
-  { name: "GST & Tax Intelligence", desc: "Never miss deadlines, avoid penalties", slug: "gst-tax" },
-  { name: "Governance Intelligence", desc: "Board ready reports and audit trails", slug: "governance" },
-  { name: "HR & Workforce Intelligence", desc: "Payroll analytics and headcount ROI", slug: "hr-workforce" },
+  { name: "Liquidity Intelligence", desc: "Know your runway before you run out", to: "/solutions#cash-liquidity" },
+  { name: "Revenue Intelligence", desc: "Track MRR, ARR, and customer cohorts", to: "/solutions#collections-revenue" },
+  { name: "Cost Intelligence", desc: "Optimize vendor spend and expenses", to: "/dashboard/cost" },
+  { name: "GST & Tax Intelligence", desc: "Never miss deadlines, avoid penalties", to: "/solutions#gst-compliance" },
+  { name: "Governance Intelligence", desc: "Board ready reports and audit trails", to: "/dashboard/cockpit" },
+  { name: "HR & Workforce Intelligence", desc: "Payroll analytics and headcount ROI", to: "/dashboard/hr" },
 ];
 
 const businessTypes = [
@@ -100,9 +100,9 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
             <ColHeader>Intelligence Suites</ColHeader>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
               {intelligenceModules.map((m) => (
-                <li key={m.slug}>
+                <li key={m.name}>
                   <Link
-                    to={`/solutions#${m.slug}`}
+                    to={m.to}
                     onClick={onClose}
                     role="menuitem"
                     className="mega-row"

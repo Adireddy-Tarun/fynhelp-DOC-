@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -355,6 +355,19 @@ function EcosystemMap() {
 const SolutionsPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Smooth-scroll to anchored section when arriving via /solutions#slug
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    // Defer to next tick so the section is mounted
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [location.hash, location.key]);
 
   const handleLearnMore = (dashSlug: string) => {
     if (!user) {
@@ -415,7 +428,7 @@ const SolutionsPage = () => {
 
       {/* Solution deep dives */}
       {solutions.map((s) => (
-        <section key={s.title} className={`${s.bg} fyn-section`}>
+        <section key={s.title} id={s.slug} className={`${s.bg} fyn-section scroll-mt-24`}>
           <div className="fyn-container max-w-3xl font-bold">
             <h2 className={`text-3xl ${s.text} mb-4`}>{s.title}</h2>
             <p className={`${s.sub} mb-6 leading-relaxed`}>{s.problem}</p>
