@@ -1,7 +1,10 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { SUITES, type SuiteMeta } from "@/data/suiteStatus";
+import SuiteStatusBadge from "@/components/SuiteStatusBadge";
+import NotifyMeModal from "@/components/NotifyMeModal";
 
 interface Module {
   name: string;
