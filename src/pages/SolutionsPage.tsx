@@ -250,6 +250,7 @@ function EcosystemMap() {
           const x = CENTER + RADIUS * Math.cos(rad);
           const y = CENTER + RADIUS * Math.sin(rad);
           const isActive = activeNode === n.id;
+          const isComingSoon = n.status === "coming_soon";
           return (
             <g
               key={n.id}
@@ -259,13 +260,19 @@ function EcosystemMap() {
                 e.stopPropagation();
                 handleNodeTap(n);
               }}
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                opacity: isComingSoon && !isActive ? 0.6 : 1,
+                filter: isComingSoon && !isActive ? "blur(0.6px)" : "none",
+                transition: "opacity 250ms ease, filter 250ms ease",
+              }}
             >
               <circle
                 cx={x} cy={y} r={OUTER_R}
                 fill={isActive ? "#FFFFFF" : "#F5F1E8"}
-                stroke={isActive ? "#C41E1E" : "rgba(26,16,8,0.18)"}
+                stroke={isActive ? "#C41E1E" : isComingSoon ? "#9CA3AF" : "rgba(26,16,8,0.18)"}
                 strokeWidth={2}
+                strokeDasharray={isComingSoon && !isActive ? "3 3" : undefined}
                 style={{
                   filter: "drop-shadow(0 4px 10px rgba(26,16,8,0.10))",
                   transform: isActive ? "scale(1.1)" : "scale(1)",
@@ -274,13 +281,23 @@ function EcosystemMap() {
                 }}
               />
               <text
-                x={x} y={y + 5} textAnchor="middle"
+                x={x} y={isComingSoon ? y + 1 : y + 5} textAnchor="middle"
                 fill={isActive ? "#C41E1E" : "#2A2A2A"}
-                fontSize="14" fontWeight="500"
+                fontSize="13" fontWeight="500"
                 style={{ pointerEvents: "none", fontFamily: "'Inter', sans-serif", transition: "fill 250ms ease" }}
               >
                 {n.label}
               </text>
+              {isComingSoon && (
+                <text
+                  x={x} y={y + 14} textAnchor="middle"
+                  fill="#6B7280"
+                  fontSize="8" fontWeight="600"
+                  style={{ pointerEvents: "none", fontFamily: "'Inter', sans-serif", letterSpacing: "0.06em", textTransform: "uppercase" }}
+                >
+                  In Development
+                </text>
+              )}
             </g>
           );
         })}
