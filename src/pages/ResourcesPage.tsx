@@ -13,14 +13,14 @@ const guides = [
 ];
 
 const templates = [
-  { id: "gst-reconciliation", title: "GST ITC Reconciliation Tracker", format: "Excel", desc: "Track GSTR-2B vs purchase register. Columns: Vendor, GSTIN, Invoice, Amount, ITC, Match status." },
-  { id: "cash-flow", title: "Cash Flow Projection Workbook", format: "Excel", desc: "12-month projection in ₹ Indian format with DSO/DPO impact modeling and seasonal adjustments." },
-  { id: "receivables-aging", title: "Receivables Aging Register", format: "Excel", desc: "Customer master + invoice tracker with auto-calculated 0-30, 31-60, 61-90, 90+ aging buckets." },
-  { id: "vendor-gst", title: "Vendor GST Compliance Checklist", format: "PDF", desc: "10-point checklist for onboarding new vendors. Includes GSTIN validation, filing history review." },
-  { id: "msme-letter", title: "MSME Rights Demand Letter", format: "Word", desc: "Legally worded demand letter under Section 43B(h) with variable fields for buyer name, invoices, amounts." },
-  { id: "advance-tax", title: "Advance Tax Calculation Workbook", format: "Excel", desc: "Calculates each installment (Jun/Sep/Dec/Mar) with YTD inputs and TDS offsets." },
-  { id: "cfo-report", title: "Monthly CFO Report Template", format: "Word", desc: "12-page template: Executive Summary, Cash, Revenue, GST, Compliance, Risk, Next Month Outlook." },
-  { id: "board-meeting", title: "Board Meeting Financial Update", format: "PPT", desc: "10-slide quarterly deck: Health Score, Runway, Revenue vs Budget, Risk Register, Outlook." },
+  { id: "gst-reconciliation", title: "GSTR-2B Reconciliation Tracker", format: "Excel", desc: "Track GSTR-2B vs purchase register. Columns: Vendor, GSTIN, Invoice, Amount, ITC, Match status.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/1_GSTR2B_Reconciliation_Tracker.xlsx" },
+  { id: "cash-flow", title: "Cash Flow Projection Workbook", format: "Excel", desc: "12-month projection in ₹ Indian format with DSO/DPO impact modeling and seasonal adjustments.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/2_Cash_Flow_Projection_Workbook.xlsx" },
+  { id: "receivables-aging", title: "Receivables Aging Register", format: "Excel", desc: "Customer master + invoice tracker with auto-calculated 0-30, 31-60, 61-90, 90+ aging buckets.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/3_Receivables_Aging_Register.xlsx" },
+  { id: "vendor-gst", title: "Vendor GST Compliance Checklist", format: "PDF", desc: "10-point checklist for onboarding new vendors. Includes GSTIN validation, filing history review.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/4_Vendor_GST_Compliance_Checklist.pdf" },
+  { id: "msme-letter", title: "MSME Rights Demand Letter", format: "Word", desc: "Legally worded demand letter under Section 43B(h) with variable fields for buyer name, invoices, amounts.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/5_MSME_Rights_Demand_Letter.docx" },
+  { id: "advance-tax", title: "Advance Tax Calculation Workbook", format: "Excel", desc: "Calculates each installment (Jun/Sep/Dec/Mar) with YTD inputs and TDS offsets.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/6_Advance_Tax_Calculation_Workbook.xlsx" },
+  { id: "cfo-report", title: "Monthly CFO Report Template", format: "Word", desc: "12-page template: Executive Summary, Cash, Revenue, GST, Compliance, Risk, Next Month Outlook.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/7_Monthly_CFO_Report_Template.docx" },
+  { id: "board-meeting", title: "Board Meeting Financial Update", format: "PPT", desc: "10-slide quarterly deck: Health Score, Runway, Revenue vs Budget, Risk Register, Outlook.", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/8_Board_Meeting_Financial_Update.pptx" },
 ];
 
 const videos = [
@@ -184,11 +184,15 @@ const ResourcesPage = () => {
                     </div>
                     <h3 className="text-fyn-ink font-semibold text-sm mb-2">{t.title}</h3>
                     <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.desc}</p>
-                    {/* BACKEND: GET /api/resources/download?file=[template-id] 
-                         Returns pre-signed Supabase Storage URL */}
-                    <button className="w-full py-2 rounded-lg bg-fyn-ink text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                    <a
+                      href={t.url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-2 rounded-lg bg-fyn-ink text-white text-sm font-medium hover:opacity-90 transition-opacity text-center"
+                    >
                       Download {t.format}
-                    </button>
+                    </a>
                   </div>
                 ))}
               </div>
