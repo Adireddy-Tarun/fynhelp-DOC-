@@ -215,11 +215,30 @@ export default function ProductsPage() {
       <section className="bg-muted" style={{ padding: "48px 0" }}>
         <div className="fyn-container text-center font-serif">
           <h1 className="font-serif text-5xl text-primary" style={{ fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>
-            50+ modules. One AI connecting everything.
+            10 Intelligence Suites. One AI connecting everything.
           </h1>
           <p className="text-secondary-foreground font-sans" style={{ fontSize: 18, maxWidth: 720, margin: "0 auto", lineHeight: 1.7 }}>
-            FynHelp's intelligence modules are not independent features — they are interconnected systems that feed a single intelligence engine: AI CFO Nidhi. Every module's output is an input into AI CFO Nidhi's reasoning.
+            Liquidity Intelligence is live today. Nine additional suites are in active development through 2027 — each one engineered to feed AI CFO Nidhi.
           </p>
+        </div>
+      </section>
+
+      {/* 10 Intelligence Suites grid */}
+      <section style={{ background: "#F9F7F4", paddingBlock: 64 }}>
+        <div className="fyn-container">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {SUITES.map((suite) => (
+              <SuiteCard key={suite.id} suite={suite} onNotify={openNotify} />
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              to="/roadmap"
+              className="inline-flex items-center gap-2 text-fyn-red font-semibold text-sm hover:underline"
+            >
+              See full product roadmap →
+            </Link>
+          </div>
         </div>
       </section>
 
