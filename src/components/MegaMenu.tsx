@@ -29,9 +29,11 @@ const platformFeatures = [
 interface MegaMenuProps {
   open: boolean;
   onClose: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-export default function MegaMenu({ open, onClose }: MegaMenuProps) {
+export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: MegaMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
