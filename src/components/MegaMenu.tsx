@@ -29,9 +29,11 @@ const platformFeatures = [
 interface MegaMenuProps {
   open: boolean;
   onClose: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-export default function MegaMenu({ open, onClose }: MegaMenuProps) {
+export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: MegaMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +64,8 @@ export default function MegaMenu({ open, onClose }: MegaMenuProps) {
         zIndex: 1000,
         pointerEvents: open ? "auto" : "none",
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       aria-hidden={!open}
       role="menu"
       aria-label="Products menu"
