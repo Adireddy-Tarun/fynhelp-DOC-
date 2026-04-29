@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const downloadHref = (id: string) =>
+  `${SUPABASE_URL}/functions/v1/download-resource?id=${encodeURIComponent(id)}`;
+
 const tabs = ["Getting Started", "Templates & Downloads", "Financial Glossary"];
 
 const guides = [
