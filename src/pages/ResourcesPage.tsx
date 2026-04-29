@@ -82,6 +82,16 @@ const ResourcesPage = () => {
   const [videoModalOpen, setVideoModalOpen] = useState<string | null>(null);
   const [glossarySearch, setGlossarySearch] = useState("");
   const [expandedGuide, setExpandedGuide] = useState<number | null>(null);
+  const [templates, setTemplates] = useState<TemplateRow[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("resources")
+      .select("id, title, description, format, icon_url")
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => setTemplates(data ?? []));
+  }, []);
 
   const filteredGlossary = glossarySearch.trim()
     ? glossary.filter((g) => g.term.toLowerCase().includes(glossarySearch.toLowerCase()) || g.definition.toLowerCase().includes(glossarySearch.toLowerCase()))
