@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const downloadHref = (id: string) =>
+  `${SUPABASE_URL}/functions/v1/download-resource?id=${encodeURIComponent(id)}`;
+
 const tabs = ["Getting Started", "Templates & Downloads", "Financial Glossary"];
 
 const guides = [
@@ -187,9 +191,8 @@ const ResourcesPage = () => {
                     <h3 className="text-fyn-ink font-semibold text-sm mb-2">{t.title}</h3>
                     <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.desc}</p>
                     <a
-                      href={t.url}
+                      href={downloadHref(t.id)}
                       download
-                      target="_blank"
                       rel="noopener noreferrer"
                       className="block w-full py-2 rounded-lg bg-fyn-ink text-white text-sm font-medium hover:opacity-90 transition-opacity text-center"
                     >
