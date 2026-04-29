@@ -51,6 +51,7 @@ import IntegrationsPage from "./pages/dashboard/settings/IntegrationsPage.tsx";
 import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.tsx";
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
+import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
@@ -121,6 +122,7 @@ const App = () => (
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
+            <Route path="/admin/resources" element={<AdminResourcesPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />

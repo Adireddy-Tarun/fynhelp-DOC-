@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
+import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const downloadHref = (id: string) =>
   `${SUPABASE_URL}/functions/v1/download-resource?id=${encodeURIComponent(id)}`;
+
+type TemplateRow = {
+  id: string;
+  title: string;
+  description: string;
+  format: string;
+  icon_url: string | null;
+};
 
 const tabs = ["Getting Started", "Templates & Downloads", "Financial Glossary"];
 
@@ -16,16 +25,7 @@ const guides = [
   { step: "Week 2", title: "Running your first simulation", time: "15 minutes", content: "Go to Decision Simulator → Select 'Hiring Impact'. Enter: headcount (2), average CTC (₹8L/year), expected revenue per hire (₹2L/month). See: months to breakeven, burn rate increase, runway impact. Save and share with your CA for review." },
 ];
 
-const templates = [
-  { id: "gst-reconciliation", title: "GSTR-2B Reconciliation Tracker", format: "Excel", desc: "Track GSTR-2B vs purchase register. Columns: Vendor, GSTIN, Invoice, Amount, ITC, Match status.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_1_gstr2b.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/1_GSTR2B_Reconciliation_Tracker.xlsx" },
-  { id: "cash-flow", title: "Cash Flow Projection Workbook", format: "Excel", desc: "12-month projection in ₹ Indian format with DSO/DPO impact modeling and seasonal adjustments.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_2_cashflow.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/2_Cash_Flow_Projection_Workbook.xlsx" },
-  { id: "receivables-aging", title: "Receivables Aging Register", format: "Excel", desc: "Customer master + invoice tracker with auto-calculated 0-30, 31-60, 61-90, 90+ aging buckets.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_3_receivables.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/3_Receivables_Aging_Register.xlsx" },
-  { id: "vendor-gst", title: "Vendor GST Compliance Checklist", format: "PDF", desc: "10-point checklist for onboarding new vendors. Includes GSTIN validation, filing history review.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_4_compliance.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/4_Vendor_GST_Compliance_Checklist.pdf" },
-  { id: "msme-letter", title: "MSME Rights Demand Letter", format: "Word", desc: "Legally worded demand letter under Section 43B(h) with variable fields for buyer name, invoices, amounts.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_5_demand.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/5_MSME_Rights_Demand_Letter.docx" },
-  { id: "advance-tax", title: "Advance Tax Calculation Workbook", format: "Excel", desc: "Calculates each installment (Jun/Sep/Dec/Mar) with YTD inputs and TDS offsets.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_6_tax.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/6_Advance_Tax_Calculation_Workbook.xlsx" },
-  { id: "cfo-report", title: "Monthly CFO Report Template", format: "Word", desc: "12-page template: Executive Summary, Cash, Revenue, GST, Compliance, Risk, Next Month Outlook.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_7_cfo.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/7_Monthly_CFO_Report_Template.docx" },
-  { id: "board-meeting", title: "Board Meeting Financial Update", format: "PPT", desc: "10-slide quarterly deck: Health Score, Runway, Revenue vs Budget, Risk Register, Outlook.", icon: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/icon_8_board.svg", url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/8_Board_Meeting_Financial_Update.pptx" },
-];
+// Templates are loaded from the `resources` table at runtime.
 
 const videos = [
   { title: "How AI CFO Nidhi's morning brief works", dur: "4 min" },
@@ -82,6 +82,16 @@ const ResourcesPage = () => {
   const [videoModalOpen, setVideoModalOpen] = useState<string | null>(null);
   const [glossarySearch, setGlossarySearch] = useState("");
   const [expandedGuide, setExpandedGuide] = useState<number | null>(null);
+  const [templates, setTemplates] = useState<TemplateRow[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("resources")
+      .select("id, title, description, format, icon_url")
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => setTemplates(data ?? []));
+  }, []);
 
   const filteredGlossary = glossarySearch.trim()
     ? glossary.filter((g) => g.term.toLowerCase().includes(glossarySearch.toLowerCase()) || g.definition.toLowerCase().includes(glossarySearch.toLowerCase()))
@@ -182,14 +192,14 @@ const ResourcesPage = () => {
                     {/* Template icon */}
                     <div className="bg-fyn-beige-dark rounded-lg h-24 flex items-center justify-center mb-4">
                       <img
-                        src={t.icon}
+                        src={t.icon_url ?? "/placeholder.svg"}
                         alt={`${t.title} icon`}
                         className="w-16 h-16"
                         loading="lazy"
                       />
                     </div>
                     <h3 className="text-fyn-ink font-semibold text-sm mb-2">{t.title}</h3>
-                    <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.desc}</p>
+                    <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.description}</p>
                     <a
                       href={downloadHref(t.id)}
                       download
