@@ -175,12 +175,14 @@ const ResourcesPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {templates.map((t) => (
                   <div key={t.id} className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-5 hover:shadow-md transition-shadow">
-                    {/* Preview thumbnail */}
+                    {/* Template icon */}
                     <div className="bg-fyn-beige-dark rounded-lg h-24 flex items-center justify-center mb-4">
-                      <div className="text-center">
-                        <span className="text-3xl">{t.format === "Excel" ? "📊" : t.format === "PDF" ? "📄" : t.format === "Word" ? "📝" : "📑"}</span>
-                        <p className="text-fyn-ink/30 text-[10px] mt-1">{t.format}</p>
-                      </div>
+                      <img
+                        src={t.icon}
+                        alt={`${t.title} icon`}
+                        className="w-16 h-16"
+                        loading="lazy"
+                      />
                     </div>
                     <h3 className="text-fyn-ink font-semibold text-sm mb-2">{t.title}</h3>
                     <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.desc}</p>
