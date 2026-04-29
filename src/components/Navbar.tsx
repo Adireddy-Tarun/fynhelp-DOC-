@@ -56,7 +56,6 @@ const Navbar = () => {
         ref={navRef}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navBg}`}
         style={{ height: 72 }}
-        onMouseLeave={handleMegaLeave}
       >
         <div className="fyn-container h-full flex items-center justify-between">
           <Link to="/" className="hover:opacity-85 transition-opacity">
@@ -70,6 +69,7 @@ const Navbar = () => {
                 key={l.href}
                 className="relative"
                 onMouseEnter={l.hasMega ? handleMegaEnter : undefined}
+                onMouseLeave={l.hasMega ? handleMegaLeave : undefined}
               >
                 <Link
                   to={l.href}
@@ -108,6 +108,8 @@ const Navbar = () => {
         <MegaMenu
           open={megaOpen}
           onClose={() => setMegaOpen(false)}
+          onMouseEnter={handleMegaEnter}
+          onMouseLeave={handleMegaLeave}
         />
       </nav>
 
