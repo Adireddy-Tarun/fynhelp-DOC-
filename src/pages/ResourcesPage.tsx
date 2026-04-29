@@ -192,14 +192,14 @@ const ResourcesPage = () => {
                     {/* Template icon */}
                     <div className="bg-fyn-beige-dark rounded-lg h-24 flex items-center justify-center mb-4">
                       <img
-                        src={t.icon}
+                        src={t.icon_url ?? "/placeholder.svg"}
                         alt={`${t.title} icon`}
                         className="w-16 h-16"
                         loading="lazy"
                       />
                     </div>
                     <h3 className="text-fyn-ink font-semibold text-sm mb-2">{t.title}</h3>
-                    <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.desc}</p>
+                    <p className="text-fyn-ink/60 text-xs leading-relaxed mb-4">{t.description}</p>
                     <a
                       href={downloadHref(t.id)}
                       download
