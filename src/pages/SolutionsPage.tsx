@@ -355,6 +355,19 @@ function EcosystemMap() {
 const SolutionsPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Smooth-scroll to anchored section when arriving via /solutions#slug
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    // Defer to next tick so the section is mounted
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [location.hash, location.key]);
 
   const handleLearnMore = (dashSlug: string) => {
     if (!user) {
