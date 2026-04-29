@@ -64,6 +64,8 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
         zIndex: 1000,
         pointerEvents: open ? "auto" : "none",
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       aria-hidden={!open}
       role="menu"
       aria-label="Products menu"
