@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { MessageSquare, Calculator, Users, Landmark } from "lucide-react";
+import { SUITES } from "@/data/suiteStatus";
 
-const intelligenceModules = [
-  { name: "Liquidity Intelligence", desc: "Know your runway before you run out", to: "/solutions#cash-liquidity" },
-  { name: "Revenue Intelligence", desc: "Track MRR, ARR, and customer cohorts", to: "/solutions#collections-revenue" },
-  { name: "Cost Intelligence", desc: "Optimize vendor spend and expenses", to: "/dashboard/cost" },
-  { name: "GST & Tax Intelligence", desc: "Never miss deadlines, avoid penalties", to: "/solutions#gst-compliance" },
-  { name: "Governance Intelligence", desc: "Board ready reports and audit trails", to: "/dashboard/cockpit" },
-  { name: "HR & Workforce Intelligence", desc: "Payroll analytics and headcount ROI", to: "/dashboard/hr" },
-];
+const intelligenceModules = SUITES.map((s) => ({
+  name: s.name,
+  desc: s.description,
+  to: s.href,
+  status: s.status,
+}));
 
 const businessTypes = [
   { name: "D2C & E-commerce", slug: "d2c-ecommerce" },
