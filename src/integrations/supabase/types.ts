@@ -679,6 +679,30 @@ export type Database = {
         }
         Relationships: []
       }
+      early_access_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          requested_module: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          requested_module: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          requested_module?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           created_at: string

@@ -168,6 +168,19 @@ function LeftColumn() {
         predicts your risks, and tells you exactly what to do — in your language, every morning.
       </p>
 
+      {/* 10 Intelligence Suites callout */}
+      <p
+        className="animate-fade-in"
+        style={{
+          animationDelay: "380ms", animationFillMode: "both",
+          fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14,
+          color: "rgba(255,255,255,0.85)", marginTop: 20,
+        }}
+      >
+        <span style={{ color: "#FFFFFF", fontWeight: 700 }}>10 Intelligence Suites</span>
+        <span style={{ color: "rgba(255,255,255,0.55)" }}> · Liquidity Intelligence available now. 9 additional suites in active development.</span>
+      </p>
+
       {/* CTAs */}
       <div
         className="flex flex-col sm:flex-row items-center justify-center animate-fade-in"

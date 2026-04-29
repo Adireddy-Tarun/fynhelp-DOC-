@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { MessageSquare, Calculator, Users, Landmark } from "lucide-react";
+import { SUITES } from "@/data/suiteStatus";
 
-const intelligenceModules = [
-  { name: "Liquidity Intelligence", desc: "Know your runway before you run out", to: "/solutions#cash-liquidity" },
-  { name: "Revenue Intelligence", desc: "Track MRR, ARR, and customer cohorts", to: "/solutions#collections-revenue" },
-  { name: "Cost Intelligence", desc: "Optimize vendor spend and expenses", to: "/dashboard/cost" },
-  { name: "GST & Tax Intelligence", desc: "Never miss deadlines, avoid penalties", to: "/solutions#gst-compliance" },
-  { name: "Governance Intelligence", desc: "Board ready reports and audit trails", to: "/dashboard/cockpit" },
-  { name: "HR & Workforce Intelligence", desc: "Payroll analytics and headcount ROI", to: "/dashboard/hr" },
-];
+const intelligenceModules = SUITES.map((s) => ({
+  name: s.name,
+  desc: s.description,
+  to: s.href,
+  status: s.status,
+}));
 
 const businessTypes = [
   { name: "D2C & E-commerce", slug: "d2c-ecommerce" },
@@ -98,32 +97,51 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
           {/* Column 1 — Intelligence Modules */}
           <div>
             <ColHeader>Intelligence Suites</ColHeader>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-              {intelligenceModules.map((m) => (
-                <li key={m.name}>
-                  <Link
-                    to={m.to}
-                    onClick={onClose}
-                    role="menuitem"
-                    className="mega-row"
-                    style={{
-                      display: "block",
-                      padding: "10px 12px",
-                      borderRadius: 6,
-                      textDecoration: "none",
-                      transition: "background 200ms ease, padding-left 200ms ease",
-                      minHeight: 44,
-                    }}
-                  >
-                    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 16, lineHeight: 1.5, color: "#1A1A1A", margin: 0 }}>
-                      {m.name}
-                    </p>
-                    <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, lineHeight: 1.5, color: "#666666", margin: 0, marginTop: 2 }}>
-                      {m.desc}
-                    </p>
-                  </Link>
-                </li>
-              ))}
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+              {intelligenceModules.map((m) => {
+                const isLive = m.status === "live";
+                return (
+                  <li key={m.name}>
+                    <Link
+                      to={m.to}
+                      onClick={onClose}
+                      role="menuitem"
+                      className="mega-row"
+                      style={{
+                        display: "block",
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        textDecoration: "none",
+                        transition: "background 200ms ease, padding-left 200ms ease",
+                        minHeight: 40,
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, lineHeight: 1.4, color: "#1A1A1A", margin: 0, flex: 1 }}>
+                          {m.name}
+                        </p>
+                        <span
+                          style={{
+                            fontFamily: "'Inter', sans-serif",
+                            fontWeight: 600,
+                            fontSize: 9,
+                            letterSpacing: "0.04em",
+                            color: "#FFFFFF",
+                            backgroundColor: isLive ? "#10B981" : "#6B7280",
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            textTransform: "uppercase",
+                            whiteSpace: "nowrap",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isLive ? "Live" : "Soon"}
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

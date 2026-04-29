@@ -1,7 +1,10 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { SUITES, type SuiteMeta } from "@/data/suiteStatus";
+import SuiteStatusBadge from "@/components/SuiteStatusBadge";
+import NotifyMeModal from "@/components/NotifyMeModal";
 
 interface Module {
   name: string;
@@ -164,8 +167,15 @@ export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [authModal, setAuthModal] = useState<string | null>(null);
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifySuiteId, setNotifySuiteId] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const openNotify = (id: string) => {
+    setNotifySuiteId(id);
+    setNotifyOpen(true);
+  };
 
   const filteredSuites = useMemo(() => {
     let result = activeFilter === "all" ? suites : suites.filter((s) => s.id === activeFilter);
@@ -205,11 +215,30 @@ export default function ProductsPage() {
       <section className="bg-muted" style={{ padding: "48px 0" }}>
         <div className="fyn-container text-center font-serif">
           <h1 className="font-serif text-5xl text-primary" style={{ fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>
-            50+ modules. One AI connecting everything.
+            10 Intelligence Suites. One AI connecting everything.
           </h1>
           <p className="text-secondary-foreground font-sans" style={{ fontSize: 18, maxWidth: 720, margin: "0 auto", lineHeight: 1.7 }}>
-            FynHelp's intelligence modules are not independent features — they are interconnected systems that feed a single intelligence engine: AI CFO Nidhi. Every module's output is an input into AI CFO Nidhi's reasoning.
+            Liquidity Intelligence is live today. Nine additional suites are in active development through 2027 — each one engineered to feed AI CFO Nidhi.
           </p>
+        </div>
+      </section>
+
+      {/* 10 Intelligence Suites grid */}
+      <section style={{ background: "#F9F7F4", paddingBlock: 64 }}>
+        <div className="fyn-container">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {SUITES.map((suite) => (
+              <SuiteCard key={suite.id} suite={suite} onNotify={openNotify} />
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              to="/roadmap"
+              className="inline-flex items-center gap-2 text-fyn-red font-semibold text-sm hover:underline"
+            >
+              See full product roadmap →
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -389,6 +418,119 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+
+      <NotifyMeModal
+        open={notifyOpen}
+        initialModuleId={notifySuiteId}
+        onClose={() => setNotifyOpen(false)}
+      />
     </Layout>
   );
 }
+
+/* ── Suite card used in the 10-suite grid ── */
+function SuiteCard({
+  suite,
+  onNotify,
+}: {
+  suite: SuiteMeta;
+  onNotify: (id: string) => void;
+}) {
+  const Icon = suite.Icon;
+  const isLive = suite.status === "live";
+
+  if (isLive) {
+    return (
+      <Link
+        to={suite.href}
+        className="group block bg-fyn-beige-card rounded-lg p-5 transition-all"
+        style={{
+          border: "1px solid #E5E7EB",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.borderColor = "#C41E1E";
+          (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 20px rgba(196,30,30,0.10)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.borderColor = "#E5E7EB";
+          (e.currentTarget as HTMLElement).style.boxShadow = "";
+        }}
+      >
+        <div className="flex items-start justify-between mb-3">
+          <div
+            className="w-10 h-10 rounded-md flex items-center justify-center"
+            style={{ background: "rgba(196,30,30,0.10)" }}
+          >
+            <Icon size={20} color="#C41E1E" />
+          </div>
+          <SuiteStatusBadge status="live" />
+        </div>
+        <h3 className="font-serif text-fyn-ink mb-1.5" style={{ fontSize: 16, fontWeight: 700 }}>
+          {suite.name}
+        </h3>
+        <p className="text-[12.5px] text-fyn-ink/70 leading-relaxed">{suite.description}</p>
+      </Link>
+    );
+  }
+
+  // Coming soon: under-construction styling
+  return (
+    <div
+      className="relative rounded-lg p-5 overflow-hidden"
+      style={{
+        border: "1px dashed #E5E7EB",
+        background: "#FBFAF6",
+        backgroundImage:
+          "repeating-linear-gradient(45deg, transparent 0, transparent 10px, rgba(249,247,244,0.3) 10px, rgba(249,247,244,0.3) 20px)",
+        cursor: "not-allowed",
+      }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+        style={{
+          transform: "rotate(-15deg)",
+          fontSize: 22,
+          letterSpacing: "0.25em",
+          textTransform: "uppercase",
+          color: "#9CA3AF",
+          opacity: 0.1,
+          fontWeight: 700,
+        }}
+      >
+        In Development
+      </span>
+      <div className="relative" style={{ opacity: 0.6 }}>
+        <div className="flex items-start justify-between mb-3">
+          <div
+            className="w-10 h-10 rounded-md flex items-center justify-center"
+            style={{ background: "rgba(107,114,128,0.10)" }}
+          >
+            <Icon size={20} color="#6B7280" />
+          </div>
+          <SuiteStatusBadge status="coming_soon" />
+        </div>
+        <h3 className="font-serif text-fyn-ink mb-1.5" style={{ fontSize: 16, fontWeight: 700 }}>
+          {suite.name}
+        </h3>
+        <p className="text-[12.5px] text-fyn-ink/70 leading-relaxed mb-3">{suite.description}</p>
+        <p className="text-[10.5px] uppercase tracking-wider text-fyn-ink/50 mb-3">
+          Launching {suite.quarter}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onNotify(suite.id);
+        }}
+        className="relative w-full py-2 rounded-md bg-fyn-ink text-white text-xs font-medium hover:opacity-90"
+        style={{ cursor: "pointer", transition: "opacity 200ms" }}
+      >
+        Notify me at launch
+      </button>
+    </div>
+  );
+}
+
