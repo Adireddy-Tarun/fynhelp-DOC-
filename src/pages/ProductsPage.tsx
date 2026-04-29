@@ -167,8 +167,15 @@ export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [authModal, setAuthModal] = useState<string | null>(null);
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifySuiteId, setNotifySuiteId] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const openNotify = (id: string) => {
+    setNotifySuiteId(id);
+    setNotifyOpen(true);
+  };
 
   const filteredSuites = useMemo(() => {
     let result = activeFilter === "all" ? suites : suites.filter((s) => s.id === activeFilter);
