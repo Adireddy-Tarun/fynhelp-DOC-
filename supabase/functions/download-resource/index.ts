@@ -8,6 +8,7 @@
 //   GET /functions/v1/download-resource?url=<allowlisted-url>&filename=foo.xlsx
 
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
 
 type Resource = {
   url: string;
@@ -15,54 +16,22 @@ type Resource = {
   contentType: string;
 };
 
-// Curated registry. Keep IDs stable — the frontend uses them.
-const RESOURCES: Record<string, Resource> = {
-  "gst-reconciliation": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/1_GSTR2B_Reconciliation_Tracker.xlsx",
-    filename: "GSTR2B_Reconciliation_Tracker.xlsx",
-    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  },
-  "cash-flow": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/2_Cash_Flow_Projection_Workbook.xlsx",
-    filename: "Cash_Flow_Projection_Workbook.xlsx",
-    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  },
-  "receivables-aging": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/3_Receivables_Aging_Register.xlsx",
-    filename: "Receivables_Aging_Register.xlsx",
-    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  },
-  "vendor-gst": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/4_Vendor_GST_Compliance_Checklist.pdf",
-    filename: "Vendor_GST_Compliance_Checklist.pdf",
-    contentType: "application/pdf",
-  },
-  "msme-letter": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/5_MSME_Rights_Demand_Letter.docx",
-    filename: "MSME_Rights_Demand_Letter.docx",
-    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  },
-  "advance-tax": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/6_Advance_Tax_Calculation_Workbook.xlsx",
-    filename: "Advance_Tax_Calculation_Workbook.xlsx",
-    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  },
-  "cfo-report": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/7_Monthly_CFO_Report_Template.docx",
-    filename: "Monthly_CFO_Report_Template.docx",
-    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  },
-  "board-meeting": {
-    url: "https://wiknwxniwqvsxgyzqqxu.supabase.co/storage/v1/object/public/fynhelp-resources/8_Board_Meeting_Financial_Update.pptx",
-    filename: "Board_Meeting_Financial_Update.pptx",
-    contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  },
-};
-
 const ALLOWED_HOSTS = new Set<string>([
   "wiknwxniwqvsxgyzqqxu.supabase.co",
   "ukmtzflxtcoqnwujvrqh.supabase.co",
 ]);
+
+const EXT_TO_MIME: Record<string, string> = {
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  xls: "application/vnd.ms-excel",
+  pdf: "application/pdf",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  doc: "application/msword",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ppt: "application/vnd.ms-powerpoint",
+  csv: "text/csv",
+  zip: "application/zip",
+};
 
 function jsonError(status: number, message: string) {
   return new Response(JSON.stringify({ error: message }), {
@@ -72,9 +41,32 @@ function jsonError(status: number, message: string) {
 }
 
 function sanitizeFilename(name: string): string {
-  // Strip path separators and quotes; keep it simple & safe for headers.
-  const cleaned = name.replace(/[\\\r\n\"\\\/]/g, "_").trim();
+  const cleaned = name.replace(/[\\\r\n\"\/]/g, "_").trim();
   return cleaned.length > 0 && cleaned.length <= 200 ? cleaned : "download";
+}
+
+function inferContentType(filename: string): string {
+  const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+  return EXT_TO_MIME[ext] ?? "application/octet-stream";
+}
+
+async function lookupResourceById(id: string): Promise<Resource | null> {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { data, error } = await supabase
+    .from("resources")
+    .select("file_url, title")
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data?.file_url) return null;
+  const filename = (data.file_url.split("/").pop() ?? "download").split("?")[0];
+  return {
+    url: data.file_url,
+    filename,
+    contentType: inferContentType(filename),
+  };
 }
 
 Deno.serve(async (req) => {
@@ -95,9 +87,17 @@ Deno.serve(async (req) => {
     let target: Resource | null = null;
 
     if (id) {
-      const found = RESOURCES[id];
-      if (!found) return jsonError(404, "Unknown resource id");
-      target = found;
+      target = await lookupResourceById(id);
+      if (!target) return jsonError(404, "Unknown resource id");
+      // Verify host
+      try {
+        const parsed = new URL(target.url);
+        if (parsed.protocol !== "https:" || !ALLOWED_HOSTS.has(parsed.hostname)) {
+          return jsonError(400, "Host not allowed");
+        }
+      } catch {
+        return jsonError(400, "Invalid stored url");
+      }
     } else if (rawUrl) {
       let parsed: URL;
       try {
@@ -113,15 +113,13 @@ Deno.serve(async (req) => {
       target = {
         url: parsed.toString(),
         filename: inferredName,
-        contentType: "application/octet-stream",
+        contentType: inferContentType(inferredName),
       };
     } else {
       return jsonError(400, "Missing id or url");
     }
 
-    const upstream = await fetch(target.url, {
-      headers: { Accept: "*/*" },
-    });
+    const upstream = await fetch(target.url, { headers: { Accept: "*/*" } });
 
     if (!upstream.ok || !upstream.body) {
       const text = await upstream.text().catch(() => "");
@@ -130,15 +128,14 @@ Deno.serve(async (req) => {
     }
 
     const filename = sanitizeFilename(filenameOverride ?? target.filename);
-    const contentType =
-      upstream.headers.get("content-type") ?? target.contentType;
+    const contentType = upstream.headers.get("content-type") ?? target.contentType;
     const contentLength = upstream.headers.get("content-length");
 
     const headers: Record<string, string> = {
       ...corsHeaders,
       "Content-Type": contentType,
       "Content-Disposition": `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      "Cache-Control": "public, max-age=300",
+      "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
     };
     if (contentLength) headers["Content-Length"] = contentLength;
