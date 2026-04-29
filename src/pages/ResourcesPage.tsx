@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
+import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const downloadHref = (id: string) =>
   `${SUPABASE_URL}/functions/v1/download-resource?id=${encodeURIComponent(id)}`;
+
+type TemplateRow = {
+  id: string;
+  title: string;
+  description: string;
+  format: string;
+  icon_url: string | null;
+};
 
 const tabs = ["Getting Started", "Templates & Downloads", "Financial Glossary"];
 
