@@ -1,124 +1,40 @@
-import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
-
-const messages = [
-  { role: "nidhi", text: "Good morning. Let me tell you about your business today.", delay: 500 },
-  { role: "nidhi", text: "Your cash runway is 52 days at ₹23,846 daily burn. That's 8 days less than last week — burn accelerated due to Diwali advance payments to suppliers.", delay: 1800 },
-];
-
-const suggestions = [
-  "Why did burn increase?",
-  "Show me my receivables",
-  "What should I do today?",
-];
-
-const followUp = {
-  role: "nidhi" as const,
-  text: "Three actions with highest impact:\n1. Chase ABC Electronics (₹8.4L, 62 days) — adds 15 days runway.\n2. File GSTR-3B before Apr 20 — ₹3.2L ITC at risk if delayed.\n3. Hold the 3 new hires until May — saves ₹5.25L burn next quarter.",
-};
-
-const TypingIndicator = () => (
-  <div className="flex gap-1.5 px-4 py-3">
-    {[0, 1, 2].map((i) => (
-      <div key={i} className="w-2 h-2 rounded-full bg-white/40 typing-dot" />
-    ))}
-  </div>
-);
-
-interface Msg { role: string; text: string }
+import { useState, useEffect } from "react";
 
 export default function HeroSection() {
-  const [displayedMsgs, setDisplayedMsgs] = useState<Msg[]>([]);
-  const [showTyping, setShowTyping] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showFollowUp, setShowFollowUp] = useState(false);
-  const [demoComplete, setDemoComplete] = useState(false);
-
-  const runDemo = useCallback(() => {
-    setDisplayedMsgs([]);
-    setShowTyping(false);
-    setShowSuggestions(false);
-    setShowFollowUp(false);
-    setDemoComplete(false);
-
-    let cumDelay = 0;
-    messages.forEach((msg, i) => {
-      cumDelay += msg.delay;
-      const typeDelay = cumDelay;
-      const showDelay = typeDelay + 600;
-
-      setTimeout(() => setShowTyping(true), typeDelay);
-      setTimeout(() => {
-        setShowTyping(false);
-        setDisplayedMsgs((prev) => [...prev, { role: msg.role, text: msg.text }]);
-        if (i === messages.length - 1) {
-          setTimeout(() => setShowSuggestions(true), 400);
-        }
-      }, showDelay);
-      cumDelay = showDelay;
-    });
-  }, []);
-
-  useEffect(() => { runDemo(); }, [runDemo]);
-
-  const handleSuggestion = (s: string) => {
-    if (s !== "What should I do today?") return;
-    setShowSuggestions(false);
-    setDisplayedMsgs((prev) => [...prev, { role: "user", text: s }]);
-    setTimeout(() => setShowTyping(true), 300);
-    setTimeout(() => {
-      setShowTyping(false);
-      setShowFollowUp(true);
-      setDemoComplete(true);
-    }, 1500);
-  };
-
   return (
     <section
-      className="relative overflow-hidden"
+      className="relative overflow-hidden flex items-center"
       style={{
         background: "#1A1008",
-        minHeight: 720,
+        minHeight: "100vh",
       }}
     >
       {/* Subtle radial glow */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139,105,20,0.08), transparent)"
-      }} />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(139,105,20,0.10), transparent)",
+        }}
+      />
 
       <div
-        className="relative"
-        style={{ zIndex: 10, maxWidth: 1200, margin: "0 auto", padding: "120px 24px 80px" }}
+        className="relative w-full"
+        style={{ zIndex: 10, maxWidth: 1280, margin: "0 auto", padding: "120px 24px 80px" }}
       >
-        <div className="flex flex-col items-center text-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <LeftColumn />
-          <div className="mt-12 w-full flex justify-center">
-            <RightColumn
-              displayedMsgs={displayedMsgs}
-              showTyping={showTyping}
-              showSuggestions={showSuggestions}
-              showFollowUp={showFollowUp}
-              demoComplete={demoComplete}
-              handleSuggestion={handleSuggestion}
-              runDemo={runDemo}
-            />
-          </div>
+          <NidhiShowcase />
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce" style={{ bottom: 32, color: "rgba(255,255,255,0.3)" }}>
-        <span style={{ fontSize: 12 }}>Explore FynHelp</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
       </div>
     </section>
   );
 }
 
-/* ── Left Column ── */
+/* ── Left Column (Copy) ── */
 function LeftColumn() {
   return (
-    <div style={{ maxWidth: 900, width: "100%", position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+    <div className="flex flex-col items-start text-left" style={{ position: "relative", zIndex: 10 }}>
       {/* Eyebrow pill */}
       <div
         className="inline-flex items-center gap-2 rounded-full animate-fade-in font-bold"
@@ -129,10 +45,16 @@ function LeftColumn() {
         }}
       >
         <span className="rounded-full pulse-ring" style={{ width: 6, height: 6, background: "#22C55E" }} />
-        <span style={{
-          fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 11,
-          letterSpacing: "0.1em", color: "#FFFFFF", textTransform: "uppercase" as const,
-        }}>
+        <span
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 500,
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            color: "#FFFFFF",
+            textTransform: "uppercase" as const,
+          }}
+        >
           India's Virtual CFO Platform
         </span>
       </div>
@@ -141,97 +63,91 @@ function LeftColumn() {
       <h1
         className="animate-fade-in"
         style={{
-          animationDelay: "150ms", animationFillMode: "both",
-          fontFamily: "'Playfair Display', Georgia, serif",
+          animationDelay: "150ms",
+          animationFillMode: "both",
           fontWeight: 700,
-          fontSize: "clamp(44px, 5vw, 68px)",
+          fontSize: "clamp(40px, 4.6vw, 64px)",
           lineHeight: 1.1,
           marginTop: 24,
           marginBottom: 0,
         }}
       >
-        <span className="font-sans" style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
-        <span className="font-sans" style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
-        <span className="font-sans" style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
+        <span style={{ display: "block", color: "#FFFFFF" }}>Every Indian SME</span>
+        <span style={{ display: "block", color: "#C41E1E" }}>deserves a CFO.</span>
+        <span style={{ display: "block", color: "#FFFFFF" }}>Now they have one.</span>
       </h1>
 
       {/* Subheadline */}
       <p
         className="animate-fade-in"
         style={{
-          animationDelay: "300ms", animationFillMode: "both",
-          fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 18,
-          color: "rgba(255,255,255,0.70)", lineHeight: 1.75, maxWidth: 700, marginTop: 24,
+          animationDelay: "300ms",
+          animationFillMode: "both",
+          fontFamily: "'Roboto', sans-serif",
+          fontWeight: 400,
+          fontSize: 18,
+          color: "rgba(255,255,255,0.72)",
+          lineHeight: 1.7,
+          maxWidth: 560,
+          marginTop: 24,
         }}
       >
-        Meet AI CFO Nidhi — the AI CFO built for Indian business. She monitors your cash, protects your GST,
-        predicts your risks, and tells you exactly what to do — in your language, every morning.
+        Meet AI CFO Nidhi — the AI CFO built for Indian business. She monitors your cash,
+        protects your GST, predicts your risks, and tells you exactly what to do — in your
+        language, every morning.
       </p>
 
       {/* 10 Intelligence Suites callout */}
       <p
         className="animate-fade-in"
         style={{
-          animationDelay: "380ms", animationFillMode: "both",
-          fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14,
-          color: "rgba(255,255,255,0.85)", marginTop: 20,
+          animationDelay: "380ms",
+          animationFillMode: "both",
+          fontFamily: "'Roboto', sans-serif",
+          fontWeight: 500,
+          fontSize: 14,
+          color: "rgba(255,255,255,0.85)",
+          marginTop: 22,
         }}
       >
         <span style={{ color: "#FFFFFF", fontWeight: 700 }}>10 Intelligence Suites</span>
-        <span style={{ color: "rgba(255,255,255,0.55)" }}> · Liquidity Intelligence available now. 9 additional suites in active development.</span>
-      </p>
-
-      {/* CTAs */}
-      <div
-        className="flex flex-col sm:flex-row items-center justify-center animate-fade-in"
-        style={{ gap: 16, marginTop: 36, animationDelay: "450ms", animationFillMode: "both" }}
-      >
-        <Link
-          to="/waitlist"
-          style={{
-            background: "#C41E1E", color: "#FFFFFF", padding: "14px 28px", borderRadius: 6,
-            fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 15,
-            border: "none", cursor: "pointer", display: "inline-block", textDecoration: "none",
-            transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)",
-          }}
-        >
-          Start Your 15-Day Free Trial →
-        </Link>
-        <button style={{
-          background: "transparent", color: "#FFFFFF",
-          border: "1.5px solid rgba(255,255,255,0.3)", padding: "14px 28px",
-          borderRadius: 6, fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 15,
-          cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8,
-          transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)",
-        }}>
-          Watch AI CFO Nidhi in action
-        </button>
-      </div>
-
-      {/* Trust line */}
-      <p
-        className="animate-fade-in"
-        style={{
-          animationDelay: "500ms", animationFillMode: "both",
-          fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
-          color: "rgba(255,255,255,0.40)", marginTop: 12,
-        }}
-      >
-        No credit card · Setup in 10 min · Works with All Accounting Softwares!
+        <span style={{ color: "rgba(255,255,255,0.55)" }}>
+          {" "}· Liquidity Intelligence available now. 9 additional suites in active development.
+        </span>
       </p>
 
       {/* Language pills */}
-      <div className="animate-fade-in" style={{ animationDelay: "600ms", animationFillMode: "both", marginTop: 28 }}>
-        <div className="flex flex-wrap items-center justify-center" style={{ gap: 8 }}>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.60)" }}>
+      <div
+        className="animate-fade-in"
+        style={{ animationDelay: "500ms", animationFillMode: "both", marginTop: 32 }}
+      >
+        <div className="flex flex-wrap items-center" style={{ gap: 8 }}>
+          <span
+            style={{
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 400,
+              fontSize: 13,
+              color: "rgba(255,255,255,0.60)",
+            }}
+          >
             AI CFO Nidhi speaks:
           </span>
-          {["हिंदी", "English", "ગુજરાતી", "தமிழ்", "मराठी"].map((lang) => (
-            <span key={lang} className="text-sm mx-[5px]" style={{
-              border: "1px solid rgba(139,105,20,0.3)", borderRadius: 100, padding: "4px 12px",
-              fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "#FFFFFF",
-              background: "rgba(139,105,20,0.08)",
-            }}>{lang}</span>
+          {["हिंदी", "English", "తెలుగు", "தமிழ்", "ಕನ್ನಡ"].map((lang) => (
+            <span
+              key={lang}
+              style={{
+                border: "1px solid rgba(139,105,20,0.3)",
+                borderRadius: 100,
+                padding: "4px 12px",
+                fontFamily: "'Work Sans', sans-serif",
+                fontWeight: 500,
+                fontSize: 12,
+                color: "#FFFFFF",
+                background: "rgba(139,105,20,0.08)",
+              }}
+            >
+              {lang}
+            </span>
           ))}
         </div>
       </div>
@@ -239,115 +155,434 @@ function LeftColumn() {
   );
 }
 
-/* ── Right Column (AI CFO Nidhi mockup) ── */
-interface RightColumnProps {
-  displayedMsgs: Msg[];
-  showTyping: boolean;
-  showSuggestions: boolean;
-  showFollowUp: boolean;
-  demoComplete: boolean;
-  handleSuggestion: (s: string) => void;
-  runDemo: () => void;
-  mobile?: boolean;
-}
+/* ── Right Column: Meet Your AI CFO Showcase ── */
+function NidhiShowcase() {
+  const [step, setStep] = useState(0);
 
-function RightColumn({ displayedMsgs, showTyping, showSuggestions, showFollowUp, demoComplete, handleSuggestion, runDemo, mobile }: RightColumnProps) {
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 800),
+      setTimeout(() => setStep(2), 2000),
+      setTimeout(() => setStep(3), 3400),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const metrics = [
+    { label: "Cash today", value: "₹12.4L", color: "#1A6B3C", trend: "+₹1.2L" },
+    { label: "Runway", value: "52 days", color: "#8B5A00", trend: "−8d" },
+    { label: "ITC at risk", value: "₹3.2L", color: "#C41E1E", trend: "Apr 20" },
+  ];
+
   return (
     <div
-      className="liquid-float"
+      className="liquid-float animate-fade-in"
       style={{
-        position: "relative", zIndex: 10,
-        maxWidth: 560, width: "100%", margin: "0 auto",
+        animationDelay: "200ms",
+        animationFillMode: "both",
+        position: "relative",
+        zIndex: 10,
+        width: "100%",
       }}
     >
-      <div className="shadow-2xl" style={{
-        background: "hsl(24 53% 7%)", border: "1px solid rgba(255,255,255,0.10)",
-        borderRadius: 12, overflow: "hidden",
-      }}>
-        {/* Title bar */}
-        <div className="flex items-center gap-2" style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(196,30,30,0.6)" }} />
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(139,90,0,0.6)" }} />
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "rgba(26,107,60,0.6)" }} />
-          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginLeft: 8, fontFamily: "'Inter', sans-serif" }}>FynHelp · AI CFO Nidhi Cockpit</span>
+      {/* Outer glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(196,30,30,0.18), transparent 70%)",
+          filter: "blur(40px)",
+          transform: "scale(1.05)",
+        }}
+      />
+
+      {/* Eyebrow label */}
+      <div
+        className="flex items-center gap-2 mb-3"
+        style={{ position: "relative" }}
+      >
+        <span
+          style={{
+            fontFamily: "'Work Sans', sans-serif",
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "rgba(196,30,30,0.95)",
+          }}
+        >
+          ◆ Meet Your AI CFO
+        </span>
+      </div>
+
+      <div
+        className="shadow-2xl relative"
+        style={{
+          background: "linear-gradient(180deg, #1F1610 0%, #15100A 100%)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          borderRadius: 16,
+          overflow: "hidden",
+          boxShadow:
+            "0 30px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,30,30,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
+        }}
+      >
+        {/* Top bar with persona */}
+        <div
+          className="flex items-center justify-between"
+          style={{
+            padding: "16px 20px",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            background:
+              "linear-gradient(180deg, rgba(196,30,30,0.08) 0%, transparent 100%)",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {/* Nidhi avatar */}
+            <div
+              className="flex items-center justify-center relative"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background:
+                  "linear-gradient(135deg, #C41E1E 0%, #8B1414 100%)",
+                boxShadow: "0 0 0 2px rgba(196,30,30,0.25), 0 0 20px rgba(196,30,30,0.4)",
+              }}
+            >
+              <span
+                style={{
+                  color: "#FFFFFF",
+                  fontFamily: "'Oswald', sans-serif",
+                  fontWeight: 700,
+                  fontSize: 18,
+                }}
+              >
+                N
+              </span>
+              <span
+                className="pulse-ring absolute"
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: "#22C55E",
+                  border: "2px solid #1F1610",
+                  bottom: -2,
+                  right: -2,
+                }}
+              />
+            </div>
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Oswald', sans-serif",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#FFFFFF",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                AI CFO Nidhi
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Roboto', sans-serif",
+                  fontSize: 11,
+                  color: "rgba(34,197,94,0.9)",
+                  fontWeight: 500,
+                }}
+              >
+                Online · Analyzing your books
+              </div>
+            </div>
+          </div>
+          <div
+            style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "rgba(255,255,255,0.35)",
+            }}
+          >
+            FynHelp Cockpit
+          </div>
         </div>
 
-        {/* Mini metrics */}
-        <div className="grid grid-cols-3 gap-2 p-3">
-          {[
-            { label: "Cash today", value: "₹12.4L", color: "hsl(150 60% 26%)" },
-            { label: "Runway", value: "52 days", color: "hsl(38 100% 27%)" },
-            { label: "ITC at risk", value: "₹3.2L", color: "hsl(0 73% 44%)" },
-          ].map((m) => (
-            <div key={m.label} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 12 }}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: m.color }} />
-                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 10 }}>{m.label}</span>
+        {/* Metrics dashboard background */}
+        <div className="grid grid-cols-3 gap-2" style={{ padding: "14px 14px 8px" }}>
+          {metrics.map((m, i) => (
+            <div
+              key={m.label}
+              className="animate-fade-in"
+              style={{
+                animationDelay: `${400 + i * 120}ms`,
+                animationFillMode: "both",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 10,
+                padding: "12px 14px",
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: m.color,
+                  }}
+                />
+                <span
+                  style={{
+                    color: "rgba(255,255,255,0.45)",
+                    fontFamily: "'Work Sans', sans-serif",
+                    fontSize: 10,
+                    fontWeight: 500,
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {m.label}
+                </span>
               </div>
-              <p className="fyn-metric" style={{ color: "#FFFFFF", fontSize: 18 }}>{m.value}</p>
+              <div className="flex items-baseline justify-between">
+                <span
+                  style={{
+                    color: "#FFFFFF",
+                    fontFamily: "'Oswald', sans-serif",
+                    fontSize: 20,
+                    fontWeight: 600,
+                  }}
+                >
+                  {m.value}
+                </span>
+                <span
+                  style={{
+                    color: m.color,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    fontWeight: 600,
+                  }}
+                >
+                  {m.trend}
+                </span>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Chat */}
-        <div className="space-y-2" style={{ padding: "0 12px 12px", minHeight: 220 }}>
-          {displayedMsgs.map((msg, i) => (
-            <div key={i} className={`slide-up-bounce ${msg.role === "user" ? "ml-8" : ""}`}>
-              <div style={{
-                borderRadius: 8, padding: 12, fontSize: 13,
-                background: msg.role === "user" ? "rgba(196,30,30,0.08)" : "rgba(255,255,255,0.05)"
-              }}>
-                {msg.role === "nidhi" && (
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="flex items-center justify-center" style={{ width: 20, height: 20, borderRadius: "50%", background: "#C41E1E" }}>
-                      <span style={{ color: "#FFFFFF", fontSize: 9, fontWeight: 700 }}>N</span>
-                    </div>
-                    <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>AI CFO Nidhi</span>
+        {/* Conversation */}
+        <div
+          className="space-y-2"
+          style={{ padding: "8px 16px 18px", minHeight: 280 }}
+        >
+          {/* User question */}
+          {step >= 1 && (
+            <div
+              className="slide-up-bounce flex justify-end"
+              style={{ marginTop: 8 }}
+            >
+              <div
+                style={{
+                  maxWidth: "85%",
+                  background: "rgba(196,30,30,0.12)",
+                  border: "1px solid rgba(196,30,30,0.25)",
+                  borderRadius: "12px 12px 4px 12px",
+                  padding: "10px 14px",
+                }}
+              >
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.92)",
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: 13,
+                    lineHeight: 1.55,
+                    margin: 0,
+                  }}
+                >
+                  Nidhi, what should I do today?
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Nidhi response */}
+          {step >= 2 && (
+            <div className="slide-up-bounce" style={{ marginTop: 12 }}>
+              <div
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "12px 12px 12px 4px",
+                  padding: "12px 14px",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: "50%",
+                      background: "#C41E1E",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#FFFFFF",
+                        fontFamily: "'Oswald', sans-serif",
+                        fontSize: 9,
+                        fontWeight: 700,
+                      }}
+                    >
+                      N
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      color: "rgba(255,255,255,0.4)",
+                      fontFamily: "'Work Sans', sans-serif",
+                      fontSize: 10,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    AI CFO Nidhi
+                  </span>
+                </div>
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontFamily: "'Roboto', sans-serif",
+                    fontSize: 13,
+                    lineHeight: 1.65,
+                    margin: 0,
+                  }}
+                >
+                  Your cash runway is{" "}
+                  <span style={{ color: "#FFFFFF", fontWeight: 600 }}>52 days</span>.
+                  Three actions with highest impact today:
+                </p>
+
+                {step >= 3 && (
+                  <div className="mt-3 space-y-2 slide-up-bounce">
+                    {[
+                      {
+                        n: "1",
+                        text: "Chase ABC Electronics — ₹8.4L overdue, adds 15 days runway.",
+                        tag: "Receivables",
+                        color: "#1A6B3C",
+                      },
+                      {
+                        n: "2",
+                        text: "File GSTR-3B before Apr 20 — ₹3.2L ITC at risk.",
+                        tag: "GST",
+                        color: "#C41E1E",
+                      },
+                      {
+                        n: "3",
+                        text: "Hold 3 new hires till May — saves ₹5.25L next quarter.",
+                        tag: "Burn",
+                        color: "#8B5A00",
+                      },
+                    ].map((a) => (
+                      <div
+                        key={a.n}
+                        className="flex items-start gap-2.5"
+                        style={{
+                          padding: "8px 10px",
+                          background: "rgba(0,0,0,0.25)",
+                          borderLeft: `2px solid ${a.color}`,
+                          borderRadius: "4px 6px 6px 4px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: a.color,
+                            fontFamily: "'Oswald', sans-serif",
+                            fontSize: 13,
+                            fontWeight: 700,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {a.n}
+                        </span>
+                        <div className="flex-1">
+                          <p
+                            style={{
+                              color: "rgba(255,255,255,0.85)",
+                              fontFamily: "'Roboto', sans-serif",
+                              fontSize: 12,
+                              lineHeight: 1.5,
+                              margin: 0,
+                            }}
+                          >
+                            {a.text}
+                          </p>
+                        </div>
+                        <span
+                          style={{
+                            fontFamily: "'Work Sans', sans-serif",
+                            fontSize: 9,
+                            fontWeight: 600,
+                            letterSpacing: "0.05em",
+                            textTransform: "uppercase",
+                            color: a.color,
+                            background: `${a.color}1A`,
+                            padding: "2px 6px",
+                            borderRadius: 3,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {a.tag}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
-                <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-line" }}>{msg.text}</p>
-              </div>
-            </div>
-          ))}
-
-          {showTyping && <TypingIndicator />}
-
-          {showFollowUp && (
-            <div className="slide-up-bounce" style={{ background: "rgba(255,255,255,0.05)", borderRadius: 8, padding: 12 }}>
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="flex items-center justify-center" style={{ width: 20, height: 20, borderRadius: "50%", background: "#C41E1E" }}>
-                  <span style={{ color: "#FFFFFF", fontSize: 9, fontWeight: 700 }}>N</span>
-                </div>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>AI CFO Nidhi</span>
-              </div>
-              <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-line" }}>{followUp.text}</p>
-              <div className="flex gap-2 mt-3">
-                <span style={{ fontSize: 11, background: "rgba(196,30,30,0.2)", color: "#C41E1E", padding: "4px 8px", borderRadius: 4, cursor: "pointer" }}>Draft chase message</span>
-                <span style={{ fontSize: 11, background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", padding: "4px 8px", borderRadius: 4, cursor: "pointer" }}>Open GST</span>
               </div>
             </div>
           )}
 
-          {showSuggestions && !showFollowUp && (
-            <div className="flex flex-wrap gap-2 pt-1 slide-up-bounce">
-              {suggestions.map((s) => (
-                <button key={s} onClick={() => handleSuggestion(s)}
-                  style={{
-                    fontSize: 11, border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.6)",
-                    padding: "6px 12px", borderRadius: 100, background: "transparent", cursor: "pointer",
-                    transition: "all 250ms cubic-bezier(0.25, 0.1, 0.25, 1)",
-                  }}>
-                  {s}
-                </button>
-              ))}
+          {/* Input bar */}
+          <div
+            className="flex items-center gap-2 mt-4"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 100,
+              padding: "8px 8px 8px 16px",
+            }}
+          >
+            <span
+              style={{
+                color: "rgba(255,255,255,0.35)",
+                fontFamily: "'Roboto', sans-serif",
+                fontSize: 12,
+                flex: 1,
+              }}
+            >
+              Ask Nidhi anything about your business…
+            </span>
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                background: "#C41E1E",
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M2 8h12M9 3l5 5-5 5"
+                  stroke="#FFFFFF"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
-          )}
-
-          {demoComplete && (
-            <button onClick={runDemo} style={{ color: "#8B6914", fontSize: 12, background: "transparent", border: "none", cursor: "pointer", marginTop: 8 }}>
-              ↻ Restart demo
-            </button>
-          )}
+          </div>
         </div>
       </div>
     </div>
