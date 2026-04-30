@@ -21,7 +21,6 @@ const HomePage = () => {
 
       <SocialProofSection />
       <IntegrationsSection />
-      <PricingSection />
       <FinalCTASection />
     </div>
   );
