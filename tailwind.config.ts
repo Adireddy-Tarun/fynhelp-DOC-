@@ -14,10 +14,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["'Playfair Display'", "Georgia", "serif"],
-        serif: ["'Playfair Display'", "Georgia", "serif"],
-        sans: ["'Inter'", "-apple-system", "sans-serif"],
+        display: ["'Oswald'", "Impact", "sans-serif"],
+        serif: ["'Oswald'", "Impact", "sans-serif"],
+        sans: ["'Roboto'", "-apple-system", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
+        heading: ["'Oswald'", "Impact", "sans-serif"],
+        subheading: ["'Raleway'", "-apple-system", "sans-serif"],
+        body: ["'Roboto'", "-apple-system", "sans-serif"],
+        button: ["'DM Sans'", "-apple-system", "sans-serif"],
+        badge: ["'Work Sans'", "-apple-system", "sans-serif"],
+        nav: ["'Oswald'", "Impact", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
