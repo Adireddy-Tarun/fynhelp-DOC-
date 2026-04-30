@@ -44,8 +44,8 @@ export default function HowItWorksSection() {
     <section className="bg-fyn-ink py-24" ref={ref}>
       <div className="fyn-container">
         <span className="fyn-caption text-fyn-gold block mb-4 text-center reveal-up">Getting Started</span>
-        <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-white text-center mb-16 reveal-up">
-          From zero to financial intelligence in 10 minutes.
+        <h2 className="text-3xl md:text-4xl lg:text-[44px] leading-[1.2] text-white text-center mb-16 reveal-up" style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}>
+          Get your Finance Team in 4 Steps
         </h2>
 
         <div className="relative">
@@ -55,34 +55,44 @@ export default function HowItWorksSection() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 stagger-children">
-            {steps.map((s, i) => (
-              <div
-                key={s.title}
-                className="relative cursor-pointer"
-                onClick={() => setExpanded(expanded === i ? null : i)}
-              >
-                {/* Step number */}
-                <div className="w-[72px] h-[72px] rounded-full bg-fyn-red flex items-center justify-center mx-auto mb-5 relative z-10 transition-transform duration-300 hover:scale-110"
-                  style={{ transitionTimingFunction: "var(--ease-spring)" }}>
-                  <span className="text-white font-display text-2xl font-bold">{i + 1}</span>
-                </div>
-
-                <div className="bg-white/5 border border-white/8 rounded-lg p-5 hover-card">
-                  <h3 className="text-white font-semibold text-base mb-1">{s.title}</h3>
-                  <p className="text-white/40 text-sm mb-3">{s.sub}</p>
-
-                  <div className={`overflow-hidden transition-all duration-500 ${
-                    expanded === i ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
-                  }`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>
-                    <p className="text-white/55 text-sm leading-relaxed pt-3 border-t border-white/10">{s.detail}</p>
+            {steps.map((s, i) => {
+              const { Icon } = s;
+              return (
+                <div
+                  key={s.title}
+                  className="relative cursor-pointer group"
+                  onClick={() => setExpanded(expanded === i ? null : i)}
+                >
+                  {/* Step number */}
+                  <div className="w-[72px] h-[72px] rounded-full bg-fyn-red flex items-center justify-center mx-auto mb-5 relative z-10 transition-transform duration-300 hover:scale-110"
+                    style={{ transitionTimingFunction: "var(--ease-spring)" }}>
+                    <span className="text-white text-2xl font-bold" style={{ fontFamily: "'Oswald', sans-serif" }}>{i + 1}</span>
                   </div>
 
-                  <button className="text-fyn-red text-xs font-medium mt-2">
-                    {expanded === i ? "Show less" : "Learn more →"}
-                  </button>
+                  <div className="bg-white/5 border border-white/8 rounded-lg p-5 hover-card">
+                    {/* Step icon */}
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-fyn-red/10 border border-fyn-red/20 flex items-center justify-center transition-colors duration-300 group-hover:bg-fyn-red/20">
+                        <Icon className="w-6 h-6 text-fyn-red" aria-label={s.title} />
+                      </div>
+                    </div>
+
+                    <h3 className="text-white font-semibold text-base mb-1 text-center" style={{ fontFamily: "'Raleway', sans-serif" }}>{s.title}</h3>
+                    <p className="text-white/40 text-sm mb-3 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>{s.sub}</p>
+
+                    <div className={`overflow-hidden transition-all duration-500 ${
+                      expanded === i ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+                    }`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>
+                      <p className="text-white/55 text-sm leading-relaxed pt-3 border-t border-white/10" style={{ fontFamily: "'Roboto', sans-serif" }}>{s.detail}</p>
+                    </div>
+
+                    <button className="text-fyn-red text-xs font-medium mt-2">
+                      {expanded === i ? "Show less" : "Learn more →"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
