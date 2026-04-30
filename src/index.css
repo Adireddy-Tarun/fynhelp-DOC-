@@ -318,14 +318,14 @@
     @apply py-16 md:py-24;
   }
   .fyn-label {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Work Sans', -apple-system, sans-serif;
     font-weight: 500;
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .fyn-caption {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Work Sans', -apple-system, sans-serif;
     font-weight: 500;
     font-size: 12px;
     line-height: 1.5;
@@ -333,7 +333,7 @@
     text-transform: uppercase;
   }
   .fyn-metric {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Oswald', Impact, sans-serif;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
@@ -342,10 +342,10 @@
     font-size: 13px;
   }
   .fyn-display {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Oswald', Impact, sans-serif;
     font-weight: 700;
     font-size: 72px;
-    line-height: 1.1;
+    line-height: 1.05;
     letter-spacing: -1px;
   }
 
