@@ -1,7 +1,6 @@
 import HeroSection from "@/components/home/HeroSection";
 import TickerStrip from "@/components/home/TickerStrip";
 import ProblemSection from "@/components/home/ProblemSection";
-import NidhiSection from "@/components/home/NidhiSection";
 import SuitesSection from "@/components/home/SuitesSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import SimulatorSection from "@/components/home/SimulatorSection";
@@ -17,11 +16,10 @@ const HomePage = () => {
       <HeroSection />
       <TickerStrip />
       <ProblemSection />
-      <NidhiSection />
       <SuitesSection />
       <HowItWorksSection />
       <SimulatorSection />
-      
+
       <SocialProofSection />
       <IntegrationsSection />
       <PricingSection />
