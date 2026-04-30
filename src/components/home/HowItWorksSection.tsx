@@ -1,26 +1,38 @@
 import { useState } from "react";
+import { Landmark, FileSpreadsheet, Receipt, Sparkles, type LucideIcon } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-const steps = [
+interface Step {
+  title: string;
+  sub: string;
+  detail: string;
+  Icon: LucideIcon;
+}
+
+const steps: Step[] = [
   {
     title: "Connect your bank account",
     sub: "2 minutes via RBI's Account Aggregator",
     detail: "We use RBI's Account Aggregator (AA) framework — the same technology that powers India's Open Banking. Your bank login credentials are never shared with us. You grant consent directly to your bank. Supported: HDFC, ICICI, SBI, Axis, Kotak, Yes Bank, IndusInd, PNB, BOB, Canara, and 20+ more. Alternatively, upload a PDF bank statement — our parser handles all 12 major Indian bank formats.",
+    Icon: Landmark,
   },
   {
     title: "Connect your accounting software",
     sub: "15 minutes — we handle the mapping",
     detail: "FynHelp connects to Tally Prime via ODBC (a lightweight agent syncing every 2 hours), Zoho Books and QuickBooks India via OAuth 2.0, and Busy Accounting via CSV. Our intelligent column mapper handles any CSV format with AI-assisted column detection.",
+    Icon: FileSpreadsheet,
   },
   {
     title: "Enter your GSTIN — we do the rest",
     sub: "3 minutes — instant compliance calendar",
     detail: "Your GSTIN unlocks: business detail lookup, 12-month filing history, ITC reconciliation with GSTR-2B, personalised compliance calendar with YOUR due dates, and vendor GSTIN validation. We are a GST Suvidha Provider (GSP) certified platform.",
+    Icon: Receipt,
   },
   {
     title: "AI CFO Nidhi delivers your first brief",
     sub: "Within minutes — and every morning after",
     detail: "AI CFO Nidhi assembles your financial picture: cash from bank, receivables from books, GST from portal. She computes 50+ metrics, identifies your top 3 risks, and delivers a plain-language brief. Every morning at 8 AM, you wake up to a message from your AI CFO.",
+    Icon: Sparkles,
   },
 ];
 
