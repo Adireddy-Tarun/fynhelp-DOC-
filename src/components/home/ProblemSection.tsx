@@ -8,11 +8,12 @@ import {
   Calculator,
   ChevronLeft,
   ChevronRight,
+  type LucideIcon,
 } from "lucide-react";
 
 type Slide = {
   id: string;
-  Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
+  Icon: LucideIcon;
   eyebrow: string;
   headline: string;
   statValue: string;
