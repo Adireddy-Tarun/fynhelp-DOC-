@@ -7,7 +7,6 @@ import SimulatorSection from "@/components/home/SimulatorSection";
 
 import SocialProofSection from "@/components/home/SocialProofSection";
 import IntegrationsSection from "@/components/home/IntegrationsSection";
-import PricingSection from "@/components/home/PricingSection";
 import FinalCTASection from "@/components/home/FinalCTASection";
 
 const HomePage = () => {
@@ -22,7 +21,6 @@ const HomePage = () => {
 
       <SocialProofSection />
       <IntegrationsSection />
-      <PricingSection />
       <FinalCTASection />
     </div>
   );
