@@ -1055,6 +1055,10 @@ export default function NeuralNetwork() {
           0%, 100% { transform: scale(1); opacity: 0.96; }
           50%      { transform: scale(1.02); opacity: 1; }
         }
+        @keyframes nn-tip-in {
+          from { opacity: 0; transform: translate(-50%, -4px); }
+          to   { opacity: 1; transform: translate(-50%, 0); }
+        }
         @keyframes nn-card-in {
           from { opacity: 0; transform: scale(0.92) translateY(12px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
