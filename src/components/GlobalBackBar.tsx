@@ -1,5 +1,6 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { ChevronLeft, Home } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const pageTitles: Record<string, string> = {
   "/": "Home",
