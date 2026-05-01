@@ -96,7 +96,7 @@ const SolutionsPage = () => {
           <p style={{ fontSize: 16, color: "#2A2A2A", opacity: 0.7, marginBottom: 40 }}>
             Hover over any node to learn more. Click to explore the module.
           </p>
-          <EcosystemMap />
+          <NeuralNetwork />
           <p
             style={{
               fontSize: 16,
