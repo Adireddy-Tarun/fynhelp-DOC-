@@ -141,7 +141,7 @@ export default function ConnectionFlow() {
               transition: "all 200ms ease",
             }}
           >
-            Talk to AI CFO Nidhi →
+            Join the Waitlist →
           </button>
           <p
             style={{
