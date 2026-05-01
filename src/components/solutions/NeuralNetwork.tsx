@@ -239,6 +239,7 @@ export default function NeuralNetwork() {
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
+  const [pinnedChild, setPinnedChild] = useState<{ moduleId: string; childIdx: number } | null>(null);
   const [bp, setBp] = useState<"mobile" | "tablet" | "desktop">("desktop");
 
   const active = pinned ?? hovered;
