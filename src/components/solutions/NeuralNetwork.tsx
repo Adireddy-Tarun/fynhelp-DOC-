@@ -617,10 +617,11 @@ export default function NeuralNetwork() {
       {!isMobile && nodes.map((n) => {
         const pts = [{ x: n.x, y: n.y }, ...n.children.map((c) => ({ x: c.x, y: c.y }))];
         const pad = layout.childSize / 2 + 24;
+        const labelAllowance = 56; // include the text label that sits below the module circle
         const minX = Math.min(...pts.map((p) => p.x)) - pad;
         const minY = Math.min(...pts.map((p) => p.y)) - pad;
         const maxX = Math.max(...pts.map((p) => p.x)) + pad;
-        const maxY = Math.max(...pts.map((p) => p.y)) + pad;
+        const maxY = Math.max(...pts.map((p) => p.y)) + pad + labelAllowance;
         const isActive = active === n.id;
         return (
           <div
