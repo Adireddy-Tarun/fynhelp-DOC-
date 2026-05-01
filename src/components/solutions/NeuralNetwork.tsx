@@ -4,9 +4,19 @@ import {
   Brain, Check, X, Clock,
   Droplets, TrendingUp, PieChart, FileText, Shield,
   Briefcase, Users, Zap, Building2, BarChart3,
+  TrendingDown, Flame, DollarSign, AlertTriangle,
+  Clock as ClockIcon, BarChart2, UserX,
+  ShoppingCart, Eye,
+  GitCompare, Calendar, AlertCircle,
+  CalendarDays, Bell, CheckCircle2, Award,
+  Activity, Share2,
+  User, UserMinus, Wallet,
+  GitBranch, Target, AlertOctagon,
+  LayoutGrid, Smartphone, CreditCard, Banknote,
+  Rocket, Trophy, Map,
   type LucideIcon,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 /* ---------------- Module data (10 suites, ordered clockwise from top) ---------------- */
 
@@ -177,6 +187,20 @@ const MODULES: ModuleDef[] = [
   },
 ];
 
+/** Icon for each child metric, keyed by exact metric label. */
+const CHILD_ICONS: Record<string, LucideIcon> = {
+  "Cash Runway": TrendingDown, "Burn Rate": Flame, "Working Capital": DollarSign, "Cash Crunch Date": AlertTriangle,
+  "MRR/ARR Growth": TrendingUp, "Aging Receivables": ClockIcon, "Payment Patterns": BarChart2, "Churn Signals": UserX,
+  "Category Breakdown": PieChart, "Vendor Spend": ShoppingCart, "Hidden Costs": Eye, "Optimization Opps": Zap,
+  "ITC Reconciliation": GitCompare, "Filing Deadlines": Calendar, "Notice Risk": AlertCircle, "Unclaimed ITC": DollarSign,
+  "Obligation Calendar": CalendarDays, "Deadline Alerts": Bell, "Completion Rate": CheckCircle2, "Audit Score": Award,
+  "Portfolio Health": Activity, "Compliance Status": Shield, "Shared Intelligence": Share2, "White-label Reports": FileText,
+  "Cost per Employee": User, "Attrition Risk": UserMinus, "Headcount ROI": Users, "Payroll Optimization": Wallet,
+  "Scenario Impact": GitBranch, "Break-even Period": Target, "ROI Projections": TrendingUp, "Risk Score": AlertOctagon,
+  "Unified View": LayoutGrid, "UPI Tracking": Smartphone, "Credit Utilization": CreditCard, "Financing Options": Banknote,
+  "Industry Benchmarks": BarChart3, "Growth Readiness": Rocket, "Competitive Position": Trophy, "Expansion Map": Map,
+};
+
 /** Inter-module relationships (intelligent web) — by id pairs */
 const RELATIONSHIPS: [string, string][] = [
   ["liquidity", "revenue"],
@@ -209,7 +233,7 @@ interface Layout {
 
 export default function NeuralNetwork() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hoverTimer = useRef<number | null>(null);
 
@@ -286,10 +310,11 @@ export default function NeuralNetwork() {
     hoverTimer.current = window.setTimeout(() => setHovered(id), 100);
   }, []);
 
-  /* ----- Navigation ----- */
+  /* ----- Navigation: live → /products anchor; others → waitlist with module slug ----- */
   const navigateToModule = (id: string) => {
-    if (!user) navigate(`/waitlist?module=${id}`);
-    else navigate(`/products#${id}`);
+    const m = nodeById[id];
+    if (m?.status === "live") navigate(`/products#${id}`);
+    else navigate(`/waitlist?module=${id}`);
   };
 
   const handleClick = (id: string) => {
@@ -499,6 +524,9 @@ export default function NeuralNetwork() {
                 dur={isActive ? "1.5s" : "2.5s"}
                 repeatCount="indefinite"
                 begin={`${(i * 0.22).toFixed(2)}s`}
+                keyPoints="1;0"
+                keyTimes="0;1"
+                calcMode="linear"
               >
                 <mpath href={`#nn-cm-${n.id}`} />
               </animateMotion>
@@ -524,10 +552,10 @@ export default function NeuralNetwork() {
             width: layout.centerSize,
             height: layout.centerSize,
             background: "radial-gradient(circle at 35% 30%, #FF4444 0%, #C41E1E 75%)",
-            boxShadow: active
-              ? "0 20px 70px rgba(196,30,30,0.7)"
-              : "0 15px 50px rgba(196,30,30,0.45)",
-            animation: "nn-center-pulse 3000ms ease-in-out infinite",
+            position: "relative",
+            animation: active
+              ? "nn-center-pulse-active 2000ms ease-in-out infinite"
+              : "nn-center-pulse 3000ms ease-in-out infinite",
             transition: "box-shadow 250ms ease",
           }}
           aria-label="AI CFO Nidhi — Central Intelligence"
@@ -536,6 +564,12 @@ export default function NeuralNetwork() {
             color="#FFFFFF"
             size={Math.round(layout.centerSize * 0.47)}
             strokeWidth={2}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
           />
         </div>
         <div className="text-center" style={{ pointerEvents: "none", marginTop: 18 }}>
@@ -564,8 +598,38 @@ export default function NeuralNetwork() {
         </div>
       </div>
 
+      {/* ============ Hover zones (invisible bounding boxes covering module + 4 children + padding) ============
+          Keeps cluster "hovered" while user moves between module → children → info card. */}
+      {!isMobile && nodes.map((n) => {
+        const pts = [{ x: n.x, y: n.y }, ...n.children.map((c) => ({ x: c.x, y: c.y }))];
+        const pad = layout.childSize / 2 + 24;
+        const minX = Math.min(...pts.map((p) => p.x)) - pad;
+        const minY = Math.min(...pts.map((p) => p.y)) - pad;
+        const maxX = Math.max(...pts.map((p) => p.x)) + pad;
+        const maxY = Math.max(...pts.map((p) => p.y)) + pad;
+        const isActive = active === n.id;
+        return (
+          <div
+            key={`hz-${n.id}`}
+            onMouseEnter={() => debouncedSetHovered(n.id)}
+            onMouseLeave={() => debouncedSetHovered(null)}
+            style={{
+              position: "absolute",
+              left: minX,
+              top: minY,
+              width: maxX - minX,
+              height: maxY - minY,
+              zIndex: isActive ? 25 : 10,
+              pointerEvents: "auto",
+              background: "transparent",
+            }}
+            aria-hidden="true"
+          />
+        );
+      })}
+
       {/* ============ Module nodes (Layer 2) ============ */}
-      {nodes.map((n) => {
+      {nodes.map((n, idx) => {
         const Icon = n.Icon;
         const isActive = active === n.id;
         const isLive = n.status === "live";
@@ -583,14 +647,13 @@ export default function NeuralNetwork() {
               opacity: dimmed ? 0.4 : 1,
               transition: "opacity 200ms ease",
               willChange: "transform, opacity",
+              pointerEvents: "none",
             }}
           >
             <button
               type="button"
               tabIndex={0}
               aria-label={`${n.name} module. Status: ${isLive ? "Live" : "In development"}. Click to explore.`}
-              onMouseEnter={() => !isMobile && debouncedSetHovered(n.id)}
-              onMouseLeave={() => !isMobile && debouncedSetHovered(null)}
               onClick={() => handleClick(n.id)}
               onKeyDown={(e) => onNodeKey(e, n.id)}
               className="relative rounded-full flex items-center justify-center focus-visible:outline-none"
@@ -600,22 +663,25 @@ export default function NeuralNetwork() {
                 background: "#FFFFFF",
                 border: `2px solid ${isActive ? "#C41E1E" : isRelated ? "rgba(196,30,30,0.3)" : "#E5E7EB"}`,
                 boxShadow: isActive
-                  ? "0 12px 36px rgba(196,30,30,0.3)"
-                  : "0 6px 18px rgba(0,0,0,0.08)",
+                  ? "0 0 35px rgba(196,30,30,0.45), 0 14px 40px rgba(196,30,30,0.35), 0 4px 12px rgba(0,0,0,0.15)"
+                  : "0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)",
                 transform: isActive ? "scale(1.15)" : isRelated ? "scale(1.05)" : "scale(1)",
-                transition: "transform 200ms ease-out, border-color 200ms ease, box-shadow 200ms ease",
+                transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms ease, box-shadow 250ms ease",
                 cursor: "pointer",
-                animation: isActive ? undefined : "nn-breathe 4000ms ease-in-out infinite",
+                animation: (isActive || isRelated)
+                  ? undefined
+                  : `nn-breathe 4000ms ease-in-out ${(idx * 0.3).toFixed(2)}s infinite`,
                 willChange: "transform",
                 outline: "none",
+                pointerEvents: "auto",
               }}
               onFocus={(e) => {
                 e.currentTarget.style.boxShadow = "0 0 0 3px #C41E1E, 0 6px 18px rgba(0,0,0,0.08)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.boxShadow = isActive
-                  ? "0 12px 36px rgba(196,30,30,0.3)"
-                  : "0 6px 18px rgba(0,0,0,0.08)";
+                  ? "0 0 35px rgba(196,30,30,0.45), 0 14px 40px rgba(196,30,30,0.35), 0 4px 12px rgba(0,0,0,0.15)"
+                  : "0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)";
               }}
             >
               <Icon
@@ -665,6 +731,7 @@ export default function NeuralNetwork() {
           const isActive = showChildren(n.id);
           // Hide on mobile unless module is active
           const visible = isActive || (!isMobile && !active);
+          const ChildIcon = CHILD_ICONS[c.label];
           return (
             <div
               key={c.id}
@@ -677,7 +744,7 @@ export default function NeuralNetwork() {
                 zIndex: isActive ? 90 : 20,
                 transition: `transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1) ${ci * 40}ms, opacity 250ms ease ${ci * 40}ms`,
                 willChange: "transform, opacity",
-                pointerEvents: visible ? "auto" : "none",
+                pointerEvents: "none",
               }}
             >
               <div
@@ -688,27 +755,36 @@ export default function NeuralNetwork() {
                   background: "#FFFFFF",
                   border: `1.5px solid ${isActive ? "#C41E1E" : "#E5E7EB"}`,
                   boxShadow: isActive
-                    ? "0 6px 18px rgba(196,30,30,0.2)"
+                    ? "0 0 20px rgba(196,30,30,0.3), 0 6px 18px rgba(0,0,0,0.1)"
                     : "0 4px 12px rgba(0,0,0,0.06)",
                   transition: "border-color 200ms ease, box-shadow 200ms ease",
+                  padding: 4,
+                  textAlign: "center",
                 }}
                 aria-label={`${c.label} metric`}
-              />
-              <div
-                style={{
-                  marginTop: 6,
-                  fontFamily: "'Roboto', sans-serif",
-                  fontWeight: 500,
-                  fontSize: isMobile ? 10 : 12,
-                  color: "#1A1A1A",
-                  textAlign: "center",
-                  maxWidth: 80,
-                  lineHeight: 1.25,
-                  opacity: isActive ? 1 : 0,
-                  transition: "opacity 200ms ease",
-                }}
               >
-                {c.label}
+                {isActive ? (
+                  <span
+                    style={{
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 500,
+                      fontSize: isMobile ? 9 : 11,
+                      color: "#1A1A1A",
+                      lineHeight: 1.15,
+                      padding: 2,
+                    }}
+                  >
+                    {c.label}
+                  </span>
+                ) : (
+                  ChildIcon && (
+                    <ChildIcon
+                      size={Math.round(layout.childSize * 0.4)}
+                      color="#1A1A1A"
+                      strokeWidth={2}
+                    />
+                  )
+                )}
               </div>
             </div>
           );
@@ -797,15 +873,43 @@ export default function NeuralNetwork() {
       <style>{`
         @keyframes nn-center-pulse {
           0%, 100% {
-            transform: translate(-50%, -50%) scale(1);
+            transform: scale(1);
+            box-shadow:
+              0 0 40px rgba(255, 68, 68, 0.4),
+              0 0 80px rgba(196, 30, 30, 0.2),
+              0 15px 50px rgba(196, 30, 30, 0.45),
+              inset 0 0 30px rgba(255, 255, 255, 0.1);
           }
           50% {
-            transform: translate(-50%, -50%) scale(1.06);
+            transform: scale(1.06);
+            box-shadow:
+              0 0 60px rgba(255, 68, 68, 0.6),
+              0 0 100px rgba(196, 30, 30, 0.3),
+              0 20px 70px rgba(196, 30, 30, 0.65),
+              inset 0 0 30px rgba(255, 255, 255, 0.15);
+          }
+        }
+        @keyframes nn-center-pulse-active {
+          0%, 100% {
+            transform: scale(1.04);
+            box-shadow:
+              0 0 60px rgba(255, 68, 68, 0.7),
+              0 0 110px rgba(196, 30, 30, 0.4),
+              0 22px 70px rgba(196, 30, 30, 0.7),
+              inset 0 0 30px rgba(255, 255, 255, 0.18);
+          }
+          50% {
+            transform: scale(1.10);
+            box-shadow:
+              0 0 80px rgba(255, 68, 68, 0.85),
+              0 0 130px rgba(196, 30, 30, 0.5),
+              0 28px 90px rgba(196, 30, 30, 0.85),
+              inset 0 0 30px rgba(255, 255, 255, 0.22);
           }
         }
         @keyframes nn-breathe {
-          0%, 100% { opacity: 1; }
-          50%      { opacity: 0.96; }
+          0%, 100% { transform: scale(1); opacity: 0.96; }
+          50%      { transform: scale(1.02); opacity: 1; }
         }
         @keyframes nn-card-in {
           from { opacity: 0; transform: scale(0.92) translateY(12px); }
