@@ -18,7 +18,7 @@ export default function FinalCTASection() {
         </h2>
 
         <p className="text-white/90 text-lg md:text-xl mt-4 leading-relaxed">
-          Be among the first 1,000 businesses to get 6 months FREE access to AI CFO Nidhi
+          Be among the first 100 businesses to get 6 months FREE access to AI CFO Nidhi
         </p>
 
         <div className="mt-8">
@@ -32,7 +32,7 @@ export default function FinalCTASection() {
         </div>
 
         <p className="text-white font-medium text-base md:text-lg mt-5">
-          First 1,000 users get Pro Plan FREE for 6 months (₹45,000 value)
+          (First 100 users get Pro Plan FREE for 6 months Worth ₹45,000)
         </p>
 
         <p className="text-white/70 text-sm mt-3">
