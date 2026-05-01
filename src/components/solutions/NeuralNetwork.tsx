@@ -668,7 +668,7 @@ export default function NeuralNetwork() {
                 transform: isActive ? "scale(1.15)" : isRelated ? "scale(1.05)" : "scale(1)",
                 transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms ease, box-shadow 250ms ease",
                 cursor: "pointer",
-                animation: isActive
+                animation: (isActive || isRelated)
                   ? undefined
                   : `nn-breathe 4000ms ease-in-out ${(idx * 0.3).toFixed(2)}s infinite`,
                 willChange: "transform",
