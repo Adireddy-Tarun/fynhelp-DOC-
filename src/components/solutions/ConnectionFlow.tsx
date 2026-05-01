@@ -20,11 +20,12 @@ type FlowCard = {
   Icon: LucideIcon;
   label: string;
   sub: string;
+  brandColor?: string;
 };
 
 const SOURCES: FlowCard[] = [
-  { id: "razorpay", Icon: CreditCard, label: "Razorpay",     sub: "Payment Data" },
-  { id: "zoho",     Icon: BookOpen,   label: "Zoho Books",   sub: "Accounting Data" },
+  { id: "razorpay", Icon: CreditCard, label: "Razorpay",     sub: "Payment Data",          brandColor: "#3395FF" },
+  { id: "zoho",     Icon: BookOpen,   label: "Zoho Books",   sub: "Accounting Data",       brandColor: "#E42527" },
   { id: "bank",     Icon: Building2,  label: "Bank Account", sub: "RBI Account Aggregator" },
   { id: "gst",      Icon: FileText,   label: "GST Portal",   sub: "Tax & Compliance" },
 ];
