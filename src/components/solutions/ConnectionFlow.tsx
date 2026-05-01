@@ -75,8 +75,8 @@ export default function ConnectionFlow() {
       ref={sectionRef}
       aria-labelledby="cf-heading"
       style={{
-        background: "linear-gradient(180deg, #E0F2FE 0%, #F3E8FF 100%)",
-        padding: isMobile ? "60px 20px" : "80px 40px",
+        background: "#FAFAF8",
+        padding: isMobile ? "60px 20px" : "100px 40px",
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 600ms ease, transform 600ms ease",
