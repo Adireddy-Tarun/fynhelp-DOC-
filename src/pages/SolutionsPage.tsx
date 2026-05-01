@@ -114,6 +114,9 @@ const SolutionsPage = () => {
         </div>
       </section>
 
+      {/* Animated connection flow illustration */}
+      <ConnectionFlow />
+
       {/* Solution deep dives */}
       {solutions.map((s) => (
         <section key={s.title} id={s.slug} className={`${s.bg} fyn-section scroll-mt-24`}>
