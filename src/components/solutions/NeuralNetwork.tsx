@@ -310,10 +310,11 @@ export default function NeuralNetwork() {
     hoverTimer.current = window.setTimeout(() => setHovered(id), 100);
   }, []);
 
-  /* ----- Navigation ----- */
+  /* ----- Navigation: live → /products anchor; others → waitlist with module slug ----- */
   const navigateToModule = (id: string) => {
-    if (!user) navigate(`/waitlist?module=${id}`);
-    else navigate(`/products#${id}`);
+    const m = nodeById[id];
+    if (m?.status === "live") navigate(`/products#${id}`);
+    else navigate(`/waitlist?module=${id}`);
   };
 
   const handleClick = (id: string) => {
