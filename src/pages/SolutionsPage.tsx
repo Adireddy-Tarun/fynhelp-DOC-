@@ -1,49 +1,10 @@
 import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { useAuth } from "@/contexts/AuthContext";
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
 import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
-const solutions = [
-  {
-    bg: "bg-fyn-beige", text: "text-fyn-ink", sub: "text-fyn-ink/70",
-    title: "Never run out of cash again",
-    slug: "cash-liquidity",
-    problem: "The #1 cause of SME failure is cash flow management — not profitability. Most business owners only know their bank balance, not their runway.",
-    solution: "AI CFO Nidhi computes your exact runway every morning from live bank data via RBI's Account Aggregator. She models your next 90 days using invoice due dates, vendor payment schedules, and payroll commitments.",
-    modules: ["Financial Health Score", "Cash Flow Projection", "Burn Acceleration", "Liquidity Alerts"],
-    before: "Average time to detect cash crisis: 14 days after it begins",
-    after: "Average time to detect cash crisis: 62 days before it begins",
-    dashSlug: "/dashboard/cash-flow",
-  },
-  {
-    bg: "bg-fyn-ink", text: "text-white", sub: "text-white/70",
-    title: "Stop losing money to customers who aren't paying",
-    slug: "collections-revenue",
-    problem: "The average Indian SME has 42 days of receivables sitting unpaid — working capital locked in invoices, not in your bank.",
-    solution: "AI CFO Nidhi scores every customer on payment reliability. She automatically drafts WhatsApp payment reminders and enforces your Section 43B(h) rights.",
-    modules: ["Receivables AI", "Default Prediction", "Customer Risk Score", "Collections Automation"],
-    before: "Average DSO for Indian SMEs: 42 days",
-    after: "FynHelp customers average DSO: 28 days",
-    dashSlug: "/dashboard/receivables",
-  },
-  {
-    bg: "bg-fyn-beige", text: "text-fyn-ink", sub: "text-fyn-ink/70",
-    title: "Stop fearing GST notices",
-    slug: "gst-compliance",
-    problem: "Indian SMEs collectively lose thousands of crores in unclaimed ITC every year because their vendors don't file on time.",
-    solution: "On the 14th of every month, AI CFO Nidhi automatically pulls your ITC data and matches it against every purchase invoice. Mismatches are flagged instantly.",
-    modules: ["ITC Reconciliation", "Notice Risk Scorer", "Smart Filing Calendar", "Vendor GST Health"],
-    before: "₹3.2L average annual ITC loss per SME",
-    after: "74% of ITC losses prevented with vendor monitoring",
-    dashSlug: "/dashboard/gst",
-  },
-];
-
 const SolutionsPage = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Smooth-scroll to anchored section when arriving via /solutions#slug
