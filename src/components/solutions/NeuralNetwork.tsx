@@ -552,10 +552,10 @@ export default function NeuralNetwork() {
             width: layout.centerSize,
             height: layout.centerSize,
             background: "radial-gradient(circle at 35% 30%, #FF4444 0%, #C41E1E 75%)",
-            boxShadow: active
-              ? "0 20px 70px rgba(196,30,30,0.7)"
-              : "0 15px 50px rgba(196,30,30,0.45)",
-            animation: "nn-center-pulse 3000ms ease-in-out infinite",
+            position: "relative",
+            animation: active
+              ? "nn-center-pulse-active 2000ms ease-in-out infinite"
+              : "nn-center-pulse 3000ms ease-in-out infinite",
             transition: "box-shadow 250ms ease",
           }}
           aria-label="AI CFO Nidhi — Central Intelligence"
@@ -564,6 +564,12 @@ export default function NeuralNetwork() {
             color="#FFFFFF"
             size={Math.round(layout.centerSize * 0.47)}
             strokeWidth={2}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
           />
         </div>
         <div className="text-center" style={{ pointerEvents: "none", marginTop: 18 }}>
