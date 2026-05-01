@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, KeyboardEvent, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Brain, Check, X, Clock,
   Droplets, TrendingUp, PieChart, FileText, Shield,
