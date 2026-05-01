@@ -873,15 +873,43 @@ export default function NeuralNetwork() {
       <style>{`
         @keyframes nn-center-pulse {
           0%, 100% {
-            transform: translate(-50%, -50%) scale(1);
+            transform: scale(1);
+            box-shadow:
+              0 0 40px rgba(255, 68, 68, 0.4),
+              0 0 80px rgba(196, 30, 30, 0.2),
+              0 15px 50px rgba(196, 30, 30, 0.45),
+              inset 0 0 30px rgba(255, 255, 255, 0.1);
           }
           50% {
-            transform: translate(-50%, -50%) scale(1.06);
+            transform: scale(1.06);
+            box-shadow:
+              0 0 60px rgba(255, 68, 68, 0.6),
+              0 0 100px rgba(196, 30, 30, 0.3),
+              0 20px 70px rgba(196, 30, 30, 0.65),
+              inset 0 0 30px rgba(255, 255, 255, 0.15);
+          }
+        }
+        @keyframes nn-center-pulse-active {
+          0%, 100% {
+            transform: scale(1.04);
+            box-shadow:
+              0 0 60px rgba(255, 68, 68, 0.7),
+              0 0 110px rgba(196, 30, 30, 0.4),
+              0 22px 70px rgba(196, 30, 30, 0.7),
+              inset 0 0 30px rgba(255, 255, 255, 0.18);
+          }
+          50% {
+            transform: scale(1.10);
+            box-shadow:
+              0 0 80px rgba(255, 68, 68, 0.85),
+              0 0 130px rgba(196, 30, 30, 0.5),
+              0 28px 90px rgba(196, 30, 30, 0.85),
+              inset 0 0 30px rgba(255, 255, 255, 0.22);
           }
         }
         @keyframes nn-breathe {
-          0%, 100% { opacity: 1; }
-          50%      { opacity: 0.96; }
+          0%, 100% { transform: scale(1); opacity: 0.96; }
+          50%      { transform: scale(1.02); opacity: 1; }
         }
         @keyframes nn-card-in {
           from { opacity: 0; transform: scale(0.92) translateY(12px); }
