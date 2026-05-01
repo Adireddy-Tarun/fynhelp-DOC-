@@ -239,6 +239,7 @@ export default function NeuralNetwork() {
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
+  const [pinnedChild, setPinnedChild] = useState<{ moduleId: string; childIdx: number } | null>(null);
   const [bp, setBp] = useState<"mobile" | "tablet" | "desktop">("desktop");
 
   const active = pinned ?? hovered;
@@ -333,6 +334,7 @@ export default function NeuralNetwork() {
   const closeCard = useCallback(() => {
     setPinned(null);
     setHovered(null);
+    setPinnedChild(null);
   }, []);
 
   // ESC closes card
@@ -732,6 +734,8 @@ export default function NeuralNetwork() {
           // Hide on mobile unless module is active
           const visible = isActive || (!isMobile && !active);
           const ChildIcon = CHILD_ICONS[c.label];
+          const isChildPinned =
+            pinnedChild?.moduleId === n.id && pinnedChild.childIdx === ci;
           return (
             <div
               key={c.id}
@@ -741,14 +745,21 @@ export default function NeuralNetwork() {
                 top: c.y,
                 transform: `translate(-50%, -50%) scale(${isActive ? 1.08 : visible ? 1 : 0})`,
                 opacity: isActive ? 1 : visible ? 0.85 : 0,
-                zIndex: isActive ? 90 : 20,
+                zIndex: isChildPinned ? 110 : isActive ? 90 : 20,
                 transition: `transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1) ${ci * 40}ms, opacity 250ms ease ${ci * 40}ms`,
                 willChange: "transform, opacity",
-                pointerEvents: "none",
+                pointerEvents: visible ? "auto" : "none",
               }}
             >
-              <div
-                className="rounded-full flex items-center justify-center"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPinnedChild({ moduleId: n.id, childIdx: ci });
+                  setHovered(n.id);
+                }}
+                aria-label={`${c.label} metric. Click for details.`}
+                className="rounded-full flex items-center justify-center focus-visible:outline-none"
                 style={{
                   width: layout.childSize,
                   height: layout.childSize,
@@ -757,35 +768,99 @@ export default function NeuralNetwork() {
                   boxShadow: isActive
                     ? "0 0 20px rgba(196,30,30,0.3), 0 6px 18px rgba(0,0,0,0.1)"
                     : "0 4px 12px rgba(0,0,0,0.06)",
-                  transition: "border-color 200ms ease, box-shadow 200ms ease",
-                  padding: 4,
-                  textAlign: "center",
+                  transition: "border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease",
+                  cursor: "pointer",
+                  padding: 0,
                 }}
-                aria-label={`${c.label} metric`}
               >
-                {isActive ? (
-                  <span
+                {ChildIcon && (
+                  <ChildIcon
+                    size={Math.round(layout.childSize * 0.42)}
+                    color={isActive ? "#C41E1E" : "#1A1A1A"}
+                    strokeWidth={2}
+                    style={{ transition: "color 200ms ease" }}
+                  />
+                )}
+              </button>
+
+              {/* Child info popup */}
+              {isChildPinned && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    position: "absolute",
+                    top: layout.childSize + 12,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 260,
+                    background: "#FFFFFF",
+                    borderRadius: 12,
+                    padding: 18,
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+                    border: "1px solid #E5E7EB",
+                    zIndex: 1100,
+                    animation: "nn-card-in 200ms ease-out",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPinnedChild(null);
+                    }}
+                    aria-label="Close"
                     style={{
-                      fontFamily: "'Roboto', sans-serif",
-                      fontWeight: 500,
-                      fontSize: isMobile ? 9 : 11,
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 4,
+                      lineHeight: 0,
+                    }}
+                  >
+                    <X size={16} color="#6B7280" />
+                  </button>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: "#F9F7F4",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 12,
+                    }}
+                  >
+                    {ChildIcon && <ChildIcon size={22} color="#C41E1E" strokeWidth={2} />}
+                  </div>
+                  <h4
+                    style={{
+                      fontFamily: "'Raleway', sans-serif",
+                      fontWeight: 700,
+                      fontSize: 15,
                       color: "#1A1A1A",
-                      lineHeight: 1.15,
-                      padding: 2,
+                      margin: "0 0 6px 0",
+                      lineHeight: 1.3,
                     }}
                   >
                     {c.label}
-                  </span>
-                ) : (
-                  ChildIcon && (
-                    <ChildIcon
-                      size={Math.round(layout.childSize * 0.4)}
-                      color="#1A1A1A"
-                      strokeWidth={2}
-                    />
-                  )
-                )}
-              </div>
+                  </h4>
+                  <p
+                    style={{
+                      fontFamily: "'Roboto', sans-serif",
+                      fontSize: 12.5,
+                      color: "#6B7280",
+                      lineHeight: 1.55,
+                      margin: 0,
+                    }}
+                  >
+                    {n.name} metric — part of {n.shortLabel}.
+                  </p>
+                </div>
+              )}
             </div>
           );
         })

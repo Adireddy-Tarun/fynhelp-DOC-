@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
-import BackendInfrastructure from "@/components/solutions/BackendInfrastructure";
 import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
 const SolutionsPage = () => {
@@ -78,9 +77,6 @@ const SolutionsPage = () => {
           </p>
         </div>
       </section>
-
-      {/* Backend infrastructure layer */}
-      <BackendInfrastructure />
 
       {/* Animated connection flow illustration */}
       <ConnectionFlow />
