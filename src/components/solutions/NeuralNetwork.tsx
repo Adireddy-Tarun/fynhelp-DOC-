@@ -16,6 +16,7 @@ import {
   Rocket, Trophy, Map,
   type LucideIcon,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 /* ---------------- Module data (10 suites, ordered clockwise from top) ---------------- */
 
