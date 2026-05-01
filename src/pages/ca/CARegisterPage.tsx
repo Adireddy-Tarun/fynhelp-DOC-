@@ -138,7 +138,7 @@ export default function CARegisterPage() {
         className="md:w-[45%] w-full md:min-h-screen flex flex-col justify-between p-8 md:p-12"
         style={{ background: "#1A1008", color: "#fff", minHeight: "280px" }}
       >
-        <div><FynLogo variant="light" showTagline={false} className="" /></div>
+        <div><FynLogo variant="light" showTagline={false} className="bg-primary-foreground" /></div>
         <div className="my-8 md:my-0 max-w-md">
           <h1 className="text-white" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "36px", lineHeight: 1.15 }}>
             CA Partner Portal
