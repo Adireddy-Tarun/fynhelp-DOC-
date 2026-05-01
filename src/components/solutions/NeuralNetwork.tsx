@@ -187,6 +187,20 @@ const MODULES: ModuleDef[] = [
   },
 ];
 
+/** Icon for each child metric, keyed by exact metric label. */
+const CHILD_ICONS: Record<string, LucideIcon> = {
+  "Cash Runway": TrendingDown, "Burn Rate": Flame, "Working Capital": DollarSign, "Cash Crunch Date": AlertTriangle,
+  "MRR/ARR Growth": TrendingUp, "Aging Receivables": ClockIcon, "Payment Patterns": BarChart2, "Churn Signals": UserX,
+  "Category Breakdown": PieChart, "Vendor Spend": ShoppingCart, "Hidden Costs": Eye, "Optimization Opps": Zap,
+  "ITC Reconciliation": GitCompare, "Filing Deadlines": Calendar, "Notice Risk": AlertCircle, "Unclaimed ITC": DollarSign,
+  "Obligation Calendar": CalendarDays, "Deadline Alerts": Bell, "Completion Rate": CheckCircle2, "Audit Score": Award,
+  "Portfolio Health": Activity, "Compliance Status": Shield, "Shared Intelligence": Share2, "White-label Reports": FileText,
+  "Cost per Employee": User, "Attrition Risk": UserMinus, "Headcount ROI": Users, "Payroll Optimization": Wallet,
+  "Scenario Impact": GitBranch, "Break-even Period": Target, "ROI Projections": TrendingUp, "Risk Score": AlertOctagon,
+  "Unified View": LayoutGrid, "UPI Tracking": Smartphone, "Credit Utilization": CreditCard, "Financing Options": Banknote,
+  "Industry Benchmarks": BarChart3, "Growth Readiness": Rocket, "Competitive Position": Trophy, "Expansion Map": Map,
+};
+
 /** Inter-module relationships (intelligent web) — by id pairs */
 const RELATIONSHIPS: [string, string][] = [
   ["liquidity", "revenue"],
