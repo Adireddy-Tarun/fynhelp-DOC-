@@ -234,6 +234,8 @@ interface Layout {
 
 export default function NeuralNetwork() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [centerHover, setCenterHover] = useState(false);
   
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hoverTimer = useRef<number | null>(null);
