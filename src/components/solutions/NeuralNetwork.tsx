@@ -436,7 +436,7 @@ export default function NeuralNetwork() {
         </defs>
 
         {/* Inter-module curved connections (dashed) */}
-        {RELATIONSHIPS.map(([aId, bId]) => {
+        {!isMobile && RELATIONSHIPS.map(([aId, bId]) => {
           const a = nodeById[aId];
           const b = nodeById[bId];
           if (!a || !b) return null;
