@@ -20,11 +20,12 @@ type FlowCard = {
   Icon: LucideIcon;
   label: string;
   sub: string;
+  brandColor?: string;
 };
 
 const SOURCES: FlowCard[] = [
-  { id: "razorpay", Icon: CreditCard, label: "Razorpay",     sub: "Payment Data" },
-  { id: "zoho",     Icon: BookOpen,   label: "Zoho Books",   sub: "Accounting Data" },
+  { id: "razorpay", Icon: CreditCard, label: "Razorpay",     sub: "Payment Data",          brandColor: "#3395FF" },
+  { id: "zoho",     Icon: BookOpen,   label: "Zoho Books",   sub: "Accounting Data",       brandColor: "#E42527" },
   { id: "bank",     Icon: Building2,  label: "Bank Account", sub: "RBI Account Aggregator" },
   { id: "gst",      Icon: FileText,   label: "GST Portal",   sub: "Tax & Compliance" },
 ];
@@ -75,8 +76,8 @@ export default function ConnectionFlow() {
       ref={sectionRef}
       aria-labelledby="cf-heading"
       style={{
-        background: "linear-gradient(180deg, #E0F2FE 0%, #F3E8FF 100%)",
-        padding: isMobile ? "60px 20px" : "80px 40px",
+        background: "#FAFAF8",
+        padding: isMobile ? "60px 20px" : "100px 40px",
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 600ms ease, transform 600ms ease",
@@ -141,7 +142,7 @@ export default function ConnectionFlow() {
               transition: "all 200ms ease",
             }}
           >
-            Talk to AI CFO Nidhi →
+            Join the Waitlist →
           </button>
           <p
             style={{
@@ -243,7 +244,7 @@ function Card({ card, delayMs, slideFrom }: { card: FlowCard; delayMs: number; s
         });
       }}
     >
-      <Icon size={28} color="#1A1A1A" strokeWidth={2} />
+      <Icon size={28} color={card.brandColor ?? "#1A1A1A"} strokeWidth={2} />
       <div style={{ textAlign: "center" }}>
         <div style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 500, fontSize: 13, color: "#1A1A1A", lineHeight: 1.2 }}>
           {card.label}
