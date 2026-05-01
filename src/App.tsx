@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index.tsx";
-import SolutionsPage from "./pages/SolutionsPage.tsx";
 import ProductsPage from "./pages/ProductsPage.tsx";
 import PricingPage from "./pages/PricingPage.tsx";
 import BlogPage from "./pages/BlogPage.tsx";
@@ -86,7 +85,6 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/solutions" element={<SolutionsPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/blog" element={<BlogPage />} />
