@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
+import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
 const solutions = [
   {
