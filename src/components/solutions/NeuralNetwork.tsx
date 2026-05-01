@@ -240,39 +240,47 @@ export default function NeuralNetwork() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const [pinnedChild, setPinnedChild] = useState<{ moduleId: string; childIdx: number } | null>(null);
-  const [bp, setBp] = useState<"mobile" | "tablet" | "desktop">("desktop");
+  const [vw, setVw] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1280);
 
+  const bp: "mobile" | "tablet" | "desktop" =
+    vw < 768 ? "mobile" : vw < 1200 ? "tablet" : "desktop";
   const active = pinned ?? hovered;
   const isMobile = bp === "mobile";
 
-  /* ----- Responsive layout (mathematical) ----- */
+  /* ----- Responsive layout (mathematical) — recomputes on resize via vw ----- */
   useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth;
-      if (w < 768) setBp("mobile");
-      else if (w < 1200) setBp("tablet");
-      else setBp("desktop");
-    };
+    const update = () => setVw(window.innerWidth);
     update();
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
   }, []);
 
   const layout: Layout = useMemo(() => {
     if (bp === "mobile") {
-      const w = Math.min(typeof window !== "undefined" ? window.innerWidth - 24 : 360, 600);
-      const h = 600;
-      return { w, h, cx: w / 2, cy: h / 2, centerSize: 90, moduleSize: 60, childSize: 45, innerR: 140, outerR: 240 };
+      // Use full available width, clamped, with small horizontal padding
+      const w = Math.max(280, Math.min(vw - 16, 480));
+      const min = w; // height-constrained by width on mobile for centering
+      const h = Math.max(520, Math.min(min + 80, 620));
+      const innerR = w * 0.30;
+      const outerR = w * 0.46;
+      return { w, h, cx: w / 2, cy: h / 2, centerSize: 84, moduleSize: 56, childSize: 42, innerR, outerR };
     }
     if (bp === "tablet") {
-      const w = Math.min(typeof window !== "undefined" ? window.innerWidth - 48 : 900, 1000);
+      const w = Math.min(vw - 48, 1000);
       const h = 700;
-      return { w, h, cx: w / 2, cy: h / 2, centerSize: 120, moduleSize: 75, childSize: 55, innerR: 200, outerR: 340 };
+      const minDim = Math.min(w, h);
+      const innerR = minDim * 0.33;
+      const outerR = minDim * 0.50;
+      return { w, h, cx: w / 2, cy: h / 2, centerSize: 120, moduleSize: 75, childSize: 55, innerR, outerR };
     }
-    const w = Math.min(typeof window !== "undefined" ? window.innerWidth - 80 : 1280, 1280);
+    const w = Math.min(vw - 80, 1280);
     const h = 900;
     return { w, h, cx: w / 2, cy: h / 2, centerSize: 150, moduleSize: 90, childSize: 65, innerR: 280, outerR: 450 };
-  }, [bp]);
+  }, [bp, vw]);
 
   /* ----- Compute node positions via trigonometry ----- */
   const nodes = useMemo(() => {
@@ -388,7 +396,11 @@ export default function NeuralNetwork() {
       style={{
         width: layout.w,
         height: layout.h,
+        maxWidth: "100%",
         background: "transparent",
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
+        overflow: "visible",
       }}
     >
       {/* ============ SVG: lines + particles ============ */}
@@ -397,7 +409,7 @@ export default function NeuralNetwork() {
         height={layout.h}
         viewBox={`0 0 ${layout.w} ${layout.h}`}
         className="absolute inset-0"
-        style={{ pointerEvents: "none", overflow: "visible" }}
+        style={{ pointerEvents: "none", overflow: isMobile ? "hidden" : "visible" }}
         aria-hidden="true"
       >
         <defs>
@@ -424,7 +436,7 @@ export default function NeuralNetwork() {
         </defs>
 
         {/* Inter-module curved connections (dashed) */}
-        {RELATIONSHIPS.map(([aId, bId]) => {
+        {!isMobile && RELATIONSHIPS.map(([aId, bId]) => {
           const a = nodeById[aId];
           const b = nodeById[bId];
           if (!a || !b) return null;
