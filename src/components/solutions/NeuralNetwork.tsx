@@ -524,6 +524,9 @@ export default function NeuralNetwork() {
                 dur={isActive ? "1.5s" : "2.5s"}
                 repeatCount="indefinite"
                 begin={`${(i * 0.22).toFixed(2)}s`}
+                keyPoints="1;0"
+                keyTimes="0;1"
+                calcMode="linear"
               >
                 <mpath href={`#nn-cm-${n.id}`} />
               </animateMotion>
