@@ -396,7 +396,11 @@ export default function NeuralNetwork() {
       style={{
         width: layout.w,
         height: layout.h,
+        maxWidth: "100%",
         background: "transparent",
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
+        overflow: "visible",
       }}
     >
       {/* ============ SVG: lines + particles ============ */}
@@ -405,7 +409,7 @@ export default function NeuralNetwork() {
         height={layout.h}
         viewBox={`0 0 ${layout.w} ${layout.h}`}
         className="absolute inset-0"
-        style={{ pointerEvents: "none", overflow: "visible" }}
+        style={{ pointerEvents: "none", overflow: isMobile ? "hidden" : "visible" }}
         aria-hidden="true"
       >
         <defs>
