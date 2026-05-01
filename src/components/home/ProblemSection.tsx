@@ -262,7 +262,7 @@ export default function ProblemSection() {
         {/* CTA */}
         <div className="text-center mt-8">
           <Link
-            to="/solutions"
+            to="/#product-ecosystem"
             className="inline-flex items-center gap-2 hover:underline"
             style={{
               fontFamily: "'DM Sans', sans-serif",

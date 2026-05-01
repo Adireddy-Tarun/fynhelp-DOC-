@@ -1,7 +1,7 @@
 import HeroSection from "@/components/home/HeroSection";
 import TickerStrip from "@/components/home/TickerStrip";
 import ProblemSection from "@/components/home/ProblemSection";
-import SuitesSection from "@/components/home/SuitesSection";
+import ProductEcosystemSection from "@/components/home/ProductEcosystemSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import SimulatorSection from "@/components/home/SimulatorSection";
 
@@ -15,7 +15,7 @@ const HomePage = () => {
       <HeroSection />
       <TickerStrip />
       <ProblemSection />
-      <SuitesSection />
+      <ProductEcosystemSection />
       <HowItWorksSection />
       <SimulatorSection />
 

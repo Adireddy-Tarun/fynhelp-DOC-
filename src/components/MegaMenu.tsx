@@ -152,7 +152,7 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
               {businessTypes.map((b) => (
                 <li key={b.slug}>
                   <Link
-                    to={`/solutions?type=${b.slug}`}
+                    to={`/#product-ecosystem`}
                     onClick={onClose}
                     role="menuitem"
                     className="mega-biz"
@@ -233,7 +233,7 @@ export default function MegaMenu({ open, onClose, onMouseEnter, onMouseLeave }: 
           }}
         >
           <Link
-            to="/solutions"
+            to="/#product-ecosystem"
             onClick={onClose}
             className="mega-foot-link"
             style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, color: "#C41E1E", textDecoration: "none" }}

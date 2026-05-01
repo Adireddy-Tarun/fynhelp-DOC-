@@ -39,7 +39,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Real-time cash flow tracking, burn rate alerts, runway forecasting",
     status: "live",
     quarter: "Live",
-    href: "/solutions#cash-liquidity",
+    href: "/#product-ecosystem",
   },
   {
     id: "revenue",
