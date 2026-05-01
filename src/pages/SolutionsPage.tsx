@@ -35,22 +35,31 @@ const SolutionsPage = () => {
       </section>
 
       {/* Interactive Ecosystem Map */}
-      <section style={{ background: "#F9F7F4", paddingTop: 80, paddingBottom: 80 }}>
-        <div className="fyn-container text-center">
+      <section style={{ background: "#FAFAF8", padding: "50px 20px 80px" }}>
+        <div className="text-center" style={{ padding: "0 20px 40px" }}>
           <h2
             style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "'Oswald', sans-serif",
               fontWeight: 700,
-              fontSize: 32,
-              color: "#2A2A2A",
+              fontSize: 38,
+              color: "#1A1A1A",
               marginBottom: 16,
+              lineHeight: 1.2,
             }}
           >
             How the product ecosystem works together
           </h2>
-          <p style={{ fontSize: 16, color: "#2A2A2A", opacity: 0.7, marginBottom: 40 }}>
-            Hover over any node to learn more. Click to explore the module.
+          <p style={{
+            fontFamily: "'Roboto', sans-serif",
+            fontSize: 17,
+            color: "#1A1A1A",
+            opacity: 0.75,
+            marginBottom: 0,
+          }}>
+            Hover over any module to see what's inside. Click to explore deeper.
           </p>
+        </div>
+        <div className="text-center">
           <NeuralNetwork />
           <p
             style={{
