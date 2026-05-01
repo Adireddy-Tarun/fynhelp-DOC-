@@ -1,5 +1,6 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { ChevronLeft, Home } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const pageTitles: Record<string, string> = {
   "/": "Home",
@@ -57,17 +58,38 @@ export default function GlobalBackBar() {
     }
   };
 
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    lastY.current = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+      if (Math.abs(delta) < 6) return;
+      // Only hide once we're past the navbar area
+      if (delta > 0 && y > 80) setHidden(true);
+      else if (delta < 0) setHidden(false);
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (isHome) return null;
 
   return (
     <div
-      className="w-full flex items-center sticky z-[900]"
+      className="w-full flex items-center sticky"
       style={{
         height: 44,
         background: "#EDE4CB",
         borderBottom: "1px solid rgba(26,16,8,0.10)",
         top: 72,
         backdropFilter: "blur(8px)",
+        zIndex: 10,
+        transform: hidden ? "translateY(-120%)" : "translateY(0)",
+        transition: "transform 250ms ease",
       }}
     >
       <div
