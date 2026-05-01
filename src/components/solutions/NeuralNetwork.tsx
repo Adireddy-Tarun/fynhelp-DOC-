@@ -554,14 +554,27 @@ export default function NeuralNetwork() {
 
       {/* ============ Center node — AI CFO Nidhi ============ */}
       <div
-        className="absolute flex flex-col items-center"
+        className="absolute flex flex-col items-center center-node"
         style={{
           left: layout.cx,
           top: layout.cy,
           transform: "translate(-50%, -50%)",
           zIndex: 50,
           willChange: "transform",
+          cursor: "pointer",
         }}
+        onMouseEnter={() => setCenterHover(true)}
+        onMouseLeave={() => setCenterHover(false)}
+        onClick={() => navigate(user ? "/dashboard" : "/waitlist")}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            navigate(user ? "/dashboard" : "/waitlist");
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="AI CFO Nidhi — Central Intelligence. Click to get started."
       >
         <div
           className="rounded-full flex items-center justify-center"
@@ -570,12 +583,16 @@ export default function NeuralNetwork() {
             height: layout.centerSize,
             background: "radial-gradient(circle at 35% 30%, #FF4444 0%, #C41E1E 75%)",
             position: "relative",
-            animation: active
+            animation: active || centerHover
               ? "nn-center-pulse-active 2000ms ease-in-out infinite"
               : "nn-center-pulse 3000ms ease-in-out infinite",
-            transition: "box-shadow 250ms ease",
+            transition: "box-shadow 250ms ease, transform 250ms ease",
+            transform: centerHover ? "scale(1.05)" : "scale(1)",
+            boxShadow: centerHover
+              ? "0 0 0 10px rgba(196,30,30,0.12), 0 16px 48px rgba(196,30,30,0.45)"
+              : undefined,
           }}
-          aria-label="AI CFO Nidhi — Central Intelligence"
+          aria-hidden="true"
         >
           <Brain
             color="#FFFFFF"
@@ -613,6 +630,38 @@ export default function NeuralNetwork() {
             Central Intelligence
           </div>
         </div>
+
+        {/* Hover popup (desktop/tablet) */}
+        {centerHover && !isMobile && (
+          <div
+            role="tooltip"
+            style={{
+              position: "absolute",
+              top: `calc(100% + 16px)`,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#1A1A1A",
+              color: "#FFFFFF",
+              padding: "14px 18px",
+              borderRadius: 10,
+              boxShadow: "0 12px 32px rgba(0,0,0,0.25)",
+              width: 280,
+              pointerEvents: "none",
+              zIndex: 60,
+              animation: "nn-tip-in 160ms ease-out",
+            }}
+          >
+            <div style={{ fontFamily: "'Raleway', sans-serif", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>
+              Central Intelligence Brain
+            </div>
+            <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, lineHeight: 1.5, color: "#D1D5DB" }}>
+              Processes data from all 10 modules to give you unified financial intelligence.
+            </div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 12, marginTop: 10, color: "#FF6B6B" }}>
+              Click to get started →
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ============ Hover zones (invisible bounding boxes covering module + 4 children + padding) ============
