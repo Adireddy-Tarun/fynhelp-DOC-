@@ -78,9 +78,6 @@ const SolutionsPage = () => {
         </div>
       </section>
 
-      {/* Backend infrastructure layer */}
-      <BackendInfrastructure />
-
       {/* Animated connection flow illustration */}
       <ConnectionFlow />
 
