@@ -244,7 +244,7 @@ function Card({ card, delayMs, slideFrom }: { card: FlowCard; delayMs: number; s
         });
       }}
     >
-      <Icon size={28} color="#1A1A1A" strokeWidth={2} />
+      <Icon size={28} color={card.brandColor ?? "#1A1A1A"} strokeWidth={2} />
       <div style={{ textAlign: "center" }}>
         <div style={{ fontFamily: "'Roboto', sans-serif", fontWeight: 500, fontSize: 13, color: "#1A1A1A", lineHeight: 1.2 }}>
           {card.label}
