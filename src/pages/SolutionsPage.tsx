@@ -1,21 +1,8 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-
-import { SUITES } from "@/data/suiteStatus";
-
-// Ecosystem nodes derived from the shared suite registry.
-// 10 modules around AI CFO Nidhi at the center.
-const nodes = SUITES.map((s, i) => ({
-  id: s.id,
-  label: s.shortLabel,
-  angle: (360 / SUITES.length) * i, // evenly distributed around the circle
-  slug: s.href,
-  title: s.description,
-  status: s.status,
-  quarter: s.quarter,
-}));
+import NeuralNetwork from "@/components/solutions/NeuralNetwork";
 
 const solutions = [
   {
