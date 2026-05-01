@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
+import BackendInfrastructure from "@/components/solutions/BackendInfrastructure";
 import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
 const SolutionsPage = () => {
@@ -63,20 +64,23 @@ const SolutionsPage = () => {
           <NeuralNetwork />
           <p
             style={{
-              fontSize: 16,
+              fontFamily: "'Roboto', sans-serif",
+              fontSize: 18,
               lineHeight: 1.6,
-              color: "#2A2A2A",
-              opacity: 0.8,
-              marginTop: 40,
-              maxWidth: 640,
-              marginLeft: "auto",
-              marginRight: "auto",
+              color: "#1A1A1A",
+              maxWidth: 820,
+              margin: "50px auto 0 auto",
+              padding: "0 20px",
+              textAlign: "center",
             }}
           >
             Every module feeds AI CFO Nidhi. AI CFO Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
           </p>
         </div>
       </section>
+
+      {/* Backend infrastructure layer */}
+      <BackendInfrastructure />
 
       {/* Animated connection flow illustration */}
       <ConnectionFlow />
