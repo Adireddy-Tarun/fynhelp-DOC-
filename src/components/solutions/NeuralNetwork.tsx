@@ -4,9 +4,18 @@ import {
   Brain, Check, X, Clock,
   Droplets, TrendingUp, PieChart, FileText, Shield,
   Briefcase, Users, Zap, Building2, BarChart3,
+  TrendingDown, Flame, DollarSign, AlertTriangle,
+  Clock as ClockIcon, BarChart2, UserX,
+  ShoppingCart, Eye,
+  GitCompare, Calendar, AlertCircle,
+  CalendarDays, Bell, CheckCircle2, Award,
+  Activity, Share2,
+  User, UserMinus, Wallet,
+  GitBranch, Target, AlertOctagon,
+  LayoutGrid, Smartphone, CreditCard, Banknote,
+  Rocket, Trophy, Map,
   type LucideIcon,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 
 /* ---------------- Module data (10 suites, ordered clockwise from top) ---------------- */
 
