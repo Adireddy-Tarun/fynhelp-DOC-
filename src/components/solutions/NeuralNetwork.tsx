@@ -334,6 +334,7 @@ export default function NeuralNetwork() {
   const closeCard = useCallback(() => {
     setPinned(null);
     setHovered(null);
+    setPinnedChild(null);
   }, []);
 
   // ESC closes card
