@@ -656,7 +656,6 @@ export default function NeuralNetwork() {
             className="absolute flex flex-col items-center"
             onMouseEnter={() => !isMobile && debouncedSetHovered(n.id)}
             onMouseLeave={() => !isMobile && debouncedSetHovered(null)}
-            onClick={() => handleClick(n.id)}
             style={{
               left: n.x,
               top: n.y,
