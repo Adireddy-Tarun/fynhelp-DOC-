@@ -1,5 +1,4 @@
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
-import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
 /**
  * ProductEcosystemSection
@@ -59,8 +58,6 @@ export default function ProductEcosystemSection() {
         </div>
       </section>
 
-      {/* Connection visualization (includes its own CTA) */}
-      <ConnectionFlow />
     </div>
   );
 }
