@@ -19,13 +19,6 @@ const SolutionsPage = () => {
     return () => window.clearTimeout(t);
   }, [location.hash, location.key]);
 
-  const handleLearnMore = (dashSlug: string) => {
-    if (!user) {
-      navigate(`/waitlist?return=${dashSlug}`);
-    } else {
-      navigate(dashSlug);
-    }
-  };
 
   return (
     <Layout>
