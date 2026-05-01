@@ -32,7 +32,7 @@ export default function FinalCTASection() {
         </div>
 
         <p className="text-white font-medium text-base md:text-lg mt-5">
-          First 1,000 users get Pro Plan FREE for 6 months (₹45,000 value)
+          (First 100 users get Pro Plan FREE for 6 months Worth ₹45,000)
         </p>
 
         <p className="text-white/70 text-sm mt-3">
