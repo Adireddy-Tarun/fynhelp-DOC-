@@ -598,8 +598,38 @@ export default function NeuralNetwork() {
         </div>
       </div>
 
+      {/* ============ Hover zones (invisible bounding boxes covering module + 4 children + padding) ============
+          Keeps cluster "hovered" while user moves between module → children → info card. */}
+      {!isMobile && nodes.map((n) => {
+        const pts = [{ x: n.x, y: n.y }, ...n.children.map((c) => ({ x: c.x, y: c.y }))];
+        const pad = layout.childSize / 2 + 24;
+        const minX = Math.min(...pts.map((p) => p.x)) - pad;
+        const minY = Math.min(...pts.map((p) => p.y)) - pad;
+        const maxX = Math.max(...pts.map((p) => p.x)) + pad;
+        const maxY = Math.max(...pts.map((p) => p.y)) + pad;
+        const isActive = active === n.id;
+        return (
+          <div
+            key={`hz-${n.id}`}
+            onMouseEnter={() => debouncedSetHovered(n.id)}
+            onMouseLeave={() => debouncedSetHovered(null)}
+            style={{
+              position: "absolute",
+              left: minX,
+              top: minY,
+              width: maxX - minX,
+              height: maxY - minY,
+              zIndex: isActive ? 25 : 10,
+              pointerEvents: "auto",
+              background: "transparent",
+            }}
+            aria-hidden="true"
+          />
+        );
+      })}
+
       {/* ============ Module nodes (Layer 2) ============ */}
-      {nodes.map((n) => {
+      {nodes.map((n, idx) => {
         const Icon = n.Icon;
         const isActive = active === n.id;
         const isLive = n.status === "live";
@@ -617,14 +647,13 @@ export default function NeuralNetwork() {
               opacity: dimmed ? 0.4 : 1,
               transition: "opacity 200ms ease",
               willChange: "transform, opacity",
+              pointerEvents: "none",
             }}
           >
             <button
               type="button"
               tabIndex={0}
               aria-label={`${n.name} module. Status: ${isLive ? "Live" : "In development"}. Click to explore.`}
-              onMouseEnter={() => !isMobile && debouncedSetHovered(n.id)}
-              onMouseLeave={() => !isMobile && debouncedSetHovered(null)}
               onClick={() => handleClick(n.id)}
               onKeyDown={(e) => onNodeKey(e, n.id)}
               className="relative rounded-full flex items-center justify-center focus-visible:outline-none"
@@ -634,22 +663,25 @@ export default function NeuralNetwork() {
                 background: "#FFFFFF",
                 border: `2px solid ${isActive ? "#C41E1E" : isRelated ? "rgba(196,30,30,0.3)" : "#E5E7EB"}`,
                 boxShadow: isActive
-                  ? "0 12px 36px rgba(196,30,30,0.3)"
-                  : "0 6px 18px rgba(0,0,0,0.08)",
+                  ? "0 0 35px rgba(196,30,30,0.45), 0 14px 40px rgba(196,30,30,0.35), 0 4px 12px rgba(0,0,0,0.15)"
+                  : "0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)",
                 transform: isActive ? "scale(1.15)" : isRelated ? "scale(1.05)" : "scale(1)",
-                transition: "transform 200ms ease-out, border-color 200ms ease, box-shadow 200ms ease",
+                transition: "transform 250ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms ease, box-shadow 250ms ease",
                 cursor: "pointer",
-                animation: isActive ? undefined : "nn-breathe 4000ms ease-in-out infinite",
+                animation: isActive
+                  ? undefined
+                  : `nn-breathe 4000ms ease-in-out ${(idx * 0.3).toFixed(2)}s infinite`,
                 willChange: "transform",
                 outline: "none",
+                pointerEvents: "auto",
               }}
               onFocus={(e) => {
                 e.currentTarget.style.boxShadow = "0 0 0 3px #C41E1E, 0 6px 18px rgba(0,0,0,0.08)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.boxShadow = isActive
-                  ? "0 12px 36px rgba(196,30,30,0.3)"
-                  : "0 6px 18px rgba(0,0,0,0.08)";
+                  ? "0 0 35px rgba(196,30,30,0.45), 0 14px 40px rgba(196,30,30,0.35), 0 4px 12px rgba(0,0,0,0.15)"
+                  : "0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)";
               }}
             >
               <Icon
@@ -699,6 +731,7 @@ export default function NeuralNetwork() {
           const isActive = showChildren(n.id);
           // Hide on mobile unless module is active
           const visible = isActive || (!isMobile && !active);
+          const ChildIcon = CHILD_ICONS[c.label];
           return (
             <div
               key={c.id}
@@ -711,7 +744,7 @@ export default function NeuralNetwork() {
                 zIndex: isActive ? 90 : 20,
                 transition: `transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1) ${ci * 40}ms, opacity 250ms ease ${ci * 40}ms`,
                 willChange: "transform, opacity",
-                pointerEvents: visible ? "auto" : "none",
+                pointerEvents: "none",
               }}
             >
               <div
@@ -722,27 +755,36 @@ export default function NeuralNetwork() {
                   background: "#FFFFFF",
                   border: `1.5px solid ${isActive ? "#C41E1E" : "#E5E7EB"}`,
                   boxShadow: isActive
-                    ? "0 6px 18px rgba(196,30,30,0.2)"
+                    ? "0 0 20px rgba(196,30,30,0.3), 0 6px 18px rgba(0,0,0,0.1)"
                     : "0 4px 12px rgba(0,0,0,0.06)",
                   transition: "border-color 200ms ease, box-shadow 200ms ease",
+                  padding: 4,
+                  textAlign: "center",
                 }}
                 aria-label={`${c.label} metric`}
-              />
-              <div
-                style={{
-                  marginTop: 6,
-                  fontFamily: "'Roboto', sans-serif",
-                  fontWeight: 500,
-                  fontSize: isMobile ? 10 : 12,
-                  color: "#1A1A1A",
-                  textAlign: "center",
-                  maxWidth: 80,
-                  lineHeight: 1.25,
-                  opacity: isActive ? 1 : 0,
-                  transition: "opacity 200ms ease",
-                }}
               >
-                {c.label}
+                {isActive ? (
+                  <span
+                    style={{
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 500,
+                      fontSize: isMobile ? 9 : 11,
+                      color: "#1A1A1A",
+                      lineHeight: 1.15,
+                      padding: 2,
+                    }}
+                  >
+                    {c.label}
+                  </span>
+                ) : (
+                  ChildIcon && (
+                    <ChildIcon
+                      size={Math.round(layout.childSize * 0.4)}
+                      color="#1A1A1A"
+                      strokeWidth={2}
+                    />
+                  )
+                )}
               </div>
             </div>
           );
