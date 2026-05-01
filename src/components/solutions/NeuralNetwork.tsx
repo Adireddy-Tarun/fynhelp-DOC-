@@ -654,6 +654,9 @@ export default function NeuralNetwork() {
           <div
             key={n.id}
             className="absolute flex flex-col items-center"
+            onMouseEnter={() => !isMobile && debouncedSetHovered(n.id)}
+            onMouseLeave={() => !isMobile && debouncedSetHovered(null)}
+            onClick={() => handleClick(n.id)}
             style={{
               left: n.x,
               top: n.y,
@@ -662,7 +665,9 @@ export default function NeuralNetwork() {
               opacity: dimmed ? 0.4 : 1,
               transition: "opacity 200ms ease",
               willChange: "transform, opacity",
-              pointerEvents: "none",
+              pointerEvents: "auto",
+              cursor: "pointer",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
             <button
