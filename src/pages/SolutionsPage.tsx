@@ -72,55 +72,6 @@ const SolutionsPage = () => {
       {/* Animated connection flow illustration */}
       <ConnectionFlow />
 
-      {/* Solution deep dives */}
-      {solutions.map((s) => (
-        <section key={s.title} id={s.slug} className={`${s.bg} fyn-section scroll-mt-24`}>
-          <div className="fyn-container max-w-3xl font-bold">
-            <h2 className={`text-3xl ${s.text} mb-4`}>{s.title}</h2>
-            <p className={`${s.sub} mb-6 leading-relaxed`}>{s.problem}</p>
-            <p className={`${s.sub} mb-6 leading-relaxed`}>{s.solution}</p>
-
-            {/* Before / After */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <div className={`rounded-lg p-4 ${s.bg === "bg-fyn-ink" ? "bg-white/5" : "bg-fyn-danger-bg"}`}>
-                <p className="fyn-caption text-fyn-red text-[10px] mb-1">Before FynHelp</p>
-                <p className={`text-sm ${s.bg === "bg-fyn-ink" ? "text-white/80" : "text-fyn-ink/80"}`}>{s.before}</p>
-              </div>
-              <div className={`rounded-lg p-4 ${s.bg === "bg-fyn-ink" ? "bg-white/5" : "bg-fyn-success-bg"}`}>
-                <p className="fyn-caption text-fyn-success text-[10px] mb-1">After FynHelp</p>
-                <p className={`text-sm ${s.bg === "bg-fyn-ink" ? "text-white/80" : "text-fyn-ink/80"}`}>{s.after}</p>
-              </div>
-            </div>
-
-            {/* Module chips — clickable */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {s.modules.map((m) => (
-                <button key={m}
-                  onClick={() => handleLearnMore(s.dashSlug)}
-                  className={`text-xs px-3 py-1.5 rounded border cursor-pointer ${
-                    s.bg === "bg-fyn-ink"
-                      ? "border-white/20 text-white/60 hover:border-fyn-red hover:text-fyn-red"
-                      : "border-fyn-ink-10 text-fyn-ink/60 hover:border-fyn-red hover:text-fyn-red hover:bg-fyn-red-light"
-                  }`}
-                  style={{ transition: "all 200ms" }}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-
-            {/* Learn more */}
-            <button
-              onClick={() => handleLearnMore(s.dashSlug)}
-              className="text-fyn-red text-sm font-medium inline-flex items-center gap-1 group"
-              style={{ background: "transparent", border: "none", cursor: "pointer" }}
-            >
-              Learn more
-              <span className="inline-block transition-transform group-hover:translate-x-1" style={{ transition: "transform 200ms" }}>→</span>
-            </button>
-          </div>
-        </section>
-      ))}
     </Layout>
   );
 };
