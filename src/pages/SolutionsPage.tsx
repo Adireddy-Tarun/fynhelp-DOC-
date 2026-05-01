@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
 import NeuralNetwork from "@/components/solutions/NeuralNetwork";
-import BackendInfrastructure from "@/components/solutions/BackendInfrastructure";
 import ConnectionFlow from "@/components/solutions/ConnectionFlow";
 
 const SolutionsPage = () => {
