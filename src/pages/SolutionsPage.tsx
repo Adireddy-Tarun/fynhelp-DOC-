@@ -35,7 +35,7 @@ const SolutionsPage = () => {
       </section>
 
       {/* Interactive Ecosystem Map */}
-      <section style={{ background: "#FAFAF8", padding: "50px 20px 80px" }}>
+      <section style={{ background: "#FAFAF8", padding: "50px 12px 80px", overflowX: "hidden" }}>
         <div className="text-center" style={{ padding: "0 20px 40px" }}>
           <h2
             style={{
