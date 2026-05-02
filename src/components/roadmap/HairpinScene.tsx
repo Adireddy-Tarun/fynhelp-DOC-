@@ -172,29 +172,63 @@ export default function HairpinScene({ onSelectStop }: Props) {
   const pathRef = useRef<SVGPathElement | null>(null);
   const [steps, setSteps] = useState<{ x: number; y: number; angle: number; completed: boolean; behind: boolean }[]>([]);
 
-  // Build the spiral path through stops (start at kiosk near base, end at summit)
-  const pathD = useMemo(() => {
-    const anchors: Pt[] = [
-      { x: 16, y: 90 }, // kiosk start
-      ...HAIRPIN_STOPS.map((s) => ({ x: s.xPct, y: s.yPct })),
-      { x: 50, y: 7 },  // summit cap
+  // Build the spiral path as PER-SEGMENT quadratic curves so we can:
+  //  - bulge each curve outward toward the chip side (mountainside arc)
+  //  - hide a small mid-portion when the curve crosses the ridge (behind illusion)
+  //  - color completed (≤ climber) vs remaining segments
+  const segments = useMemo(() => {
+    const stops = HAIRPIN_STOPS.map((s) => ({
+      x: s.xPct,
+      y: s.yPct,
+      side: s.side as "left" | "right",
+      n: s.n,
+    }));
+    const anchors = [
+      { x: 16, y: 90, side: "left" as const, n: 0 }, // kiosk
+      ...stops,
+      { x: 50, y: 7, side: "right" as const, n: 99 }, // summit
     ];
-    return buildSmoothPath(anchors);
+    const segs: Array<{
+      d: string;
+      completed: boolean;
+      crosses: boolean;
+      from: typeof anchors[number];
+      to: typeof anchors[number];
+    }> = [];
+    for (let i = 0; i < anchors.length - 1; i++) {
+      const a = anchors[i];
+      const b = anchors[i + 1];
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2;
+      // Push control point outward toward the chip side of the source stop
+      // for the "wraps around mountainside" arc.
+      const bulge = a.side === "left" ? -8 : 8; // negative = leftward
+      const cx = mx + bulge;
+      const cy = my; // keep vertical mid
+      const d = `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
+      // crosses = endpoints are on opposite sides → curve wraps behind ridge
+      const crosses = a.side !== b.side;
+      const completed = b.n <= CLIMBER_AT && a.n < CLIMBER_AT + 1;
+      segs.push({ d, completed, crosses, from: a, to: b });
+    }
+    return segs;
   }, []);
+
+  // Combined path string for the hidden measurement path (used to find
+  // climber pixel coords and to lay sample-driven step strokes).
+  const pathD = useMemo(() => segments.map((s) => s.d).join(" "), [segments]);
 
   // After path renders, sample step positions for stairway look.
   useEffect(() => {
     const path = pathRef.current;
     if (!path) return;
-    const samples = samplePath(path, 140);
-    // Determine the path-length of the climber stop to split completed/remaining.
+    const samples = samplePath(path, 180);
     const total = path.getTotalLength();
-    // Find sample index closest to climber stop
     const climber = HAIRPIN_STOPS.find((s) => s.n === CLIMBER_AT)!;
     let climberLen = total * 0.5;
     let best = Infinity;
-    for (let i = 0; i <= 200; i++) {
-      const len = (i / 200) * total;
+    for (let i = 0; i <= 240; i++) {
+      const len = (i / 240) * total;
       const pt = path.getPointAtLength(len);
       const d = (pt.x - climber.xPct) ** 2 + (pt.y - climber.yPct) ** 2;
       if (d < best) { best = d; climberLen = len; }
@@ -202,8 +236,8 @@ export default function HairpinScene({ onSelectStop }: Props) {
     const result = samples.map((s, i) => {
       const len = (i / samples.length) * total;
       const completed = len <= climberLen;
-      // Heuristic "behind mountain": within central band high up (above y=55) and close to mountain center
-      const behind = s.p.y < 55 && Math.abs(s.p.x - 50) < 4.5;
+      // "Behind ridge" band — wider so behind portions are clearly hidden
+      const behind = s.p.y < 70 && Math.abs(s.p.x - 50) < 6;
       return { x: s.p.x, y: s.p.y, angle: s.angle, completed, behind };
     });
     setSteps(result);
@@ -293,24 +327,24 @@ export default function HairpinScene({ onSelectStop }: Props) {
         <path d="M 0 70 Q 12 56 22 62 T 42 60 T 62 58 T 82 62 T 100 60 L 100 78 L 0 78 Z" fill="url(#hp-distant-1)" />
         <path d="M 0 78 Q 14 66 28 72 T 50 70 T 72 72 T 100 70 L 100 84 L 0 84 Z" fill="url(#hp-distant-2)" />
 
-        {/* === Wide main mountain (broad bell shape) === */}
+        {/* === Wide Mt-Fuji-style main mountain (base spans 92% of width) === */}
         <path
-          d="M 8 92
-             C 14 70, 22 50, 30 36
-             C 36 26, 42 16, 50 8
-             C 58 16, 64 26, 70 36
-             C 78 50, 86 70, 92 92
+          d="M 4 92
+             C 12 78, 20 60, 28 44
+             C 34 32, 42 18, 50 8
+             C 58 18, 66 32, 72 44
+             C 80 60, 88 78, 96 92
              Z"
           fill="url(#hp-mountain)"
         />
         {/* lit slope from upper right */}
         <path
-          d="M 50 8 C 58 16, 64 26, 70 36 C 78 50, 86 70, 92 92 L 50 92 Z"
+          d="M 50 8 C 58 18, 66 32, 72 44 C 80 60, 88 78, 96 92 L 50 92 Z"
           fill="url(#hp-mtn-lit)"
         />
         {/* Ridge shading lines */}
         <path d="M 50 8 L 50 92" stroke="#0e0c0a" strokeWidth="0.22" opacity="0.35" />
-        <path d="M 38 30 L 50 12 M 62 30 L 50 12 M 30 55 L 50 25 M 70 55 L 50 25 M 22 78 L 50 45 M 78 78 L 50 45"
+        <path d="M 36 32 L 50 12 M 64 32 L 50 12 M 28 55 L 50 25 M 72 55 L 50 25 M 18 78 L 50 45 M 82 78 L 50 45"
               stroke="#0e0c0a" strokeWidth="0.16" opacity="0.28" fill="none" />
 
         {/* Snow cap */}
@@ -320,17 +354,34 @@ export default function HairpinScene({ onSelectStop }: Props) {
           style={{ filter: "drop-shadow(0 0.4px 0.6px rgba(0,0,0,0.3))" }}
         />
 
-        {/* === The path (used for measurement; not drawn directly) === */}
+        {/* === Hidden measurement path === */}
         <path ref={pathRef} d={pathD} fill="none" stroke="transparent" />
 
-        {/* Faint full path outline for continuity */}
-        <path d={pathD} fill="none" stroke="#FAF6EE" strokeWidth="0.3" opacity="0.25" strokeLinecap="round" />
+        {/* === Per-segment curves (visible) === */}
+        {segments.map((seg, i) => {
+          const color = seg.completed ? GREEN : GOLD;
+          // Faint backing trail on every segment (subtle, even where step strokes go)
+          return (
+            <g key={`seg-${i}`}>
+              {/* faint backing curve */}
+              <path
+                d={seg.d}
+                stroke={color}
+                strokeWidth="0.4"
+                fill="none"
+                opacity={seg.crosses ? 0.18 : 0.55}
+                strokeLinecap="round"
+              />
+            </g>
+          );
+        })}
 
-        {/* Stairway steps — generated from samples */}
+        {/* === Stairway steps (horizontal stone treads) === */}
         {steps.map((s, i) => {
-          if (i % 2 !== 0) return null; // step every 2 samples
-          const len = 1.6;
-          const w = 0.6;
+          if (i % 3 !== 0) return null; // step every 3rd sample → cleaner spacing
+          const len = 1.0; // shorter tread (~3px on screen)
+          const w = 0.5;   // ~2px tall
+          // Tread is perpendicular to path direction (so it looks horizontal where path climbs vertically)
           const nx = -Math.sin(s.angle);
           const ny = Math.cos(s.angle);
           const x1 = s.x + nx * len * 0.5;
@@ -338,7 +389,7 @@ export default function HairpinScene({ onSelectStop }: Props) {
           const x2 = s.x - nx * len * 0.5;
           const y2 = s.y - ny * len * 0.5;
           const color = s.completed ? GREEN : GOLD;
-          const opacity = s.behind ? 0.32 : 1;
+          if (s.behind) return null; // hide behind-ridge steps entirely → "wraps behind" illusion
           return (
             <line
               key={`step-${i}`}
@@ -346,43 +397,52 @@ export default function HairpinScene({ onSelectStop }: Props) {
               stroke={color}
               strokeWidth={w}
               strokeLinecap="round"
-              opacity={opacity}
-              style={{ filter: s.behind ? "none" : `drop-shadow(0 0 0.6px ${color})` }}
+              style={{ filter: `drop-shadow(0 0 0.5px ${color})` }}
             />
           );
         })}
 
-        {/* === Ground strip === */}
-        <rect x="0" y="89" width="100" height="6" fill="url(#hp-ground)" />
-        {/* grass tufts on top edge */}
-        {Array.from({ length: 28 }).map((_, i) => {
-          const x = (i + 0.5) * (100 / 28);
+        {/* === Ground strip (taller, with darker patches) === */}
+        <rect x="0" y="87" width="100" height="8" fill="url(#hp-ground)" />
+        {/* darker sand patches for variation */}
+        <ellipse cx="22" cy="92" rx="9" ry="1.1" fill="#A88B5E" opacity="0.55" />
+        <ellipse cx="55" cy="93" rx="12" ry="1.0" fill="#8E7448" opacity="0.4" />
+        <ellipse cx="82" cy="92" rx="10" ry="1.2" fill="#A88B5E" opacity="0.55" />
+        {/* grass tufts on top edge — denser, curved humps */}
+        {Array.from({ length: 36 }).map((_, i) => {
+          const x = (i + 0.5) * (100 / 36);
           return (
             <path
               key={`grass-${i}`}
-              d={`M ${x} 89.4 l -0.4 -0.7 M ${x} 89.4 l 0 -0.9 M ${x} 89.4 l 0.4 -0.7`}
-              stroke="#3a6620" strokeWidth="0.18" strokeLinecap="round" fill="none"
+              d={`M ${x - 0.5} 87.4 Q ${x} 86.2 ${x + 0.5} 87.4`}
+              stroke="#7A9E5A" strokeWidth="0.32" strokeLinecap="round" fill="#7A9E5A" opacity="0.85"
             />
           );
         })}
 
-        {/* === Trees on ground & lower slopes === */}
-        <PineTree  x={10} y={89} scale={1.1} delay={0.0} />
-        <RoundTree x={14} y={89} scale={0.9} delay={0.4} />
-        <PineTree  x={6}  y={89} scale={0.8} delay={0.8} />
-        <RoundTree x={22} y={89} scale={0.7} delay={1.2} />
-        <PineTree  x={30} y={89} scale={1.0} delay={0.5} />
-        <RoundTree x={70} y={89} scale={1.0} delay={0.2} />
-        <PineTree  x={78} y={89} scale={1.2} delay={0.9} />
-        <RoundTree x={86} y={89} scale={0.85} delay={1.5} />
-        <PineTree  x={92} y={89} scale={0.7} delay={0.3} />
-        {/* Tiny trees higher up */}
-        <PineTree  x={18} y={78} scale={0.45} delay={1.1} />
-        <RoundTree x={84} y={76} scale={0.4} delay={0.6} />
-        <PineTree  x={28} y={66} scale={0.35} delay={1.4} />
+        {/* === Trees on ground & lower slopes (baseline y=87) === */}
+        <PineTree  x={6}  y={87} scale={0.85} delay={0.8} />
+        <PineTree  x={10} y={87} scale={1.15} delay={0.0} />
+        <RoundTree x={13.5} y={87} scale={0.95} delay={0.4} />
+        <PineTree  x={22} y={87} scale={0.75} delay={1.2} />
+        <RoundTree x={26} y={87} scale={0.7}  delay={0.9} />
+        <PineTree  x={30} y={87} scale={1.05} delay={0.5} />
+        <RoundTree x={66} y={87} scale={0.7}  delay={1.3} />
+        <PineTree  x={70} y={87} scale={1.0}  delay={0.2} />
+        <RoundTree x={74} y={87} scale={0.85} delay={0.6} />
+        <PineTree  x={78} y={87} scale={1.25} delay={0.9} />
+        <RoundTree x={86} y={87} scale={0.85} delay={1.5} />
+        <PineTree  x={92} y={87} scale={0.75} delay={0.3} />
+        {/* Smaller, darker distance trees on lower slopes */}
+        <g opacity="0.75">
+          <PineTree  x={18} y={78} scale={0.45} delay={1.1} />
+          <RoundTree x={84} y={76} scale={0.4}  delay={0.6} />
+          <PineTree  x={28} y={66} scale={0.35} delay={1.4} />
+          <PineTree  x={76} y={68} scale={0.32} delay={0.7} />
+        </g>
 
-        {/* === FYNHelp Kiosk at base === */}
-        <Kiosk x={16} y={89} />
+        {/* === FYNHelp Kiosk at base, near Stop 1 === */}
+        <Kiosk x={18} y={87} />
 
         {/* === Ocean === */}
         <rect x="0" y="95" width="100" height="5" fill="url(#hp-ocean)" />
@@ -416,13 +476,53 @@ export default function HairpinScene({ onSelectStop }: Props) {
         </g>
       </svg>
 
-      {/* === Story labels (positioned with %) === */}
+      {/* === Story labels & speech bubbles (positioned with %) === */}
+      {/* HELP! speech bubble above first sinker */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", left: "42%", top: "92.5%",
+          transform: "translate(-50%, -100%)",
+          zIndex: 5, pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            background: "#FFFFFF",
+            color: DARK,
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 700,
+            fontSize: 8,
+            letterSpacing: "0.4px",
+            padding: "2px 6px",
+            borderRadius: 6,
+            border: `1px solid ${DARK}`,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.18)",
+            position: "relative",
+          }}
+        >
+          HELP!
+          <span
+            style={{
+              position: "absolute",
+              left: "50%",
+              bottom: -4,
+              transform: "translateX(-50%) rotate(45deg)",
+              width: 6, height: 6,
+              background: "#FFFFFF",
+              borderRight: `1px solid ${DARK}`,
+              borderBottom: `1px solid ${DARK}`,
+            }}
+          />
+        </div>
+      </div>
+
       <span
         className="hairpin-sink-label"
         style={{
-          position: "absolute", left: "30%", top: "94.4%",
-          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
-          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+          position: "absolute", left: "30%", top: "97.4%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", color: "#6B5D4D",
+          zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
         }}
       >
         63M Indian SMEs without financial clarity
@@ -430,9 +530,9 @@ export default function HairpinScene({ onSelectStop }: Props) {
       <span
         className="hairpin-raft-label"
         style={{
-          position: "absolute", left: "70%", top: "92.5%",
-          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
-          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+          position: "absolute", left: "70%", top: "92%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", color: "#6B5D4D",
+          zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
         }}
       >
         Surviving on spreadsheets &amp; gut feeling
