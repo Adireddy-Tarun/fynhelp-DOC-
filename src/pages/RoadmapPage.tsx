@@ -1,182 +1,150 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import NotifyMeModal from "@/components/NotifyMeModal";
-import SuiteStatusBadge from "@/components/SuiteStatusBadge";
-import { SUITES, QUARTERS, type SuiteMeta } from "@/data/suiteStatus";
-
-const stripeBg = {
-  backgroundImage:
-    "repeating-linear-gradient(45deg, transparent 0, transparent 10px, rgba(249,247,244,0.3) 10px, rgba(249,247,244,0.3) 20px)",
-};
-
-function FeatureCard({ suite, onNotify }: { suite: SuiteMeta; onNotify: (id: string) => void }) {
-  const Icon = suite.Icon;
-  return (
-    <div
-      id={suite.id}
-      className="relative bg-fyn-beige-card rounded-lg p-6 overflow-hidden scroll-mt-24"
-      style={{
-        border: "1px dashed #E5E7EB",
-        ...stripeBg,
-      }}
-    >
-      {/* Diagonal "In Development" watermark */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
-        style={{
-          transform: "rotate(-15deg)",
-          fontSize: 28,
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          color: "#9CA3AF",
-          opacity: 0.1,
-          fontWeight: 700,
-        }}
-      >
-        In Development
-      </span>
-
-      <div className="relative" style={{ opacity: 0.85 }}>
-        <div className="flex items-start justify-between mb-3">
-          <div
-            className="w-10 h-10 rounded-md flex items-center justify-center"
-            style={{ background: "rgba(107,114,128,0.10)" }}
-          >
-            <Icon size={20} color="#6B7280" />
-          </div>
-          <SuiteStatusBadge status={suite.status} />
-        </div>
-        <h3 className="font-serif text-fyn-ink mb-1" style={{ fontSize: 18, fontWeight: 700 }}>
-          {suite.name}
-        </h3>
-        <p className="text-xs font-semibold text-fyn-ink/70 mb-3">
-          Launching <span className="text-fyn-ink">{suite.quarter}</span>
-        </p>
-        <p className="text-[13px] text-fyn-ink/70 leading-relaxed mb-4">{suite.description}</p>
-        <p className="text-[11px] uppercase tracking-wider text-fyn-ink/50 mb-3">
-          Currently in development
-        </p>
-        <button
-          type="button"
-          onClick={() => onNotify(suite.id)}
-          className="w-full py-2.5 rounded-md bg-fyn-ink text-white text-sm font-medium hover:opacity-90"
-          style={{ transition: "opacity 200ms" }}
-        >
-          Notify me at launch
-        </button>
-      </div>
-    </div>
-  );
-}
+import MountainScene from "@/components/roadmap/MountainScene";
+import ProductWidgetModal, {
+  type ModalProduct,
+} from "@/components/products/ProductWidgetModal";
+import type { RoadmapProduct } from "@/components/roadmap/roadmapData";
 
 export default function RoadmapPage() {
-  const [modalSuite, setModalSuite] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [active, setActive] = useState<ModalProduct | null>(null);
 
-  const openNotify = (id: string) => {
-    setModalSuite(id);
-    setModalOpen(true);
+  const handleSelect = (p: RoadmapProduct) => {
+    setActive({
+      name: p.name,
+      description: p.longDescription,
+      widget: p.widget,
+      href: p.href,
+      status: p.status,
+    });
   };
-
-  const liveSuites = SUITES.filter((s) => s.status === "live");
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-fyn-ink py-16">
-        <div className="fyn-container text-center">
-          <span className="fyn-label block mb-4 font-sans text-[#8e7343] text-base">
-            WHAT'S NEXT
-          </span>
+      <section
+        style={{
+          position: "relative",
+          minHeight: "100vh",
+          padding: "80px 20px",
+          background:
+            "linear-gradient(180deg, #F4EDDA 0%, rgba(244, 237, 218, 0.6) 100%)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Subtle noise texture */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.05,
+            pointerEvents: "none",
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* Title block */}
+        <header
+          style={{
+            position: "relative",
+            zIndex: 6,
+            textAlign: "center",
+            marginBottom: 40,
+            maxWidth: 800,
+            marginInline: "auto",
+          }}
+        >
           <h1
-            className="text-white max-w-[900px] mx-auto mb-4 font-serif font-bold"
-            style={{ fontSize: "clamp(36px, 5vw, 60px)", lineHeight: 1.15 }}
+            style={{
+              fontFamily: "'Oswald', sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(32px, 5vw, 48px)",
+              color: "#1A1008",
+              letterSpacing: "-1px",
+              margin: 0,
+              lineHeight: 1.05,
+            }}
           >
-            Product Roadmap
+            Roadmap
           </h1>
-          <p className="text-white/60 text-lg max-w-[680px] mx-auto">
-            Building the complete financial operating system for Indian businesses. One Intelligence Suite is live today; nine more arrive over the next 18 months.
+          <p
+            style={{
+              fontFamily: "'Raleway', sans-serif",
+              fontWeight: 600,
+              fontSize: "clamp(16px, 2vw, 20px)",
+              color: "#8B6914",
+              marginTop: 12,
+              marginBottom: 0,
+            }}
+          >
+            Your Journey to Financial Excellence
           </p>
-        </div>
-      </section>
+          <p
+            style={{
+              fontFamily: "'Roboto', sans-serif",
+              fontSize: 14,
+              color: "rgba(26,16,8,0.65)",
+              marginTop: 16,
+              maxWidth: 620,
+              marginInline: "auto",
+              lineHeight: 1.6,
+            }}
+          >
+            Building the complete financial operating system for Indian businesses.
+            Climb with us — from Base Camp to Summit, one Intelligence Suite at a time.
+          </p>
+        </header>
 
-      {/* Available Now strip */}
-      <section className="fyn-section" style={{ background: "#F9F7F4", paddingBlock: 48 }}>
-        <div className="fyn-container">
-          <div className="flex items-center gap-3 mb-6">
+        {/* Mountain scene */}
+        <div style={{ position: "relative", zIndex: 4 }}>
+          <MountainScene onSelectProduct={handleSelect} />
+        </div>
+
+        {/* Legend */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 6,
+            marginTop: 40,
+            display: "flex",
+            justifyContent: "center",
+            gap: 24,
+            flexWrap: "wrap",
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 12,
+            color: "#1A1008",
+          }}
+        >
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
             <span
-              className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md text-white"
-              style={{ background: "#10B981" }}
-            >
-              Available Now
-            </span>
-            <h2 className="font-serif text-fyn-ink" style={{ fontSize: 22, fontWeight: 700 }}>
-              Live today
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {liveSuites.map((s) => {
-              const Icon = s.Icon;
-              return (
-                <a
-                  key={s.id}
-                  href={s.href}
-                  className="block bg-fyn-beige-card border rounded-lg p-6 hover:shadow-md transition-all"
-                  style={{ borderColor: "#E5E7EB" }}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className="w-10 h-10 rounded-md flex items-center justify-center"
-                      style={{ background: "rgba(196,30,30,0.10)" }}
-                    >
-                      <Icon size={20} color="#C41E1E" />
-                    </div>
-                    <SuiteStatusBadge status="live" />
-                  </div>
-                  <h3 className="font-serif text-fyn-ink mb-2" style={{ fontSize: 18, fontWeight: 700 }}>
-                    {s.name}
-                  </h3>
-                  <p className="text-[13px] text-fyn-ink/70 leading-relaxed">{s.description}</p>
-                </a>
-              );
-            })}
-          </div>
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                background: "#10B981",
+                boxShadow: "0 0 0 2px rgba(16,185,129,0.25)",
+              }}
+            />
+            Live today — click to open
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                background: "#6B7280",
+              }}
+            />
+            Coming soon — preview the experience
+          </span>
         </div>
       </section>
 
-      {/* Quarters timeline */}
-      <section className="fyn-section" style={{ background: "#F9F7F4", paddingBottom: 96 }}>
-        <div className="fyn-container">
-          {QUARTERS.map((q) => {
-            const inQuarter = SUITES.filter((s) => s.quarter === q);
-            if (inQuarter.length === 0) return null;
-            return (
-              <div key={q} className="mb-12">
-                <div className="flex items-baseline gap-3 mb-6">
-                  <h2 className="font-serif text-fyn-ink" style={{ fontSize: 28, fontWeight: 700 }}>
-                    {q}
-                  </h2>
-                  <span className="text-sm text-fyn-ink/50">
-                    {inQuarter.length} suite{inQuarter.length > 1 ? "s" : ""} launching
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {inQuarter.map((s) => (
-                    <FeatureCard key={s.id} suite={s} onNotify={openNotify} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <NotifyMeModal
-        open={modalOpen}
-        initialModuleId={modalSuite}
-        onClose={() => setModalOpen(false)}
-      />
+      <ProductWidgetModal product={active} onClose={() => setActive(null)} />
     </Layout>
   );
 }
