@@ -2,18 +2,18 @@ import { Link } from "react-router-dom";
 import FynLogo from "./FynLogo";
 
 const productLinks = [
-  { label: "Liquidity Intelligence", href: "/products" },
-  { label: "Revenue Intelligence", href: "/products" },
-  { label: "GST & Tax", href: "/products" },
-  { label: "Governance Intelligence", href: "/products" },
-  { label: "HR & Workforce", href: "/products" },
-  { label: "Decision Simulator", href: "/products" },
-  { label: "Market Intelligence", href: "/products" },
-  { label: "Banking Intelligence", href: "/products" },
-  { label: "CA Partner Program", href: "/products" },
-  { label: "AI CFO Nidhi AI CFO", href: "/products" },
+  { label: "Liquidity Intelligence", href: "/#product-ecosystem" },
+  { label: "Revenue Intelligence", href: "/#product-ecosystem" },
+  { label: "GST & Tax", href: "/#product-ecosystem" },
+  { label: "Governance Intelligence", href: "/#product-ecosystem" },
+  { label: "HR & Workforce", href: "/#product-ecosystem" },
+  { label: "Decision Simulator", href: "/#product-ecosystem" },
+  { label: "Market Intelligence", href: "/#product-ecosystem" },
+  { label: "Banking Intelligence", href: "/#product-ecosystem" },
+  { label: "CA Partner Program", href: "/#product-ecosystem" },
+  { label: "AI CFO Nidhi", href: "/dashboard/nidhi" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Integrations", href: "/products" },
+  { label: "Integrations", href: "/dashboard/settings/integrations" },
 ];
 
 const companyLinks = [
