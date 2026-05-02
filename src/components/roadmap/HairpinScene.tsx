@@ -476,13 +476,53 @@ export default function HairpinScene({ onSelectStop }: Props) {
         </g>
       </svg>
 
-      {/* === Story labels (positioned with %) === */}
+      {/* === Story labels & speech bubbles (positioned with %) === */}
+      {/* HELP! speech bubble above first sinker */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute", left: "42%", top: "92.5%",
+          transform: "translate(-50%, -100%)",
+          zIndex: 5, pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            background: "#FFFFFF",
+            color: DARK,
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 700,
+            fontSize: 8,
+            letterSpacing: "0.4px",
+            padding: "2px 6px",
+            borderRadius: 6,
+            border: `1px solid ${DARK}`,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.18)",
+            position: "relative",
+          }}
+        >
+          HELP!
+          <span
+            style={{
+              position: "absolute",
+              left: "50%",
+              bottom: -4,
+              transform: "translateX(-50%) rotate(45deg)",
+              width: 6, height: 6,
+              background: "#FFFFFF",
+              borderRight: `1px solid ${DARK}`,
+              borderBottom: `1px solid ${DARK}`,
+            }}
+          />
+        </div>
+      </div>
+
       <span
         className="hairpin-sink-label"
         style={{
-          position: "absolute", left: "30%", top: "94.4%",
-          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
-          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+          position: "absolute", left: "30%", top: "97.4%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", color: "#6B5D4D",
+          zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
         }}
       >
         63M Indian SMEs without financial clarity
@@ -490,9 +530,9 @@ export default function HairpinScene({ onSelectStop }: Props) {
       <span
         className="hairpin-raft-label"
         style={{
-          position: "absolute", left: "70%", top: "92.5%",
-          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
-          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+          position: "absolute", left: "70%", top: "92%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem", color: "#6B5D4D",
+          zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
         }}
       >
         Surviving on spreadsheets &amp; gut feeling
