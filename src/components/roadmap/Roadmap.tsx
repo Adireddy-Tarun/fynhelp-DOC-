@@ -113,13 +113,21 @@ const Roadmap = () => {
     { x: 680, y: 130 },
   ];
 
-  // Build path strings
-  let greenPath = `M ${waypoints[0].x} ${waypoints[0].y}`;
-  for (let i = 1; i <= 2; i++) greenPath += ` L ${waypoints[i].x} ${waypoints[i].y}`;
+  // Build smooth curved path between waypoints
+  const buildCurvedPath = (points: { x: number; y: number }[]) => {
+    if (points.length < 2) return '';
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const midY = (prev.y + curr.y) / 2;
+      d += ` C ${prev.x} ${midY}, ${curr.x} ${midY}, ${curr.x} ${curr.y}`;
+    }
+    return d;
+  };
 
-  let goldPath = `M ${waypoints[2].x} ${waypoints[2].y}`;
-  for (let i = 3; i < waypoints.length; i++) goldPath += ` L ${waypoints[i].x} ${waypoints[i].y}`;
-  goldPath += ' L 700 85';
+  const greenPath = buildCurvedPath(waypoints.slice(0, 3));
+  const goldPath = buildCurvedPath([...waypoints.slice(2), { x: 700, y: 85 }]);
 
   return (
     <div style={{
