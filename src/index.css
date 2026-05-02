@@ -814,3 +814,193 @@
   .roadmap-path-dot,
   .roadmap-badge-live { animation: none !important; }
 }
+
+/* === Hairpin roadmap scene === */
+@keyframes hairpin-road-flow {
+  to { stroke-dashoffset: -40; }
+}
+@keyframes hairpin-flag-wave {
+  0%, 100% { transform: skewY(0deg) scaleX(1); }
+  50%      { transform: skewY(-8deg) scaleX(0.92); }
+}
+@keyframes hairpin-dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.55), 0 0 8px rgba(201,168,76,0.6); }
+  50%      { box-shadow: 0 0 0 8px rgba(201,168,76,0), 0 0 14px rgba(201,168,76,0.8); }
+}
+@keyframes hairpin-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes hairpin-chip-in {
+  from { opacity: 0; transform: translate(var(--tx, 0), calc(-50% + 8px)); }
+  to   { opacity: 1; }
+}
+
+.hairpin-scene { isolation: isolate; }
+
+.hairpin-cloud {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+  background: rgba(255,255,255,0.85);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(255,255,255,0.4), inset 0 2px 6px rgba(255,255,255,0.6);
+  will-change: transform;
+}
+.hairpin-cloud::before,
+.hairpin-cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255,255,255,0.92);
+  border-radius: 50%;
+}
+.hairpin-cloud::before { width: 55%; height: 75%; top: -28%; left: 18%; }
+.hairpin-cloud::after  { width: 40%; height: 60%; top: -18%; right: 12%; }
+
+.hairpin-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #C9A84C;
+  border: 2px solid #FAF6EE;
+  z-index: 4;
+  pointer-events: none;
+  animation: hairpin-dot-pulse 2.4s ease-in-out infinite;
+}
+
+.hairpin-chip-anchor {
+  position: absolute;
+  z-index: 6;
+  opacity: 0;
+  animation: hairpin-chip-in 0.6s ease-out forwards;
+}
+
+.hairpin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 6px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(201,168,76,0.45);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(26,24,20,0.18);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+.hairpin-chip:hover,
+.hairpin-chip:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(26,24,20,0.28);
+  border-color: #C9A84C;
+  outline: none;
+}
+.hairpin-chip:active { transform: translateY(0); }
+
+.hairpin-chip-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 6px rgba(0,0,0,0.18);
+}
+.hairpin-chip-name {
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #2C2418;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
+.hairpin-badge {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: #fff;
+  text-transform: uppercase;
+}
+.hairpin-badge.live { background: #34C759; box-shadow: 0 0 0 0 rgba(52,199,89,0.6); animation: roadmap-badge-pulse 1.8s infinite; }
+.hairpin-badge.soon { background: #FF9F0A; }
+
+.hairpin-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  max-width: 220px;
+  padding: 8px 10px;
+  background: #1a1814;
+  color: #FAF6EE;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11.5px;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid rgba(201,168,76,0.35);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  z-index: 20;
+  pointer-events: none;
+}
+.hairpin-tooltip-arrow {
+  position: absolute;
+  top: -5px;
+  left: 14px;
+  width: 8px;
+  height: 8px;
+  background: #1a1814;
+  border-left: 1px solid rgba(201,168,76,0.35);
+  border-top: 1px solid rgba(201,168,76,0.35);
+  transform: rotate(45deg);
+}
+
+.hairpin-climber {
+  position: absolute;
+  z-index: 8;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  filter: drop-shadow(0 4px 4px rgba(26,24,20,0.35));
+}
+.hairpin-climber-bob { animation: hairpin-bob 2.5s ease-in-out infinite; }
+.hairpin-here {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #2C2418;
+  background: rgba(250,246,238,0.92);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(201,168,76,0.55);
+  white-space: nowrap;
+}
+
+/* Mobile: hide chip names, shrink */
+@media (max-width: 767px) {
+  .hairpin-scene { aspect-ratio: 9 / 18 !important; }
+  .hairpin-chip-name { display: none; }
+  .hairpin-chip { padding: 4px; }
+  .hairpin-chip-icon { width: 26px; height: 26px; font-size: 14px; border-radius: 7px; }
+  .hairpin-badge { font-size: 8px; padding: 1px 4px; }
+  .hairpin-tooltip { max-width: 160px; font-size: 10.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hairpin-cloud,
+  .hairpin-dot,
+  .hairpin-climber-bob,
+  .hairpin-chip-anchor,
+  .hairpin-badge.live { animation: none !important; }
+  .hairpin-chip-anchor { opacity: 1; }
+}
