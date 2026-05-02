@@ -865,10 +865,93 @@
   border-radius: 50%;
   background: #C9A84C;
   border: 2px solid #FAF6EE;
-  z-index: 4;
+  z-index: 5;
   pointer-events: none;
   animation: hairpin-dot-pulse 2.4s ease-in-out infinite;
 }
+.hairpin-dot.completed {
+  background: #34C759;
+  animation: hairpin-dot-pulse-green 2.4s ease-in-out infinite;
+}
+@keyframes hairpin-dot-pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52,199,89,0.55), 0 0 8px rgba(52,199,89,0.65); }
+  50%      { box-shadow: 0 0 0 8px rgba(52,199,89,0), 0 0 14px rgba(52,199,89,0.85); }
+}
+
+/* Scenery: trees, raft, sinking people, birds, waves */
+@keyframes hairpin-tree-sway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50%      { transform: rotate(0.6deg); }
+}
+.hairpin-tree { transform-origin: 50% 100%; animation: hairpin-tree-sway 4s ease-in-out infinite; }
+
+@keyframes hairpin-raft-bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-2px) rotate(1deg); }
+}
+.hairpin-raft { animation: hairpin-raft-bob 3.2s ease-in-out infinite; transform-origin: 50% 100%; }
+
+@keyframes hairpin-sink-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+.hairpin-sinker { animation: hairpin-sink-bob 2.6s ease-in-out infinite; }
+
+@keyframes hairpin-bird-flap {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(0.55); }
+}
+@keyframes hairpin-bird-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(120%); }
+}
+.hairpin-bird-wrap { position: absolute; will-change: transform; animation: hairpin-bird-drift 70s linear infinite; opacity: 0.6; }
+.hairpin-bird-wrap > svg { animation: hairpin-bird-flap 1.6s ease-in-out infinite; transform-origin: 50% 50%; }
+
+@keyframes hairpin-wave-shift {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-2%); }
+}
+.hairpin-wave-1 { animation: hairpin-wave-shift 6s ease-in-out infinite; transform-origin: 50% 50%; }
+.hairpin-wave-2 { animation: hairpin-wave-shift 8s ease-in-out infinite reverse; transform-origin: 50% 50%; }
+
+/* Front clouds drift across (in front of mountain, below chips) */
+@keyframes hairpin-front-cloud {
+  from { transform: translateX(-30%); }
+  to   { transform: translateX(120%); }
+}
+.hairpin-cloud-front {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  background: rgba(255,255,255,0.88);
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(255,255,255,0.35), inset 0 2px 6px rgba(255,255,255,0.65);
+  will-change: transform;
+}
+.hairpin-cloud-front::before,
+.hairpin-cloud-front::after {
+  content: ''; position: absolute; background: rgba(255,255,255,0.92); border-radius: 50%;
+}
+.hairpin-cloud-front::before { width: 55%; height: 75%; top: -28%; left: 18%; }
+.hairpin-cloud-front::after  { width: 40%; height: 60%; top: -18%; right: 12%; }
+
+/* Back clouds — sit behind mountain (z-index 1, lower opacity) */
+.hairpin-cloud-back {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(255,255,255,0.5);
+  border-radius: 999px;
+  filter: blur(0.5px);
+  will-change: transform;
+}
+.hairpin-cloud-back::before,
+.hairpin-cloud-back::after {
+  content: ''; position: absolute; background: rgba(255,255,255,0.55); border-radius: 50%;
+}
+.hairpin-cloud-back::before { width: 55%; height: 75%; top: -28%; left: 18%; }
+.hairpin-cloud-back::after  { width: 40%; height: 60%; top: -18%; right: 12%; }
 
 .hairpin-chip-anchor {
   position: absolute;
