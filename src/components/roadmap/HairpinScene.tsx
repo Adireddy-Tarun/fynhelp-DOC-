@@ -420,37 +420,29 @@ export default function HairpinScene({ onSelectStop }: Props) {
           );
         })}
 
-        {/* === Ground strip === */}
-        <rect x="0" y="89" width="100" height="6" fill="url(#hp-ground)" />
-        {/* grass tufts on top edge */}
-        {Array.from({ length: 28 }).map((_, i) => {
-          const x = (i + 0.5) * (100 / 28);
-          return (
-            <path
-              key={`grass-${i}`}
-              d={`M ${x} 89.4 l -0.4 -0.7 M ${x} 89.4 l 0 -0.9 M ${x} 89.4 l 0.4 -0.7`}
-              stroke="#3a6620" strokeWidth="0.18" strokeLinecap="round" fill="none"
-            />
-          );
-        })}
+        {/* === Trees on ground & lower slopes (baseline y=87) === */}
+        <PineTree  x={6}  y={87} scale={0.85} delay={0.8} />
+        <PineTree  x={10} y={87} scale={1.15} delay={0.0} />
+        <RoundTree x={13.5} y={87} scale={0.95} delay={0.4} />
+        <PineTree  x={22} y={87} scale={0.75} delay={1.2} />
+        <RoundTree x={26} y={87} scale={0.7}  delay={0.9} />
+        <PineTree  x={30} y={87} scale={1.05} delay={0.5} />
+        <RoundTree x={66} y={87} scale={0.7}  delay={1.3} />
+        <PineTree  x={70} y={87} scale={1.0}  delay={0.2} />
+        <RoundTree x={74} y={87} scale={0.85} delay={0.6} />
+        <PineTree  x={78} y={87} scale={1.25} delay={0.9} />
+        <RoundTree x={86} y={87} scale={0.85} delay={1.5} />
+        <PineTree  x={92} y={87} scale={0.75} delay={0.3} />
+        {/* Smaller, darker distance trees on lower slopes */}
+        <g opacity="0.75">
+          <PineTree  x={18} y={78} scale={0.45} delay={1.1} />
+          <RoundTree x={84} y={76} scale={0.4}  delay={0.6} />
+          <PineTree  x={28} y={66} scale={0.35} delay={1.4} />
+          <PineTree  x={76} y={68} scale={0.32} delay={0.7} />
+        </g>
 
-        {/* === Trees on ground & lower slopes === */}
-        <PineTree  x={10} y={89} scale={1.1} delay={0.0} />
-        <RoundTree x={14} y={89} scale={0.9} delay={0.4} />
-        <PineTree  x={6}  y={89} scale={0.8} delay={0.8} />
-        <RoundTree x={22} y={89} scale={0.7} delay={1.2} />
-        <PineTree  x={30} y={89} scale={1.0} delay={0.5} />
-        <RoundTree x={70} y={89} scale={1.0} delay={0.2} />
-        <PineTree  x={78} y={89} scale={1.2} delay={0.9} />
-        <RoundTree x={86} y={89} scale={0.85} delay={1.5} />
-        <PineTree  x={92} y={89} scale={0.7} delay={0.3} />
-        {/* Tiny trees higher up */}
-        <PineTree  x={18} y={78} scale={0.45} delay={1.1} />
-        <RoundTree x={84} y={76} scale={0.4} delay={0.6} />
-        <PineTree  x={28} y={66} scale={0.35} delay={1.4} />
-
-        {/* === FYNHelp Kiosk at base === */}
-        <Kiosk x={16} y={89} />
+        {/* === FYNHelp Kiosk at base, near Stop 1 === */}
+        <Kiosk x={18} y={87} />
 
         {/* === Ocean === */}
         <rect x="0" y="95" width="100" height="5" fill="url(#hp-ocean)" />
