@@ -16,10 +16,7 @@ interface Props {
   onSelectProduct: (p: RoadmapProduct) => void;
 }
 
-/**
- * Sample N points along an SVG path so we can position DOM elements
- * (climber, milestones) accurately on top of the responsive SVG.
- */
+/** Sample N points along an SVG path so we can position DOM overlays. */
 function usePathPoints(pathD: string, count: number) {
   return useMemo(() => {
     if (typeof document === "undefined") return [];
@@ -40,19 +37,20 @@ function usePathPoints(pathD: string, count: number) {
 export default function MountainScene({ onSelectProduct }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
     const obs = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       setSize({ w: width, h: height });
+      setIsMobile(width < 640);
     });
     obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, []);
 
-  // Sample path so we know exact (x,y) per milestone.
-  const points = usePathPoints(PATH_D, 120);
+  const points = usePathPoints(PATH_D, 200);
   const sampleAt = (t: number) => {
     if (!points.length) return { x: 0, y: 0 };
     const i = Math.min(points.length - 1, Math.max(0, Math.round(t * points.length)));
@@ -65,13 +63,13 @@ export default function MountainScene({ onSelectProduct }: Props) {
   const climberStartT = milestoneAnchors[0];
   const climberEndT = milestoneAnchors[climberTargetIdx];
 
-  // Convert SVG coords → CSS pixels for absolutely-positioned DOM overlays.
+  // Convert SVG coords → CSS pixels.
   const toPx = (sx: number, sy: number) => ({
     x: (sx / VIEW_W) * size.w,
     y: (sy / VIEW_H) * size.h,
   });
 
-  // Build climber animation keyframes by sampling the path between start & end.
+  // Climber walk-on keyframes
   const climberKeyframes = useMemo(() => {
     if (!points.length || !size.w) return { x: [0], y: [0] };
     const startIdx = Math.round(climberStartT * points.length);
@@ -91,23 +89,27 @@ export default function MountainScene({ onSelectProduct }: Props) {
     return { x: xs, y: ys };
   }, [points, size.w, size.h, climberStartT, climberEndT]);
 
-  // Floating clouds (fixed sizes/positions for organic spread).
-  const clouds = [
-    { top: "8%", size: 220, dur: 70, delay: 0, opacity: 0.65 },
-    { top: "18%", size: 140, dur: 55, delay: 8, opacity: 0.55 },
-    { top: "32%", size: 100, dur: 60, delay: 4, opacity: 0.6 },
-    { top: "48%", size: 180, dur: 75, delay: 12, opacity: 0.5 },
-    { top: "62%", size: 120, dur: 50, delay: 2, opacity: 0.6 },
-    { top: "76%", size: 80, dur: 45, delay: 10, opacity: 0.55 },
-  ];
+  /** Compute icon position in circular orbit around milestone center. */
+  const orbitPosition = (
+    centerX: number,
+    centerY: number,
+    angleDeg: number,
+    radius: number,
+  ) => {
+    const rad = (angleDeg * Math.PI) / 180;
+    return {
+      x: centerX + Math.cos(rad) * radius,
+      y: centerY + Math.sin(rad) * radius,
+    };
+  };
 
-  // Sparkle particles
-  const sparkles = Array.from({ length: 18 }).map((_, i) => ({
-    left: `${(i * 53) % 95}%`,
-    top: `${30 + ((i * 17) % 60)}%`,
-    dur: 8 + (i % 5) * 0.8,
-    delay: (i % 7) * 1.2,
-  }));
+  /** Per-milestone orbit configs (angle list), alternating sides of the path. */
+  const orbitConfigs: { radius: number; angles: number[] }[] = [
+    { radius: 95,  angles: [-150, -180, -210] }, // Base Camp — left/below
+    { radius: 95,  angles: [-30, 0, 30] },        // Mid Slope — right
+    { radius: 95,  angles: [-150, -180, -210] }, // High Ridge — left
+    { radius: 90,  angles: [-110, -90, -70] },    // Summit — fan above
+  ];
 
   return (
     <div
@@ -121,37 +123,6 @@ export default function MountainScene({ onSelectProduct }: Props) {
         margin: "0 auto",
       }}
     >
-      {/* Clouds */}
-      {clouds.map((c, i) => (
-        <div
-          key={`cloud-${i}`}
-          className="roadmap-cloud"
-          style={{
-            top: c.top,
-            left: 0,
-            width: c.size,
-            height: c.size * 0.55,
-            opacity: c.opacity,
-            zIndex: 0,
-            animation: `roadmap-cloud-drift ${c.dur}s linear ${c.delay}s infinite`,
-          }}
-        />
-      ))}
-
-      {/* Sparkles */}
-      {sparkles.map((s, i) => (
-        <div
-          key={`spark-${i}`}
-          className="roadmap-sparkle"
-          style={{
-            left: s.left,
-            top: s.top,
-            zIndex: 2,
-            animation: `roadmap-sparkle-float ${s.dur}s ease-in-out ${s.delay}s infinite`,
-          }}
-        />
-      ))}
-
       {/* Mountain SVG */}
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
@@ -168,20 +139,24 @@ export default function MountainScene({ onSelectProduct }: Props) {
       >
         <defs>
           <linearGradient id="frontPeak" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#8B6914" />
-            <stop offset="55%" stopColor="#3A2410" />
+            <stop offset="0%" stopColor="#3A2410" />
+            <stop offset="35%" stopColor="#2A1A0C" />
             <stop offset="100%" stopColor="#1A1008" />
           </linearGradient>
+          <linearGradient id="frontPeakLit" x1="0" x2="1" y1="0" y2="0.6">
+            <stop offset="0%" stopColor="#8B6914" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#1A1008" stopOpacity="0" />
+          </linearGradient>
           <linearGradient id="midPeak" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#3A2410" />
+            <stop offset="0%" stopColor="#2A1A0C" />
             <stop offset="100%" stopColor="#1A1008" />
           </linearGradient>
           <linearGradient id="backPeak" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#5A3A1E" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#1A1008" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#3A2410" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#1A1008" stopOpacity="0.5" />
           </linearGradient>
           <radialGradient id="summitGlow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%" stopColor="#8B6914" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#8B6914" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#8B6914" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="snowGrad" x1="0" x2="1" y1="0" y2="0">
@@ -189,6 +164,13 @@ export default function MountainScene({ onSelectProduct }: Props) {
             <stop offset="50%" stopColor="#FFFFFF" />
             <stop offset="100%" stopColor="#F4EDDA" />
           </linearGradient>
+          <filter id="pathGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {/* Back peaks */}
@@ -199,76 +181,62 @@ export default function MountainScene({ onSelectProduct }: Props) {
         <polygon points="160,680 520,180 760,680" fill="url(#midPeak)" />
 
         {/* Summit glow */}
-        <circle cx="720" cy="120" r="120" fill="url(#summitGlow)" />
+        <circle cx="720" cy="120" r="140" fill="url(#summitGlow)" />
 
         {/* Front peak (main mountain) */}
-        <polygon
-          points="180,680 720,90 880,680"
-          fill="url(#frontPeak)"
-        />
+        <polygon points="180,680 720,90 880,680" fill="url(#frontPeak)" />
+        {/* Lit slope overlay (sun-facing left side) */}
+        <polygon points="180,680 720,90 720,680" fill="url(#frontPeakLit)" />
 
-        {/* Snow cap on front peak (top ~15%) */}
-        <polygon
-          points="675,170 720,90 765,170 740,180 720,165 700,180"
-          fill="url(#snowGrad)"
-        />
-        {/* Snow detail on summit */}
+        {/* Subtle rock shading lines */}
+        <path d="M 320 540 L 540 320 M 380 600 L 620 280 M 460 640 L 680 220" 
+              stroke="#1A1008" strokeWidth="1.2" opacity="0.25" />
+
+        {/* Snow cap — jagged */}
         <path
-          d="M 660 200 L 720 120 L 780 200 L 760 215 L 735 195 L 720 210 L 705 195 L 680 215 Z"
-          fill="#F4EDDA"
-          opacity="0.92"
+          d="M 660 200 L 685 160 L 705 175 L 720 90 L 735 175 L 755 160 L 780 200 L 760 215 L 738 195 L 720 215 L 702 195 L 680 215 Z"
+          fill="url(#snowGrad)"
+          style={{ filter: "drop-shadow(0 -8px 24px rgba(139,105,20,0.5))" }}
         />
 
-        {/* Golden path */}
+        {/* Golden path — thick + glow */}
         <path
           d={PATH_D}
           stroke="#8B6914"
-          strokeWidth="4"
+          strokeWidth="8"
           strokeLinecap="round"
           fill="none"
-          strokeDasharray="8 6"
-          style={{ animation: "roadmap-path-dash 3s linear infinite" }}
-          opacity="0.9"
+          strokeDasharray="10 6"
+          filter="url(#pathGlow)"
+          style={{ animation: "roadmap-path-dash 4s linear infinite" }}
+          opacity="0.95"
         />
-        {/* Subtle inner path glow */}
+        {/* Inner brighter highlight */}
         <path
           d={PATH_D}
           stroke="#D9A441"
-          strokeWidth="1.5"
+          strokeWidth="2.5"
           fill="none"
-          opacity="0.35"
+          opacity="0.6"
+          strokeLinecap="round"
         />
-
-        {/* Traveling dots along the path */}
-        {[0.15, 0.4, 0.65, 0.88].map((offset, i) => {
-          const p = sampleAt(offset);
-          return (
-            <circle
-              key={`pt-${i}`}
-              cx={p.x}
-              cy={p.y}
-              r="4"
-              fill="#8B6914"
-              opacity="0.85"
-            >
-              <animate
-                attributeName="opacity"
-                values="0.4;1;0.4"
-                dur="2.4s"
-                begin={`${i * 0.4}s`}
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="r"
-                values="3;5;3"
-                dur="2.4s"
-                begin={`${i * 0.4}s`}
-                repeatCount="indefinite"
-              />
-            </circle>
-          );
-        })}
       </svg>
+
+      {/* Traveling dots along the path (CSS offset-path) */}
+      {[0, 2, 4, 6].map((delay) => (
+        <div
+          key={`pdot-${delay}`}
+          className="roadmap-path-dot"
+          aria-hidden
+          style={{
+            offsetPath: `path('${PATH_D}')`,
+            // Scale dot positioning to container size
+            transform: `scale(${size.w ? size.w / VIEW_W : 1})`,
+            transformOrigin: "0 0",
+            animationDelay: `${delay}s`,
+          }}
+        />
+      ))}
 
       {/* Summit shimmer overlay */}
       {size.w > 0 &&
@@ -298,15 +266,16 @@ export default function MountainScene({ onSelectProduct }: Props) {
         MILESTONES.map((m, idx) => {
           const path = sampleAt(milestoneAnchors[idx]);
           const pos = toPx(path.x, path.y);
-          const labelOffsetX = m.labelSide === "right" ? 70 : -210;
+          const labelOffsetX = m.labelSide === "right" ? 90 : -240;
+          const labelOffsetY = -22;
+          const labelCenterX = pos.x + labelOffsetX + 75;
+          const labelCenterY = pos.y + labelOffsetY + 22;
 
-          // Layout product icons in a horizontal row near the milestone
-          const iconCount = m.products.length;
-          const iconSize = 64;
-          const gap = 14;
-          const rowWidth = iconCount * iconSize + (iconCount - 1) * gap;
-          const iconRowLeft = pos.x - rowWidth / 2;
-          const iconRowTop = pos.y - 95;
+          // Icon orbit
+          const cfg = orbitConfigs[idx];
+          const isCurrentMilestone = idx === climberTargetIdx;
+          const iconSize = isMobile ? 56 : isCurrentMilestone ? 72 : 64;
+          const iconOpacity = isCurrentMilestone ? 1 : 0.78;
 
           return (
             <motion.div
@@ -316,35 +285,62 @@ export default function MountainScene({ onSelectProduct }: Props) {
               transition={{ delay: 0.3 + idx * 0.18, duration: 0.5, ease: "easeOut" }}
               style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}
             >
+              {/* Connector line from path to label */}
+              <svg
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  pointerEvents: "none",
+                  overflow: "visible",
+                }}
+                aria-hidden
+              >
+                <line
+                  x1={pos.x}
+                  y1={pos.y}
+                  x2={labelCenterX}
+                  y2={labelCenterY}
+                  stroke="#8B6914"
+                  strokeWidth="2"
+                  strokeDasharray="4 4"
+                  opacity="0.5"
+                />
+              </svg>
+
               {/* Marker dot */}
               <div
                 style={{
                   position: "absolute",
-                  left: pos.x - 9,
-                  top: pos.y - 9,
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
+                  left: pos.x - 10,
+                  top: pos.y - 10,
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
                   background: "#8B6914",
                   border: "3px solid #F4EDDA",
-                  boxShadow: "0 4px 12px rgba(26,16,8,0.3)",
+                  boxShadow:
+                    "0 4px 12px rgba(26,16,8,0.35), 0 0 0 4px rgba(139,105,20,0.18)",
                 }}
               />
 
-              {/* Label badge */}
+              {/* Label badge — gold border, gold text */}
               <div
                 style={{
                   position: "absolute",
                   left: pos.x + labelOffsetX,
-                  top: pos.y - 18,
-                  background: "rgba(255,255,255,0.92)",
-                  backdropFilter: "blur(8px)",
-                  border: "2px solid #8B6914",
-                  borderRadius: 16,
-                  padding: "6px 14px",
-                  boxShadow: "0 4px 12px rgba(26,16,8,0.12)",
+                  top: pos.y + labelOffsetY,
+                  background: "rgba(255,255,255,0.95)",
+                  backdropFilter: "blur(12px) saturate(110%)",
+                  WebkitBackdropFilter: "blur(12px) saturate(110%)",
+                  border: "3px solid #8B6914",
+                  borderRadius: 18,
+                  padding: "10px 20px",
+                  boxShadow:
+                    "0 6px 20px rgba(139,105,20,0.25), inset 0 1px 0 rgba(255,255,255,0.8)",
                   pointerEvents: "auto",
-                  width: 140,
+                  width: 150,
                   textAlign: "center",
                 }}
               >
@@ -352,9 +348,10 @@ export default function MountainScene({ onSelectProduct }: Props) {
                   style={{
                     fontFamily: "'Raleway', sans-serif",
                     fontWeight: 600,
-                    fontSize: 16,
+                    fontSize: 18,
                     color: "#8B6914",
                     lineHeight: 1.1,
+                    letterSpacing: 0.5,
                   }}
                 >
                   {m.label}
@@ -362,35 +359,40 @@ export default function MountainScene({ onSelectProduct }: Props) {
                 <div
                   style={{
                     fontFamily: "'Roboto', sans-serif",
-                    fontSize: 11,
-                    color: "rgba(26,16,8,0.7)",
-                    marginTop: 2,
+                    fontSize: 13,
+                    color: "#1A1008",
+                    opacity: 0.7,
+                    marginTop: 4,
                   }}
                 >
                   {m.quarter}
                 </div>
               </div>
 
-              {/* Product icons */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: iconRowLeft,
-                  top: iconRowTop,
-                  display: "flex",
-                  gap,
-                  pointerEvents: "auto",
-                }}
-              >
-                {m.products.map((p) => (
-                  <ProductIcon3D
+              {/* Product icons — circular orbit around milestone */}
+              {m.products.map((p, i) => {
+                const angle = cfg.angles[i] ?? cfg.angles[0];
+                const orbit = orbitPosition(pos.x, pos.y, angle, cfg.radius);
+                return (
+                  <div
                     key={p.id}
-                    product={p}
-                    size={iconSize}
-                    onClick={onSelectProduct}
-                  />
-                ))}
-              </div>
+                    style={{
+                      position: "absolute",
+                      left: orbit.x - iconSize / 2,
+                      top: orbit.y - iconSize / 2,
+                      pointerEvents: "auto",
+                      opacity: iconOpacity,
+                      transition: "opacity 0.4s ease",
+                    }}
+                  >
+                    <ProductIcon3D
+                      product={p}
+                      size={iconSize}
+                      onClick={onSelectProduct}
+                    />
+                  </div>
+                );
+              })}
             </motion.div>
           );
         })}
@@ -398,29 +400,38 @@ export default function MountainScene({ onSelectProduct }: Props) {
       {/* Climber */}
       {size.w > 0 && climberKeyframes.x.length > 1 && (
         <motion.div
-          initial={{ x: climberKeyframes.x[0], y: climberKeyframes.y[0], opacity: 0 }}
+          initial={{
+            x: climberKeyframes.x[0] - 80,
+            y: climberKeyframes.y[0] + 40,
+            opacity: 0,
+          }}
           animate={{
             x: climberKeyframes.x,
             y: climberKeyframes.y,
             opacity: 1,
           }}
           transition={{
-            x: { duration: 3, ease: "easeInOut", delay: 0.6 },
-            y: { duration: 3, ease: "easeInOut", delay: 0.6 },
-            opacity: { duration: 0.4, delay: 0.6 },
+            x: { duration: 3.2, ease: "easeInOut", delay: 0.8 },
+            y: { duration: 3.2, ease: "easeInOut", delay: 0.8 },
+            opacity: { duration: 0.5, delay: 0.8 },
           }}
           style={{
             position: "absolute",
             left: 0,
             top: 0,
-            zIndex: 5,
+            zIndex: 10,
             transformOrigin: "bottom center",
-            filter: "drop-shadow(0 6px 8px rgba(26,16,8,0.3))",
-            animation:
-              "roadmap-climber-bob 0.8s ease-in-out infinite, roadmap-climber-breathe 3s ease-in-out infinite",
+            filter: "drop-shadow(0 6px 8px rgba(26,16,8,0.35))",
           }}
         >
-          <Climber />
+          <div
+            style={{
+              animation:
+                "roadmap-climber-bob 0.8s ease-in-out infinite, roadmap-climber-breathe 3s ease-in-out infinite",
+            }}
+          >
+            <Climber />
+          </div>
         </motion.div>
       )}
     </div>
