@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
-import MegaMenu from "./MegaMenu";
+import ProductsNav from "./products/ProductsNav";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Products", href: "/products", hasMega: true },
   { label: "Roadmap", href: "/roadmap" },
   { label: "Pricing", href: "/pricing" },
   { label: "Resources", href: "/resources" },
@@ -17,8 +16,6 @@ const navLinks = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
-  const megaTimeout = useRef<ReturnType<typeof setTimeout>>();
   const navRef = useRef<HTMLElement>(null);
   const location = useLocation();
 
@@ -30,20 +27,7 @@ const Navbar = () => {
 
   useEffect(() => {
     setMobileOpen(false);
-    setMegaOpen(false);
   }, [location.pathname]);
-
-
-
-
-  const handleMegaEnter = useCallback(() => {
-    clearTimeout(megaTimeout.current);
-    megaTimeout.current = setTimeout(() => setMegaOpen(true), 200);
-  }, []);
-  const handleMegaLeave = useCallback(() => {
-    clearTimeout(megaTimeout.current);
-    megaTimeout.current = setTimeout(() => setMegaOpen(false), 300);
-  }, []);
 
   const isHome = location.pathname === "/";
   const navBg = isHome && !scrolled
@@ -64,24 +48,19 @@ const Navbar = () => {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
+            <ProductsNav variant="desktop" />
             {navLinks.map((l) => (
-              <div
+              <Link
                 key={l.href}
-                className="relative"
-                onMouseEnter={l.hasMega ? handleMegaEnter : undefined}
-                onMouseLeave={l.hasMega ? handleMegaLeave : undefined}
+                to={l.href}
+                className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
+                  location.pathname === l.href
+                    ? "text-white"
+                    : "text-white/70 hover:text-white"
+                }`}
               >
-                <Link
-                  to={l.href}
-                  className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
-                    location.pathname === l.href
-                      ? "text-white"
-                      : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  {l.label}
-                </Link>
-              </div>
+                {l.label}
+              </Link>
             ))}
           </div>
 
@@ -94,23 +73,16 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile toggle — animated hamburger */}
           <button
             className="lg:hidden text-white p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-
-        {/* Mega Menu */}
-        <MegaMenu
-          open={megaOpen}
-          onClose={() => setMegaOpen(false)}
-          onMouseEnter={handleMegaEnter}
-          onMouseLeave={handleMegaLeave}
-        />
       </nav>
 
       {/* Spacer */}
@@ -130,6 +102,11 @@ const Navbar = () => {
           style={{ transitionTimingFunction: "var(--ease-spring)" }}
         >
           <div className="flex flex-col gap-2 pt-20 px-6">
+            <ProductsNav
+              variant="mobile"
+              mobileMenuOpen={mobileOpen}
+              onCloseMobileMenu={() => setMobileOpen(false)}
+            />
             {navLinks.map((l) => (
               <Link
                 key={l.href}
