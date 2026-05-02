@@ -327,24 +327,24 @@ export default function HairpinScene({ onSelectStop }: Props) {
         <path d="M 0 70 Q 12 56 22 62 T 42 60 T 62 58 T 82 62 T 100 60 L 100 78 L 0 78 Z" fill="url(#hp-distant-1)" />
         <path d="M 0 78 Q 14 66 28 72 T 50 70 T 72 72 T 100 70 L 100 84 L 0 84 Z" fill="url(#hp-distant-2)" />
 
-        {/* === Wide main mountain (broad bell shape) === */}
+        {/* === Wide Mt-Fuji-style main mountain (base spans 92% of width) === */}
         <path
-          d="M 8 92
-             C 14 70, 22 50, 30 36
-             C 36 26, 42 16, 50 8
-             C 58 16, 64 26, 70 36
-             C 78 50, 86 70, 92 92
+          d="M 4 92
+             C 12 78, 20 60, 28 44
+             C 34 32, 42 18, 50 8
+             C 58 18, 66 32, 72 44
+             C 80 60, 88 78, 96 92
              Z"
           fill="url(#hp-mountain)"
         />
         {/* lit slope from upper right */}
         <path
-          d="M 50 8 C 58 16, 64 26, 70 36 C 78 50, 86 70, 92 92 L 50 92 Z"
+          d="M 50 8 C 58 18, 66 32, 72 44 C 80 60, 88 78, 96 92 L 50 92 Z"
           fill="url(#hp-mtn-lit)"
         />
         {/* Ridge shading lines */}
         <path d="M 50 8 L 50 92" stroke="#0e0c0a" strokeWidth="0.22" opacity="0.35" />
-        <path d="M 38 30 L 50 12 M 62 30 L 50 12 M 30 55 L 50 25 M 70 55 L 50 25 M 22 78 L 50 45 M 78 78 L 50 45"
+        <path d="M 36 32 L 50 12 M 64 32 L 50 12 M 28 55 L 50 25 M 72 55 L 50 25 M 18 78 L 50 45 M 82 78 L 50 45"
               stroke="#0e0c0a" strokeWidth="0.16" opacity="0.28" fill="none" />
 
         {/* Snow cap */}
@@ -354,17 +354,34 @@ export default function HairpinScene({ onSelectStop }: Props) {
           style={{ filter: "drop-shadow(0 0.4px 0.6px rgba(0,0,0,0.3))" }}
         />
 
-        {/* === The path (used for measurement; not drawn directly) === */}
+        {/* === Hidden measurement path === */}
         <path ref={pathRef} d={pathD} fill="none" stroke="transparent" />
 
-        {/* Faint full path outline for continuity */}
-        <path d={pathD} fill="none" stroke="#FAF6EE" strokeWidth="0.3" opacity="0.25" strokeLinecap="round" />
+        {/* === Per-segment curves (visible) === */}
+        {segments.map((seg, i) => {
+          const color = seg.completed ? GREEN : GOLD;
+          // Faint backing trail on every segment (subtle, even where step strokes go)
+          return (
+            <g key={`seg-${i}`}>
+              {/* faint backing curve */}
+              <path
+                d={seg.d}
+                stroke={color}
+                strokeWidth="0.4"
+                fill="none"
+                opacity={seg.crosses ? 0.18 : 0.55}
+                strokeLinecap="round"
+              />
+            </g>
+          );
+        })}
 
-        {/* Stairway steps — generated from samples */}
+        {/* === Stairway steps (horizontal stone treads) === */}
         {steps.map((s, i) => {
-          if (i % 2 !== 0) return null; // step every 2 samples
-          const len = 1.6;
-          const w = 0.6;
+          if (i % 3 !== 0) return null; // step every 3rd sample → cleaner spacing
+          const len = 1.0; // shorter tread (~3px on screen)
+          const w = 0.5;   // ~2px tall
+          // Tread is perpendicular to path direction (so it looks horizontal where path climbs vertically)
           const nx = -Math.sin(s.angle);
           const ny = Math.cos(s.angle);
           const x1 = s.x + nx * len * 0.5;
@@ -372,7 +389,7 @@ export default function HairpinScene({ onSelectStop }: Props) {
           const x2 = s.x - nx * len * 0.5;
           const y2 = s.y - ny * len * 0.5;
           const color = s.completed ? GREEN : GOLD;
-          const opacity = s.behind ? 0.32 : 1;
+          if (s.behind) return null; // hide behind-ridge steps entirely → "wraps behind" illusion
           return (
             <line
               key={`step-${i}`}
@@ -380,8 +397,25 @@ export default function HairpinScene({ onSelectStop }: Props) {
               stroke={color}
               strokeWidth={w}
               strokeLinecap="round"
-              opacity={opacity}
-              style={{ filter: s.behind ? "none" : `drop-shadow(0 0 0.6px ${color})` }}
+              style={{ filter: `drop-shadow(0 0 0.5px ${color})` }}
+            />
+          );
+        })}
+
+        {/* === Ground strip (taller, with darker patches) === */}
+        <rect x="0" y="87" width="100" height="8" fill="url(#hp-ground)" />
+        {/* darker sand patches for variation */}
+        <ellipse cx="22" cy="92" rx="9" ry="1.1" fill="#A88B5E" opacity="0.55" />
+        <ellipse cx="55" cy="93" rx="12" ry="1.0" fill="#8E7448" opacity="0.4" />
+        <ellipse cx="82" cy="92" rx="10" ry="1.2" fill="#A88B5E" opacity="0.55" />
+        {/* grass tufts on top edge — denser, curved humps */}
+        {Array.from({ length: 36 }).map((_, i) => {
+          const x = (i + 0.5) * (100 / 36);
+          return (
+            <path
+              key={`grass-${i}`}
+              d={`M ${x - 0.5} 87.4 Q ${x} 86.2 ${x + 0.5} 87.4`}
+              stroke="#7A9E5A" strokeWidth="0.32" strokeLinecap="round" fill="#7A9E5A" opacity="0.85"
             />
           );
         })}
