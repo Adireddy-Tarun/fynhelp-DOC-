@@ -172,29 +172,63 @@ export default function HairpinScene({ onSelectStop }: Props) {
   const pathRef = useRef<SVGPathElement | null>(null);
   const [steps, setSteps] = useState<{ x: number; y: number; angle: number; completed: boolean; behind: boolean }[]>([]);
 
-  // Build the spiral path through stops (start at kiosk near base, end at summit)
-  const pathD = useMemo(() => {
-    const anchors: Pt[] = [
-      { x: 16, y: 90 }, // kiosk start
-      ...HAIRPIN_STOPS.map((s) => ({ x: s.xPct, y: s.yPct })),
-      { x: 50, y: 7 },  // summit cap
+  // Build the spiral path as PER-SEGMENT quadratic curves so we can:
+  //  - bulge each curve outward toward the chip side (mountainside arc)
+  //  - hide a small mid-portion when the curve crosses the ridge (behind illusion)
+  //  - color completed (≤ climber) vs remaining segments
+  const segments = useMemo(() => {
+    const stops = HAIRPIN_STOPS.map((s) => ({
+      x: s.xPct,
+      y: s.yPct,
+      side: s.side as "left" | "right",
+      n: s.n,
+    }));
+    const anchors = [
+      { x: 16, y: 90, side: "left" as const, n: 0 }, // kiosk
+      ...stops,
+      { x: 50, y: 7, side: "right" as const, n: 99 }, // summit
     ];
-    return buildSmoothPath(anchors);
+    const segs: Array<{
+      d: string;
+      completed: boolean;
+      crosses: boolean;
+      from: typeof anchors[number];
+      to: typeof anchors[number];
+    }> = [];
+    for (let i = 0; i < anchors.length - 1; i++) {
+      const a = anchors[i];
+      const b = anchors[i + 1];
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2;
+      // Push control point outward toward the chip side of the source stop
+      // for the "wraps around mountainside" arc.
+      const bulge = a.side === "left" ? -8 : 8; // negative = leftward
+      const cx = mx + bulge;
+      const cy = my; // keep vertical mid
+      const d = `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
+      // crosses = endpoints are on opposite sides → curve wraps behind ridge
+      const crosses = a.side !== b.side;
+      const completed = b.n <= CLIMBER_AT && a.n < CLIMBER_AT + 1;
+      segs.push({ d, completed, crosses, from: a, to: b });
+    }
+    return segs;
   }, []);
+
+  // Combined path string for the hidden measurement path (used to find
+  // climber pixel coords and to lay sample-driven step strokes).
+  const pathD = useMemo(() => segments.map((s) => s.d).join(" "), [segments]);
 
   // After path renders, sample step positions for stairway look.
   useEffect(() => {
     const path = pathRef.current;
     if (!path) return;
-    const samples = samplePath(path, 140);
-    // Determine the path-length of the climber stop to split completed/remaining.
+    const samples = samplePath(path, 180);
     const total = path.getTotalLength();
-    // Find sample index closest to climber stop
     const climber = HAIRPIN_STOPS.find((s) => s.n === CLIMBER_AT)!;
     let climberLen = total * 0.5;
     let best = Infinity;
-    for (let i = 0; i <= 200; i++) {
-      const len = (i / 200) * total;
+    for (let i = 0; i <= 240; i++) {
+      const len = (i / 240) * total;
       const pt = path.getPointAtLength(len);
       const d = (pt.x - climber.xPct) ** 2 + (pt.y - climber.yPct) ** 2;
       if (d < best) { best = d; climberLen = len; }
@@ -202,8 +236,8 @@ export default function HairpinScene({ onSelectStop }: Props) {
     const result = samples.map((s, i) => {
       const len = (i / samples.length) * total;
       const completed = len <= climberLen;
-      // Heuristic "behind mountain": within central band high up (above y=55) and close to mountain center
-      const behind = s.p.y < 55 && Math.abs(s.p.x - 50) < 4.5;
+      // "Behind ridge" band — wider so behind portions are clearly hidden
+      const behind = s.p.y < 70 && Math.abs(s.p.x - 50) < 6;
       return { x: s.p.x, y: s.p.y, angle: s.angle, completed, behind };
     });
     setSteps(result);
