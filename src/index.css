@@ -440,3 +440,91 @@
     width: 100%;
   }
 }
+
+/* === Products Nav: premium animations === */
+@keyframes fyn-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes fyn-pulse-live {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.fyn-badge-live {
+  animation: fyn-pulse-live 1.5s infinite;
+}
+
+/* Products dropdown trigger hover */
+.fyn-products-trigger:hover {
+  color: #FF4444 !important;
+  transform: translateY(-2px);
+}
+
+/* Dropdown items */
+.fyn-product-item:hover {
+  background: linear-gradient(135deg, #FAFAF8 0%, #FFFFFF 100%);
+  border-left-color: #C41E1E !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(196, 30, 30, 0.10);
+}
+.fyn-product-item:active {
+  transform: translateX(4px) scale(0.98);
+}
+.fyn-product-item:focus-visible {
+  outline: 2px solid #C41E1E;
+  outline-offset: 2px;
+}
+
+/* Modal close button */
+.fyn-modal-close:hover {
+  background: #C41E1E !important;
+  color: #FFFFFF !important;
+  transform: rotate(90deg);
+}
+
+/* CTA button hover */
+.fyn-cta-btn:hover {
+  background: linear-gradient(135deg, #A01818 0%, #CC3333 100%) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(196, 30, 30, 0.5) !important;
+}
+.fyn-cta-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 12px rgba(196, 30, 30, 0.3) !important;
+}
+
+/* Widget shell 3D hover */
+.fyn-widget-shell:hover {
+  transform: rotateX(2deg) rotateY(-2deg) translateZ(8px);
+}
+
+/* Simulator slider thumb */
+.fyn-sim-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: linear-gradient(to right, #C41E1E 0%, #FF4444 var(--val, 20%), #F3F4F6 var(--val, 20%));
+  border-radius: 4px;
+  outline: none;
+}
+.fyn-sim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C41E1E, #FF4444);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(196, 30, 30, 0.4);
+  border: 2px solid #FFFFFF;
+}
+.fyn-sim-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #C41E1E, #FF4444);
+  cursor: pointer;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 4px 12px rgba(196, 30, 30, 0.4);
+}
