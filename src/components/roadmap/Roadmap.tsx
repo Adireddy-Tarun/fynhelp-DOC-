@@ -164,7 +164,7 @@ const Roadmap = () => {
 
       {/* Mountain Scene */}
       <div style={{ position: 'relative', width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 0.5rem' }}>
-        <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: 'auto', display: 'block' }}>
+        <svg ref={svgRef} viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid meet" style={{ width: '100%', height: 'auto', display: 'block' }}>
 
           {/* SKY */}
           <rect width="1200" height="900" fill="#EDEAE3" />
