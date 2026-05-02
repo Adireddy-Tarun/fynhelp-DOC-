@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 const pageTitles: Record<string, string> = {
   "/": "Home",
   "/solutions": "Solutions",
-  "/products": "Products",
   "/pricing": "Pricing",
   "/resources": "Resources",
   "/blog": "Blog",
