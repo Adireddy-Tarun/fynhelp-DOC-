@@ -1069,21 +1069,28 @@
   white-space: nowrap;
 }
 
+/* Tablet */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .hairpin-scene { aspect-ratio: 10 / 18 !important; }
+}
 /* Mobile: hide chip names, shrink */
 @media (max-width: 767px) {
-  .hairpin-scene { aspect-ratio: 9 / 18 !important; }
+  .hairpin-scene { aspect-ratio: 9 / 20 !important; }
   .hairpin-chip-name { display: none; }
   .hairpin-chip { padding: 4px; }
   .hairpin-chip-icon { width: 26px; height: 26px; font-size: 14px; border-radius: 7px; }
   .hairpin-badge { font-size: 8px; padding: 1px 4px; }
   .hairpin-tooltip { max-width: 160px; font-size: 10.5px; }
+  .hairpin-cloud-front { display: none; }
+  .hairpin-raft-label, .hairpin-sink-label { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hairpin-cloud,
-  .hairpin-dot,
-  .hairpin-climber-bob,
-  .hairpin-chip-anchor,
+  .hairpin-cloud, .hairpin-cloud-front, .hairpin-cloud-back,
+  .hairpin-dot, .hairpin-climber-bob, .hairpin-chip-anchor,
+  .hairpin-tree, .hairpin-raft, .hairpin-sinker,
+  .hairpin-bird-wrap, .hairpin-bird-wrap > svg,
+  .hairpin-wave-1, .hairpin-wave-2,
   .hairpin-badge.live { animation: none !important; }
   .hairpin-chip-anchor { opacity: 1; }
 }
