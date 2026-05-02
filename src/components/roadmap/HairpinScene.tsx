@@ -1,83 +1,213 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HAIRPIN_STOPS, CLIMBER_AT, type HairpinStop } from "./hairpinStops";
 
 const GOLD = "#C9A84C";
+const GREEN = "#34C759";
 const DARK = "#1a1814";
 
 interface Props {
   onSelectStop: (s: HairpinStop) => void;
 }
 
-/** Tiny climber SVG — round head, brown hat, red jacket, dark pants, backpack, walking stick. */
+/** Climber: round head, brown hat, red jacket, dark pants, backpack, walking stick. */
 function ClimberSvg() {
   return (
-    <svg
-      width="34"
-      height="42"
-      viewBox="0 0 34 42"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-      style={{ display: "block" }}
-    >
-      {/* Backpack */}
+    <svg width="34" height="42" viewBox="0 0 34 42" fill="none" aria-hidden style={{ display: "block" }}>
       <rect x="6" y="16" width="9" height="11" rx="2" fill="#7a4f1f" />
-      {/* Body / red jacket */}
-      <path
-        d="M12 13 C 9 13 8 15 8.5 19 L 8.5 26 C 8.5 27.5 9.8 28 11 28 L 19 28 C 20.2 28 21.5 27.5 21.5 26 L 21.5 19 C 22 15 21 13 18 13 Z"
-        fill="#C41E1E"
-      />
-      {/* Head */}
+      <path d="M12 13 C 9 13 8 15 8.5 19 L 8.5 26 C 8.5 27.5 9.8 28 11 28 L 19 28 C 20.2 28 21.5 27.5 21.5 26 L 21.5 19 C 22 15 21 13 18 13 Z" fill="#C41E1E" />
       <circle cx="15" cy="9" r="4.2" fill="#F5D0A9" />
-      {/* Hat (brown) */}
       <path d="M10.5 8.5 C 10.5 5.5 12 4 15 4 C 18 4 19.5 5.5 19.5 8.5 L 19.5 9 L 10.5 9 Z" fill="#5a3a1a" />
       <ellipse cx="15" cy="9" rx="5.2" ry="0.9" fill="#5a3a1a" />
-      {/* Pants */}
-      <path d="M9 28 L 10.5 39 L 13.5 39 L 14.2 29 Z" fill="#1a1814" />
-      <path d="M21 28 L 19.5 39 L 16.5 39 L 15.8 29 Z" fill="#1a1814" />
-      {/* Boots */}
+      <path d="M9 28 L 10.5 39 L 13.5 39 L 14.2 29 Z" fill={DARK} />
+      <path d="M21 28 L 19.5 39 L 16.5 39 L 15.8 29 Z" fill={DARK} />
       <ellipse cx="12" cy="40" rx="2.4" ry="1.2" fill="#3a2410" />
       <ellipse cx="18" cy="40" rx="2.4" ry="1.2" fill="#3a2410" />
-      {/* Walking stick (brown) */}
       <line x1="23" y1="14" x2="27" y2="36" stroke="#7a4f1f" strokeWidth="1.4" strokeLinecap="round" />
-      {/* Arm */}
       <path d="M21 18 C 23 17 24 15.5 24 14.8" stroke="#C41E1E" strokeWidth="2.6" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
 
-/** Build a smooth SVG path through (xPct,yPct) anchors using Catmull-Rom→Bezier. */
-function buildSmoothPath(points: { x: number; y: number }[]): string {
+/* ---------- Path math: build smooth curve through anchors ---------- */
+type Pt = { x: number; y: number };
+
+function buildSmoothPath(points: Pt[]): string {
   if (points.length < 2) return "";
-  const tension = 0.5;
+  const t = 0.5;
   let d = `M ${points[0].x} ${points[0].y}`;
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = points[i - 1] ?? points[i];
     const p1 = points[i];
     const p2 = points[i + 1];
     const p3 = points[i + 2] ?? p2;
-    const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
-    const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
-    const cp2x = p2.x - ((p3.x - p1.x) / 6) * tension;
-    const cp2y = p2.y - ((p3.y - p1.y) / 6) * tension;
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+    const c1x = p1.x + ((p2.x - p0.x) / 6) * t;
+    const c1y = p1.y + ((p2.y - p0.y) / 6) * t;
+    const c2x = p2.x - ((p3.x - p1.x) / 6) * t;
+    const c2y = p2.y - ((p3.y - p1.y) / 6) * t;
+    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
   }
   return d;
 }
 
+/** Sample N points along an SVG path (in user-space units). */
+function samplePath(path: SVGPathElement, n: number): { p: Pt; angle: number }[] {
+  const total = path.getTotalLength();
+  const out: { p: Pt; angle: number }[] = [];
+  for (let i = 0; i <= n; i++) {
+    const len = (i / n) * total;
+    const cur = path.getPointAtLength(len);
+    const nxt = path.getPointAtLength(Math.min(len + 0.5, total));
+    out.push({
+      p: { x: cur.x, y: cur.y },
+      angle: Math.atan2(nxt.y - cur.y, nxt.x - cur.x),
+    });
+  }
+  return out;
+}
+
+/* ---------- Decorative SVG bits ---------- */
+
+function PineTree({ x, y, scale = 1, delay = 0 }: { x: number; y: number; scale?: number; delay?: number }) {
+  return (
+    <g
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      className="hairpin-tree"
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <rect x="-0.4" y="0" width="0.8" height="2.2" fill="#6B4226" />
+      <polygon points="-2.5,0 2.5,0 0,-3.6" fill="#2D5016" />
+      <polygon points="-2,-2 2,-2 0,-5" fill="#3a6620" />
+      <polygon points="-1.5,-3.6 1.5,-3.6 0,-6" fill="#4a7a2e" />
+    </g>
+  );
+}
+
+function RoundTree({ x, y, scale = 1, delay = 0 }: { x: number; y: number; scale?: number; delay?: number }) {
+  return (
+    <g
+      transform={`translate(${x} ${y}) scale(${scale})`}
+      className="hairpin-tree"
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <rect x="-0.35" y="0" width="0.7" height="1.8" fill="#6B4226" />
+      <circle cx="0" cy="-1.6" r="2.2" fill="#4A7A2E" />
+      <circle cx="-1.2" cy="-1" r="1.4" fill="#5a8a3a" />
+      <circle cx="1.2" cy="-1" r="1.4" fill="#3d6a24" />
+    </g>
+  );
+}
+
+function Kiosk({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      {/* Booth body */}
+      <rect x="-3.4" y="-3.5" width="6.8" height="3.8" fill="#FAF6EE" stroke={DARK} strokeWidth="0.18" />
+      {/* Roof */}
+      <polygon points="-4,-3.5 4,-3.5 0,-5.6" fill={GOLD} stroke={DARK} strokeWidth="0.18" />
+      <rect x="-4" y="-3.7" width="8" height="0.35" fill={GOLD} />
+      {/* Door */}
+      <rect x="-1.2" y="-2.4" width="2.4" height="2.1" fill="#E8DCC4" stroke={DARK} strokeWidth="0.12" />
+      <circle cx="0.7" cy="-1.4" r="0.12" fill={DARK} />
+      {/* Sign */}
+      <rect x="-2.6" y="-3.25" width="5.2" height="0.7" fill="#FFF" stroke={GOLD} strokeWidth="0.1" rx="0.1" />
+      <text x="0" y="-2.72" textAnchor="middle" fontSize="0.55" fontFamily="DM Sans, sans-serif" fontWeight="700" fill={DARK}>FYNHelp</text>
+      {/* Arrow sign pointing up */}
+      <g transform="translate(3.2 -2.6)">
+        <rect x="-0.08" y="0" width="0.16" height="2" fill="#6B4226" />
+        <polygon points="-1.1,-0.3 1.1,-0.3 0,-1.4" fill={GOLD} stroke={DARK} strokeWidth="0.1" />
+        <text x="0" y="-0.65" textAnchor="middle" fontSize="0.42" fontWeight="700" fill={DARK}>UP</text>
+      </g>
+      {/* Tiny welcoming figure */}
+      <g transform="translate(-2.5 -0.2)">
+        <circle cx="0" cy="-0.6" r="0.32" fill="#F5D0A9" />
+        <rect x="-0.28" y="-0.3" width="0.56" height="0.7" fill="#C41E1E" />
+        <line x1="-0.28" y1="-0.05" x2="-0.55" y2="-0.5" stroke="#F5D0A9" strokeWidth="0.14" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+function SinkingPerson({ x, y, delay = 0 }: { x: number; y: number; delay?: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`} className="hairpin-sinker" style={{ animationDelay: `${delay}s` }}>
+      <circle cx="0" cy="0" r="0.55" fill="#F5D0A9" stroke={DARK} strokeWidth="0.08" />
+      <line x1="-0.45" y1="-0.1" x2="-1.1" y2="-1.1" stroke="#F5D0A9" strokeWidth="0.18" strokeLinecap="round" />
+      <line x1="0.45" y1="-0.1" x2="1.1" y2="-1.1" stroke="#F5D0A9" strokeWidth="0.18" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Raft({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`} className="hairpin-raft">
+      {/* planks */}
+      <rect x="-3" y="-0.2" width="6" height="0.85" fill="#8B6914" stroke="#5a3a1a" strokeWidth="0.08" rx="0.12" />
+      <line x1="-3" y1="0.05" x2="3" y2="0.05" stroke="#5a3a1a" strokeWidth="0.08" />
+      <line x1="-3" y1="0.4" x2="3" y2="0.4" stroke="#5a3a1a" strokeWidth="0.08" />
+      <line x1="-1.5" y1="-0.2" x2="-1.5" y2="0.65" stroke="#5a3a1a" strokeWidth="0.08" />
+      <line x1="1.5" y1="-0.2" x2="1.5" y2="0.65" stroke="#5a3a1a" strokeWidth="0.08" />
+      {/* people */}
+      <g transform="translate(-1.5 -0.2)">
+        <circle cx="0" cy="-0.7" r="0.4" fill="#F5D0A9" stroke={DARK} strokeWidth="0.06" />
+        <rect x="-0.32" y="-0.35" width="0.64" height="0.6" fill="#3B82F6" />
+      </g>
+      <g transform="translate(0.2 -0.25)">
+        <circle cx="0" cy="-0.75" r="0.42" fill="#F5D0A9" stroke={DARK} strokeWidth="0.06" />
+        <rect x="-0.34" y="-0.4" width="0.68" height="0.65" fill="#10B981" />
+        {/* arm pointing toward shore (left) */}
+        <line x1="-0.3" y1="-0.3" x2="-1.1" y2="-0.6" stroke="#F5D0A9" strokeWidth="0.16" strokeLinecap="round" />
+      </g>
+      <g transform="translate(1.7 -0.2)">
+        <circle cx="0" cy="-0.7" r="0.4" fill="#F5D0A9" stroke={DARK} strokeWidth="0.06" />
+        <rect x="-0.32" y="-0.35" width="0.64" height="0.6" fill="#F59E0B" />
+      </g>
+    </g>
+  );
+}
+
+/* ---------- Main scene ---------- */
+
 export default function HairpinScene({ onSelectStop }: Props) {
   const [hoverId, setHoverId] = useState<number | null>(null);
+  const pathRef = useRef<SVGPathElement | null>(null);
+  const [steps, setSteps] = useState<{ x: number; y: number; angle: number; completed: boolean; behind: boolean }[]>([]);
 
-  // Build road path: start at shore (just left of stop 1, at sea level)
-  // through every stop, ending just past the summit.
+  // Build the spiral path through stops (start at kiosk near base, end at summit)
   const pathD = useMemo(() => {
-    const anchors = [
-      { x: 8, y: 96 }, // shore start
+    const anchors: Pt[] = [
+      { x: 16, y: 90 }, // kiosk start
       ...HAIRPIN_STOPS.map((s) => ({ x: s.xPct, y: s.yPct })),
-      { x: 50, y: 6 }, // summit cap
+      { x: 50, y: 7 },  // summit cap
     ];
     return buildSmoothPath(anchors);
   }, []);
+
+  // After path renders, sample step positions for stairway look.
+  useEffect(() => {
+    const path = pathRef.current;
+    if (!path) return;
+    const samples = samplePath(path, 140);
+    // Determine the path-length of the climber stop to split completed/remaining.
+    const total = path.getTotalLength();
+    // Find sample index closest to climber stop
+    const climber = HAIRPIN_STOPS.find((s) => s.n === CLIMBER_AT)!;
+    let climberLen = total * 0.5;
+    let best = Infinity;
+    for (let i = 0; i <= 200; i++) {
+      const len = (i / 200) * total;
+      const pt = path.getPointAtLength(len);
+      const d = (pt.x - climber.xPct) ** 2 + (pt.y - climber.yPct) ** 2;
+      if (d < best) { best = d; climberLen = len; }
+    }
+    const result = samples.map((s, i) => {
+      const len = (i / samples.length) * total;
+      const completed = len <= climberLen;
+      // Heuristic "behind mountain": within central band high up (above y=55) and close to mountain center
+      const behind = s.p.y < 55 && Math.abs(s.p.x - 50) < 4.5;
+      return { x: s.p.x, y: s.p.y, angle: s.angle, completed, behind };
+    });
+    setSteps(result);
+  }, [pathD]);
 
   return (
     <div
@@ -86,33 +216,51 @@ export default function HairpinScene({ onSelectStop }: Props) {
         width: "100%",
         margin: "0 auto",
         aspectRatio: "12 / 16",
-        maxWidth: 980,
+        maxWidth: 1040,
       }}
       className="hairpin-scene"
     >
-      {/* === SCENE SVG (mountain, ocean, clouds, flag) === */}
+      {/* Back drifting clouds (behind mountain) */}
+      {[
+        { top: "8%", left: "-15%", w: 110, h: 38, dur: 95, delay: 0 },
+        { top: "16%", left: "-25%", w: 80, h: 30, dur: 120, delay: 30 },
+        { top: "22%", left: "-10%", w: 95, h: 34, dur: 110, delay: 60 },
+      ].map((c, i) => (
+        <div
+          key={`bc-${i}`}
+          aria-hidden
+          className="hairpin-cloud-back"
+          style={{
+            top: c.top,
+            left: c.left,
+            width: c.w,
+            height: c.h,
+            animation: `hairpin-front-cloud ${c.dur}s linear ${c.delay}s infinite`,
+          }}
+        />
+      ))}
+
+      {/* === Main scene SVG === */}
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 1,
-        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 2 }}
         aria-hidden
       >
         <defs>
-          {/* Sky already on parent — just put faint distant peaks here */}
-          <linearGradient id="hp-distant" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#B5A892" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#B5A892" stopOpacity="0.15" />
+          <linearGradient id="hp-distant-1" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#B5A892" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#B5A892" stopOpacity="0.1" />
           </linearGradient>
+          <linearGradient id="hp-distant-2" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#C4B8A4" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#C4B8A4" stopOpacity="0.18" />
+          </linearGradient>
+
           <linearGradient id="hp-mountain" x1="0.3" x2="0.7" y1="0" y2="1">
-            <stop offset="0%" stopColor="#3a3128" />
-            <stop offset="35%" stopColor="#2a2520" />
-            <stop offset="100%" stopColor="#1a1814" />
+            <stop offset="0%" stopColor="#1a1814" />
+            <stop offset="55%" stopColor="#2a2520" />
+            <stop offset="100%" stopColor="#3d3530" />
           </linearGradient>
           <linearGradient id="hp-mtn-lit" x1="0" x2="1" y1="0" y2="0.5">
             <stop offset="0%" stopColor="#C9A84C" stopOpacity="0.18" />
@@ -123,65 +271,142 @@ export default function HairpinScene({ onSelectStop }: Props) {
             <stop offset="100%" stopColor="#E8DCC4" />
           </linearGradient>
           <linearGradient id="hp-ocean" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#5B8FA8" />
-            <stop offset="100%" stopColor="#3F6B82" />
+            <stop offset="0%" stopColor="#7BA7BC" />
+            <stop offset="50%" stopColor="#5B8FA8" />
+            <stop offset="100%" stopColor="#4A7D96" />
           </linearGradient>
-          <filter id="hp-path-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="0.8" />
+          <linearGradient id="hp-ground" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#7A9E5A" />
+            <stop offset="35%" stopColor="#C4A87C" />
+            <stop offset="100%" stopColor="#A88B5E" />
+          </linearGradient>
+
+          <filter id="hp-path-glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="0.7" />
+          </filter>
+          <filter id="hp-path-glow-green" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="0.7" />
           </filter>
         </defs>
 
-        {/* Distant faded peaks */}
-        <polygon points="0,72 12,52 22,64 34,46 46,62 60,48 76,60 88,50 100,66 100,80 0,80" fill="url(#hp-distant)" />
-        <polygon points="0,80 18,62 32,72 50,58 70,72 86,62 100,76 100,86 0,86" fill="url(#hp-distant)" opacity="0.7" />
+        {/* Distant rolling hills */}
+        <path d="M 0 70 Q 12 56 22 62 T 42 60 T 62 58 T 82 62 T 100 60 L 100 78 L 0 78 Z" fill="url(#hp-distant-1)" />
+        <path d="M 0 78 Q 14 66 28 72 T 50 70 T 72 72 T 100 70 L 100 84 L 0 84 Z" fill="url(#hp-distant-2)" />
 
-        {/* Main mountain — a tall triangular peak rising from ocean */}
-        <polygon points="2,98 50,4 98,98" fill="url(#hp-mountain)" />
-        {/* Lit slope (sun side from upper right) */}
-        <polygon points="50,4 98,98 50,98" fill="url(#hp-mtn-lit)" />
-        {/* Subtle ridge shading */}
-        <path d="M 50 4 L 50 98" stroke="#0e0c0a" strokeWidth="0.25" opacity="0.35" />
-        <path d="M 30 70 L 50 30 M 38 84 L 50 50 M 62 84 L 50 50 M 70 70 L 50 30"
-              stroke="#0e0c0a" strokeWidth="0.18" opacity="0.4" fill="none" />
+        {/* === Wide main mountain (broad bell shape) === */}
+        <path
+          d="M 8 92
+             C 14 70, 22 50, 30 36
+             C 36 26, 42 16, 50 8
+             C 58 16, 64 26, 70 36
+             C 78 50, 86 70, 92 92
+             Z"
+          fill="url(#hp-mountain)"
+        />
+        {/* lit slope from upper right */}
+        <path
+          d="M 50 8 C 58 16, 64 26, 70 36 C 78 50, 86 70, 92 92 L 50 92 Z"
+          fill="url(#hp-mtn-lit)"
+        />
+        {/* Ridge shading lines */}
+        <path d="M 50 8 L 50 92" stroke="#0e0c0a" strokeWidth="0.22" opacity="0.35" />
+        <path d="M 38 30 L 50 12 M 62 30 L 50 12 M 30 55 L 50 25 M 70 55 L 50 25 M 22 78 L 50 45 M 78 78 L 50 45"
+              stroke="#0e0c0a" strokeWidth="0.16" opacity="0.28" fill="none" />
 
         {/* Snow cap */}
         <path
-          d="M 44 12 L 47 7 L 50 4 L 53 7 L 56 12 L 54 14 L 52 12 L 50 14 L 48 12 L 46 14 Z"
+          d="M 44 14 L 47 9 L 50 5 L 53 9 L 56 14 L 54.5 16 L 52.5 14 L 50 16 L 47.5 14 L 45.5 16 Z"
           fill="url(#hp-snow)"
           style={{ filter: "drop-shadow(0 0.4px 0.6px rgba(0,0,0,0.3))" }}
         />
 
-        {/* Ocean at very bottom */}
-        <rect x="0" y="93" width="100" height="7" fill="url(#hp-ocean)" />
-        {/* Wave lines */}
-        <path d="M 0 95 Q 5 94.3 10 95 T 20 95 T 30 95 T 40 95 T 50 95 T 60 95 T 70 95 T 80 95 T 90 95 T 100 95"
-              stroke="#FFFFFF" strokeWidth="0.18" opacity="0.55" fill="none" />
-        <path d="M 0 97 Q 6 96.3 12 97 T 24 97 T 36 97 T 48 97 T 60 97 T 72 97 T 84 97 T 100 97"
-              stroke="#FFFFFF" strokeWidth="0.15" opacity="0.4" fill="none" />
+        {/* === The path (used for measurement; not drawn directly) === */}
+        <path ref={pathRef} d={pathD} fill="none" stroke="transparent" />
 
-        {/* Golden hairpin road — glow base */}
-        <path
-          d={pathD}
-          stroke={GOLD}
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.18"
-          filter="url(#hp-path-glow)"
-        />
-        {/* Dashed road on top */}
-        <path
-          d={pathD}
-          stroke={GOLD}
-          strokeWidth="0.55"
-          strokeLinecap="round"
-          fill="none"
-          strokeDasharray="1.1 0.85"
-          style={{ animation: "hairpin-road-flow 6s linear infinite" }}
-        />
+        {/* Faint full path outline for continuity */}
+        <path d={pathD} fill="none" stroke="#FAF6EE" strokeWidth="0.3" opacity="0.25" strokeLinecap="round" />
 
-        {/* Flag at summit */}
-        <g transform="translate(50 4)">
+        {/* Stairway steps — generated from samples */}
+        {steps.map((s, i) => {
+          if (i % 2 !== 0) return null; // step every 2 samples
+          const len = 1.6;
+          const w = 0.6;
+          const nx = -Math.sin(s.angle);
+          const ny = Math.cos(s.angle);
+          const x1 = s.x + nx * len * 0.5;
+          const y1 = s.y + ny * len * 0.5;
+          const x2 = s.x - nx * len * 0.5;
+          const y2 = s.y - ny * len * 0.5;
+          const color = s.completed ? GREEN : GOLD;
+          const opacity = s.behind ? 0.32 : 1;
+          return (
+            <line
+              key={`step-${i}`}
+              x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke={color}
+              strokeWidth={w}
+              strokeLinecap="round"
+              opacity={opacity}
+              style={{ filter: s.behind ? "none" : `drop-shadow(0 0 0.6px ${color})` }}
+            />
+          );
+        })}
+
+        {/* === Ground strip === */}
+        <rect x="0" y="89" width="100" height="6" fill="url(#hp-ground)" />
+        {/* grass tufts on top edge */}
+        {Array.from({ length: 28 }).map((_, i) => {
+          const x = (i + 0.5) * (100 / 28);
+          return (
+            <path
+              key={`grass-${i}`}
+              d={`M ${x} 89.4 l -0.4 -0.7 M ${x} 89.4 l 0 -0.9 M ${x} 89.4 l 0.4 -0.7`}
+              stroke="#3a6620" strokeWidth="0.18" strokeLinecap="round" fill="none"
+            />
+          );
+        })}
+
+        {/* === Trees on ground & lower slopes === */}
+        <PineTree  x={10} y={89} scale={1.1} delay={0.0} />
+        <RoundTree x={14} y={89} scale={0.9} delay={0.4} />
+        <PineTree  x={6}  y={89} scale={0.8} delay={0.8} />
+        <RoundTree x={22} y={89} scale={0.7} delay={1.2} />
+        <PineTree  x={30} y={89} scale={1.0} delay={0.5} />
+        <RoundTree x={70} y={89} scale={1.0} delay={0.2} />
+        <PineTree  x={78} y={89} scale={1.2} delay={0.9} />
+        <RoundTree x={86} y={89} scale={0.85} delay={1.5} />
+        <PineTree  x={92} y={89} scale={0.7} delay={0.3} />
+        {/* Tiny trees higher up */}
+        <PineTree  x={18} y={78} scale={0.45} delay={1.1} />
+        <RoundTree x={84} y={76} scale={0.4} delay={0.6} />
+        <PineTree  x={28} y={66} scale={0.35} delay={1.4} />
+
+        {/* === FYNHelp Kiosk at base === */}
+        <Kiosk x={16} y={89} />
+
+        {/* === Ocean === */}
+        <rect x="0" y="95" width="100" height="5" fill="url(#hp-ocean)" />
+        {/* wave lines */}
+        <g className="hairpin-wave-1">
+          <path d="M 0 96 Q 5 95.4 10 96 T 20 96 T 30 96 T 40 96 T 50 96 T 60 96 T 70 96 T 80 96 T 90 96 T 100 96"
+                stroke="#FFFFFF" strokeWidth="0.18" opacity="0.55" fill="none" />
+        </g>
+        <g className="hairpin-wave-2">
+          <path d="M 0 98 Q 6 97.4 12 98 T 24 98 T 36 98 T 48 98 T 60 98 T 72 98 T 84 98 T 100 98"
+                stroke="#FFFFFF" strokeWidth="0.15" opacity="0.42" fill="none" />
+        </g>
+
+        {/* Sinking people */}
+        <SinkingPerson x={42} y={96.3} delay={0} />
+        <SinkingPerson x={56} y={97}   delay={0.6} />
+        <SinkingPerson x={68} y={96.5} delay={1.2} />
+        <SinkingPerson x={34} y={97}   delay={1.8} />
+
+        {/* Raft */}
+        <Raft x={80} y={96.2} />
+
+        {/* === Flag at summit === */}
+        <g transform="translate(50 5)">
           <line x1="0" y1="0" x2="0" y2="-6" stroke={DARK} strokeWidth="0.35" strokeLinecap="round" />
           <path
             d="M 0 -6 L 4 -5 L 3 -3.5 L 4 -2 L 0 -3 Z"
@@ -191,33 +416,84 @@ export default function HairpinScene({ onSelectStop }: Props) {
         </g>
       </svg>
 
-      {/* === Drifting clouds (CSS) === */}
+      {/* === Story labels (positioned with %) === */}
+      <span
+        className="hairpin-sink-label"
+        style={{
+          position: "absolute", left: "30%", top: "94.4%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
+          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+        }}
+      >
+        63M Indian SMEs without financial clarity
+      </span>
+      <span
+        className="hairpin-raft-label"
+        style={{
+          position: "absolute", left: "70%", top: "92.5%",
+          fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: "#3a3128",
+          opacity: 0.85, zIndex: 5, pointerEvents: "none", whiteSpace: "nowrap",
+        }}
+      >
+        Surviving on spreadsheets &amp; gut feeling
+      </span>
+
+      {/* === Front drifting clouds (over mountain, under chips) === */}
       {[
-        { top: "6%", size: 90, dur: 75, delay: 0, dir: "l2r", op: 0.85 },
-        { top: "11%", size: 60, dur: 90, delay: 14, dir: "r2l", op: 0.75 },
-        { top: "18%", size: 70, dur: 80, delay: 6, dir: "l2r", op: 0.7 },
-        { top: "26%", size: 55, dur: 70, delay: 18, dir: "r2l", op: 0.7 },
+        { top: "20%", w: 120, h: 40, dur: 38, delay: 0 },
+        { top: "40%", w: 90,  h: 32, dur: 48, delay: 12 },
+        { top: "58%", w: 100, h: 36, dur: 55, delay: 25 },
       ].map((c, i) => (
         <div
-          key={`hc-${i}`}
+          key={`fc-${i}`}
           aria-hidden
-          className="hairpin-cloud"
+          className="hairpin-cloud-front"
           style={{
             top: c.top,
-            width: c.size,
-            height: c.size * 0.4,
-            opacity: c.op,
-            animation: `roadmap-cloud-drift-${c.dir} ${c.dur}s linear ${c.delay}s infinite`,
+            left: 0,
+            width: c.w,
+            height: c.h,
+            animation: `hairpin-front-cloud ${c.dur}s linear ${c.delay}s infinite`,
           }}
         />
       ))}
 
-      {/* === Stop dots (positioned via %) === */}
+      {/* === Birds === */}
+      {[
+        { top: "6%",  left: "-10%", size: 14, dur: 90, delay: 0  },
+        { top: "12%", left: "-20%", size: 10, dur: 110, delay: 25 },
+        { top: "18%", left: "-15%", size: 12, dur: 75, delay: 50 },
+        { top: "9%",  left: "-30%", size: 8,  dur: 130, delay: 10 },
+        { top: "24%", left: "-25%", size: 11, dur: 95, delay: 70 },
+        { top: "32%", left: "-12%", size: 16, dur: 60, delay: 5  },
+        { top: "38%", left: "-18%", size: 13, dur: 70, delay: 35 },
+      ].map((b, i) => (
+        <div
+          key={`bird-${i}`}
+          aria-hidden
+          className="hairpin-bird-wrap"
+          style={{
+            top: b.top,
+            left: b.left,
+            width: b.size,
+            height: b.size * 0.5,
+            animationDuration: `${b.dur}s`,
+            animationDelay: `${b.delay}s`,
+            zIndex: i > 4 ? 7 : 2, // last two birds in foreground
+          }}
+        >
+          <svg viewBox="0 0 20 10" width="100%" height="100%">
+            <path d="M 1 6 Q 5 1 10 5 Q 15 1 19 6" stroke="#5D4E37" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+          </svg>
+        </div>
+      ))}
+
+      {/* === Stop dots === */}
       {HAIRPIN_STOPS.map((s, i) => (
         <div
           key={`dot-${s.n}`}
           aria-hidden
-          className="hairpin-dot"
+          className={`hairpin-dot ${s.n <= CLIMBER_AT ? "completed" : ""}`}
           style={{
             left: `${s.xPct}%`,
             top: `${s.yPct}%`,
@@ -252,18 +528,11 @@ export default function HairpinScene({ onSelectStop }: Props) {
               className="hairpin-chip"
               aria-label={`${s.name} — ${s.status === "live" ? "Live" : "Coming soon"}: ${s.description}`}
             >
-              <span
-                className="hairpin-chip-icon"
-                style={{ background: s.color }}
-                aria-hidden
-              >
+              <span className="hairpin-chip-icon" style={{ background: s.color }} aria-hidden>
                 {s.emoji}
               </span>
               <span className="hairpin-chip-name">{s.name}</span>
-              <span
-                className={s.status === "live" ? "hairpin-badge live" : "hairpin-badge soon"}
-                aria-hidden
-              >
+              <span className={s.status === "live" ? "hairpin-badge live" : "hairpin-badge soon"} aria-hidden>
                 {s.status === "live" ? "LIVE" : "SOON"}
               </span>
             </button>
@@ -271,10 +540,7 @@ export default function HairpinScene({ onSelectStop }: Props) {
               <div
                 role="tooltip"
                 className="hairpin-tooltip"
-                style={{
-                  left: isLeft ? "auto" : 0,
-                  right: isLeft ? 0 : "auto",
-                }}
+                style={{ left: isLeft ? "auto" : 0, right: isLeft ? 0 : "auto" }}
               >
                 <span className="hairpin-tooltip-arrow" />
                 {s.description}
@@ -303,7 +569,7 @@ export default function HairpinScene({ onSelectStop }: Props) {
             <div className="hairpin-climber-bob">
               <ClimberSvg />
             </div>
-            <span className="hairpin-here">You are here</span>
+            <span className="hairpin-here">▸ You are here</span>
           </div>
         );
       })()}
