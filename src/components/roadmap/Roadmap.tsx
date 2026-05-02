@@ -518,6 +518,7 @@ const Roadmap: React.FC = () => {
                   {stop.products.map((p, i) => {
                     const id = `${stop.id}-${i}`;
                     const isHover = hoveredChip === id;
+                    const resolved = resolveProduct(p, stop.status);
                     return (
                       <button
                         key={id}
@@ -535,14 +536,14 @@ const Roadmap: React.FC = () => {
                         <span className="chip-name">{p.name}</span>
                         <span
                           className="chip-status"
-                          style={{ background: STATUS_COLOR[stop.status] }}
+                          style={{ background: STATUS_COLOR[resolved.status] }}
                         >
-                          {STATUS_LABEL[stop.status]}
+                          {STATUS_LABEL[resolved.status]}
                         </span>
                         {isHover && (
                           <div className="chip-tooltip" role="tooltip">
                             <div className="chip-tooltip-title">{p.name}</div>
-                            <div className="chip-tooltip-desc">{p.desc}</div>
+                            <div className="chip-tooltip-desc">{resolved.desc}</div>
                           </div>
                         )}
                       </button>
