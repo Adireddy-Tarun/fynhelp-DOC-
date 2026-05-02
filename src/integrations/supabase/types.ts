@@ -1339,6 +1339,60 @@ export type Database = {
         }
         Relationships: []
       }
+      roadmap_stops: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          emoji: string
+          href: string
+          id: string
+          name: string
+          side: string
+          sort_order: number
+          status: string
+          stop_number: number
+          updated_at: string
+          widget: string
+          x_pct: number
+          y_pct: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string
+          emoji?: string
+          href?: string
+          id?: string
+          name: string
+          side?: string
+          sort_order?: number
+          status?: string
+          stop_number: number
+          updated_at?: string
+          widget?: string
+          x_pct?: number
+          y_pct?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          emoji?: string
+          href?: string
+          id?: string
+          name?: string
+          side?: string
+          sort_order?: number
+          status?: string
+          stop_number?: number
+          updated_at?: string
+          widget?: string
+          x_pct?: number
+          y_pct?: number
+        }
+        Relationships: []
+      }
       simulations: {
         Row: {
           business_id: string
