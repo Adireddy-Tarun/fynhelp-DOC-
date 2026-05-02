@@ -149,15 +149,15 @@ export default function ProductsNav({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="fyn-products-trigger nav-link-underline text-sm font-medium py-6 inline-flex items-center gap-1"
+        className={`fyn-products-trigger nav-link-underline text-sm font-medium py-6 inline-flex items-center gap-1 transition-colors ${
+          open ? "text-white" : "text-white/70 hover:text-white"
+        }`}
         style={{
-          color: open ? FYN.red : undefined,
           fontFamily: "'Raleway', sans-serif",
           fontWeight: 600,
           background: "transparent",
           border: "none",
           cursor: "pointer",
-          transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
         Products
