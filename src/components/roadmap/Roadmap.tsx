@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Full-page animated mountain roadmap.
@@ -143,8 +144,53 @@ const SEGMENTS: { from: { x: number; y: number }; to: { x: number; y: number }; 
   { from: STOPS[3], to: SUMMIT, status: "soon" },
 ];
 
+type DbStatus = "live" | "coming_soon";
+interface DbStop {
+  name: string;
+  status: DbStatus;
+  description: string;
+}
+
+const dbStatusToChipStatus = (s: DbStatus): Status =>
+  s === "live" ? "live" : "soon";
+
+/** Normalize names so DB rows match in-scene product names regardless of emoji prefix. */
+const normalizeName = (n: string) =>
+  n
+    .replace(/^[^\p{L}\p{N}]+/u, "") // strip leading emoji/punctuation
+    .trim()
+    .toLowerCase();
+
 const Roadmap: React.FC = () => {
   const [hoveredChip, setHoveredChip] = useState<string | null>(null);
+  const [overrides, setOverrides] = useState<Record<string, DbStop>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("roadmap_stops")
+        .select("name, status, description")
+        .order("sort_order", { ascending: true });
+      if (cancelled || error || !data) return;
+      const map: Record<string, DbStop> = {};
+      for (const row of data as DbStop[]) {
+        map[normalizeName(row.name)] = row;
+      }
+      setOverrides(map);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const resolveProduct = (p: Product, fallback: Status) => {
+    const o = overrides[normalizeName(p.name)];
+    return {
+      status: o ? dbStatusToChipStatus(o.status) : fallback,
+      desc: o?.description || p.desc,
+    };
+  };
 
   return (
     <section className="roadmap-root">
