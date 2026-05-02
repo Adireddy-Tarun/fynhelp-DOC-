@@ -1,12 +1,85 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
+const EXPECTED_WAYPOINTS = 12;
+const EXPECTED_STOPS = 12;
 
 const Roadmap = () => {
   const [visible, setVisible] = useState(false);
   const [hoveredStop, setHoveredStop] = useState<number | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 200);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Runtime sanity check — verifies all roadmap SVG elements mounted & are visible.
+  useEffect(() => {
+    const check = () => {
+      const svg = svgRef.current;
+      if (!svg) {
+        console.error('[Roadmap check] SVG root did not mount');
+        return;
+      }
+      const issues: string[] = [];
+
+      const isVisible = (el: Element) => {
+        const cs = window.getComputedStyle(el as Element);
+        const rect = (el as SVGGraphicsElement).getBoundingClientRect?.();
+        if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+        if (rect && (rect.width === 0 || rect.height === 0)) return false;
+        return true;
+      };
+
+      const paths = svg.querySelectorAll('path');
+      const circles = svg.querySelectorAll('circle');
+      const rects = svg.querySelectorAll('rect');
+      const polygons = svg.querySelectorAll('polygon');
+      const texts = svg.querySelectorAll('text');
+
+      if (paths.length === 0) issues.push('no <path> elements found');
+      if (circles.length === 0) issues.push('no <circle> elements found');
+      if (rects.length === 0) issues.push('no <rect> elements found');
+      if (polygons.length === 0) issues.push('no <polygon> elements (mountains) found');
+      if (texts.length === 0) issues.push('no <text> elements (chip labels) found');
+
+      // Waypoint dots: stroke="white" circles with r 6.5 or 9 — count by chip groups instead.
+      // Each stop renders >=2 rects (chip bg + icon) and 2 texts (name + badge label).
+      // Conservative thresholds tied to the data:
+      if (rects.length < EXPECTED_STOPS * 2) {
+        issues.push(`expected >= ${EXPECTED_STOPS * 2} <rect>, got ${rects.length}`);
+      }
+      if (circles.length < EXPECTED_WAYPOINTS) {
+        issues.push(`expected >= ${EXPECTED_WAYPOINTS} <circle> waypoints, got ${circles.length}`);
+      }
+      if (paths.length < 2) {
+        issues.push(`expected >= 2 <path> (green + gold trails), got ${paths.length}`);
+      }
+
+      // Visibility spot-check: ensure SVG itself and a sample of children are visible.
+      const sampled: Element[] = [
+        svg,
+        ...Array.from(paths).slice(0, 2),
+        ...Array.from(circles).slice(0, 3),
+        ...Array.from(polygons).slice(0, 2),
+      ];
+      const hidden = sampled.filter((el) => !isVisible(el));
+      if (hidden.length > 0) {
+        issues.push(`${hidden.length} sampled element(s) are not visible (zero-size or hidden)`);
+      }
+
+      if (issues.length > 0) {
+        console.error('[Roadmap check] FAILED:', issues);
+      } else {
+        console.info(
+          `[Roadmap check] OK — ${paths.length} paths, ${circles.length} circles, ${rects.length} rects, ${polygons.length} polygons, ${texts.length} texts`,
+        );
+      }
+    };
+
+    // Wait for the visible-transition + browser paint before measuring.
+    const t = window.setTimeout(check, 600);
+    return () => window.clearTimeout(t);
   }, []);
 
   const stops = [
