@@ -426,7 +426,7 @@ const Roadmap: React.FC = () => {
             return (
               <path
                 key={i}
-                d={`M ${x} 908 q 3 -8 6 0 M ${x + 3} 908 q 0 -10 3 -2`}
+                d={`M ${x} 870 q 3 -8 6 0 M ${x + 3} 870 q 0 -10 3 -2`}
                 stroke="#5C7042"
                 strokeWidth="1.2"
                 fill="none"
