@@ -630,12 +630,42 @@ export default function PricingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 mx-auto rounded-[24px] px-8 md:px-12 py-7 text-center text-white shadow-[0_12px_40px_rgba(139,105,20,0.3)] flex items-center justify-center gap-3 flex-wrap"
-            style={{ background: "linear-gradient(135deg,#8B6914 0%, rgba(139,105,20,0.85) 100%)" }}
+            className="mt-12 mx-auto flex items-center justify-center gap-3 flex-wrap"
+            style={{
+              width: "100%",
+              maxWidth: 1200,
+              padding: "28px 48px",
+              borderRadius: 24,
+              background: "linear-gradient(135deg, #8B6914 0%, rgba(139,105,20,0.85) 100%)",
+              boxShadow: "0 12px 40px rgba(139,105,20,0.35)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              textAlign: "center",
+            }}
           >
-            <Coins className="h-7 w-7 shrink-0" />
-            <span className="font-subheading font-semibold text-lg md:text-2xl">
-              Save ₹56–91L annually by choosing FYNHelp over hiring a full team
+            <Coins className="h-7 w-7 shrink-0" style={{ color: "#FFFFFF" }} />
+            <span
+              style={{
+                fontFamily: "'Raleway', sans-serif",
+                fontWeight: 600,
+                fontSize: "clamp(16px, 1.6vw, 22px)",
+                color: "#FFFFFF",
+                lineHeight: 1.4,
+                letterSpacing: "0.3px",
+                textShadow: "0 2px 8px rgba(26,16,8,0.2)",
+              }}
+            >
+              Save{" "}
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(18px, 1.9vw, 26px)",
+                  color: "#FFFFFF",
+                }}
+              >
+                ₹56–91L
+              </span>{" "}
+              annually by choosing FYNHelp over hiring a full team
             </span>
           </motion.div>
         </div>
