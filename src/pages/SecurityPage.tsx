@@ -141,7 +141,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
             <br /><strong>Deletion:</strong> Settings &gt; Account &gt; Delete Account. 30-day deletion timeline.
             <br /><strong>Revoke Integrations:</strong> Disconnect Razorpay/Zoho/bank instantly via Integrations.
             <br /><br />
-            <strong>Contact:</strong> security@fynhelp.com · privacy@fynhelp.com · support@fynhelp.com
+            <strong>Contact:</strong> support@fynhelp.com · privacy@fynhelp.com · support@fynhelp.com
           </Section>
 
           <Section title="10. Changes to This Policy">
