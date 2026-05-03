@@ -250,7 +250,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
       {c.icon ? (
         <img src={c.icon} alt="" style={{ width: 64, height: 64 }} />
       ) : (
-        <span style={{ fontSize: 56, color: GOLD }}>📊</span>
+        <FYNIcon name="template" size={64} />
       )}
     </div>
     <div style={{ padding: 20 }}>
