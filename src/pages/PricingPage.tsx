@@ -1,39 +1,37 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
-import { Check, X } from "lucide-react";
+
+/* ================================================================
+   FYNHelp Pricing Page — brand palette only
+   Ink #1A1008 | Red #C41E1E | Beige #F4EDDA | Gold #8B6914
+   Fonts: Oswald, Raleway, Roboto, DM Sans
+================================================================ */
+
+/* --------------------------- Data --------------------------- */
 
 type Plan = {
   id: "starter" | "pro" | "enterprise";
   name: string;
-  badge: string;
+  badge?: string;
   highlight?: boolean;
-  priceTop: React.ReactNode;
-  priceSub?: React.ReactNode;
+  price: string;
+  priceSuffix?: string;
+  subline: string;
   features: string[];
   cta: { label: string; href: string; external?: boolean };
+  ctaStyle: "outline-red" | "gradient" | "outline-ink";
 };
 
 const plans: Plan[] = [
   {
     id: "starter",
     name: "Starter",
-    badge: "For First 100 Waitlisters",
-    priceTop: (
-      <>
-        <span className="text-4xl md:text-5xl font-bold text-fyn-ink">FREE</span>
-        <span className="text-fyn-ink/60 ml-2 text-sm">for 6 months</span>
-      </>
-    ),
-    priceSub: (
-      <>
-        <p className="text-sm text-fyn-ink/60 mt-2">
-          Then <span className="font-semibold text-fyn-ink">₹30,000/year</span> or ₹3,000/month
-        </p>
-        <span className="inline-block mt-2 text-[11px] font-semibold tracking-wide uppercase bg-fyn-red/10 text-fyn-red px-2 py-1 rounded">
-          Waitlist Only
-        </span>
-      </>
-    ),
+    price: "FREE",
+    priceSuffix: "for 6 months",
+    subline: "Then ₹30,000/year — Waitlist only",
     features: [
       "8 AI CFO queries per month",
       "Real-time cash flow tracking",
@@ -44,28 +42,16 @@ const plans: Plan[] = [
       "1 user account",
     ],
     cta: { label: "Join Waitlist", href: "/waitlist" },
+    ctaStyle: "outline-red",
   },
   {
     id: "pro",
     name: "Pro",
-    badge: "Most Popular",
+    badge: "POPULAR",
     highlight: true,
-    priceTop: (
-      <>
-        <span className="text-4xl md:text-5xl font-bold text-fyn-ink">₹90,000</span>
-        <span className="text-fyn-ink/60 ml-1 text-sm">/year</span>
-      </>
-    ),
-    priceSub: (
-      <>
-        <p className="text-sm text-fyn-success font-medium mt-2">Save ₹18K vs monthly (₹9,000/mo)</p>
-        <p className="text-sm text-fyn-ink/70 mt-2">
-          Waitlisters: <span className="font-semibold text-fyn-red">₹45,000/year</span>{" "}
-          <span className="line-through text-fyn-ink/40">₹90,000</span>{" "}
-          <span className="text-xs text-fyn-success">(50% off)</span>
-        </p>
-      </>
-    ),
+    price: "₹90,000",
+    priceSuffix: "/year",
+    subline: "Waitlisters: ₹45,000/year (50% off)",
     features: [
       "Everything in Starter, plus:",
       "Unlimited AI CFO queries",
@@ -74,19 +60,16 @@ const plans: Plan[] = [
       "Decision simulator",
       "Priority email & chat support",
       "Up to 5 user accounts",
-      "Custom reporting",
-      "API access",
+      "Custom reporting & API access",
     ],
     cta: { label: "Join Waitlist", href: "/waitlist" },
+    ctaStyle: "gradient",
   },
   {
     id: "enterprise",
     name: "Enterprise",
-    badge: "For Teams",
-    priceTop: (
-      <span className="text-4xl md:text-5xl font-bold text-fyn-ink">Custom</span>
-    ),
-    priceSub: <p className="text-sm text-fyn-ink/60 mt-2">Tailored to your team</p>,
+    price: "Custom",
+    subline: "Tailored to your team",
     features: [
       "Everything in Pro, plus:",
       "Unlimited users",
@@ -96,9 +79,9 @@ const plans: Plan[] = [
       "Advanced security & compliance",
       "SLA guarantees",
       "Onboarding & training",
-      "Quarterly business reviews",
     ],
     cta: { label: "Contact Sales", href: "mailto:hello@fynhelp.com", external: true },
+    ctaStyle: "outline-ink",
   },
 ];
 
@@ -122,7 +105,16 @@ const comparisonRows: Array<{
   { label: "Multi-entity support", starter: false, pro: false, enterprise: true },
   { label: "Dedicated manager", starter: false, pro: false, enterprise: true },
   { label: "SLA guarantees", starter: false, pro: false, enterprise: true },
-  { label: "Support", starter: "Email", pro: "Priority email & chat", enterprise: "Dedicated" },
+  { label: "Support", starter: "Email", pro: "Priority", enterprise: "Dedicated" },
+];
+
+const roles = [
+  { role: "CFO / Finance Head", human: "₹25–40L/yr", fyn: "AI CFO Nidhi" },
+  { role: "Financial Analyst", human: "₹8–12L/yr", fyn: "Revenue & Cost Intelligence" },
+  { role: "Accountant / Bookkeeper", human: "₹5–8L/yr", fyn: "Liquidity Intelligence" },
+  { role: "GST / Tax Consultant", human: "₹6–10L/yr", fyn: "GST & Tax Intelligence" },
+  { role: "Compliance Manager", human: "₹7–12L/yr", fyn: "Governance Intelligence" },
+  { role: "HR Analytics Specialist", human: "₹6–10L/yr", fyn: "HR & Workforce Intelligence" },
 ];
 
 const faqs = [
@@ -132,7 +124,7 @@ const faqs = [
   },
   {
     q: "Can I upgrade anytime?",
-    a: "Yes! Waitlisters get 50% off Pro plan if upgraded within first 6 months.",
+    a: "Yes. Waitlisters get 50% off Pro plan if upgraded within the first 6 months.",
   },
   {
     q: "What happens after 6 months free?",
@@ -144,123 +136,498 @@ const faqs = [
   },
 ];
 
-function Cell({ value }: { value: string | boolean }) {
-  if (typeof value === "boolean") {
-    return value ? (
-      <Check className="w-5 h-5 text-fyn-success mx-auto" />
-    ) : (
-      <X className="w-4 h-4 text-fyn-ink/25 mx-auto" />
-    );
-  }
-  return <span className="text-sm text-fyn-ink/80">{value}</span>;
+/* ----------------------- Small primitives ----------------------- */
+
+function Sparkles() {
+  // 18 deterministic gold particles
+  const dots = Array.from({ length: 18 }, (_, i) => {
+    const left = (i * 53) % 100;
+    const top = (i * 37) % 100;
+    const size = 4 + (i % 3) * 2;
+    const dur = 12 + (i % 7) * 1.2;
+    const delay = (i % 8) * 1.1;
+    return { left, top, size, dur, delay, i };
+  });
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {dots.map((d) => (
+        <span
+          key={d.i}
+          className="fyn-sparkle"
+          style={{
+            left: `${d.left}%`,
+            top: `${d.top}%`,
+            width: d.size,
+            height: d.size,
+            animationDuration: `${d.dur}s`,
+            animationDelay: `-${d.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
+function Counter({ to, prefix = "", suffix = "" }: { to: number; prefix?: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const mv = useMotionValue(0);
+  const rounded = useTransform(mv, (v) => `${prefix}${Math.round(v).toLocaleString("en-IN")}${suffix}`);
+  const [text, setText] = useState(`${prefix}0${suffix}`);
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(mv, to, { duration: 1.6, ease: [0.22, 1, 0.36, 1] });
+    const unsub = rounded.on("change", (v) => setText(v));
+    return () => {
+      controls.stop();
+      unsub();
+    };
+  }, [inView, to, mv, rounded]);
+
+  return <span ref={ref}>{text}</span>;
+}
+
+/* ============================ Page ============================ */
+
 export default function PricingPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [email, setEmail] = useState("");
+
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-fyn-beige py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="font-serif font-bold text-4xl md:text-5xl text-fyn-ink mb-4">
-            Simple, transparent pricing
-          </h1>
-          <p className="text-lg text-fyn-ink/70">
-            Start free for 6 months. Upgrade when ready.
-          </p>
-        </div>
-      </section>
+      {/* Local styles — sparkles, gradient bg, accents */}
+      <style>{`
+        .fyn-bg-anim {
+          background: linear-gradient(145deg, #F4EDDA 0%, #E8DCC4 30%, #F4EDDA 60%, #D4C4A8 100%);
+          background-size: 200% 200%;
+          animation: fynBgShift 22s ease-in-out infinite alternate;
+        }
+        @keyframes fynBgShift {
+          0% { background-position: 0% 0%; }
+          100% { background-position: 100% 100%; }
+        }
+        .fyn-sparkle {
+          position: absolute;
+          border-radius: 9999px;
+          background: radial-gradient(circle, rgba(139,105,20,0.55) 0%, rgba(139,105,20,0) 70%);
+          opacity: 0.55;
+          animation-name: fynFloat;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+        }
+        @keyframes fynFloat {
+          0% { transform: translate(0,0) scale(1); opacity: 0.15; }
+          50% { opacity: 0.55; }
+          100% { transform: translate(40px,-120px) scale(1.2); opacity: 0; }
+        }
+        .fyn-blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(50px);
+          animation: fynBlob 14s ease-in-out infinite;
+        }
+        @keyframes fynBlob {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(20px,-15px) scale(1.15); }
+        }
+        .fyn-pulse-soft {
+          animation: fynPulseSoft 2.4s ease-in-out infinite;
+        }
+        @keyframes fynPulseSoft {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.06); }
+        }
+        .fyn-underline-gold {
+          background-image: linear-gradient(90deg, #8B6914 0%, #A67C1A 100%);
+          background-repeat: no-repeat;
+          background-size: 100% 2px;
+          background-position: 0 100%;
+          padding-bottom: 2px;
+        }
+        .fyn-glass {
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(20px) saturate(110%);
+          -webkit-backdrop-filter: blur(20px) saturate(110%);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fyn-bg-anim, .fyn-sparkle, .fyn-blob, .fyn-pulse-soft { animation: none !important; }
+        }
+      `}</style>
 
-      {/* Pricing cards */}
-      <section className="bg-fyn-beige-dark py-16 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {plans.map((p) => (
-            <div
-              key={p.id}
-              className={`relative bg-white rounded-2xl p-8 flex flex-col ${
-                p.highlight
-                  ? "border-2 border-fyn-red shadow-lg shadow-fyn-red/10 md:-translate-y-2"
-                  : "border border-fyn-ink/10 shadow-sm"
-              }`}
-            >
-              <span
-                className={`absolute -top-3 left-8 text-xs font-medium px-3 py-1 rounded-full ${
-                  p.highlight ? "bg-fyn-red text-white" : "bg-fyn-ink text-white"
+      {/* ========================= HERO + CARDS ========================= */}
+      <section className="fyn-bg-anim relative overflow-hidden pt-20 pb-24 px-6">
+        <Sparkles />
+
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="font-display font-bold text-[40px] md:text-[56px] leading-[1.1] text-fyn-ink mb-4 tracking-tight"
+          >
+            Simple, transparent pricing
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="font-subheading text-lg md:text-xl text-fyn-gold"
+          >
+            Start free for 6 months. Upgrade when ready.
+          </motion.p>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {plans.map((p, idx) => {
+            const isPro = p.highlight;
+            return (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.55, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -10, scale: 1.015 }}
+                className={`fyn-glass relative flex flex-col p-10 rounded-[32px] transition-shadow duration-300 ${
+                  isPro
+                    ? "border-2 border-fyn-red shadow-[0_30px_80px_rgba(196,30,30,0.18)]"
+                    : "border border-fyn-gold/20 shadow-[0_20px_60px_rgba(26,16,8,0.06)] hover:shadow-[0_30px_80px_rgba(26,16,8,0.12)]"
                 }`}
               >
-                {p.badge}
-              </span>
-              <h3 className="font-serif font-bold text-2xl text-fyn-ink mb-4 mt-2">{p.name}</h3>
-              <div className="mb-6 min-h-[120px]">
-                <div className="flex items-baseline flex-wrap">{p.priceTop}</div>
-                {p.priceSub}
-              </div>
-              <ul className="space-y-3 mb-8 flex-1">
-                {p.features.map((f) => (
-                  <li key={f} className="flex gap-3 text-sm text-fyn-ink/80">
-                    <Check className="w-5 h-5 text-fyn-success shrink-0 mt-0.5" />
-                    <span className={f.endsWith(":") ? "font-semibold text-fyn-ink" : ""}>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              {p.cta.external ? (
-                <a
-                  href={p.cta.href}
-                  className={`block text-center w-full font-semibold py-3 rounded-lg transition-colors ${
-                    p.highlight
-                      ? "bg-fyn-red text-white hover:bg-fyn-red/90"
-                      : "border-[1.5px] border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-white"
-                  }`}
-                >
-                  {p.cta.label}
-                </a>
-              ) : (
-                <Link
-                  to={p.cta.href}
-                  className={`block text-center w-full font-semibold py-3 rounded-lg transition-colors ${
-                    p.highlight
-                      ? "bg-fyn-red text-white hover:bg-fyn-red/90"
-                      : "bg-fyn-red text-white hover:bg-fyn-red/90"
-                  }`}
-                >
-                  {p.cta.label}
-                </Link>
-              )}
-            </div>
-          ))}
+                {p.badge && (
+                  <span
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 font-button font-bold text-[12px] uppercase tracking-[1px] text-white px-6 py-2 rounded-full shadow-[0_4px_16px_rgba(196,30,30,0.35)]"
+                    style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+                  >
+                    {p.badge}
+                  </span>
+                )}
+
+                <div className="font-subheading font-semibold text-sm uppercase tracking-[1px] text-fyn-gold mb-3">
+                  {p.name}
+                </div>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="font-display font-bold text-[52px] leading-none text-fyn-ink">
+                    {p.price}
+                  </span>
+                  {p.priceSuffix && (
+                    <span className="font-body text-sm text-fyn-ink/60">{p.priceSuffix}</span>
+                  )}
+                </div>
+                <p className="font-body text-sm text-fyn-ink/70 mb-6">{p.subline}</p>
+
+                <ul className="space-y-4 mb-10 flex-1">
+                  {p.features.map((f, i) => (
+                    <motion.li
+                      key={f}
+                      initial={{ opacity: 0, x: -8 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.35, delay: 0.1 + i * 0.04 }}
+                      className="flex items-start gap-3"
+                    >
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fyn-gold text-white">
+                        <Check className="h-3 w-3" strokeWidth={3} />
+                      </span>
+                      <span
+                        className={`font-body text-[15px] leading-relaxed ${
+                          f.endsWith(":") ? "font-semibold text-fyn-ink" : "text-fyn-ink/85"
+                        }`}
+                      >
+                        {f}
+                      </span>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                <CTAButton plan={p} />
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Comparison */}
-      <section className="bg-fyn-beige py-16 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-serif font-bold text-3xl text-fyn-ink mb-8 text-center">
+      {/* ========================= WAITLIST WIDGET ========================= */}
+      <section
+        className="relative overflow-hidden px-6 py-28 md:py-32"
+        style={{
+          background:
+            "linear-gradient(145deg, #1A1008 0%, rgba(26,16,8,0.95) 30%, rgba(196,30,30,0.18) 65%, rgba(139,105,20,0.28) 100%)",
+        }}
+      >
+        {/* floating gradient blobs */}
+        <span
+          className="fyn-blob"
+          style={{ width: 280, height: 280, left: "8%", top: "15%", background: "rgba(196,30,30,0.35)" }}
+        />
+        <span
+          className="fyn-blob"
+          style={{
+            width: 220,
+            height: 220,
+            right: "10%",
+            top: "20%",
+            background: "rgba(139,105,20,0.45)",
+            animationDelay: "-4s",
+          }}
+        />
+        <span
+          className="fyn-blob"
+          style={{
+            width: 180,
+            height: 180,
+            left: "20%",
+            bottom: "10%",
+            background: "rgba(244,237,218,0.18)",
+            animationDelay: "-7s",
+          }}
+        />
+
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="font-display font-bold text-[36px] md:text-[56px] leading-[1.15] tracking-tight text-fyn-beige mb-8"
+          >
+            Ready for financial insights that work around the clock?
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="font-subheading text-lg md:text-xl text-fyn-beige/85 max-w-3xl mx-auto leading-relaxed mb-5"
+          >
+            Join hundreds of startups and SMEs who've transformed their financial intelligence with FYNHelp.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="font-button font-semibold text-base md:text-lg text-fyn-gold mb-10"
+          >
+            Start your{" "}
+            <span className="fyn-underline-gold text-fyn-beige">6-months free</span> today — no credit card required.
+          </motion.p>
+
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const url = `/waitlist${email ? `?email=${encodeURIComponent(email)}` : ""}`;
+              window.location.href = url;
+            }}
+            className="relative z-10 mx-auto flex flex-col sm:flex-row items-stretch gap-3 p-4 max-w-2xl rounded-[24px] border-2 border-fyn-beige/25 shadow-[0_20px_60px_rgba(0,0,0,0.3)]"
+            style={{
+              background: "rgba(244,237,218,0.08)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+            }}
+          >
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="flex-1 bg-transparent border-0 outline-none px-6 py-4 font-body text-base text-fyn-beige placeholder:text-fyn-beige/50"
+            />
+            <motion.button
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="font-button font-bold uppercase tracking-wide text-white px-10 py-4 rounded-[18px] shadow-[0_8px_24px_rgba(196,30,30,0.4)] transition-shadow"
+              style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+            >
+              Join Waitlist
+            </motion.button>
+          </motion.form>
+        </div>
+      </section>
+
+      {/* ========================= COST COMPARISON ========================= */}
+      <section className="fyn-bg-anim relative overflow-hidden px-6 py-28">
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="font-display font-bold text-[36px] md:text-[48px] text-fyn-ink text-center mb-4 tracking-tight"
+          >
+            FYNHelp AI vs. Hiring a Team
+          </motion.h2>
+          <p className="font-subheading text-lg text-fyn-ink/70 text-center max-w-2xl mx-auto mb-16">
+            See how much you save by choosing AI-powered financial intelligence over traditional hiring.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Human team column */}
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="fyn-glass rounded-[32px] overflow-hidden shadow-[0_20px_60px_rgba(26,16,8,0.08)]"
+            >
+              <div
+                className="px-8 py-8 flex items-center justify-center gap-3 text-fyn-beige"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(26,16,8,0.92) 0%, rgba(26,16,8,1) 100%)",
+                }}
+              >
+                <Users className="h-7 w-7" />
+                <span className="font-subheading font-semibold text-2xl">Human Team</span>
+              </div>
+              <ul>
+                {roles.map((r) => (
+                  <li
+                    key={r.role}
+                    className="px-8 py-6 border-b border-fyn-ink/10 transition-colors hover:bg-fyn-gold/5"
+                  >
+                    <div className="font-subheading font-semibold text-fyn-ink text-lg mb-1">
+                      {r.role}
+                    </div>
+                    <div className="font-button font-medium text-fyn-red text-base">{r.human}</div>
+                  </li>
+                ))}
+                <li className="px-8 py-8 bg-fyn-beige/60">
+                  <div className="font-subheading text-sm text-fyn-ink/70 mb-1">
+                    Total Annual Cost
+                  </div>
+                  <div className="font-display font-bold text-[32px] text-fyn-red leading-none">
+                    ₹57–92L<span className="text-base font-body text-fyn-ink/60">/year</span>
+                  </div>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* FYNHelp column */}
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="fyn-glass relative rounded-[32px] overflow-hidden shadow-[0_20px_60px_rgba(196,30,30,0.15)]"
+            >
+              <div
+                className="relative px-8 py-8 flex items-center justify-center gap-3 text-white"
+                style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+              >
+                <Bot className="h-7 w-7" />
+                <span className="font-subheading font-semibold text-2xl">FYNHelp AI</span>
+                <span className="fyn-pulse-soft absolute top-4 right-4 font-button font-bold text-xs uppercase tracking-wide bg-fyn-gold text-white px-3 py-1.5 rounded-xl">
+                  Save 92%
+                </span>
+              </div>
+              <ul>
+                {roles.map((r) => (
+                  <li
+                    key={r.role}
+                    className="px-8 py-6 border-b border-fyn-ink/10 transition-colors hover:bg-fyn-gold/5"
+                  >
+                    <div className="font-subheading font-semibold text-fyn-ink text-lg mb-1">
+                      {r.role}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-button font-semibold text-fyn-gold text-base">
+                        Included
+                      </span>
+                      <Check className="h-4 w-4 text-fyn-gold" strokeWidth={3} />
+                    </div>
+                    <div className="font-body text-[13px] text-fyn-ink/60 mt-0.5">{r.fyn}</div>
+                  </li>
+                ))}
+                <li className="px-8 py-8 bg-fyn-beige/60">
+                  <div className="font-subheading text-sm text-fyn-ink/70 mb-1">
+                    FYNHelp Pro Plan
+                  </div>
+                  <div className="font-display font-bold text-[32px] text-fyn-gold leading-none">
+                    ₹<Counter to={90000} />
+                    <span className="text-base font-body text-fyn-ink/60">/year</span>
+                  </div>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-12 mx-auto rounded-[24px] px-8 md:px-12 py-7 text-center text-white shadow-[0_12px_40px_rgba(139,105,20,0.3)] flex items-center justify-center gap-3 flex-wrap"
+            style={{ background: "linear-gradient(135deg,#8B6914 0%, rgba(139,105,20,0.85) 100%)" }}
+          >
+            <Coins className="h-7 w-7 shrink-0" />
+            <span className="font-subheading font-semibold text-lg md:text-2xl">
+              Save ₹56–91L annually by choosing FYNHelp over hiring a full team
+            </span>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ========================= COMPARE PLANS ========================= */}
+      <section className="fyn-bg-anim relative overflow-hidden px-6 py-24">
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="font-display font-bold text-[36px] md:text-[42px] text-fyn-ink text-center mb-14 tracking-tight"
+          >
             Compare plans
-          </h2>
-          <div className="bg-white rounded-2xl border border-fyn-ink/10 overflow-hidden">
+          </motion.h2>
+
+          <div className="fyn-glass rounded-[24px] overflow-hidden shadow-[0_20px_60px_rgba(26,16,8,0.08)]">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-fyn-ink text-white">
-                    <th className="text-left px-6 py-4 font-semibold">Feature</th>
-                    <th className="px-6 py-4 font-semibold">Starter</th>
-                    <th className="px-6 py-4 font-semibold bg-fyn-red">Pro</th>
-                    <th className="px-6 py-4 font-semibold">Enterprise</th>
+                  <tr
+                    className="text-fyn-beige"
+                    style={{
+                      background: "linear-gradient(135deg,#1A1008 0%, rgba(26,16,8,0.92) 100%)",
+                    }}
+                  >
+                    <th className="text-left px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
+                      Feature
+                    </th>
+                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
+                      Starter
+                    </th>
+                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px] bg-fyn-red/30">
+                      Pro
+                    </th>
+                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
+                      Enterprise
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonRows.map((r, i) => (
                     <tr
                       key={r.label}
-                      className={i % 2 === 0 ? "bg-white" : "bg-fyn-beige/40"}
+                      className="border-b border-fyn-ink/5 transition-colors hover:bg-fyn-gold/5"
                     >
-                      <td className="px-6 py-3 text-fyn-ink/90">{r.label}</td>
-                      <td className="px-6 py-3 text-center">
+                      <td className="px-6 py-4 font-body text-fyn-ink/90">{r.label}</td>
+                      <td className="px-6 py-4 text-center">
                         <Cell value={r.starter} />
                       </td>
-                      <td className="px-6 py-3 text-center bg-fyn-red/5">
+                      <td className="px-6 py-4 text-center bg-fyn-red/[0.04]">
                         <Cell value={r.pro} />
                       </td>
-                      <td className="px-6 py-3 text-center">
+                      <td className="px-6 py-4 text-center">
                         <Cell value={r.enterprise} />
                       </td>
                     </tr>
@@ -272,25 +639,66 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-fyn-beige-dark py-16 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif font-bold text-3xl text-fyn-ink mb-8 text-center">
+      {/* ========================= FAQ ========================= */}
+      <section className="fyn-bg-anim relative overflow-hidden px-6 pt-12 pb-28">
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+            className="font-display font-bold text-[36px] md:text-[42px] text-fyn-ink text-center mb-14 tracking-tight"
+          >
             Frequently Asked Questions
-          </h2>
-          <div className="space-y-4">
-            {faqs.map((f) => (
-              <div key={f.q} className="bg-white rounded-lg border border-fyn-ink/10 p-6">
-                <h3 className="font-semibold text-fyn-ink mb-2">{f.q}</h3>
-                <p className="text-fyn-ink/70 text-sm leading-relaxed">{f.a}</p>
-              </div>
-            ))}
+          </motion.h2>
+
+          <div className="space-y-5">
+            {faqs.map((f, i) => {
+              const open = openFaq === i;
+              return (
+                <motion.div
+                  key={f.q}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                  className="fyn-glass rounded-[20px] border border-fyn-gold/15 px-7 py-6 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,16,8,0.08)]"
+                  onClick={() => setOpenFaq(open ? null : i)}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    className="w-full flex items-center justify-between gap-4 text-left"
+                  >
+                    <span className="font-subheading font-semibold text-base md:text-lg text-fyn-ink">
+                      {f.q}
+                    </span>
+                    <ChevronDown
+                      className={`h-6 w-6 text-fyn-gold shrink-0 transition-transform duration-300 ${
+                        open ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                  <motion.div
+                    initial={false}
+                    animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="overflow-hidden"
+                  >
+                    <p className="font-body text-fyn-ink/80 leading-relaxed pt-5 mt-5 border-t border-fyn-gold/15 text-[15px]">
+                      {f.a}
+                    </p>
+                  </motion.div>
+                </motion.div>
+              );
+            })}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-14">
             <Link
               to="/waitlist"
-              className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-fyn-red/90 transition-colors"
+              className="inline-block font-button font-bold uppercase tracking-wide text-white px-14 py-5 rounded-[18px] shadow-[0_8px_24px_rgba(196,30,30,0.4)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.5)] transition-all"
+              style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
             >
               Join the Waitlist →
             </Link>
@@ -299,4 +707,69 @@ export default function PricingPage() {
       </section>
     </Layout>
   );
+}
+
+/* ----------------------- helpers ----------------------- */
+
+function CTAButton({ plan }: { plan: Plan }) {
+  const base =
+    "block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] transition-all duration-300";
+  if (plan.ctaStyle === "gradient") {
+    return plan.cta.external ? (
+      <a
+        href={plan.cta.href}
+        className={`${base} text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)]`}
+        style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+      >
+        {plan.cta.label}
+      </a>
+    ) : (
+      <Link
+        to={plan.cta.href}
+        className={`${base} text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)]`}
+        style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+      >
+        {plan.cta.label}
+      </Link>
+    );
+  }
+  if (plan.ctaStyle === "outline-ink") {
+    return plan.cta.external ? (
+      <a
+        href={plan.cta.href}
+        className={`${base} border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5`}
+      >
+        {plan.cta.label}
+      </a>
+    ) : (
+      <Link
+        to={plan.cta.href}
+        className={`${base} border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5`}
+      >
+        {plan.cta.label}
+      </Link>
+    );
+  }
+  // outline-red
+  return (
+    <Link
+      to={plan.cta.href}
+      className={`${base} border-2 border-fyn-red text-fyn-red hover:bg-fyn-red hover:text-white hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(196,30,30,0.3)]`}
+    >
+      {plan.cta.label}
+    </Link>
+  );
+}
+
+function Cell({ value }: { value: string | boolean }) {
+  if (typeof value === "boolean") {
+    return value ? (
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-fyn-gold text-white">
+        <Check className="h-3.5 w-3.5" strokeWidth={3} />
+      </span>
+    ) : (
+      <X className="h-4 w-4 text-fyn-ink/25 mx-auto" />
+    );
+  }
+  return <span className="font-body text-[14px] text-fyn-ink/85">{value}</span>;
 }
