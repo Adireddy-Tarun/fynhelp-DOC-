@@ -254,6 +254,19 @@ const Roadmap: React.FC = () => {
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
             </radialGradient>
 
+            {/* Island silhouette path — used by both clipPath (ocean exclusion) and visual rendering */}
+            <path
+              id="islandShape"
+              d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 1010 L -20 1010 Z"
+            />
+            <clipPath id="oceanClip" clipPathUnits="userSpaceOnUse">
+              {/* Ocean rectangle MINUS island shape via even-odd fill rule */}
+              <path
+                d="M 0 820 L 1200 820 L 1200 1000 L 0 1000 Z M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 1010 L -20 1010 Z"
+                clipRule="evenodd"
+              />
+            </clipPath>
+
             {(["live", "beta", "soon"] as Status[]).map((s) => (
               <filter key={s} id={`glow-${s}`} x="-30%" y="-30%" width="160%" height="160%">
                 <feGaussianBlur stdDeviation="3" result="b" />
@@ -329,21 +342,21 @@ const Roadmap: React.FC = () => {
             <path d="M 0 855 Q 80 845 160 852 T 320 850 T 480 855 T 640 848 T 800 853 T 960 850 T 1120 855 T 1200 852 L 1200 875 L 0 875 Z" fill="#5A6B58" />
           </g>
 
-          {/* Main mountain — many low-poly facets (base extended down to ground) */}
+          {/* Main mountain — sits ON the island (bases at land top y=860) */}
           <g>
             {/* base silhouette */}
-            <polygon points="180,905 624,120 1080,905" fill="url(#rockA)" />
+            <polygon points="200,862 624,120 1060,862" fill="url(#rockA)" />
             {/* shadow side (right) */}
-            <polygon points="624,120 1080,905 624,905" fill="url(#rockShadow)" opacity="0.9" />
+            <polygon points="624,120 1060,862 624,862" fill="url(#rockShadow)" opacity="0.9" />
             {/* facet planes */}
-            <polygon points="180,905 624,120 380,905" fill="url(#rockB)" opacity="0.85" />
-            <polygon points="380,905 624,120 520,905" fill="url(#rockA)" opacity="0.7" />
-            <polygon points="624,120 760,905 880,905" fill="url(#rockShadow)" opacity="0.6" />
-            <polygon points="624,120 520,905 700,905" fill="url(#rockB)" opacity="0.5" />
-            <polygon points="624,120 880,905 1080,905" fill="url(#rockShadow)" opacity="0.45" />
+            <polygon points="200,862 624,120 380,862" fill="url(#rockB)" opacity="0.85" />
+            <polygon points="380,862 624,120 520,862" fill="url(#rockA)" opacity="0.7" />
+            <polygon points="624,120 760,862 880,862" fill="url(#rockShadow)" opacity="0.6" />
+            <polygon points="624,120 520,862 700,862" fill="url(#rockB)" opacity="0.5" />
+            <polygon points="624,120 880,862 1060,862" fill="url(#rockShadow)" opacity="0.45" />
             {/* ridge lines */}
-            <polyline points="280,780 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
-            <polyline points="780,760 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="320,760 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="760,740 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
             {/* snow cap (jagged) */}
             <polygon
               points="540,260 580,210 600,225 624,120 648,225 670,210 710,260 685,275 660,255 638,275 614,255 590,275 566,255"
@@ -356,25 +369,19 @@ const Roadmap: React.FC = () => {
 
           {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,880 90,805 160,775 230,795 280,880" fill="url(#hill)" />
-            <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
-            <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
-            {/* grass strip top */}
-            <path d="M 40 880 Q 160 845 280 880 Z" fill="#8B9E6B" opacity="0.85" />
+            <polygon points="60,878 100,820 160,795 220,810 270,878" fill="url(#hill)" />
+            <polygon points="100,820 160,795 135,840" fill="#B0A488" opacity="0.7" />
+            <polygon points="160,795 220,810 195,845" fill="#9C9078" opacity="0.6" />
+            <path d="M 60 878 Q 165 855 270 878 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ocean (full-width water) — extends from y=820 to bottom, wraps around island */}
-          <g>
+          {/* Ocean (full-width water) — clipped to exclude the island shape so it never covers land */}
+          <g clipPath="url(#oceanClip)">
             <rect x="0" y="820" width={VBW} height={180} fill="url(#oceanGrad)" />
             <rect x="0" y="820" width={VBW} height="80" fill="url(#oceanShine)" />
 
             {/* Distant horizon shimmer */}
             <path d="M 0 828 L 1200 828" stroke="#A8D4E5" strokeWidth="1" opacity="0.55" />
-
-            {/* Reflection of mountains shimmering */}
-            <g opacity="0.18">
-              <polygon points="180,820 624,860 1080,820" fill="#1A1008" />
-            </g>
 
             {/* Wave highlights — many lines for depth */}
             <path d="M 0 850 Q 60 846 120 850 T 240 850 T 360 850 T 480 850 T 600 850 T 720 850 T 840 850 T 960 850 T 1080 850 T 1200 850" stroke="#B8DCEC" strokeWidth="1.2" fill="none" opacity="0.5" />
@@ -385,7 +392,7 @@ const Roadmap: React.FC = () => {
 
             {/* Drifting wave foam line */}
             <path
-              d="M -40 935 Q 80 928 200 935 T 440 935 T 680 935 T 920 935 T 1160 935 T 1400 935"
+              d="M -40 965 Q 80 958 200 965 T 440 965 T 680 965 T 920 965 T 1160 965 T 1400 965"
               stroke="#E8F4F9"
               strokeWidth="1.4"
               fill="none"
@@ -394,30 +401,30 @@ const Roadmap: React.FC = () => {
             />
           </g>
 
-          {/* Island (the land the mountain stands on) — shaped like a rounded landmass with water wrapping around */}
+          {/* Shoreline foam — outline of island top edge (above water, below land) */}
+          <path
+            d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940"
+            stroke="#FFFFFF"
+            strokeWidth="2.5"
+            fill="none"
+            opacity="0.55"
+          />
+
+          {/* Island (the land the mountain stands on) — uses the exact same shape as the ocean clip mask */}
           <g>
-            {/* Underwater shadow / depth ring */}
+            {/* Main land body */}
+            <use href="#islandShape" fill="#C4B89C" />
+            {/* Sandy beach band along the top */}
             <path
-              d="M -10 880 Q 200 855 624 850 Q 1000 855 1210 880 L 1210 905 Q 1000 920 624 915 Q 200 920 -10 905 Z"
-              fill="#1A1008"
-              opacity="0.18"
-            />
-            {/* Main land shape */}
-            <path
-              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 935 Q 1080 922 880 924 Q 624 926 380 924 Q 160 922 -10 935 Z"
-              fill="#C4B89C"
-            />
-            {/* sandy beach edge */}
-            <path
-              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 912 Q 1080 880 880 878 Q 624 870 380 880 Q 160 884 -10 912 Z"
+              d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 955 Q 1080 928 880 924 Q 624 920 380 924 Q 160 928 -20 955 Z"
               fill="#E5D5A8"
-              opacity="0.85"
-            />
-            {/* grass cap on top of land */}
-            <path
-              d="M 30 880 Q 200 858 624 858 Q 1000 858 1170 880 L 1170 875 Q 1000 855 624 855 Q 200 855 30 875 Z"
-              fill="#8B9E6B"
               opacity="0.9"
+            />
+            {/* Grass cap that hides the seam between land top and mountain bases */}
+            <path
+              d="M 60 895 Q 200 870 624 868 Q 1000 870 1140 895 L 1140 888 Q 1000 862 624 862 Q 200 862 60 888 Z"
+              fill="#8B9E6B"
+              opacity="0.95"
             />
           </g>
           {/* grass tufts on island */}
@@ -555,32 +562,38 @@ const Roadmap: React.FC = () => {
             <circle r="7" fill={STATUS_COLOR.live} stroke="#FFFFFF" strokeWidth="2.5" />
           </g>
 
-          {/* Rafts on the ocean */}
+          {/* Rafts on the ocean — placed in safe water zones (left/right bays where shoreline dips) */}
           <g className="rafts">
             {[
-              { x: 80, y: 945, dur: 22, delay: 0, scale: 1 },
-              { x: 360, y: 970, dur: 28, delay: -8, scale: 0.85 },
-              { x: 920, y: 955, dur: 26, delay: -14, scale: 1.05 },
-              { x: 1080, y: 980, dur: 32, delay: -4, scale: 0.9 },
+              // Left bay (x < 180, water visible y=820-940)
+              { x: 70, y: 920, dur: 22, delay: 0, scale: 0.85, sailColor: "#F4EDDA" },
+              { x: 130, y: 905, dur: 26, delay: -8, scale: 0.7, sailColor: "#C41E1E" },
+              // Right bay (x > 1040, water visible y=820-940)
+              { x: 1090, y: 915, dur: 28, delay: -14, scale: 0.9, sailColor: "#F4EDDA" },
+              { x: 1150, y: 925, dur: 24, delay: -4, scale: 0.75, sailColor: "#C9A84C" },
             ].map((r, i) => (
               <g
                 key={`raft-${i}`}
                 style={{
-                  animation: `raft-bob 4.${i + 2}s ease-in-out ${r.delay}s infinite`,
+                  animation: `raft-bob 4.${(i % 4) + 2}s ease-in-out ${r.delay}s infinite`,
                   transformOrigin: `${r.x}px ${r.y}px`,
                 }}
               >
                 <g transform={`translate(${r.x} ${r.y}) scale(${r.scale})`}>
+                  {/* reflection in water (drawn first, behind raft) */}
+                  <ellipse cx="0" cy="7" rx="22" ry="2.5" fill="#0F3D54" opacity="0.35" />
                   {/* raft logs */}
                   <rect x="-22" y="-2" width="44" height="5" rx="2" fill="#6B4226" />
                   <rect x="-22" y="-5" width="44" height="2" fill="#5C3A1F" opacity="0.7" />
+                  {/* log seams */}
+                  <line x1="-22" y1="0.5" x2="22" y2="0.5" stroke="#3B2613" strokeWidth="0.3" opacity="0.5" />
                   {/* mast */}
-                  <line x1="0" y1="-3" x2="0" y2="-22" stroke="#3B2613" strokeWidth="1.4" />
+                  <line x1="0" y1="-3" x2="0" y2="-24" stroke="#3B2613" strokeWidth="1.4" />
                   {/* sail */}
-                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#F4EDDA" />
-                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#C9A84C" opacity="0.25" />
-                  {/* reflection in water */}
-                  <ellipse cx="0" cy="6" rx="20" ry="2" fill="#1A1008" opacity="0.18" />
+                  <path d="M 0 -24 L 16 -8 L 0 -8 Z" fill={r.sailColor} />
+                  <path d="M 0 -24 L 16 -8 L 0 -8 Z" fill="#1A1008" opacity="0.12" />
+                  {/* tiny ripple under raft */}
+                  <path d="M -18 5 Q -9 3 0 5 Q 9 7 18 5" stroke="#E8F4F9" strokeWidth="0.7" fill="none" opacity="0.7" />
                 </g>
               </g>
             ))}
@@ -784,10 +797,12 @@ const Roadmap: React.FC = () => {
         /* Path dash march */
         @keyframes path-dash { to { stroke-dashoffset: -26; } }
 
-        /* Rafts bobbing on water */
+        /* Rafts bobbing on water — gentle buoyancy with slight roll */
         @keyframes raft-bob {
-          0%,100% { transform: translateY(0) rotate(-1.2deg); }
-          50%     { transform: translateY(-3px) rotate(1.2deg); }
+          0%,100% { transform: translateY(0) rotate(-1.5deg); }
+          25%     { transform: translateY(-1.5px) rotate(0.5deg); }
+          50%     { transform: translateY(-3.5px) rotate(1.8deg); }
+          75%     { transform: translateY(-1.5px) rotate(0.3deg); }
         }
 
         /* Drifting wave foam */
