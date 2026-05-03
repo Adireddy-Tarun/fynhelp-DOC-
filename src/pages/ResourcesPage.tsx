@@ -342,7 +342,7 @@ const CommunityCardView = ({ c }: { c: CommunityCard }) => (
       {c.preview}
     </p>
     <div style={{ display: "flex", gap: 12, fontFamily: "Roboto, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.5)" }}>
-      <span>💬 {c.replies} replies</span>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><FYNIcon name="discussion" size={14} animated={false} /> {c.replies} replies</span>
       <span>🕒 {c.ago}</span>
     </div>
   </article>
