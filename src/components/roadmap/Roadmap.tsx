@@ -139,6 +139,7 @@ function buildSegment(
 }
 
 const SEGMENTS: { from: { x: number; y: number }; to: { x: number; y: number }; status: Status }[] = [
+  { from: START_POINT, to: STOPS[0], status: "live" },
   { from: STOPS[0], to: STOPS[1], status: "live" },
   { from: STOPS[1], to: STOPS[2], status: "beta" },
   { from: STOPS[2], to: STOPS[3], status: "soon" },
