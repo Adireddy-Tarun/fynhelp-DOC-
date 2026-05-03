@@ -141,7 +141,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
             <br /><strong>Deletion:</strong> Settings &gt; Account &gt; Delete Account. 30-day deletion timeline.
             <br /><strong>Revoke Integrations:</strong> Disconnect Razorpay/Zoho/bank instantly via Integrations.
             <br /><br />
-            <strong>Contact:</strong> security@fynhelp.com · privacy@fynhelp.com · support@fynhelp.com
+            <strong>Contact:</strong> support@fynhelp.com · privacy@fynhelp.com · support@fynhelp.com
           </Section>
 
           <Section title="10. Changes to This Policy">
@@ -151,7 +151,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
 
         <div className="px-8 md:px-14 py-5 border-t flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "rgba(26,16,8,0.08)", background: BEIGE }}>
           <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>
-            Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
+            Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
           </p>
           <button
             onClick={onClose}
@@ -922,7 +922,7 @@ const SecurityPage = () => {
 
       {/* ───── Section 7: Final CTA ───── */}
       <section
-        className="relative"
+        className="relative bg-sidebar"
         style={{
           background: `linear-gradient(145deg, ${INK} 0%, ${INK} 40%, rgba(196,30,30,0.15) 75%, rgba(139,105,20,0.15) 100%)`,
           padding: "100px 24px",
@@ -954,7 +954,7 @@ const SecurityPage = () => {
             </Link>
 
             <a
-              href="mailto:security@fynhelp.com"
+              href="mailto:support@fynhelp.com"
               className="transition-all hover:-translate-y-0.5"
               style={{
                 fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 17,
@@ -974,7 +974,7 @@ const SecurityPage = () => {
           <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.8)" }}>
             <Users size={16} />
             <span style={{ fontFamily: "'Roboto'", fontSize: 16 }}>
-              Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
+              Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
             </span>
           </div>
         </div>
