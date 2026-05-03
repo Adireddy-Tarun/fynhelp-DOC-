@@ -226,7 +226,7 @@ const SecurityPage = () => {
               color: "#FFFFFF",
               lineHeight: 1.15,
               letterSpacing: "-1px",
-              textShadow: "0 4px 16px rgba(0,0,0,0.4)",
+              textShadow: "0 6px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
               marginBottom: 32,
             }}
           >
