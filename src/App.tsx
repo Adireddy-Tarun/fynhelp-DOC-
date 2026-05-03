@@ -10,7 +10,7 @@ import PricingPage from "./pages/PricingPage.tsx";
 import BlogPage from "./pages/BlogPage.tsx";
 import BlogArticlePage from "./pages/BlogArticlePage.tsx";
 import ResourcesPage from "./pages/ResourcesPage.tsx";
-import RoadmapPage from "./pages/RoadmapPage.tsx";
+
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import WaitlistPage from "./pages/WaitlistPage.tsx";
@@ -90,7 +90,7 @@ const App = () => (
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/roadmap" element={<RoadmapPage />} />
+            
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/waitlist" element={<WaitlistPage />} />
