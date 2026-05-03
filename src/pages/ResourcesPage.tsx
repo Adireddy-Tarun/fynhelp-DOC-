@@ -218,7 +218,7 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
         justifyContent: "center",
       }}
     >
-      <span style={{ fontSize: 48 }}>✍️</span>
+      <FYNIcon name="blog" size={64} />
     </div>
     <div style={{ padding: 20 }}>
       <CategoryBadge>Blog</CategoryBadge>
