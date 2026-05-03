@@ -252,9 +252,6 @@ const Roadmap: React.FC = () => {
             <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
               <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-            <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
             </radialGradient>
 
             {/* Island silhouette path — used by both clipPath (ocean exclusion) and visual rendering */}
