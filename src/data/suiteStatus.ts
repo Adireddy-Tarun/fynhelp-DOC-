@@ -26,7 +26,7 @@ export interface SuiteMeta {
   description: string; // <= ~80 chars one-liner
   status: SuiteStatus;
   quarter: SuiteQuarter;
-  /** Where to send users who click an active suite. Coming-soon suites use /roadmap. */
+  /** Where to send users who click an active suite. Coming-soon suites point to homepage ecosystem section. */
   href: string;
 }
 
@@ -49,7 +49,7 @@ export const SUITES: SuiteMeta[] = [
     description: "MRR/ARR tracking, cohort analysis, churn prediction, revenue forecasts",
     status: "coming_soon",
     quarter: "Q2 2026",
-    href: "/roadmap#revenue",
+    href: "/#product-ecosystem",
   },
   {
     id: "cost",
@@ -59,7 +59,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Expense categorization, vendor spend analysis, cost optimization insights",
     status: "coming_soon",
     quarter: "Q2 2026",
-    href: "/roadmap#cost",
+    href: "/#product-ecosystem",
   },
   {
     id: "gst",
@@ -69,7 +69,7 @@ export const SUITES: SuiteMeta[] = [
     description: "GST compliance tracking, ITC reconciliation, GSTR-2B matching, deadline alerts",
     status: "coming_soon",
     quarter: "Q3 2026",
-    href: "/roadmap#gst",
+    href: "/#product-ecosystem",
   },
   {
     id: "governance",
@@ -79,7 +79,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Audit readiness, compliance tracking, regulatory alerts, risk monitoring",
     status: "coming_soon",
     quarter: "Q3 2026",
-    href: "/roadmap#governance",
+    href: "/#product-ecosystem",
   },
   {
     id: "hr",
@@ -89,7 +89,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Payroll analytics, cost-per-employee, headcount ROI, attrition insights",
     status: "coming_soon",
     quarter: "Q3 2026",
-    href: "/roadmap#hr",
+    href: "/#product-ecosystem",
   },
   {
     id: "simulator",
@@ -99,7 +99,7 @@ export const SUITES: SuiteMeta[] = [
     description: "What-if scenarios, financial modeling, strategic decision simulations",
     status: "coming_soon",
     quarter: "Q4 2026",
-    href: "/roadmap#simulator",
+    href: "/#product-ecosystem",
   },
   {
     id: "market",
@@ -109,7 +109,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Market trends, competitor benchmarking, growth opportunity identification",
     status: "coming_soon",
     quarter: "Q1 2027",
-    href: "/roadmap#market",
+    href: "/#product-ecosystem",
   },
   {
     id: "banking",
@@ -119,7 +119,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Multi-bank aggregation, credit analysis, fintech integrations, working capital",
     status: "coming_soon",
     quarter: "Q1 2027",
-    href: "/roadmap#banking",
+    href: "/#product-ecosystem",
   },
   {
     id: "ca-partner",
@@ -129,7 +129,7 @@ export const SUITES: SuiteMeta[] = [
     description: "CA collaboration portal, client sharing, compliance delegation, ecosystem tools",
     status: "coming_soon",
     quarter: "Q2 2027",
-    href: "/roadmap#ca-partner",
+    href: "/#product-ecosystem",
   },
 ];
 

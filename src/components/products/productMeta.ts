@@ -83,7 +83,7 @@ export const PLATFORM_FEATURES = [
       "Drag a slider, see the future. Test hires, price changes, and capital decisions in seconds.",
     status: "coming_soon" as const,
     widget: "simulator" as WidgetKey,
-    href: "/roadmap#simulator",
+    href: "/#product-ecosystem",
   },
   {
     id: "ca-partner-feature",
@@ -93,6 +93,6 @@ export const PLATFORM_FEATURES = [
       "Manage your entire client portfolio from one dashboard. Compliance, GST, and reports — co-branded.",
     status: "coming_soon" as const,
     widget: "generic" as WidgetKey,
-    href: "/roadmap#ca-partner",
+    href: "/#product-ecosystem",
   },
 ];
