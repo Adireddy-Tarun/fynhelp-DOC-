@@ -641,17 +641,18 @@ const Roadmap: React.FC = () => {
         .sun-wrap { transform-origin: 0 0; animation: sun-arc 24s linear infinite; }
         .moon-wrap { transform-origin: 0 0; animation: moon-arc 24s linear infinite; opacity: 0; }
         @keyframes sun-arc {
-          0%   { transform: translate(-50px, 850px); opacity: 0; }
-          10%  { opacity: 1; }
-          50%  { transform: translate(600px, 110px); opacity: 1; }
-          70%  { transform: translate(1250px, 850px); opacity: 0; }
-          100% { transform: translate(1250px, 850px); opacity: 0; }
+          0%   { transform: translate(-80px, 850px); opacity: 0; }
+          8%   { opacity: 1; }
+          25%  { transform: translate(600px, 110px); opacity: 1; }
+          42%  { transform: translate(1280px, 850px); opacity: 0; }
+          100% { transform: translate(1280px, 850px); opacity: 0; }
         }
         @keyframes moon-arc {
-          0%, 55%   { transform: translate(1250px, 850px); opacity: 0; }
-          70%       { transform: translate(900px, 200px); opacity: 0.95; }
-          85%       { transform: translate(400px, 200px); opacity: 0.95; }
-          100%      { transform: translate(-50px, 850px); opacity: 0; }
+          0%, 50%   { transform: translate(-80px, 850px); opacity: 0; }
+          58%       { transform: translate(-80px, 850px); opacity: 0; }
+          75%       { transform: translate(600px, 200px); opacity: 0.95; }
+          92%       { transform: translate(1280px, 850px); opacity: 0; }
+          100%      { transform: translate(1280px, 850px); opacity: 0; }
         }
         .sun-rays { animation: ray-spin 8s linear infinite; transform-origin: 0 0; }
         @keyframes ray-spin { to { transform: rotate(360deg); } }
