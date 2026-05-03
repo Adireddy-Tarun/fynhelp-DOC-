@@ -7,7 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
-import SecurityPage from "./pages/SecurityPage.tsx";
+import PublicSecurityPage from "./pages/SecurityPage.tsx";
 
 import BlogPage from "./pages/BlogPage.tsx";
 import BlogArticlePage from "./pages/BlogArticlePage.tsx";
@@ -89,7 +89,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/security" element={<PublicSecurityPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
