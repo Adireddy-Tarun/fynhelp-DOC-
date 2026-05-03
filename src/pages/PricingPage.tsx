@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
+import FYNIcon from "@/components/FYNIcon";
 
 /* ================================================================
    FYNHelp Pricing Page — brand palette only
