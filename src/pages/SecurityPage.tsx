@@ -193,22 +193,23 @@ const SecurityPage = () => {
           minHeight: "100vh",
           paddingTop: 120,
           paddingBottom: 80,
-          background: `linear-gradient(145deg, ${INK} 0%, rgba(26,16,8,0.92) 40%, rgba(139,105,20,0.18) 80%, rgba(196,30,30,0.12) 100%)`,
+          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 30%, rgba(26,16,8,0.95) 60%, rgba(139,105,20,0.08) 85%, rgba(196,30,30,0.05) 100%)`,
         }}
       >
         {/* Floating particles */}
-        {Array.from({ length: 14 }).map((_, i) => (
+        {Array.from({ length: 18 }).map((_, i) => (
           <span
             key={i}
             className="absolute rounded-full pointer-events-none"
             style={{
-              width: 3 + (i % 3),
-              height: 3 + (i % 3),
+              width: 4 + (i % 5),
+              height: 4 + (i % 5),
               background: GOLD,
-              opacity: 0.25,
-              left: `${(i * 7.3) % 100}%`,
+              opacity: 0.4,
+              boxShadow: `0 0 8px rgba(139,105,20,0.6)`,
+              left: `${(i * 5.7) % 100}%`,
               top: `${(i * 11.7) % 100}%`,
-              animation: `fynFloat ${10 + (i % 5) * 2}s linear ${i * 0.7}s infinite`,
+              animation: `fynFloat ${14 + (i % 5) * 1.5}s linear ${i * 0.6}s infinite`,
             }}
           />
         ))}
@@ -225,7 +226,7 @@ const SecurityPage = () => {
               color: "#FFFFFF",
               lineHeight: 1.15,
               letterSpacing: "-1px",
-              textShadow: "0 4px 16px rgba(0,0,0,0.4)",
+              textShadow: "0 6px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
               marginBottom: 32,
             }}
           >
@@ -240,10 +241,11 @@ const SecurityPage = () => {
               fontFamily: "'Raleway'",
               fontWeight: 400,
               fontSize: "clamp(16px, 1.4vw, 22px)",
-              color: "rgba(244,237,218,0.95)",
+              color: "rgba(244,237,218,1)",
               lineHeight: 1.7,
               maxWidth: 900,
               margin: "0 auto 48px",
+              textShadow: "0 2px 12px rgba(244,237,218,0.3)",
             }}
           >
             Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
@@ -265,19 +267,20 @@ const SecurityPage = () => {
                 letterSpacing: "0.5px",
                 padding: "18px 40px",
                 borderRadius: 16,
-                background: "transparent",
+                background: "rgba(139,105,20,0.15)",
                 border: `2px solid ${GOLD}`,
-                color: GOLD,
+                color: BEIGE,
+                boxShadow: "0 4px 16px rgba(139,105,20,0.25)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = GOLD;
                 e.currentTarget.style.color = "#FFFFFF";
-                e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,105,20,0.4)";
+                e.currentTarget.style.boxShadow = "0 8px 28px rgba(139,105,20,0.5)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = GOLD;
-                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.background = "rgba(139,105,20,0.15)";
+                e.currentTarget.style.color = BEIGE;
+                e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.25)";
               }}
             >
               View Security Whitepaper
@@ -313,14 +316,15 @@ const SecurityPage = () => {
             <div
               className="flex items-center justify-center rounded-full"
               style={{
-                width: 120,
-                height: 120,
-                border: `2px solid ${GOLD}`,
-                background: "rgba(139,105,20,0.08)",
+                width: 140,
+                height: 140,
+                border: `3px solid ${RED}`,
+                background: `linear-gradient(135deg, ${GOLD} 0%, rgba(139,105,20,0.7) 100%)`,
+                boxShadow: "0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3)",
                 animation: "fynShieldPulse 3s ease-in-out infinite",
               }}
             >
-              <Shield size={56} color={GOLD} strokeWidth={1.5} />
+              <Shield size={68} color="#FFFFFF" strokeWidth={2} fill="rgba(255,255,255,0.15)" />
             </div>
           </motion.div>
         </div>
@@ -726,16 +730,16 @@ const SecurityPage = () => {
       <section
         className="relative"
         style={{
-          background: `linear-gradient(145deg, ${INK} 0%, rgba(26,16,8,0.9) 40%, rgba(196,30,30,0.2) 70%, rgba(139,105,20,0.25) 100%)`,
+          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 40%, rgba(196,30,30,0.15) 75%, rgba(139,105,20,0.15) 100%)`,
           padding: "100px 24px",
           borderRadius: "48px 48px 0 0",
         }}
       >
         <div className="max-w-[1000px] mx-auto text-center">
-          <motion.h2 {...fadeUp} style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 4.4vw, 52px)", color: "#FFFFFF", lineHeight: 1.2, marginBottom: 24 }}>
+          <motion.h2 {...fadeUp} style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 4.4vw, 52px)", color: "#FFFFFF", lineHeight: 1.2, marginBottom: 24, textShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
             Ready to Experience Financial Intelligence You Can Trust?
           </motion.h2>
-          <motion.p {...fadeUp} className="mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: "clamp(16px, 1.4vw, 20px)", color: "rgba(244,237,218,0.95)", lineHeight: 1.6, maxWidth: 800, marginBottom: 48 }}>
+          <motion.p {...fadeUp} className="mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: "clamp(16px, 1.4vw, 20px)", color: "rgba(244,237,218,1)", lineHeight: 1.6, maxWidth: 800, marginBottom: 48, textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
             See how FYNHelp keeps your data secure while giving you the insights you need. Start your 6-month free trial — no credit card, no risk, no obligations.
           </motion.p>
 
@@ -748,7 +752,7 @@ const SecurityPage = () => {
                 padding: "20px 52px", borderRadius: 16,
                 color: "#FFFFFF",
                 background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`,
-                boxShadow: "0 12px 32px rgba(196,30,30,0.4)",
+                boxShadow: "0 12px 32px rgba(196,30,30,0.5)",
                 display: "inline-block",
               }}
             >
@@ -762,20 +766,20 @@ const SecurityPage = () => {
                 fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 17,
                 padding: "20px 44px", borderRadius: 16,
                 background: "transparent",
-                border: "2px solid rgba(244,237,218,0.5)",
+                border: "2px solid rgba(244,237,218,0.8)",
                 color: BEIGE,
                 display: "inline-block",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = BEIGE; e.currentTarget.style.color = INK; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = BEIGE; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = BEIGE; e.currentTarget.style.color = INK; e.currentTarget.style.borderColor = BEIGE; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = BEIGE; e.currentTarget.style.borderColor = "rgba(244,237,218,0.8)"; }}
             >
               Talk to Our Security Team
             </a>
           </motion.div>
 
-          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.7)" }}>
+          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.8)" }}>
             <Users size={16} />
-            <span style={{ fontFamily: "'Roboto'", fontSize: 14 }}>
+            <span style={{ fontFamily: "'Roboto'", fontSize: 16 }}>
               Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
             </span>
           </div>
@@ -792,8 +796,8 @@ const SecurityPage = () => {
           100% { transform: translateY(-120vh) translateX(20px); opacity: 0; }
         }
         @keyframes fynShieldPulse {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139,105,20,0.5); }
-          50% { transform: scale(1.05); box-shadow: 0 0 40px 8px rgba(139,105,20,0.2); }
+          0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3); }
+          50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(139,105,20,0.8), 0 0 120px rgba(196,30,30,0.45); }
         }
       `}</style>
     </Layout>
