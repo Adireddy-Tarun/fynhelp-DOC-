@@ -84,6 +84,7 @@ const STOPS: Stop[] = [
   },
 ];
 const SUMMIT = { x: 624, y: 120 };
+const START_POINT = { x: 600, y: 870 };
 
 // Mountain center band where the path "disappears" behind the peak.
 const HIDE_X1 = 540;
@@ -138,6 +139,7 @@ function buildSegment(
 }
 
 const SEGMENTS: { from: { x: number; y: number }; to: { x: number; y: number }; status: Status }[] = [
+  { from: START_POINT, to: STOPS[0], status: "live" },
   { from: STOPS[0], to: STOPS[1], status: "live" },
   { from: STOPS[1], to: STOPS[2], status: "beta" },
   { from: STOPS[2], to: STOPS[3], status: "soon" },
@@ -237,6 +239,20 @@ const Roadmap: React.FC = () => {
               <stop offset="60%" stopColor="#FFD93D" />
               <stop offset="100%" stopColor="#FFA500" stopOpacity="0.6" />
             </radialGradient>
+            <linearGradient id="hazeGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+              <stop offset="60%" stopColor="#E8E4D6" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#D8D4C6" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#5BA8C9" />
+              <stop offset="40%" stopColor="#3A8FB7" />
+              <stop offset="100%" stopColor="#0F3D54" />
+            </linearGradient>
+            <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            </radialGradient>
 
             {(["live", "beta", "soon"] as Status[]).map((s) => (
               <filter key={s} id={`glow-${s}`} x="-30%" y="-30%" width="160%" height="160%">
@@ -288,11 +304,29 @@ const Roadmap: React.FC = () => {
             </g>
           </g>
 
-          {/* Background mountains */}
+          {/* Atmospheric haze layer (depth) */}
+          <g opacity="0.5">
+            <rect x="0" y="380" width={VBW} height="240" fill="url(#hazeGrad)" />
+          </g>
+
+          {/* Far distant mountains (deepest, most faded) */}
+          <g opacity="0.22">
+            <polygon points="-50,860 180,560 420,860" fill="#A8B5C8" />
+            <polygon points="320,860 560,500 800,860" fill="#9AA8BC" />
+            <polygon points="700,860 940,540 1180,860" fill="#A8B5C8" />
+            <polygon points="1000,860 1200,600 1260,860" fill="#94A2B8" />
+          </g>
+
+          {/* Mid-distance mountains */}
+          <g opacity="0.42">
+            <polygon points="0,870 220,640 440,870" fill="#B8BCB8" />
+            <polygon points="380,870 600,580 820,870" fill="#A8AEAC" />
+            <polygon points="780,870 1000,620 1200,870" fill="#B0B6B2" />
+          </g>
+
+          {/* Forest tree-line silhouette across mid distance */}
           <g opacity="0.35">
-            <polygon points="0,900 220,640 440,900" fill="#C5BFB5" />
-            <polygon points="380,900 600,580 820,900" fill="#B8B2A8" />
-            <polygon points="780,900 1000,620 1200,900" fill="#C5BFB5" />
+            <path d="M 0 855 Q 80 845 160 852 T 320 850 T 480 855 T 640 848 T 800 853 T 960 850 T 1120 855 T 1200 852 L 1200 875 L 0 875 Z" fill="#5A6B58" />
           </g>
 
           {/* Main mountain — many low-poly facets (base extended down to ground) */}
@@ -322,44 +356,77 @@ const Roadmap: React.FC = () => {
 
           {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,905 90,805 160,775 230,795 280,905" fill="url(#hill)" />
+            <polygon points="40,880 90,805 160,775 230,795 280,880" fill="url(#hill)" />
             <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
             <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
             {/* grass strip top */}
-            <path d="M 40 905 Q 160 845 280 905 Z" fill="#8B9E6B" opacity="0.85" />
+            <path d="M 40 880 Q 160 845 280 880 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ocean (full-width water behind island) */}
+          {/* Ocean (full-width water) — extends from y=820 to bottom, wraps around island */}
           <g>
-            <defs>
-              <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#3A8FB7" />
-                <stop offset="100%" stopColor="#1E5A7A" />
-              </linearGradient>
-            </defs>
-            <rect x="0" y="900" width={VBW} height={100} fill="url(#oceanGrad)" />
-            {/* wave highlights */}
-            <path d="M 0 920 Q 60 914 120 920 T 240 920 T 360 920 T 480 920 T 600 920 T 720 920 T 840 920 T 960 920 T 1080 920 T 1200 920" stroke="#9CC9DD" strokeWidth="1.4" fill="none" opacity="0.7" />
-            <path d="M 0 945 Q 60 939 120 945 T 240 945 T 360 945 T 480 945 T 600 945 T 720 945 T 840 945 T 960 945 T 1080 945 T 1200 945" stroke="#9CC9DD" strokeWidth="1.2" fill="none" opacity="0.5" />
-            <path d="M 0 970 Q 60 964 120 970 T 240 970 T 360 970 T 480 970 T 600 970 T 720 970 T 840 970 T 960 970 T 1080 970 T 1200 970" stroke="#9CC9DD" strokeWidth="1" fill="none" opacity="0.4" />
-          </g>
+            <rect x="0" y="820" width={VBW} height={180} fill="url(#oceanGrad)" />
+            <rect x="0" y="820" width={VBW} height="80" fill="url(#oceanShine)" />
 
-          {/* Island (the land the mountain stands on) */}
-          <g>
+            {/* Distant horizon shimmer */}
+            <path d="M 0 828 L 1200 828" stroke="#A8D4E5" strokeWidth="1" opacity="0.55" />
+
+            {/* Reflection of mountains shimmering */}
+            <g opacity="0.18">
+              <polygon points="180,820 624,860 1080,820" fill="#1A1008" />
+            </g>
+
+            {/* Wave highlights — many lines for depth */}
+            <path d="M 0 850 Q 60 846 120 850 T 240 850 T 360 850 T 480 850 T 600 850 T 720 850 T 840 850 T 960 850 T 1080 850 T 1200 850" stroke="#B8DCEC" strokeWidth="1.2" fill="none" opacity="0.5" />
+            <path d="M 0 880 Q 60 874 120 880 T 240 880 T 360 880 T 480 880 T 600 880 T 720 880 T 840 880 T 960 880 T 1080 880 T 1200 880" stroke="#B8DCEC" strokeWidth="1.3" fill="none" opacity="0.55" />
+            <path d="M 0 915 Q 60 908 120 915 T 240 915 T 360 915 T 480 915 T 600 915 T 720 915 T 840 915 T 960 915 T 1080 915 T 1200 915" stroke="#9CC9DD" strokeWidth="1.5" fill="none" opacity="0.6" />
+            <path d="M 0 950 Q 60 942 120 950 T 240 950 T 360 950 T 480 950 T 600 950 T 720 950 T 840 950 T 960 950 T 1080 950 T 1200 950" stroke="#9CC9DD" strokeWidth="1.5" fill="none" opacity="0.55" />
+            <path d="M 0 985 Q 60 977 120 985 T 240 985 T 360 985 T 480 985 T 600 985 T 720 985 T 840 985 T 960 985 T 1080 985 T 1200 985" stroke="#7FB5CC" strokeWidth="1.3" fill="none" opacity="0.5" />
+
+            {/* Drifting wave foam line */}
             <path
-              d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 940 Q 1100 960 900 950 Q 624 938 360 952 Q 160 962 0 945 Z"
+              d="M -40 935 Q 80 928 200 935 T 440 935 T 680 935 T 920 935 T 1160 935 T 1400 935"
+              stroke="#E8F4F9"
+              strokeWidth="1.4"
+              fill="none"
+              opacity="0.55"
+              style={{ animation: "wave-drift 14s linear infinite" }}
+            />
+          </g>
+
+          {/* Island (the land the mountain stands on) — shaped like a rounded landmass with water wrapping around */}
+          <g>
+            {/* Underwater shadow / depth ring */}
+            <path
+              d="M -10 880 Q 200 855 624 850 Q 1000 855 1210 880 L 1210 905 Q 1000 920 624 915 Q 200 920 -10 905 Z"
+              fill="#1A1008"
+              opacity="0.18"
+            />
+            {/* Main land shape */}
+            <path
+              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 935 Q 1080 922 880 924 Q 624 926 380 924 Q 160 922 -10 935 Z"
               fill="#C4B89C"
             />
-            {/* sandy/grass top edge */}
-            <path d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 912 Q 1100 905 900 908 Q 624 902 360 910 Q 160 916 0 912 Z" fill="#8B9E6B" opacity="0.9" />
+            {/* sandy beach edge */}
+            <path
+              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 912 Q 1080 880 880 878 Q 624 870 380 880 Q 160 884 -10 912 Z"
+              fill="#E5D5A8"
+              opacity="0.85"
+            />
+            {/* grass cap on top of land */}
+            <path
+              d="M 30 880 Q 200 858 624 858 Q 1000 858 1170 880 L 1170 875 Q 1000 855 624 855 Q 200 855 30 875 Z"
+              fill="#8B9E6B"
+              opacity="0.9"
+            />
           </g>
           {/* grass tufts on island */}
-          {Array.from({ length: 18 }).map((_, i) => {
-            const x = 30 + i * 65;
+          {Array.from({ length: 16 }).map((_, i) => {
+            const x = 60 + i * 70;
             return (
               <path
                 key={i}
-                d={`M ${x} 908 q 3 -8 6 0 M ${x + 3} 908 q 0 -10 3 -2`}
+                d={`M ${x} 870 q 3 -8 6 0 M ${x + 3} 870 q 0 -10 3 -2`}
                 stroke="#5C7042"
                 strokeWidth="1.2"
                 fill="none"
@@ -370,17 +437,16 @@ const Roadmap: React.FC = () => {
           {/* Trees */}
           <g className="trees">
             {[
-              { x: 70, y: 890, s: 0.6, d: 0 },
-              { x: 130, y: 885, s: 0.7, d: 0.3 },
-              { x: 210, y: 885, s: 0.55, d: 0.6 },
-              { x: 245, y: 895, s: 0.5, d: 0.9 },
-              { x: 340, y: 905, s: 0.9, d: 0.2 },
-              { x: 410, y: 905, s: 0.7, d: 0.5 },
-              { x: 760, y: 905, s: 1.0, d: 0.1 },
-              { x: 850, y: 905, s: 0.8, d: 0.7 },
-              { x: 940, y: 905, s: 0.9, d: 1.1 },
-              { x: 1050, y: 905, s: 1.1, d: 0.4 },
-              { x: 1140, y: 905, s: 0.75, d: 0.9 },
+              { x: 70, y: 868, s: 0.6, d: 0 },
+              { x: 130, y: 866, s: 0.7, d: 0.3 },
+              { x: 245, y: 868, s: 0.5, d: 0.9 },
+              { x: 340, y: 866, s: 0.9, d: 0.2 },
+              { x: 410, y: 866, s: 0.7, d: 0.5 },
+              { x: 760, y: 866, s: 1.0, d: 0.1 },
+              { x: 850, y: 864, s: 0.8, d: 0.7 },
+              { x: 940, y: 866, s: 0.9, d: 1.1 },
+              { x: 1050, y: 868, s: 1.1, d: 0.4 },
+              { x: 1140, y: 872, s: 0.75, d: 0.9 },
               { x: 320, y: 855, s: 0.45, d: 1.3 },
             ].map((t, i) => (
               <g
@@ -459,9 +525,9 @@ const Roadmap: React.FC = () => {
             </text>
           </g>
 
-          {/* Climber at Stop 1 */}
+          {/* Climber at Stop 2 */}
           <g
-            transform={`translate(${STOPS[0].x - 38} ${STOPS[0].y - 56})`}
+            transform={`translate(${STOPS[1].x - 38} ${STOPS[1].y - 56})`}
             style={{ animation: "climber-bob 2s ease-in-out infinite" }}
           >
             {/* backpack */}
@@ -479,14 +545,45 @@ const Roadmap: React.FC = () => {
             {/* stick */}
             <line x1="34" y1="20" x2="40" y2="50" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" />
           </g>
-          {/* START HERE label */}
-          <g transform={`translate(${STOPS[0].x - 110} ${STOPS[0].y - 70})`}>
-            <rect x="0" y="0" width="78" height="22" rx="11" fill="#1A1008" />
-            <text x="39" y="15" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontWeight={700} fontSize="10" fill="#F4EDDA" letterSpacing="1">
-              START HERE
-            </text>
-            <path d="M 78 11 L 92 11" stroke="#1A1008" strokeWidth="1.5" />
-            <polygon points="92,7 100,11 92,15" fill="#1A1008" />
+
+          {/* Starting waypoint at the bottom */}
+          <g transform={`translate(${START_POINT.x} ${START_POINT.y})`}>
+            <circle r="8" fill="none" stroke={STATUS_COLOR.live} strokeWidth="2">
+              <animate attributeName="r" values="8;16;8" dur="2.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" repeatCount="indefinite" />
+            </circle>
+            <circle r="7" fill={STATUS_COLOR.live} stroke="#FFFFFF" strokeWidth="2.5" />
+          </g>
+
+          {/* Rafts on the ocean */}
+          <g className="rafts">
+            {[
+              { x: 80, y: 945, dur: 22, delay: 0, scale: 1 },
+              { x: 360, y: 970, dur: 28, delay: -8, scale: 0.85 },
+              { x: 920, y: 955, dur: 26, delay: -14, scale: 1.05 },
+              { x: 1080, y: 980, dur: 32, delay: -4, scale: 0.9 },
+            ].map((r, i) => (
+              <g
+                key={`raft-${i}`}
+                style={{
+                  animation: `raft-bob 4.${i + 2}s ease-in-out ${r.delay}s infinite`,
+                  transformOrigin: `${r.x}px ${r.y}px`,
+                }}
+              >
+                <g transform={`translate(${r.x} ${r.y}) scale(${r.scale})`}>
+                  {/* raft logs */}
+                  <rect x="-22" y="-2" width="44" height="5" rx="2" fill="#6B4226" />
+                  <rect x="-22" y="-5" width="44" height="2" fill="#5C3A1F" opacity="0.7" />
+                  {/* mast */}
+                  <line x1="0" y1="-3" x2="0" y2="-22" stroke="#3B2613" strokeWidth="1.4" />
+                  {/* sail */}
+                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#F4EDDA" />
+                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#C9A84C" opacity="0.25" />
+                  {/* reflection in water */}
+                  <ellipse cx="0" cy="6" rx="20" ry="2" fill="#1A1008" opacity="0.18" />
+                </g>
+              </g>
+            ))}
           </g>
 
           {/* Front clouds (in front of mountain) */}
@@ -677,8 +774,8 @@ const Roadmap: React.FC = () => {
 
         /* Climber */
         @keyframes climber-bob {
-          0%,100% { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 56}px); }
-          50%     { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 59}px); }
+          0%,100% { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 56}px); }
+          50%     { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 59}px); }
         }
 
         /* Flag */
@@ -686,6 +783,18 @@ const Roadmap: React.FC = () => {
 
         /* Path dash march */
         @keyframes path-dash { to { stroke-dashoffset: -26; } }
+
+        /* Rafts bobbing on water */
+        @keyframes raft-bob {
+          0%,100% { transform: translateY(0) rotate(-1.2deg); }
+          50%     { transform: translateY(-3px) rotate(1.2deg); }
+        }
+
+        /* Drifting wave foam */
+        @keyframes wave-drift {
+          from { transform: translateX(-60px); }
+          to   { transform: translateX(60px); }
+        }
 
         /* Chips */
         .chip-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
