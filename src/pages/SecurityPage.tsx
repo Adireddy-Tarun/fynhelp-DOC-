@@ -488,7 +488,7 @@ const SecurityPage = () => {
           }
           .security-badges {
             position: absolute;
-            right: 5vw;
+            left: 5vw;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
@@ -501,7 +501,7 @@ const SecurityPage = () => {
           }
           @media (max-width: 1023px) {
             .security-badge { width: 90px; height: 90px; }
-            .security-badges { right: 2vw; gap: 18px; }
+            .security-badges { left: 2vw; gap: 18px; }
           }
           @media (max-width: 767px) {
             .security-glass-panel { padding: 40px 24px !important; border-radius: 24px !important; }
@@ -509,9 +509,9 @@ const SecurityPage = () => {
             .security-mockup-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
             .security-badges {
               top: auto;
-              right: 50%;
+              left: 50%;
               bottom: 32px;
-              transform: translateX(50%);
+              transform: translateX(-50%);
               flex-direction: row;
               gap: 12px;
             }
