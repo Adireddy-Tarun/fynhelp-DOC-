@@ -730,16 +730,16 @@ const SecurityPage = () => {
       <section
         className="relative"
         style={{
-          background: `linear-gradient(145deg, ${INK} 0%, rgba(26,16,8,0.9) 40%, rgba(196,30,30,0.2) 70%, rgba(139,105,20,0.25) 100%)`,
+          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 40%, rgba(196,30,30,0.15) 75%, rgba(139,105,20,0.15) 100%)`,
           padding: "100px 24px",
           borderRadius: "48px 48px 0 0",
         }}
       >
         <div className="max-w-[1000px] mx-auto text-center">
-          <motion.h2 {...fadeUp} style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 4.4vw, 52px)", color: "#FFFFFF", lineHeight: 1.2, marginBottom: 24 }}>
+          <motion.h2 {...fadeUp} style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 4.4vw, 52px)", color: "#FFFFFF", lineHeight: 1.2, marginBottom: 24, textShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
             Ready to Experience Financial Intelligence You Can Trust?
           </motion.h2>
-          <motion.p {...fadeUp} className="mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: "clamp(16px, 1.4vw, 20px)", color: "rgba(244,237,218,0.95)", lineHeight: 1.6, maxWidth: 800, marginBottom: 48 }}>
+          <motion.p {...fadeUp} className="mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: "clamp(16px, 1.4vw, 20px)", color: "rgba(244,237,218,1)", lineHeight: 1.6, maxWidth: 800, marginBottom: 48, textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
             See how FYNHelp keeps your data secure while giving you the insights you need. Start your 6-month free trial — no credit card, no risk, no obligations.
           </motion.p>
 
@@ -752,7 +752,7 @@ const SecurityPage = () => {
                 padding: "20px 52px", borderRadius: 16,
                 color: "#FFFFFF",
                 background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`,
-                boxShadow: "0 12px 32px rgba(196,30,30,0.4)",
+                boxShadow: "0 12px 32px rgba(196,30,30,0.5)",
                 display: "inline-block",
               }}
             >
@@ -766,20 +766,20 @@ const SecurityPage = () => {
                 fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 17,
                 padding: "20px 44px", borderRadius: 16,
                 background: "transparent",
-                border: "2px solid rgba(244,237,218,0.5)",
+                border: "2px solid rgba(244,237,218,0.8)",
                 color: BEIGE,
                 display: "inline-block",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = BEIGE; e.currentTarget.style.color = INK; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = BEIGE; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = BEIGE; e.currentTarget.style.color = INK; e.currentTarget.style.borderColor = BEIGE; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = BEIGE; e.currentTarget.style.borderColor = "rgba(244,237,218,0.8)"; }}
             >
               Talk to Our Security Team
             </a>
           </motion.div>
 
-          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.7)" }}>
+          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.8)" }}>
             <Users size={16} />
-            <span style={{ fontFamily: "'Roboto'", fontSize: 14 }}>
+            <span style={{ fontFamily: "'Roboto'", fontSize: 16 }}>
               Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
             </span>
           </div>
