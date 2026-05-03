@@ -954,7 +954,7 @@ const SecurityPage = () => {
             </Link>
 
             <a
-              href="mailto:security@fynhelp.com"
+              href="mailto:support@fynhelp.com"
               className="transition-all hover:-translate-y-0.5"
               style={{
                 fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 17,
