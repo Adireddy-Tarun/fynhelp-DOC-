@@ -112,8 +112,9 @@ const Navbar = () => {
                 key={l.href}
                 to={l.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5"
+                className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5 flex items-center gap-2"
               >
+                {l.href === "/security" && <Shield size={18} className="text-fyn-gold" />}
                 {l.label}
               </Link>
             ))}
