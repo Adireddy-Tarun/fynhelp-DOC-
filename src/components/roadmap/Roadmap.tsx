@@ -237,6 +237,20 @@ const Roadmap: React.FC = () => {
               <stop offset="60%" stopColor="#FFD93D" />
               <stop offset="100%" stopColor="#FFA500" stopOpacity="0.6" />
             </radialGradient>
+            <linearGradient id="hazeGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+              <stop offset="60%" stopColor="#E8E4D6" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#D8D4C6" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#5BA8C9" />
+              <stop offset="40%" stopColor="#3A8FB7" />
+              <stop offset="100%" stopColor="#0F3D54" />
+            </linearGradient>
+            <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            </radialGradient>
 
             {(["live", "beta", "soon"] as Status[]).map((s) => (
               <filter key={s} id={`glow-${s}`} x="-30%" y="-30%" width="160%" height="160%">
