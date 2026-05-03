@@ -974,7 +974,7 @@ const SecurityPage = () => {
           <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.8)" }}>
             <Users size={16} />
             <span style={{ fontFamily: "'Roboto'", fontSize: 16 }}>
-              Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
+              Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
             </span>
           </div>
         </div>
