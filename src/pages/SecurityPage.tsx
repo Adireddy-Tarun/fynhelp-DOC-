@@ -193,7 +193,7 @@ const SecurityPage = () => {
           minHeight: "100vh",
           paddingTop: 120,
           paddingBottom: 80,
-          background: `linear-gradient(145deg, #1A1008 0%, #1A1008 35%, rgba(26,16,8,0.96) 60%, rgba(196,30,30,0.12) 80%, rgba(139,105,20,0.12) 100%)`,
+          background: `linear-gradient(145deg, #1A1008 0%, #1A1008 40%, rgba(26,16,8,0.98) 65%, rgba(196,30,30,0.08) 85%, rgba(139,105,20,0.08) 100%)`,
         }}
         aria-label="Security overview"
       >
@@ -208,8 +208,8 @@ const SecurityPage = () => {
             width: "85vw",
             maxWidth: 1100,
             zIndex: 2,
-            opacity: 0.4,
-            filter: "blur(3px)",
+            opacity: 0.6,
+            filter: "blur(2px)",
             background: "rgba(244,237,218,0.08)",
             border: "1px solid rgba(139,105,20,0.15)",
             borderRadius: 24,
@@ -248,19 +248,19 @@ const SecurityPage = () => {
               <div
                 key={m.label}
                 style={{
-                  background: "rgba(26,16,8,0.6)",
+                  background: "rgba(26,16,8,0.8)",
                   borderRadius: 16,
-                  padding: "20px 24px",
-                  border: "1px solid rgba(139,105,20,0.2)",
+                  padding: "22px 26px",
+                  border: "1px solid rgba(139,105,20,0.25)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 16,
+                  gap: 18,
                 }}
               >
-                <div style={{ fontSize: 32 }}>{m.icon}</div>
+                <div style={{ fontSize: 40, lineHeight: 1 }}>{m.icon}</div>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <span style={{ fontFamily: "'Roboto'", fontSize: 14, color: "rgba(244,237,218,0.7)" }}>{m.label}</span>
-                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 18, color: GOLD }}>{m.value}</span>
+                  <span style={{ fontFamily: "'Roboto'", fontSize: 17, color: "rgba(244,237,218,0.8)" }}>{m.label}</span>
+                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 700, fontSize: 22, color: "rgba(139,105,20,1)" }}>{m.value}</span>
                 </div>
               </div>
             ))}
@@ -298,14 +298,14 @@ const SecurityPage = () => {
             style={{
               width: "90vw",
               maxWidth: 900,
-              background: "rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.15)",
               backdropFilter: "blur(24px) saturate(120%)",
               WebkitBackdropFilter: "blur(24px) saturate(120%)",
               borderRadius: 32,
-              border: "1px solid rgba(255,255,255,0.25)",
+              border: "1px solid rgba(255,255,255,0.35)",
               padding: "64px 56px",
               boxShadow:
-                "0 30px 80px rgba(0,0,0,0.5), inset 0 0 1px rgba(255,255,255,0.4), 0 8px 32px rgba(139,105,20,0.2)",
+                "0 30px 80px rgba(0,0,0,0.6), inset 0 0 2px rgba(255,255,255,0.5), 0 8px 40px rgba(139,105,20,0.25)",
               textAlign: "center",
             }}
           >
@@ -318,7 +318,7 @@ const SecurityPage = () => {
                 lineHeight: 1.15,
                 letterSpacing: "-1px",
                 marginBottom: 24,
-                textShadow: "0 4px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
+                textShadow: "0 6px 24px rgba(0,0,0,0.8), 0 2px 12px rgba(196,30,30,0.4), 0 0 60px rgba(139,105,20,0.3)",
               }}
             >
               How We Protect Your Financial Data
@@ -333,7 +333,7 @@ const SecurityPage = () => {
                 lineHeight: 1.7,
                 maxWidth: 750,
                 margin: "0 auto 40px",
-                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
+                textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 0 40px rgba(139,105,20,0.2)",
               }}
             >
               Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
@@ -350,23 +350,23 @@ const SecurityPage = () => {
                   letterSpacing: "0.5px",
                   padding: "18px 40px",
                   borderRadius: 16,
-                  background: "rgba(139,105,20,0.25)",
-                  border: `2px solid ${GOLD}`,
+                  background: "rgba(139,105,20,0.3)",
+                  border: "2px solid rgba(139,105,20,1)",
                   color: "#FFFFFF",
                   backdropFilter: "blur(8px)",
                   WebkitBackdropFilter: "blur(8px)",
-                  boxShadow: "0 4px 16px rgba(139,105,20,0.3)",
+                  boxShadow: "0 6px 20px rgba(139,105,20,0.35)",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = GOLD;
+                  e.currentTarget.style.background = "rgba(139,105,20,0.9)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,105,20,0.5)";
+                  e.currentTarget.style.boxShadow = "0 10px 32px rgba(139,105,20,0.55)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(139,105,20,0.25)";
+                  e.currentTarget.style.background = "rgba(139,105,20,0.3)";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.3)";
+                  e.currentTarget.style.boxShadow = "0 6px 20px rgba(139,105,20,0.35)";
                 }}
               >
                 View Security Whitepaper
@@ -461,26 +461,26 @@ const SecurityPage = () => {
             content: "";
             position: absolute;
             top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent 0%, rgba(139,105,20,0.15) 50%, transparent 100%);
-            animation: securitySlideRight 8s ease-in-out infinite;
+            width: 40%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(139,105,20,0.25) 50%, transparent 100%);
+            animation: securitySlideRight 6s ease-in-out infinite;
             pointer-events: none;
-            z-index: 1;
+            z-index: 3;
           }
           .security-hero::after {
             content: "";
             position: absolute;
             inset: 0;
             background:
-              repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px),
-              repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px);
-            opacity: 0.3;
+              repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(139,105,20,0.04) 60px, rgba(139,105,20,0.04) 61px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(139,105,20,0.04) 60px, rgba(139,105,20,0.04) 61px);
+            opacity: 0.5;
             pointer-events: none;
             z-index: 1;
           }
           @keyframes securitySlideRight {
             0% { transform: translateX(0); }
-            100% { transform: translateX(200vw); }
+            100% { transform: translateX(300vw); }
           }
           @keyframes badgeFloat {
             0%, 100% { transform: translateY(0); }
