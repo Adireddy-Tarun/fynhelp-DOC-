@@ -290,26 +290,26 @@ const Roadmap: React.FC = () => {
 
           {/* Background mountains */}
           <g opacity="0.35">
-            <polygon points="0,820 220,560 440,820" fill="#C5BFB5" />
-            <polygon points="380,820 600,500 820,820" fill="#B8B2A8" />
-            <polygon points="780,820 1000,540 1200,820" fill="#C5BFB5" />
+            <polygon points="0,900 220,640 440,900" fill="#C5BFB5" />
+            <polygon points="380,900 600,580 820,900" fill="#B8B2A8" />
+            <polygon points="780,900 1000,620 1200,900" fill="#C5BFB5" />
           </g>
 
-          {/* Main mountain — many low-poly facets */}
+          {/* Main mountain — many low-poly facets (base extended down to ground) */}
           <g>
             {/* base silhouette */}
-            <polygon points="180,820 624,120 1080,820" fill="url(#rockA)" />
+            <polygon points="180,905 624,120 1080,905" fill="url(#rockA)" />
             {/* shadow side (right) */}
-            <polygon points="624,120 1080,820 624,820" fill="url(#rockShadow)" opacity="0.9" />
+            <polygon points="624,120 1080,905 624,905" fill="url(#rockShadow)" opacity="0.9" />
             {/* facet planes */}
-            <polygon points="180,820 624,120 380,820" fill="url(#rockB)" opacity="0.85" />
-            <polygon points="380,820 624,120 520,820" fill="url(#rockA)" opacity="0.7" />
-            <polygon points="624,120 760,820 880,820" fill="url(#rockShadow)" opacity="0.6" />
-            <polygon points="624,120 520,820 700,820" fill="url(#rockB)" opacity="0.5" />
-            <polygon points="624,120 880,820 1080,820" fill="url(#rockShadow)" opacity="0.45" />
+            <polygon points="180,905 624,120 380,905" fill="url(#rockB)" opacity="0.85" />
+            <polygon points="380,905 624,120 520,905" fill="url(#rockA)" opacity="0.7" />
+            <polygon points="624,120 760,905 880,905" fill="url(#rockShadow)" opacity="0.6" />
+            <polygon points="624,120 520,905 700,905" fill="url(#rockB)" opacity="0.5" />
+            <polygon points="624,120 880,905 1080,905" fill="url(#rockShadow)" opacity="0.45" />
             {/* ridge lines */}
-            <polyline points="280,720 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
-            <polyline points="780,700 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="280,780 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="780,760 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
             {/* snow cap (jagged) */}
             <polygon
               points="540,260 580,210 600,225 624,120 648,225 670,210 710,260 685,275 660,255 638,275 614,255 590,275 566,255"
@@ -320,28 +320,46 @@ const Roadmap: React.FC = () => {
             <polygon points="660,245 685,235 670,255" fill="#FFFFFF" opacity="0.9" />
           </g>
 
-          {/* Small starting hill (left) */}
+          {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,820 90,720 160,690 230,710 280,820" fill="url(#hill)" />
-            <polygon points="90,720 160,690 130,750" fill="#B0A488" opacity="0.7" />
-            <polygon points="160,690 230,710 200,760" fill="#9C9078" opacity="0.6" />
+            <polygon points="40,905 90,805 160,775 230,795 280,905" fill="url(#hill)" />
+            <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
+            <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
             {/* grass strip top */}
-            <path d="M 40 820 Q 160 760 280 820 Z" fill="#8B9E6B" opacity="0.85" />
+            <path d="M 40 905 Q 160 845 280 905 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ground */}
-          <rect x="0" y="900" width={VBW} height={100} fill="#C4B89C" />
-          <path
-            d={`M 0 905 Q 300 880 600 905 T 1200 905 L 1200 920 L 0 920 Z`}
-            fill="#8B9E6B"
-          />
-          {/* grass tufts */}
+          {/* Ocean (full-width water behind island) */}
+          <g>
+            <defs>
+              <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#3A8FB7" />
+                <stop offset="100%" stopColor="#1E5A7A" />
+              </linearGradient>
+            </defs>
+            <rect x="0" y="900" width={VBW} height={100} fill="url(#oceanGrad)" />
+            {/* wave highlights */}
+            <path d="M 0 920 Q 60 914 120 920 T 240 920 T 360 920 T 480 920 T 600 920 T 720 920 T 840 920 T 960 920 T 1080 920 T 1200 920" stroke="#9CC9DD" strokeWidth="1.4" fill="none" opacity="0.7" />
+            <path d="M 0 945 Q 60 939 120 945 T 240 945 T 360 945 T 480 945 T 600 945 T 720 945 T 840 945 T 960 945 T 1080 945 T 1200 945" stroke="#9CC9DD" strokeWidth="1.2" fill="none" opacity="0.5" />
+            <path d="M 0 970 Q 60 964 120 970 T 240 970 T 360 970 T 480 970 T 600 970 T 720 970 T 840 970 T 960 970 T 1080 970 T 1200 970" stroke="#9CC9DD" strokeWidth="1" fill="none" opacity="0.4" />
+          </g>
+
+          {/* Island (the land the mountain stands on) */}
+          <g>
+            <path
+              d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 940 Q 1100 960 900 950 Q 624 938 360 952 Q 160 962 0 945 Z"
+              fill="#C4B89C"
+            />
+            {/* sandy/grass top edge */}
+            <path d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 912 Q 1100 905 900 908 Q 624 902 360 910 Q 160 916 0 912 Z" fill="#8B9E6B" opacity="0.9" />
+          </g>
+          {/* grass tufts on island */}
           {Array.from({ length: 18 }).map((_, i) => {
             const x = 30 + i * 65;
             return (
               <path
                 key={i}
-                d={`M ${x} 910 q 3 -8 6 0 M ${x + 3} 910 q 0 -10 3 -2`}
+                d={`M ${x} 908 q 3 -8 6 0 M ${x + 3} 908 q 0 -10 3 -2`}
                 stroke="#5C7042"
                 strokeWidth="1.2"
                 fill="none"
@@ -352,10 +370,10 @@ const Roadmap: React.FC = () => {
           {/* Trees */}
           <g className="trees">
             {[
-              { x: 70, y: 805, s: 0.6, d: 0 },
-              { x: 130, y: 800, s: 0.7, d: 0.3 },
-              { x: 210, y: 800, s: 0.55, d: 0.6 },
-              { x: 245, y: 810, s: 0.5, d: 0.9 },
+              { x: 70, y: 890, s: 0.6, d: 0 },
+              { x: 130, y: 885, s: 0.7, d: 0.3 },
+              { x: 210, y: 885, s: 0.55, d: 0.6 },
+              { x: 245, y: 895, s: 0.5, d: 0.9 },
               { x: 340, y: 905, s: 0.9, d: 0.2 },
               { x: 410, y: 905, s: 0.7, d: 0.5 },
               { x: 760, y: 905, s: 1.0, d: 0.1 },
@@ -363,7 +381,7 @@ const Roadmap: React.FC = () => {
               { x: 940, y: 905, s: 0.9, d: 1.1 },
               { x: 1050, y: 905, s: 1.1, d: 0.4 },
               { x: 1140, y: 905, s: 0.75, d: 0.9 },
-              { x: 320, y: 770, s: 0.45, d: 1.3 },
+              { x: 320, y: 855, s: 0.45, d: 1.3 },
             ].map((t, i) => (
               <g
                 key={i}
@@ -623,17 +641,18 @@ const Roadmap: React.FC = () => {
         .sun-wrap { transform-origin: 0 0; animation: sun-arc 24s linear infinite; }
         .moon-wrap { transform-origin: 0 0; animation: moon-arc 24s linear infinite; opacity: 0; }
         @keyframes sun-arc {
-          0%   { transform: translate(-50px, 850px); opacity: 0; }
-          10%  { opacity: 1; }
-          50%  { transform: translate(600px, 110px); opacity: 1; }
-          70%  { transform: translate(1250px, 850px); opacity: 0; }
-          100% { transform: translate(1250px, 850px); opacity: 0; }
+          0%   { transform: translate(-80px, 850px); opacity: 0; }
+          8%   { opacity: 1; }
+          25%  { transform: translate(600px, 110px); opacity: 1; }
+          42%  { transform: translate(1280px, 850px); opacity: 0; }
+          100% { transform: translate(1280px, 850px); opacity: 0; }
         }
         @keyframes moon-arc {
-          0%, 55%   { transform: translate(1250px, 850px); opacity: 0; }
-          70%       { transform: translate(900px, 200px); opacity: 0.95; }
-          85%       { transform: translate(400px, 200px); opacity: 0.95; }
-          100%      { transform: translate(-50px, 850px); opacity: 0; }
+          0%, 50%   { transform: translate(-80px, 850px); opacity: 0; }
+          58%       { transform: translate(-80px, 850px); opacity: 0; }
+          75%       { transform: translate(600px, 200px); opacity: 0.95; }
+          92%       { transform: translate(1280px, 850px); opacity: 0; }
+          100%      { transform: translate(1280px, 850px); opacity: 0; }
         }
         .sun-rays { animation: ray-spin 8s linear infinite; transform-origin: 0 0; }
         @keyframes ray-spin { to { transform: rotate(360deg); } }
