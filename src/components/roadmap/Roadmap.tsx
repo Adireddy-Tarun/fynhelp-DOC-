@@ -89,55 +89,44 @@ const SUMMIT = { x: 624, y: 120 };
 const HIDE_X1 = 540;
 const HIDE_X2 = 720;
 
-/** Build a smooth cubic bezier from a→b. If the segment crosses the mountain
- *  center band, return TWO sub-paths with a gap so it looks like it goes behind. */
-function buildSegment(
+/** Build a structured staircase from a→b: a sequence of step rectangles
+ *  going horizontally then vertically (like a flight of stairs). */
+interface Step {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+function buildStairs(
   a: { x: number; y: number },
   b: { x: number; y: number },
-): string[] {
-  const midY = (a.y + b.y) / 2;
-  const c1x = a.x;
-  const c1y = midY;
-  const c2x = b.x;
-  const c2y = midY;
-  const fullPath = `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`;
-
-  // Detect if the segment crosses the mountain center band.
-  const minX = Math.min(a.x, b.x);
-  const maxX = Math.max(a.x, b.x);
-  if (maxX < HIDE_X1 || minX > HIDE_X2) return [fullPath];
-
-  // Sample along the bezier to find entry/exit t-values at HIDE_X1/HIDE_X2.
-  const sample = (t: number) => {
-    const u = 1 - t;
-    return {
-      x: u * u * u * a.x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * b.x,
-      y: u * u * u * a.y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * b.y,
-    };
-  };
-  let entryT = -1;
-  let exitT = -1;
-  const STEPS = 80;
-  let prev = sample(0);
-  for (let i = 1; i <= STEPS; i++) {
-    const t = i / STEPS;
-    const cur = sample(t);
-    const inside = (p: { x: number }) => p.x >= HIDE_X1 && p.x <= HIDE_X2;
-    if (entryT < 0 && !inside(prev) && inside(cur)) entryT = t;
-    if (entryT >= 0 && exitT < 0 && inside(prev) && !inside(cur)) exitT = t;
-    prev = cur;
+  stepCount = 6,
+): { steps: Step[]; treadH: number; riserW: number } {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y; // negative going up
+  const dir = dx >= 0 ? 1 : -1;
+  const treadW = Math.abs(dx) / stepCount;
+  const riser = Math.abs(dy) / stepCount;
+  const treadH = 6; // step thickness
+  const steps: Step[] = [];
+  for (let i = 0; i < stepCount; i++) {
+    // each step: horizontal tread then vertical riser
+    const x0 = a.x + dir * treadW * i;
+    const y0 = a.y - riser * (i + 1);
+    steps.push({
+      x: dir > 0 ? x0 : x0 - treadW,
+      y: y0,
+      w: treadW,
+      h: treadH,
+    });
   }
-  if (entryT < 0 || exitT < 0) return [fullPath];
-
-  const p1 = sample(entryT);
-  const p2 = sample(exitT);
-  return [
-    `M ${a.x} ${a.y} Q ${(a.x + p1.x) / 2} ${(a.y + p1.y) / 2 - 20}, ${p1.x} ${p1.y}`,
-    `M ${p2.x} ${p2.y} Q ${(p2.x + b.x) / 2} ${(p2.y + b.y) / 2 - 20}, ${b.x} ${b.y}`,
-  ];
+  return { steps, treadH, riserW: 6 };
 }
 
+// Path starts from the ground (bottom of island) up to first stop, then through stops.
+const GROUND_START = { x: 100, y: 905 };
 const SEGMENTS: { from: { x: number; y: number }; to: { x: number; y: number }; status: Status }[] = [
+  { from: GROUND_START, to: STOPS[0], status: "live" },
   { from: STOPS[0], to: STOPS[1], status: "live" },
   { from: STOPS[1], to: STOPS[2], status: "beta" },
   { from: STOPS[2], to: STOPS[3], status: "soon" },
