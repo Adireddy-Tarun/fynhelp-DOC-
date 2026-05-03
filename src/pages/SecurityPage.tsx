@@ -922,7 +922,7 @@ const SecurityPage = () => {
 
       {/* ───── Section 7: Final CTA ───── */}
       <section
-        className="relative"
+        className="relative bg-sidebar"
         style={{
           background: `linear-gradient(145deg, ${INK} 0%, ${INK} 40%, rgba(196,30,30,0.15) 75%, rgba(139,105,20,0.15) 100%)`,
           padding: "100px 24px",
