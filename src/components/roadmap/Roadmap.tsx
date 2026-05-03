@@ -797,10 +797,12 @@ const Roadmap: React.FC = () => {
         /* Path dash march */
         @keyframes path-dash { to { stroke-dashoffset: -26; } }
 
-        /* Rafts bobbing on water */
+        /* Rafts bobbing on water — gentle buoyancy with slight roll */
         @keyframes raft-bob {
-          0%,100% { transform: translateY(0) rotate(-1.2deg); }
-          50%     { transform: translateY(-3px) rotate(1.2deg); }
+          0%,100% { transform: translateY(0) rotate(-1.5deg); }
+          25%     { transform: translateY(-1.5px) rotate(0.5deg); }
+          50%     { transform: translateY(-3.5px) rotate(1.8deg); }
+          75%     { transform: translateY(-1.5px) rotate(0.3deg); }
         }
 
         /* Drifting wave foam */
