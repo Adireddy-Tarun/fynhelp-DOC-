@@ -267,19 +267,20 @@ const SecurityPage = () => {
                 letterSpacing: "0.5px",
                 padding: "18px 40px",
                 borderRadius: 16,
-                background: "transparent",
+                background: "rgba(139,105,20,0.15)",
                 border: `2px solid ${GOLD}`,
-                color: GOLD,
+                color: BEIGE,
+                boxShadow: "0 4px 16px rgba(139,105,20,0.25)",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = GOLD;
                 e.currentTarget.style.color = "#FFFFFF";
-                e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,105,20,0.4)";
+                e.currentTarget.style.boxShadow = "0 8px 28px rgba(139,105,20,0.5)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = GOLD;
-                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.background = "rgba(139,105,20,0.15)";
+                e.currentTarget.style.color = BEIGE;
+                e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.25)";
               }}
             >
               View Security Whitepaper
