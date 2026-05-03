@@ -298,14 +298,14 @@ const SecurityPage = () => {
             style={{
               width: "90vw",
               maxWidth: 900,
-              background: "rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.15)",
               backdropFilter: "blur(24px) saturate(120%)",
               WebkitBackdropFilter: "blur(24px) saturate(120%)",
               borderRadius: 32,
-              border: "1px solid rgba(255,255,255,0.25)",
+              border: "1px solid rgba(255,255,255,0.35)",
               padding: "64px 56px",
               boxShadow:
-                "0 30px 80px rgba(0,0,0,0.5), inset 0 0 1px rgba(255,255,255,0.4), 0 8px 32px rgba(139,105,20,0.2)",
+                "0 30px 80px rgba(0,0,0,0.6), inset 0 0 2px rgba(255,255,255,0.5), 0 8px 40px rgba(139,105,20,0.25)",
               textAlign: "center",
             }}
           >
