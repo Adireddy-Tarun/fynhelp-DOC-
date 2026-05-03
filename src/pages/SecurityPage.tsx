@@ -186,148 +186,342 @@ const SecurityPage = () => {
 
   return (
     <Layout>
-      {/* ───── Hero ───── */}
+      {/* ───── Hero (3-Layer Glassmorphic) ───── */}
       <section
-        className="relative overflow-hidden flex items-center"
+        className="security-hero relative overflow-hidden flex items-center justify-center"
         style={{
           minHeight: "100vh",
           paddingTop: 120,
           paddingBottom: 80,
-          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 30%, rgba(26,16,8,0.95) 60%, rgba(139,105,20,0.08) 85%, rgba(196,30,30,0.05) 100%)`,
+          background: `linear-gradient(145deg, #1A1008 0%, #1A1008 35%, rgba(26,16,8,0.96) 60%, rgba(196,30,30,0.12) 80%, rgba(139,105,20,0.12) 100%)`,
         }}
+        aria-label="Security overview"
       >
-        {/* Floating particles */}
-        {Array.from({ length: 18 }).map((_, i) => (
-          <span
-            key={i}
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              width: 4 + (i % 5),
-              height: 4 + (i % 5),
-              background: GOLD,
-              opacity: 0.4,
-              boxShadow: `0 0 8px rgba(139,105,20,0.6)`,
-              left: `${(i * 5.7) % 100}%`,
-              top: `${(i * 11.7) % 100}%`,
-              animation: `fynFloat ${14 + (i % 5) * 1.5}s linear ${i * 0.6}s infinite`,
-            }}
-          />
-        ))}
-
-        <div className="fyn-container relative z-10 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            style={{
-              fontFamily: "'Oswald'",
-              fontWeight: 700,
-              fontSize: "clamp(36px, 5.5vw, 64px)",
-              color: "#FFFFFF",
-              lineHeight: 1.15,
-              letterSpacing: "-1px",
-              textShadow: "0 6px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
-              marginBottom: 32,
-            }}
-          >
-            How We Protect Your Financial Data
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+        {/* LAYER 2: Blurred dashboard mockup */}
+        <div
+          aria-hidden="true"
+          className="security-mockup absolute pointer-events-none"
+          style={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "85vw",
+            maxWidth: 1100,
+            zIndex: 2,
+            opacity: 0.4,
+            filter: "blur(3px)",
+            background: "rgba(244,237,218,0.08)",
+            border: "1px solid rgba(139,105,20,0.15)",
+            borderRadius: 24,
+            padding: 32,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+          }}
+        >
+          <div
             style={{
               fontFamily: "'Raleway'",
-              fontWeight: 400,
-              fontSize: "clamp(16px, 1.4vw, 22px)",
-              color: "rgba(244,237,218,1)",
-              lineHeight: 1.7,
-              maxWidth: 900,
-              margin: "0 auto 48px",
-              textShadow: "0 2px 12px rgba(244,237,218,0.3)",
+              fontWeight: 600,
+              fontSize: 18,
+              color: "rgba(244,237,218,0.9)",
+              borderBottom: "1px solid rgba(139,105,20,0.2)",
+              paddingBottom: 16,
+              marginBottom: 24,
             }}
           >
-            Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6"
+            FYNHelp Security Dashboard
+          </div>
+          <div
+            className="security-mockup-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 20,
+              marginBottom: 24,
+            }}
           >
-            <button
-              onClick={() => setWhitepaperOpen(true)}
-              className="transition-all hover:-translate-y-0.5"
-              style={{
-                fontFamily: "'DM Sans'",
-                fontWeight: 600,
-                fontSize: 16,
-                letterSpacing: "0.5px",
-                padding: "18px 40px",
-                borderRadius: 16,
-                background: "rgba(139,105,20,0.15)",
-                border: `2px solid ${GOLD}`,
-                color: BEIGE,
-                boxShadow: "0 4px 16px rgba(139,105,20,0.25)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = GOLD;
-                e.currentTarget.style.color = "#FFFFFF";
-                e.currentTarget.style.boxShadow = "0 8px 28px rgba(139,105,20,0.5)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(139,105,20,0.15)";
-                e.currentTarget.style.color = BEIGE;
-                e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.25)";
-              }}
-            >
-              View Security Whitepaper
-            </button>
-
-            <Link
-              to="/waitlist"
-              className="transition-all hover:-translate-y-0.5"
-              style={{
-                fontFamily: "'DM Sans'",
-                fontWeight: 700,
-                fontSize: 16,
-                letterSpacing: "0.5px",
-                padding: "18px 40px",
-                borderRadius: 16,
-                color: "#FFFFFF",
-                background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`,
-                boxShadow: "0 8px 24px rgba(196,30,30,0.35)",
-                display: "inline-block",
-              }}
-            >
-              Start Free Trial
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="flex justify-center"
-            style={{ marginTop: 60 }}
-          >
+            {[
+              { icon: "🔐", label: "Encryption Status", value: "✓ Active" },
+              { icon: "🌍", label: "Data Location", value: "Mumbai (ap-south-1)" },
+              { icon: "👥", label: "Active Sessions", value: "142" },
+              { icon: "✅", label: "Alerts (Last 30 days)", value: "0" },
+            ].map((m) => (
+              <div
+                key={m.label}
+                style={{
+                  background: "rgba(26,16,8,0.6)",
+                  borderRadius: 16,
+                  padding: "20px 24px",
+                  border: "1px solid rgba(139,105,20,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                }}
+              >
+                <div style={{ fontSize: 32 }}>{m.icon}</div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontFamily: "'Roboto'", fontSize: 14, color: "rgba(244,237,218,0.7)" }}>{m.label}</span>
+                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 18, color: GOLD }}>{m.value}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {[60, 85, 72].map((w, i) => (
             <div
-              className="flex items-center justify-center rounded-full"
+              key={i}
               style={{
-                width: 140,
-                height: 140,
-                border: `3px solid ${RED}`,
-                background: `linear-gradient(135deg, ${GOLD} 0%, rgba(139,105,20,0.7) 100%)`,
-                boxShadow: "0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3)",
-                animation: "fynShieldPulse 3s ease-in-out infinite",
+                height: 8,
+                background: "rgba(26,16,8,0.5)",
+                borderRadius: 8,
+                marginBottom: 12,
+                overflow: "hidden",
               }}
             >
-              <Shield size={68} color="#FFFFFF" strokeWidth={2} fill="rgba(255,255,255,0.15)" />
+              <div
+                style={{
+                  width: `${w}%`,
+                  height: "100%",
+                  background: `linear-gradient(90deg, ${GOLD} 0%, ${RED} 100%)`,
+                  borderRadius: 8,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* LAYER 3: Glassmorphic content panel */}
+        <div className="relative w-full flex justify-center" style={{ zIndex: 10 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1], delay: 0.2 }}
+            className="security-glass-panel"
+            style={{
+              width: "90vw",
+              maxWidth: 900,
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(24px) saturate(120%)",
+              WebkitBackdropFilter: "blur(24px) saturate(120%)",
+              borderRadius: 32,
+              border: "1px solid rgba(255,255,255,0.25)",
+              padding: "64px 56px",
+              boxShadow:
+                "0 30px 80px rgba(0,0,0,0.5), inset 0 0 1px rgba(255,255,255,0.4), 0 8px 32px rgba(139,105,20,0.2)",
+              textAlign: "center",
+            }}
+          >
+            <h1
+              style={{
+                fontFamily: "'Oswald'",
+                fontWeight: 700,
+                fontSize: "clamp(36px, 5.2vw, 56px)",
+                color: "#FFFFFF",
+                lineHeight: 1.15,
+                letterSpacing: "-1px",
+                marginBottom: 24,
+                textShadow: "0 4px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
+              }}
+            >
+              How We Protect Your Financial Data
+            </h1>
+
+            <p
+              style={{
+                fontFamily: "'Raleway'",
+                fontWeight: 400,
+                fontSize: "clamp(15px, 1.2vw, 18px)",
+                color: "rgba(244,237,218,1)",
+                lineHeight: 1.7,
+                maxWidth: 750,
+                margin: "0 auto 40px",
+                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
+              }}
+            >
+              Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <button
+                onClick={() => setWhitepaperOpen(true)}
+                className="transition-all"
+                style={{
+                  fontFamily: "'DM Sans'",
+                  fontWeight: 600,
+                  fontSize: 16,
+                  letterSpacing: "0.5px",
+                  padding: "18px 40px",
+                  borderRadius: 16,
+                  background: "rgba(139,105,20,0.25)",
+                  border: `2px solid ${GOLD}`,
+                  color: "#FFFFFF",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  boxShadow: "0 4px 16px rgba(139,105,20,0.3)",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = GOLD;
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,105,20,0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(139,105,20,0.25)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.3)";
+                }}
+              >
+                View Security Whitepaper
+              </button>
+
+              <Link
+                to="/waitlist"
+                className="inline-block"
+                style={{
+                  fontFamily: "'DM Sans'",
+                  fontWeight: 700,
+                  fontSize: 16,
+                  letterSpacing: "0.5px",
+                  padding: "18px 40px",
+                  borderRadius: 16,
+                  color: "#FFFFFF",
+                  background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`,
+                  boxShadow: "0 8px 24px rgba(196,30,30,0.4)",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, #991B1B 0%, #6B4E10 100%)";
+                  e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(196,30,30,0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`;
+                  e.currentTarget.style.transform = "translateY(0) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(196,30,30,0.4)";
+                }}
+              >
+                Start Free Trial
+              </Link>
             </div>
           </motion.div>
         </div>
+
+        {/* Floating certification badges */}
+        <div className="security-badges" style={{ zIndex: 15 }}>
+          {[
+            { icon: "🏆", label: "SOC 2", status: "Q3 2026", statusBg: "rgba(139,105,20,0.3)", statusColor: "rgba(244,237,218,0.95)", delay: "0s" },
+            { icon: "🇮🇳", label: "RBI", status: "Compliant", statusBg: "rgba(16,185,129,0.2)", statusColor: "#10B981", delay: "0.5s" },
+            { icon: "🛡️", label: "GDPR", status: "Ready", statusBg: "rgba(139,105,20,0.3)", statusColor: "#E8C76A", delay: "1s" },
+          ].map((b, i) => (
+            <motion.div
+              key={b.label}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 1.2 + i * 0.2 }}
+              className="security-badge"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: "2px solid rgba(255,255,255,0.3)",
+                borderRadius: "50%",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 12,
+                animation: `badgeFloat 3s ease-in-out ${b.delay} infinite`,
+                transition: "transform 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
+              <div style={{ fontSize: 30, lineHeight: 1 }}>{b.icon}</div>
+              <div style={{ fontFamily: "'DM Sans'", fontWeight: 700, fontSize: 13, color: "#FFFFFF", marginTop: 6 }}>{b.label}</div>
+              <div
+                style={{
+                  fontFamily: "'Roboto'",
+                  fontSize: 10,
+                  color: b.statusColor,
+                  background: b.statusBg,
+                  padding: "3px 8px",
+                  borderRadius: 12,
+                  marginTop: 5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {b.status}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Hero-scoped CSS: scanning light, circuit pattern, badge float, responsive */}
+        <style>{`
+          .security-hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(139,105,20,0.15) 50%, transparent 100%);
+            animation: securitySlideRight 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+          }
+          .security-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+              repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px),
+              repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+          }
+          @keyframes securitySlideRight {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(200vw); }
+          }
+          @keyframes badgeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+          }
+          .security-badges {
+            position: absolute;
+            right: 5vw;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+          }
+          .security-badge {
+            width: 110px;
+            height: 110px;
+          }
+          @media (max-width: 1023px) {
+            .security-badge { width: 90px; height: 90px; }
+            .security-badges { right: 2vw; gap: 18px; }
+          }
+          @media (max-width: 767px) {
+            .security-glass-panel { padding: 40px 24px !important; border-radius: 24px !important; }
+            .security-mockup { height: 400px; filter: blur(4px) !important; padding: 20px !important; }
+            .security-mockup-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .security-badges {
+              top: auto;
+              right: 50%;
+              bottom: 32px;
+              transform: translateX(50%);
+              flex-direction: row;
+              gap: 12px;
+            }
+            .security-badge { width: 80px; height: 80px; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .security-hero::before { animation: none; display: none; }
+            .security-badge { animation: none !important; }
+          }
+        `}</style>
       </section>
 
       {/* ───── Section 2: Pillars ───── */}
