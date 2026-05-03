@@ -363,7 +363,7 @@ export default function PricingPage() {
         className="relative overflow-hidden px-6 py-28 md:py-32"
         style={{
           background:
-            "linear-gradient(145deg, #1A1008 0%, rgba(26,16,8,0.95) 30%, rgba(196,30,30,0.18) 65%, rgba(139,105,20,0.28) 100%)",
+            "linear-gradient(145deg, #1A1008 0%, rgba(26,16,8,0.92) 40%, rgba(139,105,20,0.25) 70%, rgba(196,30,30,0.20) 100%)",
         }}
       >
         {/* floating gradient blobs */}
@@ -400,7 +400,15 @@ export default function PricingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display font-bold text-[36px] md:text-[56px] leading-[1.15] tracking-tight text-fyn-beige mb-8"
+            className="font-display font-bold text-[32px] md:text-[38px] lg:text-[52px] mx-auto"
+            style={{
+              color: "#FFFFFF",
+              lineHeight: 1.25,
+              letterSpacing: "-0.5px",
+              textShadow: "0 3px 12px rgba(0,0,0,0.3)",
+              maxWidth: 1100,
+              marginBottom: 28,
+            }}
           >
             Ready for financial insights that work around the clock?
           </motion.h2>
@@ -410,7 +418,16 @@ export default function PricingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-subheading text-lg md:text-xl text-fyn-beige/85 max-w-3xl mx-auto leading-relaxed mb-5"
+            className="font-subheading mx-auto"
+            style={{
+              fontWeight: 400,
+              fontSize: "clamp(16px, 1.5vw, 20px)",
+              color: "rgba(244,237,218,0.95)",
+              lineHeight: 1.65,
+              letterSpacing: "0.3px",
+              maxWidth: 900,
+              marginBottom: 24,
+            }}
           >
             Join hundreds of startups and SMEs who've transformed their financial intelligence with FYNHelp.
           </motion.p>
@@ -420,10 +437,27 @@ export default function PricingPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-button font-semibold text-base md:text-lg text-fyn-gold mb-10"
+            className="font-button"
+            style={{
+              fontWeight: 600,
+              fontSize: "clamp(16px, 1.4vw, 18px)",
+              color: "#8B6914",
+              marginBottom: 48,
+            }}
           >
             Start your{" "}
-            <span className="fyn-underline-gold text-fyn-beige">6-months free</span> today — no credit card required.
+            <span
+              style={{
+                color: "#8B6914",
+                textDecoration: "underline",
+                textDecorationColor: "#8B6914",
+                textDecorationThickness: "2px",
+                textUnderlineOffset: "4px",
+              }}
+            >
+              6-months free
+            </span>{" "}
+            today — no credit card required.
           </motion.p>
 
           <motion.form
@@ -436,12 +470,7 @@ export default function PricingPage() {
               const url = `/waitlist${email ? `?email=${encodeURIComponent(email)}` : ""}`;
               window.location.href = url;
             }}
-            className="relative z-10 mx-auto flex flex-col sm:flex-row items-stretch gap-3 p-4 max-w-2xl rounded-[24px] border-2 border-fyn-beige/25 shadow-[0_20px_60px_rgba(0,0,0,0.3)]"
-            style={{
-              background: "rgba(244,237,218,0.08)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-            }}
+            className="relative z-10 mx-auto flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 max-w-2xl"
           >
             <input
               type="email"
@@ -449,14 +478,39 @@ export default function PricingPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="flex-1 bg-transparent border-0 outline-none px-6 py-4 font-body text-base text-fyn-beige placeholder:text-fyn-beige/50"
+              className="flex-1 outline-none font-body"
+              style={{
+                background: "rgba(244,237,218,0.12)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "2px solid rgba(244,237,218,0.25)",
+                borderRadius: 24,
+                padding: "20px 28px",
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: 16,
+                color: "#F4EDDA",
+              }}
             />
             <motion.button
               whileHover={{ y: -2, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="font-button font-bold uppercase tracking-wide text-white px-10 py-4 rounded-[18px] shadow-[0_8px_24px_rgba(196,30,30,0.4)] transition-shadow"
-              style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+              className="font-button"
+              style={{
+                background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)",
+                color: "#FFFFFF",
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 700,
+                fontSize: 16,
+                textTransform: "uppercase",
+                letterSpacing: "1.2px",
+                padding: "20px 48px",
+                borderRadius: 24,
+                border: "none",
+                boxShadow: "0 8px 24px rgba(196,30,30,0.4)",
+                cursor: "pointer",
+              }}
             >
               Join Waitlist
             </motion.button>
