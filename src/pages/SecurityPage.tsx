@@ -350,23 +350,23 @@ const SecurityPage = () => {
                   letterSpacing: "0.5px",
                   padding: "18px 40px",
                   borderRadius: 16,
-                  background: "rgba(139,105,20,0.25)",
-                  border: `2px solid ${GOLD}`,
+                  background: "rgba(139,105,20,0.3)",
+                  border: "2px solid rgba(139,105,20,1)",
                   color: "#FFFFFF",
                   backdropFilter: "blur(8px)",
                   WebkitBackdropFilter: "blur(8px)",
-                  boxShadow: "0 4px 16px rgba(139,105,20,0.3)",
+                  boxShadow: "0 6px 20px rgba(139,105,20,0.35)",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = GOLD;
+                  e.currentTarget.style.background = "rgba(139,105,20,0.9)";
                   e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(139,105,20,0.5)";
+                  e.currentTarget.style.boxShadow = "0 10px 32px rgba(139,105,20,0.55)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(139,105,20,0.25)";
+                  e.currentTarget.style.background = "rgba(139,105,20,0.3)";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,105,20,0.3)";
+                  e.currentTarget.style.boxShadow = "0 6px 20px rgba(139,105,20,0.35)";
                 }}
               >
                 View Security Whitepaper
