@@ -509,9 +509,9 @@ const SecurityPage = () => {
             .security-mockup-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
             .security-badges {
               top: auto;
-              right: 50%;
+              left: 50%;
               bottom: 32px;
-              transform: translateX(50%);
+              transform: translateX(-50%);
               flex-direction: row;
               gap: 12px;
             }
