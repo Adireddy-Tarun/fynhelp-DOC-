@@ -437,12 +437,9 @@ export default function PricingPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-button"
+            className="font-button font-semibold text-base md:text-lg mb-10 text-primary-foreground"
             style={{
-              fontWeight: 600,
               fontSize: "clamp(16px, 1.4vw, 18px)",
-              color: "#8B6914",
-              marginBottom: 48,
             }}
           >
             Start your{" "}
