@@ -641,10 +641,8 @@ export default function PricingPage() {
           >
             <Coins className="h-7 w-7 shrink-0" style={{ color: "#FFFFFF" }} />
             <span
+              className="font-semibold text-lg font-sans md:text-4xl"
               style={{
-                fontFamily: "'Raleway', sans-serif",
-                fontWeight: 600,
-                fontSize: "clamp(16px, 1.6vw, 22px)",
                 color: "#FFFFFF",
                 lineHeight: 1.4,
                 letterSpacing: "0.3px",
