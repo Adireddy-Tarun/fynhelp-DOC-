@@ -318,7 +318,7 @@ const SecurityPage = () => {
                 lineHeight: 1.15,
                 letterSpacing: "-1px",
                 marginBottom: 24,
-                textShadow: "0 4px 20px rgba(0,0,0,0.6), 0 2px 8px rgba(196,30,30,0.3)",
+                textShadow: "0 6px 24px rgba(0,0,0,0.8), 0 2px 12px rgba(196,30,30,0.4), 0 0 60px rgba(139,105,20,0.3)",
               }}
             >
               How We Protect Your Financial Data
