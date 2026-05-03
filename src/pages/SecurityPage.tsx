@@ -333,7 +333,7 @@ const SecurityPage = () => {
                 lineHeight: 1.7,
                 maxWidth: 750,
                 margin: "0 auto 40px",
-                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
+                textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 0 40px rgba(139,105,20,0.2)",
               }}
             >
               Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
