@@ -288,7 +288,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
 
 const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
   <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
-    <div style={{ fontSize: 32, color: GOLD, marginBottom: 12 }}>📖</div>
+    <div style={{ marginBottom: 12 }}><FYNIcon name="glossary" size={36} /></div>
     <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: INK, marginBottom: 8 }}>
       {c.title}
     </h3>
