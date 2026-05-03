@@ -84,6 +84,7 @@ const STOPS: Stop[] = [
   },
 ];
 const SUMMIT = { x: 624, y: 120 };
+const START_POINT = { x: 600, y: 870 };
 
 // Mountain center band where the path "disappears" behind the peak.
 const HIDE_X1 = 540;
