@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Search } from "lucide-react";
+import FYNIcon, { type FYNIconName } from "@/components/FYNIcon";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const downloadHref = (id: string) =>
@@ -200,7 +201,7 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
         {c.title}
       </h3>
       <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", display: "flex", alignItems: "center", gap: 8 }}>
-        <span>📹</span> {c.duration}
+        <FYNIcon name="video" size={16} animated={false} /> {c.duration}
       </div>
     </div>
   </article>
@@ -217,7 +218,7 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
         justifyContent: "center",
       }}
     >
-      <span style={{ fontSize: 48 }}>✍️</span>
+      <FYNIcon name="blog" size={64} />
     </div>
     <div style={{ padding: 20 }}>
       <CategoryBadge>Blog</CategoryBadge>
@@ -249,7 +250,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
       {c.icon ? (
         <img src={c.icon} alt="" style={{ width: 64, height: 64 }} />
       ) : (
-        <span style={{ fontSize: 56, color: GOLD }}>📊</span>
+        <FYNIcon name="template" size={64} />
       )}
     </div>
     <div style={{ padding: 20 }}>
@@ -287,7 +288,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
 
 const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
   <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
-    <div style={{ fontSize: 32, color: GOLD, marginBottom: 12 }}>📖</div>
+    <div style={{ marginBottom: 12 }}><FYNIcon name="glossary" size={36} /></div>
     <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: INK, marginBottom: 8 }}>
       {c.title}
     </h3>
@@ -341,7 +342,7 @@ const CommunityCardView = ({ c }: { c: CommunityCard }) => (
       {c.preview}
     </p>
     <div style={{ display: "flex", gap: 12, fontFamily: "Roboto, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.5)" }}>
-      <span>💬 {c.replies} replies</span>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><FYNIcon name="discussion" size={14} animated={false} /> {c.replies} replies</span>
       <span>🕒 {c.ago}</span>
     </div>
   </article>
@@ -364,20 +365,20 @@ const SkeletonCard = () => (
 // ============================================================
 // TABS / FILTERS CONFIG
 // ============================================================
-const TABS: { key: "all" | Category; label: string }[] = [
+const TABS: { key: "all" | Category; label: string; icon?: FYNIconName }[] = [
   { key: "all", label: "All" },
-  { key: "getting-started", label: "📚 Getting Started" },
-  { key: "templates", label: "📄 Templates" },
-  { key: "glossary", label: "📖 Glossary" },
-  { key: "blog", label: "✍️ Blog" },
-  { key: "community", label: "👥 Community" },
+  { key: "getting-started", label: "Getting Started", icon: "getting-started" },
+  { key: "templates", label: "Templates", icon: "templates" },
+  { key: "glossary", label: "Glossary", icon: "glossary" },
+  { key: "blog", label: "Blog", icon: "blog" },
+  { key: "community", label: "Community", icon: "community" },
 ];
 
-const FILTERS: { key: ContentType; label: string }[] = [
-  { key: "video", label: "📹 Video" },
-  { key: "article", label: "📄 Article" },
-  { key: "template", label: "📊 Template" },
-  { key: "community", label: "💬 Discussion" },
+const FILTERS: { key: ContentType; label: string; icon: FYNIconName }[] = [
+  { key: "video", label: "Video", icon: "video" },
+  { key: "article", label: "Article", icon: "article" },
+  { key: "template", label: "Template", icon: "template" },
+  { key: "community", label: "Discussion", icon: "discussion" },
 ];
 
 // ============================================================
@@ -692,7 +693,10 @@ const ResourcesPage = () => {
                   }}
                   aria-pressed={isActive}
                 >
-                  {t.label}
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    {t.icon && <FYNIcon name={t.icon} size={20} animated={false} />}
+                    {t.label}
+                  </span>
                 </button>
               );
             })}
@@ -783,7 +787,10 @@ const ResourcesPage = () => {
                       }
                     }}
                   >
-                    {f.label}
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <FYNIcon name={f.icon} size={16} animated={false} />
+                      {f.label}
+                    </span>
                   </button>
                 );
               })}

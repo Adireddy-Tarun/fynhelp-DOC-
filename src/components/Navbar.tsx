@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
+import FYNIcon, { type FYNIconName } from "./FYNIcon";
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
@@ -10,12 +11,12 @@ const navLinks = [
   { label: "About", href: "/about" },
 ];
 
-const resourceItems = [
-  { icon: "📚", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
-  { icon: "📄", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
-  { icon: "📖", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
-  { icon: "✍️", label: "Blog", desc: "Insights & updates", tab: "blog" },
-  { icon: "👥", label: "Community", desc: "Q&A & discussions", tab: "community" },
+const resourceItems: { icon: FYNIconName; label: string; desc: string; tab: string }[] = [
+  { icon: "getting-started", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
+  { icon: "templates", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
+  { icon: "glossary", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
+  { icon: "blog", label: "Blog", desc: "Insights & updates", tab: "blog" },
+  { icon: "community", label: "Community", desc: "Q&A & discussions", tab: "community" },
 ];
 
 const Navbar = () => {
@@ -160,9 +161,9 @@ const Navbar = () => {
                         >
                           <span
                             className="transition-transform duration-200 group-hover:scale-110"
-                            style={{ fontSize: 28, lineHeight: 1 }}
+                            style={{ display: "inline-flex" }}
                           >
-                            {item.icon}
+                            <FYNIcon name={item.icon} size={32} animated={false} />
                           </span>
                           <span className="flex flex-col">
                             <span
@@ -290,7 +291,7 @@ const Navbar = () => {
                     onClick={() => setMobileOpen(false)}
                     className="text-white/70 hover:text-white text-sm py-2.5 flex items-center gap-3"
                   >
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <FYNIcon name={item.icon} size={24} animated={false} />
                     <span>{item.label}</span>
                   </Link>
                 ))}
