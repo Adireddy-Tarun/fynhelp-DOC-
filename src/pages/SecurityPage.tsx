@@ -480,7 +480,7 @@ const SecurityPage = () => {
           }
           @keyframes securitySlideRight {
             0% { transform: translateX(0); }
-            100% { transform: translateX(200vw); }
+            100% { transform: translateX(300vw); }
           }
           @keyframes badgeFloat {
             0%, 100% { transform: translateY(0); }
