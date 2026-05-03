@@ -248,19 +248,19 @@ const SecurityPage = () => {
               <div
                 key={m.label}
                 style={{
-                  background: "rgba(26,16,8,0.6)",
+                  background: "rgba(26,16,8,0.8)",
                   borderRadius: 16,
-                  padding: "20px 24px",
-                  border: "1px solid rgba(139,105,20,0.2)",
+                  padding: "22px 26px",
+                  border: "1px solid rgba(139,105,20,0.25)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 16,
+                  gap: 18,
                 }}
               >
-                <div style={{ fontSize: 32 }}>{m.icon}</div>
+                <div style={{ fontSize: 40, lineHeight: 1 }}>{m.icon}</div>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <span style={{ fontFamily: "'Roboto'", fontSize: 14, color: "rgba(244,237,218,0.7)" }}>{m.label}</span>
-                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 18, color: GOLD }}>{m.value}</span>
+                  <span style={{ fontFamily: "'Roboto'", fontSize: 17, color: "rgba(244,237,218,0.8)" }}>{m.label}</span>
+                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 700, fontSize: 22, color: "rgba(139,105,20,1)" }}>{m.value}</span>
                 </div>
               </div>
             ))}
