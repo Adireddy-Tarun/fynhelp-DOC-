@@ -365,20 +365,20 @@ const SkeletonCard = () => (
 // ============================================================
 // TABS / FILTERS CONFIG
 // ============================================================
-const TABS: { key: "all" | Category; label: string }[] = [
+const TABS: { key: "all" | Category; label: string; icon?: FYNIconName }[] = [
   { key: "all", label: "All" },
-  { key: "getting-started", label: "📚 Getting Started" },
-  { key: "templates", label: "📄 Templates" },
-  { key: "glossary", label: "📖 Glossary" },
-  { key: "blog", label: "✍️ Blog" },
-  { key: "community", label: "👥 Community" },
+  { key: "getting-started", label: "Getting Started", icon: "getting-started" },
+  { key: "templates", label: "Templates", icon: "templates" },
+  { key: "glossary", label: "Glossary", icon: "glossary" },
+  { key: "blog", label: "Blog", icon: "blog" },
+  { key: "community", label: "Community", icon: "community" },
 ];
 
-const FILTERS: { key: ContentType; label: string }[] = [
-  { key: "video", label: "📹 Video" },
-  { key: "article", label: "📄 Article" },
-  { key: "template", label: "📊 Template" },
-  { key: "community", label: "💬 Discussion" },
+const FILTERS: { key: ContentType; label: string; icon: FYNIconName }[] = [
+  { key: "video", label: "Video", icon: "video" },
+  { key: "article", label: "Article", icon: "article" },
+  { key: "template", label: "Template", icon: "template" },
+  { key: "community", label: "Discussion", icon: "discussion" },
 ];
 
 // ============================================================
