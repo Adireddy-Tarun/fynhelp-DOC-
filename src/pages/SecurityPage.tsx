@@ -796,8 +796,8 @@ const SecurityPage = () => {
           100% { transform: translateY(-120vh) translateX(20px); opacity: 0; }
         }
         @keyframes fynShieldPulse {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139,105,20,0.5); }
-          50% { transform: scale(1.05); box-shadow: 0 0 40px 8px rgba(139,105,20,0.2); }
+          0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3); }
+          50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(139,105,20,0.8), 0 0 120px rgba(196,30,30,0.45); }
         }
       `}</style>
     </Layout>
