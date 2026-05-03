@@ -288,11 +288,29 @@ const Roadmap: React.FC = () => {
             </g>
           </g>
 
-          {/* Background mountains */}
+          {/* Atmospheric haze layer (depth) */}
+          <g opacity="0.5">
+            <rect x="0" y="380" width={VBW} height="240" fill="url(#hazeGrad)" />
+          </g>
+
+          {/* Far distant mountains (deepest, most faded) */}
+          <g opacity="0.22">
+            <polygon points="-50,860 180,560 420,860" fill="#A8B5C8" />
+            <polygon points="320,860 560,500 800,860" fill="#9AA8BC" />
+            <polygon points="700,860 940,540 1180,860" fill="#A8B5C8" />
+            <polygon points="1000,860 1200,600 1260,860" fill="#94A2B8" />
+          </g>
+
+          {/* Mid-distance mountains */}
+          <g opacity="0.42">
+            <polygon points="0,870 220,640 440,870" fill="#B8BCB8" />
+            <polygon points="380,870 600,580 820,870" fill="#A8AEAC" />
+            <polygon points="780,870 1000,620 1200,870" fill="#B0B6B2" />
+          </g>
+
+          {/* Forest tree-line silhouette across mid distance */}
           <g opacity="0.35">
-            <polygon points="0,900 220,640 440,900" fill="#C5BFB5" />
-            <polygon points="380,900 600,580 820,900" fill="#B8B2A8" />
-            <polygon points="780,900 1000,620 1200,900" fill="#C5BFB5" />
+            <path d="M 0 855 Q 80 845 160 852 T 320 850 T 480 855 T 640 848 T 800 853 T 960 850 T 1120 855 T 1200 852 L 1200 875 L 0 875 Z" fill="#5A6B58" />
           </g>
 
           {/* Main mountain — many low-poly facets (base extended down to ground) */}
