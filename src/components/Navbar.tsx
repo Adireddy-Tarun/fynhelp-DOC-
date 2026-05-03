@@ -161,9 +161,9 @@ const Navbar = () => {
                         >
                           <span
                             className="transition-transform duration-200 group-hover:scale-110"
-                            style={{ fontSize: 28, lineHeight: 1 }}
+                            style={{ display: "inline-flex" }}
                           >
-                            {item.icon}
+                            <FYNIcon name={item.icon} size={32} animated={false} />
                           </span>
                           <span className="flex flex-col">
                             <span
