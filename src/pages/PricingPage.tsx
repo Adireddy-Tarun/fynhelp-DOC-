@@ -4,6 +4,8 @@ import { motion, useInView, useMotionValue, useTransform, animate } from "framer
 import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /* ================================================================
    FYNHelp Pricing Page — brand palette only
@@ -868,11 +870,19 @@ function Cell({ value }: { value: string | boolean }) {
 
 function EngagementPopup() {
   const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
 
+  // 3-minute trigger, once per session, skip if very small screens
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem("pricing_popup_shown")) return;
+    if (window.innerWidth < 500) return;
     const t = setTimeout(() => {
       setOpen(true);
       sessionStorage.setItem("pricing_popup_shown", "true");
@@ -880,6 +890,7 @@ function EngagementPopup() {
     return () => clearTimeout(t);
   }, []);
 
+  // ESC + body scroll lock + focus
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -895,6 +906,56 @@ function EngagementPopup() {
     };
   }, [open]);
 
+  // Auto-close 3s after success
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => setOpen(false), 3000);
+    return () => clearTimeout(t);
+  }, [done]);
+
+  const validatePhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, "");
+    const local = digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits;
+    if (local.length !== 10 || !/^[6-9]/.test(local)) return null;
+    return local;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const local = validatePhone(phone);
+    if (!local) {
+      setError("Please enter a valid 10-digit Indian mobile number.");
+      phoneInputRef.current?.focus();
+      return;
+    }
+    if (name.trim().length > 100) {
+      setError("Name is too long.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const payload = {
+        phone: local,
+        name: name.trim() || null,
+        source: "pricing_popup",
+        ...(user?.id ? { user_id: user.id } : {}),
+      };
+      const { error: insertError } = await supabase
+        .from("callback_requests")
+        .insert(payload);
+      if (insertError) throw insertError;
+      toast.success("Callback scheduled ✓");
+      setDone(`+91 ${local.slice(0, 5)} ${local.slice(5)}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not submit. Please try again.";
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -902,16 +963,12 @@ function EngagementPopup() {
       <style>{`
         @keyframes fynPopupBackdrop { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fynPopupIn {
-          from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-          to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-        @keyframes fynPopupBlob {
-          0%, 100% { transform: translate(0,0) scale(1) rotate(0deg); }
-          50%      { transform: translate(20px,-30px) scale(1.15) rotate(180deg); }
+          from { opacity: 0; transform: translate(-50%, calc(-50% + 24px)); }
+          to   { opacity: 1; transform: translate(-50%, -50%); }
         }
         .fyn-popup-backdrop {
           position: fixed; inset: 0; z-index: 9999;
-          background: rgba(26,16,8,0.85);
+          background: rgba(26,16,8,0.7);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           animation: fynPopupBackdrop 300ms ease-out;
@@ -919,70 +976,113 @@ function EngagementPopup() {
         .fyn-popup {
           position: fixed; top: 50%; left: 50%;
           transform: translate(-50%, -50%);
-          width: min(700px, 90vw);
-          max-height: 80vh;
-          background: linear-gradient(135deg, #C41E1E 0%, #8B6914 100%);
-          border-radius: 32px;
-          overflow: hidden;
-          box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+          width: min(900px, 95vw);
+          max-height: 92vh;
+          overflow-y: auto;
+          background:
+            linear-gradient(135deg,
+              #1A1008 0%,
+              rgba(26,16,8,0.95) 40%,
+              rgba(196,30,30,0.30) 70%,
+              rgba(139,105,20,0.30) 100%);
+          border-radius: 28px;
+          box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(244,237,218,0.08);
           animation: fynPopupIn 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
           z-index: 10000;
         }
         .fyn-popup-close {
           position: absolute; top: 20px; right: 20px;
-          width: 40px; height: 40px;
-          background: rgba(26,16,8,0.3);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(255,255,255,0.2);
+          width: 44px; height: 44px;
+          background: rgba(255,255,255,0.10);
+          border: 1px solid rgba(244,237,218,0.18);
           border-radius: 50%;
-          color: #fff;
-          font-size: 20px;
-          cursor: pointer;
-          z-index: 10;
+          color: #FFFFFF;
+          font-size: 22px; line-height: 1;
+          cursor: pointer; z-index: 10;
           display: inline-flex; align-items: center; justify-content: center;
-          transition: all 0.3s ease;
+          transition: background 0.25s ease, transform 0.3s ease;
         }
         .fyn-popup-close:hover {
-          background: rgba(26,16,8,0.5);
+          background: rgba(196,30,30,0.85);
           transform: rotate(90deg);
         }
         .fyn-popup-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          min-height: 400px;
+          grid-template-columns: 1.2fr 1fr;
+          gap: 40px;
+          padding: 48px 56px;
         }
-        @media (max-width: 768px) {
-          .fyn-popup-grid { grid-template-columns: 1fr; }
-          .fyn-popup-image { height: 250px !important; }
+        .fyn-popup-input {
+          flex: 1 1 240px;
+          min-width: 0;
+          height: 54px;
+          background: rgba(255,255,255,0.12);
+          border: 1px solid rgba(244,237,218,0.30);
+          border-radius: 12px;
+          padding: 0 20px;
+          font-family: 'Roboto', sans-serif;
+          font-size: 16px;
+          color: #FFFFFF;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .fyn-popup-input::placeholder { color: rgba(244,237,218,0.5); }
+        .fyn-popup-input:focus {
+          border: 2px solid #8B6914;
+          background: rgba(255,255,255,0.16);
+          box-shadow: 0 0 0 4px rgba(139,105,20,0.15);
+          padding: 0 19px;
         }
         .fyn-popup-cta {
-          background: #FFFFFF;
-          color: #C41E1E;
+          height: 54px;
+          padding: 0 36px;
+          background: linear-gradient(135deg, #C41E1E 0%, #8B6914 100%);
+          color: #FFFFFF;
           font-family: 'DM Sans', sans-serif;
           font-weight: 700;
           font-size: 16px;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
           text-transform: uppercase;
-          padding: 18px 40px;
-          border-radius: 16px;
           border: none;
+          border-radius: 12px;
           cursor: pointer;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          align-self: flex-start;
+          box-shadow: 0 8px 24px rgba(196,30,30,0.4);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          white-space: nowrap;
         }
-        .fyn-popup-cta:hover {
-          background: #F4EDDA;
-          color: #1A1008;
-          transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+        .fyn-popup-cta:hover:not(:disabled) {
+          background: linear-gradient(135deg, #991B1B 0%, #6B4E10 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(196,30,30,0.55);
         }
-        .fyn-popup-cta:active { transform: scale(0.98); }
-        .fyn-popup-blob {
-          position: absolute;
-          border-radius: 9999px;
-          filter: blur(60px);
-          animation: fynPopupBlob 15s ease-in-out infinite;
+        .fyn-popup-cta:disabled { opacity: 0.7; cursor: not-allowed; }
+        .fyn-stat-card {
+          background: rgba(255,255,255,0.10);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(244,237,218,0.12);
+          border-radius: 16px;
+          padding: 14px 18px;
+          display: flex; align-items: center; gap: 14px;
+        }
+        .fyn-stat-icon {
+          width: 40px; height: 40px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(139,105,20,0.35), rgba(196,30,30,0.25));
+          display: inline-flex; align-items: center; justify-content: center;
+          color: #F4EDDA;
+          flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+          .fyn-popup-grid {
+            grid-template-columns: 1fr;
+            gap: 28px;
+            padding: 36px 28px;
+          }
+          .fyn-popup-headline { font-size: 32px !important; }
+          .fyn-popup-form { flex-direction: column !important; }
+          .fyn-popup-cta, .fyn-popup-input { width: 100% !important; }
+          .fyn-popup-right { order: 2; }
         }
       `}</style>
 
@@ -995,7 +1095,7 @@ function EngagementPopup() {
         className="fyn-popup"
         role="dialog"
         aria-modal="true"
-        aria-label="Can't find what you're looking for?"
+        aria-labelledby="fyn-popup-title"
         aria-describedby="fyn-popup-desc"
         onClick={(e) => e.stopPropagation()}
       >
@@ -1010,95 +1110,200 @@ function EngagementPopup() {
         </button>
 
         <div className="fyn-popup-grid">
-          {/* LEFT - text */}
-          <div
-            style={{
-              padding: "60px 48px 60px 60px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
+          {/* LEFT — text + form */}
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <h2
+              id="fyn-popup-title"
+              className="fyn-popup-headline"
               style={{
                 fontFamily: "'Oswald', sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(28px, 4vw, 42px)",
-                lineHeight: 1.2,
+                fontSize: 42,
+                lineHeight: 1.15,
                 letterSpacing: "-0.5px",
                 color: "#FFFFFF",
-                marginBottom: 20,
-                textShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                marginBottom: 16,
+                textShadow: "0 2px 12px rgba(0,0,0,0.3)",
               }}
             >
-              Can't find what you're looking for?
+              Need help choosing the right plan?
             </h2>
             <p
               id="fyn-popup-desc"
               style={{
                 fontFamily: "'Raleway', sans-serif",
-                fontWeight: 500,
-                fontSize: "clamp(16px, 1.4vw, 18px)",
+                fontWeight: 400,
+                fontSize: 18,
                 lineHeight: 1.6,
-                color: "rgba(255,255,255,0.95)",
-                marginBottom: 32,
-                textShadow: "0 1px 4px rgba(0,0,0,0.15)",
+                color: "rgba(244,237,218,0.95)",
+                marginBottom: 12,
               }}
             >
-              Let us know what you need — we're happy to help!
+              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Nidhi</strong> — real founders, not sales reps. Honest advice on what'll work for your business.
             </p>
-            <a
-              href="mailto:hello@fynhelp.com?subject=Callback%20Request"
-              className="fyn-popup-cta"
-              style={{ textDecoration: "none", display: "inline-block", textAlign: "center" }}
-              onClick={() => setOpen(false)}
+            <p
+              style={{
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 500,
+                fontSize: 15,
+                color: "#D6A93B",
+                marginBottom: 28,
+                display: "flex", alignItems: "center", gap: 8,
+              }}
             >
-              Request a callback
-            </a>
+              <span
+                aria-hidden
+                style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 22, height: 22, borderRadius: "50%",
+                  background: "rgba(139,105,20,0.25)", color: "#F4EDDA",
+                  fontSize: 13, fontWeight: 700,
+                }}
+              >✓</span>
+              Join 200+ Indian founders who chose FynHelp after a free chat.
+            </p>
+
+            {done ? (
+              <div
+                role="status"
+                style={{
+                  background: "rgba(244,237,218,0.10)",
+                  border: "1px solid rgba(139,105,20,0.5)",
+                  borderRadius: 14,
+                  padding: "20px 22px",
+                  color: "#F4EDDA",
+                  fontFamily: "'Raleway', sans-serif",
+                  fontSize: 16,
+                  lineHeight: 1.5,
+                  animation: "fade-in 300ms ease-out",
+                }}
+              >
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, marginBottom: 6, color: "#FFFFFF" }}>
+                  ✓ Got it!
+                </div>
+                We'll call you at <strong>{done}</strong> within 2 hours.
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="fyn-popup-form"
+                style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "stretch" }}
+              >
+                <input
+                  ref={phoneInputRef}
+                  className="fyn-popup-input"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  required
+                  maxLength={15}
+                  placeholder="Your phone number"
+                  aria-label="Phone number"
+                  value={phone}
+                  onChange={(e) => { setPhone(e.target.value); if (error) setError(null); }}
+                  style={{ width: 240 }}
+                />
+                <button
+                  type="submit"
+                  className="fyn-popup-cta"
+                  disabled={submitting}
+                >
+                  {submitting ? "Scheduling…" : "Call me back"}
+                </button>
+              </form>
+            )}
+
+            {error && !done && (
+              <p
+                role="alert"
+                style={{
+                  marginTop: 12,
+                  fontFamily: "'Roboto', sans-serif",
+                  fontSize: 14,
+                  color: "#FCA5A5",
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            {!done && (
+              <p
+                style={{
+                  marginTop: 16,
+                  fontFamily: "'Roboto', sans-serif",
+                  fontSize: 13,
+                  color: "rgba(244,237,218,0.7)",
+                  lineHeight: 1.5,
+                }}
+              >
+                We'll call you within 2 hours during business hours (9 AM – 7 PM IST).
+              </p>
+            )}
           </div>
 
-          {/* RIGHT - decorative panel */}
+          {/* RIGHT — stats panel */}
           <div
-            className="fyn-popup-image"
+            className="fyn-popup-right"
             style={{
-              background: "rgba(26,16,8,0.15)",
-              position: "relative",
-              overflow: "hidden",
-              minHeight: 400,
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
               justifyContent: "center",
+              gap: 12,
             }}
           >
-            <span
-              className="fyn-popup-blob"
-              style={{ width: 320, height: 320, top: "-60px", right: "-80px", background: "rgba(139,105,20,0.45)" }}
-            />
-            <span
-              className="fyn-popup-blob"
-              style={{ width: 260, height: 260, bottom: "-60px", left: "-60px", background: "rgba(196,30,30,0.45)", animationDelay: "-5s" }}
-            />
-            <span
-              className="fyn-popup-blob"
-              style={{ width: 180, height: 180, top: "40%", left: "30%", background: "rgba(244,237,218,0.25)", animationDelay: "-9s" }}
-            />
-            <div
-              style={{
-                position: "relative",
-                zIndex: 2,
-                width: 140,
-                height: 140,
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05))",
-                border: "2px solid rgba(255,255,255,0.35)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <FYNIcon name="callback" size={88} title="Request a callback" />
+            <div className="fyn-stat-card">
+              <span className="fyn-stat-icon" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2 L4 14 H12 L11 22 L20 10 H12 Z" />
+                </svg>
+              </span>
+              <div>
+                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
+                  &lt; 2 hours
+                </div>
+                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
+                  Average callback time
+                </div>
+              </div>
+            </div>
+
+            <div className="fyn-stat-card">
+              <span className="fyn-stat-icon" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12 L10 17 L19 7" />
+                </svg>
+              </span>
+              <div>
+                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
+                  94%
+                </div>
+                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
+                  Find the right plan on first call
+                </div>
+              </div>
+            </div>
+
+            <div className="fyn-stat-card">
+              <span className="fyn-stat-icon" aria-hidden>
+                {/* Mini India outline */}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
+                  <path d="M7 3 L17 4 L19 9 L17 12 L19 15 L15 18 L13 22 L11 18 L9 17 L6 14 L8 11 L5 8 Z" />
+                </svg>
+              </span>
+              <div>
+                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
+                  100%
+                </div>
+                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
+                  India-based founders, not a call centre
+                </div>
+              </div>
+            </div>
+
+            {/* Subtle FYN callback icon as bottom anchor */}
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 8, opacity: 0.85 }}>
+              <FYNIcon name="callback" size={56} animated={false} title="Callback" />
             </div>
           </div>
         </div>
@@ -1106,3 +1311,4 @@ function EngagementPopup() {
     </>
   );
 }
+
