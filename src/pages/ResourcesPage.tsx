@@ -183,7 +183,7 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
   <article style={cardBase} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave} onClick={onClick}>
     <div
       style={{
-        height: 200,
+        height: 220,
         background: "linear-gradient(135deg, rgba(139,105,20,0.2) 0%, rgba(196,30,30,0.2) 100%)",
         position: "relative",
       }}
@@ -209,9 +209,9 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
         </svg>
       </div>
     </div>
-    <div style={{ padding: 20 }}>
-      <CategoryBadge>{c.step}</CategoryBadge>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 12 }}>
+    <div style={{ padding: 24 }}>
+      <CategoryBadge iconName="getting-started">{c.step}</CategoryBadge>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, lineHeight: 1.4, marginBottom: 12 }}>
         {c.title}
       </h3>
       <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", display: "flex", alignItems: "center", gap: 8 }}>
@@ -225,7 +225,7 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
   <article style={cardBase} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div
       style={{
-        height: 180,
+        height: 200,
         background: "linear-gradient(135deg, rgba(196,30,30,0.18) 0%, rgba(139,105,20,0.25) 100%)",
         display: "flex",
         alignItems: "center",
@@ -234,9 +234,9 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
     >
       <FYNIcon name="blog" size={64} />
     </div>
-    <div style={{ padding: 20 }}>
-      <CategoryBadge>Blog</CategoryBadge>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
+    <div style={{ padding: 24 }}>
+      <CategoryBadge iconName="blog">Blog</CategoryBadge>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
         {c.title}
       </h3>
       <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.7)", lineHeight: 1.6, marginBottom: 12 }}>
@@ -267,8 +267,8 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
         <FYNIcon name="template" size={64} />
       )}
     </div>
-    <div style={{ padding: 20 }}>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, textAlign: "center", marginBottom: 10 }}>
+    <div style={{ padding: 24 }}>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, textAlign: "center", marginBottom: 10 }}>
         {c.title}
       </h3>
       <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", textAlign: "center", marginBottom: 16 }}>
@@ -301,7 +301,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
 );
 
 const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
-  <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
+  <article style={{ ...cardBase, padding: 28 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div style={{ marginBottom: 12 }}><FYNIcon name="glossary" size={36} /></div>
     <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: INK, marginBottom: 8 }}>
       {c.title}
@@ -326,7 +326,7 @@ const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
 );
 
 const CommunityCardView = ({ c }: { c: CommunityCard }) => (
-  <article style={{ ...cardBase, padding: 20 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
+  <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
       <div
         style={{
@@ -349,7 +349,7 @@ const CommunityCardView = ({ c }: { c: CommunityCard }) => (
         {c.author}
       </span>
     </div>
-    <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 17, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
+    <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
       {c.title}
     </h3>
     <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", lineHeight: 1.5, marginBottom: 12 }}>
