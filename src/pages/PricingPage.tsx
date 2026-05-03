@@ -881,10 +881,12 @@ function EngagementPopup() {
   // 3-minute trigger, once per session, skip if very small screens
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("pricing_popup_shown")) return;
     if (window.innerWidth < 500) return;
     const t = setTimeout(() => {
       setOpen(true);
-    }, 300);
+      sessionStorage.setItem("pricing_popup_shown", "true");
+    }, 180000);
     return () => clearTimeout(t);
   }, []);
 
