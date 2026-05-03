@@ -124,7 +124,8 @@ const cardBase: React.CSSProperties = {
   background: "#FFFFFF",
   borderRadius: 20,
   border: "1px solid rgba(26,16,8,0.08)",
-  boxShadow: "0 4px 16px rgba(26,16,8,0.06)",
+  boxShadow:
+    "0 6px 20px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.06)",
   overflow: "hidden",
   cursor: "pointer",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -135,32 +136,45 @@ const cardBase: React.CSSProperties = {
 const onCardEnter = (e: React.MouseEvent<HTMLElement>) => {
   const el = e.currentTarget as HTMLElement;
   el.style.transform = "translateY(-4px)";
-  el.style.boxShadow = "0 12px 32px rgba(26,16,8,0.12)";
+  el.style.boxShadow =
+    "0 16px 40px rgba(26,16,8,0.16), 0 4px 12px rgba(139,105,20,0.12)";
   el.style.border = "1px solid rgba(139,105,20,0.3)";
 };
 const onCardLeave = (e: React.MouseEvent<HTMLElement>) => {
   const el = e.currentTarget as HTMLElement;
   el.style.transform = "";
-  el.style.boxShadow = "0 4px 16px rgba(26,16,8,0.06)";
+  el.style.boxShadow =
+    "0 6px 20px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.06)";
   el.style.border = "1px solid rgba(26,16,8,0.08)";
 };
 
-const CategoryBadge = ({ children }: { children: React.ReactNode }) => (
+const CategoryBadge = ({
+  children,
+  iconName,
+}: {
+  children: React.ReactNode;
+  iconName?: FYNIconName;
+}) => (
   <span
     style={{
       fontFamily: "'DM Sans', sans-serif",
       fontWeight: 700,
-      fontSize: 11,
+      fontSize: 12,
       textTransform: "uppercase",
       letterSpacing: 1,
       color: GOLD,
       background: "rgba(139,105,20,0.12)",
-      padding: "6px 12px",
-      borderRadius: 6,
-      display: "inline-block",
+      padding: "8px 14px",
+      borderRadius: 8,
+      height: 28,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
       marginBottom: 12,
+      lineHeight: 1,
     }}
   >
+    {iconName && <FYNIcon name={iconName} size={16} animated={false} />}
     {children}
   </span>
 );
