@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Shield } from "lucide-react";
 
 const navLinks = [
   { label: "Pricing", href: "/pricing" },
