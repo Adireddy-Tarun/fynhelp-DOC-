@@ -316,14 +316,15 @@ const SecurityPage = () => {
             <div
               className="flex items-center justify-center rounded-full"
               style={{
-                width: 120,
-                height: 120,
-                border: `2px solid ${GOLD}`,
-                background: "rgba(139,105,20,0.08)",
+                width: 140,
+                height: 140,
+                border: `3px solid ${RED}`,
+                background: `linear-gradient(135deg, ${GOLD} 0%, rgba(139,105,20,0.7) 100%)`,
+                boxShadow: "0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3)",
                 animation: "fynShieldPulse 3s ease-in-out infinite",
               }}
             >
-              <Shield size={56} color={GOLD} strokeWidth={1.5} />
+              <Shield size={68} color="#FFFFFF" strokeWidth={2} fill="rgba(255,255,255,0.15)" />
             </div>
           </motion.div>
         </div>
