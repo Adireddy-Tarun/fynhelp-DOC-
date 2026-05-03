@@ -814,8 +814,14 @@ const ResourcesPage = () => {
       </div>
 
       {/* MASONRY GRID */}
-      <section style={{ background: BEIGE, padding: "60px 40px 100px" }}>
-        <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+      <section
+        style={{
+          background:
+            "repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(139,105,20,0.02) 60px, rgba(139,105,20,0.02) 61px), #F4EDDA",
+          padding: "40px 40px 60px",
+        }}
+      >
+        <div style={{ maxWidth: 1300, margin: "0 auto" }}>
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
               <div style={{ fontSize: 48, color: "rgba(26,16,8,0.3)", marginBottom: 16 }}>🔍</div>
@@ -830,8 +836,9 @@ const ResourcesPage = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 24,
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+                gridAutoRows: 10,
                 alignItems: "start",
               }}
             >
