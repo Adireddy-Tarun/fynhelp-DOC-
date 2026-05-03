@@ -291,7 +291,7 @@ const Navbar = () => {
                     onClick={() => setMobileOpen(false)}
                     className="text-white/70 hover:text-white text-sm py-2.5 flex items-center gap-3"
                   >
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <FYNIcon name={item.icon} size={24} animated={false} />
                     <span>{item.label}</span>
                   </Link>
                 ))}
