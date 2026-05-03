@@ -252,7 +252,23 @@ const Roadmap: React.FC = () => {
             <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
               <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+            <radialGradient id="oceanShine" cx="0.5" cy="0" r="0.7">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
             </radialGradient>
+
+            {/* Island silhouette path — used by both clipPath (ocean exclusion) and visual rendering */}
+            <path
+              id="islandShape"
+              d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 1010 L -20 1010 Z"
+            />
+            <clipPath id="oceanClip" clipPathUnits="userSpaceOnUse">
+              {/* Ocean rectangle MINUS island shape via even-odd fill rule */}
+              <path
+                d="M 0 820 L 1200 820 L 1200 1000 L 0 1000 Z M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 1010 L -20 1010 Z"
+                clipRule="evenodd"
+              />
+            </clipPath>
 
             {(["live", "beta", "soon"] as Status[]).map((s) => (
               <filter key={s} id={`glow-${s}`} x="-30%" y="-30%" width="160%" height="160%">
