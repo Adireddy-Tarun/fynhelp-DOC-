@@ -787,7 +787,10 @@ const ResourcesPage = () => {
                       }
                     }}
                   >
-                    {f.label}
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <FYNIcon name={f.icon} size={16} animated={false} />
+                      {f.label}
+                    </span>
                   </button>
                 );
               })}
