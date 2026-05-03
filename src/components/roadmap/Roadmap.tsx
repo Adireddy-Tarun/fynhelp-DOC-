@@ -342,21 +342,21 @@ const Roadmap: React.FC = () => {
             <path d="M 0 855 Q 80 845 160 852 T 320 850 T 480 855 T 640 848 T 800 853 T 960 850 T 1120 855 T 1200 852 L 1200 875 L 0 875 Z" fill="#5A6B58" />
           </g>
 
-          {/* Main mountain — many low-poly facets (base extended down to ground) */}
+          {/* Main mountain — sits ON the island (bases at land top y=860) */}
           <g>
             {/* base silhouette */}
-            <polygon points="180,905 624,120 1080,905" fill="url(#rockA)" />
+            <polygon points="200,862 624,120 1060,862" fill="url(#rockA)" />
             {/* shadow side (right) */}
-            <polygon points="624,120 1080,905 624,905" fill="url(#rockShadow)" opacity="0.9" />
+            <polygon points="624,120 1060,862 624,862" fill="url(#rockShadow)" opacity="0.9" />
             {/* facet planes */}
-            <polygon points="180,905 624,120 380,905" fill="url(#rockB)" opacity="0.85" />
-            <polygon points="380,905 624,120 520,905" fill="url(#rockA)" opacity="0.7" />
-            <polygon points="624,120 760,905 880,905" fill="url(#rockShadow)" opacity="0.6" />
-            <polygon points="624,120 520,905 700,905" fill="url(#rockB)" opacity="0.5" />
-            <polygon points="624,120 880,905 1080,905" fill="url(#rockShadow)" opacity="0.45" />
+            <polygon points="200,862 624,120 380,862" fill="url(#rockB)" opacity="0.85" />
+            <polygon points="380,862 624,120 520,862" fill="url(#rockA)" opacity="0.7" />
+            <polygon points="624,120 760,862 880,862" fill="url(#rockShadow)" opacity="0.6" />
+            <polygon points="624,120 520,862 700,862" fill="url(#rockB)" opacity="0.5" />
+            <polygon points="624,120 880,862 1060,862" fill="url(#rockShadow)" opacity="0.45" />
             {/* ridge lines */}
-            <polyline points="280,780 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
-            <polyline points="780,760 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="320,760 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="760,740 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
             {/* snow cap (jagged) */}
             <polygon
               points="540,260 580,210 600,225 624,120 648,225 670,210 710,260 685,275 660,255 638,275 614,255 590,275 566,255"
@@ -369,11 +369,10 @@ const Roadmap: React.FC = () => {
 
           {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,880 90,805 160,775 230,795 280,880" fill="url(#hill)" />
-            <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
-            <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
-            {/* grass strip top */}
-            <path d="M 40 880 Q 160 845 280 880 Z" fill="#8B9E6B" opacity="0.85" />
+            <polygon points="60,878 100,820 160,795 220,810 270,878" fill="url(#hill)" />
+            <polygon points="100,820 160,795 135,840" fill="#B0A488" opacity="0.7" />
+            <polygon points="160,795 220,810 195,845" fill="#9C9078" opacity="0.6" />
+            <path d="M 60 878 Q 165 855 270 878 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
           {/* Ocean (full-width water) — extends from y=820 to bottom, wraps around island */}
