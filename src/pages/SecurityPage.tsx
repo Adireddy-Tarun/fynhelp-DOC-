@@ -193,7 +193,7 @@ const SecurityPage = () => {
           minHeight: "100vh",
           paddingTop: 120,
           paddingBottom: 80,
-          background: `linear-gradient(145deg, #1A1008 0%, #1A1008 35%, rgba(26,16,8,0.96) 60%, rgba(196,30,30,0.12) 80%, rgba(139,105,20,0.12) 100%)`,
+          background: `linear-gradient(145deg, #1A1008 0%, #1A1008 40%, rgba(26,16,8,0.98) 65%, rgba(196,30,30,0.08) 85%, rgba(139,105,20,0.08) 100%)`,
         }}
         aria-label="Security overview"
       >
