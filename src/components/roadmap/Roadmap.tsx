@@ -89,44 +89,55 @@ const SUMMIT = { x: 624, y: 120 };
 const HIDE_X1 = 540;
 const HIDE_X2 = 720;
 
-/** Build a structured staircase from a→b: a sequence of step rectangles
- *  going horizontally then vertically (like a flight of stairs). */
-interface Step {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-function buildStairs(
+/** Build a smooth cubic bezier from a→b. If the segment crosses the mountain
+ *  center band, return TWO sub-paths with a gap so it looks like it goes behind. */
+function buildSegment(
   a: { x: number; y: number },
   b: { x: number; y: number },
-  stepCount = 6,
-): { steps: Step[]; treadH: number; riserW: number } {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y; // negative going up
-  const dir = dx >= 0 ? 1 : -1;
-  const treadW = Math.abs(dx) / stepCount;
-  const riser = Math.abs(dy) / stepCount;
-  const treadH = 6; // step thickness
-  const steps: Step[] = [];
-  for (let i = 0; i < stepCount; i++) {
-    // each step: horizontal tread then vertical riser
-    const x0 = a.x + dir * treadW * i;
-    const y0 = a.y - riser * (i + 1);
-    steps.push({
-      x: dir > 0 ? x0 : x0 - treadW,
-      y: y0,
-      w: treadW,
-      h: treadH,
-    });
+): string[] {
+  const midY = (a.y + b.y) / 2;
+  const c1x = a.x;
+  const c1y = midY;
+  const c2x = b.x;
+  const c2y = midY;
+  const fullPath = `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`;
+
+  // Detect if the segment crosses the mountain center band.
+  const minX = Math.min(a.x, b.x);
+  const maxX = Math.max(a.x, b.x);
+  if (maxX < HIDE_X1 || minX > HIDE_X2) return [fullPath];
+
+  // Sample along the bezier to find entry/exit t-values at HIDE_X1/HIDE_X2.
+  const sample = (t: number) => {
+    const u = 1 - t;
+    return {
+      x: u * u * u * a.x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * b.x,
+      y: u * u * u * a.y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * b.y,
+    };
+  };
+  let entryT = -1;
+  let exitT = -1;
+  const STEPS = 80;
+  let prev = sample(0);
+  for (let i = 1; i <= STEPS; i++) {
+    const t = i / STEPS;
+    const cur = sample(t);
+    const inside = (p: { x: number }) => p.x >= HIDE_X1 && p.x <= HIDE_X2;
+    if (entryT < 0 && !inside(prev) && inside(cur)) entryT = t;
+    if (entryT >= 0 && exitT < 0 && inside(prev) && !inside(cur)) exitT = t;
+    prev = cur;
   }
-  return { steps, treadH, riserW: 6 };
+  if (entryT < 0 || exitT < 0) return [fullPath];
+
+  const p1 = sample(entryT);
+  const p2 = sample(exitT);
+  return [
+    `M ${a.x} ${a.y} Q ${(a.x + p1.x) / 2} ${(a.y + p1.y) / 2 - 20}, ${p1.x} ${p1.y}`,
+    `M ${p2.x} ${p2.y} Q ${(p2.x + b.x) / 2} ${(p2.y + b.y) / 2 - 20}, ${b.x} ${b.y}`,
+  ];
 }
 
-// Path starts from the ground (bottom of island) up to first stop, then through stops.
-const GROUND_START = { x: 100, y: 905 };
 const SEGMENTS: { from: { x: number; y: number }; to: { x: number; y: number }; status: Status }[] = [
-  { from: GROUND_START, to: STOPS[0], status: "live" },
   { from: STOPS[0], to: STOPS[1], status: "live" },
   { from: STOPS[1], to: STOPS[2], status: "beta" },
   { from: STOPS[2], to: STOPS[3], status: "soon" },
@@ -388,56 +399,25 @@ const Roadmap: React.FC = () => {
             ))}
           </g>
 
-          {/* Staircase path — structured steps from ground up through each stop */}
+          {/* Path segments — drawn split for behind-mountain effect */}
           <g className="path-group">
             {SEGMENTS.flatMap((seg, idx) => {
-              const { steps } = buildStairs(seg.from, seg.to, 7);
+              const paths = buildSegment(seg.from, seg.to);
               const color = STATUS_COLOR[seg.status];
-              const dir = seg.to.x >= seg.from.x ? 1 : -1;
-              return steps.map((s, k) => {
-                const treadY = s.y;
-                const nextY = k === steps.length - 1 ? seg.to.y : steps[k + 1].y;
-                const riserX = dir > 0 ? s.x + s.w : s.x;
-                return (
-                  <g key={`stair-${idx}-${k}`} filter={`url(#glow-${seg.status})`}>
-                    {/* tread (horizontal step top) */}
-                    <rect
-                      x={s.x}
-                      y={s.y - 3}
-                      width={s.w}
-                      height={6}
-                      fill={color}
-                      stroke="#1A1008"
-                      strokeWidth="0.8"
-                      opacity="0.95"
-                      rx="1.5"
-                    />
-                    {/* tread shadow */}
-                    <rect
-                      x={s.x}
-                      y={s.y + 3}
-                      width={s.w}
-                      height={3}
-                      fill="#1A1008"
-                      opacity="0.25"
-                    />
-                    {/* riser (vertical face up to next step) */}
-                    {k < steps.length - 1 && (
-                      <rect
-                        x={riserX - 3}
-                        y={nextY}
-                        width={6}
-                        height={s.y - nextY}
-                        fill={color}
-                        stroke="#1A1008"
-                        strokeWidth="0.8"
-                        opacity="0.75"
-                        rx="1"
-                      />
-                    )}
-                  </g>
-                );
-              });
+              const sw = seg.status === "live" ? 4 : seg.status === "beta" ? 3.5 : 3;
+              return paths.map((d, k) => (
+                <path
+                  key={`seg-${idx}-${k}`}
+                  d={d}
+                  stroke={color}
+                  strokeWidth={sw}
+                  strokeLinecap="round"
+                  strokeDasharray="8 5"
+                  fill="none"
+                  filter={`url(#glow-${seg.status})`}
+                  style={{ animation: "path-dash 2.5s linear infinite" }}
+                />
+              ));
             })}
           </g>
 
@@ -479,9 +459,9 @@ const Roadmap: React.FC = () => {
             </text>
           </g>
 
-          {/* Climber at Stop 2 */}
+          {/* Climber at Stop 1 */}
           <g
-            transform={`translate(${STOPS[1].x - 38} ${STOPS[1].y - 56})`}
+            transform={`translate(${STOPS[0].x - 38} ${STOPS[0].y - 56})`}
             style={{ animation: "climber-bob 2s ease-in-out infinite" }}
           >
             {/* backpack */}
@@ -499,7 +479,7 @@ const Roadmap: React.FC = () => {
             {/* stick */}
             <line x1="34" y1="20" x2="40" y2="50" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" />
           </g>
-          {/* START HERE label at Stop 1 */}
+          {/* START HERE label */}
           <g transform={`translate(${STOPS[0].x - 110} ${STOPS[0].y - 70})`}>
             <rect x="0" y="0" width="78" height="22" rx="11" fill="#1A1008" />
             <text x="39" y="15" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontWeight={700} fontSize="10" fill="#F4EDDA" letterSpacing="1">
@@ -661,24 +641,16 @@ const Roadmap: React.FC = () => {
         .sun-wrap { transform-origin: 0 0; animation: sun-arc 24s linear infinite; }
         .moon-wrap { transform-origin: 0 0; animation: moon-arc 24s linear infinite; opacity: 0; }
         @keyframes sun-arc {
-          /* Curve up from left to apex (smooth arc), then triangular straight descent to right */
           0%   { transform: translate(-80px, 850px); opacity: 0; }
-          5%   { opacity: 1; }
-          8%   { transform: translate(60px, 600px); opacity: 1; }
-          16%  { transform: translate(260px, 320px); opacity: 1; }
+          8%   { opacity: 1; }
           25%  { transform: translate(600px, 110px); opacity: 1; }
-          /* triangular descent: straight diagonal line down to right horizon */
           42%  { transform: translate(1280px, 850px); opacity: 0; }
           100% { transform: translate(1280px, 850px); opacity: 0; }
         }
         @keyframes moon-arc {
           0%, 50%   { transform: translate(-80px, 850px); opacity: 0; }
-          55%       { transform: translate(-80px, 850px); opacity: 0; }
-          /* curve up */
-          60%       { transform: translate(60px, 650px); opacity: 0.6; }
-          68%       { transform: translate(280px, 380px); opacity: 0.9; }
+          58%       { transform: translate(-80px, 850px); opacity: 0; }
           75%       { transform: translate(600px, 200px); opacity: 0.95; }
-          /* triangular straight descent */
           92%       { transform: translate(1280px, 850px); opacity: 0; }
           100%      { transform: translate(1280px, 850px); opacity: 0; }
         }
@@ -705,8 +677,8 @@ const Roadmap: React.FC = () => {
 
         /* Climber */
         @keyframes climber-bob {
-          0%,100% { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 56}px); }
-          50%     { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 59}px); }
+          0%,100% { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 56}px); }
+          50%     { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 59}px); }
         }
 
         /* Flag */
