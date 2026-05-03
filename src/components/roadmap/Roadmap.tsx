@@ -479,9 +479,9 @@ const Roadmap: React.FC = () => {
             </text>
           </g>
 
-          {/* Climber at Stop 1 */}
+          {/* Climber at Stop 2 */}
           <g
-            transform={`translate(${STOPS[0].x - 38} ${STOPS[0].y - 56})`}
+            transform={`translate(${STOPS[1].x - 38} ${STOPS[1].y - 56})`}
             style={{ animation: "climber-bob 2s ease-in-out infinite" }}
           >
             {/* backpack */}
@@ -499,7 +499,7 @@ const Roadmap: React.FC = () => {
             {/* stick */}
             <line x1="34" y1="20" x2="40" y2="50" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" />
           </g>
-          {/* START HERE label */}
+          {/* START HERE label at Stop 1 */}
           <g transform={`translate(${STOPS[0].x - 110} ${STOPS[0].y - 70})`}>
             <rect x="0" y="0" width="78" height="22" rx="11" fill="#1A1008" />
             <text x="39" y="15" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontWeight={700} fontSize="10" fill="#F4EDDA" letterSpacing="1">
