@@ -661,16 +661,24 @@ const Roadmap: React.FC = () => {
         .sun-wrap { transform-origin: 0 0; animation: sun-arc 24s linear infinite; }
         .moon-wrap { transform-origin: 0 0; animation: moon-arc 24s linear infinite; opacity: 0; }
         @keyframes sun-arc {
+          /* Curve up from left to apex (smooth arc), then triangular straight descent to right */
           0%   { transform: translate(-80px, 850px); opacity: 0; }
-          8%   { opacity: 1; }
+          5%   { opacity: 1; }
+          8%   { transform: translate(60px, 600px); opacity: 1; }
+          16%  { transform: translate(260px, 320px); opacity: 1; }
           25%  { transform: translate(600px, 110px); opacity: 1; }
+          /* triangular descent: straight diagonal line down to right horizon */
           42%  { transform: translate(1280px, 850px); opacity: 0; }
           100% { transform: translate(1280px, 850px); opacity: 0; }
         }
         @keyframes moon-arc {
           0%, 50%   { transform: translate(-80px, 850px); opacity: 0; }
-          58%       { transform: translate(-80px, 850px); opacity: 0; }
+          55%       { transform: translate(-80px, 850px); opacity: 0; }
+          /* curve up */
+          60%       { transform: translate(60px, 650px); opacity: 0.6; }
+          68%       { transform: translate(280px, 380px); opacity: 0.9; }
           75%       { transform: translate(600px, 200px); opacity: 0.95; }
+          /* triangular straight descent */
           92%       { transform: translate(1280px, 850px); opacity: 0; }
           100%      { transform: translate(1280px, 850px); opacity: 0; }
         }
