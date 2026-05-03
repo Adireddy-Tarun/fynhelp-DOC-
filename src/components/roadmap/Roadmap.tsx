@@ -525,9 +525,9 @@ const Roadmap: React.FC = () => {
             </text>
           </g>
 
-          {/* Climber at Stop 1 */}
+          {/* Climber at Stop 2 */}
           <g
-            transform={`translate(${STOPS[0].x - 38} ${STOPS[0].y - 56})`}
+            transform={`translate(${STOPS[1].x - 38} ${STOPS[1].y - 56})`}
             style={{ animation: "climber-bob 2s ease-in-out infinite" }}
           >
             {/* backpack */}
@@ -545,14 +545,45 @@ const Roadmap: React.FC = () => {
             {/* stick */}
             <line x1="34" y1="20" x2="40" y2="50" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" />
           </g>
-          {/* START HERE label */}
-          <g transform={`translate(${STOPS[0].x - 110} ${STOPS[0].y - 70})`}>
-            <rect x="0" y="0" width="78" height="22" rx="11" fill="#1A1008" />
-            <text x="39" y="15" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontWeight={700} fontSize="10" fill="#F4EDDA" letterSpacing="1">
-              START HERE
-            </text>
-            <path d="M 78 11 L 92 11" stroke="#1A1008" strokeWidth="1.5" />
-            <polygon points="92,7 100,11 92,15" fill="#1A1008" />
+
+          {/* Starting waypoint at the bottom */}
+          <g transform={`translate(${START_POINT.x} ${START_POINT.y})`}>
+            <circle r="8" fill="none" stroke={STATUS_COLOR.live} strokeWidth="2">
+              <animate attributeName="r" values="8;16;8" dur="2.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" repeatCount="indefinite" />
+            </circle>
+            <circle r="7" fill={STATUS_COLOR.live} stroke="#FFFFFF" strokeWidth="2.5" />
+          </g>
+
+          {/* Rafts on the ocean */}
+          <g className="rafts">
+            {[
+              { x: 80, y: 945, dur: 22, delay: 0, scale: 1 },
+              { x: 360, y: 970, dur: 28, delay: -8, scale: 0.85 },
+              { x: 920, y: 955, dur: 26, delay: -14, scale: 1.05 },
+              { x: 1080, y: 980, dur: 32, delay: -4, scale: 0.9 },
+            ].map((r, i) => (
+              <g
+                key={`raft-${i}`}
+                style={{
+                  animation: `raft-bob 4.${i + 2}s ease-in-out ${r.delay}s infinite`,
+                  transformOrigin: `${r.x}px ${r.y}px`,
+                }}
+              >
+                <g transform={`translate(${r.x} ${r.y}) scale(${r.scale})`}>
+                  {/* raft logs */}
+                  <rect x="-22" y="-2" width="44" height="5" rx="2" fill="#6B4226" />
+                  <rect x="-22" y="-5" width="44" height="2" fill="#5C3A1F" opacity="0.7" />
+                  {/* mast */}
+                  <line x1="0" y1="-3" x2="0" y2="-22" stroke="#3B2613" strokeWidth="1.4" />
+                  {/* sail */}
+                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#F4EDDA" />
+                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#C9A84C" opacity="0.25" />
+                  {/* reflection in water */}
+                  <ellipse cx="0" cy="6" rx="20" ry="2" fill="#1A1008" opacity="0.18" />
+                </g>
+              </g>
+            ))}
           </g>
 
           {/* Front clouds (in front of mountain) */}
