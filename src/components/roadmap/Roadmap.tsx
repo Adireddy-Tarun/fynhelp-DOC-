@@ -774,8 +774,8 @@ const Roadmap: React.FC = () => {
 
         /* Climber */
         @keyframes climber-bob {
-          0%,100% { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 56}px); }
-          50%     { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 59}px); }
+          0%,100% { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 56}px); }
+          50%     { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 59}px); }
         }
 
         /* Flag */
@@ -783,6 +783,18 @@ const Roadmap: React.FC = () => {
 
         /* Path dash march */
         @keyframes path-dash { to { stroke-dashoffset: -26; } }
+
+        /* Rafts bobbing on water */
+        @keyframes raft-bob {
+          0%,100% { transform: translateY(0) rotate(-1.2deg); }
+          50%     { transform: translateY(-3px) rotate(1.2deg); }
+        }
+
+        /* Drifting wave foam */
+        @keyframes wave-drift {
+          from { transform: translateX(-60px); }
+          to   { transform: translateX(60px); }
+        }
 
         /* Chips */
         .chip-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
