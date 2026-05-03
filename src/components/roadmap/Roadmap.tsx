@@ -388,25 +388,56 @@ const Roadmap: React.FC = () => {
             ))}
           </g>
 
-          {/* Path segments — drawn split for behind-mountain effect */}
+          {/* Staircase path — structured steps from ground up through each stop */}
           <g className="path-group">
             {SEGMENTS.flatMap((seg, idx) => {
-              const paths = buildSegment(seg.from, seg.to);
+              const { steps } = buildStairs(seg.from, seg.to, 7);
               const color = STATUS_COLOR[seg.status];
-              const sw = seg.status === "live" ? 4 : seg.status === "beta" ? 3.5 : 3;
-              return paths.map((d, k) => (
-                <path
-                  key={`seg-${idx}-${k}`}
-                  d={d}
-                  stroke={color}
-                  strokeWidth={sw}
-                  strokeLinecap="round"
-                  strokeDasharray="8 5"
-                  fill="none"
-                  filter={`url(#glow-${seg.status})`}
-                  style={{ animation: "path-dash 2.5s linear infinite" }}
-                />
-              ));
+              const dir = seg.to.x >= seg.from.x ? 1 : -1;
+              return steps.map((s, k) => {
+                const treadY = s.y;
+                const nextY = k === steps.length - 1 ? seg.to.y : steps[k + 1].y;
+                const riserX = dir > 0 ? s.x + s.w : s.x;
+                return (
+                  <g key={`stair-${idx}-${k}`} filter={`url(#glow-${seg.status})`}>
+                    {/* tread (horizontal step top) */}
+                    <rect
+                      x={s.x}
+                      y={s.y - 3}
+                      width={s.w}
+                      height={6}
+                      fill={color}
+                      stroke="#1A1008"
+                      strokeWidth="0.8"
+                      opacity="0.95"
+                      rx="1.5"
+                    />
+                    {/* tread shadow */}
+                    <rect
+                      x={s.x}
+                      y={s.y + 3}
+                      width={s.w}
+                      height={3}
+                      fill="#1A1008"
+                      opacity="0.25"
+                    />
+                    {/* riser (vertical face up to next step) */}
+                    {k < steps.length - 1 && (
+                      <rect
+                        x={riserX - 3}
+                        y={nextY}
+                        width={6}
+                        height={s.y - nextY}
+                        fill={color}
+                        stroke="#1A1008"
+                        strokeWidth="0.8"
+                        opacity="0.75"
+                        rx="1"
+                      />
+                    )}
+                  </g>
+                );
+              });
             })}
           </g>
 
