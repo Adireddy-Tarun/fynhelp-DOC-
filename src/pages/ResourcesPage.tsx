@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Search } from "lucide-react";
+import FYNIcon, { type FYNIconName } from "@/components/FYNIcon";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const downloadHref = (id: string) =>
