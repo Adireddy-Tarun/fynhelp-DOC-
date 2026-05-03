@@ -587,6 +587,42 @@ export type Database = {
           },
         ]
       }
+      callback_requests: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+          notes: string | null
+          phone: string
+          source: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone: string
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       compliance_events: {
         Row: {
           business_id: string
