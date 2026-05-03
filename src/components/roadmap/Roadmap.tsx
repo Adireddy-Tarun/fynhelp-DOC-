@@ -290,26 +290,26 @@ const Roadmap: React.FC = () => {
 
           {/* Background mountains */}
           <g opacity="0.35">
-            <polygon points="0,820 220,560 440,820" fill="#C5BFB5" />
-            <polygon points="380,820 600,500 820,820" fill="#B8B2A8" />
-            <polygon points="780,820 1000,540 1200,820" fill="#C5BFB5" />
+            <polygon points="0,900 220,640 440,900" fill="#C5BFB5" />
+            <polygon points="380,900 600,580 820,900" fill="#B8B2A8" />
+            <polygon points="780,900 1000,620 1200,900" fill="#C5BFB5" />
           </g>
 
-          {/* Main mountain — many low-poly facets */}
+          {/* Main mountain — many low-poly facets (base extended down to ground) */}
           <g>
             {/* base silhouette */}
-            <polygon points="180,820 624,120 1080,820" fill="url(#rockA)" />
+            <polygon points="180,905 624,120 1080,905" fill="url(#rockA)" />
             {/* shadow side (right) */}
-            <polygon points="624,120 1080,820 624,820" fill="url(#rockShadow)" opacity="0.9" />
+            <polygon points="624,120 1080,905 624,905" fill="url(#rockShadow)" opacity="0.9" />
             {/* facet planes */}
-            <polygon points="180,820 624,120 380,820" fill="url(#rockB)" opacity="0.85" />
-            <polygon points="380,820 624,120 520,820" fill="url(#rockA)" opacity="0.7" />
-            <polygon points="624,120 760,820 880,820" fill="url(#rockShadow)" opacity="0.6" />
-            <polygon points="624,120 520,820 700,820" fill="url(#rockB)" opacity="0.5" />
-            <polygon points="624,120 880,820 1080,820" fill="url(#rockShadow)" opacity="0.45" />
+            <polygon points="180,905 624,120 380,905" fill="url(#rockB)" opacity="0.85" />
+            <polygon points="380,905 624,120 520,905" fill="url(#rockA)" opacity="0.7" />
+            <polygon points="624,120 760,905 880,905" fill="url(#rockShadow)" opacity="0.6" />
+            <polygon points="624,120 520,905 700,905" fill="url(#rockB)" opacity="0.5" />
+            <polygon points="624,120 880,905 1080,905" fill="url(#rockShadow)" opacity="0.45" />
             {/* ridge lines */}
-            <polyline points="280,720 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
-            <polyline points="780,700 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="280,780 480,520 560,420" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
+            <polyline points="780,760 700,500 640,360" stroke="#1A1008" strokeWidth="1.2" opacity="0.18" fill="none" />
             {/* snow cap (jagged) */}
             <polygon
               points="540,260 580,210 600,225 624,120 648,225 670,210 710,260 685,275 660,255 638,275 614,255 590,275 566,255"
