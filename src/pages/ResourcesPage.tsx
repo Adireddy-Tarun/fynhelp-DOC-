@@ -201,7 +201,7 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
         {c.title}
       </h3>
       <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", display: "flex", alignItems: "center", gap: 8 }}>
-        <span>📹</span> {c.duration}
+        <FYNIcon name="video" size={16} animated={false} /> {c.duration}
       </div>
     </div>
   </article>
