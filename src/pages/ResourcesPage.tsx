@@ -693,7 +693,10 @@ const ResourcesPage = () => {
                   }}
                   aria-pressed={isActive}
                 >
-                  {t.label}
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    {t.icon && <FYNIcon name={t.icon} size={20} animated={false} />}
+                    {t.label}
+                  </span>
                 </button>
               );
             })}
