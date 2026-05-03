@@ -461,20 +461,20 @@ const SecurityPage = () => {
             content: "";
             position: absolute;
             top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent 0%, rgba(139,105,20,0.15) 50%, transparent 100%);
-            animation: securitySlideRight 8s ease-in-out infinite;
+            width: 40%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(139,105,20,0.25) 50%, transparent 100%);
+            animation: securitySlideRight 6s ease-in-out infinite;
             pointer-events: none;
-            z-index: 1;
+            z-index: 3;
           }
           .security-hero::after {
             content: "";
             position: absolute;
             inset: 0;
             background:
-              repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px),
-              repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,105,20,0.03) 50px, rgba(139,105,20,0.03) 51px);
-            opacity: 0.3;
+              repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(139,105,20,0.04) 60px, rgba(139,105,20,0.04) 61px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(139,105,20,0.04) 60px, rgba(139,105,20,0.04) 61px);
+            opacity: 0.5;
             pointer-events: none;
             z-index: 1;
           }
