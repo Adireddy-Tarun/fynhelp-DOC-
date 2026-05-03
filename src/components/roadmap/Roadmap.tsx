@@ -562,32 +562,38 @@ const Roadmap: React.FC = () => {
             <circle r="7" fill={STATUS_COLOR.live} stroke="#FFFFFF" strokeWidth="2.5" />
           </g>
 
-          {/* Rafts on the ocean */}
+          {/* Rafts on the ocean — placed in safe water zones (left/right bays where shoreline dips) */}
           <g className="rafts">
             {[
-              { x: 80, y: 945, dur: 22, delay: 0, scale: 1 },
-              { x: 360, y: 970, dur: 28, delay: -8, scale: 0.85 },
-              { x: 920, y: 955, dur: 26, delay: -14, scale: 1.05 },
-              { x: 1080, y: 980, dur: 32, delay: -4, scale: 0.9 },
+              // Left bay (x < 180, water visible y=820-940)
+              { x: 70, y: 920, dur: 22, delay: 0, scale: 0.85, sailColor: "#F4EDDA" },
+              { x: 130, y: 905, dur: 26, delay: -8, scale: 0.7, sailColor: "#C41E1E" },
+              // Right bay (x > 1040, water visible y=820-940)
+              { x: 1090, y: 915, dur: 28, delay: -14, scale: 0.9, sailColor: "#F4EDDA" },
+              { x: 1150, y: 925, dur: 24, delay: -4, scale: 0.75, sailColor: "#C9A84C" },
             ].map((r, i) => (
               <g
                 key={`raft-${i}`}
                 style={{
-                  animation: `raft-bob 4.${i + 2}s ease-in-out ${r.delay}s infinite`,
+                  animation: `raft-bob 4.${(i % 4) + 2}s ease-in-out ${r.delay}s infinite`,
                   transformOrigin: `${r.x}px ${r.y}px`,
                 }}
               >
                 <g transform={`translate(${r.x} ${r.y}) scale(${r.scale})`}>
+                  {/* reflection in water (drawn first, behind raft) */}
+                  <ellipse cx="0" cy="7" rx="22" ry="2.5" fill="#0F3D54" opacity="0.35" />
                   {/* raft logs */}
                   <rect x="-22" y="-2" width="44" height="5" rx="2" fill="#6B4226" />
                   <rect x="-22" y="-5" width="44" height="2" fill="#5C3A1F" opacity="0.7" />
+                  {/* log seams */}
+                  <line x1="-22" y1="0.5" x2="22" y2="0.5" stroke="#3B2613" strokeWidth="0.3" opacity="0.5" />
                   {/* mast */}
-                  <line x1="0" y1="-3" x2="0" y2="-22" stroke="#3B2613" strokeWidth="1.4" />
+                  <line x1="0" y1="-3" x2="0" y2="-24" stroke="#3B2613" strokeWidth="1.4" />
                   {/* sail */}
-                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#F4EDDA" />
-                  <path d="M 0 -22 L 14 -8 L 0 -8 Z" fill="#C9A84C" opacity="0.25" />
-                  {/* reflection in water */}
-                  <ellipse cx="0" cy="6" rx="20" ry="2" fill="#1A1008" opacity="0.18" />
+                  <path d="M 0 -24 L 16 -8 L 0 -8 Z" fill={r.sailColor} />
+                  <path d="M 0 -24 L 16 -8 L 0 -8 Z" fill="#1A1008" opacity="0.12" />
+                  {/* tiny ripple under raft */}
+                  <path d="M -18 5 Q -9 3 0 5 Q 9 7 18 5" stroke="#E8F4F9" strokeWidth="0.7" fill="none" opacity="0.7" />
                 </g>
               </g>
             ))}
