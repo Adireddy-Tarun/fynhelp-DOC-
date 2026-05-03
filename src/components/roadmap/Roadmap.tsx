@@ -705,8 +705,8 @@ const Roadmap: React.FC = () => {
 
         /* Climber */
         @keyframes climber-bob {
-          0%,100% { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 56}px); }
-          50%     { transform: translate(${STOPS[0].x - 38}px, ${STOPS[0].y - 59}px); }
+          0%,100% { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 56}px); }
+          50%     { transform: translate(${STOPS[1].x - 38}px, ${STOPS[1].y - 59}px); }
         }
 
         /* Flag */
