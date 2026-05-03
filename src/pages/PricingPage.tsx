@@ -783,3 +783,248 @@ function Cell({ value }: { value: string | boolean }) {
   }
   return <span className="font-body text-[14px] text-fyn-ink/85">{value}</span>;
 }
+
+/* ====================== Engagement Popup ====================== */
+
+function EngagementPopup() {
+  const [open, setOpen] = useState(false);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("pricing_popup_shown")) return;
+    const t = setTimeout(() => {
+      setOpen(true);
+      sessionStorage.setItem("pricing_popup_shown", "true");
+    }, 180000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    closeBtnRef.current?.focus();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <>
+      <style>{`
+        @keyframes fynPopupBackdrop { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fynPopupIn {
+          from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+          to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes fynPopupBlob {
+          0%, 100% { transform: translate(0,0) scale(1) rotate(0deg); }
+          50%      { transform: translate(20px,-30px) scale(1.15) rotate(180deg); }
+        }
+        .fyn-popup-backdrop {
+          position: fixed; inset: 0; z-index: 9999;
+          background: rgba(26,16,8,0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          animation: fynPopupBackdrop 300ms ease-out;
+        }
+        .fyn-popup {
+          position: fixed; top: 50%; left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(700px, 90vw);
+          max-height: 80vh;
+          background: linear-gradient(135deg, #C41E1E 0%, #8B6914 100%);
+          border-radius: 32px;
+          overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+          animation: fynPopupIn 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          z-index: 10000;
+        }
+        .fyn-popup-close {
+          position: absolute; top: 20px; right: 20px;
+          width: 40px; height: 40px;
+          background: rgba(26,16,8,0.3);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 50%;
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+          z-index: 10;
+          display: inline-flex; align-items: center; justify-content: center;
+          transition: all 0.3s ease;
+        }
+        .fyn-popup-close:hover {
+          background: rgba(26,16,8,0.5);
+          transform: rotate(90deg);
+        }
+        .fyn-popup-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          min-height: 400px;
+        }
+        @media (max-width: 768px) {
+          .fyn-popup-grid { grid-template-columns: 1fr; }
+          .fyn-popup-image { height: 250px !important; }
+        }
+        .fyn-popup-cta {
+          background: #FFFFFF;
+          color: #C41E1E;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 700;
+          font-size: 16px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          padding: 18px 40px;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          align-self: flex-start;
+        }
+        .fyn-popup-cta:hover {
+          background: #F4EDDA;
+          color: #1A1008;
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+        }
+        .fyn-popup-cta:active { transform: scale(0.98); }
+        .fyn-popup-blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(60px);
+          animation: fynPopupBlob 15s ease-in-out infinite;
+        }
+      `}</style>
+
+      <div
+        className="fyn-popup-backdrop"
+        onClick={() => setOpen(false)}
+        aria-hidden
+      />
+      <div
+        className="fyn-popup"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Can't find what you're looking for?"
+        aria-describedby="fyn-popup-desc"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          ref={closeBtnRef}
+          type="button"
+          className="fyn-popup-close"
+          aria-label="Close"
+          onClick={() => setOpen(false)}
+        >
+          ✕
+        </button>
+
+        <div className="fyn-popup-grid">
+          {/* LEFT - text */}
+          <div
+            style={{
+              padding: "60px 48px 60px 60px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "'Oswald', sans-serif",
+                fontWeight: 700,
+                fontSize: "clamp(28px, 4vw, 42px)",
+                lineHeight: 1.2,
+                letterSpacing: "-0.5px",
+                color: "#FFFFFF",
+                marginBottom: 20,
+                textShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              }}
+            >
+              Can't find what you're looking for?
+            </h2>
+            <p
+              id="fyn-popup-desc"
+              style={{
+                fontFamily: "'Raleway', sans-serif",
+                fontWeight: 500,
+                fontSize: "clamp(16px, 1.4vw, 18px)",
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.95)",
+                marginBottom: 32,
+                textShadow: "0 1px 4px rgba(0,0,0,0.15)",
+              }}
+            >
+              Let us know what you need — we're happy to help!
+            </p>
+            <a
+              href="mailto:hello@fynhelp.com?subject=Callback%20Request"
+              className="fyn-popup-cta"
+              style={{ textDecoration: "none", display: "inline-block", textAlign: "center" }}
+              onClick={() => setOpen(false)}
+            >
+              Request a callback
+            </a>
+          </div>
+
+          {/* RIGHT - decorative panel */}
+          <div
+            className="fyn-popup-image"
+            style={{
+              background: "rgba(26,16,8,0.15)",
+              position: "relative",
+              overflow: "hidden",
+              minHeight: 400,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              className="fyn-popup-blob"
+              style={{ width: 320, height: 320, top: "-60px", right: "-80px", background: "rgba(139,105,20,0.45)" }}
+            />
+            <span
+              className="fyn-popup-blob"
+              style={{ width: 260, height: 260, bottom: "-60px", left: "-60px", background: "rgba(196,30,30,0.45)", animationDelay: "-5s" }}
+            />
+            <span
+              className="fyn-popup-blob"
+              style={{ width: 180, height: 180, top: "40%", left: "30%", background: "rgba(244,237,218,0.25)", animationDelay: "-9s" }}
+            />
+            <div
+              style={{
+                position: "relative",
+                zIndex: 2,
+                width: 140,
+                height: 140,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05))",
+                border: "2px solid rgba(255,255,255,0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
