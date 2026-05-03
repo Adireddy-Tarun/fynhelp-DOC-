@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
+import FYNIcon, { type FYNIconName } from "./FYNIcon";
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
@@ -10,12 +11,12 @@ const navLinks = [
   { label: "About", href: "/about" },
 ];
 
-const resourceItems = [
-  { icon: "📚", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
-  { icon: "📄", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
-  { icon: "📖", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
-  { icon: "✍️", label: "Blog", desc: "Insights & updates", tab: "blog" },
-  { icon: "👥", label: "Community", desc: "Q&A & discussions", tab: "community" },
+const resourceItems: { icon: FYNIconName; label: string; desc: string; tab: string }[] = [
+  { icon: "getting-started", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
+  { icon: "templates", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
+  { icon: "glossary", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
+  { icon: "blog", label: "Blog", desc: "Insights & updates", tab: "blog" },
+  { icon: "community", label: "Community", desc: "Q&A & discussions", tab: "community" },
 ];
 
 const Navbar = () => {
