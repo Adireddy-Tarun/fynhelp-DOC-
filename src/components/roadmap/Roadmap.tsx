@@ -356,40 +356,73 @@ const Roadmap: React.FC = () => {
 
           {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,905 90,805 160,775 230,795 280,905" fill="url(#hill)" />
+            <polygon points="40,880 90,805 160,775 230,795 280,880" fill="url(#hill)" />
             <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
             <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
             {/* grass strip top */}
-            <path d="M 40 905 Q 160 845 280 905 Z" fill="#8B9E6B" opacity="0.85" />
+            <path d="M 40 880 Q 160 845 280 880 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ocean (full-width water behind island) */}
+          {/* Ocean (full-width water) — extends from y=820 to bottom, wraps around island */}
           <g>
-            <defs>
-              <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#3A8FB7" />
-                <stop offset="100%" stopColor="#1E5A7A" />
-              </linearGradient>
-            </defs>
-            <rect x="0" y="900" width={VBW} height={100} fill="url(#oceanGrad)" />
-            {/* wave highlights */}
-            <path d="M 0 920 Q 60 914 120 920 T 240 920 T 360 920 T 480 920 T 600 920 T 720 920 T 840 920 T 960 920 T 1080 920 T 1200 920" stroke="#9CC9DD" strokeWidth="1.4" fill="none" opacity="0.7" />
-            <path d="M 0 945 Q 60 939 120 945 T 240 945 T 360 945 T 480 945 T 600 945 T 720 945 T 840 945 T 960 945 T 1080 945 T 1200 945" stroke="#9CC9DD" strokeWidth="1.2" fill="none" opacity="0.5" />
-            <path d="M 0 970 Q 60 964 120 970 T 240 970 T 360 970 T 480 970 T 600 970 T 720 970 T 840 970 T 960 970 T 1080 970 T 1200 970" stroke="#9CC9DD" strokeWidth="1" fill="none" opacity="0.4" />
-          </g>
+            <rect x="0" y="820" width={VBW} height={180} fill="url(#oceanGrad)" />
+            <rect x="0" y="820" width={VBW} height="80" fill="url(#oceanShine)" />
 
-          {/* Island (the land the mountain stands on) */}
-          <g>
+            {/* Distant horizon shimmer */}
+            <path d="M 0 828 L 1200 828" stroke="#A8D4E5" strokeWidth="1" opacity="0.55" />
+
+            {/* Reflection of mountains shimmering */}
+            <g opacity="0.18">
+              <polygon points="180,820 624,860 1080,820" fill="#1A1008" />
+            </g>
+
+            {/* Wave highlights — many lines for depth */}
+            <path d="M 0 850 Q 60 846 120 850 T 240 850 T 360 850 T 480 850 T 600 850 T 720 850 T 840 850 T 960 850 T 1080 850 T 1200 850" stroke="#B8DCEC" strokeWidth="1.2" fill="none" opacity="0.5" />
+            <path d="M 0 880 Q 60 874 120 880 T 240 880 T 360 880 T 480 880 T 600 880 T 720 880 T 840 880 T 960 880 T 1080 880 T 1200 880" stroke="#B8DCEC" strokeWidth="1.3" fill="none" opacity="0.55" />
+            <path d="M 0 915 Q 60 908 120 915 T 240 915 T 360 915 T 480 915 T 600 915 T 720 915 T 840 915 T 960 915 T 1080 915 T 1200 915" stroke="#9CC9DD" strokeWidth="1.5" fill="none" opacity="0.6" />
+            <path d="M 0 950 Q 60 942 120 950 T 240 950 T 360 950 T 480 950 T 600 950 T 720 950 T 840 950 T 960 950 T 1080 950 T 1200 950" stroke="#9CC9DD" strokeWidth="1.5" fill="none" opacity="0.55" />
+            <path d="M 0 985 Q 60 977 120 985 T 240 985 T 360 985 T 480 985 T 600 985 T 720 985 T 840 985 T 960 985 T 1080 985 T 1200 985" stroke="#7FB5CC" strokeWidth="1.3" fill="none" opacity="0.5" />
+
+            {/* Drifting wave foam line */}
             <path
-              d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 940 Q 1100 960 900 950 Q 624 938 360 952 Q 160 962 0 945 Z"
+              d="M -40 935 Q 80 928 200 935 T 440 935 T 680 935 T 920 935 T 1160 935 T 1400 935"
+              stroke="#E8F4F9"
+              strokeWidth="1.4"
+              fill="none"
+              opacity="0.55"
+              style={{ animation: "wave-drift 14s linear infinite" }}
+            />
+          </g>
+
+          {/* Island (the land the mountain stands on) — shaped like a rounded landmass with water wrapping around */}
+          <g>
+            {/* Underwater shadow / depth ring */}
+            <path
+              d="M -10 880 Q 200 855 624 850 Q 1000 855 1210 880 L 1210 905 Q 1000 920 624 915 Q 200 920 -10 905 Z"
+              fill="#1A1008"
+              opacity="0.18"
+            />
+            {/* Main land shape */}
+            <path
+              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 935 Q 1080 922 880 924 Q 624 926 380 924 Q 160 922 -10 935 Z"
               fill="#C4B89C"
             />
-            {/* sandy/grass top edge */}
-            <path d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 912 Q 1100 905 900 908 Q 624 902 360 910 Q 160 916 0 912 Z" fill="#8B9E6B" opacity="0.9" />
+            {/* sandy beach edge */}
+            <path
+              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 912 Q 1080 880 880 878 Q 624 870 380 880 Q 160 884 -10 912 Z"
+              fill="#E5D5A8"
+              opacity="0.85"
+            />
+            {/* grass cap on top of land */}
+            <path
+              d="M 30 880 Q 200 858 624 858 Q 1000 858 1170 880 L 1170 875 Q 1000 855 624 855 Q 200 855 30 875 Z"
+              fill="#8B9E6B"
+              opacity="0.9"
+            />
           </g>
           {/* grass tufts on island */}
-          {Array.from({ length: 18 }).map((_, i) => {
-            const x = 30 + i * 65;
+          {Array.from({ length: 16 }).map((_, i) => {
+            const x = 60 + i * 70;
             return (
               <path
                 key={i}
