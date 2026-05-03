@@ -320,28 +320,46 @@ const Roadmap: React.FC = () => {
             <polygon points="660,245 685,235 670,255" fill="#FFFFFF" opacity="0.9" />
           </g>
 
-          {/* Small starting hill (left) */}
+          {/* Small starting hill (left) — sits on the island */}
           <g>
-            <polygon points="40,820 90,720 160,690 230,710 280,820" fill="url(#hill)" />
-            <polygon points="90,720 160,690 130,750" fill="#B0A488" opacity="0.7" />
-            <polygon points="160,690 230,710 200,760" fill="#9C9078" opacity="0.6" />
+            <polygon points="40,905 90,805 160,775 230,795 280,905" fill="url(#hill)" />
+            <polygon points="90,805 160,775 130,835" fill="#B0A488" opacity="0.7" />
+            <polygon points="160,775 230,795 200,845" fill="#9C9078" opacity="0.6" />
             {/* grass strip top */}
-            <path d="M 40 820 Q 160 760 280 820 Z" fill="#8B9E6B" opacity="0.85" />
+            <path d="M 40 905 Q 160 845 280 905 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ground */}
-          <rect x="0" y="900" width={VBW} height={100} fill="#C4B89C" />
-          <path
-            d={`M 0 905 Q 300 880 600 905 T 1200 905 L 1200 920 L 0 920 Z`}
-            fill="#8B9E6B"
-          />
-          {/* grass tufts */}
+          {/* Ocean (full-width water behind island) */}
+          <g>
+            <defs>
+              <linearGradient id="oceanGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#3A8FB7" />
+                <stop offset="100%" stopColor="#1E5A7A" />
+              </linearGradient>
+            </defs>
+            <rect x="0" y="900" width={VBW} height={100} fill="url(#oceanGrad)" />
+            {/* wave highlights */}
+            <path d="M 0 920 Q 60 914 120 920 T 240 920 T 360 920 T 480 920 T 600 920 T 720 920 T 840 920 T 960 920 T 1080 920 T 1200 920" stroke="#9CC9DD" strokeWidth="1.4" fill="none" opacity="0.7" />
+            <path d="M 0 945 Q 60 939 120 945 T 240 945 T 360 945 T 480 945 T 600 945 T 720 945 T 840 945 T 960 945 T 1080 945 T 1200 945" stroke="#9CC9DD" strokeWidth="1.2" fill="none" opacity="0.5" />
+            <path d="M 0 970 Q 60 964 120 970 T 240 970 T 360 970 T 480 970 T 600 970 T 720 970 T 840 970 T 960 970 T 1080 970 T 1200 970" stroke="#9CC9DD" strokeWidth="1" fill="none" opacity="0.4" />
+          </g>
+
+          {/* Island (the land the mountain stands on) */}
+          <g>
+            <path
+              d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 940 Q 1100 960 900 950 Q 624 938 360 952 Q 160 962 0 945 Z"
+              fill="#C4B89C"
+            />
+            {/* sandy/grass top edge */}
+            <path d="M 0 905 Q 90 895 180 902 Q 360 880 624 882 Q 880 884 1080 902 Q 1140 906 1200 905 L 1200 912 Q 1100 905 900 908 Q 624 902 360 910 Q 160 916 0 912 Z" fill="#8B9E6B" opacity="0.9" />
+          </g>
+          {/* grass tufts on island */}
           {Array.from({ length: 18 }).map((_, i) => {
             const x = 30 + i * 65;
             return (
               <path
                 key={i}
-                d={`M ${x} 910 q 3 -8 6 0 M ${x + 3} 910 q 0 -10 3 -2`}
+                d={`M ${x} 908 q 3 -8 6 0 M ${x + 3} 908 q 0 -10 3 -2`}
                 stroke="#5C7042"
                 strokeWidth="1.2"
                 fill="none"
