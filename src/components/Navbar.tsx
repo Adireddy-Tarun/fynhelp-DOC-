@@ -2,21 +2,29 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
-import { Menu, X, Shield } from "lucide-react";
+import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { label: "Pricing", href: "/pricing" },
   { label: "Security", href: "/security" },
-  { label: "Resources", href: "/resources" },
-  { label: "Blog", href: "/blog" },
-  { label: "Community", href: "/community" },
   { label: "About", href: "/about" },
+];
+
+const resourceItems = [
+  { icon: "📚", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
+  { icon: "📄", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
+  { icon: "📖", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
+  { icon: "✍️", label: "Blog", desc: "Insights & updates", tab: "blog" },
+  { icon: "👥", label: "Community", desc: "Q&A & discussions", tab: "community" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -27,12 +35,26 @@ const Navbar = () => {
 
   useEffect(() => {
     setMobileOpen(false);
-  }, [location.pathname]);
+    setResourcesOpen(false);
+  }, [location.pathname, location.search]);
+
+  // Close resources dropdown on outside click
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
+        setResourcesOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
 
   const isHome = location.pathname === "/";
   const navBg = isHome && !scrolled
     ? "bg-transparent"
     : "bg-fyn-ink border-b border-white/10 backdrop-blur-xl";
+
+  const isResourcesActive = location.pathname === "/resources";
 
   return (
     <>
@@ -49,14 +71,138 @@ const Navbar = () => {
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
             <ProductsNav variant="desktop" />
-            {navLinks.map((l) => (
+
+            {/* Pricing, Security */}
+            {navLinks.slice(0, 2).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
                 className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
-                  location.pathname === l.href
-                    ? "text-white"
-                    : "text-white/70 hover:text-white"
+                  location.pathname === l.href ? "text-white" : "text-white/70 hover:text-white"
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
+
+            {/* Resources dropdown */}
+            <div
+              ref={resourcesRef}
+              className="relative py-6"
+              onMouseEnter={() => setResourcesOpen(true)}
+              onMouseLeave={() => setResourcesOpen(false)}
+            >
+              <button
+                onClick={() => setResourcesOpen((v) => !v)}
+                className={`nav-link-underline text-sm font-medium transition-colors flex items-center gap-1 ${
+                  isResourcesActive ? "text-white" : "text-white/70 hover:text-white"
+                }`}
+                aria-haspopup="true"
+                aria-expanded={resourcesOpen}
+              >
+                Resources
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${resourcesOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {resourcesOpen && (
+                <div
+                  className="absolute right-0 top-full"
+                  style={{
+                    width: 320,
+                    marginTop: 12,
+                    background: "rgba(255,255,255,0.98)",
+                    backdropFilter: "blur(20px) saturate(110%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(110%)",
+                    borderRadius: 20,
+                    border: "1px solid rgba(139,105,20,0.25)",
+                    boxShadow: "0 16px 48px rgba(26,16,8,0.18), 0 0 1px rgba(139,105,20,0.3)",
+                    padding: "16px 0",
+                    zIndex: 1000,
+                    animation: "fade-in 200ms ease-out",
+                  }}
+                  role="menu"
+                >
+                  {resourceItems.map((item, i) => {
+                    const isActive =
+                      isResourcesActive &&
+                      new URLSearchParams(location.search).get("tab") === item.tab;
+                    return (
+                      <div key={item.tab}>
+                        {i === 3 && (
+                          <div
+                            style={{
+                              borderTop: "1px solid rgba(26,16,8,0.08)",
+                              margin: "8px 24px",
+                            }}
+                          />
+                        )}
+                        <Link
+                          to={`/resources?tab=${item.tab}`}
+                          role="menuitem"
+                          className="group flex items-center gap-[14px] transition-colors"
+                          style={{
+                            padding: isActive ? "14px 24px 14px 20px" : "14px 24px",
+                            background: isActive ? "rgba(139,105,20,0.12)" : "transparent",
+                            borderLeft: isActive ? "4px solid #8B6914" : "4px solid transparent",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive)
+                              (e.currentTarget as HTMLElement).style.background =
+                                "rgba(139,105,20,0.08)";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive)
+                              (e.currentTarget as HTMLElement).style.background = "transparent";
+                          }}
+                        >
+                          <span
+                            className="transition-transform duration-200 group-hover:scale-110"
+                            style={{ fontSize: 28, lineHeight: 1 }}
+                          >
+                            {item.icon}
+                          </span>
+                          <span className="flex flex-col">
+                            <span
+                              style={{
+                                fontFamily: "Raleway, sans-serif",
+                                fontWeight: 600,
+                                fontSize: 16,
+                                color: isActive ? "#8B6914" : "#1A1008",
+                              }}
+                              className="group-hover:text-fyn-gold"
+                            >
+                              {item.label}
+                            </span>
+                            <span
+                              style={{
+                                fontFamily: "Roboto, sans-serif",
+                                fontWeight: 400,
+                                fontSize: 13,
+                                color: "rgba(26,16,8,0.6)",
+                                marginTop: 2,
+                              }}
+                            >
+                              {item.desc}
+                            </span>
+                          </span>
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* About */}
+            {navLinks.slice(2).map((l) => (
+              <Link
+                key={l.href}
+                to={l.href}
+                className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
+                  location.pathname === l.href ? "text-white" : "text-white/70 hover:text-white"
                 }`}
               >
                 {l.label}
@@ -73,7 +219,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile toggle — animated hamburger */}
+          {/* Mobile toggle */}
           <button
             className="lg:hidden text-white p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -96,18 +242,20 @@ const Navbar = () => {
       >
         <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
         <div
-          className={`absolute right-0 top-0 bottom-0 w-[300px] bg-fyn-ink transition-transform duration-400 ${
+          className={`absolute right-0 top-0 bottom-0 w-[300px] bg-fyn-ink transition-transform duration-400 overflow-y-auto ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
           style={{ transitionTimingFunction: "var(--ease-spring)" }}
         >
-          <div className="flex flex-col gap-2 pt-20 px-6">
+          <div className="flex flex-col gap-2 pt-20 px-6 pb-8">
             <ProductsNav
               variant="mobile"
               mobileMenuOpen={mobileOpen}
               onCloseMobileMenu={() => setMobileOpen(false)}
             />
-            {navLinks.map((l) => (
+
+            {/* Pricing, Security */}
+            {navLinks.slice(0, 2).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -118,6 +266,49 @@ const Navbar = () => {
                 {l.label}
               </Link>
             ))}
+
+            {/* Mobile Resources accordion */}
+            <button
+              onClick={() => setMobileResourcesOpen((v) => !v)}
+              className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5 flex items-center justify-between w-full"
+              aria-expanded={mobileResourcesOpen}
+            >
+              <span>Resources</span>
+              <ChevronDown
+                size={18}
+                className={`transition-transform duration-200 ${
+                  mobileResourcesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {mobileResourcesOpen && (
+              <div className="flex flex-col pl-4 border-b border-white/5">
+                {resourceItems.map((item) => (
+                  <Link
+                    key={item.tab}
+                    to={`/resources?tab=${item.tab}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-white/70 hover:text-white text-sm py-2.5 flex items-center gap-3"
+                  >
+                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* About */}
+            {navLinks.slice(2).map((l) => (
+              <Link
+                key={l.href}
+                to={l.href}
+                onClick={() => setMobileOpen(false)}
+                className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5"
+              >
+                {l.label}
+              </Link>
+            ))}
+
             <div className="mt-4 space-y-3">
               <Link
                 to="/waitlist"
