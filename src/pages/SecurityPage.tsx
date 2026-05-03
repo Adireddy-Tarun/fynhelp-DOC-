@@ -193,22 +193,23 @@ const SecurityPage = () => {
           minHeight: "100vh",
           paddingTop: 120,
           paddingBottom: 80,
-          background: `linear-gradient(145deg, ${INK} 0%, rgba(26,16,8,0.92) 40%, rgba(139,105,20,0.18) 80%, rgba(196,30,30,0.12) 100%)`,
+          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 30%, rgba(26,16,8,0.95) 60%, rgba(139,105,20,0.08) 85%, rgba(196,30,30,0.05) 100%)`,
         }}
       >
         {/* Floating particles */}
-        {Array.from({ length: 14 }).map((_, i) => (
+        {Array.from({ length: 18 }).map((_, i) => (
           <span
             key={i}
             className="absolute rounded-full pointer-events-none"
             style={{
-              width: 3 + (i % 3),
-              height: 3 + (i % 3),
+              width: 4 + (i % 5),
+              height: 4 + (i % 5),
               background: GOLD,
-              opacity: 0.25,
-              left: `${(i * 7.3) % 100}%`,
+              opacity: 0.4,
+              boxShadow: `0 0 8px rgba(139,105,20,0.6)`,
+              left: `${(i * 5.7) % 100}%`,
               top: `${(i * 11.7) % 100}%`,
-              animation: `fynFloat ${10 + (i % 5) * 2}s linear ${i * 0.7}s infinite`,
+              animation: `fynFloat ${14 + (i % 5) * 1.5}s linear ${i * 0.6}s infinite`,
             }}
           />
         ))}
