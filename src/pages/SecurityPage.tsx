@@ -241,10 +241,11 @@ const SecurityPage = () => {
               fontFamily: "'Raleway'",
               fontWeight: 400,
               fontSize: "clamp(16px, 1.4vw, 22px)",
-              color: "rgba(244,237,218,0.95)",
+              color: "rgba(244,237,218,1)",
               lineHeight: 1.7,
               maxWidth: 900,
               margin: "0 auto 48px",
+              textShadow: "0 2px 12px rgba(244,237,218,0.3)",
             }}
           >
             Your financial data is the lifeblood of your business. At FYNHelp, we've built our platform from the ground up with enterprise-grade security standards, complete transparency, and an unwavering commitment to your privacy.
