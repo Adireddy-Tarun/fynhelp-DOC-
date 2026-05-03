@@ -936,12 +936,12 @@ function EngagementPopup() {
     setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const payload: Record<string, unknown> = {
+      const payload = {
         phone: local,
         name: name.trim() || null,
         source: "pricing_popup",
+        ...(user?.id ? { user_id: user.id } : {}),
       };
-      if (user?.id) payload.user_id = user.id;
       const { error: insertError } = await supabase
         .from("callback_requests")
         .insert(payload);
