@@ -124,7 +124,8 @@ const cardBase: React.CSSProperties = {
   background: "#FFFFFF",
   borderRadius: 20,
   border: "1px solid rgba(26,16,8,0.08)",
-  boxShadow: "0 4px 16px rgba(26,16,8,0.06)",
+  boxShadow:
+    "0 6px 20px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.06)",
   overflow: "hidden",
   cursor: "pointer",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -135,32 +136,45 @@ const cardBase: React.CSSProperties = {
 const onCardEnter = (e: React.MouseEvent<HTMLElement>) => {
   const el = e.currentTarget as HTMLElement;
   el.style.transform = "translateY(-4px)";
-  el.style.boxShadow = "0 12px 32px rgba(26,16,8,0.12)";
+  el.style.boxShadow =
+    "0 16px 40px rgba(26,16,8,0.16), 0 4px 12px rgba(139,105,20,0.12)";
   el.style.border = "1px solid rgba(139,105,20,0.3)";
 };
 const onCardLeave = (e: React.MouseEvent<HTMLElement>) => {
   const el = e.currentTarget as HTMLElement;
   el.style.transform = "";
-  el.style.boxShadow = "0 4px 16px rgba(26,16,8,0.06)";
+  el.style.boxShadow =
+    "0 6px 20px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.06)";
   el.style.border = "1px solid rgba(26,16,8,0.08)";
 };
 
-const CategoryBadge = ({ children }: { children: React.ReactNode }) => (
+const CategoryBadge = ({
+  children,
+  iconName,
+}: {
+  children: React.ReactNode;
+  iconName?: FYNIconName;
+}) => (
   <span
     style={{
       fontFamily: "'DM Sans', sans-serif",
       fontWeight: 700,
-      fontSize: 11,
+      fontSize: 12,
       textTransform: "uppercase",
       letterSpacing: 1,
       color: GOLD,
       background: "rgba(139,105,20,0.12)",
-      padding: "6px 12px",
-      borderRadius: 6,
-      display: "inline-block",
+      padding: "8px 14px",
+      borderRadius: 8,
+      height: 28,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
       marginBottom: 12,
+      lineHeight: 1,
     }}
   >
+    {iconName && <FYNIcon name={iconName} size={16} animated={false} />}
     {children}
   </span>
 );
@@ -169,7 +183,7 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
   <article style={cardBase} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave} onClick={onClick}>
     <div
       style={{
-        height: 200,
+        height: 220,
         background: "linear-gradient(135deg, rgba(139,105,20,0.2) 0%, rgba(196,30,30,0.2) 100%)",
         position: "relative",
       }}
@@ -195,9 +209,9 @@ const VideoCardView = ({ c, onClick }: { c: VideoCard; onClick: () => void }) =>
         </svg>
       </div>
     </div>
-    <div style={{ padding: 20 }}>
-      <CategoryBadge>{c.step}</CategoryBadge>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 12 }}>
+    <div style={{ padding: 24 }}>
+      <CategoryBadge iconName="getting-started">{c.step}</CategoryBadge>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, lineHeight: 1.4, marginBottom: 12 }}>
         {c.title}
       </h3>
       <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", display: "flex", alignItems: "center", gap: 8 }}>
@@ -211,7 +225,7 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
   <article style={cardBase} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div
       style={{
-        height: 180,
+        height: 200,
         background: "linear-gradient(135deg, rgba(196,30,30,0.18) 0%, rgba(139,105,20,0.25) 100%)",
         display: "flex",
         alignItems: "center",
@@ -220,9 +234,9 @@ const ArticleCardView = ({ c }: { c: ArticleCard }) => (
     >
       <FYNIcon name="blog" size={64} />
     </div>
-    <div style={{ padding: 20 }}>
-      <CategoryBadge>Blog</CategoryBadge>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
+    <div style={{ padding: 24 }}>
+      <CategoryBadge iconName="blog">Blog</CategoryBadge>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
         {c.title}
       </h3>
       <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.7)", lineHeight: 1.6, marginBottom: 12 }}>
@@ -253,8 +267,8 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
         <FYNIcon name="template" size={64} />
       )}
     </div>
-    <div style={{ padding: 20 }}>
-      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, textAlign: "center", marginBottom: 10 }}>
+    <div style={{ padding: 24 }}>
+      <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 19, color: INK, textAlign: "center", marginBottom: 10 }}>
         {c.title}
       </h3>
       <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", textAlign: "center", marginBottom: 16 }}>
@@ -287,7 +301,7 @@ const TemplateCardView = ({ c }: { c: TemplateCard }) => (
 );
 
 const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
-  <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
+  <article style={{ ...cardBase, padding: 28 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div style={{ marginBottom: 12 }}><FYNIcon name="glossary" size={36} /></div>
     <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: INK, marginBottom: 8 }}>
       {c.title}
@@ -312,7 +326,7 @@ const GlossaryCardView = ({ c }: { c: GlossaryCard }) => (
 );
 
 const CommunityCardView = ({ c }: { c: CommunityCard }) => (
-  <article style={{ ...cardBase, padding: 20 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
+  <article style={{ ...cardBase, padding: 24 }} onMouseEnter={onCardEnter} onMouseLeave={onCardLeave}>
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
       <div
         style={{
@@ -335,7 +349,7 @@ const CommunityCardView = ({ c }: { c: CommunityCard }) => (
         {c.author}
       </span>
     </div>
-    <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 17, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
+    <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.4, marginBottom: 10 }}>
       {c.title}
     </h3>
     <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", lineHeight: 1.5, marginBottom: 12 }}>
@@ -800,8 +814,14 @@ const ResourcesPage = () => {
       </div>
 
       {/* MASONRY GRID */}
-      <section style={{ background: BEIGE, padding: "60px 40px 100px" }}>
-        <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+      <section
+        style={{
+          background:
+            "repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(139,105,20,0.02) 60px, rgba(139,105,20,0.02) 61px), #F4EDDA",
+          padding: "40px 40px 60px",
+        }}
+      >
+        <div style={{ maxWidth: 1300, margin: "0 auto" }}>
           {filtered.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
               <div style={{ fontSize: 48, color: "rgba(26,16,8,0.3)", marginBottom: 16 }}>🔍</div>
@@ -816,8 +836,9 @@ const ResourcesPage = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 24,
+                gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                gap: 16,
+                gridAutoRows: 10,
                 alignItems: "start",
               }}
             >
