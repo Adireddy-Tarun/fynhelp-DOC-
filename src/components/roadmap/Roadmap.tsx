@@ -375,18 +375,13 @@ const Roadmap: React.FC = () => {
             <path d="M 60 878 Q 165 855 270 878 Z" fill="#8B9E6B" opacity="0.85" />
           </g>
 
-          {/* Ocean (full-width water) — extends from y=820 to bottom, wraps around island */}
-          <g>
+          {/* Ocean (full-width water) — clipped to exclude the island shape so it never covers land */}
+          <g clipPath="url(#oceanClip)">
             <rect x="0" y="820" width={VBW} height={180} fill="url(#oceanGrad)" />
             <rect x="0" y="820" width={VBW} height="80" fill="url(#oceanShine)" />
 
             {/* Distant horizon shimmer */}
             <path d="M 0 828 L 1200 828" stroke="#A8D4E5" strokeWidth="1" opacity="0.55" />
-
-            {/* Reflection of mountains shimmering */}
-            <g opacity="0.18">
-              <polygon points="180,820 624,860 1080,820" fill="#1A1008" />
-            </g>
 
             {/* Wave highlights — many lines for depth */}
             <path d="M 0 850 Q 60 846 120 850 T 240 850 T 360 850 T 480 850 T 600 850 T 720 850 T 840 850 T 960 850 T 1080 850 T 1200 850" stroke="#B8DCEC" strokeWidth="1.2" fill="none" opacity="0.5" />
@@ -397,7 +392,7 @@ const Roadmap: React.FC = () => {
 
             {/* Drifting wave foam line */}
             <path
-              d="M -40 935 Q 80 928 200 935 T 440 935 T 680 935 T 920 935 T 1160 935 T 1400 935"
+              d="M -40 965 Q 80 958 200 965 T 440 965 T 680 965 T 920 965 T 1160 965 T 1400 965"
               stroke="#E8F4F9"
               strokeWidth="1.4"
               fill="none"
@@ -406,30 +401,30 @@ const Roadmap: React.FC = () => {
             />
           </g>
 
-          {/* Island (the land the mountain stands on) — shaped like a rounded landmass with water wrapping around */}
+          {/* Shoreline foam — outline of island top edge (above water, below land) */}
+          <path
+            d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940"
+            stroke="#FFFFFF"
+            strokeWidth="2.5"
+            fill="none"
+            opacity="0.55"
+          />
+
+          {/* Island (the land the mountain stands on) — uses the exact same shape as the ocean clip mask */}
           <g>
-            {/* Underwater shadow / depth ring */}
+            {/* Main land body */}
+            <use href="#islandShape" fill="#C4B89C" />
+            {/* Sandy beach band along the top */}
             <path
-              d="M -10 880 Q 200 855 624 850 Q 1000 855 1210 880 L 1210 905 Q 1000 920 624 915 Q 200 920 -10 905 Z"
-              fill="#1A1008"
-              opacity="0.18"
-            />
-            {/* Main land shape */}
-            <path
-              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 935 Q 1080 922 880 924 Q 624 926 380 924 Q 160 922 -10 935 Z"
-              fill="#C4B89C"
-            />
-            {/* sandy beach edge */}
-            <path
-              d="M -10 905 Q 60 870 180 866 Q 360 855 624 855 Q 880 858 1040 868 Q 1140 875 1210 905 L 1210 912 Q 1080 880 880 878 Q 624 870 380 880 Q 160 884 -10 912 Z"
+              d="M -20 940 Q 60 905 180 895 Q 360 875 624 872 Q 880 875 1040 893 Q 1140 902 1220 940 L 1220 955 Q 1080 928 880 924 Q 624 920 380 924 Q 160 928 -20 955 Z"
               fill="#E5D5A8"
-              opacity="0.85"
-            />
-            {/* grass cap on top of land */}
-            <path
-              d="M 30 880 Q 200 858 624 858 Q 1000 858 1170 880 L 1170 875 Q 1000 855 624 855 Q 200 855 30 875 Z"
-              fill="#8B9E6B"
               opacity="0.9"
+            />
+            {/* Grass cap that hides the seam between land top and mountain bases */}
+            <path
+              d="M 60 895 Q 200 870 624 868 Q 1000 870 1140 895 L 1140 888 Q 1000 862 624 862 Q 200 862 60 888 Z"
+              fill="#8B9E6B"
+              opacity="0.95"
             />
           </g>
           {/* grass tufts on island */}
