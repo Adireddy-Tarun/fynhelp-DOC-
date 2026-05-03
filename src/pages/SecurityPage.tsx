@@ -501,7 +501,7 @@ const SecurityPage = () => {
           }
           @media (max-width: 1023px) {
             .security-badge { width: 90px; height: 90px; }
-            .security-badges { right: 2vw; gap: 18px; }
+            .security-badges { left: 2vw; gap: 18px; }
           }
           @media (max-width: 767px) {
             .security-glass-panel { padding: 40px 24px !important; border-radius: 24px !important; }
