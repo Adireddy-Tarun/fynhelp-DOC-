@@ -259,24 +259,34 @@ export default function PricingPage() {
       <section className="fyn-bg-anim relative overflow-hidden pt-20 pb-24 px-6">
         <Sparkles />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="relative z-10 max-w-[900px] mx-auto text-center">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display font-bold text-[40px] md:text-[56px] leading-[1.1] text-fyn-ink mb-4 tracking-tight"
+            className="font-display font-bold text-[32px] md:text-[38px] lg:text-[52px] leading-[1.2] text-fyn-ink mb-5"
+            style={{ letterSpacing: "-0.5px", color: "#1A1008" }}
           >
-            Simple, transparent pricing
+            Simple pricing. Powerful insights.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-subheading text-lg md:text-xl text-fyn-gold"
+            className="font-subheading text-base md:text-[18px] lg:text-[20px] mx-auto"
+            style={{
+              color: "#8B6914",
+              lineHeight: 1.6,
+              letterSpacing: "0.3px",
+              maxWidth: "900px",
+              marginBottom: "60px",
+            }}
           >
-            Start free for 6 months. Upgrade when ready.
+            All plans include enterprise-grade security and the financial insights you need to make better decisions.
           </motion.p>
         </div>
+
+        <EngagementPopup />
 
         <div className="relative z-10 max-w-6xl mx-auto mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((p, idx) => {
