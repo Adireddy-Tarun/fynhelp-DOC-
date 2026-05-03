@@ -151,7 +151,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
 
         <div className="px-8 md:px-14 py-5 border-t flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "rgba(26,16,8,0.08)", background: BEIGE }}>
           <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>
-            Questions? Email <a href="mailto:security@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>security@fynhelp.com</a>
+            Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
           </p>
           <button
             onClick={onClose}
