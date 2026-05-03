@@ -4,6 +4,8 @@ import { motion, useInView, useMotionValue, useTransform, animate } from "framer
 import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 /* ================================================================
    FYNHelp Pricing Page — brand palette only
