@@ -488,7 +488,7 @@ const SecurityPage = () => {
           }
           .security-badges {
             position: absolute;
-            right: 5vw;
+            left: 5vw;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
