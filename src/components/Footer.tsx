@@ -20,7 +20,6 @@ const companyLinks = [
   { label: "About FynHelp", href: "/about" },
   { label: "Our Mission", href: "/about" },
   { label: "Founders", href: "/about" },
-  { label: "Roadmap", href: "/roadmap" },
   { label: "Blog", href: "/blog" },
   { label: "Community", href: "/community" },
   { label: "Contact Us", href: "/about" },

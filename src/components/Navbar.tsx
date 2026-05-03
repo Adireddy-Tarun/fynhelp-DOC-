@@ -5,7 +5,6 @@ import ProductsNav from "./products/ProductsNav";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Roadmap", href: "/roadmap" },
   { label: "Pricing", href: "/pricing" },
   { label: "Resources", href: "/resources" },
   { label: "Blog", href: "/blog" },
