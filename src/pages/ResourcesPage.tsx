@@ -119,12 +119,12 @@ const COMMUNITY: CommunityItem[] = [
 // ============================================================
 // TABS CONFIG
 // ============================================================
-const TABS: { key: TabKey; label: string; icon: FYNIconName; badge: string; placeholder: string }[] = [
-  { key: "getting-started", label: "Getting Started", icon: "getting-started", badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
-  { key: "templates", label: "Templates & Downloads", icon: "templates", badge: "5 files", placeholder: "Search templates..." },
-  { key: "glossary", label: "Financial Glossary", icon: "glossary", badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
-  { key: "blog", label: "Blog", icon: "blog", badge: "New", placeholder: "Search articles..." },
-  { key: "community", label: "Community", icon: "community", badge: `${COMMUNITY.length} discussions`, placeholder: "Search discussions..." },
+const TABS: { key: TabKey; label: string; shortLabel: string; icon: FYNIconName; badge: string; placeholder: string }[] = [
+  { key: "getting-started", label: "Getting Started", shortLabel: "Getting Started", icon: "getting-started", badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
+  { key: "templates", label: "Templates & Downloads", shortLabel: "Templates", icon: "templates", badge: "5 files", placeholder: "Search templates..." },
+  { key: "glossary", label: "Financial Glossary", shortLabel: "Glossary", icon: "glossary", badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
+  { key: "blog", label: "Blog", shortLabel: "Blog", icon: "blog", badge: "New", placeholder: "Search articles..." },
+  { key: "community", label: "Community", shortLabel: "Community", icon: "community", badge: `${COMMUNITY.length} discussions`, placeholder: "Search discussions..." },
 ];
 
 const STEP_ORDER = ["DAY 1", "WEEK 1", "WEEK 2", "WEEK 3", "MONTH 1"];
@@ -579,15 +579,25 @@ const ResourcesPage = () => {
         }
         .resource-anim { animation: fade-card 350ms ease-out both; }
         .fyn-tabs-row::-webkit-scrollbar { display: none; }
-        .fyn-tabs-row { scrollbar-width: none; }
+        .fyn-tabs-row { scrollbar-width: none; -ms-overflow-style: none; }
+        .fyn-tab-badge-mobile { display: inline-flex; }
         @media (max-width: 768px) {
           .resource-video-row { flex-direction: column !important; }
           .resource-video-row > div:first-child { width: 100% !important; min-width: 0 !important; height: 200px !important; }
+          .fyn-resources-hero { padding: 40px 20px 32px !important; }
+          .fyn-resources-tabs-wrap { padding: 16px 16px !important; }
+          .fyn-resources-content { padding: 32px 16px 56px !important; }
+          .fyn-tab-btn { min-width: 0 !important; padding: 12px 16px !important; font-size: 14px !important; }
+          .fyn-tab-badge-mobile { display: none !important; }
+          .fyn-resources-grid-tpl { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .fyn-resources-grid-blog { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .fyn-resources-search { height: 48px !important; font-size: 15px !important; }
         }
       `}</style>
 
       {/* HERO */}
       <section
+        className="fyn-resources-hero"
         style={{
           background: "linear-gradient(135deg, #1A1008 0%, rgba(26,16,8,0.95) 100%)",
           padding: "72px 32px 56px",
@@ -598,7 +608,7 @@ const ResourcesPage = () => {
           style={{
             fontFamily: "Oswald, sans-serif",
             fontWeight: 700,
-            fontSize: "clamp(34px, 5.5vw, 52px)",
+            fontSize: "clamp(28px, 5.5vw, 52px)",
             color: "#FFFFFF",
             lineHeight: 1.15,
             letterSpacing: "-0.5px",
@@ -610,7 +620,7 @@ const ResourcesPage = () => {
         <p
           style={{
             fontFamily: "Raleway, sans-serif",
-            fontSize: "clamp(15px, 1.7vw, 19px)",
+            fontSize: "clamp(14px, 1.7vw, 19px)",
             color: "rgba(244,237,218,0.9)",
             maxWidth: 660,
             margin: "0 auto",
@@ -631,13 +641,14 @@ const ResourcesPage = () => {
           zIndex: 30,
         }}
       >
-        <div style={{ maxWidth: 1300, margin: "0 auto", padding: "20px 24px" }}>
+        <div className="fyn-resources-tabs-wrap" style={{ maxWidth: 1300, margin: "0 auto", padding: "20px 24px", position: "relative" }}>
           <div
             className="fyn-tabs-row"
             style={{
               display: "flex",
               gap: 8,
               overflowX: "auto",
+              overflowY: "hidden",
               paddingBottom: 4,
               WebkitOverflowScrolling: "touch",
             }}
@@ -647,9 +658,14 @@ const ResourcesPage = () => {
               return (
                 <button
                   key={t.key}
-                  onClick={() => setActiveTab(t.key)}
+                  onClick={(e) => {
+                    setActiveTab(t.key);
+                    (e.currentTarget as HTMLElement).scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                  }}
                   aria-pressed={isActive}
+                  className="fyn-tab-btn"
                   style={{
+                    flex: "0 0 auto",
                     minWidth: 160,
                     padding: "12px 20px",
                     borderRadius: 12,
@@ -684,8 +700,12 @@ const ResourcesPage = () => {
                   }}
                 >
                   <FYNIcon name={t.icon} size={20} animated={false} />
-                  <span>{t.label}</span>
+                  <span className="fyn-tab-label-full" style={{ display: "inline" }}>
+                    <span className="hidden sm:inline">{t.label}</span>
+                    <span className="sm:hidden">{t.shortLabel}</span>
+                  </span>
                   <span
+                    className="fyn-tab-badge-mobile"
                     style={{
                       fontFamily: "'JetBrains Mono', monospace",
                       fontSize: 11,
@@ -717,6 +737,7 @@ const ResourcesPage = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={currentTabConfig.placeholder}
                 aria-label={currentTabConfig.placeholder}
+                className="fyn-resources-search"
                 style={{
                   width: "100%",
                   height: 52,
@@ -745,6 +766,7 @@ const ResourcesPage = () => {
 
       {/* CONTENT */}
       <section
+        className="fyn-resources-content"
         style={{
           background:
             "repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(139,105,20,0.02) 60px, rgba(139,105,20,0.02) 61px), #F4EDDA",
@@ -807,6 +829,7 @@ const ResourcesPage = () => {
                 <EmptyState label="templates" />
               ) : (
                 <div
+                  className="fyn-resources-grid-tpl"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
@@ -847,6 +870,7 @@ const ResourcesPage = () => {
                 <EmptyState label="articles" />
               ) : (
                 <div
+                  className="fyn-resources-grid-blog"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
