@@ -119,12 +119,12 @@ const COMMUNITY: CommunityItem[] = [
 // ============================================================
 // TABS CONFIG
 // ============================================================
-const TABS: { key: TabKey; label: string; icon: FYNIconName; badge: string; placeholder: string }[] = [
-  { key: "getting-started", label: "Getting Started", icon: "getting-started", badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
-  { key: "templates", label: "Templates & Downloads", icon: "templates", badge: "5 files", placeholder: "Search templates..." },
-  { key: "glossary", label: "Financial Glossary", icon: "glossary", badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
-  { key: "blog", label: "Blog", icon: "blog", badge: "New", placeholder: "Search articles..." },
-  { key: "community", label: "Community", icon: "community", badge: `${COMMUNITY.length} discussions`, placeholder: "Search discussions..." },
+const TABS: { key: TabKey; label: string; shortLabel: string; icon: FYNIconName; badge: string; placeholder: string }[] = [
+  { key: "getting-started", label: "Getting Started", shortLabel: "Getting Started", icon: "getting-started", badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
+  { key: "templates", label: "Templates & Downloads", shortLabel: "Templates", icon: "templates", badge: "5 files", placeholder: "Search templates..." },
+  { key: "glossary", label: "Financial Glossary", shortLabel: "Glossary", icon: "glossary", badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
+  { key: "blog", label: "Blog", shortLabel: "Blog", icon: "blog", badge: "New", placeholder: "Search articles..." },
+  { key: "community", label: "Community", shortLabel: "Community", icon: "community", badge: `${COMMUNITY.length} discussions`, placeholder: "Search discussions..." },
 ];
 
 const STEP_ORDER = ["DAY 1", "WEEK 1", "WEEK 2", "WEEK 3", "MONTH 1"];
