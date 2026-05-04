@@ -641,13 +641,14 @@ const ResourcesPage = () => {
           zIndex: 30,
         }}
       >
-        <div style={{ maxWidth: 1300, margin: "0 auto", padding: "20px 24px" }}>
+        <div className="fyn-resources-tabs-wrap" style={{ maxWidth: 1300, margin: "0 auto", padding: "20px 24px", position: "relative" }}>
           <div
             className="fyn-tabs-row"
             style={{
               display: "flex",
               gap: 8,
               overflowX: "auto",
+              overflowY: "hidden",
               paddingBottom: 4,
               WebkitOverflowScrolling: "touch",
             }}
@@ -657,9 +658,14 @@ const ResourcesPage = () => {
               return (
                 <button
                   key={t.key}
-                  onClick={() => setActiveTab(t.key)}
+                  onClick={(e) => {
+                    setActiveTab(t.key);
+                    (e.currentTarget as HTMLElement).scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                  }}
                   aria-pressed={isActive}
+                  className="fyn-tab-btn"
                   style={{
+                    flex: "0 0 auto",
                     minWidth: 160,
                     padding: "12px 20px",
                     borderRadius: 12,
@@ -694,8 +700,12 @@ const ResourcesPage = () => {
                   }}
                 >
                   <FYNIcon name={t.icon} size={20} animated={false} />
-                  <span>{t.label}</span>
+                  <span className="fyn-tab-label-full" style={{ display: "inline" }}>
+                    <span className="hidden sm:inline">{t.label}</span>
+                    <span className="sm:hidden">{t.shortLabel}</span>
+                  </span>
                   <span
+                    className="fyn-tab-badge-mobile"
                     style={{
                       fontFamily: "'JetBrains Mono', monospace",
                       fontSize: 11,
@@ -727,6 +737,7 @@ const ResourcesPage = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={currentTabConfig.placeholder}
                 aria-label={currentTabConfig.placeholder}
+                className="fyn-resources-search"
                 style={{
                   width: "100%",
                   height: 52,
@@ -755,6 +766,7 @@ const ResourcesPage = () => {
 
       {/* CONTENT */}
       <section
+        className="fyn-resources-content"
         style={{
           background:
             "repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(139,105,20,0.02) 60px, rgba(139,105,20,0.02) 61px), #F4EDDA",
