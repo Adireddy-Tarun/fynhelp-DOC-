@@ -870,6 +870,7 @@ const ResourcesPage = () => {
                 <EmptyState label="articles" />
               ) : (
                 <div
+                  className="fyn-resources-grid-blog"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
