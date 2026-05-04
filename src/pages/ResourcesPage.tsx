@@ -579,10 +579,19 @@ const ResourcesPage = () => {
         }
         .resource-anim { animation: fade-card 350ms ease-out both; }
         .fyn-tabs-row::-webkit-scrollbar { display: none; }
-        .fyn-tabs-row { scrollbar-width: none; }
+        .fyn-tabs-row { scrollbar-width: none; -ms-overflow-style: none; }
+        .fyn-tab-badge-mobile { display: inline-flex; }
         @media (max-width: 768px) {
           .resource-video-row { flex-direction: column !important; }
           .resource-video-row > div:first-child { width: 100% !important; min-width: 0 !important; height: 200px !important; }
+          .fyn-resources-hero { padding: 40px 20px 32px !important; }
+          .fyn-resources-tabs-wrap { padding: 16px 16px !important; }
+          .fyn-resources-content { padding: 32px 16px 56px !important; }
+          .fyn-tab-btn { min-width: 0 !important; padding: 12px 16px !important; font-size: 14px !important; }
+          .fyn-tab-badge-mobile { display: none !important; }
+          .fyn-resources-grid-tpl { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .fyn-resources-grid-blog { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .fyn-resources-search { height: 48px !important; font-size: 15px !important; }
         }
       `}</style>
 
