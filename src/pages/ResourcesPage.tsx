@@ -597,6 +597,7 @@ const ResourcesPage = () => {
 
       {/* HERO */}
       <section
+        className="fyn-resources-hero"
         style={{
           background: "linear-gradient(135deg, #1A1008 0%, rgba(26,16,8,0.95) 100%)",
           padding: "72px 32px 56px",
@@ -607,7 +608,7 @@ const ResourcesPage = () => {
           style={{
             fontFamily: "Oswald, sans-serif",
             fontWeight: 700,
-            fontSize: "clamp(34px, 5.5vw, 52px)",
+            fontSize: "clamp(28px, 5.5vw, 52px)",
             color: "#FFFFFF",
             lineHeight: 1.15,
             letterSpacing: "-0.5px",
@@ -619,7 +620,7 @@ const ResourcesPage = () => {
         <p
           style={{
             fontFamily: "Raleway, sans-serif",
-            fontSize: "clamp(15px, 1.7vw, 19px)",
+            fontSize: "clamp(14px, 1.7vw, 19px)",
             color: "rgba(244,237,218,0.9)",
             maxWidth: 660,
             margin: "0 auto",
