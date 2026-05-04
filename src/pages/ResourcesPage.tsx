@@ -829,6 +829,7 @@ const ResourcesPage = () => {
                 <EmptyState label="templates" />
               ) : (
                 <div
+                  className="fyn-resources-grid-tpl"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
