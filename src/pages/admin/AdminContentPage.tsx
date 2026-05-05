@@ -142,7 +142,7 @@ function RowActions({ onEdit }: { onEdit: () => void }) {
   return (
     <div className="flex items-center gap-1">
       <button onClick={onEdit} className="p-1.5 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.06)]" aria-label="Edit"><Edit2 size={14} color="hsl(var(--fyn-ink) / 0.6)" /></button>
-      <button className="p-1.5 rounded-lg hover:bg-[rgba(196,30,30,0.08)]" aria-label="Delete"><Trash2 size={14} color="#C41E1E" /></button>
+      <button onClick={() => toast.info("Delete coming in Part 4")} className="p-1.5 rounded-lg hover:bg-[rgba(196,30,30,0.08)]" aria-label="Delete"><Trash2 size={14} color="#C41E1E" /></button>
     </div>
   );
 }
