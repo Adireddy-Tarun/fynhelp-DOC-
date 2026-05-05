@@ -309,6 +309,13 @@ export default function AdminLayout() {
                   }}
                 >
                   <button
+                    onClick={() => { setMenuOpen(false); nav("/dashboard"); toast.info("Switched to CEO Dashboard"); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
+                    style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
+                  >
+                    <LayoutDashboard size={16} /> Switch to CEO Dashboard
+                  </button>
+                  <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
                     style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
@@ -318,6 +325,7 @@ export default function AdminLayout() {
                 </div>
               </>
             )}
+            </div>
           </div>
         </header>
 
