@@ -17,6 +17,11 @@ import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage.tsx";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage.tsx";
 import AdminAIMonitoringPage from "./pages/admin/AdminAIMonitoringPage.tsx";
 import AdminFeatureFlagsPage from "./pages/admin/AdminFeatureFlagsPage.tsx";
+import AdminCommunicationsPage from "./pages/admin/AdminCommunicationsPage.tsx";
+import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
+import AdminSupportTicketDetailPage from "./pages/admin/AdminSupportTicketDetailPage.tsx";
+import AdminSystemHealthPage from "./pages/admin/AdminSystemHealthPage.tsx";
+import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
