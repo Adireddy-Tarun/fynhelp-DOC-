@@ -103,10 +103,10 @@ export default function AdminSubscriptionsPage() {
       <PageHeader title="Subscriptions & Billing" subtitle="Manage user subscriptions and revenue" />
 
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <Metric label="Active Subscriptions" value={String(metrics.active)} trend={8}  icon={<CreditCard size={22} color="#8B6914" />} />
-        <Metric label="Monthly Recurring Revenue" value={fmtINR(metrics.mrr)} trend={18} icon={<IndianRupee size={22} color="#8B6914" />} />
-        <Metric label="Annual Recurring Revenue" value={fmtINR(metrics.arr)} trend={18} icon={<TrendingUp size={22} color="#8B6914" />} />
-        <Metric label="Churn Rate (30 days)" value={`${metrics.churn.toFixed(1)}%`} trend={-1.1} icon={<TrendingDown size={22} color="#8B6914" />} />
+        <Metric label="Active Subscriptions" value={String(metrics.active)} icon={<CreditCard size={22} color="#8B6914" />} />
+        <Metric label="Monthly Recurring Revenue" value={fmtINR(metrics.mrr)} icon={<IndianRupee size={22} color="#8B6914" />} />
+        <Metric label="Annual Recurring Revenue" value={fmtINR(metrics.arr)} icon={<TrendingUp size={22} color="#8B6914" />} />
+        <Metric label="Churn Rate (30 days)" value={`${metrics.churn.toFixed(1)}%`} icon={<TrendingDown size={22} color="#8B6914" />} />
       </div>
 
       {/* Revenue trend */}
