@@ -111,7 +111,9 @@ export default function AdminAuditLogsPage() {
                   <tr key={l.id} onClick={() => setOpen(l)}
                     style={{
                       background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff",
-                      borderBottom: "1px solid rgba(26,16,8,0.06)", cursor: "pointer",
+                      borderBottom: "1px solid rgba(26,16,8,0.06)",
+                      borderLeft: `4px solid ${c.fg}`,
+                      cursor: "pointer",
                     }}>
                     <td style={cell}>{new Date(l.created_at).toLocaleString("en-IN")}</td>
                     <td style={cell}>{l.admin_user_id.slice(0, 8)}…</td>
