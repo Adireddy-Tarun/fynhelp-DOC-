@@ -23,6 +23,7 @@ import AdminSupportTicketDetailPage from "./pages/admin/AdminSupportTicketDetail
 import AdminSystemHealthPage from "./pages/admin/AdminSystemHealthPage.tsx";
 import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import AdminCeoViewPage from "./pages/admin/AdminCeoViewPage.tsx";
+import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
