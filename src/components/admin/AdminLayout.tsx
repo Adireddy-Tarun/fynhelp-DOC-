@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard,
+  Search, Bell, LayoutDashboard, Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,7 +16,7 @@ type NavItem =
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
-  { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin","admin"] },
+  { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin"] },
   { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
@@ -47,7 +47,8 @@ const TOP_H = 70;
 
 export default function AdminLayout() {
   const { user, signOut } = useAuth();
-  const { primaryRole } = useAdminAuth();
+  const { primaryRole, hasRole } = useAdminAuth();
+  const isSuperAdmin = hasRole("super_admin");
   const location = useLocation();
   const nav = useNavigate();
 
@@ -82,9 +83,13 @@ export default function AdminLayout() {
     return () => window.removeEventListener("keydown", onEsc);
   }, [sidebarOpen, isDesktop]);
 
-  // Auth disabled during design — show all items. Re-enable role filtering later:
-  // const visible = NAV_ITEMS.filter((i) => i.divider || !primaryRole || i.roles.includes(primaryRole));
-  const visible = NAV_ITEMS;
+  // Auth disabled during design — show all items EXCEPT super_admin-only ones.
+  const visible = NAV_ITEMS.filter((i) => {
+    if ("divider" in i && i.divider) return true;
+    const it = i as Extract<NavItem, { to: string }>;
+    if (it.roles.length === 1 && it.roles[0] === "super_admin") return isSuperAdmin;
+    return true;
+  });
 
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
 
@@ -318,13 +323,15 @@ export default function AdminLayout() {
                     boxShadow: "0 12px 32px hsl(var(--fyn-ink) / 0.15)",
                   }}
                 >
-                  <button
-                    onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
-                    style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
-                  >
-                    <LayoutDashboard size={16} /> Switch to CEO View
-                  </button>
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
+                      style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
+                    >
+                      <Lock size={14} color="hsl(var(--fyn-gold))" /> CEO View
+                    </button>
+                  )}
                   <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"

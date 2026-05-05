@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -90,7 +90,18 @@ export default function AdminCeoViewPage() {
 
   return (
     <div>
-      <PageHeader title="CEO Strategic View" subtitle="High-level platform intelligence & customer pulse" />
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
+        <PageHeader title="CEO Strategic View" subtitle="High-level platform intelligence & customer pulse" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+          style={{
+            background: "linear-gradient(135deg, rgba(196,30,30,0.12), rgba(139,105,20,0.12))",
+            border: "1px solid rgba(139,105,20,0.35)",
+            fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11,
+            color: "#8B6914", letterSpacing: 0.6, marginTop: 8,
+          }}>
+          <Lock size={12} /> SUPER ADMIN ONLY
+        </span>
+      </div>
 
       {/* Strategic metrics */}
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>

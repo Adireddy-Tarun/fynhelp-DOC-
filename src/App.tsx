@@ -23,6 +23,7 @@ import AdminSupportTicketDetailPage from "./pages/admin/AdminSupportTicketDetail
 import AdminSystemHealthPage from "./pages/admin/AdminSystemHealthPage.tsx";
 import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import AdminCeoViewPage from "./pages/admin/AdminCeoViewPage.tsx";
+import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
@@ -111,7 +112,7 @@ const App = () => (
             <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
               <Route index element={<AdminDashboardPage />} />
               <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="ceo-view" element={<AdminCeoViewPage />} />
+              <Route path="ceo-view" element={<ProtectedCeoRoute><AdminCeoViewPage /></ProtectedCeoRoute>} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="users/:id" element={<AdminUserDetailPage />} />
               <Route path="audit-logs" element={<AdminAuditLogsPage />} />
