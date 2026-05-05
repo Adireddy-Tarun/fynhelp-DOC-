@@ -182,12 +182,12 @@ export default function AdminUsersPage() {
                     </td>
                     <td style={cell} onClick={go}><span style={{ fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>{r.name}</span></td>
                     <td style={cell} onClick={go}><span style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{r.email}</span></td>
-                    <td style={cell} onClick={go}><span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)" }}>{r.mobile}</span></td>
+                    <td style={cell} onClick={go}><span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)" }}>{r.mobile}</span></td>
                     <td style={cell} onClick={go}><span style={{ color: "hsl(var(--fyn-ink) / 0.85)" }}>{r.company}</span></td>
                     <td style={cell} onClick={go}><Badge {...PLAN_STYLE[r.plan]} /></td>
                     <td style={cell} onClick={go}><Badge {...STATUS_STYLE[r.status]} /></td>
                     <td style={cell} onClick={go}>
-                      <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 13, fontWeight: 600, color: r.mrr > 0 ? "#8B6914" : "hsl(var(--fyn-ink) / 0.4)" }}>
+                      <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 600, color: r.mrr > 0 ? "#8B6914" : "hsl(var(--fyn-ink) / 0.4)" }}>
                         {r.mrr > 0 ? fmtINR(r.mrr) : "—"}
                       </span>
                     </td>
