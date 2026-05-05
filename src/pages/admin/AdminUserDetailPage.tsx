@@ -156,9 +156,9 @@ export default function AdminUserDetailPage() {
           </div>
           <div style={{ padding: 24, minHeight: 360 }}>
             {tab === "Subscription" && <SubscriptionTab business={business} />}
-            {tab === "Usage" && <PlaceholderTab text="Usage analytics arrive in Part 2 alongside the metering pipeline." />}
+            {tab === "Usage" && <UsageTab />}
             {tab === "Activity" && <ActivityTab logs={activity} />}
-            {tab === "Tickets" && <PlaceholderTab text="Support tickets ship with the support module in Part 2." />}
+            {tab === "Tickets" && <TicketsTab userId={profile.user_id} />}
           </div>
         </Card>
 
