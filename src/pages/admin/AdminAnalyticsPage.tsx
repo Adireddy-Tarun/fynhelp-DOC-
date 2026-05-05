@@ -177,7 +177,7 @@ export default function AdminAnalyticsPage() {
                 <tr key={i} style={{ borderTop:"1px solid rgba(26,16,8,0.06)" }}>
                   <td style={{ ...td, fontWeight:600 }}>{row[0]}</td>
                   {(row.slice(1) as (number|null)[]).map((v,j)=>(
-                    <td key={j} style={{ ...td, textAlign:"center", background: heat(v), color: v && v < 50 ? "#fff" : "hsl(var(--fyn-ink))", fontFamily:"DM Sans, sans-serif" }}>
+                    <td key={j} style={{ ...td, textAlign:"center", background: heat(v), color: v && v < 50 ? "#fff" : "hsl(var(--fyn-ink))", fontFamily:"JetBrains Mono, monospace" }}>
                       {v == null ? "—" : `${v}%`}
                     </td>
                   ))}

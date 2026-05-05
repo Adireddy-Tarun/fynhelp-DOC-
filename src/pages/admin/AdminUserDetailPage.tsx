@@ -310,7 +310,7 @@ function UsageTab() {
             <div key={m.module} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.4)", border: "1px solid rgba(139,105,20,0.12)" }}>
               <div className="flex items-center justify-between mb-1.5">
                 <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{m.module}</span>
-                <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>{m.usage}%</span>
+                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>{m.usage}%</span>
               </div>
               <div style={{ height: 6, borderRadius: 3, background: "rgba(26,16,8,0.08)", overflow: "hidden" }}>
                 <div style={{ width: `${m.usage}%`, height: "100%", background: "linear-gradient(90deg,#C41E1E,#8B6914)" }} />
@@ -337,7 +337,7 @@ function TicketsTab({ userId: _userId }: { userId: string }) {
           className="w-full text-left rounded-lg p-4 hover:bg-[hsl(var(--fyn-ink)/0.03)]"
           style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(26,16,8,0.1)" }}>
           <div className="flex items-center justify-between">
-            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "#8B6914", fontWeight: 600 }}>{t.number}</span>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#8B6914", fontWeight: 600 }}>{t.number}</span>
             <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{t.created}</span>
           </div>
           <div className="mt-1.5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{t.subject}</div>

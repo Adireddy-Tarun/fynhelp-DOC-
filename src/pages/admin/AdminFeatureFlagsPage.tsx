@@ -127,7 +127,7 @@ function FlagCard({ f, onToggle, onEdit }: { f: Flag; onToggle: () => void; onEd
             </p>
           )}
           <p className="mt-1" style={{ fontFamily:"Roboto, sans-serif", fontSize:12, color:"hsl(var(--fyn-ink) / 0.45)" }}>
-            <code style={{ fontFamily:"DM Sans, sans-serif" }}>{f.flag_name}</code> · Updated {new Date(f.updated_at).toLocaleString("en-IN")}
+            <code style={{ fontFamily:"JetBrains Mono, monospace" }}>{f.flag_name}</code> · Updated {new Date(f.updated_at).toLocaleString("en-IN")}
           </p>
         </div>
 
@@ -221,7 +221,7 @@ function FlagModal({ flag, onClose, onSaved }: { flag: Flag | null; onClose: () 
           <div>
             <label style={lbl}>Flag Name</label>
             <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="my_feature_name" disabled={!!flag}
-              style={{ ...input, fontFamily:"DM Sans, sans-serif" }} />
+              style={{ ...input, fontFamily:"JetBrains Mono, monospace" }} />
           </div>
           <div>
             <label style={lbl}>Display Name</label>

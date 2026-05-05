@@ -100,11 +100,11 @@ export default function AdminSystemHealthPage() {
               <div className="mt-2 grid grid-cols-2 gap-3" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }}>
                 <div>
                   <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Avg response</div>
-                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "DM Sans, sans-serif" }}>{s.responseMs}ms</div>
+                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>{s.responseMs}ms</div>
                 </div>
                 <div>
                   <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Uptime</div>
-                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "DM Sans, sans-serif" }}>{s.uptime}</div>
+                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>{s.uptime}</div>
                 </div>
               </div>
               <div className="mt-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>
@@ -161,7 +161,7 @@ export default function AdminSystemHealthPage() {
                     <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: "rgba(196,30,30,0.12)", color: "#C41E1E" }}>{e.type}</span>
                   </td>
                   <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{e.message}</td>
-                  <td className="py-3 px-2" style={{ fontFamily: "DM Sans, sans-serif", color: "hsl(var(--fyn-ink))" }}>{e.count}×</td>
+                  <td className="py-3 px-2" style={{ fontFamily: "JetBrains Mono, monospace", color: "hsl(var(--fyn-ink))" }}>{e.count}×</td>
                 </tr>
               ))}
             </tbody>

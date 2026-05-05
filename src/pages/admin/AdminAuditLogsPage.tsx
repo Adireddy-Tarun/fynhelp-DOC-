@@ -174,7 +174,7 @@ export default function AdminAuditLogsPage() {
                 </div>
                 <pre style={{
                   background: "#1A1008", color: "#F4EDDA", borderRadius: 12, padding: 16,
-                  fontFamily: "DM Sans, sans-serif", fontSize: 12, overflow: "auto",
+                  fontFamily: "JetBrains Mono, monospace", fontSize: 12, overflow: "auto",
                 }}>{JSON.stringify(open.details ?? {}, null, 2)}</pre>
               </div>
             </div>
