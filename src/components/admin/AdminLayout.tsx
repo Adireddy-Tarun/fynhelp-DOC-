@@ -318,11 +318,11 @@ export default function AdminLayout() {
                   }}
                 >
                   <button
-                    onClick={() => { setMenuOpen(false); nav("/dashboard"); toast.info("Switched to CEO Dashboard"); }}
+                    onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
                     style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
                   >
-                    <LayoutDashboard size={16} /> Switch to CEO Dashboard
+                    <LayoutDashboard size={16} /> Switch to CEO View
                   </button>
                   <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
