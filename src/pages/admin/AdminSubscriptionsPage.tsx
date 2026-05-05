@@ -225,7 +225,7 @@ export default function AdminSubscriptionsPage() {
                   <td style={td}>{SAMPLE_BIZ[i % SAMPLE_BIZ.length]}</td>
                   <td style={td}><PlanBadge plan={s.plan_type} /></td>
                   <td style={td}><StatusBadge status={s.status} /></td>
-                  <td style={{ ...td, textAlign:"right", fontFamily:"JetBrains Mono, monospace" }}>{fmtINR(Number(s.mrr))}</td>
+                  <td style={{ ...td, textAlign:"right", fontFamily:"DM Sans, sans-serif" }}>{fmtINR(Number(s.mrr))}</td>
                   <td style={td}>{s.billing_cycle}</td>
                   <td style={td}>{s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" }) : "—"}</td>
                   <td style={td}>{new Date(s.started_at).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" })}</td>

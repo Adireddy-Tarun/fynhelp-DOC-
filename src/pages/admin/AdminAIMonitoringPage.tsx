@@ -190,7 +190,7 @@ export default function AdminAIMonitoringPage() {
               <li key={String(q)} className="flex items-center justify-between py-2"
                 style={{ borderBottom:"1px solid rgba(26,16,8,0.05)" }}>
                 <span style={{ fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))" }}>{q}</span>
-                <span style={{ fontFamily:"JetBrains Mono, monospace", fontSize:13, color:"hsl(var(--fyn-ink) / 0.6)" }}>{n.toLocaleString("en-IN")}×</span>
+                <span style={{ fontFamily:"DM Sans, sans-serif", fontSize:13, color:"hsl(var(--fyn-ink) / 0.6)" }}>{n.toLocaleString("en-IN")}×</span>
               </li>
             ))}
           </ol>

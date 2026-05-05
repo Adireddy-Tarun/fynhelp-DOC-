@@ -80,7 +80,7 @@ export default function AdminContentPage() {
                   <td className="py-3 px-2"><span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: s.bg, color: s.color }}>{s.label}</span></td>
                   <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{p.author}</td>
                   <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.6)" }}>{p.date}</td>
-                  <td className="py-3 px-2" style={{ fontFamily: "JetBrains Mono, monospace", color: "hsl(var(--fyn-ink))" }}>{p.views.toLocaleString("en-IN")}</td>
+                  <td className="py-3 px-2" style={{ fontFamily: "DM Sans, sans-serif", color: "hsl(var(--fyn-ink))" }}>{p.views.toLocaleString("en-IN")}</td>
                   <td className="py-3 px-2"><RowActions onEdit={() => setEditorOpen(true)} /></td>
                 </tr>
               );
