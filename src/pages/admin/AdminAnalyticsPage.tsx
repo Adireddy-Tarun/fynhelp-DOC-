@@ -13,15 +13,20 @@ export default function AdminAnalyticsPage() {
     <div>
       <div className="flex items-start justify-between flex-wrap gap-4">
         <PageHeader title="Analytics" subtitle="Deep insights into revenue, churn, and usage" />
-        <select value={range} onChange={(e)=>setRange(e.target.value)}
-          style={{ height:44, padding:"0 14px", borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", background:"#fff",
-            fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))" }}>
-          <option value="7d">Last 7 days</option>
-          <option value="30d">Last 30 days</option>
-          <option value="90d">Last 90 days</option>
-          <option value="12m">Last 12 months</option>
-          <option value="all">All time</option>
-        </select>
+        <div>
+          <select value={range} onChange={(e)=>setRange(e.target.value)}
+            style={{ height:44, padding:"0 14px", borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", background:"#fff",
+              fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))" }}>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+            <option value="12m">Last 12 months</option>
+            <option value="all">All time</option>
+          </select>
+          <div className="mt-2 text-right" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>
+            Showing: {range === "7d" ? "Last 7 days" : range === "30d" ? "Last 30 days" : range === "90d" ? "Last 90 days" : range === "12m" ? "Last 12 months" : "All time"}
+          </div>
+        </div>
       </div>
 
       <Section title="Revenue Metrics">
