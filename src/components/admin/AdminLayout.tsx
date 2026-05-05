@@ -25,18 +25,8 @@ const FOOTER_NAV: NavItem[] = [
   { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
 ];
 
-export function AdminProtected({ children, allowed }: { children?: ReactNode; allowed?: AdminRole[] }) {
-  const { user, loading: aLoading } = useAuth();
-  const { loading, isAdmin, hasRole } = useAdminAuth();
-  const loc = useLocation();
-  if (aLoading || loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--fyn-beige))]">
-      <div className="text-[hsl(var(--fyn-ink)/0.5)]" style={{ fontFamily: "Raleway, sans-serif" }}>Loading…</div>
-    </div>;
-  }
-  if (!user) return <Navigate to="/admin/login" state={{ from: loc }} replace />;
-  if (!isAdmin) return <Navigate to="/admin/login" state={{ denied: true }} replace />;
-  if (allowed && !hasRole(...allowed)) return <Navigate to="/admin/dashboard" replace />;
+export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
+  // Auth temporarily disabled — admin portal is in design phase.
   return <>{children ?? <Outlet />}</>;
 }
 
