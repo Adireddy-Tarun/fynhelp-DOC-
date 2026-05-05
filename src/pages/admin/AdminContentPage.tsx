@@ -32,6 +32,12 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }>
   archived:  { bg: "rgba(196,30,30,0.1)",   color: "#C41E1E", label: "Archived" },
 };
 
+const TYPE_COLORS: Record<string, string> = {
+  Video: "#9333EA",
+  Template: "#3B82F6",
+  Article: "#10B981",
+};
+
 export default function AdminContentPage() {
   const [tab, setTab] = useState<Tab>("blog");
   const [editorOpen, setEditorOpen] = useState(false);
