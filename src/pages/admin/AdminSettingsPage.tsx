@@ -79,9 +79,9 @@ function AdminTeamTab() {
                 <td style={cell}>{r.role}</td>
                 <td style={cell}>{r.last}</td>
                 <td style={cell}>
-                  <button style={linkBtn("#8B6914")}>Edit Role</button>
+                  <button onClick={() => toast.info("Edit role coming in Part 4")} style={linkBtn("#8B6914")}>Edit Role</button>
                   <span style={{ margin: "0 8px", color: "rgba(26,16,8,0.2)" }}>·</span>
-                  <button style={linkBtn("#C41E1E")}>Remove</button>
+                  <button onClick={() => toast.info("Remove admin coming in Part 4")} style={linkBtn("#C41E1E")}>Remove</button>
                 </td>
               </tr>
             ))}
