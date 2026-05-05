@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Mail, Phone, Building2, Calendar, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { logAdminAction } from "@/lib/adminAudit";
+import { toast } from "sonner";
 
 type Profile = {
   user_id: string; full_name: string | null; mobile: string | null;
