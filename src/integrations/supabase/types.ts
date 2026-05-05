@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_logs: {
+        Row: {
+          business_id: string | null
+          cost_usd: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          model: string
+          prompt: string
+          response: string | null
+          response_time_ms: number | null
+          status: string
+          tokens_used: number | null
+          user_id: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          cost_usd?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          model?: string
+          prompt: string
+          response?: string | null
+          response_time_ms?: number | null
+          status?: string
+          tokens_used?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          cost_usd?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          model?: string
+          prompt?: string
+          response?: string | null
+          response_time_ms?: number | null
+          status?: string
+          tokens_used?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       alerts: {
         Row: {
           action_url: string | null
@@ -832,6 +877,42 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string | null
+          enabled: boolean
+          flag_name: string
+          id: string
+          rollout_percentage: number
+          target_segment: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name?: string | null
+          enabled?: boolean
+          flag_name: string
+          id?: string
+          rollout_percentage?: number
+          target_segment?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string | null
+          enabled?: boolean
+          flag_name?: string
+          id?: string
+          rollout_percentage?: number
+          target_segment?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gst_filings: {
         Row: {
           acknowledgement_number: string | null
@@ -1411,6 +1492,33 @@ export type Database = {
         }
         Relationships: []
       }
+      revenue_analytics_cache: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          metric_name: string
+          metric_value: number | null
+          period: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          metric_name: string
+          metric_value?: number | null
+          period?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          metric_name?: string
+          metric_value?: number | null
+          period?: string | null
+        }
+        Relationships: []
+      }
       roadmap_stops: {
         Row: {
           color: string
@@ -1502,6 +1610,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_history: {
+        Row: {
+          change_reason: string | null
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_mrr: number | null
+          new_plan: string | null
+          old_mrr: number | null
+          old_plan: string | null
+          subscription_id: string
+        }
+        Insert: {
+          change_reason?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_mrr?: number | null
+          new_plan?: string | null
+          old_mrr?: number | null
+          old_plan?: string | null
+          subscription_id: string
+        }
+        Update: {
+          change_reason?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_mrr?: number | null
+          new_plan?: string | null
+          old_mrr?: number | null
+          old_plan?: string | null
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          billing_cycle: string
+          business_id: string | null
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          mrr: number
+          next_billing_date: string | null
+          payment_method: string | null
+          payment_method_details: Json
+          plan_type: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          billing_cycle?: string
+          business_id?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mrr?: number
+          next_billing_date?: string | null
+          payment_method?: string | null
+          payment_method_details?: Json
+          plan_type?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          billing_cycle?: string
+          business_id?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          mrr?: number
+          next_billing_date?: string | null
+          payment_method?: string | null
+          payment_method_details?: Json
+          plan_type?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       tds_filings: {
         Row: {
