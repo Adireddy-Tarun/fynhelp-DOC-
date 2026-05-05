@@ -92,7 +92,7 @@ export default function AdminSupportTicketDetailPage() {
             <Field label="Assigned"><Select value={assigned} onChange={setAssigned} options={[["unassigned","Unassigned"],["self","Assign to me"],["tarun","Tarun"],["nidhi","Nidhi"]]} /></Field>
 
             <Divider />
-            <button className="w-full py-2 rounded-lg text-white"
+            <button onClick={() => toast.info("Close ticket coming in Part 4")} className="w-full py-2 rounded-lg text-white"
               style={{ background: "#C41E1E", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13 }}>
               Close Ticket
             </button>
