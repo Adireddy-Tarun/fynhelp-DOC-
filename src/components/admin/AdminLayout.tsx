@@ -83,9 +83,13 @@ export default function AdminLayout() {
     return () => window.removeEventListener("keydown", onEsc);
   }, [sidebarOpen, isDesktop]);
 
-  // Auth disabled during design — show all items. Re-enable role filtering later:
-  // const visible = NAV_ITEMS.filter((i) => i.divider || !primaryRole || i.roles.includes(primaryRole));
-  const visible = NAV_ITEMS;
+  // Auth disabled during design — show all items EXCEPT super_admin-only ones.
+  const visible = NAV_ITEMS.filter((i) => {
+    if ("divider" in i && i.divider) return true;
+    const it = i as Extract<NavItem, { to: string }>;
+    if (it.roles.length === 1 && it.roles[0] === "super_admin") return isSuperAdmin;
+    return true;
+  });
 
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
 
