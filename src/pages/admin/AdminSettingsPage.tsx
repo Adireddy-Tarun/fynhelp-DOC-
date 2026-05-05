@@ -134,7 +134,7 @@ function SecurityTab() {
                   <td style={cell}>{r.d}</td>
                   <td style={cell}>{r.l}</td>
                   <td style={cell}>{r.la}</td>
-                  <td style={cell}><button style={linkBtn("#C41E1E")}>Revoke</button></td>
+                  <td style={cell}><button onClick={() => toast.info("Revoke session coming in Part 4")} style={linkBtn("#C41E1E")}>Revoke</button></td>
                 </tr>
               ))}
             </tbody>
