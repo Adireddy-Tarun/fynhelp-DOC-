@@ -13,6 +13,10 @@ import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage.tsx";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage.tsx";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage.tsx";
 import AdminPlaceholderPage from "./pages/admin/AdminPlaceholderPage.tsx";
+import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage.tsx";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage.tsx";
+import AdminAIMonitoringPage from "./pages/admin/AdminAIMonitoringPage.tsx";
+import AdminFeatureFlagsPage from "./pages/admin/AdminFeatureFlagsPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
