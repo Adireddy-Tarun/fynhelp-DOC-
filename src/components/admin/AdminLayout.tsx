@@ -44,7 +44,8 @@ export default function AdminLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
-  const visible = NAV.filter((n) => !n.roles || hasRole(...n.roles));
+  // Auth temporarily disabled — show all nav items during design phase.
+  const visible = NAV;
 
   return (
     <div className="min-h-screen" style={{ background: "hsl(var(--fyn-beige))" }}>
