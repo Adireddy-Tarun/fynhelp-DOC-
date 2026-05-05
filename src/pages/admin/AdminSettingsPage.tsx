@@ -228,7 +228,7 @@ function NotificationsTab() {
         <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.55)", marginTop: 6 }}>
           Paste your Slack webhook URL to send notifications to a channel.
         </p>
-        <button className="mt-4"
+        <button onClick={() => toast.info("Test notification coming in Part 4")} className="mt-4"
           style={{
             height: 44, padding: "0 18px", borderRadius: 12, background: "transparent",
             border: "2px solid #8B6914", color: "#8B6914",
