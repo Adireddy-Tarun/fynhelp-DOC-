@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Plus } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { toast } from "sonner";
 
 const TABS = ["Admin Team", "Security", "Email Templates", "Notifications"] as const;
 type Tab = typeof TABS[number];
