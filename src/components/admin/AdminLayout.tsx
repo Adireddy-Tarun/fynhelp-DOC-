@@ -139,15 +139,23 @@ export default function AdminLayout() {
           </button>
         )}
 
-        <div style={{ padding: "24px 20px" }}>
-          <Link to="/admin/dashboard" className="flex items-baseline gap-2">
-            <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "#F4EDDA", letterSpacing: 1 }}>
-              FYNHelp
-            </span>
-            <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 12, color: "hsl(var(--fyn-gold))" }}>
+        <div style={{ padding: "20px 20px 12px" }}>
+          <button
+            onClick={() => { if (isMobile) setSidebarOpen(false); nav("/"); }}
+            aria-label="Go to FYNHelp home"
+            style={{
+              background: "transparent", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 10, width: "100%",
+              padding: 0, transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            <FynLogo variant="light" showTagline={false} size="sm" className="" />
+            <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, color: "hsl(var(--fyn-gold))", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
               Admin
             </span>
-          </Link>
+          </button>
         </div>
 
         <nav className="flex-1" style={{ paddingBottom: 60 }}>
