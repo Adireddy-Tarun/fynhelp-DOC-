@@ -160,8 +160,8 @@ export default function AdminCommunicationsPage() {
                   {s.content}
                 </p>
                 <div className="mt-3 flex gap-2">
-                  <button className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>Edit</button>
-                  <button className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(196,30,30,0.3)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "#C41E1E" }}>Cancel</button>
+                  <button onClick={() => toast.info("Edit scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>Edit</button>
+                  <button onClick={() => toast.info("Cancel scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(196,30,30,0.3)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "#C41E1E" }}>Cancel</button>
                 </div>
               </div>
             );
