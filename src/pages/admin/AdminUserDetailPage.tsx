@@ -182,7 +182,10 @@ export default function AdminUserDetailPage() {
             }}
           />
           <button
-            onClick={() => logAdminAction({ action: "user_note_saved", target_type: "user", target_id: profile.user_id, details: { length: notes.length } })}
+            onClick={async () => {
+              await logAdminAction({ action: "user_note_saved", target_type: "user", target_id: profile.user_id, details: { length: notes.length, note: notes } });
+              toast.success("Note saved (persistent storage coming in Part 4)");
+            }}
             disabled={!notes.trim()}
             style={{
               marginTop: 12, height: 40, padding: "0 16px", borderRadius: 10,
@@ -192,6 +195,22 @@ export default function AdminUserDetailPage() {
               fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13,
             }}
           >Save Note</button>
+
+          {/* Previous Notes (sample) */}
+          <div className="mt-6">
+            <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)", marginBottom: 8 }}>Previous Notes</div>
+            <div className="space-y-2">
+              {[
+                { author: "Tarun", time: "2 hours ago", text: "Called user about billing issue. Resolved." },
+                { author: "Nidhi", time: "1 day ago", text: "User interested in Enterprise plan. Follow up next week." },
+              ].map((n, i) => (
+                <div key={i} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.12)" }}>
+                  <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>{n.text}</div>
+                  <div className="mt-1" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{n.author} · {n.time}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </Card>
       </div>
     </div>
