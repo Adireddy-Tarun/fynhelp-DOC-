@@ -8,6 +8,7 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
+import FynLogo from "@/components/FynLogo";
 
 type NavItem =
   | { divider: true }
@@ -15,6 +16,7 @@ type NavItem =
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
+  { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin","admin"] },
   { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
@@ -138,15 +140,23 @@ export default function AdminLayout() {
           </button>
         )}
 
-        <div style={{ padding: "24px 20px" }}>
-          <Link to="/admin/dashboard" className="flex items-baseline gap-2">
-            <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "#F4EDDA", letterSpacing: 1 }}>
-              FYNHelp
-            </span>
-            <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 12, color: "hsl(var(--fyn-gold))" }}>
+        <div style={{ padding: "20px 20px 12px" }}>
+          <button
+            onClick={() => { if (isMobile) setSidebarOpen(false); nav("/"); }}
+            aria-label="Go to FYNHelp home"
+            style={{
+              background: "transparent", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 10, width: "100%",
+              padding: 0, transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            <FynLogo variant="light" showTagline={false} size="sm" className="" />
+            <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, color: "hsl(var(--fyn-gold))", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
               Admin
             </span>
-          </Link>
+          </button>
         </div>
 
         <nav className="flex-1" style={{ paddingBottom: 60 }}>
@@ -309,11 +319,11 @@ export default function AdminLayout() {
                   }}
                 >
                   <button
-                    onClick={() => { setMenuOpen(false); nav("/dashboard"); toast.info("Switched to CEO Dashboard"); }}
+                    onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
                     style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
                   >
-                    <LayoutDashboard size={16} /> Switch to CEO Dashboard
+                    <LayoutDashboard size={16} /> Switch to CEO View
                   </button>
                   <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
