@@ -141,7 +141,7 @@ export default function AdminSubscriptionsPage() {
         <Card style={{ height: 340 }}>
           <ResponsiveContainer>
             <PieChart>
-              <Pie data={Object.entries(planDist).map(([k,v]) => ({ name:k, value:v.count }))}
+              <Pie data={Object.entries(planDist).map(([k,v]) => ({ name: k === "free_trial" ? "Free Trial" : k.charAt(0).toUpperCase()+k.slice(1), value:v.count, key:k }))}
                 dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={110}>
                 {Object.keys(planDist).map((k) => <Cell key={k} fill={PLAN_COLORS[k]} />)}
               </Pie>
