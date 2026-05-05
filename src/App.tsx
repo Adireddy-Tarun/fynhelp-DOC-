@@ -23,6 +23,7 @@ import AdminSupportTicketDetailPage from "./pages/admin/AdminSupportTicketDetail
 import AdminSystemHealthPage from "./pages/admin/AdminSystemHealthPage.tsx";
 import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import Index from "./pages/Index.tsx";
+import DashboardPage from "./pages/DashboardPage.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
 import PublicSecurityPage from "./pages/SecurityPage.tsx";
@@ -136,6 +137,7 @@ const App = () => (
             <Route path="/waitlist" element={<WaitlistPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
