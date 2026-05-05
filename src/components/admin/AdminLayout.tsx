@@ -47,7 +47,8 @@ const TOP_H = 70;
 
 export default function AdminLayout() {
   const { user, signOut } = useAuth();
-  const { primaryRole } = useAdminAuth();
+  const { primaryRole, hasRole } = useAdminAuth();
+  const isSuperAdmin = hasRole("super_admin");
   const location = useLocation();
   const nav = useNavigate();
 
