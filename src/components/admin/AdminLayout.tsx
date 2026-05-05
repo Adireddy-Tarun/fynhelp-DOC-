@@ -1,74 +1,144 @@
-import { ReactNode, useState } from "react";
-import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp,
-  Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown, Bot,
+  BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
+  Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
 
-type NavItem = { to: string; label: string; icon: typeof BarChart3; roles?: AdminRole[] };
+type NavItem =
+  | { divider: true }
+  | { divider?: false; to: string; label: string; icon: typeof BarChart3; roles: AdminRole[] };
 
-const NAV: NavItem[] = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3 },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","analyst"] },
-  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin"] },
-  { to: "/admin/support", label: "Support Tickets", icon: MessageCircle },
-  { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },
-  { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
-  { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin"] },
-  { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin"] },
-  { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin"] },
-  { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin"] },
+const NAV_ITEMS: NavItem[] = [
+  { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
+  { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
+  { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
+  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
+  { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent","admin"] },
+  { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst","admin"] },
+  { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst","admin"] },
+  { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin","admin"] },
+  { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin","admin"] },
+  { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin","admin"] },
+  { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin","admin"] },
+  { divider: true },
+  { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
 ];
-const FOOTER_NAV: NavItem[] = [
-  { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList },
-];
-
-export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
-  // Auth temporarily disabled — admin portal is in design phase.
-  return <>{children ?? <Outlet />}</>;
-}
 
 const ROLE_LABEL: Record<AdminRole, string> = {
   super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",
   support_agent: "Support Agent", analyst: "Analyst",
 };
 
+export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
+  // Auth temporarily disabled — admin portal is in design phase.
+  return <>{children ?? <Outlet />}</>;
+}
+
+const SIDEBAR_W = 260;
+const MOBILE_W = 280;
+const TOP_H = 70;
+
 export default function AdminLayout() {
   const { user, signOut } = useAuth();
-  const { primaryRole, hasRole } = useAdminAuth();
+  const { primaryRole } = useAdminAuth();
+  const location = useLocation();
   const nav = useNavigate();
-  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1280
+  );
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const isDesktop = windowWidth >= 1024;
+
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop) setSidebarOpen(true);
+    else if (isMobile) setSidebarOpen(false);
+  }, [isDesktop, isMobile]);
+
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && sidebarOpen && !isDesktop) setSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [sidebarOpen, isDesktop]);
+
+  // Auth disabled during design — show all items. Re-enable role filtering later:
+  // const visible = NAV_ITEMS.filter((i) => i.divider || !primaryRole || i.roles.includes(primaryRole));
+  const visible = NAV_ITEMS;
+
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
-  // Auth temporarily disabled — show all nav items during design phase.
-  const visible = NAV;
+
+  // Derived layout values
+  const sidebarLeft = isMobile ? (sidebarOpen ? 0 : -MOBILE_W) : 0;
+  const sidebarWidth = isMobile ? MOBILE_W : isTablet ? (sidebarOpen ? SIDEBAR_W : 0) : SIDEBAR_W;
+  const mainMargin = isMobile ? 0 : isTablet ? (sidebarOpen ? SIDEBAR_W : 0) : SIDEBAR_W;
+  const mainPad = isMobile ? 20 : isTablet ? 32 : 40;
 
   return (
-    <div className="min-h-screen" style={{ background: "hsl(var(--fyn-beige))" }}>
-      {/* Top nav */}
-      <header
-        className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 md:px-6"
+    <div className="admin-layout" style={{ minHeight: "100vh", background: "hsl(var(--fyn-beige))" }}>
+      {/* Backdrop (mobile only) */}
+      {sidebarOpen && isMobile && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+            zIndex: 40, transition: "opacity 0.3s ease",
+          }}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        role="navigation"
+        aria-label="Admin navigation"
         style={{
-          height: 64, background: "#FFFFFF",
-          borderBottom: "1px solid hsl(var(--fyn-ink) / 0.1)",
-          boxShadow: "0 2px 8px hsl(var(--fyn-ink) / 0.04)",
+          position: "fixed",
+          top: 0, left: sidebarLeft,
+          width: isMobile ? MOBILE_W : sidebarWidth,
+          height: "100vh",
+          background: "hsl(var(--fyn-ink))",
+          zIndex: 50,
+          overflowY: "auto", overflowX: "hidden",
+          transition: "left 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1)",
+          display: "flex", flexDirection: "column",
         }}
       >
-        <div className="flex items-center gap-3">
+        {!isDesktop && (
           <button
-            className="md:hidden p-2 -ml-2 rounded-lg"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation"
-            style={{ minWidth: 44, minHeight: 44 }}
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+            style={{
+              position: "absolute", top: 16, right: 16,
+              background: "transparent", border: "none", cursor: "pointer",
+              color: "#F4EDDA", padding: 6, zIndex: 60, transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            <Menu size={22} color="hsl(var(--fyn-ink))" />
+            <X size={24} strokeWidth={2.5} />
           </button>
+        )}
+
+        <div style={{ padding: "24px 20px" }}>
           <Link to="/admin/dashboard" className="flex items-baseline gap-2">
-            <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+            <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "#F4EDDA", letterSpacing: 1 }}>
               FYNHelp
             </span>
             <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 12, color: "hsl(var(--fyn-gold))" }}>
@@ -76,149 +146,162 @@ export default function AdminLayout() {
             </span>
           </Link>
         </div>
-        <div className="relative">
-          <button
-            onClick={() => setMenuOpen((s) => !s)}
-            className="flex items-center gap-3 rounded-xl pl-2 pr-3 py-1.5 hover:bg-[hsl(var(--fyn-ink)/0.04)]"
-            style={{ minHeight: 44 }}
-          >
-            <span
-              className="grid place-items-center rounded-full text-white"
-              style={{
-                width: 36, height: 36,
-                background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-                fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 13,
-              }}
-            >{initials}</span>
-            <div className="hidden sm:flex flex-col items-start leading-tight">
-              <span style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
-                {user?.email?.split("@")[0] ?? "Admin"}
-              </span>
-              <span
+
+        <nav className="flex-1" style={{ paddingBottom: 60 }}>
+          {visible.map((item, idx) => {
+            if ("divider" in item && item.divider) {
+              return (
+                <div
+                  key={`div-${idx}`}
+                  style={{ height: 1, background: "rgba(244,237,218,0.1)", margin: "12px 16px" }}
+                />
+              );
+            }
+            const it = item as Extract<NavItem, { to: string }>;
+            const Icon = it.icon;
+            const isActive = location.pathname === it.to || location.pathname.startsWith(it.to + "/");
+            return (
+              <NavLink
+                key={it.to}
+                to={it.to}
+                onClick={() => { if (isMobile) setSidebarOpen(false); }}
                 style={{
-                  fontFamily: "DM Sans, sans-serif", fontSize: 11,
-                  color: "hsl(var(--fyn-gold))", fontWeight: 600,
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "14px 20px",
+                  background: isActive ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)" : "transparent",
+                  color: isActive ? "#FFFFFF" : "rgba(244,237,218,0.8)",
+                  borderLeft: isActive ? "4px solid #8B6914" : "4px solid transparent",
+                  paddingLeft: isActive ? 16 : 20,
+                  fontFamily: "Raleway, sans-serif", fontWeight: 500, fontSize: 15,
+                  textDecoration: "none",
+                  transition: "all 0.25s ease",
+                  boxShadow: isActive ? "0 4px 12px rgba(196,30,30,0.3)" : "none",
                 }}
-              >{primaryRole ? ROLE_LABEL[primaryRole] : "Admin"}</span>
-            </div>
-            <ChevronDown size={16} color="hsl(var(--fyn-ink) / 0.5)" />
-          </button>
-          {menuOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div
-                className="absolute right-0 mt-2 w-56 z-20 overflow-hidden rounded-xl"
-                style={{
-                  background: "rgba(255,255,255,0.98)",
-                  backdropFilter: "blur(20px)",
-                  border: "1px solid hsl(var(--fyn-gold) / 0.2)",
-                  boxShadow: "0 12px 32px hsl(var(--fyn-ink) / 0.15)",
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "rgba(139,105,20,0.15)";
+                    e.currentTarget.style.color = "#F4EDDA";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "rgba(244,237,218,0.8)";
+                  }
                 }}
               >
-                <button
-                  onClick={async () => { await signOut(); nav("/admin/login"); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
-                  style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
-                >
-                  <LogOut size={16} /> Sign out
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </header>
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 z-50 md:z-30 transition-transform duration-300
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
-        style={{
-          width: 260, height: "100vh", background: "hsl(var(--fyn-ink))",
-          paddingTop: 64, display: "flex", flexDirection: "column",
-        }}
-      >
-        <button
-          className="md:hidden absolute top-3 right-3 p-2 rounded-lg text-white"
-          onClick={() => setMobileOpen(false)}
-          aria-label="Close navigation"
-          style={{ minWidth: 44, minHeight: 44 }}
-        >
-          <X size={22} />
-        </button>
-        <nav className="flex-1 overflow-y-auto py-4">
-          {visible.map((item) => (
-            <SidebarLink key={item.to} item={item} onClick={() => setMobileOpen(false)} />
-          ))}
+                <Icon size={20} />
+                <span>{it.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
-        <div style={{ borderTop: "1px solid rgba(244,237,218,0.1)", padding: "8px 0" }}>
-          {FOOTER_NAV.map((item) => (
-            <SidebarLink key={item.to} item={item} onClick={() => setMobileOpen(false)} />
-          ))}
-        </div>
+
         <div
-          className="px-5 py-4"
           style={{
+            position: "absolute", bottom: 0, left: 0, right: 0,
+            padding: "16px 20px",
             borderTop: "1px solid rgba(244,237,218,0.1)",
             color: "rgba(244,237,218,0.5)",
             fontFamily: "Roboto, sans-serif", fontSize: 12,
+            background: "hsl(var(--fyn-ink))",
           }}
-        >v1.0.0</div>
+        >
+          v1.0.0
+        </div>
       </aside>
 
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 md:hidden"
-          style={{ background: "rgba(0,0,0,0.5)" }}
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* Main */}
-      <main
+      {/* Main wrapper */}
+      <div
         style={{
-          paddingTop: 64,
-          paddingLeft: 0,
-          minHeight: "100vh",
+          marginLeft: mainMargin,
+          transition: "margin-left 0.3s cubic-bezier(0.4,0,0.2,1)",
+          display: "flex", flexDirection: "column", minHeight: "100vh",
         }}
-        className="md:pl-[260px]"
       >
-        <div className="px-5 py-6 md:px-10 md:py-10">
-          <Outlet />
-        </div>
-      </main>
-    </div>
-  );
-}
+        {/* Top nav */}
+        <header
+          style={{
+            height: TOP_H, background: "#FFFFFF",
+            borderBottom: "1px solid hsl(var(--fyn-ink) / 0.08)",
+            boxShadow: "0 2px 8px hsl(var(--fyn-ink) / 0.04)",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: isMobile ? "0 16px" : "0 32px",
+            position: "sticky", top: 0, zIndex: 30,
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {!isDesktop && (
+              <button
+                onClick={() => setSidebarOpen((s) => !s)}
+                aria-label="Toggle sidebar"
+                style={{
+                  background: "transparent", border: "none", cursor: "pointer",
+                  padding: 8, color: "hsl(var(--fyn-ink))", borderRadius: 8,
+                  transition: "background 0.2s ease", minWidth: 44, minHeight: 44,
+                  display: "grid", placeItems: "center",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,16,8,0.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <Menu size={24} />
+              </button>
+            )}
+          </div>
 
-function SidebarLink({ item, onClick }: { item: NavItem; onClick?: () => void }) {
-  const Icon = item.icon;
-  return (
-    <NavLink
-      to={item.to}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3.5 px-5 py-3.5 transition-all duration-200 ${
-          isActive ? "active-admin-link" : ""
-        }`
-      }
-      style={({ isActive }) =>
-        isActive
-          ? {
-              background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-              color: "#FFFFFF",
-              borderLeft: "4px solid #8B6914",
-              paddingLeft: 16,
-              boxShadow: "0 4px 12px rgba(196,30,30,0.3)",
-              fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 15,
-            }
-          : {
-              color: "rgba(244,237,218,0.8)",
-              fontFamily: "Raleway, sans-serif", fontWeight: 500, fontSize: 15,
-            }
-      }
-    >
-      <Icon size={20} />
-      <span>{item.label}</span>
-    </NavLink>
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((s) => !s)}
+              className="flex items-center gap-3 rounded-xl pl-2 pr-3 py-1.5 hover:bg-[hsl(var(--fyn-ink)/0.04)]"
+              style={{ minHeight: 44 }}
+            >
+              <span
+                className="grid place-items-center rounded-full text-white"
+                style={{
+                  width: 36, height: 36,
+                  background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                  fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 13,
+                }}
+              >{initials}</span>
+              <div className="hidden sm:flex flex-col items-start leading-tight">
+                <span style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
+                  {user?.email?.split("@")[0] ?? "Admin"}
+                </span>
+                <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-gold))", fontWeight: 600 }}>
+                  {primaryRole ? ROLE_LABEL[primaryRole] : "Admin"}
+                </span>
+              </div>
+              <ChevronDown size={16} color="hsl(var(--fyn-ink) / 0.5)" />
+            </button>
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                <div
+                  className="absolute right-0 mt-2 w-56 z-20 overflow-hidden rounded-xl"
+                  style={{
+                    background: "rgba(255,255,255,0.98)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid hsl(var(--fyn-gold) / 0.2)",
+                    boxShadow: "0 12px 32px hsl(var(--fyn-ink) / 0.15)",
+                  }}
+                >
+                  <button
+                    onClick={async () => { await signOut(); nav("/admin/login"); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
+                    style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
+                  >
+                    <LogOut size={16} /> Sign out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </header>
+
+        <main style={{ flex: 1, padding: mainPad, overflowY: "auto" }}>
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 }
