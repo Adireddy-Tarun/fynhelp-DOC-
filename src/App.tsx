@@ -109,12 +109,13 @@ const App = () => (
               <Route path="users/:id" element={<AdminUserDetailPage />} />
               <Route path="audit-logs" element={<AdminAuditLogsPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
-              <Route path="subscriptions" element={<AdminPlaceholderPage title="Subscriptions & Billing" subtitle="Plans, MRR, invoices" note="Subscriptions and billing ship in Part 2." />} />
+              <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+              <Route path="ai-monitoring" element={<AdminAIMonitoringPage />} />
               <Route path="content" element={<AdminPlaceholderPage title="Content Management" subtitle="Resources, blog, roadmap" note="Content management ships in Part 2." />} />
               <Route path="support" element={<AdminPlaceholderPage title="Support Tickets" subtitle="Inbox, SLAs, replies" note="Support tickets ship in Part 2." />} />
-              <Route path="analytics" element={<AdminPlaceholderPage title="Analytics" subtitle="Usage, retention, funnels" note="Analytics dashboards ship in Part 2." />} />
+              <Route path="analytics" element={<AdminAnalyticsPage />} />
               <Route path="communications" element={<AdminPlaceholderPage title="Communications Hub" subtitle="Broadcasts & campaigns" note="Communications hub ships in Part 3." />} />
-              <Route path="feature-flags" element={<AdminPlaceholderPage title="Feature Flags" subtitle="Rollouts and kill switches" note="Feature flags ship in Part 2." />} />
+              <Route path="feature-flags" element={<AdminFeatureFlagsPage />} />
               <Route path="system-health" element={<AdminPlaceholderPage title="System Health" subtitle="Uptime, errors, performance" note="System health ships in Part 3." />} />
             </Route>
             
