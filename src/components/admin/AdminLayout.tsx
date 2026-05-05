@@ -8,6 +8,7 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
+import FynLogo from "@/components/FynLogo";
 
 type NavItem =
   | { divider: true }
