@@ -85,6 +85,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <AdminAuthProvider>
       <CAAuthProvider>
       <TooltipProvider>
         <Toaster />
@@ -92,6 +93,12 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+            </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/security" element={<PublicSecurityPage />} />
