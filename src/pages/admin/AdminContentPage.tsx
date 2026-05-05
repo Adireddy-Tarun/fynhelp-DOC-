@@ -95,7 +95,7 @@ export default function AdminContentPage() {
             {RESOURCES.map((r) => (
               <tr key={r.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                 <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{r.title}</td>
-                <td className="py-3 px-2"><span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>{r.type}</span></td>
+                <td className="py-3 px-2"><span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: `${TYPE_COLORS[r.type] ?? "#8B6914"}20`, color: TYPE_COLORS[r.type] ?? "#8B6914" }}>{r.type}</span></td>
                 <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{r.category}</td>
                 <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.6)" }}>{r.date}</td>
                 <td className="py-3 px-2"><RowActions onEdit={() => setEditorOpen(true)} /></td>
