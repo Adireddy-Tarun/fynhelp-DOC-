@@ -4,6 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import AdminLayout, { AdminProtected } from "@/components/admin/AdminLayout";
+import AdminLoginPage from "./pages/admin/AdminLoginPage.tsx";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage.tsx";
+import AdminUsersPage from "./pages/admin/AdminUsersPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
@@ -80,6 +85,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+      <AdminAuthProvider>
       <CAAuthProvider>
       <TooltipProvider>
         <Toaster />
@@ -87,6 +93,12 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+            </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/security" element={<PublicSecurityPage />} />
@@ -166,6 +178,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
       </CAAuthProvider>
+      </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
