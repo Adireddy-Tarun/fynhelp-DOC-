@@ -89,7 +89,7 @@ function AdminTeamTab() {
         </table>
       </div>
 
-      <button className="mt-6 inline-flex items-center gap-2"
+      <button onClick={() => toast.info("Add admin coming in Part 4")} className="mt-6 inline-flex items-center gap-2"
         style={{
           height: 44, padding: "0 18px", borderRadius: 12,
           background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
