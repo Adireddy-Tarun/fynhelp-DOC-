@@ -3,7 +3,9 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
+  Search, Bell, LayoutDashboard,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
 
@@ -249,7 +251,28 @@ export default function AdminLayout() {
             )}
           </div>
 
-          <div className="relative">
+          <div className="flex items-center gap-1">
+            {/* Search */}
+            <button
+              onClick={() => toast.info("Global search coming in Part 4")}
+              className="p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"
+              aria-label="Search"
+              style={{ minWidth: 40, minHeight: 40, display: "grid", placeItems: "center" }}
+            >
+              <Search size={20} color="hsl(var(--fyn-ink) / 0.7)" />
+            </button>
+            {/* Notifications */}
+            <button
+              onClick={() => toast.info("Notifications coming in Part 4")}
+              className="relative p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"
+              aria-label="Notifications"
+              style={{ minWidth: 40, minHeight: 40, display: "grid", placeItems: "center" }}
+            >
+              <Bell size={20} color="hsl(var(--fyn-ink) / 0.7)" />
+              <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: "#C41E1E" }} />
+            </button>
+
+            <div className="relative ml-1">
             <button
               onClick={() => setMenuOpen((s) => !s)}
               className="flex items-center gap-3 rounded-xl pl-2 pr-3 py-1.5 hover:bg-[hsl(var(--fyn-ink)/0.04)]"
@@ -286,6 +309,13 @@ export default function AdminLayout() {
                   }}
                 >
                   <button
+                    onClick={() => { setMenuOpen(false); nav("/dashboard"); toast.info("Switched to CEO Dashboard"); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
+                    style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
+                  >
+                    <LayoutDashboard size={16} /> Switch to CEO Dashboard
+                  </button>
+                  <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
                     style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
@@ -295,6 +325,7 @@ export default function AdminLayout() {
                 </div>
               </>
             )}
+            </div>
           </div>
         </header>
 

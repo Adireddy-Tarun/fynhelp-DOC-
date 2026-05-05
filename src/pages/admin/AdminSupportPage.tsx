@@ -138,11 +138,16 @@ export default function AdminSupportPage() {
 
 function FilterSelect({ value, onChange, label, options }: { value: string; onChange: (v: string) => void; label: string; options: [string, string][] }) {
   return (
-    <select value={value} onChange={(e) => onChange(e.target.value)}
-      aria-label={label}
-      className="w-full rounded-lg px-3 py-2.5"
-      style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
-      {options.map(([v, l]) => <option key={v} value={v}>{label}: {l}</option>)}
-    </select>
+    <div>
+      <label className="block mb-1" style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, fontWeight: 600, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+        {label}
+      </label>
+      <select value={value} onChange={(e) => onChange(e.target.value)}
+        aria-label={label}
+        className="w-full rounded-lg px-3 py-2.5"
+        style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
+        {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+      </select>
+    </div>
   );
 }

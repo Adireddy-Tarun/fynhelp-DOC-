@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Mail, Phone, Building2, Calendar, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { logAdminAction } from "@/lib/adminAudit";
+import { toast } from "sonner";
 
 type Profile = {
   user_id: string; full_name: string | null; mobile: string | null;
@@ -61,7 +62,7 @@ export default function AdminUserDetailPage() {
       target_type: "user", target_id: profile.user_id,
       details: { mode: "read_only" },
     });
-    alert("Read-only ‘View as’ mode is logged. Full impersonation ships in Part 2.");
+    toast.info("Viewing as user (read-only mode). Full impersonation coming in Part 4.");
   };
 
   if (loading) {
@@ -155,9 +156,9 @@ export default function AdminUserDetailPage() {
           </div>
           <div style={{ padding: 24, minHeight: 360 }}>
             {tab === "Subscription" && <SubscriptionTab business={business} />}
-            {tab === "Usage" && <PlaceholderTab text="Usage analytics arrive in Part 2 alongside the metering pipeline." />}
+            {tab === "Usage" && <UsageTab />}
             {tab === "Activity" && <ActivityTab logs={activity} />}
-            {tab === "Tickets" && <PlaceholderTab text="Support tickets ship with the support module in Part 2." />}
+            {tab === "Tickets" && <TicketsTab userId={profile.user_id} />}
           </div>
         </Card>
 
@@ -181,7 +182,10 @@ export default function AdminUserDetailPage() {
             }}
           />
           <button
-            onClick={() => logAdminAction({ action: "user_note_saved", target_type: "user", target_id: profile.user_id, details: { length: notes.length } })}
+            onClick={async () => {
+              await logAdminAction({ action: "user_note_saved", target_type: "user", target_id: profile.user_id, details: { length: notes.length, note: notes } });
+              toast.success("Note saved (persistent storage coming in Part 4)");
+            }}
             disabled={!notes.trim()}
             style={{
               marginTop: 12, height: 40, padding: "0 16px", borderRadius: 10,
@@ -191,6 +195,22 @@ export default function AdminUserDetailPage() {
               fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13,
             }}
           >Save Note</button>
+
+          {/* Previous Notes (sample) */}
+          <div className="mt-6">
+            <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)", marginBottom: 8 }}>Previous Notes</div>
+            <div className="space-y-2">
+              {[
+                { author: "Tarun", time: "2 hours ago", text: "Called user about billing issue. Resolved." },
+                { author: "Nidhi", time: "1 day ago", text: "User interested in Enterprise plan. Follow up next week." },
+              ].map((n, i) => (
+                <div key={i} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.12)" }}>
+                  <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>{n.text}</div>
+                  <div className="mt-1" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{n.author} · {n.time}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </Card>
       </div>
     </div>
@@ -264,6 +284,65 @@ function PlaceholderTab({ text }: { text: string }) {
     <div className="flex items-center justify-center text-center py-12"
       style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.55)" }}>
       {text}
+    </div>
+  );
+}
+
+function UsageTab() {
+  const modules = [
+    { module: "AI CFO Nidhi", usage: 89 },
+    { module: "Liquidity Intelligence", usage: 78 },
+    { module: "GST Intelligence", usage: 67 },
+    { module: "Revenue Intelligence", usage: 54 },
+  ];
+  return (
+    <div className="space-y-5">
+      <div>
+        <h4 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>AI Queries (Last 30 days)</h4>
+        <div className="mt-3 rounded-xl p-6 text-center" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>
+          Detailed query metering chart wires up in Part 4
+        </div>
+      </div>
+      <div>
+        <h4 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Module Usage</h4>
+        <div className="mt-3 space-y-2">
+          {modules.map((m) => (
+            <div key={m.module} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.4)", border: "1px solid rgba(139,105,20,0.12)" }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{m.module}</span>
+                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>{m.usage}%</span>
+              </div>
+              <div style={{ height: 6, borderRadius: 3, background: "rgba(26,16,8,0.08)", overflow: "hidden" }}>
+                <div style={{ width: `${m.usage}%`, height: "100%", background: "linear-gradient(90deg,#C41E1E,#8B6914)" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TicketsTab({ userId: _userId }: { userId: string }) {
+  const navigate = useNavigate();
+  const tickets = [
+    { id: "1", number: "TKT-001234", subject: "Payment failed after upgrade", status: "open", created: "2 hours ago" },
+    { id: "2", number: "TKT-001189", subject: "CSV upload showing errors", status: "in_progress", created: "1 day ago" },
+  ];
+  if (tickets.length === 0) return <PlaceholderTab text="No support tickets" />;
+  return (
+    <div className="space-y-2">
+      {tickets.map((t) => (
+        <button key={t.id} onClick={() => navigate(`/admin/support/${t.id}`)}
+          className="w-full text-left rounded-lg p-4 hover:bg-[hsl(var(--fyn-ink)/0.03)]"
+          style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(26,16,8,0.1)" }}>
+          <div className="flex items-center justify-between">
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#8B6914", fontWeight: 600 }}>{t.number}</span>
+            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{t.created}</span>
+          </div>
+          <div className="mt-1.5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{t.subject}</div>
+        </button>
+      ))}
     </div>
   );
 }

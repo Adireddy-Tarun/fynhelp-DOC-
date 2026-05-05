@@ -160,8 +160,8 @@ export default function AdminCommunicationsPage() {
                   {s.content}
                 </p>
                 <div className="mt-3 flex gap-2">
-                  <button className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>Edit</button>
-                  <button className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(196,30,30,0.3)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "#C41E1E" }}>Cancel</button>
+                  <button onClick={() => toast.info("Edit scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>Edit</button>
+                  <button onClick={() => toast.info("Cancel scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(196,30,30,0.3)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "#C41E1E" }}>Cancel</button>
                 </div>
               </div>
             );
@@ -194,28 +194,46 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
   const [content, setContent] = useState("");
   const [audience, setAudience] = useState("all_users");
   const [subject, setSubject] = useState("");
+  const [preheader, setPreheader] = useState("");
+  const [facebook, setFacebook] = useState(true);
+  const [instagram, setInstagram] = useState(false);
+  const [postType, setPostType] = useState<"feed" | "story">("feed");
   const max = platform === "twitter" ? 280 : 1000;
 
   const send = async () => {
-    if (!content.trim() && platform !== "email") { toast.error("Message is empty"); return; }
-    if (platform === "email" && !subject.trim()) { toast.error("Subject is required"); return; }
+    if (platform === "email") {
+      if (!subject.trim()) { toast.error("Subject is required"); return; }
+      if (!content.trim()) { toast.error("Body is required"); return; }
+    } else if (!content.trim()) {
+      toast.error(platform === "twitter" ? "Tweet is empty" : "Message is empty"); return;
+    }
+    if (platform === "meta" && !facebook && !instagram) { toast.error("Select at least one platform"); return; }
+
     await logAdminAction({
       action: `${platform}_blast_sent`,
       target_type: "communications",
-      details: { platform, audience, length: content.length, subject: platform === "email" ? subject : undefined },
+      details: {
+        platform, audience, length: content.length,
+        subject: platform === "email" ? subject : undefined,
+        preheader: platform === "email" ? preheader : undefined,
+        meta: platform === "meta" ? { facebook, instagram, postType } : undefined,
+      },
     });
-    toast.success(`${PLATFORM_META[platform].label} message queued`);
+    toast.success(`${PLATFORM_META[platform].label} ${platform === "twitter" ? "tweet" : platform === "email" ? "blast" : platform === "meta" ? "post" : "message"} queued`);
     onClose();
   };
+
+  const title = platform === "twitter" ? "New Tweet"
+    : platform === "email" ? "New Email Blast"
+    : platform === "meta" ? "New Meta Post"
+    : "New WhatsApp Message";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl rounded-2xl overflow-hidden"
         style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)", maxHeight: "90vh", overflowY: "auto" }}>
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
-          <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>
-            New {PLATFORM_META[platform].label} {platform === "twitter" ? "Tweet" : platform === "email" ? "Blast" : "Message"}
-          </h2>
+          <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>{title}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"><X size={18} /></button>
         </div>
 
@@ -231,18 +249,48 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               </select>
             </Field>
           )}
-          {platform === "email" && (
-            <Field label="Subject">
-              <input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full rounded-lg px-3 py-2.5"
-                placeholder="Your trial is ending in 3 days"
-                style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
-            </Field>
+
+          {platform === "meta" && (
+            <>
+              <Field label="Platforms">
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2"><input type="checkbox" checked={facebook} onChange={(e) => setFacebook(e.target.checked)} /><span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>Post to Facebook</span></label>
+                  <label className="flex items-center gap-2"><input type="checkbox" checked={instagram} onChange={(e) => setInstagram(e.target.checked)} /><span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>Post to Instagram</span></label>
+                </div>
+              </Field>
+              <Field label="Post Type">
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2"><input type="radio" name="pt" checked={postType === "feed"} onChange={() => setPostType("feed")} /><span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>Feed Post</span></label>
+                  <label className="flex items-center gap-2"><input type="radio" name="pt" checked={postType === "story"} onChange={() => setPostType("story")} disabled={!instagram} /><span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, opacity: instagram ? 1 : 0.5 }}>Story (Instagram only)</span></label>
+                </div>
+              </Field>
+            </>
           )}
 
-          <Field label={platform === "email" ? "Body" : "Message"}>
+          {platform === "email" && (
+            <>
+              <Field label="Subject">
+                <input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full rounded-lg px-3 py-2.5"
+                  placeholder="Your trial is ending in 3 days"
+                  style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+              </Field>
+              <Field label="Preheader">
+                <input value={preheader} onChange={(e) => setPreheader(e.target.value.slice(0, 140))} className="w-full rounded-lg px-3 py-2.5"
+                  placeholder="Don't lose access to your financial data"
+                  style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+                <div className="mt-1" style={{ fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>{preheader.length}/140 characters</div>
+              </Field>
+            </>
+          )}
+
+          <Field label={platform === "email" ? "Body" : platform === "twitter" ? "Tweet" : "Message"}>
             <textarea
               value={content}
-              onChange={(e) => setContent(e.target.value.slice(0, max))}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (platform === "twitter" && v.length > max) return;
+                setContent(platform === "twitter" ? v : v.slice(0, max));
+              }}
               rows={platform === "twitter" ? 4 : 8}
               placeholder={
                 platform === "whatsapp" ? "Type your WhatsApp message…"
@@ -253,21 +301,41 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               className="w-full rounded-lg px-3 py-2.5 resize-y"
               style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.5 }}
             />
-            <div className="mt-1 text-right" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: content.length > max * 0.9 ? "#C41E1E" : "hsl(var(--fyn-ink) / 0.5)" }}>
+            <div className="mt-1 text-right" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: content.length > max * 0.95 ? "#C41E1E" : content.length > max * 0.85 ? "#B45309" : "hsl(var(--fyn-ink) / 0.5)" }}>
               {content.length} / {max}
             </div>
+            {platform === "twitter" && content.length > 270 && (
+              <div className="mt-2 p-2 rounded" style={{ background: "rgba(196,30,30,0.1)", fontSize: 12, color: "#C41E1E" }}>
+                ⚠️ Tweet is approaching the character limit
+              </div>
+            )}
+            {platform === "email" && (
+              <div className="mt-1" style={{ fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>
+                Variables: {`{{user_name}}`}, {`{{company_name}}`}, {`{{plan_name}}`}, {`{{trial_end_date}}`}
+              </div>
+            )}
           </Field>
         </div>
 
-        <div className="flex items-center justify-end gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
-          <button onClick={onClose} className="px-4 py-2 rounded-lg"
-            style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
-            Cancel
-          </button>
-          <button onClick={send} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white"
-            style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>
-            <Send size={14} /> Send Now
-          </button>
+        <div className="flex items-center justify-between gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
+          <div className="flex gap-2">
+            {platform === "email" && (
+              <>
+                <button onClick={() => toast.info("Preview coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Preview</button>
+                <button onClick={() => toast.info("Send test coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Send Test</button>
+              </>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button onClick={onClose} className="px-4 py-2 rounded-lg"
+              style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
+              Cancel
+            </button>
+            <button onClick={send} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white"
+              style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>
+              <Send size={14} /> {platform === "twitter" ? "Tweet" : platform === "meta" ? "Post Now" : "Send Now"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

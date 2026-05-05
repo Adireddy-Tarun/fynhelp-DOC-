@@ -7,6 +7,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { logAdminAction } from "@/lib/adminAudit";
+import { toast } from "sonner";
 
 type Sub = {
   id: string; user_id: string | null; business_id: string | null;
@@ -102,10 +103,10 @@ export default function AdminSubscriptionsPage() {
       <PageHeader title="Subscriptions & Billing" subtitle="Manage user subscriptions and revenue" />
 
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <Metric label="Active Subscriptions" value={String(metrics.active)} trend={8}  icon={<CreditCard size={22} color="#8B6914" />} />
-        <Metric label="Monthly Recurring Revenue" value={fmtINR(metrics.mrr)} trend={18} icon={<IndianRupee size={22} color="#8B6914" />} />
-        <Metric label="Annual Recurring Revenue" value={fmtINR(metrics.arr)} trend={18} icon={<TrendingUp size={22} color="#8B6914" />} />
-        <Metric label="Churn Rate (30 days)" value={`${metrics.churn.toFixed(1)}%`} trend={-1.1} icon={<TrendingDown size={22} color="#8B6914" />} />
+        <Metric label="Active Subscriptions" value={String(metrics.active)} icon={<CreditCard size={22} color="#8B6914" />} />
+        <Metric label="Monthly Recurring Revenue" value={fmtINR(metrics.mrr)} icon={<IndianRupee size={22} color="#8B6914" />} />
+        <Metric label="Annual Recurring Revenue" value={fmtINR(metrics.arr)} icon={<TrendingUp size={22} color="#8B6914" />} />
+        <Metric label="Churn Rate (30 days)" value={`${metrics.churn.toFixed(1)}%`} icon={<TrendingDown size={22} color="#8B6914" />} />
       </div>
 
       {/* Revenue trend */}
@@ -140,7 +141,7 @@ export default function AdminSubscriptionsPage() {
         <Card style={{ height: 340 }}>
           <ResponsiveContainer>
             <PieChart>
-              <Pie data={Object.entries(planDist).map(([k,v]) => ({ name:k, value:v.count }))}
+              <Pie data={Object.entries(planDist).map(([k,v]) => ({ name: k === "free_trial" ? "Free Trial" : k.charAt(0).toUpperCase()+k.slice(1), value:v.count, key:k }))}
                 dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={110}>
                 {Object.keys(planDist).map((k) => <Cell key={k} fill={PLAN_COLORS[k]} />)}
               </Pie>
@@ -297,12 +298,12 @@ function ActionsMenu({ onChangePlan, onRefund }: { onChangePlan: () => void; onR
           <div className="absolute right-0 mt-1 z-20 rounded-xl overflow-hidden"
             style={{ width:200, background:"#fff", border:"1px solid rgba(139,105,20,0.2)", boxShadow:"0 12px 32px rgba(26,16,8,0.15)" }}>
             {[
-              { l:"View Details", fn:()=>{} },
+              { l:"View Details", fn:()=>toast.info("View details coming in Part 4") },
               { l:"Change Plan",  fn:onChangePlan },
-              { l:"Suspend",      fn:()=>{} },
-              { l:"Cancel",       fn:()=>{} },
+              { l:"Suspend",      fn:()=>toast.info("Suspend subscription coming in Part 4") },
+              { l:"Cancel",       fn:()=>toast.info("Cancel subscription coming in Part 4") },
               { l:"Issue Refund", fn:onRefund },
-              { l:"Payment History", fn:()=>{} },
+              { l:"Payment History", fn:()=>toast.info("Payment history coming in Part 4") },
             ].map((it) => (
               <button key={it.l} onClick={()=>{ setOpen(false); it.fn(); }}
                 className="w-full text-left px-4 py-2.5 hover:bg-[hsl(var(--fyn-ink)/0.04)]"
@@ -345,6 +346,7 @@ function ChangePlanModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <PrimaryBtn onClick={async () => {
           await logAdminAction({ action:"subscription_plan_changed", target_type:"subscription", target_id:sub.id, details:{ from:sub.plan_type, to:newPlan, reason } });
+          toast.success("Plan changed successfully");
           onClose();
         }}>Change Plan</PrimaryBtn>
       </div>
@@ -371,6 +373,7 @@ function RefundModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <button onClick={async () => {
             await logAdminAction({ action:"refund_issued", target_type:"subscription", target_id:sub.id, details:{ amount, why, notes } });
+            toast.success("Refund issued successfully");
             onClose();
           }}
           style={{ height:44, padding:"0 18px", borderRadius:12, background:"#C41E1E", color:"#fff", border:"none", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>

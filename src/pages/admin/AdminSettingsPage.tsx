@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Plus } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { toast } from "sonner";
 
 const TABS = ["Admin Team", "Security", "Email Templates", "Notifications"] as const;
 type Tab = typeof TABS[number];
@@ -78,9 +79,9 @@ function AdminTeamTab() {
                 <td style={cell}>{r.role}</td>
                 <td style={cell}>{r.last}</td>
                 <td style={cell}>
-                  <button style={linkBtn("#8B6914")}>Edit Role</button>
+                  <button onClick={() => toast.info("Edit role coming in Part 4")} style={linkBtn("#8B6914")}>Edit Role</button>
                   <span style={{ margin: "0 8px", color: "rgba(26,16,8,0.2)" }}>·</span>
-                  <button style={linkBtn("#C41E1E")}>Remove</button>
+                  <button onClick={() => toast.info("Remove admin coming in Part 4")} style={linkBtn("#C41E1E")}>Remove</button>
                 </td>
               </tr>
             ))}
@@ -88,7 +89,7 @@ function AdminTeamTab() {
         </table>
       </div>
 
-      <button className="mt-6 inline-flex items-center gap-2"
+      <button onClick={() => toast.info("Add admin coming in Part 4")} className="mt-6 inline-flex items-center gap-2"
         style={{
           height: 44, padding: "0 18px", borderRadius: 12,
           background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
@@ -133,7 +134,7 @@ function SecurityTab() {
                   <td style={cell}>{r.d}</td>
                   <td style={cell}>{r.l}</td>
                   <td style={cell}>{r.la}</td>
-                  <td style={cell}><button style={linkBtn("#C41E1E")}>Revoke</button></td>
+                  <td style={cell}><button onClick={() => toast.info("Revoke session coming in Part 4")} style={linkBtn("#C41E1E")}>Revoke</button></td>
                 </tr>
               ))}
             </tbody>
@@ -176,7 +177,7 @@ function EmailTemplatesTab() {
                 <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>{desc}</div>
               </div>
             </div>
-            <button style={{
+            <button onClick={() => toast.info("Email template editor coming in Part 4")} style={{
               height: 38, padding: "0 16px", borderRadius: 10, background: "transparent",
               border: "2px solid #8B6914", color: "#8B6914",
               fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
@@ -227,7 +228,7 @@ function NotificationsTab() {
         <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.55)", marginTop: 6 }}>
           Paste your Slack webhook URL to send notifications to a channel.
         </p>
-        <button className="mt-4"
+        <button onClick={() => toast.info("Test notification coming in Part 4")} className="mt-4"
           style={{
             height: 44, padding: "0 18px", borderRadius: 12, background: "transparent",
             border: "2px solid #8B6914", color: "#8B6914",
