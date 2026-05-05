@@ -178,6 +178,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
       </CAAuthProvider>
+      </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
