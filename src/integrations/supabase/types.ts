@@ -210,6 +210,57 @@ export type Database = {
           },
         ]
       }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          category: string | null
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          author_id?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          author_id?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: []
+      }
       businesses: {
         Row: {
           business_name: string
@@ -1046,6 +1097,42 @@ export type Database = {
           },
         ]
       }
+      integration_tokens: {
+        Row: {
+          access_token: string | null
+          config: Json | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          platform: string
+          refresh_token: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string | null
+          config?: Json | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          platform: string
+          refresh_token?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string | null
+          config?: Json | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          platform?: string
+          refresh_token?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nidhi_briefs: {
         Row: {
           brief_date: string
@@ -1611,6 +1698,57 @@ export type Database = {
           },
         ]
       }
+      social_posts: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          id: string
+          media_urls: string[] | null
+          metrics: Json | null
+          platform: string
+          post_type: string | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          target_audience: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          media_urls?: string[] | null
+          metrics?: Json | null
+          platform: string
+          post_type?: string | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          target_audience?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          media_urls?: string[] | null
+          metrics?: Json | null
+          platform?: string
+          post_type?: string | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          target_audience?: string | null
+        }
+        Relationships: []
+      }
       subscription_history: {
         Row: {
           change_reason: string | null
@@ -1706,6 +1844,84 @@ export type Database = {
         }
         Relationships: []
       }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          business_id: string | null
+          category: string | null
+          closed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          ticket_number: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          business_id?: string | null
+          category?: string | null
+          closed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          ticket_number?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          business_id?: string | null
+          category?: string | null
+          closed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          ticket_number?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      system_health_checks: {
+        Row: {
+          checked_at: string
+          error_message: string | null
+          id: string
+          response_time_ms: number | null
+          service_name: string
+          status: string
+        }
+        Insert: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          service_name: string
+          status: string
+        }
+        Update: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          service_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       tds_filings: {
         Row: {
           acknowledgement_number: string | null
@@ -1756,6 +1972,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ticket_replies: {
+        Row: {
+          attachments: string[] | null
+          author_id: string | null
+          created_at: string
+          id: string
+          is_admin: boolean
+          is_internal_note: boolean
+          message: string
+          ticket_id: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          is_internal_note?: boolean
+          message: string
+          ticket_id: string
+        }
+        Update: {
+          attachments?: string[] | null
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          is_internal_note?: boolean
+          message?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_replies_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -1941,6 +2198,59 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      whatsapp_messages: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          id: string
+          media_url: string | null
+          message_text: string
+          read_at: string | null
+          recipient_count: number | null
+          recipient_phone: string | null
+          sent_at: string | null
+          sent_by: string | null
+          social_post_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          media_url?: string | null
+          message_text: string
+          read_at?: string | null
+          recipient_count?: number | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          social_post_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          media_url?: string | null
+          message_text?: string
+          read_at?: string | null
+          recipient_count?: number | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+          social_post_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
