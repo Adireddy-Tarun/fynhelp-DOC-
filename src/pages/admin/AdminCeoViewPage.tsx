@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
