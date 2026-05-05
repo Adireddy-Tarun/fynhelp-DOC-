@@ -346,6 +346,7 @@ function ChangePlanModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <PrimaryBtn onClick={async () => {
           await logAdminAction({ action:"subscription_plan_changed", target_type:"subscription", target_id:sub.id, details:{ from:sub.plan_type, to:newPlan, reason } });
+          toast.success("Plan changed successfully");
           onClose();
         }}>Change Plan</PrimaryBtn>
       </div>
