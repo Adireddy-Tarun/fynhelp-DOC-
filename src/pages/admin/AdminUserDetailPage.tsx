@@ -62,7 +62,7 @@ export default function AdminUserDetailPage() {
       target_type: "user", target_id: profile.user_id,
       details: { mode: "read_only" },
     });
-    alert("Read-only ‘View as’ mode is logged. Full impersonation ships in Part 2.");
+    toast.info("Viewing as user (read-only mode). Full impersonation coming in Part 4.");
   };
 
   if (loading) {
