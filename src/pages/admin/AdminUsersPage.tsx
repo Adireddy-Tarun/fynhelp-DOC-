@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
@@ -16,6 +17,7 @@ type Row = {
 const PAGE = 20;
 
 export default function AdminUsersPage() {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
@@ -160,9 +162,11 @@ export default function AdminUsersPage() {
               )}
               {visible.map((r, i) => (
                 <tr key={r.user_id}
+                  onClick={() => navigate(`/admin/users/${r.user_id}`)}
                   style={{
                     background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff",
                     borderBottom: "1px solid rgba(26,16,8,0.06)",
+                    cursor: "pointer",
                   }}>
                   <td style={cell}>
                     <div className="flex items-center gap-3">

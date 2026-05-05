@@ -9,6 +9,10 @@ import AdminLayout, { AdminProtected } from "@/components/admin/AdminLayout";
 import AdminLoginPage from "./pages/admin/AdminLoginPage.tsx";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage.tsx";
 import AdminUsersPage from "./pages/admin/AdminUsersPage.tsx";
+import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage.tsx";
+import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage.tsx";
+import AdminSettingsPage from "./pages/admin/AdminSettingsPage.tsx";
+import AdminPlaceholderPage from "./pages/admin/AdminPlaceholderPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
@@ -98,6 +102,16 @@ const App = () => (
               <Route index element={<AdminDashboardPage />} />
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="users/:id" element={<AdminUserDetailPage />} />
+              <Route path="audit-logs" element={<AdminAuditLogsPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="subscriptions" element={<AdminPlaceholderPage title="Subscriptions & Billing" subtitle="Plans, MRR, invoices" note="Subscriptions and billing ship in Part 2." />} />
+              <Route path="content" element={<AdminPlaceholderPage title="Content Management" subtitle="Resources, blog, roadmap" note="Content management ships in Part 2." />} />
+              <Route path="support" element={<AdminPlaceholderPage title="Support Tickets" subtitle="Inbox, SLAs, replies" note="Support tickets ship in Part 2." />} />
+              <Route path="analytics" element={<AdminPlaceholderPage title="Analytics" subtitle="Usage, retention, funnels" note="Analytics dashboards ship in Part 2." />} />
+              <Route path="communications" element={<AdminPlaceholderPage title="Communications Hub" subtitle="Broadcasts & campaigns" note="Communications hub ships in Part 3." />} />
+              <Route path="feature-flags" element={<AdminPlaceholderPage title="Feature Flags" subtitle="Rollouts and kill switches" note="Feature flags ship in Part 2." />} />
+              <Route path="system-health" element={<AdminPlaceholderPage title="System Health" subtitle="Uptime, errors, performance" note="System health ships in Part 3." />} />
             </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
