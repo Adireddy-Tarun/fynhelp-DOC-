@@ -177,7 +177,7 @@ function EmailTemplatesTab() {
                 <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>{desc}</div>
               </div>
             </div>
-            <button style={{
+            <button onClick={() => toast.info("Email template editor coming in Part 4")} style={{
               height: 38, padding: "0 16px", borderRadius: 10, background: "transparent",
               border: "2px solid #8B6914", color: "#8B6914",
               fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
