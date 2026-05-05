@@ -323,13 +323,15 @@ export default function AdminLayout() {
                     boxShadow: "0 12px 32px hsl(var(--fyn-ink) / 0.15)",
                   }}
                 >
-                  <button
-                    onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
-                    style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
-                  >
-                    <LayoutDashboard size={16} /> Switch to CEO View
-                  </button>
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => { setMenuOpen(false); nav("/admin/ceo-view"); toast.info("Switched to CEO Strategic View"); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
+                      style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}
+                    >
+                      <Lock size={14} color="hsl(var(--fyn-gold))" /> CEO View
+                    </button>
+                  )}
                   <button
                     onClick={async () => { await signOut(); nav("/admin/login"); }}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--fyn-ink)/0.05)] text-left"
