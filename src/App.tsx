@@ -17,6 +17,11 @@ import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage.tsx";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage.tsx";
 import AdminAIMonitoringPage from "./pages/admin/AdminAIMonitoringPage.tsx";
 import AdminFeatureFlagsPage from "./pages/admin/AdminFeatureFlagsPage.tsx";
+import AdminCommunicationsPage from "./pages/admin/AdminCommunicationsPage.tsx";
+import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
+import AdminSupportTicketDetailPage from "./pages/admin/AdminSupportTicketDetailPage.tsx";
+import AdminSystemHealthPage from "./pages/admin/AdminSystemHealthPage.tsx";
+import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
@@ -111,12 +116,13 @@ const App = () => (
               <Route path="settings" element={<AdminSettingsPage />} />
               <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
               <Route path="ai-monitoring" element={<AdminAIMonitoringPage />} />
-              <Route path="content" element={<AdminPlaceholderPage title="Content Management" subtitle="Resources, blog, roadmap" note="Content management ships in Part 2." />} />
-              <Route path="support" element={<AdminPlaceholderPage title="Support Tickets" subtitle="Inbox, SLAs, replies" note="Support tickets ship in Part 2." />} />
+              <Route path="content" element={<AdminContentPage />} />
+              <Route path="support" element={<AdminSupportPage />} />
+              <Route path="support/:id" element={<AdminSupportTicketDetailPage />} />
               <Route path="analytics" element={<AdminAnalyticsPage />} />
-              <Route path="communications" element={<AdminPlaceholderPage title="Communications Hub" subtitle="Broadcasts & campaigns" note="Communications hub ships in Part 3." />} />
+              <Route path="communications" element={<AdminCommunicationsPage />} />
               <Route path="feature-flags" element={<AdminFeatureFlagsPage />} />
-              <Route path="system-health" element={<AdminPlaceholderPage title="System Health" subtitle="Uptime, errors, performance" note="System health ships in Part 3." />} />
+              <Route path="system-health" element={<AdminSystemHealthPage />} />
             </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
