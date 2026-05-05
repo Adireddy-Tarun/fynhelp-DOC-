@@ -287,3 +287,62 @@ function PlaceholderTab({ text }: { text: string }) {
     </div>
   );
 }
+
+function UsageTab() {
+  const modules = [
+    { module: "AI CFO Nidhi", usage: 89 },
+    { module: "Liquidity Intelligence", usage: 78 },
+    { module: "GST Intelligence", usage: 67 },
+    { module: "Revenue Intelligence", usage: 54 },
+  ];
+  return (
+    <div className="space-y-5">
+      <div>
+        <h4 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>AI Queries (Last 30 days)</h4>
+        <div className="mt-3 rounded-xl p-6 text-center" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>
+          Detailed query metering chart wires up in Part 4
+        </div>
+      </div>
+      <div>
+        <h4 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Module Usage</h4>
+        <div className="mt-3 space-y-2">
+          {modules.map((m) => (
+            <div key={m.module} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.4)", border: "1px solid rgba(139,105,20,0.12)" }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{m.module}</span>
+                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>{m.usage}%</span>
+              </div>
+              <div style={{ height: 6, borderRadius: 3, background: "rgba(26,16,8,0.08)", overflow: "hidden" }}>
+                <div style={{ width: `${m.usage}%`, height: "100%", background: "linear-gradient(90deg,#C41E1E,#8B6914)" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TicketsTab({ userId: _userId }: { userId: string }) {
+  const navigate = useNavigate();
+  const tickets = [
+    { id: "1", number: "TKT-001234", subject: "Payment failed after upgrade", status: "open", created: "2 hours ago" },
+    { id: "2", number: "TKT-001189", subject: "CSV upload showing errors", status: "in_progress", created: "1 day ago" },
+  ];
+  if (tickets.length === 0) return <PlaceholderTab text="No support tickets" />;
+  return (
+    <div className="space-y-2">
+      {tickets.map((t) => (
+        <button key={t.id} onClick={() => navigate(`/admin/support/${t.id}`)}
+          className="w-full text-left rounded-lg p-4 hover:bg-[hsl(var(--fyn-ink)/0.03)]"
+          style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(26,16,8,0.1)" }}>
+          <div className="flex items-center justify-between">
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#8B6914", fontWeight: 600 }}>{t.number}</span>
+            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{t.created}</span>
+          </div>
+          <div className="mt-1.5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{t.subject}</div>
+        </button>
+      ))}
+    </div>
+  );
+}
