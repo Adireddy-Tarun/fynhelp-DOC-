@@ -373,6 +373,7 @@ function RefundModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <button onClick={async () => {
             await logAdminAction({ action:"refund_issued", target_type:"subscription", target_id:sub.id, details:{ amount, why, notes } });
+            toast.success("Refund issued successfully");
             onClose();
           }}
           style={{ height:44, padding:"0 18px", borderRadius:12, background:"#C41E1E", color:"#fff", border:"none", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>
