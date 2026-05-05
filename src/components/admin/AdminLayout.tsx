@@ -16,7 +16,7 @@ type NavItem =
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
-  { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin","admin"] },
+  { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin"] },
   { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
