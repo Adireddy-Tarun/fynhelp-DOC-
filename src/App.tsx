@@ -4,6 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import AdminLayout, { AdminProtected } from "@/components/admin/AdminLayout";
+import AdminLoginPage from "./pages/admin/AdminLoginPage.tsx";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage.tsx";
+import AdminUsersPage from "./pages/admin/AdminUsersPage.tsx";
 import Index from "./pages/Index.tsx";
 
 import PricingPage from "./pages/PricingPage.tsx";
