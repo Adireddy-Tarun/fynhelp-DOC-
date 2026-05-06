@@ -154,6 +154,14 @@ export default function AdminCeoViewPage() {
             </div>
           );
         })}
+        <div className="p-4 rounded-xl" style={{ background: statusColors.neutral.bg, border: `1px solid ${statusColors.neutral.border}` }}>
+          <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.65)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+            AI Cost (This Month)
+          </div>
+          <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 24, fontWeight: 700, color: statusColors.neutral.text }}>
+            {aiCostThisMonth === null ? "…" : `$${aiCostThisMonth.toFixed(2)}`}
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
