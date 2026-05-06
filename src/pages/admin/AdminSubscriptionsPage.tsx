@@ -56,15 +56,35 @@ export default function AdminSubscriptionsPage() {
   const [editing, setEditing] = useState<Sub | null>(null);
   const [refunding, setRefunding] = useState<Sub | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("id,user_id,business_id,plan_type,status,mrr,billing_cycle,next_billing_date,started_at")
-        .order("started_at", { ascending: false }).limit(200);
-      setSubs(((data as Sub[]) ?? []).length ? (data as Sub[]) : SAMPLE_SUBS);
-    })();
-  }, []);
+  const load = async () => {
+    const { data } = await supabase
+      .from("subscriptions")
+      .select("id,user_id,business_id,plan_type,status,mrr,billing_cycle,next_billing_date,started_at")
+      .order("started_at", { ascending: false }).limit(200);
+    setSubs(((data as Sub[]) ?? []).length ? (data as Sub[]) : SAMPLE_SUBS);
+  };
+  useEffect(() => { load(); }, []);
+
+  const cancelSubscription = async (subId: string) => {
+    const { error } = await supabase
+      .from("subscriptions")
+      .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+      .eq("id", subId);
+    if (error) { toast.error(error.message); return; }
+    await logAdminAction({ action: "subscription_cancelled", target_type: "subscription", target_id: subId });
+    toast.success("Subscription cancelled");
+    load();
+  };
+  const suspendSubscription = async (subId: string) => {
+    const { error } = await supabase
+      .from("subscriptions")
+      .update({ status: "suspended" })
+      .eq("id", subId);
+    if (error) { toast.error(error.message); return; }
+    await logAdminAction({ action: "subscription_suspended", target_type: "subscription", target_id: subId });
+    toast.success("Subscription suspended");
+    load();
+  };
 
   const metrics = useMemo(() => {
     const active = subs.filter((s) => s.status === "active");
