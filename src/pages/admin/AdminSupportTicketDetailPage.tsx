@@ -5,6 +5,8 @@ import { Card } from "./AdminDashboardPage";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { logAdminAction } from "@/lib/adminAudit";
+import { LiveBadge } from "@/components/admin/LiveBadge";
+import { useRealtime } from "@/hooks/useRealtime";
 
 type Ticket = {
   id: string; ticket_number: string; subject: string; description: string | null;
