@@ -59,11 +59,15 @@ const OnboardingPage = () => {
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Load existing onboarding progress
   useEffect(() => {
-    if (!user) return;
+    if (authLoading) return;
+    if (!user) {
+      navigate("/?auth=signin");
+      return;
+    }
     (async () => {
       const { data: profile } = await supabase
         .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
