@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
@@ -18,6 +19,10 @@ export default function AdminLoginPage() {
   const [err, setErr] = useState<string | null>(loc.state?.denied
     ? "Access denied. This account is not authorized for the admin portal."
     : null);
+  const [needsVerify, setNeedsVerify] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetBusy, setResetBusy] = useState(false);
 
   useEffect(() => {
     if (!adminLoading && user && isAdmin) nav("/admin/dashboard", { replace: true });
@@ -25,13 +30,19 @@ export default function AdminLoginPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setErr(null); setBusy(true);
+    setErr(null); setNeedsVerify(false); setBusy(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(), password: pw,
     });
     if (error || !data.user) {
       setBusy(false);
-      setErr(error?.message ?? "Sign in failed");
+      const msg = error?.message ?? "Sign in failed";
+      if (/email not confirmed|not confirmed|email_not_confirmed/i.test(msg)) {
+        setNeedsVerify(true);
+        setErr("Please verify your email. Check your inbox for the verification link.");
+      } else {
+        setErr(msg);
+      }
       return;
     }
     // Verify admin role
@@ -48,6 +59,37 @@ export default function AdminLoginPage() {
     await logAdminAction({ action: "admin_login", target_type: "auth", target_id: data.user.id });
     await refresh();
     nav("/admin/dashboard", { replace: true });
+  };
+
+  const resendVerification = async () => {
+    if (!email.trim()) {
+      toast.error("Enter your email above first");
+      return;
+    }
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/admin/login` },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Verification email sent. Check your inbox.");
+  };
+
+  const sendReset = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) return;
+    setResetBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Password reset link sent to your email");
+    setShowForgot(false);
+    setResetEmail("");
   };
 
   return (
@@ -133,6 +175,19 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </Field>
+            <div style={{ textAlign: "right", marginTop: -8 }}>
+              <button
+                type="button"
+                onClick={() => { setResetEmail(email); setShowForgot(true); }}
+                style={{
+                  background: "transparent", border: "none", padding: 0,
+                  color: "#8B6914", fontSize: 12, cursor: "pointer",
+                  textDecoration: "underline", fontFamily: "DM Sans, sans-serif",
+                }}
+              >
+                Forgot password?
+              </button>
+            </div>
             {err && (
               <div
                 role="alert"
@@ -144,7 +199,23 @@ export default function AdminLoginPage() {
                   borderRadius: 10,
                   fontFamily: "Roboto, sans-serif", fontSize: 14,
                 }}
-              >{err}</div>
+              >
+                <div>{err}</div>
+                {needsVerify && (
+                  <button
+                    type="button"
+                    onClick={resendVerification}
+                    style={{
+                      marginTop: 8, background: "transparent",
+                      border: "1px solid rgba(153,27,27,0.4)", color: "#991B1B",
+                      padding: "6px 12px", borderRadius: 8, fontSize: 13,
+                      cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontWeight: 600,
+                    }}
+                  >
+                    Resend verification email
+                  </button>
+                )}
+              </div>
             )}
             <button
               type="submit" disabled={busy}
@@ -160,6 +231,70 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </div>
+
+      {showForgot && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setShowForgot(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 16, zIndex: 100,
+          }}
+        >
+          <form
+            onSubmit={sendReset}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%", maxWidth: 440, background: "#fff", borderRadius: 16,
+              padding: 28, position: "relative",
+              border: "1px solid rgba(139,105,20,0.18)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.35)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowForgot(false)}
+              aria-label="Close"
+              style={{
+                position: "absolute", top: 12, right: 12,
+                background: "transparent", border: "none", cursor: "pointer",
+                color: "hsl(var(--fyn-ink) / 0.6)", padding: 6,
+              }}
+            >
+              <X size={18} />
+            </button>
+            <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "hsl(var(--fyn-ink))" }}>
+              Reset your password
+            </h3>
+            <p style={{ marginTop: 6, marginBottom: 18, fontFamily: "Raleway, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.65)" }}>
+              Enter your admin email and we'll send you a reset link.
+            </p>
+            <Field label="Email address">
+              <input
+                type="email" required autoFocus value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="admin@fynhelp.com"
+                style={inputStyle}
+              />
+            </Field>
+            <button
+              type="submit" disabled={resetBusy}
+              style={{
+                marginTop: 18, width: "100%", height: 48, borderRadius: 12, color: "#fff",
+                background: resetBusy
+                  ? "rgba(196,30,30,0.7)"
+                  : "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 15,
+                border: "none", cursor: resetBusy ? "not-allowed" : "pointer",
+              }}
+            >
+              {resetBusy ? "Sending…" : "Send reset link"}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
