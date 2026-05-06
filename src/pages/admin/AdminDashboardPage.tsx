@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Users, CreditCard, TrendingDown, IndianRupee, ArrowUp, ArrowDown, ArrowRight,
   MessageCircle, Clock, CheckCircle2, AlertTriangle, AlertCircle, TrendingUp,
@@ -8,6 +8,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, PieChart, Pie, Cell, Legend, LineChart, Line,
 } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
