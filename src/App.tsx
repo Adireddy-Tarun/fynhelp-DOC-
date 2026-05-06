@@ -42,6 +42,7 @@ import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
 import RunwayPage from "./pages/dashboard/RunwayPage.tsx";
+import LiquidityIntelligencePage from "./pages/dashboard/LiquidityIntelligencePage.tsx";
 import ReceivablesPage from "./pages/dashboard/ReceivablesPage.tsx";
 import PayablesPage from "./pages/dashboard/PayablesPage.tsx";
 import SimulatorPage from "./pages/dashboard/SimulatorPage.tsx";
@@ -143,6 +144,7 @@ const App = () => (
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<RunwayPage />} />
+            <Route path="/dashboard/liquidity" element={<LiquidityIntelligencePage />} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<SimulatorPage />} />
