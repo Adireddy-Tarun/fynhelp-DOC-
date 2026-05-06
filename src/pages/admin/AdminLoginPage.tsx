@@ -231,6 +231,70 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </div>
+
+      {showForgot && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setShowForgot(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 16, zIndex: 100,
+          }}
+        >
+          <form
+            onSubmit={sendReset}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%", maxWidth: 440, background: "#fff", borderRadius: 16,
+              padding: 28, position: "relative",
+              border: "1px solid rgba(139,105,20,0.18)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.35)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShowForgot(false)}
+              aria-label="Close"
+              style={{
+                position: "absolute", top: 12, right: 12,
+                background: "transparent", border: "none", cursor: "pointer",
+                color: "hsl(var(--fyn-ink) / 0.6)", padding: 6,
+              }}
+            >
+              <X size={18} />
+            </button>
+            <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "hsl(var(--fyn-ink))" }}>
+              Reset your password
+            </h3>
+            <p style={{ marginTop: 6, marginBottom: 18, fontFamily: "Raleway, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.65)" }}>
+              Enter your admin email and we'll send you a reset link.
+            </p>
+            <Field label="Email address">
+              <input
+                type="email" required autoFocus value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="admin@fynhelp.com"
+                style={inputStyle}
+              />
+            </Field>
+            <button
+              type="submit" disabled={resetBusy}
+              style={{
+                marginTop: 18, width: "100%", height: 48, borderRadius: 12, color: "#fff",
+                background: resetBusy
+                  ? "rgba(196,30,30,0.7)"
+                  : "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 15,
+                border: "none", cursor: resetBusy ? "not-allowed" : "pointer",
+              }}
+            >
+              {resetBusy ? "Sending…" : "Send reset link"}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
