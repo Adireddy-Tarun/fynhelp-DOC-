@@ -70,7 +70,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
       <div
         className="flex-1 flex flex-col min-h-screen transition-[margin] duration-300"
-        style={{ marginLeft: typeof window !== "undefined" && window.innerWidth >= 1024 ? sidebarWidth : 0 }}
+        style={{ marginLeft: isDesktop ? sidebarWidth : 0 }}
       >
         <header
           className="h-16 border-b flex items-center px-4 lg:px-6 sticky top-0 z-30"
