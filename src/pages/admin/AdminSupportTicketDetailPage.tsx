@@ -58,6 +58,12 @@ export default function AdminSupportTicketDetailPage() {
   };
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [id]);
 
+  const liveStatus = useRealtime(
+    `ticket_${id ?? "none"}_replies`,
+    id ? [{ table: "ticket_replies", event: "INSERT", filter: `ticket_id=eq.${id}` }] : [],
+    () => { load(); },
+  );
+
   const updateField = async (field: "status" | "priority" | "category" | "assigned_to", value: string | null) => {
     if (!ticket) return;
     const before = (ticket as Record<string, unknown>)[field];
@@ -132,10 +138,13 @@ export default function AdminSupportTicketDetailPage() {
 
   return (
     <div>
-      <button onClick={() => nav(-1)} className="flex items-center gap-2 mb-5 text-sm hover:opacity-80"
-        style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, color: "hsl(var(--fyn-ink) / 0.7)" }}>
-        <ArrowLeft size={16} /> Back to tickets
-      </button>
+      <div className="flex items-center justify-between gap-3 mb-5">
+        <button onClick={() => nav(-1)} className="flex items-center gap-2 text-sm hover:opacity-80"
+          style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, color: "hsl(var(--fyn-ink) / 0.7)" }}>
+          <ArrowLeft size={16} /> Back to tickets
+        </button>
+        <LiveBadge status={liveStatus} />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-3">
