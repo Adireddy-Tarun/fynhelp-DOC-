@@ -65,7 +65,7 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
 ];
 
 export const SIDEBAR_WIDTH_EXPANDED = 300;
-export const SIDEBAR_WIDTH_COLLAPSED = 90;
+export const SIDEBAR_WIDTH_COLLAPSED = 80;
 
 export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange }: SidebarProps) {
   const navigate = useNavigate();
@@ -180,7 +180,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
 
         <nav
           className="flex-1 py-4"
-          style={{ paddingLeft: collapsed ? 12 : 20, paddingRight: collapsed ? 12 : 20 }}
+          style={{ paddingLeft: collapsed ? 8 : 20, paddingRight: collapsed ? 8 : 20 }}
         >
           {menuSections.map((section) => (
             <div key={section.title} className="mb-8">
@@ -201,6 +201,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                   {section.title}
                 </p>
               )}
+              {collapsed && <div style={{ height: 8 }} />}
 
               {section.items.map((item) => {
                 const Icon = item.icon;
@@ -212,17 +213,18 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                       navigate(item.path);
                       if (!isDesktop) onToggle();
                     }}
-                    whileHover={{ scale: 1.02, x: 4 }}
+                    whileHover={{ scale: collapsed ? 1.05 : 1.02, x: collapsed ? 0 : 4 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center gap-4 px-4 py-4 mb-2 rounded-2xl transition-all relative group"
+                    className="w-full flex items-center gap-4 mb-2 rounded-2xl transition-all relative group"
                     style={{
                       background: active
                         ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
                         : "rgba(255,255,255,0.6)",
                       border: "none",
                       cursor: "pointer",
-                      borderLeft: active ? "6px solid #8B6914" : "6px solid transparent",
+                      borderLeft: active && !collapsed ? "6px solid #8B6914" : "none",
                       justifyContent: collapsed ? "center" : "flex-start",
+                      padding: collapsed ? "12px" : "16px",
                       boxShadow: active
                         ? "0 8px 24px rgba(139,105,20,0.4), 0 4px 12px rgba(196,30,30,0.3), inset 0 1px 0 rgba(255,255,255,0.2)"
                         : "0 2px 8px rgba(0,0,0,0.08)",
@@ -231,7 +233,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                     }}
                     aria-current={active ? "page" : undefined}
                   >
-                    {active && (
+                    {active && !collapsed && (
                       <div
                         style={{
                           position: "absolute",
@@ -249,8 +251,8 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
 
                     <div
                       style={{
-                        width: 48,
-                        height: 48,
+                        width: collapsed ? 52 : 48,
+                        height: collapsed ? 52 : 48,
                         borderRadius: 14,
                         background: active ? "rgba(255,255,255,0.25)" : item.color + "20",
                         display: "flex",
@@ -263,10 +265,11 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         boxShadow: active
                           ? "0 4px 12px rgba(0,0,0,0.15)"
                           : "0 2px 8px rgba(0,0,0,0.08)",
+                        margin: collapsed ? "0 auto" : 0,
                       }}
                     >
                       <Icon
-                        size={26}
+                        size={collapsed ? 28 : 26}
                         color={active ? "#FFFFFF" : item.color}
                         strokeWidth={2.5}
                         fill={active ? "rgba(255,255,255,0.2)" : "none"}
