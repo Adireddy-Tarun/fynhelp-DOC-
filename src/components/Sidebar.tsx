@@ -86,7 +86,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={onToggle}
         />
       )}
@@ -97,20 +97,24 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         className="fixed top-0 left-0 h-full z-50 flex flex-col"
         style={{
-          background: "linear-gradient(180deg, rgba(196,30,30,0.03) 0%, rgba(196,30,30,0.02) 100%), #FFFFFF",
-          backdropFilter: "blur(12px)",
-          borderRight: "2px solid rgba(139,105,20,0.25)",
-          boxShadow: "2px 0 16px rgba(139,105,20,0.08)",
+          background: "rgba(255, 255, 255, 0.7)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+          boxShadow:
+            "0 8px 32px rgba(139, 105, 20, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.05)",
           overflowY: "auto",
           overflowX: "hidden",
         }}
       >
         <div
-          className="flex items-center justify-between px-4 py-5"
+          className="mx-4 mt-4 mb-2 flex items-center justify-between px-4 py-4 rounded-2xl"
           style={{
-            borderBottom: "1px solid rgba(139,105,20,0.2)",
-            background: "rgba(196,30,30,0.04)",
-            minHeight: 80,
+            background:
+              "linear-gradient(135deg, rgba(196,30,30,0.15) 0%, rgba(139,105,20,0.15) 100%)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255,255,255,0.4)",
+            boxShadow: "0 4px 16px rgba(139,105,20,0.15)",
           }}
         >
           <button
@@ -121,11 +125,12 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             {collapsed ? (
               <div
                 style={{
-                  width: 36, height: 36, borderRadius: 10,
+                  width: 36, height: 36, borderRadius: 12,
                   background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
                   color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 16,
-                  boxShadow: "0 2px 8px rgba(139,105,20,0.25)",
+                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 18,
+                  boxShadow: "0 4px 12px rgba(139,105,20,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.4)",
                 }}
               >
                 F
@@ -135,20 +140,25 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             )}
           </button>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 180 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => onCollapsedChange(!collapsed)}
-            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
-            style={{ background: "transparent", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(139,105,20,0.12)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            className="hidden lg:flex items-center justify-center w-9 h-9 rounded-xl"
+            style={{
+              background: "rgba(255,255,255,0.5)",
+              border: "1px solid rgba(139,105,20,0.2)",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
-              <ChevronRight size={18} color="#8B6914" strokeWidth={2.5} />
+              <ChevronRight size={18} color="#8B6914" strokeWidth={3} />
             ) : (
-              <ChevronLeft size={18} color="#8B6914" strokeWidth={2.5} />
+              <ChevronLeft size={18} color="#8B6914" strokeWidth={3} />
             )}
-          </button>
+          </motion.button>
 
           <button
             onClick={onToggle}
@@ -156,38 +166,29 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             style={{ background: "transparent", border: "none", cursor: "pointer" }}
             aria-label="Close menu"
           >
-            <X size={20} color="#1A1008" />
+            <X size={22} color="#1A1008" strokeWidth={2.5} />
           </button>
         </div>
 
-        <nav className="flex-1 py-4" style={{ paddingLeft: collapsed ? 12 : 16, paddingRight: collapsed ? 12 : 16 }}>
+        <nav className="flex-1 py-2" style={{ paddingLeft: 16, paddingRight: 16 }}>
           {menuSections.map((section) => (
-            <div key={section.title} className="mb-8">
+            <div key={section.title} className="mb-6">
               {!collapsed && (
-                <>
+                <div className="mb-3 px-3">
                   <p
                     style={{
                       fontFamily: "Inter, sans-serif",
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: "0.8px",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      letterSpacing: "1px",
                       color: "#8B6914",
-                      marginBottom: 8,
-                      paddingLeft: 12,
                       textTransform: "uppercase",
+                      textShadow: "0 1px 2px rgba(255,255,255,0.8)",
                     }}
                   >
                     {section.title}
                   </p>
-                  <div
-                    style={{
-                      height: 1,
-                      background: "linear-gradient(90deg, rgba(139,105,20,0.3) 0%, transparent 100%)",
-                      marginBottom: 12,
-                      marginLeft: 12,
-                    }}
-                  />
-                </>
+                </div>
               )}
 
               {section.items.map((item) => {
@@ -200,58 +201,62 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                       navigate(item.path);
                       if (!isDesktop) onToggle();
                     }}
-                    whileHover={{ scale: collapsed ? 1.05 : 1.01 }}
+                    whileHover={{ scale: 1.02, x: 2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center gap-3 px-3 py-3 mb-1 rounded-xl transition-all relative group"
+                    className="w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-xl transition-all relative group"
                     style={{
                       background: active
-                        ? "linear-gradient(90deg, rgba(196,30,30,0.15) 0%, rgba(139,105,20,0.15) 100%)"
-                        : "transparent",
-                      border: "none",
+                        ? "linear-gradient(135deg, rgba(196,30,30,0.25) 0%, rgba(139,105,20,0.25) 100%)"
+                        : "rgba(255,255,255,0.3)",
+                      border: active
+                        ? "1px solid rgba(139,105,20,0.4)"
+                        : "1px solid rgba(255,255,255,0.4)",
                       cursor: "pointer",
-                      borderLeft: active ? "4px solid #8B6914" : "4px solid transparent",
                       justifyContent: collapsed ? "center" : "flex-start",
-                      boxShadow: active ? "0 2px 8px rgba(139,105,20,0.15)" : "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!active) e.currentTarget.style.background = "rgba(139,105,20,0.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) e.currentTarget.style.background = "transparent";
+                      boxShadow: active
+                        ? "0 4px 16px rgba(139,105,20,0.25), inset 0 1px 0 rgba(255,255,255,0.3)"
+                        : "0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.5)",
+                      backdropFilter: "blur(10px)",
                     }}
                     aria-current={active ? "page" : undefined}
                   >
-                    <div
+                    <motion.div
+                      whileHover={{ rotate: 5 }}
                       style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 10,
-                        background: active ? `${item.color}20` : "rgba(255,255,255,0.6)",
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        background: active
+                          ? `linear-gradient(135deg, ${item.color}40 0%, ${item.color}25 100%)`
+                          : "rgba(255,255,255,0.5)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
-                        transition: "all 0.2s",
-                        border: active ? `1px solid ${item.color}40` : "1px solid rgba(139,105,20,0.1)",
+                        border: `2px solid ${active ? item.color + "60" : "rgba(255,255,255,0.6)"}`,
+                        boxShadow: active
+                          ? `0 4px 12px ${item.color}30, inset 0 1px 0 rgba(255,255,255,0.5)`
+                          : "0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
                       }}
                     >
                       <Icon
-                        size={20}
-                        color={active ? item.color : "rgba(26,16,8,0.6)"}
-                        strokeWidth={active ? 2.5 : 2}
+                        size={22}
+                        color={active ? item.color : "rgba(26,16,8,0.7)"}
+                        strokeWidth={active ? 3 : 2.5}
                       />
-                    </div>
+                    </motion.div>
 
                     {!collapsed && (
                       <>
                         <span
                           style={{
                             fontFamily: "Inter, sans-serif",
-                            fontSize: 14,
-                            fontWeight: active ? 600 : 500,
-                            color: active ? "#1A1008" : "rgba(26,16,8,0.75)",
+                            fontSize: 15,
+                            fontWeight: active ? 700 : 600,
+                            color: active ? "#1A1008" : "rgba(26,16,8,0.8)",
                             flex: 1,
                             textAlign: "left",
+                            textShadow: active ? "0 1px 1px rgba(255,255,255,0.5)" : "none",
                           }}
                         >
                           {item.label}
@@ -259,20 +264,24 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         {item.badge && (
                           <span
                             style={{
-                              fontSize: 10,
-                              fontWeight: 700,
+                              fontSize: 11,
+                              fontWeight: 800,
                               fontFamily: "Inter, sans-serif",
-                              padding: "3px 8px",
-                              borderRadius: 6,
+                              padding: "4px 10px",
+                              borderRadius: 8,
                               background:
                                 item.badge === "Active"
-                                  ? "rgba(16,185,129,0.15)"
-                                  : "rgba(100,116,139,0.12)",
-                              color: item.badge === "Active" ? "#10B981" : "#64748B",
+                                  ? "linear-gradient(135deg, rgba(16,185,129,0.3) 0%, rgba(16,185,129,0.2) 100%)"
+                                  : "linear-gradient(135deg, rgba(100,116,139,0.25) 0%, rgba(100,116,139,0.15) 100%)",
+                              color: item.badge === "Active" ? "#059669" : "#475569",
                               border:
                                 item.badge === "Active"
-                                  ? "1px solid rgba(16,185,129,0.3)"
-                                  : "1px solid rgba(100,116,139,0.2)",
+                                  ? "1px solid rgba(16,185,129,0.4)"
+                                  : "1px solid rgba(100,116,139,0.3)",
+                              boxShadow:
+                                "0 2px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
                             }}
                           >
                             {item.badge}
@@ -283,14 +292,15 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
 
                     {collapsed && (
                       <div
-                        className="absolute left-full ml-2 px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50"
+                        className="absolute left-full ml-3 px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50"
                         style={{
                           background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
                           color: "#FFFFFF",
-                          fontSize: 13,
+                          fontSize: 14,
                           fontFamily: "Inter, sans-serif",
-                          fontWeight: 500,
-                          boxShadow: "0 4px 16px rgba(139,105,20,0.3)",
+                          fontWeight: 600,
+                          boxShadow: "0 8px 24px rgba(139,105,20,0.4)",
+                          border: "1px solid rgba(255,255,255,0.2)",
                         }}
                       >
                         {item.label}
@@ -298,11 +308,12 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                           <span
                             style={{
                               fontSize: 10,
-                              fontWeight: 700,
-                              marginLeft: 8,
-                              padding: "2px 6px",
-                              borderRadius: 4,
-                              background: "rgba(255,255,255,0.2)",
+                              fontWeight: 800,
+                              marginLeft: 10,
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              background: "rgba(255,255,255,0.25)",
+                              border: "1px solid rgba(255,255,255,0.3)",
                             }}
                           >
                             {item.badge}
@@ -319,19 +330,23 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
 
         {!collapsed && (
           <div
-            className="px-4 py-4"
+            className="mx-4 mb-4 px-4 py-3 rounded-2xl"
             style={{
-              borderTop: "1px solid rgba(139,105,20,0.2)",
-              background: "rgba(196,30,30,0.03)",
+              background:
+                "linear-gradient(135deg, rgba(139,105,20,0.15) 0%, rgba(196,30,30,0.15) 100%)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.4)",
+              boxShadow: "0 4px 16px rgba(139,105,20,0.15)",
             }}
           >
             <p
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: 11,
+                fontSize: 12,
                 color: "#8B6914",
                 textAlign: "center",
-                fontWeight: 600,
+                fontWeight: 700,
+                textShadow: "0 1px 2px rgba(255,255,255,0.8)",
               }}
             >
               FYNHelp © 2026
