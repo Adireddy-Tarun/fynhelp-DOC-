@@ -108,6 +108,41 @@ const PLAN_BADGE: Record<string, { bg: string; fg: string }> = {
 };
 
 export default function AdminDashboardPage() {
+  const [live, setLive] = useState<{
+    totalUsers: number | null;
+    activeSubs: number | null;
+    monthlyRevenue: number | null;
+    openTickets: number | null;
+    loading: boolean;
+  }>({ totalUsers: null, activeSubs: null, monthlyRevenue: null, openTickets: null, loading: true });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [usersRes, subsCountRes, subsRevRes, ticketsRes] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("subscriptions").select("mrr").eq("status", "active"),
+        supabase.from("support_tickets").select("*", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
+      ]);
+      if (cancelled) return;
+      const revenue = subsRevRes.error
+        ? null
+        : (subsRevRes.data ?? []).reduce((sum, r: { mrr: number | string | null }) => sum + Number(r.mrr ?? 0), 0);
+      setLive({
+        totalUsers: usersRes.error ? null : usersRes.count ?? 0,
+        activeSubs: subsCountRes.error ? null : subsCountRes.count ?? 0,
+        monthlyRevenue: revenue,
+        openTickets: ticketsRes.error ? null : ticketsRes.count ?? 0,
+        loading: false,
+      });
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const liveValue = (n: number | null, fmt: (v: number) => string) =>
+    live.loading ? "…" : n === null ? "—" : fmt(n);
+
   return (
     <div>
       <PageHeader title="Dashboard" subtitle="Overview of FYNHelp platform" />
@@ -115,17 +150,17 @@ export default function AdminDashboardPage() {
       {/* Top metrics */}
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <MetricCard icon={<Users size={22} color="#8B6914" />} label="Total Users"
-          value={metrics.totalUsers.toLocaleString("en-IN")} trend={metrics.totalUsersTrend}
+          value={liveValue(live.totalUsers, (v) => v.toLocaleString("en-IN"))} trend={metrics.totalUsersTrend}
           trendLabel={`+${metrics.totalUsersTrend} this month`} />
-        <MetricCard icon={<CreditCard size={22} color="#8B6914" />} label="Active Businesses"
-          value={metrics.activeBusinesses.toLocaleString("en-IN")} trend={metrics.activeBusinessesTrend}
+        <MetricCard icon={<CreditCard size={22} color="#8B6914" />} label="Active Subscriptions"
+          value={liveValue(live.activeSubs, (v) => v.toLocaleString("en-IN"))} trend={metrics.activeBusinessesTrend}
           trendLabel={`+${metrics.activeBusinessesTrend} this month`} />
         <MetricCard icon={<IndianRupee size={22} color="#8B6914" />} label="Monthly Recurring Revenue"
-          value={fmtINR(metrics.mrr)} trend={metrics.mrrTrend}
+          value={liveValue(live.monthlyRevenue, fmtINR)} trend={metrics.mrrTrend}
           trendLabel={`+${metrics.mrrTrend}% growth`} />
-        <MetricCard icon={<TrendingDown size={22} color="#8B6914" />} label="Churn Rate (30 days)"
-          value={`${metrics.churnRate}%`} trend={Math.abs(metrics.churnRateTrend)} positiveTrend
-          trendLabel="Improved by 0.5%" />
+        <MetricCard icon={<MessageCircle size={22} color="#8B6914" />} label="Open Support Tickets"
+          value={liveValue(live.openTickets, (v) => v.toLocaleString("en-IN"))} trend={0} positiveTrend
+          trendLabel="Open + In Progress" />
       </div>
 
       {/* User growth + signups */}
