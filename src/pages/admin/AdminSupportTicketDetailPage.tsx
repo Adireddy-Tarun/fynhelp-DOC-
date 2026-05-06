@@ -14,7 +14,7 @@ type Ticket = {
 };
 type Reply = {
   id: string; ticket_id: string; author_id: string;
-  message: string; is_internal: boolean; created_at: string;
+  message: string; is_internal_note: boolean; created_at: string;
 };
 
 export default function AdminSupportTicketDetailPage() {
@@ -44,7 +44,7 @@ export default function AdminSupportTicketDetailPage() {
     setTicket(t);
     const [rRes, bRes] = await Promise.all([
       supabase.from("ticket_replies")
-        .select("id, ticket_id, author_id, message, is_internal, created_at")
+        .select("id, ticket_id, author_id, message, is_internal_note, created_at")
         .eq("ticket_id", id).order("created_at", { ascending: true }),
       t.business_id
         ? supabase.from("businesses").select("business_name").eq("id", t.business_id).maybeSingle()
@@ -83,9 +83,9 @@ export default function AdminSupportTicketDetailPage() {
       .from("ticket_replies")
       .insert({
         ticket_id: ticket.id, author_id: user.id,
-        message: reply.trim(), is_internal: internal,
+        message: reply.trim(), is_internal_note: internal,
       })
-      .select("id, ticket_id, author_id, message, is_internal, created_at")
+      .select("id, ticket_id, author_id, message, is_internal_note, created_at")
       .maybeSingle();
     if (error || !data) { toast.error(error?.message ?? "Failed to send reply"); setSending(false); return; }
     setReplies((arr) => [...arr, data as Reply]);
@@ -117,8 +117,8 @@ export default function AdminSupportTicketDetailPage() {
   }
 
   const userInitials = (businessName || ticket.user_id || "?").slice(0, 2).toUpperCase();
-  const publicReplies = replies.filter((r) => !r.is_internal);
-  const internalNotes = replies.filter((r) => r.is_internal);
+  const publicReplies = replies.filter((r) => !r.is_internal_note);
+  const internalNotes = replies.filter((r) => r.is_internal_note);
 
   return (
     <div>
