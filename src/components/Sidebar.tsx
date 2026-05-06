@@ -129,17 +129,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             aria-label="Go to dashboard"
           >
             {collapsed ? (
-              <div
-                style={{
-                  width: 44, height: 44, borderRadius: 12,
-                  background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-                  color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 22,
-                  boxShadow: "0 4px 14px rgba(139,105,20,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
-                }}
-              >
-                F
-              </div>
+              <FynLogo variant="dark" showTagline={false} iconOnly />
             ) : (
               <FynLogo variant="dark" showTagline={false} />
             )}
