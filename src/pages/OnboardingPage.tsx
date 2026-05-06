@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Building2, Landmark, BookOpen, Rocket, ChevronLeft, Check } from "lucide-react";
+import { Building2, Landmark, BookOpen, Rocket, ChevronLeft, Check, Loader2 } from "lucide-react";
 import StepConnectBanks from "@/components/onboarding/StepConnectBanks";
 import StepSyncBooks from "@/components/onboarding/StepSyncBooks";
 
@@ -27,187 +29,434 @@ const states = [
   "Uttar Pradesh", "Uttarakhand", "West Bengal",
 ];
 
+const pageVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 80 : -80,
+    opacity: 0,
+    rotateY: direction > 0 ? 8 : -8,
+    filter: "blur(4px)",
+  }),
+  center: { x: 0, opacity: 1, rotateY: 0, filter: "blur(0px)" },
+  exit: (direction: number) => ({
+    x: direction < 0 ? 80 : -80,
+    opacity: 0,
+    rotateY: direction < 0 ? 8 : -8,
+    filter: "blur(4px)",
+  }),
+};
+
 const OnboardingPage = () => {
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     business_type: "", industry: "", turnover_range: "", state: "",
     msme_udyam: "", employee_count: "",
   });
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const updateField = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
-
-  const handleLaunch = async () => {
+  // Load existing onboarding progress
+  useEffect(() => {
     if (!user) return;
-    setSaving(true);
-    const { data: biz } = await supabase.from("businesses").insert({
-      business_name: form.industry ? `My ${form.industry} Business` : "My Business",
-      business_type: form.business_type,
-      industry: form.industry,
-      turnover_range: form.turnover_range,
-      state: form.state,
-      msme_udyam: form.msme_udyam || null,
-      employee_count: form.employee_count,
-    }).select("id").single();
-
-    if (biz) {
-      await supabase.from("profiles").update({ business_id: biz.id }).eq("user_id", user.id);
-      for (const bankName of selectedBanks) {
-        await supabase.from("bank_accounts").insert({ business_id: biz.id, bank_name: bankName });
+    (async () => {
+      const { data: profile } = await supabase
+        .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
+      if (profile?.business_id) {
+        const { data: biz } = await supabase
+          .from("businesses").select("*").eq("id", profile.business_id).maybeSingle();
+        if (biz) {
+          setBusinessId(biz.id);
+          if (biz.onboarding_completed) {
+            navigate("/dashboard/cockpit");
+            return;
+          }
+          setStep(Math.max(0, (biz.onboarding_step || 1) - 1));
+          setForm({
+            business_type: biz.business_type || "",
+            industry: biz.industry || "",
+            turnover_range: biz.turnover_range || "",
+            state: biz.state || "",
+            msme_udyam: biz.msme_udyam || "",
+            employee_count: biz.employee_count || "",
+          });
+          const { data: banks } = await supabase
+            .from("bank_accounts").select("bank_name").eq("business_id", biz.id);
+          if (banks) setSelectedBanks(banks.map((b) => b.bank_name));
+        }
       }
-    }
-    setSaving(false);
-    navigate("/dashboard/cockpit");
+      setHydrated(true);
+    })();
+  }, [user, navigate]);
+
+  const updateField = (key: string, value: string) => {
+    setForm((p) => ({ ...p, [key]: value }));
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
   };
 
-  const inputClass = "w-full h-[42px] px-4 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--fyn-red))]";
-  const selectClass = inputClass + " appearance-none";
+  const goTo = (next: number) => {
+    setDirection(next > step ? 1 : -1);
+    setStep(next);
+  };
+
+  const saveStep1 = async () => {
+    const e: Record<string, string> = {};
+    if (!form.business_type) e.business_type = "Required";
+    if (!form.industry) e.industry = "Required";
+    if (!form.state) e.state = "Required";
+    setErrors(e);
+    if (Object.keys(e).length || !user) {
+      if (Object.keys(e).length) toast.error("Please fill in required fields");
+      return;
+    }
+    setLoading(true);
+    try {
+      const payload = {
+        business_type: form.business_type,
+        industry: form.industry,
+        turnover_range: form.turnover_range || null,
+        state: form.state,
+        msme_udyam: form.msme_udyam || null,
+        employee_count: form.employee_count || null,
+        onboarding_step: 2,
+      };
+      let bizId = businessId;
+      if (bizId) {
+        const { error } = await supabase.from("businesses").update(payload).eq("id", bizId);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("businesses").insert({
+          business_name: form.industry ? `My ${form.industry} Business` : "My Business",
+          ...payload,
+        }).select("id").single();
+        if (error) throw error;
+        bizId = data.id;
+        setBusinessId(bizId);
+        await supabase.from("profiles").update({ business_id: bizId }).eq("user_id", user.id);
+      }
+      toast.success("Business profile saved");
+      goTo(1);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to save profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveStep2 = async (skip = false) => {
+    if (!businessId) return;
+    if (!skip && selectedBanks.length === 0) {
+      toast.error("Select at least one bank or skip");
+      return;
+    }
+    setLoading(true);
+    try {
+      if (selectedBanks.length > 0) {
+        const { data: existing } = await supabase
+          .from("bank_accounts").select("bank_name").eq("business_id", businessId);
+        const have = new Set((existing || []).map((b) => b.bank_name));
+        const toInsert = selectedBanks
+          .filter((b) => !have.has(b))
+          .map((bank_name) => ({ business_id: businessId, bank_name }));
+        if (toInsert.length) {
+          const { error } = await supabase.from("bank_accounts").insert(toInsert);
+          if (error) throw error;
+        }
+        toast.info("Banks saved. Account Aggregator linking coming soon.");
+      }
+      await supabase.from("businesses").update({ onboarding_step: 3 }).eq("id", businessId);
+      goTo(2);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to save banks");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveStep3 = async () => {
+    if (!businessId) return;
+    setLoading(true);
+    try {
+      await supabase.from("businesses").update({ onboarding_step: 4 }).eq("id", businessId);
+      if (selectedSoftware.length > 0) {
+        toast.info(`${selectedSoftware.join(", ")} sync coming soon. Use CSV upload for now.`);
+      }
+      goTo(3);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to advance");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLaunch = async () => {
+    if (!businessId) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("businesses")
+        .update({ onboarding_completed: true, onboarding_step: 4 })
+        .eq("id", businessId);
+      if (error) throw error;
+      toast.success("Welcome to FynHelp! 🎉");
+      navigate("/dashboard/cockpit");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to complete onboarding");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputBase =
+    "w-full h-[42px] px-4 border rounded text-sm focus:outline-none focus:ring-2 transition-all duration-200";
+
+  const fieldStyle = (key: string) => ({
+    background: "hsl(var(--fyn-beige))",
+    borderColor: errors[key] ? "rgba(239,68,68,0.6)" : "hsl(var(--fyn-ink) / 0.10)",
+    color: "hsl(var(--fyn-ink))",
+    boxShadow: errors[key] ? "0 0 0 3px rgba(239,68,68,0.12)" : "inset 0 1px 2px rgba(0,0,0,0.04)",
+  });
+
+  if (!hydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "hsl(var(--fyn-beige))" }}>
+        <Loader2 className="animate-spin" style={{ color: "hsl(var(--fyn-red))" }} size={32} />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: "hsl(var(--fyn-beige))" }}>
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(var(--fyn-beige)) 0%, #FFF9F0 100%)" }}>
       {/* Progress bar */}
-      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))" }}>
+      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
         <div className="fyn-container flex items-center justify-center gap-4">
-          {steps.map((s, i) => (
-            <div key={s.label} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                i < step ? "text-white" : i === step ? "text-white" : "text-white/40"
-              }`} style={{
-                background: i < step ? "hsl(var(--fyn-success))" : i === step ? "hsl(var(--fyn-red))" : "rgba(255,255,255,0.10)",
-              }}>
-                {i < step ? <Check size={16} /> : i + 1}
+          {steps.map((s, i) => {
+            const done = i < step;
+            const active = i === step;
+            return (
+              <div key={s.label} className="flex items-center gap-2">
+                <motion.div
+                  animate={{ scale: active ? 1.15 : 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                  style={{
+                    background: done ? "#10B981" : active ? "hsl(var(--fyn-red))" : "rgba(255,255,255,0.10)",
+                    color: done || active ? "#fff" : "rgba(255,255,255,0.4)",
+                    boxShadow: active
+                      ? "0 6px 16px rgba(196,30,30,0.45), inset 0 1px 0 rgba(255,255,255,0.25)"
+                      : done
+                      ? "0 4px 12px rgba(16,185,129,0.35)"
+                      : "none",
+                  }}
+                >
+                  {done ? <Check size={16} /> : i + 1}
+                </motion.div>
+                <span className={`hidden md:inline text-sm ${active ? "text-white" : "text-white/40"}`}>{s.label}</span>
+                {i < steps.length - 1 && (
+                  <div
+                    className="w-8 h-0.5 transition-colors duration-500"
+                    style={{ background: i < step ? "#10B981" : "rgba(255,255,255,0.1)" }}
+                  />
+                )}
               </div>
-              <span className={`hidden md:inline text-sm ${i === step ? "text-white" : "text-white/40"}`}>{s.label}</span>
-              {i < steps.length - 1 && <div className="w-8 h-0.5 bg-white/10" />}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      <div className="fyn-container max-w-4xl py-12">
-        {step === 0 && (
-          <div className="max-w-2xl">
-            {step > 0 && (
-              <button onClick={() => setStep(step - 1)} className="flex items-center gap-1 text-sm mb-6 hover:underline" style={{ color: "hsl(var(--fyn-gold))" }}>
-                <ChevronLeft size={16} /> Back
-              </button>
-            )}
-            <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Tell us about your business</h1>
-            <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>This helps AI CFO Nidhi personalize your financial intelligence.</p>
-            <div className="space-y-4">
-              {[
-                { key: "business_type", label: "Business type", options: ["Pvt Ltd", "LLP", "Proprietorship", "Partnership"] },
-                { key: "industry", label: "Industry vertical", options: industries },
-                { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
-                { key: "state", label: "State of registration", options: states },
-                { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
-              ].map(({ key, label, options }) => (
-                <div key={key}>
-                  <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>{label}</label>
-                  <select
-                    value={(form as any)[key]}
-                    onChange={(e) => updateField(key, e.target.value)}
-                    className={selectClass}
-                    style={{ background: "hsl(var(--fyn-beige))", borderColor: "hsl(var(--fyn-ink) / 0.10)", color: "hsl(var(--fyn-ink))" }}
-                  >
-                    <option value="">Select {label.toLowerCase()}</option>
-                    {options.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
+      <div className="fyn-container max-w-4xl py-12" style={{ perspective: "1200px" }}>
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={step}
+            custom={direction}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: "tween", ease: "anticipate", duration: 0.5 }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {step === 0 && (
+              <div className="max-w-2xl">
+                <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
+                  Tell us about your business
+                </h1>
+                <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
+                  This helps AI CFO Nidhi personalize your financial intelligence.
+                </p>
+                <div
+                  className="rounded-xl p-6 space-y-4"
+                  style={{
+                    background: "rgba(255,255,255,0.85)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(139,105,20,0.15)",
+                    boxShadow: "0 12px 40px rgba(26,16,8,0.08), 0 2px 6px rgba(26,16,8,0.04)",
+                  }}
+                >
+                  {[
+                    { key: "business_type", label: "Business type", required: true, options: ["Pvt Ltd", "LLP", "Proprietorship", "Partnership"] },
+                    { key: "industry", label: "Industry vertical", required: true, options: industries },
+                    { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
+                    { key: "state", label: "State of registration", required: true, options: states },
+                    { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
+                  ].map(({ key, label, options, required }) => (
+                    <div key={key}>
+                      <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
+                        {label} {required && <span style={{ color: "#EF4444" }}>*</span>}
+                      </label>
+                      <select
+                        value={(form as any)[key]}
+                        onChange={(e) => updateField(key, e.target.value)}
+                        className={inputBase + " appearance-none"}
+                        style={fieldStyle(key)}
+                      >
+                        <option value="">Select {label.toLowerCase()}</option>
+                        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                      {errors[key] && <p className="text-xs mt-1" style={{ color: "#EF4444" }}>{errors[key]}</p>}
+                    </div>
+                  ))}
+                  <div>
+                    <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
+                      MSME Udyam number (optional)
+                    </label>
+                    <input
+                      value={form.msme_udyam}
+                      onChange={(e) => updateField("msme_udyam", e.target.value)}
+                      className={inputBase}
+                      style={fieldStyle("msme_udyam")}
+                      placeholder="UDYAM-XX-00-0000000"
+                    />
+                  </div>
                 </div>
-              ))}
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 1 }}
+                  onClick={saveStep1}
+                  disabled={loading}
+                  className="mt-8 px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                  style={{
+                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                    boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  }}
+                >
+                  {loading && <Loader2 size={16} className="animate-spin" />}
+                  {loading ? "Saving..." : "Continue →"}
+                </motion.button>
+              </div>
+            )}
+
+            {step === 1 && (
               <div>
-                <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>MSME Udyam number (optional)</label>
-                <input
-                  value={form.msme_udyam}
-                  onChange={(e) => updateField("msme_udyam", e.target.value)}
-                  className={inputClass}
-                  style={{ background: "hsl(var(--fyn-beige))", borderColor: "hsl(var(--fyn-ink) / 0.10)", color: "hsl(var(--fyn-ink))" }}
-                  placeholder="UDYAM-XX-00-0000000"
+                <button
+                  onClick={() => goTo(0)}
+                  className="flex items-center gap-1 text-sm mb-6 hover:underline"
+                  style={{ color: "hsl(var(--fyn-gold))" }}
+                >
+                  <ChevronLeft size={16} /> Back
+                </button>
+                <StepConnectBanks
+                  selectedBanks={selectedBanks}
+                  setSelectedBanks={setSelectedBanks}
+                  onContinue={() => saveStep2(false)}
+                  onSkip={() => saveStep2(true)}
                 />
               </div>
-            </div>
-            <button
-              onClick={() => setStep(1)}
-              className="mt-8 px-8 py-3 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
-              style={{ background: "hsl(var(--fyn-red))" }}
-            >
-              Continue →
-            </button>
-          </div>
-        )}
+            )}
 
-        {step === 1 && (
-          <StepConnectBanks
-            selectedBanks={selectedBanks}
-            setSelectedBanks={setSelectedBanks}
-            onContinue={() => setStep(2)}
-            onSkip={() => setStep(2)}
-          />
-        )}
+            {step === 2 && (
+              <StepSyncBooks
+                selectedSoftware={selectedSoftware}
+                setSelectedSoftware={setSelectedSoftware}
+                onContinue={saveStep3}
+                onBack={() => goTo(1)}
+              />
+            )}
 
-        {step === 2 && (
-          <StepSyncBooks
-            selectedSoftware={selectedSoftware}
-            setSelectedSoftware={setSelectedSoftware}
-            onContinue={() => setStep(3)}
-            onBack={() => setStep(1)}
-          />
-        )}
+            {step === 3 && (
+              <div className="max-w-2xl">
+                <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
+                  AI CFO Nidhi is ready. Here's what she's found.
+                </h1>
+                <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
+                  {selectedBanks.length > 0
+                    ? `We've connected ${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""} and are ready to start monitoring.`
+                    : "Connect a bank account anytime to unlock full cash intelligence."}
+                </p>
 
-        {step === 3 && (
-          <div className="max-w-2xl">
-            <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>AI CFO Nidhi is ready. Here's what she's found.</h1>
-            <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-              {selectedBanks.length > 0
-                ? `We've connected ${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""} and are ready to start monitoring.`
-                : "Connect a bank account anytime to unlock full cash intelligence."}
-            </p>
-
-            <div className="rounded-xl p-6 mb-8" style={{ background: "hsl(var(--fyn-ink))" }}>
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                {[
-                  { label: "Cash Runway", value: " days", sub: "Awaiting bank data" },
-                  { label: "Bank Balance", value: "\n", sub: "Connect to see" },
-                  { label: "GST Notice Risk", value: "\n", sub: "Enter GSTIN to score" },
-                ].map((m) => (
-                  <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>
-                    <p className="text-2xl text-white fyn-metric mt-1">{m.value}</p>
-                    <p className="text-xs text-primary-foreground">{m.sub}</p>
+                <div
+                  className="rounded-xl p-6 mb-8"
+                  style={{
+                    background: "hsl(var(--fyn-ink))",
+                    boxShadow: "0 20px 50px rgba(26,16,8,0.35)",
+                  }}
+                >
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    {[
+                      { label: "Cash Runway", value: "— days", sub: "Awaiting bank data" },
+                      { label: "Bank Balance", value: "—", sub: "Connect to see" },
+                      { label: "GST Notice Risk", value: "—", sub: "Enter GSTIN to score" },
+                    ].map((m) => (
+                      <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
+                        <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>
+                        <p className="text-2xl text-white fyn-metric mt-1">{m.value}</p>
+                        <p className="text-xs text-primary-foreground">{m.sub}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: "hsl(var(--fyn-red))" }}>N</div>
-                <p className="text-primary-foreground text-base">Welcome! I'm AI CFO Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.</p>
-              </div>
-            </div>
+                  <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
+                      style={{ background: "hsl(var(--fyn-red))" }}
+                    >
+                      N
+                    </div>
+                    <p className="text-primary-foreground text-base">
+                      Welcome! I'm AI CFO Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.
+                    </p>
+                  </div>
+                </div>
 
-            <div className="rounded-lg p-4 mb-8 border" style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)" }}>
-              <h3 className="font-serif text-lg mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Setup summary</h3>
-              <ul className="space-y-1 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                <li className="text-secondary-foreground">Business type: {form.business_type || "Not set"}</li>
-                <li className="text-secondary-foreground">Industry: {form.industry || "Not set"}</li>
-                <li className="text-secondary-foreground">Turnover: {form.turnover_range || "Not set"}</li>
-                <li className="text-secondary-foreground">Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
-                <li className="text-secondary-foreground">Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
-              </ul>
-            </div>
+                <div
+                  className="rounded-lg p-4 mb-8 border"
+                  style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)" }}
+                >
+                  <h3 className="font-serif text-lg mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Setup summary</h3>
+                  <ul className="space-y-1 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
+                    <li className="text-secondary-foreground">Business type: {form.business_type || "Not set"}</li>
+                    <li className="text-secondary-foreground">Industry: {form.industry || "Not set"}</li>
+                    <li className="text-secondary-foreground">Turnover: {form.turnover_range || "Not set"}</li>
+                    <li className="text-secondary-foreground">Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
+                    <li className="text-secondary-foreground">Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
+                  </ul>
+                </div>
 
-            <button
-              onClick={handleLaunch}
-              disabled={saving}
-              className="px-10 py-4 rounded-lg text-lg font-medium text-white hover:opacity-90 transition-opacity disabled:opacity-50"
-              style={{ background: "hsl(var(--fyn-red))" }}
-            >
-              {saving ? "Setting up..." : "Open My Dashboard →"}
-            </button>
-          </div>
-        )}
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ y: 1 }}
+                  onClick={handleLaunch}
+                  disabled={loading}
+                  className="px-10 py-4 rounded-lg text-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                  style={{
+                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                    boxShadow: "0 12px 28px rgba(196,30,30,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  }}
+                >
+                  {loading && <Loader2 size={18} className="animate-spin" />}
+                  {loading ? "Setting up..." : "Open My Dashboard →"}
+                </motion.button>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
