@@ -310,7 +310,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ActionsMenu({ onChangePlan, onRefund }: { onChangePlan: () => void; onRefund: () => void }) {
+function ActionsMenu({ onChangePlan, onRefund, onSuspend, onCancel }: { onChangePlan: () => void; onRefund: () => void; onSuspend: () => void; onCancel: () => void }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
@@ -323,12 +323,10 @@ function ActionsMenu({ onChangePlan, onRefund }: { onChangePlan: () => void; onR
           <div className="absolute right-0 mt-1 z-20 rounded-xl overflow-hidden"
             style={{ width:200, background:"#fff", border:"1px solid rgba(139,105,20,0.2)", boxShadow:"0 12px 32px rgba(26,16,8,0.15)" }}>
             {[
-              { l:"View Details", fn:()=>toast.info("View details coming in Part 4") },
               { l:"Change Plan",  fn:onChangePlan },
-              { l:"Suspend",      fn:()=>toast.info("Suspend subscription coming in Part 4") },
-              { l:"Cancel",       fn:()=>toast.info("Cancel subscription coming in Part 4") },
+              { l:"Suspend",      fn:onSuspend },
+              { l:"Cancel",       fn:onCancel },
               { l:"Issue Refund", fn:onRefund },
-              { l:"Payment History", fn:()=>toast.info("Payment history coming in Part 4") },
             ].map((it) => (
               <button key={it.l} onClick={()=>{ setOpen(false); it.fn(); }}
                 className="w-full text-left px-4 py-2.5 hover:bg-[hsl(var(--fyn-ink)/0.04)]"
