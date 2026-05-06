@@ -30,13 +30,19 @@ export default function AdminLoginPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setErr(null); setBusy(true);
+    setErr(null); setNeedsVerify(false); setBusy(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(), password: pw,
     });
     if (error || !data.user) {
       setBusy(false);
-      setErr(error?.message ?? "Sign in failed");
+      const msg = error?.message ?? "Sign in failed";
+      if (/email not confirmed|not confirmed|email_not_confirmed/i.test(msg)) {
+        setNeedsVerify(true);
+        setErr("Please verify your email. Check your inbox for the verification link.");
+      } else {
+        setErr(msg);
+      }
       return;
     }
     // Verify admin role
