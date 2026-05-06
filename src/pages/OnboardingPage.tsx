@@ -289,7 +289,20 @@ const OnboardingPage = () => {
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(var(--fyn-beige)) 0%, #FFF9F0 100%)" }}>
       {/* Progress bar */}
-      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
+      <div className="py-4 relative" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
+        <button
+          onClick={() => navigate("/dashboard/cockpit")}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-semibold hover:opacity-100 transition-opacity"
+          style={{
+            color: "rgba(255,255,255,0.55)",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+        >
+          Skip entire setup
+        </button>
         <div className="fyn-container flex items-center justify-center gap-4">
           {steps.map((s, i) => {
             const done = i < step;
@@ -390,20 +403,29 @@ const OnboardingPage = () => {
                     />
                   </div>
                 </div>
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 1 }}
-                  onClick={saveStep1}
-                  disabled={loading}
-                  className="mt-8 px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
-                  style={{
-                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
-                    boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  }}
-                >
-                  {loading && <Loader2 size={16} className="animate-spin" />}
-                  {loading ? "Saving..." : "Continue →"}
-                </motion.button>
+                <div className="flex items-center justify-between mt-8">
+                  <button
+                    onClick={() => navigate("/dashboard/cockpit")}
+                    className="text-[13px] hover:underline"
+                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                  >
+                    Skip for now
+                  </button>
+                  <motion.button
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 1 }}
+                    onClick={saveStep1}
+                    disabled={loading}
+                    className="px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                    style={{
+                      background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                      boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {loading && <Loader2 size={16} className="animate-spin" />}
+                    {loading ? "Saving..." : "Continue →"}
+                  </motion.button>
+                </div>
               </div>
             )}
 
@@ -492,20 +514,29 @@ const OnboardingPage = () => {
                   </ul>
                 </div>
 
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 1 }}
-                  onClick={handleLaunch}
-                  disabled={loading}
-                  className="px-10 py-4 rounded-lg text-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
-                  style={{
-                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
-                    boxShadow: "0 12px 28px rgba(196,30,30,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  }}
-                >
-                  {loading && <Loader2 size={18} className="animate-spin" />}
-                  {loading ? "Setting up..." : "Open My Dashboard →"}
-                </motion.button>
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => navigate("/dashboard/cockpit")}
+                    className="text-[13px] hover:underline"
+                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                  >
+                    Skip setup, go to dashboard
+                  </button>
+                  <motion.button
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 1 }}
+                    onClick={handleLaunch}
+                    disabled={loading}
+                    className="px-10 py-4 rounded-lg text-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                    style={{
+                      background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                      boxShadow: "0 12px 28px rgba(196,30,30,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {loading && <Loader2 size={18} className="animate-spin" />}
+                    {loading ? "Setting up..." : "Open My Dashboard →"}
+                  </motion.button>
+                </div>
               </div>
             )}
           </motion.div>
