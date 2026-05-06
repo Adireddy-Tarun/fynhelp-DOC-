@@ -59,12 +59,20 @@ export default function AdminSupportTicketDetailPage() {
   const updateField = async (field: "status" | "priority" | "category" | "assigned_to", value: string | null) => {
     if (!ticket) return;
     const before = (ticket as Record<string, unknown>)[field];
-    const { error } = await supabase
-      .from("support_tickets")
-      .update({ [field]: value, updated_at: new Date().toISOString() })
-      .eq("id", ticket.id);
+    const now = new Date().toISOString();
+    const q = supabase.from("support_tickets");
+    let error;
+    if (field === "status") {
+      ({ error } = await q.update({ status: value as string, updated_at: now }).eq("id", ticket.id));
+    } else if (field === "priority") {
+      ({ error } = await q.update({ priority: value as string, updated_at: now }).eq("id", ticket.id));
+    } else if (field === "category") {
+      ({ error } = await q.update({ category: value, updated_at: now }).eq("id", ticket.id));
+    } else {
+      ({ error } = await q.update({ assigned_to: value, updated_at: now }).eq("id", ticket.id));
+    }
     if (error) { toast.error(error.message); return; }
-    setTicket({ ...ticket, [field]: value, updated_at: new Date().toISOString() } as Ticket);
+    setTicket({ ...ticket, [field]: value, updated_at: now } as Ticket);
     await logAdminAction({
       action: `ticket_${field}_changed`,
       target_type: "support_ticket", target_id: ticket.id,
