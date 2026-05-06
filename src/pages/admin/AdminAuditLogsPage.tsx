@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { LiveBadge } from "@/components/admin/LiveBadge";
 import { useRealtime } from "@/hooks/useRealtime";
+import { exportToCsv } from "@/utils/csvExport";
 
 type Log = {
   id: string; admin_user_id: string; action: string;
@@ -72,11 +73,28 @@ export default function AdminAuditLogsPage() {
     });
   }, [logs, q, type]);
 
+  const exportLogs = () => {
+    exportToCsv(visible.map((l) => ({
+      timestamp: new Date(l.created_at).toLocaleString(),
+      admin_user_id: l.admin_user_id,
+      action: l.action,
+      target_type: l.target_type ?? "",
+      target_id: l.target_id ?? "",
+      details: JSON.stringify(l.details ?? {}),
+    })), "fynhelp-audit-logs");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <PageHeader title="Audit Logs" subtitle="Every admin action, immutable & timestamped" />
-        <LiveBadge status={liveStatus} />
+        <div className="flex items-center gap-2">
+          <LiveBadge status={liveStatus} />
+          <button onClick={exportLogs} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80"
+            style={{ background: "rgba(139,105,20,0.1)", border: "1px solid rgba(139,105,20,0.2)", fontFamily: "Raleway, sans-serif", fontSize: 13, fontWeight: 600, color: "#8B6914" }}>
+            <Download size={16} /> Export CSV
+          </button>
+        </div>
       </div>
 
       <Card style={{ marginBottom: 24 }}>

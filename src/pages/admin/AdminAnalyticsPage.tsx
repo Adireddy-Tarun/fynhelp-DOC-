@@ -1,13 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
-  CartesianGrid, ReferenceLine, PieChart, Pie, Cell, Legend,
+  CartesianGrid, ReferenceLine, PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from "recharts";
 import { Download } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminAnalyticsPage() {
   const [range, setRange] = useState("30d");
+  const [userGrowth, setUserGrowth] = useState<{ date: string; users: number }[]>([]);
+  const [revenueTrend, setRevenueTrend] = useState<{ month: string; mrr: number }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      // User growth: profile.created_at over last 30 days
+      const since = new Date(Date.now() - 30 * 86400000).toISOString();
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: true });
+      const daily: Record<string, number> = {};
+      for (let i = 29; i >= 0; i--) {
+        daily[new Date(Date.now() - i * 86400000).toISOString().slice(0, 10)] = 0;
+      }
+      (profs ?? []).forEach((p) => {
+        const d = new Date((p as { created_at: string }).created_at).toISOString().slice(0, 10);
+        if (d in daily) daily[d] += 1;
+      });
+      setUserGrowth(Object.entries(daily).map(([date, users]) => ({
+        date: new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        users,
+      })));
+
+      // Revenue trend: monthly cumulative MRR for active subscriptions
+      const { data: subs } = await supabase
+        .from("subscriptions")
+        .select("mrr, started_at, status")
+        .eq("status", "active")
+        .order("started_at", { ascending: true });
+      const monthly: Record<string, number> = {};
+      (subs ?? []).forEach((s) => {
+        const row = s as { mrr: number | string; started_at: string };
+        const m = new Date(row.started_at).toISOString().slice(0, 7);
+        monthly[m] = (monthly[m] || 0) + Number(row.mrr || 0);
+      });
+      // Cumulative
+      let running = 0;
+      const sorted = Object.keys(monthly).sort();
+      const trend = sorted.map((m) => {
+        running += monthly[m];
+        return {
+          month: new Date(m + "-01").toLocaleDateString("en-US", { month: "short", year: "2-digit" }),
+          mrr: Math.round(running),
+        };
+      });
+      setRevenueTrend(trend);
+    })();
+  }, []);
+
 
   return (
     <div>
@@ -28,6 +80,47 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
       </div>
+
+      <Section title="Live Platform Trends">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card style={{ height: 320 }}>
+            <h4 style={subTitle}>User Growth (Last 30 days)</h4>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={userGrowth}>
+                <defs>
+                  <linearGradient id="usersGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#8B6914" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11 }} interval={4} />
+                <YAxis tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }} allowDecimals={false} />
+                <Tooltip contentStyle={tipStyle} />
+                <Area type="monotone" dataKey="users" stroke="#8B6914" strokeWidth={2} fill="url(#usersGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+          <Card style={{ height: 320 }}>
+            <h4 style={subTitle}>Cumulative MRR</h4>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={revenueTrend}>
+                <defs>
+                  <linearGradient id="mrrGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#C41E1E" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11 }} />
+                <YAxis tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }} tickFormatter={(v) => v >= 1000 ? `₹${Math.round(v / 1000)}K` : `₹${v}`} />
+                <Tooltip contentStyle={tipStyle} formatter={(v: any) => [`₹${Number(v).toLocaleString("en-IN")}`, "MRR"]} />
+                <Area type="monotone" dataKey="mrr" stroke="#C41E1E" strokeWidth={3} fill="url(#mrrGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+      </Section>
 
       <Section title="Revenue Metrics">
         <div className="grid gap-4" style={{ gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))" }}>

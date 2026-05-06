@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CreditCard, IndianRupee, TrendingUp, TrendingDown, Search, MoreVertical, X } from "lucide-react";
+import { CreditCard, IndianRupee, TrendingUp, TrendingDown, Search, MoreVertical, X, Download } from "lucide-react";
+import { exportToCsv } from "@/utils/csvExport";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   PieChart, Pie, Cell, Legend,
@@ -118,9 +119,29 @@ export default function AdminSubscriptionsPage() {
     });
   }, [subs, q, plan, status]);
 
+  const exportSubscriptions = () => {
+    exportToCsv(visible.map((s) => ({
+      id: s.id,
+      business_id: s.business_id ?? "",
+      user_id: s.user_id ?? "",
+      plan: s.plan_type,
+      status: s.status,
+      mrr: Number(s.mrr || 0).toFixed(2),
+      billing_cycle: s.billing_cycle,
+      next_billing: s.next_billing_date ?? "",
+      started: new Date(s.started_at).toLocaleDateString(),
+    })), "fynhelp-subscriptions");
+  };
+
   return (
     <div>
-      <PageHeader title="Subscriptions & Billing" subtitle="Manage user subscriptions and revenue" />
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <PageHeader title="Subscriptions & Billing" subtitle="Manage user subscriptions and revenue" />
+        <button onClick={exportSubscriptions} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80"
+          style={{ background: "rgba(139,105,20,0.1)", border: "1px solid rgba(139,105,20,0.2)", fontFamily: "Raleway, sans-serif", fontSize: 13, fontWeight: 600, color: "#8B6914" }}>
+          <Download size={16} /> Export CSV
+        </button>
+      </div>
 
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <Metric label="Active Subscriptions" value={String(metrics.active)} icon={<CreditCard size={22} color="#8B6914" />} />

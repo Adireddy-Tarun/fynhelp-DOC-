@@ -14,7 +14,7 @@ type Log = {
   created_at: string;
 };
 
-const SAMPLE_DAILY = Array.from({ length: 30 }, (_, i) => ({
+const FALLBACK_DAILY = Array.from({ length: 30 }, (_, i) => ({
   d: `D${i+1}`, queries: 200 + Math.round(Math.sin(i/4) * 80) + i*4,
   cost: 6 + Math.sin(i/3) * 2 + i*0.15,
 }));
@@ -24,10 +24,12 @@ export default function AdminAIMonitoringPage() {
 
   useEffect(() => {
     (async () => {
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from("ai_usage_logs")
         .select("id,user_id,business_id,prompt,model,cost_usd,response_time_ms,status,error_message,created_at")
-        .order("created_at", { ascending: false }).limit(500);
+        .gte("created_at", since)
+        .order("created_at", { ascending: false }).limit(2000);
       setLogs((data as Log[]) ?? []);
     })();
   }, []);
@@ -38,6 +40,26 @@ export default function AdminAIMonitoringPage() {
     const cost = logs.reduce((a, l) => a + Number(l.cost_usd ?? 0), 0);
     const avgMs = logs.reduce((a, l) => a + Number(l.response_time_ms ?? 0), 0) / logs.length;
     return { queries: logs.length, users, cost, avgMs };
+  }, [logs]);
+
+  const dailyData = useMemo(() => {
+    if (logs.length === 0) return FALLBACK_DAILY;
+    const byDay: Record<string, { queries: number; cost: number }> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      byDay[d] = { queries: 0, cost: 0 };
+    }
+    for (const l of logs) {
+      const d = new Date(l.created_at).toISOString().slice(0, 10);
+      if (!byDay[d]) byDay[d] = { queries: 0, cost: 0 };
+      byDay[d].queries += 1;
+      byDay[d].cost += Number(l.cost_usd ?? 0);
+    }
+    return Object.entries(byDay).map(([date, v]) => ({
+      d: new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      queries: v.queries,
+      cost: Number(v.cost.toFixed(2)),
+    }));
   }, [logs]);
 
   return (
@@ -54,7 +76,7 @@ export default function AdminAIMonitoringPage() {
       <Card style={{ marginTop:32, padding:32, height:400 }}>
         <h3 style={h3Style}>AI Usage (Last 30 days)</h3>
         <ResponsiveContainer width="100%" height={310}>
-          <ComposedChart data={SAMPLE_DAILY}>
+          <ComposedChart data={dailyData}>
             <defs>
               <linearGradient id="aiCost" x1="0" x2="0" y1="0" y2="1">
                 <stop offset="0%" stopColor="#8B6914" stopOpacity={0.4} />
