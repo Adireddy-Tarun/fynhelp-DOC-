@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -7,6 +7,8 @@ import {
 } from "recharts";
 import { PageHeader, Card } from "./AdminDashboardPage";
 import { supabase } from "@/integrations/supabase/client";
+import { LiveBadge } from "@/components/admin/LiveBadge";
+import { useRealtime } from "@/hooks/useRealtime";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
