@@ -514,20 +514,29 @@ const OnboardingPage = () => {
                   </ul>
                 </div>
 
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 1 }}
-                  onClick={handleLaunch}
-                  disabled={loading}
-                  className="px-10 py-4 rounded-lg text-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
-                  style={{
-                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
-                    boxShadow: "0 12px 28px rgba(196,30,30,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  }}
-                >
-                  {loading && <Loader2 size={18} className="animate-spin" />}
-                  {loading ? "Setting up..." : "Open My Dashboard →"}
-                </motion.button>
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => navigate("/dashboard/cockpit")}
+                    className="text-[13px] hover:underline"
+                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                  >
+                    Skip setup, go to dashboard
+                  </button>
+                  <motion.button
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 1 }}
+                    onClick={handleLaunch}
+                    disabled={loading}
+                    className="px-10 py-4 rounded-lg text-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                    style={{
+                      background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                      boxShadow: "0 12px 28px rgba(196,30,30,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {loading && <Loader2 size={18} className="animate-spin" />}
+                    {loading ? "Setting up..." : "Open My Dashboard →"}
+                  </motion.button>
+                </div>
               </div>
             )}
           </motion.div>
