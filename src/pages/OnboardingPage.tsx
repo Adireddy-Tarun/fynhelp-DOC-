@@ -392,7 +392,7 @@ const OnboardingPage = () => {
                 </div>
                 <div className="flex items-center justify-between mt-8">
                   <button
-                    onClick={() => navigate("/dashboard/cockpit")}
+                    onClick={() => goTo(1)}
                     className="text-[13px] hover:underline"
                     style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
