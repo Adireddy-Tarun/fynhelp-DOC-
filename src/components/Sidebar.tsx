@@ -17,7 +17,7 @@ interface SidebarProps {
 }
 
 export const SIDEBAR_WIDTH_EXPANDED = 300;
-export const SIDEBAR_WIDTH_COLLAPSED = 88;
+export const SIDEBAR_WIDTH_COLLAPSED = 100;
 
 const menuSections = [
   {
@@ -95,6 +95,8 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           background: "#F5EFE6",
           overflowY: "auto",
           overflowX: "hidden",
+          minWidth: width,
+          maxWidth: width,
         }}
       >
         <div
@@ -106,30 +108,33 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             width: 4,
             background: "linear-gradient(180deg, #C41E1E 0%, #8B6914 100%)",
             boxShadow: "2px 0 8px rgba(196,30,30,0.3)",
+            zIndex: 1,
             pointerEvents: "none",
           }}
         />
 
+        {/* Header — logo + toggle always visible, stacked when collapsed */}
         <div
-          className="flex items-center justify-between px-6 py-6"
+          className="flex flex-col items-center gap-3 px-4 py-5"
           style={{
             borderBottom: "2px solid rgba(139,105,20,0.15)",
             background:
               "linear-gradient(135deg, rgba(196,30,30,0.04) 0%, rgba(139,105,20,0.04) 100%)",
+            minHeight: collapsed ? 140 : 90,
           }}
         >
           <button
             onClick={() => navigate("/dashboard/cockpit")}
-            style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, margin: collapsed ? "0 auto" : 0 }}
+            style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
             aria-label="Go to dashboard"
           >
             {collapsed ? (
               <div
                 style={{
-                  width: 40, height: 40, borderRadius: 12,
+                  width: 44, height: 44, borderRadius: 12,
                   background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
                   color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 20,
+                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 22,
                   boxShadow: "0 4px 14px rgba(139,105,20,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
                 }}
               >
@@ -140,23 +145,28 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             )}
           </button>
 
-          {!collapsed && (
-            <motion.button
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onCollapsedChange(!collapsed)}
-              className="hidden lg:flex items-center justify-center w-10 h-10 rounded-xl"
-              style={{
-                background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(139,105,20,0.3)",
-              }}
-              aria-label="Collapse sidebar"
-            >
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => onCollapsedChange(!collapsed)}
+            className="hidden lg:flex items-center justify-center rounded-xl"
+            style={{
+              width: 40,
+              height: 40,
+              background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(139,105,20,0.3)",
+              flexShrink: 0,
+            }}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? (
+              <ChevronRight size={20} color="#FFF" strokeWidth={3} />
+            ) : (
               <ChevronLeft size={20} color="#FFF" strokeWidth={3} />
-            </motion.button>
-          )}
+            )}
+          </motion.button>
 
           <button
             onClick={onToggle}
@@ -168,29 +178,12 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           </button>
         </div>
 
-        {collapsed && (
-          <div className="hidden lg:flex justify-center pt-3">
-            <motion.button
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onCollapsedChange(false)}
-              className="flex items-center justify-center w-9 h-9 rounded-xl"
-              style={{
-                background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(139,105,20,0.3)",
-              }}
-              aria-label="Expand sidebar"
-            >
-              <ChevronRight size={18} color="#FFF" strokeWidth={3} />
-            </motion.button>
-          </div>
-        )}
-
-        <nav className="flex-1 py-6" style={{ paddingLeft: 20, paddingRight: 20 }}>
+        <nav
+          className="flex-1 py-6"
+          style={{ paddingLeft: collapsed ? 10 : 20, paddingRight: collapsed ? 10 : 20 }}
+        >
           {menuSections.map((section, sectionIdx) => (
-            <div key={sectionIdx} style={{ marginBottom: 32 }}>
+            <div key={sectionIdx} style={{ marginBottom: 28 }}>
               {!collapsed && (
                 <p
                   style={{
@@ -199,7 +192,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                     fontWeight: 800,
                     letterSpacing: "1.2px",
                     color: "#8B6914",
-                    marginBottom: 16,
+                    marginBottom: 14,
                     paddingLeft: 8,
                     textTransform: "uppercase",
                   }}
@@ -207,9 +200,9 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                   {section.title}
                 </p>
               )}
-              {collapsed && <div style={{ height: 16 }} />}
+              {collapsed && sectionIdx > 0 && <div style={{ height: 12 }} />}
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {section.items.map((item, itemIdx) => {
                   const Icon = item.icon;
                   const active = isActive(item.path);
@@ -221,27 +214,28 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         navigate(item.path);
                         if (!isDesktop) onToggle();
                       }}
-                      whileHover={{ scale: collapsed ? 1.05 : 1.01 }}
+                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="relative group"
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: collapsed ? 0 : 16,
+                        gap: 14,
                         background: active
                           ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
                           : "#FFFFFF",
                         border: "none",
                         cursor: "pointer",
-                        borderRadius: collapsed ? 16 : (active ? "0 16px 16px 0" : 16),
-                        padding: collapsed ? 8 : "14px 16px",
+                        borderRadius: collapsed ? 14 : (active ? "0 14px 14px 0" : 14),
+                        padding: collapsed ? "14px" : "12px 14px",
                         position: "relative",
                         width: "100%",
                         justifyContent: collapsed ? "center" : "flex-start",
                         boxShadow: active
-                          ? "0 8px 24px rgba(139,105,20,0.35), 0 4px 12px rgba(196,30,30,0.25)"
-                          : "0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
+                          ? "0 6px 20px rgba(139,105,20,0.3), 0 3px 10px rgba(196,30,30,0.2)"
+                          : "0 2px 6px rgba(0,0,0,0.06)",
                         transition: "background 0.2s ease, box-shadow 0.2s ease",
+                        minHeight: 60,
                       }}
                       aria-current={active ? "page" : undefined}
                     >
@@ -262,6 +256,10 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         style={{
                           width: 48,
                           height: 48,
+                          minWidth: 48,
+                          minHeight: 48,
+                          maxWidth: 48,
+                          maxHeight: 48,
                           borderRadius: 12,
                           background: active ? "rgba(255,255,255,0.2)" : `${item.color}15`,
                           display: "flex",
@@ -272,11 +270,18 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                             ? "2px solid rgba(255,255,255,0.3)"
                             : `2px solid ${item.color}25`,
                           boxShadow: active
-                            ? "0 4px 12px rgba(0,0,0,0.15)"
-                            : `0 2px 8px ${item.color}15`,
+                            ? "0 3px 10px rgba(0,0,0,0.12)"
+                            : `0 2px 6px ${item.color}12`,
                         }}
                       >
-                        <Icon size={24} color={active ? "#FFFFFF" : item.color} strokeWidth={2.5} />
+                        <Icon
+                          size={24}
+                          width={24}
+                          height={24}
+                          color={active ? "#FFFFFF" : item.color}
+                          strokeWidth={2.5}
+                          style={{ flexShrink: 0, minWidth: 24, minHeight: 24 }}
+                        />
                       </div>
 
                       {!collapsed && (
@@ -289,6 +294,9 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                               color: active ? "#FFFFFF" : "#1A1008",
                               flex: 1,
                               textAlign: "left",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
                             }}
                           >
                             {item.label}
@@ -299,7 +307,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                                 fontSize: 10,
                                 fontWeight: 800,
                                 fontFamily: "Inter, sans-serif",
-                                padding: "5px 10px",
+                                padding: "4px 10px",
                                 borderRadius: 8,
                                 background: active
                                   ? "rgba(255,255,255,0.2)"
@@ -310,6 +318,8 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                                 textTransform: "uppercase",
                                 letterSpacing: "0.5px",
                                 boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                flexShrink: 0,
+                                whiteSpace: "nowrap",
                               }}
                             >
                               {badge}
