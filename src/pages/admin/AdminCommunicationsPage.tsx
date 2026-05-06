@@ -355,9 +355,9 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
               Cancel
             </button>
-            <button onClick={send} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white"
-              style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>
-              <Send size={14} /> {platform === "twitter" ? "Tweet" : platform === "meta" ? "Post Now" : "Send Now"}
+            <button onClick={send} disabled={sending} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white"
+              style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, opacity: sending ? 0.6 : 1 }}>
+              <Send size={14} /> {sending ? "Sending…" : platform === "twitter" ? "Tweet" : platform === "meta" ? "Post Now" : "Send Now"}
             </button>
           </div>
         </div>
