@@ -175,6 +175,19 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </Field>
+            <div style={{ textAlign: "right", marginTop: -8 }}>
+              <button
+                type="button"
+                onClick={() => { setResetEmail(email); setShowForgot(true); }}
+                style={{
+                  background: "transparent", border: "none", padding: 0,
+                  color: "#8B6914", fontSize: 12, cursor: "pointer",
+                  textDecoration: "underline", fontFamily: "DM Sans, sans-serif",
+                }}
+              >
+                Forgot password?
+              </button>
+            </div>
             {err && (
               <div
                 role="alert"
@@ -186,7 +199,23 @@ export default function AdminLoginPage() {
                   borderRadius: 10,
                   fontFamily: "Roboto, sans-serif", fontSize: 14,
                 }}
-              >{err}</div>
+              >
+                <div>{err}</div>
+                {needsVerify && (
+                  <button
+                    type="button"
+                    onClick={resendVerification}
+                    style={{
+                      marginTop: 8, background: "transparent",
+                      border: "1px solid rgba(153,27,27,0.4)", color: "#991B1B",
+                      padding: "6px 12px", borderRadius: 8, fontSize: 13,
+                      cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontWeight: 600,
+                    }}
+                  >
+                    Resend verification email
+                  </button>
+                )}
+              </div>
             )}
             <button
               type="submit" disabled={busy}
