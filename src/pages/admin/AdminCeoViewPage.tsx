@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { PageHeader, Card } from "./AdminDashboardPage";
+import { supabase } from "@/integrations/supabase/client";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -46,29 +48,10 @@ const cashFlowData = [
 ];
 
 type Query = {
-  id: number; user: string; type: "complaint" | "query" | "feedback";
+  id: string; user: string; type: string;
   priority: "urgent" | "high" | "medium" | "low";
   subject: string; message: string; timestamp: string; status: string;
 };
-
-const customerQueries: Query[] = [
-  { id: 1, user: "Rajesh Kumar (TechCorp)", type: "complaint", priority: "high",
-    subject: "CSV upload failing repeatedly",
-    message: "I've tried uploading my bank statement 5 times but it keeps showing 'Processing failed'. This is blocking my month-end close.",
-    timestamp: "2 hours ago", status: "open" },
-  { id: 2, user: "Priya Sharma (Growth Labs)", type: "query", priority: "medium",
-    subject: "How to integrate Zoho Books?",
-    message: "I want to connect my Zoho Books account but can't find the integration option in settings.",
-    timestamp: "5 hours ago", status: "open" },
-  { id: 3, user: "Amit Patel (Design Studio)", type: "feedback", priority: "low",
-    subject: "Love the AI CFO feature!",
-    message: "Nidhi has been incredibly helpful. Saved me 2 hours today. Would love more forecasting features.",
-    timestamp: "1 day ago", status: "acknowledged" },
-  { id: 4, user: "Sneha Reddy (E-Commerce Co)", type: "complaint", priority: "urgent",
-    subject: "Wrong GST calculation in report",
-    message: "The GSTR-3B draft shows incorrect ITC amount. Filing deadline is in 3 days.",
-    timestamp: "1 day ago", status: "open" },
-];
 
 const PRIORITY_STYLE: Record<Query["priority"], { bg: string; fg: string }> = {
   urgent: { bg: "rgba(196,30,30,0.15)", fg: "#C41E1E" },
@@ -77,13 +60,65 @@ const PRIORITY_STYLE: Record<Query["priority"], { bg: string; fg: string }> = {
   low:    { bg: "rgba(26,16,8,0.08)",   fg: "rgba(26,16,8,0.6)" },
 };
 
-export default function AdminCeoViewPage() {
-  const [selectedQuery, setSelectedQuery] = useState<number | null>(null);
-  const [replyText, setReplyText] = useState("");
+function timeAgo(iso: string) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diffMs / 60000);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`;
+  const d = Math.floor(h / 24);
+  return `${d} day${d === 1 ? "" : "s"} ago`;
+}
 
-  const handleSend = (id: number) => {
+export default function AdminCeoViewPage() {
+  const nav = useNavigate();
+  const [selectedQuery, setSelectedQuery] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [customerQueries, setCustomerQueries] = useState<Query[]>([]);
+  const [aiCostThisMonth, setAiCostThisMonth] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      // Support feed: latest open / in_progress tickets
+      const { data: tickets } = await supabase
+        .from("support_tickets")
+        .select("id, subject, description, priority, status, category, created_at, business_id")
+        .in("status", ["open", "in_progress"])
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+      let bizMap: Record<string, string> = {};
+      const bizIds = Array.from(new Set((tickets ?? []).map((t: any) => t.business_id).filter(Boolean)));
+      if (bizIds.length) {
+        const { data: bizs } = await supabase.from("businesses").select("id,business_name").in("id", bizIds);
+        bizMap = Object.fromEntries((bizs ?? []).map((b: any) => [b.id, b.business_name]));
+      }
+
+      setCustomerQueries(((tickets ?? []) as any[]).map((t) => ({
+        id: t.id,
+        user: bizMap[t.business_id] ?? "User",
+        type: t.category ?? "query",
+        priority: (["urgent", "high", "medium", "low"].includes(t.priority) ? t.priority : "medium") as Query["priority"],
+        subject: t.subject ?? "(no subject)",
+        message: t.description ?? "",
+        timestamp: timeAgo(t.created_at),
+        status: t.status,
+      })));
+
+      // AI cost this month
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const { data: aiLogs } = await supabase
+        .from("ai_usage_logs")
+        .select("cost_usd")
+        .gte("created_at", monthStart);
+      const total = (aiLogs ?? []).reduce((sum: number, log: any) => sum + Number(log.cost_usd ?? 0), 0);
+      setAiCostThisMonth(total);
+    })();
+  }, []);
+
+  const handleSend = (id: string) => {
     if (!replyText.trim()) return;
-    toast.success(`Reply sent to query #${id}`);
+    nav(`/admin/support/${id}`);
     setReplyText("");
     setSelectedQuery(null);
   };
@@ -119,6 +154,14 @@ export default function AdminCeoViewPage() {
             </div>
           );
         })}
+        <div className="p-4 rounded-xl" style={{ background: statusColors.neutral.bg, border: `1px solid ${statusColors.neutral.border}` }}>
+          <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.65)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+            AI Cost (This Month)
+          </div>
+          <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 24, fontWeight: 700, color: statusColors.neutral.text }}>
+            {aiCostThisMonth === null ? "…" : `$${aiCostThisMonth.toFixed(2)}`}
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -176,6 +219,11 @@ export default function AdminCeoViewPage() {
         <div className="grid lg:grid-cols-3" style={{ minHeight: 480 }}>
           {/* Query list */}
           <div className="lg:col-span-2 p-5 space-y-3" style={{ borderRight: "1px solid rgba(26,16,8,0.08)" }}>
+            {customerQueries.length === 0 && (
+              <div className="p-8 text-center" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.5)" }}>
+                No open tickets right now.
+              </div>
+            )}
             {customerQueries.map((q) => {
               const isSel = selectedQuery === q.id;
               const ps = PRIORITY_STYLE[q.priority];
@@ -237,7 +285,7 @@ export default function AdminCeoViewPage() {
                     fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                   }}
                 >
-                  <Send size={16} /> Send Reply
+                  <Send size={16} /> Open Ticket to Reply
                 </button>
                 <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(26,16,8,0.1)" }}>
                   <button
