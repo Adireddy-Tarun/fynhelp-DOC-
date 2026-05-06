@@ -27,13 +27,52 @@ Deno.serve(async (req) => {
     if (!isAdmin) return json({ error: "Forbidden" }, 403);
 
     const body = await req.json();
-    const emails: string[] = Array.isArray(body.emails) ? body.emails : [];
     const subject = String(body.subject ?? "").trim();
     const html = String(body.body ?? "").trim();
-    if (!emails.length || !subject || !html) {
-      return json({ error: "emails, subject, and body are required" }, 400);
-    }
+    const audience = String(body.audience ?? "all_users");
+    let emails: string[] = Array.isArray(body.emails) ? body.emails.filter(Boolean) : [];
+    if (!subject || !html) return json({ error: "subject and body are required" }, 400);
     if (!RESEND_API_KEY) return json({ error: "Email service not configured" }, 500);
+
+    // Resolve audience -> emails server-side (service role) if no explicit list provided.
+    if (!emails.length) {
+      const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const admin = createClient(SUPABASE_URL, SERVICE, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      });
+      let businessIds: string[] | null = null;
+      if (audience !== "all_users") {
+        const statusFilter =
+          audience === "pro_users" ? "active" :
+          audience === "trial_users" ? "trial" :
+          audience === "churned_users" ? "cancelled" : null;
+        if (statusFilter) {
+          const { data: subs } = await admin
+            .from("subscriptions").select("business_id").eq("status", statusFilter);
+          businessIds = (subs ?? []).map((s: { business_id: string }) => s.business_id).filter(Boolean);
+          if (!businessIds.length) return json({ sent: 0, failed: 0, total: 0 });
+        }
+      }
+      // Page through auth users (max 1000 per page)
+      const collected: string[] = [];
+      for (let page = 1; page <= 10; page++) {
+        const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+        if (error) break;
+        for (const u of data.users) {
+          if (!u.email) continue;
+          if (businessIds) {
+            // need profile.business_id check
+            const { data: prof } = await admin
+              .from("profiles").select("business_id").eq("user_id", u.id).maybeSingle();
+            if (!prof?.business_id || !businessIds.includes(prof.business_id)) continue;
+          }
+          collected.push(u.email);
+        }
+        if (data.users.length < 1000) break;
+      }
+      emails = collected;
+    }
+    if (!emails.length) return json({ sent: 0, failed: 0, total: 0 });
 
     let sent = 0;
     let failed = 0;
