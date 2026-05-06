@@ -333,6 +333,19 @@ export default function WaitlistPage() {
           )}
         </div>
       </main>
+      <div style={{ position: "fixed", bottom: 16, right: 16, zIndex: 50 }}>
+        <Link
+          to="/admin/login"
+          style={{
+            fontSize: 11,
+            color: "hsl(var(--fyn-ink) / 0.4)",
+            textDecoration: "none",
+            fontFamily: "DM Sans, sans-serif",
+          }}
+        >
+          Admin Access →
+        </Link>
+      </div>
     </Layout>
   );
 }
