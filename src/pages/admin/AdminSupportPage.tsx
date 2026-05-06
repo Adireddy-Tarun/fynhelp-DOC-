@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { LiveBadge } from "@/components/admin/LiveBadge";
+import { useRealtime } from "@/hooks/useRealtime";
 
 type Ticket = {
   id: string;
@@ -53,22 +55,28 @@ export default function AdminSupportPage() {
   const [priority, setPriority] = useState("all");
   const [status, setStatus] = useState("all");
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const [tRes, bRes] = await Promise.all([
-        supabase.from("support_tickets")
-          .select("id, ticket_number, subject, user_id, business_id, category, priority, status, assigned_to, created_at, updated_at")
-          .order("created_at", { ascending: false }).limit(200),
-        supabase.from("businesses").select("id, business_name"),
-      ]);
-      setTickets((tRes.data as Ticket[]) ?? []);
-      const m = new Map<string, string>();
-      ((bRes.data ?? []) as { id: string; business_name: string }[]).forEach((b) => m.set(b.id, b.business_name));
-      setBizMap(m);
-      setLoading(false);
-    })();
+  const fetchTickets = useCallback(async () => {
+    const [tRes, bRes] = await Promise.all([
+      supabase.from("support_tickets")
+        .select("id, ticket_number, subject, user_id, business_id, category, priority, status, assigned_to, created_at, updated_at")
+        .order("created_at", { ascending: false }).limit(200),
+      supabase.from("businesses").select("id, business_name"),
+    ]);
+    setTickets((tRes.data as Ticket[]) ?? []);
+    const m = new Map<string, string>();
+    ((bRes.data ?? []) as { id: string; business_name: string }[]).forEach((b) => m.set(b.id, b.business_name));
+    setBizMap(m);
+    setLoading(false);
   }, []);
+
+  useEffect(() => { fetchTickets(); }, [fetchTickets]);
+
+  const liveStatus = useRealtime(
+    "support_tickets_changes",
+    [{ table: "support_tickets", event: "*" }],
+    () => { fetchTickets(); },
+  );
+
 
   const rows = useMemo(() => tickets.filter((t) => {
     if (category !== "all" && t.category !== category) return false;
@@ -84,7 +92,10 @@ export default function AdminSupportPage() {
 
   return (
     <div>
-      <PageHeader title="Support Tickets" subtitle="Manage customer support requests" />
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <PageHeader title="Support Tickets" subtitle="Manage customer support requests" />
+        <LiveBadge status={liveStatus} />
+      </div>
 
       <Card className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
