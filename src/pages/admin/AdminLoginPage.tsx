@@ -19,6 +19,10 @@ export default function AdminLoginPage() {
   const [err, setErr] = useState<string | null>(loc.state?.denied
     ? "Access denied. This account is not authorized for the admin portal."
     : null);
+  const [needsVerify, setNeedsVerify] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetBusy, setResetBusy] = useState(false);
 
   useEffect(() => {
     if (!adminLoading && user && isAdmin) nav("/admin/dashboard", { replace: true });
