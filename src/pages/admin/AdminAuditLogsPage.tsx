@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { LiveBadge } from "@/components/admin/LiveBadge";
+import { useRealtime } from "@/hooks/useRealtime";
 
 type Log = {
   id: string; admin_user_id: string; action: string;
@@ -32,18 +34,27 @@ export default function AdminAuditLogsPage() {
   const [type, setType] = useState("all");
   const [open, setOpen] = useState<Log | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data } = await supabase
-        .from("admin_audit_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(200);
-      setLogs((data as Log[]) ?? []);
-      setLoading(false);
-    })();
+  const fetchLogs = useCallback(async () => {
+    const { data } = await supabase
+      .from("admin_audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    setLogs((data as Log[]) ?? []);
+    setLoading(false);
   }, []);
+
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+
+  const liveStatus = useRealtime(
+    "audit_logs_changes",
+    [{ table: "admin_audit_logs", event: "INSERT" }],
+    ({ new: row, eventType }) => {
+      if (eventType === "POLL") { fetchLogs(); return; }
+      if (row) setLogs((prev) => [row as Log, ...prev].slice(0, 200));
+    },
+  );
+
 
   const types = useMemo(() => {
     const set = new Set<string>();
@@ -63,7 +74,10 @@ export default function AdminAuditLogsPage() {
 
   return (
     <div>
-      <PageHeader title="Audit Logs" subtitle="Every admin action, immutable & timestamped" />
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <PageHeader title="Audit Logs" subtitle="Every admin action, immutable & timestamped" />
+        <LiveBadge status={liveStatus} />
+      </div>
 
       <Card style={{ marginBottom: 24 }}>
         <div className="flex flex-wrap items-center gap-3">
