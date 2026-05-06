@@ -1,74 +1,224 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatINR, getDaysOverdueColor } from "@/lib/indian-format";
+import { formatINR } from "@/lib/indian-format";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import {
+  Droplet, TrendingUp, DollarSign, FileText, Shield, Users,
+  Brain, BarChart, CreditCard, Briefcase, Lock, CheckCircle,
+  ArrowUpRight, ArrowDownRight, MessageCircle, Sparkles, X,
+  Receipt, FileSpreadsheet, Bell,
+} from "lucide-react";
 import { logRealtimeEvent } from "@/lib/realtimeAudit";
 import {
-  FynCard,
-  FynButton,
-  FynBadge,
-  FynTable,
-  FynTH,
-  FynTR,
-  FynTD,
-  FynLabel,
-  FynInput,
-  FynSearchInput,
-  FynSelect,
+  FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
 
 const REFETCH_MS = 30000;
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
-  const cashIn = payload.find((p: any) => p.dataKey === "cashIn")?.value || 0;
-  const cashOut = payload.find((p: any) => p.dataKey === "cashOut")?.value || 0;
-  const net = cashIn - cashOut;
-  return (
-    <div style={{ background: "#1A1008", borderRadius: 8, padding: "12px 16px", border: "none" }}>
-      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 6 }}>{label}</p>
-      <p style={{ color: "#4ADE80", fontSize: 14, fontWeight: 600 }}>In: ₹{cashIn.toLocaleString("en-IN")}</p>
-      <p style={{ color: "#F87171", fontSize: 14, fontWeight: 600 }}>Out: ₹{cashOut.toLocaleString("en-IN")}</p>
-      <p style={{ color: net >= 0 ? "#FFFFFF" : "#F87171", fontSize: 14, fontWeight: 600 }}>Net: ₹{net.toLocaleString("en-IN")}</p>
-    </div>
-  );
+// ── Demo data ────────────────────────────────────────────
+const DEMO = {
+  cashBalance: 4_200_000,
+  cashTrend: 12,
+  runwayDays: 114,
+  monthlyBurn: 1_100_000,
+  burnTrend: 8,
+  receivablesOverdue: 320_000,
+  duePayables: 240_000,
+  cashFlow: Array.from({ length: 30 }).map((_, i) => ({
+    date: new Date(Date.now() - (29 - i) * 86400000).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
+    cashIn: 80_000 + Math.round(Math.random() * 60_000),
+    cashOut: 60_000 + Math.round(Math.random() * 50_000),
+  })),
+  activity: [
+    { type: "transfer", desc: "Bank transfer received from Acme Corp", amount: 50_000, time: "2 hours ago" },
+    { type: "invoice", desc: "Invoice #INV-234 paid by Stellar Pvt Ltd", amount: 25_000, time: "5 hours ago" },
+    { type: "gst", desc: "GSTR-3B filed for August 2025", amount: null, time: "1 day ago" },
+    { type: "customer", desc: "New customer added: Horizon Industries", amount: null, time: "2 days ago" },
+    { type: "payable", desc: "Vendor payment scheduled to Tata Power", amount: -18_000, time: "3 days ago" },
+  ],
+  insight:
+    "Burn rate increased 8% this month, driven primarily by payroll and SaaS subscriptions. Review vendor costs in Cost Intelligence — three vendors account for 42% of discretionary spend.",
 };
 
-const EmptyHint = ({ text }: { text: string }) => (
-  <p className="text-fyn-ink/45 text-fyn-small italic">{text}</p>
-);
+// ── Module catalogue (mapped to existing /dashboard routes) ──
+type ModuleStatus = "active" | "soon";
+interface Module {
+  id: string;
+  name: string;
+  desc: string;
+  path: string;
+  icon: typeof Droplet;
+  status: ModuleStatus;
+  lockReason: string;
+}
 
-type ReceivablesFilter = "all" | "overdue" | "current";
+const MODULES: Module[] = [
+  { id: "liquidity",  name: "Liquidity Intelligence",   icon: Droplet,      status: "active", desc: "Cash flow, runway forecast, burn alerts",        path: "/dashboard/runway",          lockReason: "Connect a bank account to unlock" },
+  { id: "revenue",    name: "Revenue Intelligence",     icon: TrendingUp,   status: "active", desc: "MRR/ARR, cohorts, churn signals",                path: "/dashboard/receivables",     lockReason: "Connect Razorpay or upload invoices" },
+  { id: "cost",       name: "Cost Intelligence",        icon: DollarSign,   status: "active", desc: "Expense categorization, vendor spend",           path: "/dashboard/cost",            lockReason: "Upload transactions to unlock" },
+  { id: "gst",        name: "GST & Tax Intelligence",   icon: FileText,     status: "active", desc: "Compliance, deadlines, audit readiness",         path: "/dashboard/gst",             lockReason: "Connect GST data to unlock" },
+  { id: "governance", name: "Governance Intelligence",  icon: Shield,       status: "soon",   desc: "Board reporting, compliance automation",         path: "/dashboard/compliance",      lockReason: "Coming soon" },
+  { id: "hr",         name: "HR & Workforce",            icon: Users,        status: "active", desc: "Payroll analytics, cost-per-employee",           path: "/dashboard/hr",              lockReason: "Set up payroll to unlock" },
+  { id: "simulator",  name: "Decision Simulator",        icon: Brain,        status: "active", desc: "AI what-if scenarios",                           path: "/dashboard/simulator",       lockReason: "Connect data to run simulations" },
+  { id: "market",     name: "Market & Growth",           icon: BarChart,     status: "soon",   desc: "Competitive analysis, growth insights",          path: "/dashboard/market-growth",   lockReason: "Coming soon" },
+  { id: "banking",    name: "Banking & Fintech",         icon: CreditCard,   status: "active", desc: "Bank balances and reconciliation",               path: "/dashboard/banking",         lockReason: "Connect a bank to unlock" },
+  { id: "ca",         name: "CA Partner Ecosystem",      icon: Briefcase,    status: "active", desc: "Connect with chartered accountants",             path: "/dashboard/ca-partner",      lockReason: "Invite a CA to collaborate" },
+];
 
+// ── Quick stat card with 3D tilt ────────────────────────
+function StatCard({
+  icon: Icon, label, value, trend, trendLabel, accent = "ink",
+}: {
+  icon: typeof Droplet; label: string; value: string;
+  trend?: number; trendLabel?: string;
+  accent?: "ink" | "red" | "gold" | "green";
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    setTilt({ x: -py * 6, y: px * 6 });
+  };
+  const reset = () => setTilt({ x: 0, y: 0 });
+
+  const accentColor = {
+    ink: "hsl(var(--fyn-ink))", red: "hsl(var(--fyn-red))",
+    gold: "hsl(var(--fyn-gold))", green: "#16A34A",
+  }[accent];
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      animate={{ rotateX: tilt.x, rotateY: tilt.y }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      style={{ transformStyle: "preserve-3d", perspective: 1000 }}
+      className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
+    >
+      <div className="flex items-center gap-fyn-sm mb-fyn-sm">
+        <div
+          className="w-9 h-9 rounded-md flex items-center justify-center"
+          style={{ background: `${accentColor}15`, color: accentColor }}
+        >
+          <Icon size={18} />
+        </div>
+        <FynLabel>{label}</FynLabel>
+      </div>
+      <p className="font-mono text-fyn-metric text-fyn-ink">{value}</p>
+      {trend !== undefined && (
+        <div className="mt-fyn-xs flex items-center gap-1.5 text-fyn-small">
+          {trend >= 0 ? (
+            <ArrowUpRight size={14} style={{ color: "#16A34A" }} />
+          ) : (
+            <ArrowDownRight size={14} style={{ color: "#DC2626" }} />
+          )}
+          <span style={{ color: trend >= 0 ? "#16A34A" : "#DC2626", fontWeight: 600 }}>
+            {trendLabel}
+          </span>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ── Module card with 3D tilt ─────────────────────────────
+function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolean; onOpen: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const Icon = module.icon;
+  const isSoon = module.status === "soon";
+
+  const handleMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    setTilt({ x: -py * 8, y: px * 8 });
+  };
+  const reset = () => setTilt({ x: 0, y: 0 });
+
+  return (
+    <motion.button
+      ref={ref}
+      onClick={onOpen}
+      onMouseMove={handleMove}
+      onMouseLeave={reset}
+      animate={{ rotateX: tilt.x, rotateY: tilt.y }}
+      transition={{ type: "spring", stiffness: 250, damping: 22 }}
+      style={{ transformStyle: "preserve-3d", perspective: 1000 }}
+      className="text-left bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+    >
+      <div className="flex items-start justify-between mb-fyn-sm">
+        <div
+          className="w-11 h-11 rounded-md flex items-center justify-center"
+          style={{
+            background: isSoon ? "rgba(26,16,8,0.06)" : "linear-gradient(135deg, hsl(var(--fyn-red) / 0.10) 0%, hsl(var(--fyn-gold) / 0.10) 100%)",
+            color: isSoon ? "hsl(var(--fyn-ink) / 0.40)" : "hsl(var(--fyn-red))",
+          }}
+        >
+          <Icon size={20} />
+        </div>
+        {isSoon ? (
+          <FynBadge tone="neutral">Soon</FynBadge>
+        ) : locked ? (
+          <Lock size={14} className="text-fyn-ink/40" />
+        ) : (
+          <CheckCircle size={14} style={{ color: "#16A34A" }} />
+        )}
+      </div>
+      <h3 className="font-serif text-fyn-ink text-base mb-fyn-xs">{module.name}</h3>
+      <p className="text-fyn-small text-fyn-ink-60 leading-relaxed mb-fyn-sm">{module.desc}</p>
+      <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em]"
+        style={{ color: isSoon ? "hsl(var(--fyn-ink) / 0.35)" : locked ? "hsl(var(--fyn-gold))" : "#16A34A" }}>
+        {isSoon ? "Coming soon" : locked ? "Locked" : "Active"}
+      </p>
+    </motion.button>
+  );
+}
+
+// ── Activity icon ────────────────────────────────────────
+const ActivityIcon = ({ type }: { type: string }) => {
+  const map: Record<string, typeof Droplet> = {
+    transfer: ArrowDownRight, invoice: Receipt, gst: FileText,
+    customer: Users, payable: ArrowUpRight,
+  };
+  const Icon = map[type] || Bell;
+  return <Icon size={14} className="text-fyn-ink/60" />;
+};
+
+// ── Main page ────────────────────────────────────────────
 const CockpitPage = () => {
-  const { businessId } = useAuth();
+  const { businessId, profile } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [nidhiInput, setNidhiInput] = useState("");
-  const [recSearch, setRecSearch] = useState("");
-  const [recFilter, setRecFilter] = useState<ReceivablesFilter>("all");
+  const [demoMode, setDemoMode] = useState(false);
+  const [showNidhiChat, setShowNidhiChat] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 300], [0, -30]);
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.85]);
 
-  // Live updates: subscribe to row changes for this business and invalidate
-  // the matching React Query caches so the cockpit refreshes instantly when
-  // invoices, payments, alerts, or bank balances change.
+  // Realtime invalidation (kept from previous version)
   useEffect(() => {
     if (!businessId) return;
-
     const filter = `business_id=eq.${businessId}`;
-    const subs: { table: string; queryKey: string }[] = [
+    const subs = [
       { table: "receivables", queryKey: "receivables-top" },
       { table: "payables", queryKey: "payables" },
       { table: "alerts", queryKey: "alerts" },
       { table: "bank_accounts", queryKey: "bank-accounts" },
       { table: "transactions", queryKey: "transactions-180" },
-      { table: "compliance_events", queryKey: "compliance-upcoming" },
     ];
-
     const channelName = `cockpit-live-${businessId}`;
     const channel = supabase.channel(channelName);
     subs.forEach(({ table, queryKey }) => {
@@ -76,667 +226,422 @@ const CockpitPage = () => {
         "postgres_changes" as never,
         { event: "*", schema: "public", table, filter },
         (payload: any) => {
-          // Audit first (fire-and-forget), then refresh caches.
           void logRealtimeEvent({
-            channel_name: channelName,
-            table_name: table,
-            event_type: (payload?.eventType ?? "*") as
-              | "INSERT" | "UPDATE" | "DELETE" | "*",
+            channel_name: channelName, table_name: table,
+            event_type: (payload?.eventType ?? "*") as "INSERT" | "UPDATE" | "DELETE" | "*",
             business_id: businessId,
-            row_id:
-              (payload?.new as any)?.id ?? (payload?.old as any)?.id ?? null,
-            context: { queryKey },
-            handler_status: "invalidated",
+            row_id: (payload?.new as any)?.id ?? (payload?.old as any)?.id ?? null,
+            context: { queryKey }, handler_status: "invalidated",
           });
           queryClient.invalidateQueries({ queryKey: [queryKey, businessId] });
         }
       );
     });
     channel.subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [businessId, queryClient]);
 
-
-  // Bank balances
-  const { data: bankAccounts = [], isLoading: bankLoading, error: bankError } = useQuery({
+  // Live data queries
+  const { data: bankAccounts = [] } = useQuery({
     queryKey: ["bank-accounts", businessId],
     queryFn: async () => {
       const { data, error } = await supabase.from("bank_accounts").select("balance").eq("business_id", businessId!);
-      if (error) throw error;
-      return data || [];
+      if (error) throw error; return data || [];
     },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
+    enabled: !!businessId, refetchInterval: REFETCH_MS,
   });
-
-  // Transactions (last 180 days for chart, last 90 for burn)
-  const { data: transactions = [], isLoading: txLoading } = useQuery({
+  const { data: transactions = [] } = useQuery({
     queryKey: ["transactions-180", businessId],
     queryFn: async () => {
       const since = new Date(Date.now() - 180 * 86400000).toISOString().slice(0, 10);
-      const { data, error } = await supabase
-        .from("transactions")
-        .select("amount, direction, date")
-        .eq("business_id", businessId!)
-        .gte("date", since)
-        .order("date", { ascending: true });
-      if (error) throw error;
-      return data || [];
+      const { data, error } = await supabase.from("transactions")
+        .select("amount, direction, date").eq("business_id", businessId!)
+        .gte("date", since).order("date", { ascending: true });
+      if (error) throw error; return data || [];
     },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
+    enabled: !!businessId, refetchInterval: REFETCH_MS,
   });
-
-  // Alerts
-  const { data: alerts = [] } = useQuery({
-    queryKey: ["alerts", businessId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("alerts")
-        .select("*")
-        .eq("business_id", businessId!)
-        .eq("dismissed", false)
-        .order("created_at", { ascending: false })
-        .limit(3);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
-  });
-
-  // Receivables (outstanding, top 5 — filtered/searched client-side below)
-  const { data: receivables = [], isLoading: recLoading } = useQuery({
+  const { data: receivables = [] } = useQuery({
     queryKey: ["receivables-top", businessId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("receivables")
-        .select("*")
-        .eq("business_id", businessId!)
-        .eq("status", "outstanding")
-        .order("due_date", { ascending: true })
-        .limit(5);
-      if (error) throw error;
-      return data || [];
+      const { data, error } = await supabase.from("receivables").select("*")
+        .eq("business_id", businessId!).eq("status", "outstanding")
+        .order("due_date", { ascending: true }).limit(5);
+      if (error) throw error; return data || [];
     },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
+    enabled: !!businessId, refetchInterval: REFETCH_MS,
   });
-
-  // Compliance events (next 30 days)
-  const { data: compliance = [] } = useQuery({
-    queryKey: ["compliance-upcoming", businessId],
-    queryFn: async () => {
-      const today = new Date().toISOString().slice(0, 10);
-      const in30 = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-      const { data, error } = await supabase
-        .from("compliance_events")
-        .select("*")
-        .eq("business_id", businessId!)
-        .gte("due_date", today)
-        .lte("due_date", in30)
-        .order("due_date", { ascending: true })
-        .limit(5);
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
-  });
-
-  // Payables (pending/overdue)
   const { data: payables = [] } = useQuery({
     queryKey: ["payables", businessId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payables")
-        .select("*")
-        .eq("business_id", businessId!)
-        .in("status", ["pending", "overdue"]);
-      if (error) throw error;
-      return data || [];
+      const { data, error } = await supabase.from("payables").select("*")
+        .eq("business_id", businessId!).in("status", ["pending", "overdue"]);
+      if (error) throw error; return data || [];
     },
-    enabled: !!businessId,
-    refetchInterval: REFETCH_MS,
+    enabled: !!businessId, refetchInterval: REFETCH_MS,
   });
-
-  // GST ITC summary (latest period)
-  const { data: itcRow } = useQuery({
-    queryKey: ["itc-latest", businessId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("gst_itc_lines")
-        .select("itc_safe, itc_at_risk, period")
-        .eq("business_id", businessId!)
-        .order("period", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!businessId,
-  });
-
-  // GST notice risk
-  const { data: noticeRisk } = useQuery({
-    queryKey: ["notice-risk", businessId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("gst_notice_risk_scores")
-        .select("score")
-        .eq("business_id", businessId!)
-        .order("computed_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!businessId,
-  });
-
-  // Latest Nidhi brief
   const { data: brief } = useQuery({
     queryKey: ["nidhi-brief", businessId],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("nidhi_briefs")
-        .select("*")
-        .eq("business_id", businessId!)
-        .order("brief_date", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const { data } = await supabase.from("nidhi_briefs").select("*")
+        .eq("business_id", businessId!).order("brief_date", { ascending: false })
+        .limit(1).maybeSingle();
+      return data;
+    },
+    enabled: !!businessId,
+  });
+  const { data: business } = useQuery({
+    queryKey: ["business-onboarding", businessId],
+    queryFn: async () => {
+      const { data } = await supabase.from("businesses").select("onboarding_completed")
+        .eq("id", businessId!).maybeSingle();
       return data;
     },
     enabled: !!businessId,
   });
 
-  // === Derived metrics ===
-  const cashBalance = useMemo(
+  // Derived live metrics
+  const liveCash = useMemo(
     () => bankAccounts.reduce((s, a: any) => s + Number(a.balance || 0), 0),
     [bankAccounts]
   );
-
-  const { monthlyBurn, dailyBurn, runwayDays, cashFlowData } = useMemo(() => {
-    const now = Date.now();
-    const since90 = now - 90 * 86400000;
+  const { liveBurn, liveRunway, liveCashFlow } = useMemo(() => {
+    const since90 = Date.now() - 90 * 86400000;
     let totalOut = 0;
     const buckets = new Map<string, { cashIn: number; cashOut: number }>();
-
     transactions.forEach((t: any) => {
       const ts = new Date(t.date).getTime();
       const amt = Number(t.amount) || 0;
-      const isOut = t.direction === "debit" || t.direction === "out" || t.direction === "outflow";
+      const isOut = ["debit", "out", "outflow"].includes(t.direction);
       if (ts >= since90 && isOut) totalOut += amt;
-
       const key = new Date(t.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
       const b = buckets.get(key) || { cashIn: 0, cashOut: 0 };
-      if (isOut) b.cashOut += amt;
-      else b.cashIn += amt;
+      if (isOut) b.cashOut += amt; else b.cashIn += amt;
       buckets.set(key, b);
     });
-
     const monthly = totalOut / 3;
     const daily = totalOut / 90;
-    const runway = daily > 0 ? cashBalance / daily : 0;
-    const chart = Array.from(buckets.entries()).map(([date, v]) => ({ date, ...v }));
-    return { monthlyBurn: monthly, dailyBurn: daily, runwayDays: runway, cashFlowData: chart };
-  }, [transactions, cashBalance]);
+    return {
+      liveBurn: monthly,
+      liveRunway: daily > 0 ? liveCash / daily : 0,
+      liveCashFlow: Array.from(buckets.entries()).map(([date, v]) => ({ date, ...v })),
+    };
+  }, [transactions, liveCash]);
 
-  const totalPayables = useMemo(
-    () => payables.reduce((s, p: any) => s + Number(p.outstanding || p.amount || 0), 0),
-    [payables]
-  );
-
-  const dueThisWeek = useMemo(() => {
-    const in7 = Date.now() + 7 * 86400000;
-    return payables
-      .filter((p: any) => p.due_date && new Date(p.due_date).getTime() <= in7)
-      .reduce((s, p: any) => s + Number(p.outstanding || p.amount || 0), 0);
-  }, [payables]);
-
-  const receivablesOverdue = useMemo(() => {
+  const liveReceivablesOverdue = useMemo(() => {
     const now = Date.now();
-    return receivables
-      .filter((r: any) => r.due_date && new Date(r.due_date).getTime() < now)
+    return receivables.filter((r: any) => r.due_date && new Date(r.due_date).getTime() < now)
       .reduce((s, r: any) => s + Number(r.outstanding || r.amount || 0), 0);
   }, [receivables]);
 
-  const runwayColor = runwayDays >= 180 ? "#16A34A" : runwayDays >= 90 ? "#16A34A" : runwayDays >= 30 ? "#F59E0B" : "#DC2626";
+  const liveDuePayables = useMemo(() => {
+    const in7 = Date.now() + 7 * 86400000;
+    return payables.filter((p: any) => p.due_date && new Date(p.due_date).getTime() <= in7)
+      .reduce((s, p: any) => s + Number(p.outstanding || p.amount || 0), 0);
+  }, [payables]);
 
-  const daysOverdue = (dueDate: string) => {
-    const d = Math.floor((Date.now() - new Date(dueDate).getTime()) / 86400000);
-    return d > 0 ? d : 0;
-  };
-  const getDaysLeft = (dateStr: string) =>
-    Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
+  const hasLiveData = bankAccounts.length > 0 || transactions.length > 0;
+  const view = demoMode
+    ? {
+        cash: DEMO.cashBalance, cashTrend: DEMO.cashTrend,
+        runway: DEMO.runwayDays, burn: DEMO.monthlyBurn, burnTrend: DEMO.burnTrend,
+        receivables: DEMO.receivablesOverdue, payables: DEMO.duePayables,
+        cashFlow: DEMO.cashFlow, activity: DEMO.activity, insight: DEMO.insight,
+      }
+    : {
+        cash: liveCash, cashTrend: undefined as number | undefined,
+        runway: liveRunway, burn: liveBurn, burnTrend: undefined as number | undefined,
+        receivables: liveReceivablesOverdue, payables: liveDuePayables,
+        cashFlow: liveCashFlow, activity: [] as typeof DEMO.activity,
+        insight: brief?.content as string | undefined,
+      };
 
-  // Filtered + searched receivables for the table
-  const visibleReceivables = useMemo(() => {
-    const q = recSearch.trim().toLowerCase();
-    return receivables.filter((r: any) => {
-      const days = daysOverdue(r.due_date || "");
-      if (recFilter === "overdue" && days <= 0) return false;
-      if (recFilter === "current" && days > 0) return false;
-      if (!q) return true;
-      const hay = `${r.customer_name || ""} ${r.invoice_number || ""}`.toLowerCase();
-      return hay.includes(q);
-    });
-  }, [receivables, recSearch, recFilter]);
-
-  const hasAnyData =
-    bankAccounts.length > 0 ||
-    transactions.length > 0 ||
-    receivables.length > 0 ||
-    payables.length > 0 ||
-    alerts.length > 0;
-
-  // Alert severity → FynBadge tone
-  const alertTone = (sev: string): "danger" | "warning" | "neutral" =>
-    sev === "critical" ? "danger" : sev === "warning" ? "warning" : "neutral";
-  const alertAccent: Record<string, { bg: string; border: string; titleColor: string; ctaColor: string }> = {
-    critical: { bg: "#FDEAEA", border: "#C41E1E", titleColor: "#C41E1E", ctaColor: "#C41E1E" },
-    warning: { bg: "#FEF3E2", border: "#8B5A00", titleColor: "#8B5A00", ctaColor: "#8B5A00" },
-    info: { bg: "#EAF0FB", border: "#1A4A8B", titleColor: "#1A4A8B", ctaColor: "#1A4A8B" },
-  };
+  const hasData = demoMode || hasLiveData;
+  const onboardingDone = !!business?.onboarding_completed;
 
   return (
     <DashboardLayout>
-      {/* AI CFO Nidhi header — intentional dark hero (out of FynCard scope) */}
-      <div className="rounded-xl p-5 mb-fyn-md flex items-center justify-between bg-fyn-ink">
+      {/* Header: title + demo toggle */}
+      <div className="flex items-start justify-between gap-fyn-md mb-fyn-lg flex-wrap">
+        <FynPageTitle sub={`Welcome back${profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} — here's your business at a glance.`}>
+          Cockpit
+        </FynPageTitle>
         <div className="flex items-center gap-fyn-sm">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-fyn-red">N</div>
-          <div>
-            <p className="text-white font-serif text-lg">Good morning. Here's your business today.</p>
-            <p className="text-fyn-tiny" style={{ color: "#8B6914" }}>
-              {brief ? `Last brief: ${new Date(brief.created_at).toLocaleString("en-IN")}` : "No brief yet"}
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/dashboard/nidhi"
-          className="inline-flex items-center gap-2 px-4 py-2 text-fyn-body font-medium rounded-md bg-fyn-red text-white hover:bg-fyn-red-dark transition-colors"
-        >
-          Ask AI CFO Nidhi →
-        </Link>
-      </div>
-
-      {bankError && (
-        <FynCard className="mb-fyn-md border-l-4 border-l-fyn-red bg-[#FDEAEA] text-[#C41E1E] text-fyn-small">
-          Unable to load data. Please refresh.
-        </FynCard>
-      )}
-
-      {!hasAnyData && !bankLoading && !txLoading && !recLoading && (
-        <FynCard className="mb-fyn-md text-center border-dashed">
-          <p className="text-fyn-ink text-base font-semibold mb-1.5">No data yet</p>
-          <p className="text-fyn-ink/60 text-fyn-small mb-fyn-md">
-            Connect a bank account or import transactions to see your cockpit come alive.
-          </p>
-          <Link
-            to="/dashboard/banking"
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-fyn-body font-medium rounded-md bg-fyn-red text-white hover:bg-fyn-red-dark transition-colors"
+          <span className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-fyn-ink-60">Demo mode</span>
+          <button
+            onClick={() => setDemoMode((v) => !v)}
+            aria-pressed={demoMode}
+            aria-label="Toggle demo mode"
+            className="relative h-6 w-11 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+            style={{
+              background: demoMode
+                ? "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)"
+                : "hsl(var(--fyn-ink) / 0.20)",
+            }}
           >
-            Connect Bank →
-          </Link>
-        </FynCard>
+            <motion.span
+              animate={{ x: demoMode ? 22 : 2 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md"
+            />
+          </button>
+          {demoMode && <FynBadge tone="warning">DEMO</FynBadge>}
+        </div>
+      </div>
+
+      {/* Onboarding banner */}
+      {!onboardingDone && !demoMode && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-fyn-lg rounded-lg p-fyn-md flex items-center justify-between gap-fyn-md flex-wrap"
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--fyn-red) / 0.08) 0%, hsl(var(--fyn-gold) / 0.08) 100%)",
+            border: "1px solid hsl(var(--fyn-red) / 0.20)",
+          }}
+        >
+          <div>
+            <p className="font-semibold text-fyn-body text-fyn-red">Complete your setup</p>
+            <p className="text-fyn-small text-fyn-ink-60 mt-0.5">
+              Connect your bank and accounting to unlock AI-powered financial intelligence.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/onboarding")}
+            className="px-5 py-2.5 rounded-md text-white font-medium text-fyn-small whitespace-nowrap"
+            style={{
+              background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)",
+              boxShadow: "0 4px 12px hsl(var(--fyn-red) / 0.30)",
+            }}
+          >
+            Complete Setup →
+          </button>
+        </motion.div>
       )}
 
-      {/* Alert strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-fyn-md mb-fyn-md">
-        {alerts.length === 0 && (
-          <FynCard className="md:col-span-3">
-            <EmptyHint text="No active alerts." />
-          </FynCard>
-        )}
-        {alerts.map((a: any) => {
-          const s = alertAccent[a.severity] || alertAccent.info;
-          return (
-            <div
-              key={a.id}
-              className="rounded-lg transition-all duration-250 hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
-              style={{ background: s.bg, borderLeft: `4px solid ${s.border}`, padding: "16px 20px", minHeight: 72 }}
-            >
-              <div className="flex items-start justify-between mb-fyn-xs">
-                <p className="text-fyn-small font-semibold" style={{ color: s.titleColor }}>{a.title}</p>
-                <FynBadge tone={alertTone(a.severity)}>{a.severity}</FynBadge>
-              </div>
-              <p className="text-fyn-ink text-fyn-small opacity-80 mb-fyn-sm">{a.body}</p>
-              {a.action_url && (
-                <Link to={a.action_url} className="text-fyn-small font-medium underline" style={{ color: s.ctaColor }}>
-                  {a.severity === "critical" ? "Fix Now →" : a.severity === "warning" ? "Review →" : "View →"}
-                </Link>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Quick shortcut: Data Import — Bloomberg/data-dense (intentional bespoke) */}
-      <Link
-        to="/dashboard/data-import"
-        className="group block mb-fyn-md outline-none
-                   border border-l-[3px]
-                   border-[hsl(var(--fyn-ink-10))] border-l-[hsl(var(--fyn-red))]
-                   bg-[hsl(var(--fyn-beige-card))]
-                   transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out
-                   hover:-translate-y-px
-                   hover:bg-[hsl(var(--fyn-beige-deep))]
-                   hover:border-[hsl(var(--fyn-ink-20))]
-                   hover:border-l-[hsl(var(--fyn-red-dark))]
-                   hover:shadow-[0_4px_0_-2px_hsl(var(--fyn-red)/0.18),0_8px_20px_-12px_hsl(var(--fyn-ink)/0.25)]
-                   focus-visible:ring-2 focus-visible:ring-[hsl(var(--fyn-red))]
-                   focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--fyn-beige))]
-                   active:translate-y-0 active:shadow-none active:bg-[hsl(var(--fyn-beige-dark))]"
+      {/* Hero KPIs (parallax) */}
+      <motion.div
+        ref={heroRef}
+        style={{ y: heroY, opacity: heroOpacity }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-fyn-md mb-fyn-lg"
       >
-        <div className="flex items-stretch">
-          <div className="hidden sm:flex items-center px-3 fyn-label bg-[hsl(var(--fyn-ink))] text-[hsl(var(--fyn-beige))]">
-            Data · Import
-          </div>
-          <div className="flex-1 flex items-center justify-between px-4 py-3 gap-4 md:gap-6">
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="w-9 h-9 flex items-center justify-center flex-shrink-0
-                           bg-[hsl(var(--fyn-beige))]
-                           border border-[hsl(var(--fyn-ink))]
-                           shadow-[inset_0_-2px_0_0_hsl(var(--fyn-red))]
-                           text-[hsl(var(--fyn-red))]"
-                aria-hidden
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
-                  <path d="M12 3v11" />
-                  <path d="M7 9l5 5 5-5" />
-                  <path d="M4 18v2h16v-2" />
-                </svg>
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-serif font-bold truncate text-[18px] leading-[1.2] text-[hsl(var(--fyn-ink))]">
-                  Import Data
-                </h3>
-                <p className="truncate mt-1 text-[14px] leading-[1.5] text-[hsl(var(--fyn-ink)/0.60)]">
-                  Bank statements, invoices, and expenses — CSV or XLSX
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
-              <div className="hidden md:block text-right">
-                <p className="fyn-label text-[hsl(var(--fyn-ink)/0.40)]">Formats</p>
-                <p className="fyn-mono mt-1 font-semibold text-[hsl(var(--fyn-ink))]">.csv · .xlsx</p>
-              </div>
-              <span aria-hidden className="hidden md:inline-block w-px h-8 bg-[hsl(var(--fyn-ink-10))]" />
-              <div
-                className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5
-                           fyn-label
-                           bg-[hsl(var(--fyn-red)/0.08)] text-[hsl(var(--fyn-red))]
-                           border border-[hsl(var(--fyn-red))]
-                           transition-colors"
-                aria-label="Open Data Import"
-              >
-                <span className="hidden sm:inline">Open</span>
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </div>
-            </div>
-          </div>
+        <StatCard icon={Droplet} label="Cash Position" accent="ink"
+          value={hasData ? formatINR(view.cash) : "—"}
+          trend={view.cashTrend} trendLabel={view.cashTrend !== undefined ? `+${view.cashTrend}% this month` : undefined} />
+        <StatCard icon={TrendingUp} label="Runway" accent="green"
+          value={hasData && view.runway > 0 ? `${view.runway.toFixed(0)} days` : "—"} />
+        <StatCard icon={DollarSign} label="Monthly Burn" accent="red"
+          value={hasData && view.burn > 0 ? formatINR(Math.round(view.burn)) : "—"}
+          trend={view.burnTrend !== undefined ? -view.burnTrend : undefined}
+          trendLabel={view.burnTrend !== undefined ? `+${view.burnTrend}% this month` : undefined} />
+        <StatCard icon={FileText} label="Receivables Overdue" accent="gold"
+          value={hasData ? formatINR(view.receivables) : "—"} />
+      </motion.div>
+
+      {/* Cash flow chart */}
+      <FynCard className="mb-fyn-lg">
+        <div className="flex items-center justify-between mb-fyn-md">
+          <h3 className="font-serif text-fyn-h3 text-fyn-ink">Cash Flow</h3>
+          <Link to="/dashboard/cash-flow" className="text-fyn-small font-medium text-fyn-red hover:underline">
+            View detail →
+          </Link>
         </div>
-      </Link>
-
-      {/* Key metrics row — 4 dark KPI tiles (intentional Bloomberg variant; FynCard is light-surface only) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-fyn-md mb-fyn-md">
-        {/* Cash in Bank */}
-        <div className="rounded-lg bg-fyn-ink px-6 py-5">
-          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">CASH IN BANK</p>
-          <p className="text-white text-[36px] font-bold mt-1">{bankLoading ? "…" : formatINR(cashBalance)}</p>
-          <p className="text-white/60 text-fyn-tiny mt-1">{bankAccounts.length} account{bankAccounts.length === 1 ? "" : "s"}</p>
-        </div>
-
-        {/* Runway */}
-        <div className="rounded-lg bg-fyn-ink px-6 py-5">
-          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">RUNWAY</p>
-          <p className="text-[36px] font-bold mt-1" style={{ color: runwayColor }}>
-            {dailyBurn > 0 ? `${runwayDays.toFixed(0)} days` : "—"}
-          </p>
-          <p className="text-white/60 text-fyn-tiny mt-1">
-            At {dailyBurn > 0 ? formatINR(Math.round(dailyBurn)) : "₹0"} daily burn
-          </p>
-          <div className="mt-2 h-1 bg-white/10 rounded-sm">
-            <div className="h-1 rounded-sm" style={{ background: runwayColor, width: `${Math.min(100, (runwayDays / 180) * 100)}%` }} />
-          </div>
-        </div>
-
-        {/* Receivables Overdue */}
-        <div className="rounded-lg bg-fyn-ink px-6 py-5">
-          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">RECEIVABLES OVERDUE</p>
-          <p className="text-[36px] font-bold mt-1" style={{ color: receivablesOverdue > 0 ? "#F87171" : "#FFFFFF" }}>{formatINR(receivablesOverdue)}</p>
-          <p className="text-white/60 text-fyn-tiny mt-1">
-            {receivables.filter((r: any) => r.due_date && new Date(r.due_date).getTime() < Date.now()).length} customers
-          </p>
-        </div>
-
-        {/* Due This Week */}
-        <div className="rounded-lg bg-fyn-ink px-6 py-5">
-          <p className="text-white/50 text-[11px] font-medium tracking-[0.10em] uppercase">PAYABLES DUE / 7D</p>
-          <p className="text-white text-[36px] font-bold mt-1">{formatINR(dueThisWeek)}</p>
-          <p className="text-white/60 text-fyn-tiny mt-1">Total payables: {formatINR(totalPayables)}</p>
-        </div>
-      </div>
-
-      {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-fyn-lg">
-        {/* Left - 60% */}
-        <div className="lg:col-span-3 space-y-fyn-lg">
-          {/* Cash flow chart */}
-          <FynCard>
-            <div className="flex items-center justify-between mb-fyn-md">
-              <h3 className="text-fyn-ink font-serif text-fyn-h3">Cash Flow — Last 180 Days</h3>
-            </div>
-            {cashFlowData.length === 0 ? (
-              <div style={{ height: 280 }} className="flex items-center justify-center">
-                <EmptyHint text="No transactions yet. Cash flow chart will appear once data is imported." />
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={cashFlowData}>
-                  <defs>
-                    <linearGradient id="ckGreen" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#16A34A" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#16A34A" stopOpacity={0.01} />
-                    </linearGradient>
-                    <linearGradient id="ckRed" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#DC2626" stopOpacity={0.12} />
-                      <stop offset="100%" stopColor="#DC2626" stopOpacity={0.01} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} interval={Math.max(0, Math.floor(cashFlowData.length / 10))} />
-                  <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Area type="monotone" dataKey="cashIn" stroke="#16A34A" strokeWidth={2} fill="url(#ckGreen)" />
-                  <Area type="monotone" dataKey="cashOut" stroke="#DC2626" strokeWidth={2} fill="url(#ckRed)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
-            <div className="flex gap-fyn-lg mt-fyn-sm text-fyn-small">
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#16A34A" }} /> Money In
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#DC2626" }} /> Money Out
-              </span>
-            </div>
-          </FynCard>
-
-          {/* Receivables table */}
-          <FynCard>
-            <div className="flex items-center justify-between mb-fyn-md gap-fyn-sm flex-wrap">
-              <h3 className="text-fyn-ink font-serif text-fyn-h3">Top Outstanding Receivables</h3>
-              <div className="flex items-center gap-fyn-sm">
-                <div className="w-56">
-                  <FynSearchInput
-                    value={recSearch}
-                    onChange={(e) => setRecSearch(e.target.value)}
-                    placeholder="Search customer or invoice…"
-                  />
-                </div>
-                <FynSelect
-                  value={recFilter}
-                  onChange={(e) => setRecFilter(e.target.value as ReceivablesFilter)}
-                  className="w-40"
-                  aria-label="Filter receivables"
-                >
-                  <option value="all">All</option>
-                  <option value="overdue">Overdue only</option>
-                  <option value="current">Current only</option>
-                </FynSelect>
-              </div>
-            </div>
-            {receivables.length === 0 ? (
-              <EmptyHint text="No outstanding receivables." />
-            ) : visibleReceivables.length === 0 ? (
-              <EmptyHint text="No receivables match your filter." />
-            ) : (
-              <FynTable>
-                <thead>
-                  <FynTR className="hover:bg-transparent">
-                    <FynTH>Customer</FynTH>
-                    <FynTH>Invoice</FynTH>
-                    <FynTH align="right">Amount</FynTH>
-                    <FynTH align="right">Days Overdue</FynTH>
-                  </FynTR>
-                </thead>
-                <tbody>
-                  {visibleReceivables.map((r: any) => {
-                    const days = daysOverdue(r.due_date || "");
-                    return (
-                      <FynTR key={r.id}>
-                        <FynTD className="text-fyn-ink font-semibold">{r.customer_name}</FynTD>
-                        <FynTD>{r.invoice_number || "—"}</FynTD>
-                        <FynTD align="right" mono>{formatINR(r.outstanding || r.amount)}</FynTD>
-                        <FynTD align="right" mono className={cn("text-fyn-small", getDaysOverdueColor(days))}>
-                          {days > 0 ? `${days}d` : "Current"}
-                        </FynTD>
-                      </FynTR>
-                    );
-                  })}
-                </tbody>
-              </FynTable>
-            )}
-            <Link to="/dashboard/receivables" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
-              View all receivables →
-            </Link>
-          </FynCard>
-        </div>
-
-        {/* Right - 40% */}
-        <div className="lg:col-span-2 space-y-fyn-lg">
-          {/* Runway gauge */}
-          <FynCard className="text-center">
-            <h3 className="text-fyn-ink font-serif mb-fyn-md text-fyn-h3">Cash Runway</h3>
-            <div className="relative mx-auto" style={{ width: 280, height: 160 }}>
-              <svg viewBox="0 0 280 160" className="w-full">
-                <path d="M 20 145 A 120 120 0 0 1 53 35" fill="none" stroke="#DC2626" strokeWidth="20" strokeLinecap="round" />
-                <path d="M 53 35 A 120 120 0 0 1 227 35" fill="none" stroke="#F59E0B" strokeWidth="20" strokeLinecap="round" />
-                <path d="M 227 35 A 120 120 0 0 1 260 145" fill="none" stroke="#16A34A" strokeWidth="20" strokeLinecap="round" />
-                {(() => {
-                  const capped = Math.min(Math.max(runwayDays, 0), 180);
-                  const angle = Math.PI * (1 - capped / 180);
-                  const nx = 140 + 90 * Math.cos(angle);
-                  const ny = 145 - 90 * Math.sin(angle);
-                  return (
-                    <>
-                      <line x1="140" y1="145" x2={nx} y2={ny} stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
-                      <circle cx="140" cy="145" r="6" fill="#1A1008" stroke="white" strokeWidth="2" />
-                    </>
-                  );
-                })()}
-              </svg>
-            </div>
-            <p className="text-[56px] font-bold leading-none" style={{ color: runwayColor }}>
-              {dailyBurn > 0 ? runwayDays.toFixed(0) : "—"}
+        {view.cashFlow.length === 0 ? (
+          <div className="h-[240px] flex items-center justify-center">
+            <p className="text-fyn-ink/45 text-fyn-small italic">
+              No transactions yet. Toggle Demo mode to preview.
             </p>
-            <p className="text-fyn-ink/50 text-fyn-small mt-1">days of runway</p>
-            <p className="text-fyn-tiny mt-0.5" style={{ color: "#8B6914" }}>
-              Monthly burn: {monthlyBurn > 0 ? formatINR(Math.round(monthlyBurn)) : "—"}
-            </p>
-          </FynCard>
-
-          {/* Nidhi insight — intentional dark surface (out of FynCard scope) */}
-          <div className="rounded-[10px] bg-fyn-ink px-6 py-5">
-            <div className="flex items-center gap-fyn-sm">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold bg-fyn-red text-base">N</div>
-              <p className="text-white text-fyn-small font-semibold">AI CFO Nidhi's read on today</p>
-            </div>
-            <p className="text-white/85 text-fyn-small leading-[1.75] mt-fyn-sm">
-              {brief?.content || "No brief generated yet. Ask Nidhi a question to get started."}
-            </p>
-            <div className="flex gap-2 mt-3.5">
-              <FynInput
-                value={nidhiInput}
-                onChange={(e) => setNidhiInput(e.target.value)}
-                placeholder="Ask AI CFO Nidhi a follow-up..."
-                aria-label="Ask AI CFO Nidhi a follow-up"
-                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/40 text-fyn-small"
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={view.cashFlow}>
+              <defs>
+                <linearGradient id="ckIn" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#16A34A" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="#16A34A" stopOpacity={0.01} />
+                </linearGradient>
+                <linearGradient id="ckOut" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#DC2626" stopOpacity={0.20} />
+                  <stop offset="100%" stopColor="#DC2626" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }}
+                interval={Math.max(0, Math.floor(view.cashFlow.length / 8))} />
+              <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }}
+                tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
+              <Tooltip
+                contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff" }}
+                labelStyle={{ color: "rgba(255,255,255,0.5)" }}
               />
-              <FynButton
-                aria-label="Send to AI CFO Nidhi"
-                className="w-10 h-10 px-0 py-0 justify-center"
+              <Area type="monotone" dataKey="cashIn" stroke="#16A34A" strokeWidth={2} fill="url(#ckIn)" />
+              <Area type="monotone" dataKey="cashOut" stroke="#DC2626" strokeWidth={2} fill="url(#ckOut)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </FynCard>
+
+      {/* Intelligence Modules */}
+      <FynSectionTitle>Intelligence Modules</FynSectionTitle>
+      <motion.div
+        initial="hidden" animate="show"
+        variants={{ show: { transition: { staggerChildren: 0.05 } } }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-fyn-md mb-fyn-lg"
+      >
+        {MODULES.map((m) => (
+          <motion.div
+            key={m.id}
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+          >
+            <ModuleCard
+              module={m}
+              locked={!hasData && m.status === "active"}
+              onOpen={() => {
+                if (m.status === "soon") return;
+                navigate(m.path);
+              }}
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Bottom: Nidhi insight + Recent activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-lg mb-fyn-lg">
+        {/* Nidhi insight (intentional dark surface) */}
+        <div className="rounded-lg p-fyn-lg bg-fyn-ink shadow-[0_12px_30px_rgba(26,16,8,0.18)]">
+          <div className="flex items-start gap-fyn-sm">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
+            >
+              N
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-white/50 mb-fyn-xs">
+                Latest insight from AI CFO Nidhi
+              </p>
+              <p className="text-white/90 text-fyn-body leading-relaxed">
+                {view.insight ||
+                  "Connect your bank account to receive your first financial intelligence brief within 24 hours."}
+              </p>
+              <button
+                onClick={() => setShowNidhiChat(true)}
+                className="mt-fyn-md inline-flex items-center gap-2 px-4 py-2 rounded-md text-fyn-small font-medium"
+                style={{
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#fff",
+                }}
               >
-                <ArrowRight className="h-4 w-4" />
-              </FynButton>
+                <MessageCircle size={14} /> Chat with Nidhi
+              </button>
             </div>
           </div>
-
-          {/* Filing Calendar */}
-          <FynCard>
-            <h3 className="text-fyn-ink font-serif mb-fyn-sm text-fyn-h3">Filing Calendar (Next 30 days)</h3>
-            {compliance.length === 0 ? (
-              <EmptyHint text="No upcoming filings in the next 30 days." />
-            ) : (
-              <div className="space-y-1">
-                {compliance.map((c: any) => {
-                  const daysLeft = getDaysLeft(c.due_date);
-                  const dotColor = daysLeft <= 3 ? "#DC2626" : daysLeft <= 7 ? "#F59E0B" : daysLeft <= 14 ? "#8B6914" : "rgba(26,16,8,0.30)";
-                  const tone: "danger" | "warning" | "neutral" =
-                    daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warning" : "neutral";
-                  return (
-                    <div key={c.id} className="flex items-center gap-fyn-sm rounded-lg px-2.5 py-2 h-9">
-                      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${daysLeft <= 3 ? "pulse-ring" : ""}`} style={{ background: dotColor }} />
-                      <span className="flex-1 text-fyn-ink text-fyn-small font-medium">{c.filing_name}</span>
-                      <span className="text-fyn-tiny text-fyn-ink/60">{c.due_date}</span>
-                      <FynBadge tone={tone}>{daysLeft > 0 ? `${daysLeft}d` : "Due"}</FynBadge>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <Link to="/dashboard/filing-calendar" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
-              View full calendar →
-            </Link>
-          </FynCard>
-
-          {/* GST Health */}
-          <FynCard>
-            <h3 className="text-fyn-ink font-serif mb-fyn-sm text-fyn-h3">GST Health</h3>
-            <div className="grid grid-cols-3 gap-fyn-sm">
-              <div className="text-center rounded-lg p-3" style={{ background: "#DCFCE7" }}>
-                <p className="font-mono text-xl font-bold" style={{ color: "#16A34A" }}>{formatINR(Number(itcRow?.itc_safe || 0))}</p>
-                <p className="text-fyn-tiny font-medium uppercase tracking-[0.06em] mt-1" style={{ color: "#16A34A" }}>ITC SAFE</p>
-              </div>
-              <div className="text-center rounded-lg p-3" style={{ background: "#FDEAEA", border: "1px solid #C41E1E" }}>
-                <p className="font-mono text-xl font-bold" style={{ color: "#C41E1E" }}>{formatINR(Number(itcRow?.itc_at_risk || 0))}</p>
-                <p className="text-fyn-tiny font-medium uppercase tracking-[0.06em] mt-1" style={{ color: "#C41E1E" }}>ITC AT RISK</p>
-              </div>
-              <div className="text-center rounded-lg p-3" style={{ background: "#FEF3E2" }}>
-                <p className="font-mono text-xl font-bold" style={{ color: "#F59E0B" }}>{noticeRisk?.score ?? "—"}{noticeRisk ? "/100" : ""}</p>
-                <FynLabel className="mt-1">NOTICE RISK</FynLabel>
-              </div>
-            </div>
-            <Link to="/dashboard/gst" className="text-fyn-red text-fyn-small font-medium hover:underline mt-fyn-sm inline-block">
-              View GST Intelligence →
-            </Link>
-          </FynCard>
         </div>
+
+        {/* Recent activity */}
+        <FynCard>
+          <h3 className="font-serif text-fyn-h3 text-fyn-ink mb-fyn-md">Recent Activity</h3>
+          {view.activity.length > 0 ? (
+            <ul className="space-y-fyn-sm">
+              {view.activity.map((a, idx) => (
+                <li key={idx} className="flex items-start gap-fyn-sm pb-fyn-sm border-b border-fyn-ink-10 last:border-0 last:pb-0">
+                  <div className="w-7 h-7 rounded-md flex items-center justify-center bg-fyn-beige flex-shrink-0">
+                    <ActivityIcon type={a.type} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-fyn-small text-fyn-ink">{a.desc}</p>
+                    <p className="text-fyn-tiny text-fyn-ink-45 mt-0.5">{a.time}</p>
+                  </div>
+                  {a.amount !== null && (
+                    <span
+                      className="font-mono text-fyn-small font-semibold"
+                      style={{ color: a.amount >= 0 ? "#16A34A" : "#DC2626" }}
+                    >
+                      {a.amount >= 0 ? "+" : "−"}₹{Math.abs(a.amount).toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-center py-fyn-lg">
+              <p className="text-fyn-ink text-fyn-body font-semibold">No activity yet</p>
+              <p className="text-fyn-small text-fyn-ink-60 mt-fyn-xs">
+                Connect your accounts to see transactions appear here.
+              </p>
+            </div>
+          )}
+        </FynCard>
       </div>
+
+      {/* Floating Nidhi FAB */}
+      <motion.button
+        onClick={() => setShowNidhiChat(true)}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full flex items-center justify-center text-white"
+        style={{
+          background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)",
+          boxShadow: "0 10px 28px hsl(var(--fyn-red) / 0.40)",
+        }}
+        aria-label="Chat with AI CFO Nidhi"
+      >
+        <Sparkles size={22} />
+      </motion.button>
+
+      {/* Nidhi modal */}
+      <AnimatePresence>
+        {showNidhiChat && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-fyn-md"
+            style={{ background: "rgba(26,16,8,0.55)", backdropFilter: "blur(6px)" }}
+            onClick={() => setShowNidhiChat(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-lg rounded-lg p-fyn-lg bg-fyn-beige-card border border-fyn-ink-10"
+            >
+              <div className="flex items-start justify-between mb-fyn-md">
+                <div className="flex items-center gap-fyn-sm">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                    style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
+                  >
+                    N
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-fyn-h3 text-fyn-ink">AI CFO Nidhi</h3>
+                    <p className="text-fyn-tiny text-fyn-ink-60">Your financial intelligence assistant</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowNidhiChat(false)}
+                  aria-label="Close"
+                  className="text-fyn-ink-60 hover:text-fyn-ink"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <p className="text-fyn-small text-fyn-ink-60 mb-fyn-md">
+                Open the full chat to get AI-powered insights and recommendations.
+              </p>
+              <Link
+                to="/dashboard/nidhi"
+                onClick={() => setShowNidhiChat(false)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-white font-medium text-fyn-small"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)",
+                  boxShadow: "0 4px 12px hsl(var(--fyn-red) / 0.30)",
+                }}
+              >
+                Open Nidhi Chat →
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 };
