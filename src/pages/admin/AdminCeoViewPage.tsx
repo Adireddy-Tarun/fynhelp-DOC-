@@ -219,6 +219,11 @@ export default function AdminCeoViewPage() {
         <div className="grid lg:grid-cols-3" style={{ minHeight: 480 }}>
           {/* Query list */}
           <div className="lg:col-span-2 p-5 space-y-3" style={{ borderRight: "1px solid rgba(26,16,8,0.08)" }}>
+            {customerQueries.length === 0 && (
+              <div className="p-8 text-center" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.5)" }}>
+                No open tickets right now.
+              </div>
+            )}
             {customerQueries.map((q) => {
               const isSel = selectedQuery === q.id;
               const ps = PRIORITY_STYLE[q.priority];
