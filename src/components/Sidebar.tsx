@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Home, MessageSquare, TrendingUp, FileText, Shield, Users,
@@ -24,17 +24,12 @@ interface MenuItem {
   badge?: "Active" | "Soon";
 }
 
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
-
-const menuSections: MenuSection[] = [
+const menuSections: { title: string; items: MenuItem[] }[] = [
   {
     title: "OVERVIEW",
     items: [
       { icon: Home, label: "Dashboard", path: "/dashboard/cockpit", color: "#3B82F6" },
-      { icon: MessageSquare, label: "AI CFO Nidhi", path: "/dashboard/nidhi", color: "#8B5CF6" },
+      { icon: MessageSquare, label: "AI CFO Nidhi", path: "/dashboard/nidhi", color: "#C41E1E" },
     ],
   },
   {
@@ -98,24 +93,25 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
 
       <motion.aside
         initial={false}
-        animate={{
-          width,
-          x: visible ? 0 : -width,
-        }}
+        animate={{ width, x: visible ? 0 : -width }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         className="fixed top-0 left-0 h-full z-50 flex flex-col"
         style={{
-          background: "rgba(255,255,255,0.98)",
+          background: "linear-gradient(180deg, rgba(196,30,30,0.03) 0%, rgba(196,30,30,0.02) 100%), #FFFFFF",
           backdropFilter: "blur(12px)",
-          borderRight: "1px solid rgba(139,105,20,0.12)",
-          boxShadow: "2px 0 12px rgba(0,0,0,0.04)",
+          borderRight: "2px solid rgba(139,105,20,0.25)",
+          boxShadow: "2px 0 16px rgba(139,105,20,0.08)",
           overflowY: "auto",
           overflowX: "hidden",
         }}
       >
         <div
-          className="flex items-center justify-between px-4 py-5 border-b"
-          style={{ borderColor: "rgba(139,105,20,0.12)", minHeight: 80 }}
+          className="flex items-center justify-between px-4 py-5"
+          style={{
+            borderBottom: "1px solid rgba(139,105,20,0.2)",
+            background: "rgba(196,30,30,0.04)",
+            minHeight: 80,
+          }}
         >
           <button
             onClick={() => navigate("/dashboard/cockpit")}
@@ -123,7 +119,15 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             aria-label="Go to dashboard"
           >
             {collapsed ? (
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "#1A1008", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Georgia, serif", fontWeight: 700 }}>
+              <div
+                style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                  color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 16,
+                  boxShadow: "0 2px 8px rgba(139,105,20,0.25)",
+                }}
+              >
                 F
               </div>
             ) : (
@@ -135,11 +139,15 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             onClick={() => onCollapsedChange(!collapsed)}
             className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
             style={{ background: "transparent", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(139,105,20,0.08)")}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(139,105,20,0.12)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? <ChevronRight size={18} color="rgba(26,16,8,0.6)" /> : <ChevronLeft size={18} color="rgba(26,16,8,0.6)" />}
+            {collapsed ? (
+              <ChevronRight size={18} color="#8B6914" strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft size={18} color="#8B6914" strokeWidth={2.5} />
+            )}
           </button>
 
           <button
@@ -156,20 +164,30 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           {menuSections.map((section) => (
             <div key={section.title} className="mb-8">
               {!collapsed && (
-                <p
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.8px",
-                    color: "rgba(26,16,8,0.4)",
-                    marginBottom: 8,
-                    paddingLeft: 12,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {section.title}
-                </p>
+                <>
+                  <p
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.8px",
+                      color: "#8B6914",
+                      marginBottom: 8,
+                      paddingLeft: 12,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {section.title}
+                  </p>
+                  <div
+                    style={{
+                      height: 1,
+                      background: "linear-gradient(90deg, rgba(139,105,20,0.3) 0%, transparent 100%)",
+                      marginBottom: 12,
+                      marginLeft: 12,
+                    }}
+                  />
+                </>
               )}
 
               {section.items.map((item) => {
@@ -187,15 +205,16 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                     className="w-full flex items-center gap-3 px-3 py-3 mb-1 rounded-xl transition-all relative group"
                     style={{
                       background: active
-                        ? "linear-gradient(90deg, rgba(196,30,30,0.08) 0%, rgba(139,105,20,0.08) 100%)"
+                        ? "linear-gradient(90deg, rgba(196,30,30,0.15) 0%, rgba(139,105,20,0.15) 100%)"
                         : "transparent",
                       border: "none",
                       cursor: "pointer",
                       borderLeft: active ? "4px solid #8B6914" : "4px solid transparent",
                       justifyContent: collapsed ? "center" : "flex-start",
+                      boxShadow: active ? "0 2px 8px rgba(139,105,20,0.15)" : "none",
                     }}
                     onMouseEnter={(e) => {
-                      if (!active) e.currentTarget.style.background = "rgba(139,105,20,0.05)";
+                      if (!active) e.currentTarget.style.background = "rgba(139,105,20,0.08)";
                     }}
                     onMouseLeave={(e) => {
                       if (!active) e.currentTarget.style.background = "transparent";
@@ -207,15 +226,20 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         width: 40,
                         height: 40,
                         borderRadius: 10,
-                        background: active ? `${item.color}15` : "rgba(100,116,139,0.08)",
+                        background: active ? `${item.color}20` : "rgba(255,255,255,0.6)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
                         transition: "all 0.2s",
+                        border: active ? `1px solid ${item.color}40` : "1px solid rgba(139,105,20,0.1)",
                       }}
                     >
-                      <Icon size={20} color={active ? item.color : "rgba(26,16,8,0.6)"} strokeWidth={active ? 2.5 : 2} />
+                      <Icon
+                        size={20}
+                        color={active ? item.color : "rgba(26,16,8,0.6)"}
+                        strokeWidth={active ? 2.5 : 2}
+                      />
                     </div>
 
                     {!collapsed && (
@@ -225,7 +249,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                             fontFamily: "Inter, sans-serif",
                             fontSize: 14,
                             fontWeight: active ? 600 : 500,
-                            color: active ? "#1A1008" : "rgba(26,16,8,0.7)",
+                            color: active ? "#1A1008" : "rgba(26,16,8,0.75)",
                             flex: 1,
                             textAlign: "left",
                           }}
@@ -240,8 +264,15 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                               fontFamily: "Inter, sans-serif",
                               padding: "3px 8px",
                               borderRadius: 6,
-                              background: item.badge === "Active" ? "rgba(16,185,129,0.12)" : "rgba(100,116,139,0.12)",
+                              background:
+                                item.badge === "Active"
+                                  ? "rgba(16,185,129,0.15)"
+                                  : "rgba(100,116,139,0.12)",
                               color: item.badge === "Active" ? "#10B981" : "#64748B",
+                              border:
+                                item.badge === "Active"
+                                  ? "1px solid rgba(16,185,129,0.3)"
+                                  : "1px solid rgba(100,116,139,0.2)",
                             }}
                           >
                             {item.badge}
@@ -254,12 +285,12 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                       <div
                         className="absolute left-full ml-2 px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50"
                         style={{
-                          background: "#1A1008",
-                          color: "#fff",
+                          background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                          color: "#FFFFFF",
                           fontSize: 13,
                           fontFamily: "Inter, sans-serif",
                           fontWeight: 500,
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                          boxShadow: "0 4px 16px rgba(139,105,20,0.3)",
                         }}
                       >
                         {item.label}
@@ -271,7 +302,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                               marginLeft: 8,
                               padding: "2px 6px",
                               borderRadius: 4,
-                              background: item.badge === "Active" ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.2)",
+                              background: "rgba(255,255,255,0.2)",
                             }}
                           >
                             {item.badge}
@@ -287,13 +318,20 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
         </nav>
 
         {!collapsed && (
-          <div className="px-4 py-4 border-t" style={{ borderColor: "rgba(139,105,20,0.12)" }}>
+          <div
+            className="px-4 py-4"
+            style={{
+              borderTop: "1px solid rgba(139,105,20,0.2)",
+              background: "rgba(196,30,30,0.03)",
+            }}
+          >
             <p
               style={{
                 fontFamily: "Inter, sans-serif",
                 fontSize: 11,
-                color: "rgba(26,16,8,0.5)",
+                color: "#8B6914",
                 textAlign: "center",
+                fontWeight: 600,
               }}
             >
               FYNHelp © 2026
