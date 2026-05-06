@@ -1,58 +1,124 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Send, Paperclip } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { Card } from "./AdminDashboardPage";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { logAdminAction } from "@/lib/adminAudit";
 
-const MOCK = {
-  number: "TKT-001234",
-  subject: "Payment failed after upgrade",
-  created: "May 5, 2026 at 14:35",
-  updated: "2 hours ago",
-  user: { name: "Rajesh Kumar", email: "rajesh@techcorp.com", company: "TechCorp Pvt Ltd", plan: "Pro", id: "user-1" },
-  thread: [
-    { from: "user", author: "Rajesh Kumar", time: "May 5, 14:35", text: "I upgraded to Pro yesterday but my payment failed. Can you help?" },
-    { from: "admin", author: "Tarun", time: "May 5, 15:10", text: "Hi Rajesh, I can help with that. Let me check your payment logs." },
-  ],
-  notes: [{ author: "Tarun", time: "1 hour ago", text: "Called user. Issue was incorrect card details." }],
+type Ticket = {
+  id: string; ticket_number: string; subject: string; description: string | null;
+  user_id: string | null; business_id: string | null;
+  category: string | null; priority: string; status: string;
+  assigned_to: string | null; created_at: string; updated_at: string;
+};
+type Reply = {
+  id: string; ticket_id: string; author_id: string;
+  message: string; is_internal: boolean; created_at: string;
 };
 
 export default function AdminSupportTicketDetailPage() {
   const { id } = useParams();
   const nav = useNavigate();
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [businessName, setBusinessName] = useState<string | null>(null);
+  const [replies, setReplies] = useState<Reply[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [reply, setReply] = useState("");
   const [internal, setInternal] = useState(false);
-  const [thread, setThread] = useState(MOCK.thread);
-  const [notes, setNotes] = useState(MOCK.notes);
-  const [note, setNote] = useState("");
-  const [status, setStatus] = useState("open");
-  const [priority, setPriority] = useState("high");
-  const [category, setCategory] = useState("billing");
-  const [assigned, setAssigned] = useState("unassigned");
+  const [sending, setSending] = useState(false);
+
+  const load = async () => {
+    if (!id) return;
+    setLoading(true);
+    const tRes = await supabase
+      .from("support_tickets")
+      .select("id, ticket_number, subject, description, user_id, business_id, category, priority, status, assigned_to, created_at, updated_at")
+      .eq("id", id).maybeSingle();
+    if (tRes.error || !tRes.data) {
+      toast.error("Ticket not found");
+      setLoading(false); return;
+    }
+    const t = tRes.data as Ticket;
+    setTicket(t);
+    const [rRes, bRes] = await Promise.all([
+      supabase.from("ticket_replies")
+        .select("id, ticket_id, author_id, message, is_internal, created_at")
+        .eq("ticket_id", id).order("created_at", { ascending: true }),
+      t.business_id
+        ? supabase.from("businesses").select("business_name").eq("id", t.business_id).maybeSingle()
+        : Promise.resolve({ data: null, error: null } as const),
+    ]);
+    setReplies((rRes.data as Reply[]) ?? []);
+    setBusinessName((bRes.data as { business_name?: string } | null)?.business_name ?? null);
+    setLoading(false);
+  };
+  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [id]);
+
+  const updateField = async (field: "status" | "priority" | "category" | "assigned_to", value: string | null) => {
+    if (!ticket) return;
+    const before = (ticket as Record<string, unknown>)[field];
+    const { error } = await supabase
+      .from("support_tickets")
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq("id", ticket.id);
+    if (error) { toast.error(error.message); return; }
+    setTicket({ ...ticket, [field]: value, updated_at: new Date().toISOString() } as Ticket);
+    await logAdminAction({
+      action: `ticket_${field}_changed`,
+      target_type: "support_ticket", target_id: ticket.id,
+      details: { from: before, to: value },
+    });
+    toast.success(`Ticket ${field.replace("_", " ")} updated`);
+  };
 
   const sendReply = async () => {
-    if (!reply.trim()) return;
-    if (internal) {
-      setNotes((n) => [{ author: "You", time: "just now", text: reply }, ...n]);
-    } else {
-      setThread((t) => [...t, { from: "admin", author: "You", time: "just now", text: reply }]);
+    if (!ticket || !reply.trim()) return;
+    setSending(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Not signed in"); setSending(false); return; }
+
+    const { data, error } = await supabase
+      .from("ticket_replies")
+      .insert({
+        ticket_id: ticket.id, author_id: user.id,
+        message: reply.trim(), is_internal: internal,
+      })
+      .select("id, ticket_id, author_id, message, is_internal, created_at")
+      .maybeSingle();
+    if (error || !data) { toast.error(error?.message ?? "Failed to send reply"); setSending(false); return; }
+    setReplies((arr) => [...arr, data as Reply]);
+
+    // If the ticket was open and this is a public reply, move it to in_progress.
+    if (!internal && ticket.status === "open") {
+      await supabase
+        .from("support_tickets")
+        .update({ status: "in_progress", updated_at: new Date().toISOString() })
+        .eq("id", ticket.id);
+      setTicket({ ...ticket, status: "in_progress" });
     }
+
     await logAdminAction({
       action: internal ? "ticket_internal_note_added" : "ticket_reply_sent",
-      target_type: "support_ticket",
-      details: { ticket_id: id, length: reply.length },
+      target_type: "support_ticket", target_id: ticket.id,
+      details: { length: reply.length },
     });
-    toast.success(internal ? "Internal note saved" : "Reply sent to user");
+    toast.success(internal ? "Internal note saved" : "Reply sent");
     setReply("");
+    setSending(false);
   };
 
-  const saveNote = () => {
-    if (!note.trim()) return;
-    setNotes((n) => [{ author: "You", time: "just now", text: note }, ...n]);
-    setNote("");
-    toast.success("Note saved");
-  };
+  if (loading) {
+    return <div style={{ padding: 24, fontFamily: "Roboto, sans-serif", color: "hsl(var(--fyn-ink) / 0.6)" }}>Loading ticket…</div>;
+  }
+  if (!ticket) {
+    return <div style={{ padding: 24, fontFamily: "Roboto, sans-serif" }}>Ticket not found.</div>;
+  }
+
+  const userInitials = (businessName || ticket.user_id || "?").slice(0, 2).toUpperCase();
+  const publicReplies = replies.filter((r) => !r.is_internal);
+  const internalNotes = replies.filter((r) => r.is_internal);
 
   return (
     <div>
@@ -62,60 +128,74 @@ export default function AdminSupportTicketDetailPage() {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left: ticket info */}
         <div className="lg:col-span-3">
           <Card>
-            <div style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>{MOCK.number}</div>
+            <div style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>{ticket.ticket_number}</div>
             <div className="mt-1" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>
-              Created {MOCK.created}<br />Updated {MOCK.updated}
+              Created {new Date(ticket.created_at).toLocaleString("en-IN")}<br />Updated {new Date(ticket.updated_at).toLocaleString("en-IN")}
             </div>
             <Divider />
             <div className="flex items-center gap-3">
               <span className="grid place-items-center rounded-full text-white"
                 style={{ width: 44, height: 44, background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 700 }}>
-                {MOCK.user.name.split(" ").map(s => s[0]).join("").slice(0, 2)}
+                {userInitials}
               </span>
               <div>
-                <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{MOCK.user.name}</div>
-                <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>{MOCK.user.email}</div>
+                <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{businessName || "Direct user"}</div>
+                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.6)" }}>{ticket.user_id?.slice(0, 8) ?? "—"}…</div>
               </div>
             </div>
-            <div className="mt-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>
-              {MOCK.user.company}
-              <span className="ml-2" style={{ padding: "2px 7px", borderRadius: 6, background: "rgba(139,105,20,0.15)", color: "#8B6914", fontWeight: 600, fontSize: 10 }}>{MOCK.user.plan}</span>
-            </div>
 
             <Divider />
-            <Field label="Category"><Select value={category} onChange={setCategory} options={[["billing","Billing"],["technical","Technical"],["feature_request","Feature"],["bug","Bug"],["other","Other"]]} /></Field>
-            <Field label="Priority"><Select value={priority} onChange={setPriority} options={[["low","Low"],["medium","Medium"],["high","High"],["urgent","Urgent"]]} /></Field>
-            <Field label="Status"><Select value={status} onChange={setStatus} options={[["open","Open"],["in_progress","In Progress"],["waiting_customer","Waiting Customer"],["resolved","Resolved"],["closed","Closed"]]} /></Field>
-            <Field label="Assigned"><Select value={assigned} onChange={setAssigned} options={[["unassigned","Unassigned"],["self","Assign to me"],["tarun","Tarun"],["nidhi","Nidhi"]]} /></Field>
+            <Field label="Category">
+              <Select value={ticket.category ?? "other"} onChange={(v) => updateField("category", v)}
+                options={[["billing","Billing"],["technical","Technical"],["feature_request","Feature"],["bug","Bug"],["other","Other"]]} />
+            </Field>
+            <Field label="Priority">
+              <Select value={ticket.priority} onChange={(v) => updateField("priority", v)}
+                options={[["low","Low"],["medium","Medium"],["high","High"],["urgent","Urgent"]]} />
+            </Field>
+            <Field label="Status">
+              <Select value={ticket.status} onChange={(v) => updateField("status", v)}
+                options={[["open","Open"],["in_progress","In Progress"],["waiting_customer","Waiting Customer"],["resolved","Resolved"],["closed","Closed"]]} />
+            </Field>
 
             <Divider />
-            <button onClick={() => toast.info("Close ticket coming in Part 4")} className="w-full py-2 rounded-lg text-white"
-              style={{ background: "#C41E1E", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13 }}>
+            <button onClick={() => updateField("status", "resolved")} className="w-full py-2 rounded-lg text-white"
+              style={{ background: "#0F7B4F", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, border: "none", cursor: "pointer" }}>
+              Mark Resolved
+            </button>
+            <button onClick={() => updateField("status", "closed")} className="w-full py-2 rounded-lg mt-2 text-white"
+              style={{ background: "#C41E1E", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, border: "none", cursor: "pointer" }}>
               Close Ticket
             </button>
           </Card>
         </div>
 
-        {/* Middle: conversation */}
         <div className="lg:col-span-6">
           <Card>
-            <h2 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>{MOCK.subject}</h2>
+            <h2 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>{ticket.subject}</h2>
+            {ticket.description && (
+              <div className="mt-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.85)", lineHeight: 1.6 }}>
+                {ticket.description}
+              </div>
+            )}
             <Divider />
             <div className="space-y-3">
-              {thread.map((m, i) => (
-                <div key={i} className={m.from === "admin" ? "flex justify-end" : "flex justify-start"}>
+              {publicReplies.length === 0 && (
+                <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.55)" }}>
+                  No replies yet.
+                </div>
+              )}
+              {publicReplies.map((m) => (
+                <div key={m.id} className="flex justify-start">
                   <div className="max-w-[80%] rounded-2xl p-3"
-                    style={{
-                      background: m.from === "admin" ? "rgba(139,105,20,0.12)" : "rgba(244,237,218,0.7)",
-                      border: "1px solid rgba(139,105,20,0.15)",
-                    }}>
+                    style={{ background: "rgba(244,237,218,0.7)", border: "1px solid rgba(139,105,20,0.15)" }}>
                     <div className="flex items-center justify-between gap-3 mb-1" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.6)" }}>
-                      <span style={{ fontWeight: 600, color: "hsl(var(--fyn-ink))" }}>{m.author}</span><span>{m.time}</span>
+                      <span style={{ fontWeight: 600, color: "hsl(var(--fyn-ink))" }}>{m.author_id.slice(0, 8)}…</span>
+                      <span>{new Date(m.created_at).toLocaleString("en-IN")}</span>
                     </div>
-                    <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>{m.text}</div>
+                    <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{m.message}</div>
                   </div>
                 </div>
               ))}
@@ -123,44 +203,45 @@ export default function AdminSupportTicketDetailPage() {
 
             <div className="mt-5 rounded-xl p-3" style={{ background: "rgba(244,237,218,0.4)", border: "1px solid rgba(139,105,20,0.15)" }}>
               <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={3}
-                placeholder={`Write a reply to ${MOCK.user.name.split(" ")[0]}…`}
+                placeholder={`Write a reply to ${businessName || "the user"}…`}
                 className="w-full bg-transparent outline-none resize-y"
                 style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }} />
               <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-3">
-                  <button className="p-1.5 rounded hover:bg-[hsl(var(--fyn-ink)/0.05)]" aria-label="Attach"><Paperclip size={16} color="hsl(var(--fyn-ink) / 0.5)" /></button>
-                  <label className="flex items-center gap-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>
-                    <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
-                    Internal note (not visible to user)
-                  </label>
-                </div>
-                <button onClick={sendReply} className="flex items-center gap-2 px-4 py-2 rounded-lg text-white"
-                  style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13 }}>
-                  <Send size={13} /> {internal ? "Save Note" : "Send Reply"}
+                <label className="flex items-center gap-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>
+                  <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
+                  Internal note (not visible to user)
+                </label>
+                <button onClick={sendReply} disabled={sending || !reply.trim()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-white"
+                  style={{
+                    background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                    fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13,
+                    border: "none", cursor: sending || !reply.trim() ? "not-allowed" : "pointer",
+                    opacity: sending || !reply.trim() ? 0.6 : 1,
+                  }}>
+                  <Send size={13} /> {sending ? "Sending…" : (internal ? "Save Note" : "Send Reply")}
                 </button>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Right: notes */}
         <div className="lg:col-span-3">
           <Card>
             <h3 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 16, color: "hsl(var(--fyn-ink))" }}>Internal Notes</h3>
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={4}
-              placeholder="Add private notes about this ticket…"
-              className="w-full mt-3 rounded-lg px-3 py-2.5"
-              style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13 }} />
-            <button onClick={saveNote} className="mt-2 px-4 py-2 rounded-lg"
-              style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13 }}>
-              Save note
-            </button>
             <Divider />
             <div className="space-y-3">
-              {notes.map((n, i) => (
-                <div key={i}>
-                  <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>{n.text}</div>
-                  <div className="mt-1" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>{n.author}, {n.time}</div>
+              {internalNotes.length === 0 && (
+                <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.55)" }}>
+                  No internal notes yet. Tick "Internal note" on the reply box to add one.
+                </div>
+              )}
+              {internalNotes.slice().reverse().map((n) => (
+                <div key={n.id}>
+                  <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{n.message}</div>
+                  <div className="mt-1" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>
+                    {n.author_id.slice(0, 8)}…, {new Date(n.created_at).toLocaleString("en-IN")}
+                  </div>
                 </div>
               ))}
             </div>
