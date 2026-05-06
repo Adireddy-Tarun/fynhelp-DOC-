@@ -35,6 +35,7 @@ export default function AdminSettingsPage() {
         </Card>
 
         <Card style={{ padding: 32, minHeight: 600 }}>
+          {tab === "Profile" && <ProfileTab />}
           {tab === "Admin Team" && <AdminTeamTab />}
           {tab === "Security" && <SecurityTab />}
           {tab === "Email Templates" && <EmailTemplatesTab />}
