@@ -285,7 +285,7 @@ export default function AdminCeoViewPage() {
                     fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                   }}
                 >
-                  <Send size={16} /> Send Reply
+                  <Send size={16} /> Open Ticket to Reply
                 </button>
                 <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(26,16,8,0.1)" }}>
                   <button
