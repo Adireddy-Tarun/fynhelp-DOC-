@@ -61,7 +61,36 @@ export default function AdminLoginPage() {
     nav("/admin/dashboard", { replace: true });
   };
 
-  return (
+  const resendVerification = async () => {
+    if (!email.trim()) {
+      toast.error("Enter your email above first");
+      return;
+    }
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/admin/login` },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Verification email sent. Check your inbox.");
+  };
+
+  const sendReset = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) return;
+    setResetBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Password reset link sent to your email");
+    setShowForgot(false);
+    setResetEmail("");
+  };
     <div className="min-h-screen flex" style={{ background: "hsl(var(--fyn-ink))" }}>
       {/* Branding side */}
       <div
