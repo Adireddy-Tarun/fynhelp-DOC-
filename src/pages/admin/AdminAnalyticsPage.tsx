@@ -81,6 +81,47 @@ export default function AdminAnalyticsPage() {
         </div>
       </div>
 
+      <Section title="Live Platform Trends">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card style={{ height: 320 }}>
+            <h4 style={subTitle}>User Growth (Last 30 days)</h4>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={userGrowth}>
+                <defs>
+                  <linearGradient id="usersGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#8B6914" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11 }} interval={4} />
+                <YAxis tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }} allowDecimals={false} />
+                <Tooltip contentStyle={tipStyle} />
+                <Area type="monotone" dataKey="users" stroke="#8B6914" strokeWidth={2} fill="url(#usersGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+          <Card style={{ height: 320 }}>
+            <h4 style={subTitle}>Cumulative MRR</h4>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={revenueTrend}>
+                <defs>
+                  <linearGradient id="mrrGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#C41E1E" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11 }} />
+                <YAxis tickLine={false} axisLine={false} style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }} tickFormatter={(v) => v >= 1000 ? `₹${Math.round(v / 1000)}K` : `₹${v}`} />
+                <Tooltip contentStyle={tipStyle} formatter={(v: any) => [`₹${Number(v).toLocaleString("en-IN")}`, "MRR"]} />
+                <Area type="monotone" dataKey="mrr" stroke="#C41E1E" strokeWidth={3} fill="url(#mrrGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+      </Section>
+
       <Section title="Revenue Metrics">
         <div className="grid gap-4" style={{ gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))" }}>
           <SmallMetric label="New MRR"         value="₹82K" trend={25} />
