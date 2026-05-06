@@ -91,6 +91,8 @@ export default function AdminLoginPage() {
     setShowForgot(false);
     setResetEmail("");
   };
+
+  return (
     <div className="min-h-screen flex" style={{ background: "hsl(var(--fyn-ink))" }}>
       {/* Branding side */}
       <div
