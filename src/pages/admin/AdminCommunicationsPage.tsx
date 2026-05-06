@@ -3,6 +3,7 @@ import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send } from "lucid
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { toast } from "sonner";
 import { logAdminAction } from "@/lib/adminAudit";
+import { supabase } from "@/integrations/supabase/client";
 
 type Platform = "whatsapp" | "meta" | "twitter" | "email";
 
@@ -200,6 +201,8 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
   const [postType, setPostType] = useState<"feed" | "story">("feed");
   const max = platform === "twitter" ? 280 : 1000;
 
+  const [sending, setSending] = useState(false);
+
   const send = async () => {
     if (platform === "email") {
       if (!subject.trim()) { toast.error("Subject is required"); return; }
@@ -209,17 +212,38 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
     }
     if (platform === "meta" && !facebook && !instagram) { toast.error("Select at least one platform"); return; }
 
+    if (platform === "email") {
+      setSending(true);
+      try {
+        const { data, error } = await supabase.functions.invoke("email-blast", {
+          body: { audience, subject, body: content },
+        });
+        if (error) throw error;
+        await logAdminAction({
+          action: "email_blast_sent",
+          target_type: "communications",
+          details: { audience, subject, sent: data?.sent, failed: data?.failed, total: data?.total },
+        });
+        toast.success(`Email sent to ${data?.sent ?? 0} user${data?.sent === 1 ? "" : "s"}`);
+        onClose();
+      } catch (err) {
+        console.error("Email blast error:", err);
+        toast.error((err as Error).message || "Failed to send email blast");
+      } finally {
+        setSending(false);
+      }
+      return;
+    }
+
     await logAdminAction({
       action: `${platform}_blast_sent`,
       target_type: "communications",
       details: {
         platform, audience, length: content.length,
-        subject: platform === "email" ? subject : undefined,
-        preheader: platform === "email" ? preheader : undefined,
         meta: platform === "meta" ? { facebook, instagram, postType } : undefined,
       },
     });
-    toast.success(`${PLATFORM_META[platform].label} ${platform === "twitter" ? "tweet" : platform === "email" ? "blast" : platform === "meta" ? "post" : "message"} queued`);
+    toast.success(`${PLATFORM_META[platform].label} ${platform === "twitter" ? "tweet" : platform === "meta" ? "post" : "message"} queued`);
     onClose();
   };
 
