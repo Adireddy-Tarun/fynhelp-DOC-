@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mail, Plus } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-const TABS = ["Admin Team", "Security", "Email Templates", "Notifications"] as const;
+const TABS = ["Profile", "Admin Team", "Security", "Email Templates", "Notifications"] as const;
 type Tab = typeof TABS[number];
 
 export default function AdminSettingsPage() {
-  const [tab, setTab] = useState<Tab>("Admin Team");
+  const [tab, setTab] = useState<Tab>("Profile");
 
   return (
     <div>
