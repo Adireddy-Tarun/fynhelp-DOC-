@@ -135,15 +135,18 @@ export default function AdminCeoViewPage() {
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
         <PageHeader title="CEO Strategic View" subtitle="High-level platform intelligence & customer pulse" />
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{
-            background: "linear-gradient(135deg, rgba(196,30,30,0.12), rgba(139,105,20,0.12))",
-            border: "1px solid rgba(139,105,20,0.35)",
-            fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11,
-            color: "#8B6914", letterSpacing: 0.6, marginTop: 8,
-          }}>
-          <Lock size={12} /> SUPER ADMIN ONLY
-        </span>
+        <div className="flex items-center gap-2 mt-2">
+          <LiveBadge status={liveStatus} />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{
+              background: "linear-gradient(135deg, rgba(196,30,30,0.12), rgba(139,105,20,0.12))",
+              border: "1px solid rgba(139,105,20,0.35)",
+              fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11,
+              color: "#8B6914", letterSpacing: 0.6,
+            }}>
+            <Lock size={12} /> SUPER ADMIN ONLY
+          </span>
+        </div>
       </div>
 
       {/* Strategic metrics */}
