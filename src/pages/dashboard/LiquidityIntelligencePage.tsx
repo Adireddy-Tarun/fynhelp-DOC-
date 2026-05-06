@@ -118,7 +118,7 @@ function SectionHeader({ title, sub }: { title: string; sub?: string }) {
 function KPICard({
   icon: Icon, iconColor, title, value, comparison, comparisonColor, trend, details, badge,
 }: {
-  icon: React.ComponentType<{ size?: number; color?: string }>;
+  icon: React.ComponentType<any>;
   iconColor: string;
   title: string;
   value: React.ReactNode;
