@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -7,6 +7,8 @@ import {
 } from "recharts";
 import { PageHeader, Card } from "./AdminDashboardPage";
 import { supabase } from "@/integrations/supabase/client";
+import { LiveBadge } from "@/components/admin/LiveBadge";
+import { useRealtime } from "@/hooks/useRealtime";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -77,44 +79,50 @@ export default function AdminCeoViewPage() {
   const [customerQueries, setCustomerQueries] = useState<Query[]>([]);
   const [aiCostThisMonth, setAiCostThisMonth] = useState<number | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      // Support feed: latest open / in_progress tickets
-      const { data: tickets } = await supabase
-        .from("support_tickets")
-        .select("id, subject, description, priority, status, category, created_at, business_id")
-        .in("status", ["open", "in_progress"])
-        .order("created_at", { ascending: false })
-        .limit(8);
+  const fetchSupportFeed = useCallback(async () => {
+    const { data: tickets } = await supabase
+      .from("support_tickets")
+      .select("id, subject, description, priority, status, category, created_at, business_id")
+      .in("status", ["open", "in_progress"])
+      .order("created_at", { ascending: false })
+      .limit(8);
 
-      let bizMap: Record<string, string> = {};
-      const bizIds = Array.from(new Set((tickets ?? []).map((t: any) => t.business_id).filter(Boolean)));
-      if (bizIds.length) {
-        const { data: bizs } = await supabase.from("businesses").select("id,business_name").in("id", bizIds);
-        bizMap = Object.fromEntries((bizs ?? []).map((b: any) => [b.id, b.business_name]));
-      }
+    let bizMap: Record<string, string> = {};
+    const bizIds = Array.from(new Set((tickets ?? []).map((t: any) => t.business_id).filter(Boolean)));
+    if (bizIds.length) {
+      const { data: bizs } = await supabase.from("businesses").select("id,business_name").in("id", bizIds);
+      bizMap = Object.fromEntries((bizs ?? []).map((b: any) => [b.id, b.business_name]));
+    }
 
-      setCustomerQueries(((tickets ?? []) as any[]).map((t) => ({
-        id: t.id,
-        user: bizMap[t.business_id] ?? "User",
-        type: t.category ?? "query",
-        priority: (["urgent", "high", "medium", "low"].includes(t.priority) ? t.priority : "medium") as Query["priority"],
-        subject: t.subject ?? "(no subject)",
-        message: t.description ?? "",
-        timestamp: timeAgo(t.created_at),
-        status: t.status,
-      })));
-
-      // AI cost this month
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-      const { data: aiLogs } = await supabase
-        .from("ai_usage_logs")
-        .select("cost_usd")
-        .gte("created_at", monthStart);
-      const total = (aiLogs ?? []).reduce((sum: number, log: any) => sum + Number(log.cost_usd ?? 0), 0);
-      setAiCostThisMonth(total);
-    })();
+    setCustomerQueries(((tickets ?? []) as any[]).map((t) => ({
+      id: t.id,
+      user: bizMap[t.business_id] ?? "User",
+      type: t.category ?? "query",
+      priority: (["urgent", "high", "medium", "low"].includes(t.priority) ? t.priority : "medium") as Query["priority"],
+      subject: t.subject ?? "(no subject)",
+      message: t.description ?? "",
+      timestamp: timeAgo(t.created_at),
+      status: t.status,
+    })));
   }, []);
+
+  const fetchAiCost = useCallback(async () => {
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+    const { data: aiLogs } = await supabase
+      .from("ai_usage_logs")
+      .select("cost_usd")
+      .gte("created_at", monthStart);
+    const total = (aiLogs ?? []).reduce((sum: number, log: any) => sum + Number(log.cost_usd ?? 0), 0);
+    setAiCostThisMonth(total);
+  }, []);
+
+  useEffect(() => { fetchSupportFeed(); fetchAiCost(); }, [fetchSupportFeed, fetchAiCost]);
+
+  const liveStatus = useRealtime(
+    "ceo_support_feed",
+    [{ table: "support_tickets", event: "*" }],
+    () => { fetchSupportFeed(); },
+  );
 
   const handleSend = (id: string) => {
     if (!replyText.trim()) return;
@@ -127,15 +135,18 @@ export default function AdminCeoViewPage() {
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
         <PageHeader title="CEO Strategic View" subtitle="High-level platform intelligence & customer pulse" />
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{
-            background: "linear-gradient(135deg, rgba(196,30,30,0.12), rgba(139,105,20,0.12))",
-            border: "1px solid rgba(139,105,20,0.35)",
-            fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11,
-            color: "#8B6914", letterSpacing: 0.6, marginTop: 8,
-          }}>
-          <Lock size={12} /> SUPER ADMIN ONLY
-        </span>
+        <div className="flex items-center gap-2 mt-2">
+          <LiveBadge status={liveStatus} />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{
+              background: "linear-gradient(135deg, rgba(196,30,30,0.12), rgba(139,105,20,0.12))",
+              border: "1px solid rgba(139,105,20,0.35)",
+              fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11,
+              color: "#8B6914", letterSpacing: 0.6,
+            }}>
+            <Lock size={12} /> SUPER ADMIN ONLY
+          </span>
+        </div>
       </div>
 
       {/* Strategic metrics */}
