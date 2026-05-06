@@ -403,20 +403,29 @@ const OnboardingPage = () => {
                     />
                   </div>
                 </div>
-                <motion.button
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 1 }}
-                  onClick={saveStep1}
-                  disabled={loading}
-                  className="mt-8 px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
-                  style={{
-                    background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
-                    boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  }}
-                >
-                  {loading && <Loader2 size={16} className="animate-spin" />}
-                  {loading ? "Saving..." : "Continue →"}
-                </motion.button>
+                <div className="flex items-center justify-between mt-8">
+                  <button
+                    onClick={() => navigate("/dashboard/cockpit")}
+                    className="text-[13px] hover:underline"
+                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                  >
+                    Skip for now
+                  </button>
+                  <motion.button
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 1 }}
+                    onClick={saveStep1}
+                    disabled={loading}
+                    className="px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
+                    style={{
+                      background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+                      boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {loading && <Loader2 size={16} className="animate-spin" />}
+                    {loading ? "Saving..." : "Continue →"}
+                  </motion.button>
+                </div>
               </div>
             )}
 
