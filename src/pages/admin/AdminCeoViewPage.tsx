@@ -48,29 +48,10 @@ const cashFlowData = [
 ];
 
 type Query = {
-  id: number; user: string; type: "complaint" | "query" | "feedback";
+  id: string; user: string; type: string;
   priority: "urgent" | "high" | "medium" | "low";
   subject: string; message: string; timestamp: string; status: string;
 };
-
-const customerQueries: Query[] = [
-  { id: 1, user: "Rajesh Kumar (TechCorp)", type: "complaint", priority: "high",
-    subject: "CSV upload failing repeatedly",
-    message: "I've tried uploading my bank statement 5 times but it keeps showing 'Processing failed'. This is blocking my month-end close.",
-    timestamp: "2 hours ago", status: "open" },
-  { id: 2, user: "Priya Sharma (Growth Labs)", type: "query", priority: "medium",
-    subject: "How to integrate Zoho Books?",
-    message: "I want to connect my Zoho Books account but can't find the integration option in settings.",
-    timestamp: "5 hours ago", status: "open" },
-  { id: 3, user: "Amit Patel (Design Studio)", type: "feedback", priority: "low",
-    subject: "Love the AI CFO feature!",
-    message: "Nidhi has been incredibly helpful. Saved me 2 hours today. Would love more forecasting features.",
-    timestamp: "1 day ago", status: "acknowledged" },
-  { id: 4, user: "Sneha Reddy (E-Commerce Co)", type: "complaint", priority: "urgent",
-    subject: "Wrong GST calculation in report",
-    message: "The GSTR-3B draft shows incorrect ITC amount. Filing deadline is in 3 days.",
-    timestamp: "1 day ago", status: "open" },
-];
 
 const PRIORITY_STYLE: Record<Query["priority"], { bg: string; fg: string }> = {
   urgent: { bg: "rgba(196,30,30,0.15)", fg: "#C41E1E" },
