@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import Sidebar from "@/components/Sidebar";
+import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
 import ProfileCompletionBadge from "@/components/ProfileCompletionBadge";
 import { Search, Bell, Menu } from "lucide-react";
 
@@ -57,7 +57,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   const isCockpit = location.pathname === "/dashboard/cockpit";
   const pageTitle = PAGE_TITLES[location.pathname] || "Dashboard";
-  const sidebarWidth = collapsed ? 80 : 280;
+  const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   return (
     <div className="min-h-screen flex" style={{ background: "#EDE4CB" }}>
