@@ -64,8 +64,13 @@ const OnboardingPage = () => {
   // Load existing onboarding progress
   useEffect(() => {
     if (authLoading) return;
+    // TEMP: Disabled for design review
+    // if (!user) {
+    //   navigate("/?auth=signin");
+    //   return;
+    // }
     if (!user) {
-      navigate("/?auth=signin");
+      setHydrated(true);
       return;
     }
     (async () => {
