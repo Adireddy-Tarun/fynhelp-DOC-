@@ -229,10 +229,54 @@ const OnboardingPage = () => {
     boxShadow: errors[key] ? "0 0 0 3px rgba(239,68,68,0.12)" : "inset 0 1px 2px rgba(0,0,0,0.04)",
   });
 
-  if (!hydrated) {
+  if (authLoading || !hydrated) {
+    const message = authLoading
+      ? "Verifying your session…"
+      : "Loading your onboarding progress…";
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "hsl(var(--fyn-beige))" }}>
-        <Loader2 className="animate-spin" style={{ color: "hsl(var(--fyn-red))" }} size={32} />
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: "linear-gradient(135deg, hsl(var(--fyn-beige)) 0%, #FFF9F0 100%)" }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-sm rounded-2xl p-8 text-center"
+          style={{
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(139,105,20,0.15)",
+            boxShadow: "0 12px 40px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.04)",
+          }}
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 mx-auto mb-5 rounded-full flex items-center justify-center"
+            style={{
+              background: "linear-gradient(180deg, #D72424 0%, #C41E1E 100%)",
+              boxShadow: "0 8px 20px rgba(196,30,30,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+            }}
+          >
+            <Loader2 className="text-white" size={24} />
+          </motion.div>
+          <h2 className="text-xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
+            Preparing your onboarding
+          </h2>
+          <p className="text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.65)" }}>
+            {message}
+          </p>
+          <div className="mt-6 h-1 w-full rounded-full overflow-hidden" style={{ background: "hsl(var(--fyn-ink) / 0.08)" }}>
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "100%" }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+              className="h-full w-1/3 rounded-full"
+              style={{ background: "linear-gradient(90deg, hsl(var(--fyn-red)), hsl(var(--fyn-gold)))" }}
+            />
+          </div>
+        </motion.div>
       </div>
     );
   }
