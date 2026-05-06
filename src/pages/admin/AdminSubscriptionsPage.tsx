@@ -250,8 +250,12 @@ export default function AdminSubscriptionsPage() {
                   <td style={td}>{s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" }) : "—"}</td>
                   <td style={td}>{new Date(s.started_at).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" })}</td>
                   <td style={td}>
-                    <ActionsMenu onChangePlan={()=>setEditing(s)} onRefund={()=>setRefunding(s)} />
-                  </td>
+                    <ActionsMenu
+                      onChangePlan={()=>setEditing(s)}
+                      onRefund={()=>setRefunding(s)}
+                      onSuspend={()=>suspendSubscription(s.id)}
+                      onCancel={()=>cancelSubscription(s.id)}
+                    />
                 </tr>
               ))}
               {visible.length === 0 && (
