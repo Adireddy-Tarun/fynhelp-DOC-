@@ -139,11 +139,69 @@ function ProfileTab() {
 }
 
 function AdminTeamTab() {
-  const sample = [
-    { name: "Tarun", email: "tarun@fynhelp.com", role: "Super Admin", last: "2 hours ago" },
-    { name: "Nidhi", email: "nidhi@fynhelp.com", role: "Super Admin", last: "5 hours ago" },
-    { name: "Support Agent", email: "support@fynhelp.com", role: "Support Agent", last: "1 day ago" },
-  ];
+  const [rows, setRows] = useState<{ user_id: string; name: string; email: string; role: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("support_agent");
+  const [inviting, setInviting] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("user_id, role")
+      .in("role", ["super_admin", "admin", "ops_admin", "support_agent", "analyst"]);
+    const ids = Array.from(new Set((roleRows ?? []).map((r) => r.user_id)));
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("user_id, full_name, display_name").in("user_id", ids)
+      : { data: [] as { user_id: string; full_name: string | null; display_name: string | null }[] };
+    const profMap = new Map((profiles ?? []).map((p) => [p.user_id, p]));
+    const merged = (roleRows ?? []).map((r) => {
+      const p = profMap.get(r.user_id);
+      return {
+        user_id: r.user_id,
+        name: p?.display_name || p?.full_name || "—",
+        email: "",
+        role: r.role,
+      };
+    });
+    setRows(merged);
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const inviteAdmin = async () => {
+    const email = inviteEmail.trim().toLowerCase();
+    if (!email || !/.+@.+\..+/.test(email)) { toast.error("Valid email required"); return; }
+    setInviting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("new-admin-invite", {
+        body: { email, role: inviteRole },
+      });
+      if (error) throw error;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("admin_audit_logs").insert({
+          admin_user_id: user.id,
+          action: "admin_invited",
+          target_type: "user",
+          target_id: data?.user_id ?? null,
+          details: { email, role: inviteRole },
+        });
+      }
+      toast.success("Admin invitation sent");
+      setShowInvite(false);
+      setInviteEmail("");
+      load();
+    } catch (err) {
+      console.error("Invite error:", err);
+      toast.error((err as Error).message || "Failed to invite admin");
+    } finally {
+      setInviting(false);
+    }
+  };
+
   return (
     <div>
       <SectionHeading title="Admin Users" subtitle="Team members with admin access to this portal" />
@@ -151,22 +209,21 @@ function AdminTeamTab() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(26,16,8,0.04)" }}>
-              {["Name","Email","Role","Last Login","Actions"].map((h) => (
+              {["Name","User ID","Role","Actions"].map((h) => (
                 <th key={h} style={{ padding: 14, textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {sample.map((r, i) => (
-              <tr key={r.email} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+            {loading && <tr><td colSpan={4} style={{ ...cell, textAlign: "center", color: "hsl(var(--fyn-ink) / 0.5)" }}>Loading…</td></tr>}
+            {!loading && rows.length === 0 && <tr><td colSpan={4} style={{ ...cell, textAlign: "center", color: "hsl(var(--fyn-ink) / 0.5)" }}>No admins yet.</td></tr>}
+            {rows.map((r, i) => (
+              <tr key={`${r.user_id}-${r.role}`} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(26,16,8,0.06)" }}>
                 <td style={cell}>{r.name}</td>
-                <td style={cell}>{r.email}</td>
+                <td style={{ ...cell, fontFamily: "JetBrains Mono, monospace", fontSize: 12 }}>{r.user_id.slice(0, 8)}…</td>
                 <td style={cell}>{r.role}</td>
-                <td style={cell}>{r.last}</td>
                 <td style={cell}>
-                  <button onClick={() => toast.info("Edit role coming in Part 4")} style={linkBtn("#8B6914")}>Edit Role</button>
-                  <span style={{ margin: "0 8px", color: "rgba(26,16,8,0.2)" }}>·</span>
-                  <button onClick={() => toast.info("Remove admin coming in Part 4")} style={linkBtn("#C41E1E")}>Remove</button>
+                  <button onClick={() => toast.info("Edit role from User Management page")} style={linkBtn("#8B6914")}>Edit Role</button>
                 </td>
               </tr>
             ))}
@@ -174,7 +231,7 @@ function AdminTeamTab() {
         </table>
       </div>
 
-      <button onClick={() => toast.info("Add admin coming in Part 4")} className="mt-6 inline-flex items-center gap-2"
+      <button onClick={() => setShowInvite(true)} className="mt-6 inline-flex items-center gap-2"
         style={{
           height: 44, padding: "0 18px", borderRadius: 12,
           background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
@@ -183,6 +240,32 @@ function AdminTeamTab() {
         }}>
         <Plus size={16} /> Add Admin
       </button>
+
+      {showInvite && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)" }} onClick={() => setShowInvite(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl bg-white p-6">
+            <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))", marginBottom: 16 }}>Invite Admin</h3>
+            <label style={{ display: "block", fontSize: 13, marginBottom: 6 }}>Email</label>
+            <input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="name@fynhelp.com"
+              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", marginBottom: 14, fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+            <label style={{ display: "block", fontSize: 13, marginBottom: 6 }}>Role</label>
+            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
+              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", marginBottom: 18, fontFamily: "Roboto, sans-serif", fontSize: 14, background: "#fff" }}>
+              <option value="support_agent">Support Agent</option>
+              <option value="analyst">Analyst</option>
+              <option value="ops_admin">Ops Admin</option>
+              <option value="admin">Admin</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowInvite(false)} style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", background: "transparent", cursor: "pointer", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>Cancel</button>
+              <button onClick={inviteAdmin} disabled={inviting} style={{ padding: "10px 18px", borderRadius: 10, background: "linear-gradient(135deg,#C41E1E,#8B6914)", color: "#fff", border: "none", cursor: "pointer", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, opacity: inviting ? 0.6 : 1 }}>
+                {inviting ? "Sending…" : "Send Invite"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
