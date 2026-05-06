@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Eye } from "lucide-react";
+import { Search, Eye, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { LiveBadge } from "@/components/admin/LiveBadge";
 import { useRealtime } from "@/hooks/useRealtime";
+import { exportToCsv } from "@/utils/csvExport";
 
 type Ticket = {
   id: string;
@@ -90,11 +91,29 @@ export default function AdminSupportPage() {
     return true;
   }), [tickets, q, category, priority, status, bizMap]);
 
+  const exportTickets = () => {
+    exportToCsv(rows.map((t) => ({
+      ticket_number: t.ticket_number,
+      subject: t.subject,
+      business: (t.business_id && bizMap.get(t.business_id)) || "",
+      category: t.category ?? "",
+      priority: t.priority,
+      status: t.status,
+      created: new Date(t.created_at).toLocaleString(),
+    })), "fynhelp-support-tickets");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <PageHeader title="Support Tickets" subtitle="Manage customer support requests" />
-        <LiveBadge status={liveStatus} />
+        <div className="flex items-center gap-2">
+          <LiveBadge status={liveStatus} />
+          <button onClick={exportTickets} className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80"
+            style={{ background: "rgba(139,105,20,0.1)", border: "1px solid rgba(139,105,20,0.2)", fontFamily: "Raleway, sans-serif", fontSize: 13, fontWeight: 600, color: "#8B6914" }}>
+            <Download size={16} /> Export CSV
+          </button>
+        </div>
       </div>
 
       <Card className="mb-6">
