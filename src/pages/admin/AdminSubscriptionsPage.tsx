@@ -256,6 +256,7 @@ export default function AdminSubscriptionsPage() {
                       onSuspend={()=>suspendSubscription(s.id)}
                       onCancel={()=>cancelSubscription(s.id)}
                     />
+                  </td>
                 </tr>
               ))}
               {visible.length === 0 && (
