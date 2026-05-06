@@ -43,8 +43,7 @@ export function useRealtime(
 
     let ch = supabase.channel(channelName);
     for (const f of filters) {
-      ch = ch.on(
-        // @ts-expect-error - postgres_changes typing varies across supabase-js versions
+      ch = (ch as any).on(
         "postgres_changes",
         { event: f.event ?? "*", schema: f.schema ?? "public", table: f.table, filter: f.filter },
         (payload: any) => {
