@@ -272,6 +272,8 @@ export type Database = {
           id: string
           industry: string | null
           msme_udyam: string | null
+          onboarding_completed: boolean
+          onboarding_step: number
           plan: string | null
           razorpay_customer_id: string | null
           state: string | null
@@ -289,6 +291,8 @@ export type Database = {
           id?: string
           industry?: string | null
           msme_udyam?: string | null
+          onboarding_completed?: boolean
+          onboarding_step?: number
           plan?: string | null
           razorpay_customer_id?: string | null
           state?: string | null
@@ -306,6 +310,8 @@ export type Database = {
           id?: string
           industry?: string | null
           msme_udyam?: string | null
+          onboarding_completed?: boolean
+          onboarding_step?: number
           plan?: string | null
           razorpay_customer_id?: string | null
           state?: string | null
