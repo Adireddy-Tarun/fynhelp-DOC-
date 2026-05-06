@@ -289,20 +289,7 @@ const OnboardingPage = () => {
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(var(--fyn-beige)) 0%, #FFF9F0 100%)" }}>
       {/* Progress bar */}
-      <div className="py-4 relative" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
-        <button
-          onClick={() => navigate("/dashboard/cockpit")}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] font-semibold hover:opacity-100 transition-opacity"
-          style={{
-            color: "rgba(255,255,255,0.55)",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
-          Skip entire setup
-        </button>
+      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
         <div className="fyn-container flex items-center justify-center gap-4">
           {steps.map((s, i) => {
             const done = i < step;
@@ -405,7 +392,7 @@ const OnboardingPage = () => {
                 </div>
                 <div className="flex items-center justify-between mt-8">
                   <button
-                    onClick={() => navigate("/dashboard/cockpit")}
+                    onClick={() => goTo(1)}
                     className="text-[13px] hover:underline"
                     style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
@@ -516,11 +503,11 @@ const OnboardingPage = () => {
 
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => navigate("/dashboard/cockpit")}
+                    onClick={() => goTo(2)}
                     className="text-[13px] hover:underline"
                     style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
-                    Skip setup, go to dashboard
+                    ← Back
                   </button>
                   <motion.button
                     whileHover={{ y: -2 }}
