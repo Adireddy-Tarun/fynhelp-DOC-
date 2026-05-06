@@ -313,10 +313,26 @@ function ActionsMenu({ userId }: { userId: string }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  const deleteUser = async () => {
+    if (!confirm("Permanently delete this user? This cannot be undone.")) return;
+    try {
+      const { error } = await supabase.functions.invoke("delete-user", {
+        body: { user_id: userId },
+      });
+      if (error) throw error;
+      await logAdminAction({ action: "user_deleted", target_type: "user", target_id: userId });
+      toast.success("User deleted");
+      window.location.reload();
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error((err as Error).message || "Failed to delete user");
+    }
+  };
+
   const items = [
     { label: "View Profile", fn: () => navigate(`/admin/users/${userId}`) },
     { label: "View Audit Log", fn: () => navigate(`/admin/audit-logs?user=${userId}`) },
-    { label: "Suspend (coming soon)", fn: () => toast.info("Suspend requires a profile.status migration — skipped per setup."), disabled: true },
+    { label: "Delete User", fn: deleteUser, danger: true },
   ];
 
   return (
@@ -339,9 +355,9 @@ function ActionsMenu({ userId }: { userId: string }) {
                 className="w-full text-left px-4 py-2.5 hover:bg-[hsl(var(--fyn-ink)/0.04)] transition-colors"
                 style={{
                   fontFamily: "Roboto, sans-serif", fontSize: 13,
-                  color: item.disabled ? "hsl(var(--fyn-ink) / 0.4)" : "hsl(var(--fyn-ink))",
+                  color: item.danger ? "#C41E1E" : "hsl(var(--fyn-ink))",
                   border: "none", background: "transparent",
-                  cursor: item.disabled ? "default" : "pointer", display: "block",
+                  cursor: "pointer", display: "block",
                 }}>
                 {item.label}
               </button>
