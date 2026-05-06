@@ -79,8 +79,6 @@ export default function AdminCeoViewPage() {
   const [customerQueries, setCustomerQueries] = useState<Query[]>([]);
   const [aiCostThisMonth, setAiCostThisMonth] = useState<number | null>(null);
 
-  useEffect(() => {
-    (async () => {
   const fetchSupportFeed = useCallback(async () => {
     const { data: tickets } = await supabase
       .from("support_tickets")
