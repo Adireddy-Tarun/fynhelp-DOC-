@@ -60,13 +60,65 @@ const PRIORITY_STYLE: Record<Query["priority"], { bg: string; fg: string }> = {
   low:    { bg: "rgba(26,16,8,0.08)",   fg: "rgba(26,16,8,0.6)" },
 };
 
-export default function AdminCeoViewPage() {
-  const [selectedQuery, setSelectedQuery] = useState<number | null>(null);
-  const [replyText, setReplyText] = useState("");
+function timeAgo(iso: string) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diffMs / 60000);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`;
+  const d = Math.floor(h / 24);
+  return `${d} day${d === 1 ? "" : "s"} ago`;
+}
 
-  const handleSend = (id: number) => {
+export default function AdminCeoViewPage() {
+  const nav = useNavigate();
+  const [selectedQuery, setSelectedQuery] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [customerQueries, setCustomerQueries] = useState<Query[]>([]);
+  const [aiCostThisMonth, setAiCostThisMonth] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      // Support feed: latest open / in_progress tickets
+      const { data: tickets } = await supabase
+        .from("support_tickets")
+        .select("id, subject, description, priority, status, category, created_at, business_id")
+        .in("status", ["open", "in_progress"])
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+      let bizMap: Record<string, string> = {};
+      const bizIds = Array.from(new Set((tickets ?? []).map((t: any) => t.business_id).filter(Boolean)));
+      if (bizIds.length) {
+        const { data: bizs } = await supabase.from("businesses").select("id,business_name").in("id", bizIds);
+        bizMap = Object.fromEntries((bizs ?? []).map((b: any) => [b.id, b.business_name]));
+      }
+
+      setCustomerQueries(((tickets ?? []) as any[]).map((t) => ({
+        id: t.id,
+        user: bizMap[t.business_id] ?? "User",
+        type: t.category ?? "query",
+        priority: (["urgent", "high", "medium", "low"].includes(t.priority) ? t.priority : "medium") as Query["priority"],
+        subject: t.subject ?? "(no subject)",
+        message: t.description ?? "",
+        timestamp: timeAgo(t.created_at),
+        status: t.status,
+      })));
+
+      // AI cost this month
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const { data: aiLogs } = await supabase
+        .from("ai_usage_logs")
+        .select("cost_usd")
+        .gte("created_at", monthStart);
+      const total = (aiLogs ?? []).reduce((sum: number, log: any) => sum + Number(log.cost_usd ?? 0), 0);
+      setAiCostThisMonth(total);
+    })();
+  }, []);
+
+  const handleSend = (id: string) => {
     if (!replyText.trim()) return;
-    toast.success(`Reply sent to query #${id}`);
+    nav(`/admin/support/${id}`);
     setReplyText("");
     setSelectedQuery(null);
   };
