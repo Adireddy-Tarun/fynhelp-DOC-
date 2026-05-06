@@ -503,11 +503,11 @@ const OnboardingPage = () => {
 
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => navigate("/dashboard/cockpit")}
+                    onClick={() => goTo(2)}
                     className="text-[13px] hover:underline"
                     style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
-                    Skip setup, go to dashboard
+                    ← Back
                   </button>
                   <motion.button
                     whileHover={{ y: -2 }}
