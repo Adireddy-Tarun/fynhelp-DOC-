@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Droplet, TrendingUp, TrendingDown, AlertTriangle, CheckCircle,
-  RefreshCw, Link2, MessageCircle, ArrowRight, Activity, Target, Zap, Wallet, Flame, Heart,
+  Droplet, TrendingUp, TrendingDown, CheckCircle,
+  RefreshCw, Link2, MessageCircle, ArrowRight, Activity, Wallet, Flame, Heart,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // ---------- Brand tokens ----------
@@ -25,51 +26,6 @@ const FYN = {
   amberBright: "#F59E0B",
   muted: "rgba(26,16,8,0.55)",
   border: "rgba(26,16,8,0.10)",
-};
-
-// ---------- Demo data ----------
-const DEMO_DATA = {
-  cashPosition: { current: 420000, previous: 375000, change: 12, trend: "up" as const },
-  runway: { months: 3.8, days: 114, zeroDate: "September 1, 2026", status: "critical", target: 6 },
-  burnRate: { current: 110000, previous: 102000, change: 8, trend: "up" as const },
-  healthScore: { score: 65, status: "fair", target: 80 },
-  cashFlowTrend: [
-    { month: "Dec", moneyIn: 280000, moneyOut: 320000, net: -40000 },
-    { month: "Jan", moneyIn: 310000, moneyOut: 350000, net: -40000 },
-    { month: "Feb", moneyIn: 250000, moneyOut: 380000, net: -130000 },
-    { month: "Mar", moneyIn: 320000, moneyOut: 290000, net: 30000 },
-    { month: "Apr", moneyIn: 270000, moneyOut: 410000, net: -140000 },
-    { month: "May", moneyIn: 280000, moneyOut: 390000, net: -110000 },
-  ],
-  bankAccounts: [
-    { name: "HDFC Bank", balance: 250000, percentage: 59, connected: true },
-    { name: "ICICI Bank", balance: 170000, percentage: 41, connected: true },
-  ],
-  scenarios: [
-    { title: "Reduce costs by 20%", description: "₹220K savings per month", newBurn: 88000, newRunway: 4.7, improvement: 0.9, color: FYN.green },
-    { title: "Increase revenue by 30%", description: "+₹330K per month", newBurn: 77000, newRunway: 5.2, improvement: 1.4, color: "#0E766E" },
-    { title: "Cut costs + Grow revenue", description: "Combined impact", newBurn: 55000, newRunway: 6.8, improvement: 3.0, color: FYN.gold },
-  ],
-  alerts: [
-    { severity: "critical", title: "Runway < 4 months", impact: "High priority", action: "Review costs now" },
-    { severity: "warning", title: "Burn rate up 8%", details: "₹1.02L → ₹1.1L", action: "Check vendors" },
-    { severity: "warning", title: "HDFC balance low", details: "Balance: ₹2.5L (Threshold: ₹3L)", action: "Transfer funds" },
-    { severity: "good", title: "Collections up 15%", details: "₹2.43L → ₹2.8L", action: null },
-  ],
-  aiInsight: {
-    message:
-      "Your burn rate increased 8% this month (₹1.02L → ₹1.1L).\n\nTop contributors:\n• Vendor X: +₹40K (50%)\n• Marketing: +₹25K (31%)\n• Software: +₹15K (19%)\n\n💡 Recommendation: Review Vendor X contract in Cost Intelligence module.",
-    confidence: 87,
-    dataQuality: "high",
-    generatedAt: new Date(Date.now() - 5 * 60000),
-  },
-  recentTransactions: [
-    { date: "May 6", time: "14:30", category: "Income", icon: "💰", description: "Client payment", amount: 50000, balance: 420000 },
-    { date: "May 5", time: "09:15", category: "Vendor", icon: "💸", description: "AWS hosting", amount: -25000, balance: 370000 },
-    { date: "May 4", time: "10:00", category: "Payroll", icon: "👥", description: "Salary May", amount: -180000, balance: 395000 },
-    { date: "May 3", time: "16:45", category: "Software", icon: "💳", description: "Zoho subscription", amount: -15000, balance: 575000 },
-    { date: "May 2", time: "11:20", category: "Income", icon: "💰", description: "Invoice #234", amount: 75000, balance: 590000 },
-  ],
 };
 
 // ---------- Helpers ----------
@@ -124,7 +80,7 @@ function KPICard({
   value: React.ReactNode;
   comparison?: string;
   comparisonColor?: string;
-  trend?: "up" | "down";
+  trend?: "up" | "down" | "neutral";
   details?: string;
   badge?: { text: string; color: string };
 }) {
@@ -155,7 +111,10 @@ function KPICard({
 }
 
 // ---------- Sub-sections ----------
-function CashFlowChart({ data }: { data: typeof DEMO_DATA.cashFlowTrend }) {
+function CashFlowChart({ data }: { data: any[] }) {
+  const totalIn = data.reduce((s, d) => s + (d.moneyIn || 0), 0);
+  const totalOut = data.reduce((s, d) => s + (d.moneyOut || 0), 0);
+  const net = totalIn - totalOut;
   return (
     <Card>
       <SectionHeader title="📈 Cash Flow Trend" sub="Last 6 months" />
@@ -187,14 +146,14 @@ function CashFlowChart({ data }: { data: typeof DEMO_DATA.cashFlowTrend }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: 16 }}>
         {[
-          { label: "💵 Money In", value: "₹2.8L", color: FYN.green },
-          { label: "💸 Money Out", value: "₹3.9L", color: FYN.red },
-          { label: "📉 Net", value: "-₹1.1L", color: FYN.red },
+          { label: "💵 Money In", value: formatCurrency(totalIn), color: FYN.green },
+          { label: "💸 Money Out", value: formatCurrency(totalOut), color: FYN.red },
+          { label: "📉 Net", value: formatCurrency(net), color: net >= 0 ? FYN.green : FYN.red },
         ].map((s) => (
           <div key={s.label} style={{ background: FYN.beige, padding: 12, borderRadius: 8 }}>
             <p style={{ fontSize: 11, color: FYN.muted, fontWeight: 600 }}>{s.label}</p>
             <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 18, fontWeight: 700, color: s.color, marginTop: 2 }}>{s.value}</p>
-            <p style={{ fontSize: 10, color: FYN.muted, marginTop: 2 }}>this month</p>
+            <p style={{ fontSize: 10, color: FYN.muted, marginTop: 2 }}>last 6 mo</p>
           </div>
         ))}
       </div>
@@ -202,11 +161,14 @@ function CashFlowChart({ data }: { data: typeof DEMO_DATA.cashFlowTrend }) {
   );
 }
 
-function BankBalances({ accounts, total, navigate }: { accounts: typeof DEMO_DATA.bankAccounts; total: number; navigate: (p: string) => void }) {
+function BankBalances({ accounts, total, navigate }: { accounts: any[]; total: number; navigate: (p: string) => void }) {
   return (
     <Card>
-      <SectionHeader title="💰 Bank Balances" sub={accounts.every((b) => b.connected) ? "Real-time sync: ✅ ON" : "⚠️ OFF"} />
+      <SectionHeader title="💰 Bank Balances" sub={accounts.length && accounts.every((b) => b.connected) ? "Real-time sync: ✅ ON" : "⚠️ Some accounts offline"} />
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+        {accounts.length === 0 && (
+          <p style={{ fontSize: 13, color: FYN.muted }}>No bank accounts connected yet.</p>
+        )}
         {accounts.map((bank) => (
           <div key={bank.name} style={{ border: `1px solid ${FYN.border}`, borderRadius: 8, padding: 12 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
@@ -248,7 +210,7 @@ function BankBalances({ accounts, total, navigate }: { accounts: typeof DEMO_DAT
   );
 }
 
-function RunwayCalculator({ data }: { data: typeof DEMO_DATA }) {
+function RunwayCalculator({ data }: { data: any }) {
   const pct = Math.min((data.runway.months / data.runway.target) * 100, 100);
   return (
     <Card>
@@ -259,7 +221,7 @@ function RunwayCalculator({ data }: { data: typeof DEMO_DATA }) {
           { label: "Monthly Burn", value: formatCurrency(data.burnRate.current), color: FYN.red },
           { label: "Runway", value: `${data.runway.months} mo`, sub: `(${data.runway.days} days)`, color: FYN.amber },
           { label: "Zero Date ⚠️", value: data.runway.zeroDate, color: FYN.red, smaller: true },
-        ].map((m) => (
+        ].map((m: any) => (
           <div key={m.label} style={{ background: FYN.beige, padding: 12, borderRadius: 8 }}>
             <p style={{ fontSize: 11, color: FYN.muted, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>{m.label}</p>
             <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: m.smaller ? 14 : 20, fontWeight: 700, color: m.color, marginTop: 4 }}>{m.value}</p>
@@ -281,7 +243,7 @@ function RunwayCalculator({ data }: { data: typeof DEMO_DATA }) {
       </div>
       <h4 style={{ fontSize: 13, fontWeight: 700, color: FYN.ink, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>What-If Scenarios</h4>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-        {data.scenarios.map((s) => (
+        {data.scenarios.map((s: any) => (
           <div key={s.title} style={{ border: `1px solid ${FYN.border}`, borderLeft: `4px solid ${s.color}`, borderRadius: 8, padding: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 10 }}>
               <div>
@@ -289,13 +251,13 @@ function RunwayCalculator({ data }: { data: typeof DEMO_DATA }) {
                 <p style={{ fontSize: 11, color: FYN.muted, marginTop: 2 }}>{s.description}</p>
               </div>
               <div style={{ textAlign: "right" }}>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: 700, color: s.color }}>+{s.improvement} mo</p>
+                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: 700, color: s.color }}>+{s.improvement.toFixed(1)} mo</p>
                 <p style={{ fontSize: 10, color: FYN.muted }}>improvement</p>
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: FYN.muted, marginBottom: 8 }}>
               <span>New Burn: <strong style={{ color: FYN.ink }}>{formatCurrency(s.newBurn)}/mo</strong></span>
-              <span>New Runway: <strong style={{ color: FYN.ink }}>{s.newRunway} mo</strong></span>
+              <span>New Runway: <strong style={{ color: FYN.ink }}>{s.newRunway.toFixed(1)} mo</strong></span>
             </div>
             {s.newRunway >= data.runway.target && (
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, padding: "6px 10px", background: `${FYN.green}15`, borderRadius: 6 }}>
@@ -310,7 +272,7 @@ function RunwayCalculator({ data }: { data: typeof DEMO_DATA }) {
   );
 }
 
-function AlertsSection({ alerts }: { alerts: typeof DEMO_DATA.alerts }) {
+function AlertsSection({ alerts }: { alerts: any[] }) {
   const colorFor = (sev: string) =>
     sev === "critical" ? FYN.red : sev === "warning" ? FYN.amberBright : FYN.green;
   const iconFor = (sev: string) => (sev === "critical" ? "🔴" : sev === "warning" ? "🟡" : "🟢");
@@ -321,7 +283,7 @@ function AlertsSection({ alerts }: { alerts: typeof DEMO_DATA.alerts }) {
   };
   return (
     <Card>
-      <SectionHeader title="⚠️ Alerts & Warnings" sub="Updated: 2 min ago" />
+      <SectionHeader title="⚠️ Alerts & Warnings" sub={`${alerts.length} active`} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 16 }}>
         {[
           { label: "Critical", count: counts.critical, color: FYN.red },
@@ -335,6 +297,9 @@ function AlertsSection({ alerts }: { alerts: typeof DEMO_DATA.alerts }) {
         ))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {alerts.length === 0 && (
+          <p style={{ fontSize: 13, color: FYN.muted, textAlign: "center", padding: "12px 0" }}>No active alerts. 🎉</p>
+        )}
         {alerts.map((a, i) => (
           <div key={i} style={{ borderLeft: `3px solid ${colorFor(a.severity)}`, padding: "10px 12px", background: `${colorFor(a.severity)}08`, borderRadius: 6 }}>
             <div style={{ display: "flex", gap: 10 }}>
@@ -353,10 +318,10 @@ function AlertsSection({ alerts }: { alerts: typeof DEMO_DATA.alerts }) {
   );
 }
 
-function NidhiInsightCard({ insight }: { insight: typeof DEMO_DATA.aiInsight }) {
+function NidhiInsightCard({ insight }: { insight: any }) {
   return (
     <Card style={{ background: `linear-gradient(135deg, ${FYN.beige} 0%, #FFF8E7 100%)`, border: `1px solid ${FYN.gold}40` }}>
-      <SectionHeader title="💬 Nidhi's Insight" sub={`Generated: ${Math.floor((Date.now() - insight.generatedAt.getTime()) / 60000)} min ago`} />
+      <SectionHeader title="💬 Nidhi's Insight" sub={`Generated: ${Math.max(0, Math.floor((Date.now() - insight.generatedAt.getTime()) / 60000))} min ago`} />
       <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
         <div style={{
           width: 40, height: 40, borderRadius: 20, background: `linear-gradient(135deg, ${FYN.red}, ${FYN.gold})`,
@@ -372,7 +337,7 @@ function NidhiInsightCard({ insight }: { insight: typeof DEMO_DATA.aiInsight }) 
         </div>
         <div style={{ padding: 10, background: FYN.white, borderRadius: 8 }}>
           <p style={{ fontSize: 11, color: FYN.muted, fontWeight: 600 }}>Data Quality</p>
-          <p style={{ fontSize: 14, fontWeight: 700, color: FYN.ink, marginTop: 4, textTransform: "capitalize" }}>{insight.dataQuality} ✅</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: FYN.ink, marginTop: 4, textTransform: "capitalize" }}>{insight.dataQuality}</p>
         </div>
       </div>
       <button
@@ -388,10 +353,10 @@ function NidhiInsightCard({ insight }: { insight: typeof DEMO_DATA.aiInsight }) 
   );
 }
 
-function RecentTransactionsTable({ transactions }: { transactions: typeof DEMO_DATA.recentTransactions }) {
+function RecentTransactionsTable({ transactions }: { transactions: any[] }) {
   return (
     <Card>
-      <SectionHeader title="📊 Recent Transactions" sub="Last synced: 1m ago" />
+      <SectionHeader title="📊 Recent Transactions" sub={`${transactions.length} shown`} />
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
@@ -405,6 +370,9 @@ function RecentTransactionsTable({ transactions }: { transactions: typeof DEMO_D
             </tr>
           </thead>
           <tbody>
+            {transactions.length === 0 && (
+              <tr><td colSpan={5} style={{ padding: 16, textAlign: "center", color: FYN.muted }}>No recent transactions.</td></tr>
+            )}
             {transactions.map((t, i) => (
               <tr key={i} style={{ borderBottom: `1px solid ${FYN.border}` }}>
                 <td style={{ padding: "12px 8px" }}>
@@ -441,15 +409,14 @@ function RecentTransactionsTable({ transactions }: { transactions: typeof DEMO_D
 // ---------- Main Page ----------
 export default function LiquidityIntelligencePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, businessId } = useAuth();
 
   const [loading, setLoading] = useState(true);
-  const [demoMode, setDemoMode] = useState(true);
+  const [liquidityData, setLiquidityData] = useState<any>(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [autoRefresh] = useState(true);
   const [, setTick] = useState(0);
 
-  // Tick to keep "x ago" labels fresh
   useEffect(() => {
     const t = setInterval(() => setTick((n) => n + 1), 15000);
     return () => clearInterval(t);
@@ -458,10 +425,130 @@ export default function LiquidityIntelligencePage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Demo only for now; real wiring can replace this when tables ready
-      await new Promise((r) => setTimeout(r, 200));
-    } catch (e) {
-      console.error(e);
+      if (!user) {
+        toast.error("Not authenticated");
+        return;
+      }
+      if (!businessId) {
+        setLiquidityData(null);
+        return;
+      }
+
+      const [
+        { data: metrics },
+        { data: banks },
+        { data: transactions },
+        { data: cashFlow },
+        { data: alerts },
+        { data: insights },
+      ] = await Promise.all([
+        supabase.from("liquidity_metrics").select("*").eq("business_id", businessId).order("recorded_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("bank_accounts").select("*").eq("business_id", businessId),
+        supabase.from("transactions").select("*").eq("business_id", businessId).order("transaction_date", { ascending: false }).limit(5),
+        supabase.from("cash_flow_trends").select("*").eq("business_id", businessId).eq("period_type", "month").order("period_start", { ascending: false }).limit(6),
+        supabase.from("alerts").select("*").eq("business_id", businessId).eq("resolved", false).order("created_at", { ascending: false }),
+        supabase.from("ai_insights").select("*").eq("business_id", businessId).eq("module", "liquidity").order("generated_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+
+      const hasAnyData =
+        !!metrics ||
+        (banks && banks.length > 0) ||
+        (transactions && transactions.length > 0) ||
+        (cashFlow && cashFlow.length > 0) ||
+        (alerts && alerts.length > 0) ||
+        !!insights;
+
+      if (!hasAnyData) {
+        setLiquidityData(null);
+        return;
+      }
+
+      const totalBalance = (banks || []).reduce((sum: number, b: any) => sum + (Number(b.balance) || 0), 0);
+      const cash = Number(metrics?.cash_position) || totalBalance || 0;
+      const burn = Number(metrics?.burn_rate_current) || 0;
+      const runwayMonths = Number(metrics?.runway_months) || 0;
+
+      const transformed = {
+        cashPosition: { current: cash, previous: cash, change: 0, trend: "neutral" as const },
+        runway: {
+          months: runwayMonths,
+          days: Number(metrics?.runway_days) || 0,
+          zeroDate: "Not calculated",
+          status: metrics?.health_status || "unknown",
+          target: 6,
+        },
+        burnRate: { current: burn, previous: burn, change: 0, trend: "neutral" as const },
+        healthScore: { score: Number(metrics?.health_score) || 0, status: metrics?.health_status || "unknown", target: 80 },
+        cashFlowTrend: (cashFlow || []).slice().reverse().map((cf: any) => ({
+          month: cf.period_label,
+          moneyIn: Number(cf.money_in) || 0,
+          moneyOut: Math.abs(Number(cf.money_out) || 0),
+          net: Number(cf.net_cash) || 0,
+        })),
+        bankAccounts: (banks || []).map((bank: any) => ({
+          name: bank.bank_name,
+          balance: Number(bank.balance) || 0,
+          percentage: totalBalance > 0 ? Math.round(((Number(bank.balance) || 0) / totalBalance) * 100) : 0,
+          connected: bank.connected ?? true,
+        })),
+        scenarios: [
+          {
+            title: "Reduce costs by 20%",
+            description: "₹220K savings per month",
+            newBurn: burn * 0.8,
+            newRunway: burn > 0 ? cash / (burn * 0.8) : 0,
+            improvement: burn > 0 ? cash / (burn * 0.8) - runwayMonths : 0,
+            color: FYN.greenBright,
+          },
+          {
+            title: "Increase revenue by 30%",
+            description: "+₹330K per month",
+            newBurn: burn * 0.7,
+            newRunway: burn > 0 ? cash / (burn * 0.7) : 0,
+            improvement: burn > 0 ? cash / (burn * 0.7) - runwayMonths : 0,
+            color: "#14B8A6",
+          },
+          {
+            title: "Both: Cut costs + Grow revenue",
+            description: "Combined impact",
+            newBurn: burn * 0.5,
+            newRunway: burn > 0 ? cash / (burn * 0.5) : 0,
+            improvement: burn > 0 ? cash / (burn * 0.5) - runwayMonths : 0,
+            color: FYN.gold,
+          },
+        ],
+        alerts: (alerts || []).map((alert: any) => ({
+          severity: alert.severity,
+          title: alert.title,
+          details: alert.details || alert.body,
+          impact: alert.impact,
+          action: alert.suggested_action,
+        })),
+        aiInsight: {
+          message: insights?.message || "Connect your accounts to receive AI insights.",
+          confidence: Number(insights?.confidence_score) || 0,
+          dataQuality: insights?.data_quality || "unknown",
+          generatedAt: insights?.generated_at ? new Date(insights.generated_at) : new Date(),
+        },
+        recentTransactions: (transactions || []).map((txn: any) => {
+          const dateStr = txn.transaction_date || txn.date;
+          const amt = Number(txn.amount) || 0;
+          const signedAmount = txn.direction === "out" ? -Math.abs(amt) : amt;
+          return {
+            date: dateStr ? new Date(dateStr).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "",
+            time: txn.transaction_time?.toString().substring(0, 5) || "",
+            category: txn.category || "Other",
+            icon: signedAmount > 0 ? "💰" : txn.category === "Payroll" ? "👥" : txn.category === "Software" ? "💳" : "💸",
+            description: txn.description || "",
+            amount: signedAmount,
+            balance: Number(txn.balance_after) || 0,
+          };
+        }),
+      };
+
+      setLiquidityData(transformed);
+    } catch (error) {
+      console.error("Load error:", error);
       toast.error("Failed to load data");
     } finally {
       setLoading(false);
@@ -469,20 +556,23 @@ export default function LiquidityIntelligencePage() {
     }
   };
 
-  useEffect(() => { loadData(); /* eslint-disable-next-line */ }, [user, demoMode]);
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, businessId]);
 
-  // Auto refresh every 60s
   useEffect(() => {
     if (!autoRefresh) return;
-    const i = setInterval(async () => {
-      await loadData();
-      toast.success("Data refreshed", { duration: 1500 });
-    }, 60000);
+    const i = setInterval(() => { loadData(); }, 60000);
     return () => clearInterval(i);
-  }, [autoRefresh]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRefresh, businessId]);
 
-  const data = DEMO_DATA;
-  const totalBalance = useMemo(() => data.bankAccounts.reduce((s, b) => s + b.balance, 0), [data]);
+  const data = liquidityData;
+  const totalBalance = useMemo(
+    () => (data ? data.bankAccounts.reduce((s: number, b: any) => s + b.balance, 0) : 0),
+    [data]
+  );
 
   if (loading) {
     return (
@@ -490,6 +580,38 @@ export default function LiquidityIntelligencePage() {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 16 }}>
           <RefreshCw size={32} color={FYN.gold} className="animate-spin" />
           <p style={{ color: FYN.muted, fontSize: 14 }}>Loading liquidity data...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!data) {
+    return (
+      <DashboardLayout>
+        <div style={{ minHeight: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{
+            textAlign: "center", padding: 32, borderRadius: 16, maxWidth: 420,
+            background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)",
+            border: `1px solid ${FYN.gold}30`,
+          }}>
+            <Droplet size={64} color="#06B6D4" style={{ margin: "0 auto 16px" }} />
+            <h2 style={{ fontFamily: "Inter", fontSize: 24, fontWeight: 800, color: FYN.ink, marginBottom: 8 }}>
+              No Data Yet
+            </h2>
+            <p style={{ fontFamily: "Inter", fontSize: 14, color: "rgba(26,16,8,0.7)", marginBottom: 24 }}>
+              Connect your bank account or upload transactions to see your liquidity intelligence.
+            </p>
+            <button
+              onClick={() => navigate("/dashboard/settings/integrations")}
+              style={{
+                background: `linear-gradient(135deg, ${FYN.red} 0%, ${FYN.gold} 100%)`,
+                color: FYN.white, border: "none", padding: "12px 24px", borderRadius: 12,
+                fontFamily: "Inter", fontSize: 14, fontWeight: 700, cursor: "pointer",
+              }}
+            >
+              Connect Bank Account
+            </button>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -530,24 +652,6 @@ export default function LiquidityIntelligencePage() {
                 <RefreshCw size={14} />
               </button>
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>Demo</span>
-              <button
-                onClick={() => setDemoMode(!demoMode)}
-                aria-label="Toggle demo mode"
-                style={{
-                  width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer", position: "relative",
-                  background: demoMode ? `linear-gradient(135deg, ${FYN.amberBright}, #D97706)` : "rgba(255,255,255,0.2)",
-                  transition: "all 0.3s",
-                }}
-              >
-                <span style={{
-                  position: "absolute", top: 2, left: demoMode ? 22 : 2,
-                  width: 20, height: 20, borderRadius: 10, background: FYN.white, transition: "left 0.3s",
-                }} />
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -565,10 +669,7 @@ export default function LiquidityIntelligencePage() {
               iconColor={FYN.green}
               title="Cash Position"
               value={formatCurrency(data.cashPosition.current)}
-              comparison={`${data.cashPosition.change > 0 ? "+" : ""}${data.cashPosition.change}% vs last month`}
-              comparisonColor={data.cashPosition.change > 0 ? FYN.green : FYN.red}
-              trend={data.cashPosition.trend}
-              details={`${formatCurrency(data.cashPosition.previous)} → ${formatCurrency(data.cashPosition.current)}`}
+              details={`Total across ${data.bankAccounts.length} account${data.bankAccounts.length === 1 ? "" : "s"}`}
             />
             <KPICard
               icon={Activity}
@@ -583,10 +684,7 @@ export default function LiquidityIntelligencePage() {
               iconColor={FYN.red}
               title="Burn Rate"
               value={`${formatCurrency(data.burnRate.current)}/mo`}
-              comparison={`${data.burnRate.change > 0 ? "+" : ""}${data.burnRate.change}% vs last month`}
-              comparisonColor={data.burnRate.change > 0 ? FYN.red : FYN.green}
-              trend={data.burnRate.trend}
-              details={`${formatCurrency(data.burnRate.previous)} → ${formatCurrency(data.burnRate.current)}`}
+              details="Latest snapshot"
             />
             <KPICard
               icon={Heart}
