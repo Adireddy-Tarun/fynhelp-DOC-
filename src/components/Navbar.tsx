@@ -6,6 +6,7 @@ import FYNIcon, { type FYNIconName } from "./FYNIcon";
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
+  { label: "Use Cases", href: "/use-cases" },
   { label: "Pricing", href: "/pricing" },
   { label: "Security", href: "/security" },
   { label: "About", href: "/about" },
@@ -74,7 +75,7 @@ const Navbar = () => {
             <ProductsNav variant="desktop" />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 2).map((l) => (
+            {navLinks.slice(0, 3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -198,7 +199,7 @@ const Navbar = () => {
             </div>
 
             {/* About */}
-            {navLinks.slice(2).map((l) => (
+            {navLinks.slice(3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -256,7 +257,7 @@ const Navbar = () => {
             />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 2).map((l) => (
+            {navLinks.slice(0, 3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -299,7 +300,7 @@ const Navbar = () => {
             )}
 
             {/* About */}
-            {navLinks.slice(2).map((l) => (
+            {navLinks.slice(3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
