@@ -221,16 +221,21 @@ export default function UseCasesPage() {
   );
 }
 
-function UseCaseCard3D({ useCase, delay }: any) {
+function UseCaseCard3D({ useCase, delay, onClick }: any) {
   const Icon = useCase.icon;
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
       initial={{ opacity: 0, y: 30, rotateX: -15 }}
       animate={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ delay, duration: 0.6, ease: 'easeOut' }}
       whileHover={{ y: -12, rotateX: 5, rotateY: 2, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       style={{
