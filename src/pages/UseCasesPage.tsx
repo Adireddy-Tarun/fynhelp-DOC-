@@ -4,7 +4,7 @@ import {
   Search, TrendingUp, Shield, Briefcase, Users, Target, ArrowRight,
   DollarSign, BarChart3, PieChart, LineChart, Droplet, AlertCircle,
   FileCheck, Calculator, Wallet, Activity, Package, FileBarChart,
-  GitBranch, Boxes, Sparkles,
+  GitBranch, Boxes, Sparkles, ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,6 +53,24 @@ export default function UseCasesPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F4EDDA 0%, #FFF9F0 100%)', position: 'relative', overflow: 'hidden' }}>
+      {/* Top Navigation Bar */}
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,251,247,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(139,105,20,0.15)', padding: '20px 24px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: 700, color: '#FFF', boxShadow: '0 4px 16px rgba(139,105,20,0.3)' }}>
+              F
+            </div>
+            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '24px', fontWeight: 800, color: '#1A1008', letterSpacing: '-0.5px' }}>
+              FYN<span style={{ background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Help</span>
+            </span>
+          </motion.div>
+          <motion.button whileHover={{ scale: 1.05, x: -4 }} whileTap={{ scale: 0.95 }} onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(139,105,20,0.15)', color: '#1A1008', fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(10px)', boxShadow: '0 2px 8px rgba(139,105,20,0.08)' }}>
+            <ArrowLeft size={18} strokeWidth={2.5} />
+            Back to Home
+          </motion.button>
+        </div>
+      </nav>
+
       <motion.div
         animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
@@ -64,24 +82,24 @@ export default function UseCasesPage() {
         style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: '700px', height: '700px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,105,20,0.15) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }}
       />
 
-      <section style={{ padding: '80px 24px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <section style={{ padding: '80px 24px 60px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <Sparkles size={20} color="#8B6914" />
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', color: 'rgba(26,16,8,0.6)', textTransform: 'uppercase' }}>USE CASE LIBRARY</p>
-            <Sparkles size={20} color="#C41E1E" />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+            <Sparkles size={24} color="#8B6914" />
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, letterSpacing: '2px', color: 'rgba(26,16,8,0.6)', textTransform: 'uppercase' }}>USE CASE LIBRARY</p>
+            <Sparkles size={24} color="#C41E1E" />
           </div>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '56px', fontWeight: 400, color: '#1A1008', marginBottom: '24px', lineHeight: 1.2 }}>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '64px', fontWeight: 400, color: '#1A1008', marginBottom: '28px', lineHeight: 1.2 }}>
             {categoryCount} ways teams use <br />
             <motion.span
               animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
               transition={{ duration: 5, repeat: Infinity }}
-              style={{ fontStyle: 'italic', background: 'linear-gradient(90deg, #C41E1E 0%, #8B6914 50%, #C41E1E 100%)', backgroundSize: '200% 100%', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+              style={{ fontStyle: 'italic', background: 'linear-gradient(90deg, #C41E1E 0%, #8B6914 50%, #C41E1E 100%)', backgroundSize: '200% 100%', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontSize: '72px', fontWeight: 700 }}
             >
               FYNHelp
             </motion.span>
           </h1>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', color: 'rgba(26,16,8,0.7)', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', color: 'rgba(26,16,8,0.7)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.7, fontWeight: 500 }}>
             Browse real workflows across finance, compliance, operations, and more — all powered by your data.
           </p>
         </motion.div>
@@ -94,20 +112,20 @@ export default function UseCasesPage() {
           style={{ maxWidth: '700px', margin: '0 auto 48px' }}
         >
           <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(139,105,20,0.15)', backgroundImage: 'linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', border: '2px solid transparent' }}>
-            <Search size={20} color="rgba(26,16,8,0.5)" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)' }} />
+            <Search size={22} color="rgba(26,16,8,0.5)" style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
               placeholder="Search use cases..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '20px 20px 20px 56px', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#1A1008' }}
+              style={{ width: '100%', padding: '22px 24px 22px 64px', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#1A1008', fontWeight: 500 }}
             />
           </div>
         </motion.div>
       </section>
 
       <section style={{ padding: '0 24px 48px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
           {CATEGORIES.map((cat, idx) => {
             const Icon = cat.icon;
             const isActive = activeCategory === cat.id;
@@ -121,30 +139,30 @@ export default function UseCasesPage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(cat.id)}
                 style={{
-                  padding: '14px 28px',
+                  padding: '16px 32px',
                   borderRadius: '16px',
                   background: isActive ? cat.gradient : 'rgba(255,255,255,0.95)',
                   border: `2px solid ${isActive ? 'transparent' : 'rgba(139,105,20,0.15)'}`,
                   color: isActive ? '#FFF' : 'rgba(26,16,8,0.7)',
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.3s',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '10px',
                   backdropFilter: 'blur(10px)',
                   boxShadow: isActive ? '0 8px 24px rgba(0,0,0,0.2)' : '0 2px 8px rgba(139,105,20,0.08)',
                 }}
               >
-                <Icon size={18} strokeWidth={2.5} />
+                <Icon size={20} strokeWidth={2.5} />
                 {cat.label}
               </motion.button>
             );
           })}
         </div>
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
           {categoryCount} USE CASE{categoryCount !== 1 ? 'S' : ''}
         </p>
       </section>
@@ -156,7 +174,7 @@ export default function UseCasesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '28px' }}
           >
             {filteredCases.map((useCase, idx) => (
               <UseCaseCard3D key={useCase.id} useCase={useCase} delay={idx * 0.05} onClick={() => navigate(useCase.route)} />
@@ -166,8 +184,8 @@ export default function UseCasesPage() {
 
         {filteredCases.length === 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '80px 24px' }}>
-            <AlertCircle size={48} color="rgba(26,16,8,0.3)" style={{ marginBottom: '16px' }} />
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
+            <AlertCircle size={56} color="rgba(26,16,8,0.3)" style={{ marginBottom: '20px' }} />
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
               No use cases found. Try a different search or category.
             </p>
           </motion.div>
@@ -182,10 +200,10 @@ export default function UseCasesPage() {
         />
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '48px', fontWeight: 400, color: '#1A1008', marginBottom: '16px' }}>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '52px', fontWeight: 400, color: '#1A1008', marginBottom: '20px' }}>
               Don't see your use case?
             </h2>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', color: 'rgba(26,16,8,0.7)', marginBottom: '40px', lineHeight: 1.6 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', color: 'rgba(26,16,8,0.7)', marginBottom: '40px', lineHeight: 1.7, fontWeight: 500 }}>
               FYNHelp adapts to any data-to-document workflow. <br />
               Tell us what you're building.
             </p>
@@ -194,13 +212,13 @@ export default function UseCasesPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/waitlist')}
               style={{
-                padding: '18px 48px',
+                padding: '20px 52px',
                 borderRadius: '16px',
                 background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)',
                 border: 'none',
                 color: '#FFF',
                 fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
+                fontSize: '18px',
                 fontWeight: 700,
                 cursor: 'pointer',
                 boxShadow: '0 12px 40px rgba(139,105,20,0.4)',
@@ -211,7 +229,7 @@ export default function UseCasesPage() {
             >
               TRY NOW FOR FREE
               <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ArrowRight size={20} strokeWidth={3} />
+                <ArrowRight size={22} strokeWidth={3} />
               </motion.div>
             </motion.button>
           </motion.div>
@@ -243,14 +261,14 @@ function UseCaseCard3D({ useCase, delay, onClick }: any) {
         background: 'rgba(255,255,255,0.98)',
         border: '1px solid rgba(139,105,20,0.12)',
         borderRadius: '24px',
-        padding: '40px',
+        padding: '42px',
         cursor: 'pointer',
         transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
         backdropFilter: 'blur(20px)',
         boxShadow: isHovered
           ? `0 24px 60px ${useCase.glowColor}, 0 12px 24px rgba(0,0,0,0.08)`
           : '0 8px 24px rgba(139,105,20,0.08)',
-        minHeight: '320px',
+        minHeight: '340px',
         display: 'flex',
         flexDirection: 'column',
         transformStyle: 'preserve-3d',
@@ -276,14 +294,14 @@ function UseCaseCard3D({ useCase, delay, onClick }: any) {
         animate={{ rotateY: isHovered ? [0, 360] : 0, scale: isHovered ? 1.1 : 1 }}
         transition={{ duration: 0.6 }}
         style={{
-          width: '80px',
-          height: '80px',
+          width: '84px',
+          height: '84px',
           borderRadius: '20px',
           background: useCase.gradient,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '24px',
+          marginBottom: '26px',
           flexShrink: 0,
           boxShadow: isHovered ? `0 16px 40px ${useCase.glowColor}` : '0 8px 24px rgba(0,0,0,0.12)',
           position: 'relative',
@@ -293,29 +311,29 @@ function UseCaseCard3D({ useCase, delay, onClick }: any) {
         }}
       >
         <motion.div animate={{ rotate: isHovered ? 360 : 0 }} transition={{ duration: 0.6 }}>
-          <Icon size={40} color="#FFF" strokeWidth={2.5} />
+          <Icon size={44} color="#FFF" strokeWidth={2.5} />
         </motion.div>
       </motion.div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
-        <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', fontWeight: 800, color: '#1A1008', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.3 }}>
+        <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: '22px', fontWeight: 800, color: '#1A1008', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.3 }}>
           {useCase.title}
         </h3>
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: 'rgba(26,16,8,0.7)', lineHeight: 1.6, marginBottom: '24px', flex: 1 }}>
+        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: 'rgba(26,16,8,0.7)', lineHeight: 1.7, marginBottom: '26px', flex: 1, fontWeight: 500 }}>
           {useCase.description}
         </p>
         <motion.div
           animate={{ x: isHovered ? 8 : 0 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, background: useCase.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'Inter, sans-serif', fontSize: '15px', fontWeight: 700, background: useCase.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
         >
           Learn More
-          <ArrowRight size={18} strokeWidth={3} style={{ color: '#8B6914' }} />
+          <ArrowRight size={20} strokeWidth={3} style={{ color: '#8B6914' }} />
         </motion.div>
       </div>
 
       <motion.div
         animate={{ scale: isHovered ? 1 : 0, rotate: isHovered ? 0 : 45 }}
-        style={{ position: 'absolute', top: 20, right: 20, width: '8px', height: '8px', borderRadius: '50%', background: useCase.gradient, boxShadow: `0 0 20px ${useCase.glowColor}` }}
+        style={{ position: 'absolute', top: 24, right: 24, width: '10px', height: '10px', borderRadius: '50%', background: useCase.gradient, boxShadow: `0 0 20px ${useCase.glowColor}` }}
       />
     </motion.div>
   );
