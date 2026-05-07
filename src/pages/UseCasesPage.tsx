@@ -57,13 +57,8 @@ export default function UseCasesPage() {
       {/* Top Navigation Bar */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,251,247,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(139,105,20,0.15)', padding: '20px 24px' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: 700, color: '#FFF', boxShadow: '0 4px 16px rgba(139,105,20,0.3)' }}>
-              F
-            </div>
-            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '24px', fontWeight: 800, color: '#1A1008', letterSpacing: '-0.5px' }}>
-              FYN<span style={{ background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Help</span>
-            </span>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <FynLogo size="lg" showTagline={false} />
           </motion.div>
           <motion.button whileHover={{ scale: 1.05, x: -4 }} whileTap={{ scale: 0.95 }} onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(139,105,20,0.15)', color: '#1A1008', fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(10px)', boxShadow: '0 2px 8px rgba(139,105,20,0.08)' }}>
             <ArrowLeft size={18} strokeWidth={2.5} />
