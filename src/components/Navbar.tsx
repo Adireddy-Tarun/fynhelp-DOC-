@@ -75,7 +75,7 @@ const Navbar = () => {
             <ProductsNav variant="desktop" />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 2).map((l) => (
+            {navLinks.slice(0, 3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -199,7 +199,7 @@ const Navbar = () => {
             </div>
 
             {/* About */}
-            {navLinks.slice(2).map((l) => (
+            {navLinks.slice(3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -257,7 +257,7 @@ const Navbar = () => {
             />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 2).map((l) => (
+            {navLinks.slice(0, 3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -300,7 +300,7 @@ const Navbar = () => {
             )}
 
             {/* About */}
-            {navLinks.slice(2).map((l) => (
+            {navLinks.slice(3).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
