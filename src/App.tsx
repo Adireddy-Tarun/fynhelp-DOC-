@@ -135,6 +135,7 @@ const App = () => (
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/use-cases" element={<UseCasesPage />} />
             
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
