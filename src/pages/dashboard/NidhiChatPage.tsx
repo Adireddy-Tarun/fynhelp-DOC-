@@ -1,286 +1,500 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send, Sparkles, TrendingUp, TrendingDown, AlertTriangle,
+  CheckCircle2, ArrowRight, Plus, Loader2, BarChart3,
+  Calendar, Users, FileText, Zap, MessageCircle,
+} from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 
-interface Message {
-  role: "user" | "nidhi";
-  content: string;
-  timestamp: string;
+// ===== Design tokens =====
+const C = {
+  bg: "#0A0B0D",
+  bg2: "#111214",
+  card: "rgba(255,255,255,0.03)",
+  border: "rgba(255,255,255,0.08)",
+  text: "#E5E7EB",
+  textDim: "rgba(229,231,235,0.6)",
+  textMuted: "rgba(229,231,235,0.4)",
+  critical: "#EF4444",
+  warning: "#F59E0B",
+  success: "#10B981",
+  info: "#3B82F6",
+  ai: "#C41E1E",
+};
+
+interface ContextCard {
+  type: "metric" | "chart" | "alert" | "action";
+  title: string;
+  data: any;
 }
 
-const quickPrompts = [
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  cards?: ContextCard[];
+}
+
+const suggestions = [
   "What's my cash position?",
   "Who hasn't paid me this month?",
   "When is my next GST due?",
   "Simulate hiring 2 people",
-  "What's my biggest financial risk right now?",
+  "What's my biggest financial risk?",
   "Generate my monthly CFO report",
 ];
 
-const initialMessages: Message[] = [
-  {
-    role: "nidhi",
-    content: "Good morning! I'm AI CFO Nidhi, your AI CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 8 days from last week\n• ABC Electronics owes ₹8.4L, now 62 days overdue\n• Your GSTR-3B is due in 8 days — data is ready for review\n\nWhat would you like to know?",
-    timestamp: "8:03 AM",
-  },
+const quickActions = [
+  { label: "New Report", icon: FileText },
+  { label: "Cash Forecast", icon: BarChart3 },
+  { label: "GST Calendar", icon: Calendar },
+  { label: "Team Cost", icon: Users },
+  { label: "Quick Insight", icon: Zap },
 ];
 
-const responses: Record<string, string> = {
-  "What's my cash position?": "Your current cash position:\n\n• Bank balance: ₹12.4L (HDFC CA)\n• Available cash after commitments: ₹8.2L\n• Runway at current burn: 52 days\n• Cash in (expected this week): ₹3.1L from Sharma & Sons\n• Cash out (scheduled): ₹3.4L to Raj Textiles (Thursday)\n\nNet position is stable but your runway is in the amber zone. I recommend chasing ABC Electronics today.",
-  "Who hasn't paid me this month?": "Here are your overdue receivables this month:\n\n1. ABC Electronics — ₹8.4L, 62 days overdue (HIGH RISK)\n2. Sharma & Sons — ₹3.1L, 38 days overdue (MEDIUM)\n3. Delhi Distributors — ₹5.7L, 12 days overdue (LOW)\n\nTotal overdue: ₹17.2L\nCollecting just ABC Electronics would add 15 days to your runway.\n\nShall I draft WhatsApp reminders for all three?",
-  default: "Let me look into that for you. Based on your current business data, I can see several relevant factors. Would you like me to break this down in more detail, or would you prefer a summary with action items?",
-};
+function generateAIResponse(query: string): string {
+  const q = query.toLowerCase();
+  if (q.includes("cash")) {
+    return "Your current cash position is ₹4.2L, down 12% from last period. At the current burn rate of ₹1.1L/month, your runway is 52 days.\n\nImmediate recommendations:\n1. Accelerate collections on overdue invoices (₹2.1L outstanding >60 days)\n2. Review and optimize vendor payment terms\n3. Consider freezing discretionary marketing spend (potential ₹90K/month savings)\n\nThis would extend your runway to approximately 90 days.";
+  }
+  if (q.includes("paid") || q.includes("overdue") || q.includes("receivable")) {
+    return "You have ₹17.2L overdue across 3 customers:\n\n• Electronics — ₹8.4L (67 days overdue)\n• Sharma & Sons — ₹3.1L (38 days overdue)\n• Delhi Distributors — ₹5.7L (12 days overdue)\n\nCollecting Electronics alone would extend runway by 15 days.";
+  }
+  if (q.includes("gst")) {
+    return "Your next GSTR-3B is due in 8 days (15th of this month). Data is reconciled and ready for review. Estimated liability: ₹1.42L.";
+  }
+  return "I'm analyzing your request. Let me pull the relevant financial data and provide actionable insights.";
+}
 
-const NidhiChatPage = () => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+function generateContextCards(query: string): ContextCard[] {
+  const q = query.toLowerCase();
+  if (q.includes("cash")) {
+    return [
+      { type: "metric", title: "Cash Runway", data: { value: 52, unit: "days", change: -3 } },
+      { type: "action", title: "Recommended Actions", data: { actions: [
+        "Collect ₹2.1L overdue receivables",
+        "Freeze marketing spend (₹90K/mo)",
+        "Extend vendor terms by 15 days",
+      ]}},
+    ];
+  }
+  if (q.includes("overdue") || q.includes("paid")) {
+    return [
+      { type: "alert", title: "Critical Receivable", data: { severity: "critical", message: "Electronics: ₹8.4L (67 days)", action: "Send Reminder" }},
+    ];
+  }
+  return [];
+}
+
+export default function NidhiChatPage() {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [lang, setLang] = useState("EN");
-  const [isTyping, setIsTyping] = useState(false);
-  const [streamingText, setStreamingText] = useState("");
-  const [isStreaming, setIsStreaming] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [isThinking, setIsThinking] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingText]);
+    setMessages([{
+      id: "1",
+      role: "assistant",
+      content: "Good morning. I'm AI CFO Nidhi, your CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 3 days from last week\n• Electronics owes ₹8.4L, now 67 days overdue\n• Your GSTR-3B is due in 8 days — ready for review\n\nWhat would you like to know?",
+      timestamp: new Date(),
+      cards: [
+        { type: "metric", title: "Cash Position", data: { value: 420000, change: -12 }},
+        { type: "alert", title: "Overdue Receivable", data: { severity: "critical", message: "Electronics: ₹8.4L (67 days)", action: "Send Reminder" }},
+      ],
+    }]);
+  }, []);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isThinking]);
 
-    const userMsg: Message = {
-      role: "user",
-      content: input,
-      timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    const currentInput = input;
-    setMessages((prev) => [...prev, userMsg]);
+  const handleSend = () => {
+    if (!input.trim() || isThinking) return;
+    const text = input;
+    setMessages(prev => [...prev, { id: Date.now().toString(), role: "user", content: text, timestamp: new Date() }]);
     setInput("");
-    setIsTyping(true);
-
+    setShowSuggestions(false);
+    setIsThinking(true);
     setTimeout(() => {
-      setIsTyping(false);
-      const fullText = responses[currentInput] || responses.default;
-      setIsStreaming(true);
-      setStreamingText("");
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: generateAIResponse(text),
+        timestamp: new Date(),
+        cards: generateContextCards(text),
+      }]);
+      setIsThinking(false);
+    }, 1400);
+  };
 
-      let idx = 0;
-      const interval = setInterval(() => {
-        idx++;
-        setStreamingText(fullText.slice(0, idx));
-        if (idx >= fullText.length) {
-          clearInterval(interval);
-          setIsStreaming(false);
-          setStreamingText("");
-          const nidhi: Message = {
-            role: "nidhi",
-            content: fullText,
-            timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
-          };
-          setMessages((prev) => [...prev, nidhi]);
-        }
-      }, 15);
-    }, 1200);
+  const handleSuggestionClick = (s: string) => {
+    setInput(s);
+    inputRef.current?.focus();
   };
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col" style={{ height: "calc(100vh - 64px)" }}>
-        {/* Header bar */}
-        <div className="flex items-center gap-3 px-8 flex-shrink-0" style={{ height: 64, background: "#1A1008" }}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-          <div className="flex-1">
-            <p className="text-white font-serif" style={{ fontSize: 16 }}>AI CFO Nidhi</p>
-            <p style={{ color: "#4ADE80", fontSize: 12 }}>● Live — monitoring your business</p>
+      <style>{`
+        @keyframes nidhiPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.4); } }
+        @keyframes nidhiTyping { 0%,100% { opacity: 0.2; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+        .nidhi-input::placeholder { color: ${C.textMuted}; }
+        .nidhi-scroll::-webkit-scrollbar { width: 8px; }
+        .nidhi-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+      `}</style>
+
+      <div style={{
+        display: "flex", flexDirection: "column",
+        height: "calc(100vh - 64px)",
+        background: C.bg, color: C.text,
+        fontFamily: "Inter, sans-serif",
+      }}>
+        {/* Header */}
+        <div style={{
+          flexShrink: 0,
+          padding: "16px 24px",
+          background: C.bg2,
+          borderBottom: `1px solid ${C.border}`,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 16, flexWrap: "wrap",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ position: "relative" }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${C.ai}, #8B0000)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 800, fontSize: 18, color: "#fff",
+                boxShadow: `0 0 24px ${C.ai}55`,
+              }}>N</div>
+              <span style={{
+                position: "absolute", bottom: 0, right: 0,
+                width: 12, height: 12, borderRadius: "50%",
+                background: C.success, border: `2px solid ${C.bg2}`,
+                animation: "nidhiPulse 2s ease-in-out infinite",
+              }} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>AI CFO Nidhi</div>
+              <div style={{ fontSize: 12, color: C.textDim }}>Monitoring your business · Live</div>
+            </div>
           </div>
-          <div className="flex gap-1">
-            {["EN", "HI", "GU", "TA", "MR"].map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className="transition-colors"
-                style={{
-                  fontSize: 12, padding: "4px 8px", borderRadius: 4,
-                  background: lang === l ? "rgba(255,255,255,0.15)" : "transparent",
-                  color: lang === l ? "#FFFFFF" : "rgba(255,255,255,0.40)",
-                }}
-              >{l}</button>
-            ))}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "6px 12px", borderRadius: 999,
+            background: "rgba(196,30,30,0.1)", border: `1px solid ${C.ai}55`,
+            fontSize: 12, fontWeight: 500, color: C.ai,
+          }}>
+            <Sparkles size={14} />
+            AI-Powered
           </div>
         </div>
 
-        {/* Messages area */}
-        <div className="flex-1 overflow-y-auto" style={{ background: "#FAF7F0", padding: "24px 32px" }}>
-          {/* Quick prompts */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {quickPrompts.map((p) => (
-              <button
-                key={p}
-                onClick={() => setInput(p)}
-                className="transition-all"
-                style={{
-                  background: "#FFFFFF",
-                  border: "1.5px solid #E0D9C8",
-                  borderRadius: 100,
-                  padding: "8px 16px",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "#1A1008",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = "#C41E1E";
-                  e.currentTarget.style.color = "#C41E1E";
-                  e.currentTarget.style.background = "#FDF2F1";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = "#E0D9C8";
-                  e.currentTarget.style.color = "#1A1008";
-                  e.currentTarget.style.background = "#FFFFFF";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >{p}</button>
-            ))}
-          </div>
+        {/* Messages */}
+        <div className="nidhi-scroll" style={{
+          flex: 1, overflowY: "auto",
+          padding: "24px clamp(16px, 4vw, 32px)",
+        }}>
+          <div style={{ maxWidth: 880, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+            <AnimatePresence initial={false}>
+              {messages.map(m => <MessageBubble key={m.id} message={m} />)}
+            </AnimatePresence>
 
-          {/* Messages */}
-          <div className="space-y-4">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div style={{ maxWidth: m.role === "user" ? "60%" : "70%" }}>
-                  {m.role === "nidhi" && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-                      <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>AI CFO Nidhi</span>
-                      <span style={{ color: "rgba(26,16,8,0.30)", fontSize: 12 }}>{m.timestamp}</span>
-                    </div>
-                  )}
-                  {m.role === "user" && (
-                    <div className="flex items-center gap-2 mb-1 justify-end">
-                      <span style={{ color: "rgba(26,16,8,0.30)", fontSize: 12 }}>{m.timestamp}</span>
-                    </div>
-                  )}
-                  <div
-                    className="whitespace-pre-wrap"
-                    style={{
-                      borderRadius: m.role === "nidhi" ? "4px 12px 12px 12px" : "12px 4px 12px 12px",
-                      padding: "12px 16px",
-                      fontSize: 14,
-                      lineHeight: 1.7,
-                      background: m.role === "nidhi" ? "#FFFFFF" : "#1A1008",
-                      color: m.role === "nidhi" ? "#1A1008" : "#FFFFFF",
-                      border: m.role === "nidhi" ? "1px solid #E0D9C8" : "none",
-                      boxShadow: m.role === "nidhi" ? "0 1px 4px rgba(26,16,8,0.06)" : "none",
-                    }}
-                  >
-                    {m.content}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Streaming message */}
-            {isStreaming && streamingText && (
-              <div className="flex justify-start">
-                <div style={{ maxWidth: "70%" }}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-                    <span style={{ color: "#8B6914", fontSize: 12, fontWeight: 500 }}>AI CFO Nidhi</span>
-                  </div>
-                  <div
-                    className="whitespace-pre-wrap"
-                    style={{
-                      borderRadius: "4px 12px 12px 12px",
-                      padding: "12px 16px",
-                      fontSize: 14,
-                      lineHeight: 1.7,
-                      background: "#FFFFFF",
-                      color: "#1A1008",
-                      border: "1px solid #E0D9C8",
-                      boxShadow: "0 1px 4px rgba(26,16,8,0.06)",
-                    }}
-                  >
-                    {streamingText}
-                    <span className="inline-block" style={{ borderRight: "2px solid #C41E1E", animation: "blink 800ms step-end infinite", marginLeft: 1, height: "1em" }}>&nbsp;</span>
-                  </div>
+            {isThinking && (
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <Avatar />
+                <div style={{
+                  padding: "14px 18px", borderRadius: "4px 14px 14px 14px",
+                  background: C.card, border: `1px solid ${C.border}`,
+                  display: "flex", gap: 6, alignItems: "center",
+                }}>
+                  {[0, 1, 2].map(i => (
+                    <span key={i} style={{
+                      width: 7, height: 7, borderRadius: "50%", background: C.ai,
+                      animation: `nidhiTyping 1.2s ease-in-out ${i * 0.15}s infinite`,
+                    }} />
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div style={{ maxWidth: "70%" }}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold" style={{ background: "#C41E1E", fontSize: 14 }}>N</div>
-                  </div>
-                  <div style={{
-                    borderRadius: "4px 12px 12px 12px",
-                    padding: "12px 16px",
-                    background: "#FFFFFF",
-                    border: "1px solid #E0D9C8",
-                    display: "flex",
-                    gap: 6,
-                    alignItems: "center",
-                  }}>
-                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
-                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
-                    <span className="typing-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
-                  </div>
+            {showSuggestions && messages.length <= 1 && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 12, color: C.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>
+                  Try asking
+                </div>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                  gap: 8,
+                }}>
+                  {suggestions.map((s, i) => (
+                    <SuggestionButton key={i} suggestion={s} onClick={handleSuggestionClick} />
+                  ))}
                 </div>
               </div>
             )}
 
-            <div ref={chatEndRef} />
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* Input bar */}
-        <div className="flex-shrink-0 flex items-center gap-3" style={{ padding: "16px 32px", background: "#FFFFFF", borderTop: "1px solid #E0D9C8", height: 80 }}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-              }
-            }}
-            placeholder="Ask AI CFO Nidhi anything about your business..."
-            className="flex-1 outline-none"
-            style={{
-              height: 48,
-              padding: "12px 16px",
-              border: "1.5px solid #E0D9C8",
-              borderRadius: 8,
-              fontSize: 14,
-              color: "#1A1008",
-              background: "#FFFFFF",
-            }}
-            onFocus={e => { e.currentTarget.style.borderColor = "#C41E1E"; }}
-            onBlur={e => { e.currentTarget.style.borderColor = "#E0D9C8"; }}
-            aria-label="Message AI CFO Nidhi"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim()}
-            className="flex items-center justify-center transition-all"
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 6,
-              background: input.trim() ? "#C41E1E" : "#E0D9C8",
-              color: "#FFFFFF",
-              fontSize: 20,
-              fontWeight: 700,
-              cursor: input.trim() ? "pointer" : "not-allowed",
-            }}
-          >→</button>
+        {/* Input */}
+        <div style={{
+          flexShrink: 0,
+          padding: "16px clamp(16px, 4vw, 24px)",
+          background: C.bg2,
+          borderTop: `1px solid ${C.border}`,
+        }}>
+          <div style={{ maxWidth: 880, margin: "0 auto" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+              <div style={{ position: "relative", flex: 1 }}>
+                <input
+                  ref={inputRef}
+                  className="nidhi-input"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
+                  placeholder="Ask AI CFO Nidhi anything about your business..."
+                  disabled={isThinking}
+                  style={{
+                    width: "100%", height: 52,
+                    padding: "0 20px",
+                    background: C.card,
+                    border: `2px solid ${C.ai}44`,
+                    borderRadius: 12,
+                    color: C.text, fontSize: 16, fontFamily: "Inter, sans-serif",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                    opacity: isThinking ? 0.6 : 1,
+                  }}
+                  onFocus={e => { e.currentTarget.style.borderColor = C.ai; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = `${C.ai}44`; }}
+                />
+              </div>
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isThinking}
+                style={{
+                  height: 52, padding: "0 22px",
+                  display: "flex", alignItems: "center", gap: 8,
+                  background: input.trim() && !isThinking ? C.ai : "rgba(255,255,255,0.06)",
+                  color: input.trim() && !isThinking ? "#fff" : C.textMuted,
+                  border: "none", borderRadius: 12,
+                  fontSize: 14, fontWeight: 600,
+                  cursor: input.trim() && !isThinking ? "pointer" : "not-allowed",
+                  transition: "all 0.2s",
+                  boxShadow: input.trim() && !isThinking ? `0 4px 16px ${C.ai}55` : "none",
+                }}
+              >
+                {isThinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                <span style={{ display: "none" }} className="nidhi-send-label">Send</span>
+              </button>
+            </div>
+
+            {/* Quick actions */}
+            <div style={{
+              marginTop: 12,
+              display: "flex", flexWrap: "wrap", gap: 8,
+            }}>
+              {quickActions.map(a => <QuickActionChip key={a.label} label={a.label} icon={a.icon} />)}
+            </div>
+          </div>
         </div>
-        <p style={{ textAlign: "center", fontSize: 11, color: "rgba(26,16,8,0.35)", padding: "4px 0 8px", background: "#FFFFFF" }}>Press Enter to send · Shift+Enter for new line</p>
       </div>
     </DashboardLayout>
   );
-};
+}
 
-export default NidhiChatPage;
+// ===== Sub-components =====
+function Avatar() {
+  return (
+    <div style={{
+      width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+      background: `linear-gradient(135deg, ${C.ai}, #8B0000)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontWeight: 700, fontSize: 14, color: "#fff",
+    }}>N</div>
+  );
+}
+
+function MessageBubble({ message }: { message: Message }) {
+  const isAI = message.role === "assistant";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      style={{
+        display: "flex", gap: 12,
+        flexDirection: isAI ? "row" : "row-reverse",
+        alignItems: "flex-start",
+      }}
+    >
+      {isAI ? <Avatar /> : (
+        <div style={{
+          width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+          background: "rgba(255,255,255,0.08)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontWeight: 600, fontSize: 13, color: C.text,
+        }}>You</div>
+      )}
+
+      <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", gap: 10, alignItems: isAI ? "flex-start" : "flex-end" }}>
+        <div style={{
+          padding: "14px 18px",
+          borderRadius: isAI ? "4px 14px 14px 14px" : "14px 4px 14px 14px",
+          background: isAI ? C.card : C.ai,
+          border: isAI ? `1px solid ${C.border}` : "none",
+          color: isAI ? C.text : "#fff",
+          fontSize: 16, lineHeight: 1.6,
+          whiteSpace: "pre-wrap", wordBreak: "break-word",
+        }}>
+          {message.content}
+        </div>
+
+        {message.cards && message.cards.length > 0 && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 10, width: "100%",
+          }}>
+            {message.cards.map((c, i) => <ContextCardComponent key={i} card={c} />)}
+          </div>
+        )}
+
+        <div style={{ fontSize: 12, color: C.textMuted }}>
+          {message.timestamp.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ContextCardComponent({ card }: { card: ContextCard }) {
+  if (card.type === "metric") {
+    const v = card.data.value;
+    const display = typeof v === "number" && v > 1000
+      ? `₹${(v / 100000).toFixed(1)}L`
+      : `${v}${card.data.unit ? "" : ""}`;
+    return (
+      <div style={{
+        padding: 16, borderRadius: 10,
+        background: C.card, border: `1px solid ${C.border}`,
+        display: "flex", flexDirection: "column", gap: 8,
+      }}>
+        <div style={{ fontSize: 12, color: C.textDim, textTransform: "uppercase", letterSpacing: 0.5 }}>{card.title}</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6, fontFamily: "'JetBrains Mono', monospace" }}>
+          <span style={{ fontSize: 24, fontWeight: 700, color: C.text }}>{display}</span>
+          {card.data.unit && <span style={{ fontSize: 14, color: C.textDim }}>{card.data.unit}</span>}
+        </div>
+        {card.data.change !== undefined && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 4,
+            fontSize: 13, fontWeight: 600,
+            color: card.data.change > 0 ? C.success : C.critical,
+          }}>
+            {card.data.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+            {Math.abs(card.data.change)}%
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (card.type === "alert") {
+    const color = card.data.severity === "critical" ? C.critical : C.warning;
+    return (
+      <div style={{
+        padding: 16, borderRadius: 10,
+        background: `${color}10`, border: `1px solid ${color}55`,
+        display: "flex", flexDirection: "column", gap: 8,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <AlertTriangle size={16} color={color} />
+          <span style={{ fontSize: 13, fontWeight: 600, color }}>{card.title}</span>
+        </div>
+        <div style={{ fontSize: 14, color: C.text, lineHeight: 1.5 }}>{card.data.message}</div>
+        {card.data.action && (
+          <button style={{
+            marginTop: 4, alignSelf: "flex-start",
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "6px 12px", borderRadius: 6,
+            background: color, color: "#fff", border: "none",
+            fontSize: 13, fontWeight: 600, cursor: "pointer",
+          }}>
+            {card.data.action}
+            <ArrowRight size={13} />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (card.type === "action") {
+    return (
+      <div style={{
+        padding: 16, borderRadius: 10,
+        background: C.card, border: `1px solid ${C.border}`,
+        display: "flex", flexDirection: "column", gap: 10,
+        gridColumn: "1 / -1",
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{card.title}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {card.data.actions.map((a: string, i: number) => (
+            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 14, color: C.textDim, lineHeight: 1.5 }}>
+              <CheckCircle2 size={14} color={C.success} style={{ marginTop: 3, flexShrink: 0 }} />
+              <span>{a}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+function SuggestionButton({ suggestion, onClick }: { suggestion: string; onClick: (s: string) => void }) {
+  return (
+    <button
+      onClick={() => onClick(suggestion)}
+      style={{
+        padding: "12px 14px",
+        background: C.card, border: `1px solid ${C.border}`,
+        borderRadius: 10, color: C.text,
+        fontSize: 14, fontWeight: 500, fontFamily: "Inter, sans-serif",
+        cursor: "pointer", textAlign: "left",
+        display: "flex", alignItems: "center", gap: 8,
+        transition: "all 0.2s",
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.ai}88`; e.currentTarget.style.background = "rgba(196,30,30,0.06)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.card; }}
+    >
+      <MessageCircle size={14} color={C.ai} style={{ flexShrink: 0 }} />
+      <span style={{ wordBreak: "break-word" }}>{suggestion}</span>
+    </button>
+  );
+}
+
+function QuickActionChip({ label, icon: Icon }: { label: string; icon: any }) {
+  return (
+    <button style={{
+      display: "flex", alignItems: "center", gap: 6,
+      padding: "6px 12px", borderRadius: 999,
+      background: C.card, border: `1px solid ${C.border}`,
+      color: C.textDim, fontSize: 12, fontWeight: 500,
+      cursor: "pointer", transition: "all 0.2s",
+    }}
+    onMouseEnter={e => { e.currentTarget.style.color = C.text; e.currentTarget.style.borderColor = `${C.ai}66`; }}
+    onMouseLeave={e => { e.currentTarget.style.color = C.textDim; e.currentTarget.style.borderColor = C.border; }}
+    >
+      <Plus size={12} />
+      <Icon size={12} />
+      {label}
+    </button>
+  );
+}
