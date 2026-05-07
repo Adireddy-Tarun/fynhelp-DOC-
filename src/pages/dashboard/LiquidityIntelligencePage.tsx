@@ -8,8 +8,8 @@ import {
   ArrowLeft, Wallet, Flame, Heart,
 } from "lucide-react";
 import {
-  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, ReferenceLine,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import DashboardLayout from "@/components/DashboardLayout";
 
