@@ -50,6 +50,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_insights: {
+        Row: {
+          business_id: string
+          confidence_score: number
+          created_at: string
+          data_quality: string
+          generated_at: string
+          id: string
+          message: string
+          module: string
+        }
+        Insert: {
+          business_id: string
+          confidence_score?: number
+          created_at?: string
+          data_quality?: string
+          generated_at?: string
+          id?: string
+          message: string
+          module: string
+        }
+        Update: {
+          business_id?: string
+          confidence_score?: number
+          created_at?: string
+          data_quality?: string
+          generated_at?: string
+          id?: string
+          message?: string
+          module?: string
+        }
+        Relationships: []
+      }
       ai_usage_logs: {
         Row: {
           business_id: string | null
@@ -101,9 +134,13 @@ export type Database = {
           body: string | null
           business_id: string
           created_at: string
+          details: string | null
           dismissed: boolean | null
           id: string
+          impact: string | null
+          resolved: boolean
           severity: string
+          suggested_action: string | null
           title: string
         }
         Insert: {
@@ -111,9 +148,13 @@ export type Database = {
           body?: string | null
           business_id: string
           created_at?: string
+          details?: string | null
           dismissed?: boolean | null
           id?: string
+          impact?: string | null
+          resolved?: boolean
           severity: string
+          suggested_action?: string | null
           title: string
         }
         Update: {
@@ -121,9 +162,13 @@ export type Database = {
           body?: string | null
           business_id?: string
           created_at?: string
+          details?: string | null
           dismissed?: boolean | null
           id?: string
+          impact?: string | null
+          resolved?: boolean
           severity?: string
+          suggested_action?: string | null
           title?: string
         }
         Relationships: [
@@ -178,6 +223,7 @@ export type Database = {
           balance: number | null
           bank_name: string
           business_id: string
+          connected: boolean
           created_at: string
           id: string
           last_sync: string | null
@@ -187,6 +233,7 @@ export type Database = {
           balance?: number | null
           bank_name: string
           business_id: string
+          connected?: boolean
           created_at?: string
           id?: string
           last_sync?: string | null
@@ -196,6 +243,7 @@ export type Database = {
           balance?: number | null
           bank_name?: string
           business_id?: string
+          connected?: boolean
           created_at?: string
           id?: string
           last_sync?: string | null
@@ -761,6 +809,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cash_flow_trends: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          money_in: number
+          money_out: number
+          net_cash: number
+          period_label: string
+          period_start: string
+          period_type: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          money_in?: number
+          money_out?: number
+          net_cash?: number
+          period_label: string
+          period_start: string
+          period_type?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          money_in?: number
+          money_out?: number
+          net_cash?: number
+          period_label?: string
+          period_start?: string
+          period_type?: string
+        }
+        Relationships: []
+      }
       compliance_events: {
         Row: {
           business_id: string
@@ -1136,6 +1220,45 @@ export type Database = {
           refresh_token?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      liquidity_metrics: {
+        Row: {
+          burn_rate_current: number
+          business_id: string
+          cash_position: number
+          created_at: string
+          health_score: number
+          health_status: string
+          id: string
+          recorded_at: string
+          runway_days: number
+          runway_months: number
+        }
+        Insert: {
+          burn_rate_current?: number
+          business_id: string
+          cash_position?: number
+          created_at?: string
+          health_score?: number
+          health_status?: string
+          id?: string
+          recorded_at?: string
+          runway_days?: number
+          runway_months?: number
+        }
+        Update: {
+          burn_rate_current?: number
+          business_id?: string
+          cash_position?: number
+          created_at?: string
+          health_score?: number
+          health_status?: string
+          id?: string
+          recorded_at?: string
+          runway_days?: number
+          runway_months?: number
         }
         Relationships: []
       }
@@ -2023,6 +2146,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          balance_after: number | null
           bank_account_id: string | null
           business_id: string
           category: string | null
@@ -2032,9 +2156,12 @@ export type Database = {
           description: string | null
           direction: string
           id: string
+          transaction_date: string | null
+          transaction_time: string | null
         }
         Insert: {
           amount: number
+          balance_after?: number | null
           bank_account_id?: string | null
           business_id: string
           category?: string | null
@@ -2044,9 +2171,12 @@ export type Database = {
           description?: string | null
           direction: string
           id?: string
+          transaction_date?: string | null
+          transaction_time?: string | null
         }
         Update: {
           amount?: number
+          balance_after?: number | null
           bank_account_id?: string | null
           business_id?: string
           category?: string | null
@@ -2056,6 +2186,8 @@ export type Database = {
           description?: string | null
           direction?: string
           id?: string
+          transaction_date?: string | null
+          transaction_time?: string | null
         }
         Relationships: [
           {
