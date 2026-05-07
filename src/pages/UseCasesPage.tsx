@@ -159,7 +159,7 @@ export default function UseCasesPage() {
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}
           >
             {filteredCases.map((useCase, idx) => (
-              <UseCaseCard3D key={useCase.id} useCase={useCase} delay={idx * 0.05} />
+              <UseCaseCard3D key={useCase.id} useCase={useCase} delay={idx * 0.05} onClick={() => navigate(useCase.route)} />
             ))}
           </motion.div>
         </AnimatePresence>
