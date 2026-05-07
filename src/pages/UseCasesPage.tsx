@@ -7,6 +7,7 @@ import {
   GitBranch, Boxes, Sparkles, ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import FynLogo from '@/components/FynLogo';
 
 const USE_CASES = [
   { id: 1, category: 'finance', title: 'Monthly Financial Close Report', description: 'Generate period-end close reports with automated reconciliation and variance analysis from your ERP exports.', icon: BarChart3, gradient: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)', glowColor: 'rgba(247,147,30,0.4)', route: '/dashboard/reports?template=monthly-close' },
