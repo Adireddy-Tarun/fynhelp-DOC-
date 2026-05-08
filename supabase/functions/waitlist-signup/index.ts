@@ -94,23 +94,6 @@ Deno.serve(async (req) => {
       return json({ error: "Failed to save waitlist signup" }, 500);
     }
 
-    const emailPayload = {
-      name: deriveName(payload.name, payload.email),
-      email: payload.email,
-      position,
-      companyType: payload.company_type || undefined,
-      companySize: payload.company_size || undefined,
-      location: payload.location || undefined,
-    };
-
-    void fetch(`${SUPABASE_URL}/functions/v1/send-waitlist-email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(emailPayload),
-    }).catch((error) => {
-      console.error("waitlist-signup email trigger error", error);
-    });
-
     return json({ success: true, position });
   } catch (error) {
     console.error("waitlist-signup unexpected error", error);
