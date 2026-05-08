@@ -539,18 +539,18 @@ const CockpitPage = () => {
         </div>
 
         {/* Recent activity */}
-        <FynCard>
-          <h3 className="font-serif text-fyn-h3 text-fyn-ink mb-fyn-md">Recent Activity</h3>
+        <FynCard className="bg-card border-border">
+          <h3 className="font-serif text-fyn-h3 text-foreground mb-fyn-md">Recent Activity</h3>
           {view.activity.length > 0 ? (
             <ul className="space-y-fyn-sm">
               {view.activity.map((a, idx) => (
                 <li key={idx} className="flex items-start gap-fyn-sm pb-fyn-sm border-b border-fyn-ink-10 last:border-0 last:pb-0">
-                  <div className="w-7 h-7 rounded-md flex items-center justify-center bg-fyn-beige flex-shrink-0">
+                  <div className="w-7 h-7 rounded-md flex items-center justify-center bg-muted flex-shrink-0">
                     <ActivityIcon type={a.type} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-fyn-small text-fyn-ink">{a.desc}</p>
-                    <p className="text-fyn-tiny text-fyn-ink-45 mt-0.5">{a.time}</p>
+                    <p className="text-fyn-small text-foreground">{a.desc}</p>
+                    <p className="text-fyn-tiny text-muted-foreground mt-0.5">{a.time}</p>
                   </div>
                   {a.amount !== null && (
                     <span
@@ -565,8 +565,8 @@ const CockpitPage = () => {
             </ul>
           ) : (
             <div className="text-center py-fyn-lg">
-              <p className="text-fyn-ink text-fyn-body font-semibold">No activity yet</p>
-              <p className="text-fyn-small text-fyn-ink-60 mt-fyn-xs">
+              <p className="text-foreground text-fyn-body font-semibold">No activity yet</p>
+              <p className="text-fyn-small text-muted-foreground mt-fyn-xs">
                 Connect your accounts to see transactions appear here.
               </p>
             </div>
