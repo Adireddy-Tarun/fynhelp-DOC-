@@ -90,9 +90,8 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
         initial={false}
         animate={{ width, x: visible ? 0 : -width }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className="fixed top-0 left-0 h-full z-50 flex flex-col"
+        className="fixed top-0 left-0 h-full z-50 flex flex-col bg-card border-r border-border"
         style={{
-          background: "#F5EFE6",
           overflowY: "auto",
           overflowX: "hidden",
           minWidth: width,
