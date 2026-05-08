@@ -507,8 +507,8 @@ const CockpitPage = () => {
 
       {/* Bottom: Nidhi insight + Recent activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-lg mb-fyn-lg">
-        {/* Nidhi insight (intentional dark surface) */}
-        <div className="rounded-lg p-fyn-lg bg-fyn-ink shadow-[0_12px_30px_rgba(26,16,8,0.18)]">
+        {/* Nidhi insight */}
+        <div className="rounded-lg p-fyn-lg bg-card border border-border shadow-[0_12px_30px_rgba(26,16,8,0.18)]">
           <div className="flex items-start gap-fyn-sm">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
@@ -517,21 +517,16 @@ const CockpitPage = () => {
               N
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-white/50 mb-fyn-xs">
+              <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-muted-foreground mb-fyn-xs">
                 Latest insight from AI CFO Nidhi
               </p>
-              <p className="text-white/90 text-fyn-body leading-relaxed">
+              <p className="text-foreground text-fyn-body leading-relaxed">
                 {view.insight ||
                   "Connect your bank account to receive your first financial intelligence brief within 24 hours."}
               </p>
               <button
                 onClick={() => setShowNidhiChat(true)}
-                className="mt-fyn-md inline-flex items-center gap-2 px-4 py-2 rounded-md text-fyn-small font-medium"
-                style={{
-                  background: "rgba(255,255,255,0.10)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  color: "#fff",
-                }}
+                className="mt-fyn-md inline-flex items-center gap-2 px-4 py-2 rounded-md text-fyn-small font-medium bg-muted text-foreground border border-border hover:bg-muted/80"
               >
                 <MessageCircle size={14} /> Chat with Nidhi
               </button>
