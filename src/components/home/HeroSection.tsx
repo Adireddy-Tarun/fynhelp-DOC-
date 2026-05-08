@@ -157,7 +157,7 @@ export default function HeroSection() {
           }}
         >
           <span style={{ color: "#FFFFFF", fontWeight: 600 }}>10 Intelligence Suites</span> —
-          Liquidity Intelligence available now. 9 additional suites in active development.
+          Liquidity, Revenue, Cost, and GST &amp; Tax Intelligence live now. 6 additional suites in active development.
         </p>
 
         {/* Language pills */}

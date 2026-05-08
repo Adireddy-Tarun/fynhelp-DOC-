@@ -47,8 +47,8 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Revenue",
     Icon: TrendingUp,
     description: "MRR/ARR tracking, cohort analysis, churn prediction, revenue forecasts",
-    status: "coming_soon",
-    quarter: "Q2 2026",
+    status: "live",
+    quarter: "Live",
     href: "/#product-ecosystem",
   },
   {
@@ -57,8 +57,8 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Cost",
     Icon: PieChart,
     description: "Expense categorization, vendor spend analysis, cost optimization insights",
-    status: "coming_soon",
-    quarter: "Q2 2026",
+    status: "live",
+    quarter: "Live",
     href: "/#product-ecosystem",
   },
   {
@@ -67,8 +67,8 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "GST & Tax",
     Icon: FileText,
     description: "GST compliance tracking, ITC reconciliation, GSTR-2B matching, deadline alerts",
-    status: "coming_soon",
-    quarter: "Q3 2026",
+    status: "live",
+    quarter: "Live",
     href: "/#product-ecosystem",
   },
   {
