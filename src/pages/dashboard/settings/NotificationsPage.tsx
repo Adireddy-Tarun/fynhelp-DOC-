@@ -28,7 +28,7 @@ const Toggle = ({ on, onChange, disabled }: { on: boolean; onChange: () => void;
   <button onClick={disabled ? undefined : onChange}
     className="w-10 h-[22px] rounded-full relative transition-all duration-250"
     style={{ background: on ? "#C41E1E" : "#E0D9C8", opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>
-    <div className="w-4 h-4 rounded-full bg-white shadow absolute top-[3px] transition-all duration-250"
+    <div className="w-4 h-4 rounded-full bg-card shadow absolute top-[3px] transition-all duration-250"
       style={{ left: on ? 21 : 3 }} />
   </button>
 );
@@ -64,7 +64,7 @@ const NotificationsPage = () => {
             { label: "Email", key: "email" as const, status: channels.email, sub: "Connected" },
             { label: "In-App", key: null, status: true, sub: "Always on" },
           ].map(ch => (
-            <div key={ch.label} className="bg-white border rounded-lg p-4" style={{ borderColor: "#E0D9C8" }}>
+            <div key={ch.label} className="bg-card border rounded-lg p-4" style={{ borderColor: "#E0D9C8" }}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[14px] font-medium" style={{ color: "#1A1008" }}>{ch.label}</span>
                 <Toggle on={ch.status} onChange={() => ch.key && setChannels(c => ({ ...c, [ch.key!]: !c[ch.key!] }))} disabled={!ch.key} />
@@ -86,7 +86,7 @@ const NotificationsPage = () => {
 
       {/* Alert types */}
       <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>What AI CFO Nidhi alerts you about</h3>
-      <div className="bg-white border rounded-lg overflow-hidden" style={{ borderColor: "#E0D9C8" }}>
+      <div className="bg-card border rounded-lg overflow-hidden" style={{ borderColor: "#E0D9C8" }}>
         <div className="grid grid-cols-[1fr_auto_auto_auto] gap-0 text-[12px] font-semibold px-4 py-2" style={{ background: "#FAF7F0", color: "rgba(26,16,8,0.50)" }}>
           <span>Alert</span>
           <span className="w-16 text-center">WhatsApp</span>

@@ -74,7 +74,7 @@ const HRPage = () => {
     switch (status) {
       case "active": return "bg-[#1A6B3C]/10 text-[#1A6B3C]";
       case "resigned": return "bg-[#C41E1E]/10 text-[#C41E1E]";
-      default: return "bg-gray-100 text-gray-500";
+      default: return "bg-muted text-muted-foreground/70";
     }
   };
 
@@ -135,7 +135,7 @@ const HRPage = () => {
           <h3 className="text-fyn-ink font-serif text-lg mb-4">By Department</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {Object.entries(byDepartment).map(([dept, count]) => (
-              <div key={dept} className="bg-white rounded-lg p-4 border border-fyn-ink-10">
+              <div key={dept} className="bg-card rounded-lg p-4 border border-fyn-ink-10">
                 <p className="text-fyn-ink text-2xl font-bold font-sans">{count}</p>
                 <p className="text-fyn-ink/60 text-xs mt-1">{dept}</p>
               </div>
@@ -164,7 +164,7 @@ const HRPage = () => {
               </thead>
               <tbody>
                 {employees.map((e, i) => (
-                  <tr key={e.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white"}`}>
+                  <tr key={e.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-card"}`}>
                     <td className="py-3 text-fyn-ink font-medium">{e.name}</td>
                     <td className="py-3 text-fyn-ink/70">{e.email || "—"}</td>
                     <td className="py-3 text-fyn-ink/70">{e.department || "—"}</td>

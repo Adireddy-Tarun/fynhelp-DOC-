@@ -40,7 +40,7 @@ const SecurityPage = () => {
       <h2 className="font-serif text-2xl font-bold" style={{ color: "#1A1008" }}>Security & Password</h2>
 
       {/* Change Password */}
-      <div className="bg-white border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
+      <div className="bg-card border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
         <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>Change Password</h3>
         <div className="space-y-4">
           <div>
@@ -86,7 +86,7 @@ const SecurityPage = () => {
       </div>
 
       {/* 2FA */}
-      <div className="bg-white border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
+      <div className="bg-card border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -96,14 +96,14 @@ const SecurityPage = () => {
             <p className="text-[13px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>Add an extra layer of security. You'll need your phone to sign in.</p>
           </div>
           <div className="w-11 h-6 rounded-full cursor-pointer" style={{ background: "#E0D9C8" }}>
-            <div className="w-5 h-5 rounded-full bg-white shadow mt-0.5 ml-0.5 transition-all" />
+            <div className="w-5 h-5 rounded-full bg-card shadow mt-0.5 ml-0.5 transition-all" />
           </div>
         </div>
         {/* // BACKEND NEEDED: Supabase MFA API */}
       </div>
 
       {/* Active Sessions */}
-      <div className="bg-white border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
+      <div className="bg-card border rounded-lg p-6" style={{ borderColor: "#E0D9C8" }}>
         <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>Devices signed in</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between py-2 border-b" style={{ borderColor: "#E0D9C8" }}>
@@ -131,14 +131,14 @@ const SecurityPage = () => {
           This permanently deletes your business data, all transactions, GST records, and AI CFO Nidhi history. This cannot be undone.
         </p>
         <button onClick={() => setShowDeleteModal(true)}
-          className="px-4 py-2 rounded-lg text-[13px] font-semibold border bg-white"
+          className="px-4 py-2 rounded-lg text-[13px] font-semibold border bg-card"
           style={{ borderColor: "#C41E1E", color: "#C41E1E" }}>Delete my account</button>
       </div>
 
       {/* Delete modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl p-6 w-[400px] shadow-xl">
+          <div className="bg-card rounded-xl p-6 w-[400px] shadow-xl">
             <h3 className="font-semibold text-[15px] mb-3" style={{ color: "#C41E1E" }}>Confirm account deletion</h3>
             <p className="text-[13px] mb-4" style={{ color: "#1A1008" }}>Type <strong>DELETE</strong> to confirm:</p>
             <input value={deleteText} onChange={e => setDeleteText(e.target.value)}

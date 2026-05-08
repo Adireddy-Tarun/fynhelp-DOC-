@@ -112,7 +112,7 @@ export default function CAAccessPage() {
 
         {loading && <p className="text-sm" style={{ color: "rgba(26,16,8,0.50)" }}>Loading…</p>}
         {!loading && pending.length === 0 && (
-          <div className="bg-white border rounded-lg p-6 text-center" style={{ borderColor: "#E0D9C8" }}>
+          <div className="bg-card border rounded-lg p-6 text-center" style={{ borderColor: "#E0D9C8" }}>
             <Clock size={28} className="mx-auto mb-2" style={{ color: "rgba(26,16,8,0.30)" }} />
             <p className="text-sm" style={{ color: "rgba(26,16,8,0.60)" }}>No pending requests.</p>
           </div>
@@ -121,7 +121,7 @@ export default function CAAccessPage() {
           {pending.map((r) => {
             const firm = firms[r.ca_firm_id];
             return (
-              <div key={r.id} className="bg-white border rounded-lg p-5" style={{ borderColor: "#E0D9C8" }}>
+              <div key={r.id} className="bg-card border rounded-lg p-5" style={{ borderColor: "#E0D9C8" }}>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#FAF7F0", color: "#8B6914" }}>
                     <Briefcase size={18} />
@@ -185,7 +185,7 @@ export default function CAAccessPage() {
           {active.map((a) => {
             const firm = firms[a.ca_firm_id];
             return (
-              <div key={a.id} className="bg-white border rounded-lg p-4 flex items-center justify-between" style={{ borderColor: "#E0D9C8" }}>
+              <div key={a.id} className="bg-card border rounded-lg p-4 flex items-center justify-between" style={{ borderColor: "#E0D9C8" }}>
                 <div>
                   <div className="font-semibold text-sm" style={{ color: "#1A1008" }}>{firm?.firm_name ?? "CA firm"}</div>
                   <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.60)" }}>
