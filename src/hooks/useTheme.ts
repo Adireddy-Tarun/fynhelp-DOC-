@@ -1,37 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-type Theme = "light" | "dark";
+type Theme = 'light' | 'dark';
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Check localStorage
-    const saved = localStorage.getItem("fynhelp-theme");
-    if (saved === "light" || saved === "dark") return saved;
+    const saved = localStorage.getItem('fynhelp-theme');
+    if (saved === 'light' || saved === 'dark') return saved;
 
-    // Check system preference
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
     }
 
-    // Default to light (FYNHelp brand)
-    return "light";
+    return 'light';
   });
 
   useEffect(() => {
     const root = document.documentElement;
 
-    // Remove both classes
-    root.classList.remove("light", "dark");
-
-    // Add current theme
+    root.classList.remove('light', 'dark');
     root.classList.add(theme);
+    localStorage.setItem('fynhelp-theme', theme);
 
-    // Save preference
-    localStorage.setItem("fynhelp-theme", theme);
+    console.log('Theme applied:', theme, '| HTML classes:', root.className);
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === "light" ? "dark" : "light"));
+    setThemeState((prev) => {
+      const newTheme = prev === 'light' ? 'dark' : 'light';
+      console.log('Toggling:', prev, '→', newTheme);
+      return newTheme;
+    });
   };
 
   const setTheme = (newTheme: Theme) => {
