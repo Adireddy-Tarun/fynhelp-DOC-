@@ -361,13 +361,14 @@ const CockpitPage = () => {
 
   return (
     <DashboardLayout>
+      <div className="min-h-full bg-background text-foreground">
       {/* Header: title + demo toggle */}
       <div className="flex items-start justify-between gap-fyn-md mb-fyn-lg flex-wrap">
         <FynPageTitle sub={`Welcome back${profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} — here's your business at a glance.`}>
           Cockpit
         </FynPageTitle>
         <div className="flex items-center gap-fyn-sm">
-          <span className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-fyn-ink-60">Demo mode</span>
+          <span className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-muted-foreground">Demo mode</span>
           <button
             onClick={() => setDemoMode((v) => !v)}
             aria-pressed={demoMode}
@@ -601,7 +602,7 @@ const CockpitPage = () => {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg rounded-lg p-fyn-lg bg-fyn-beige-card border border-fyn-ink-10"
+              className="w-full max-w-lg rounded-lg p-fyn-lg bg-card border border-border"
             >
               <div className="flex items-start justify-between mb-fyn-md">
                 <div className="flex items-center gap-fyn-sm">
@@ -612,19 +613,19 @@ const CockpitPage = () => {
                     N
                   </div>
                   <div>
-                    <h3 className="font-serif text-fyn-h3 text-fyn-ink">AI CFO Nidhi</h3>
-                    <p className="text-fyn-tiny text-fyn-ink-60">Your financial intelligence assistant</p>
+                    <h3 className="font-serif text-fyn-h3 text-foreground">AI CFO Nidhi</h3>
+                    <p className="text-fyn-tiny text-muted-foreground">Your financial intelligence assistant</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowNidhiChat(false)}
                   aria-label="Close"
-                  className="text-fyn-ink-60 hover:text-fyn-ink"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <p className="text-fyn-small text-fyn-ink-60 mb-fyn-md">
+               <p className="text-fyn-small text-muted-foreground mb-fyn-md">
                 Open the full chat to get AI-powered insights and recommendations.
               </p>
               <Link
@@ -642,6 +643,7 @@ const CockpitPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </DashboardLayout>
   );
 };
