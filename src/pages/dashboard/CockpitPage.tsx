@@ -103,7 +103,7 @@ function StatCard({
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
+      className="bg-card border border-border rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
     >
       <div className="flex items-center gap-fyn-sm mb-fyn-sm">
         <div
@@ -112,9 +112,9 @@ function StatCard({
         >
           <Icon size={18} />
         </div>
-        <FynLabel>{label}</FynLabel>
+        <FynLabel className="text-foreground">{label}</FynLabel>
       </div>
-      <p className="font-mono text-fyn-metric text-fyn-ink">{value}</p>
+      <p className="font-mono text-fyn-metric text-foreground">{value}</p>
       {trend !== undefined && (
         <div className="mt-fyn-xs flex items-center gap-1.5 text-fyn-small">
           {trend >= 0 ? (
@@ -156,7 +156,7 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 250, damping: 22 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="text-left bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+      className="text-left bg-card border border-border rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
     >
       <div className="flex items-start justify-between mb-fyn-sm">
         <div
@@ -176,8 +176,8 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
           <CheckCircle size={14} style={{ color: "#16A34A" }} />
         )}
       </div>
-      <h3 className="font-serif text-fyn-ink text-base mb-fyn-xs">{module.name}</h3>
-      <p className="text-fyn-small text-fyn-ink-60 leading-relaxed mb-fyn-sm">{module.desc}</p>
+      <h3 className="font-serif text-foreground text-base mb-fyn-xs">{module.name}</h3>
+      <p className="text-fyn-small text-muted-foreground leading-relaxed mb-fyn-sm">{module.desc}</p>
       <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em]"
         style={{ color: isSoon ? "hsl(var(--fyn-ink) / 0.35)" : locked ? "hsl(var(--fyn-gold))" : "#16A34A" }}>
         {isSoon ? "Coming soon" : locked ? "Locked" : "Active"}
