@@ -138,6 +138,8 @@ export default function HeroSection() {
           }}
         >
           Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
+          <br /><br />
+          While other tools build board decks, Fynny provides the strategy. Upload any model or connect your stack to get predictive 'What-If' scenarios and instant financial clarity.
         </p>
 
         {/* Suites note */}
