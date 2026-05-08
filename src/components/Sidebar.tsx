@@ -213,7 +213,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         gap: 14,
                         background: active
                           ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
-                          : "#FFFFFF",
+                          : "hsl(var(--card))",
                         border: "none",
                         cursor: "pointer",
                         borderRadius: collapsed ? 14 : (active ? "0 14px 14px 0" : 14),
@@ -281,7 +281,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                               fontFamily: "Inter, sans-serif",
                               fontSize: 15,
                               fontWeight: 700,
-                              color: active ? "#FFFFFF" : "#1A1008",
+                              color: active ? "#FFFFFF" : "hsl(var(--foreground))",
                               flex: 1,
                               textAlign: "left",
                               whiteSpace: "nowrap",

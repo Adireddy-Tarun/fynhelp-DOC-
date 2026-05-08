@@ -99,8 +99,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
           <div className="ml-auto flex items-center gap-4">
             <div
-              className="hidden md:flex items-center border rounded-lg px-3 py-1.5 gap-2 w-64"
-              style={{ background: "#FFFFFF", borderColor: "rgba(26,16,8,0.10)" }}
+              className="hidden md:flex items-center border border-border rounded-lg px-3 py-1.5 gap-2 w-64 bg-card"
             >
               <Search size={14} className="text-fyn-ink/30" />
               <input
