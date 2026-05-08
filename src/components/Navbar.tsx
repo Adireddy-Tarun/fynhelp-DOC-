@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
 import FYNIcon, { type FYNIconName } from "./FYNIcon";
-import ThemeToggle from "./ThemeToggle";
+
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
