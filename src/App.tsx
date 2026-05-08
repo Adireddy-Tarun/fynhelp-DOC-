@@ -32,7 +32,7 @@ import PublicSecurityPage from "./pages/SecurityPage.tsx";
 import BlogPage from "./pages/BlogPage.tsx";
 import BlogArticlePage from "./pages/BlogArticlePage.tsx";
 import ResourcesPage from "./pages/ResourcesPage.tsx";
-import UseCasesPage from "./pages/UseCasesPage.tsx";
+
 
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
@@ -135,7 +135,7 @@ const App = () => (
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/use-cases" element={<UseCasesPage />} />
+            
             
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import UseCaseBubble, { USE_CASE_CONTENT } from "@/components/UseCaseBubble";
 import {
   Droplets,
   TrendingUp,
@@ -358,6 +359,7 @@ export default function SuitesSection() {
   const ref = useScrollReveal();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [openSuiteId, setOpenSuiteId] = useState<string | null>(null);
   const touchStart = useRef<number | null>(null);
 
   const next = useCallback(() => setIndex((i) => (i + 1) % SUITES.length), []);
@@ -504,13 +506,24 @@ export default function SuitesSection() {
                   {suite.desc}
                 </p>
 
-                <Link
-                  to={suite.href}
-                  className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
-                  style={{ fontFamily: "'Raleway', sans-serif" }}
-                >
-                  Explore {suite.short} →
-                </Link>
+                {USE_CASE_CONTENT[suite.id] ? (
+                  <button
+                    type="button"
+                    onClick={() => setOpenSuiteId(suite.id)}
+                    className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
+                    style={{ fontFamily: "'Raleway', sans-serif" }}
+                  >
+                    See {suite.short} use cases →
+                  </button>
+                ) : (
+                  <Link
+                    to={suite.href}
+                    className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
+                    style={{ fontFamily: "'Raleway', sans-serif" }}
+                  >
+                    Explore {suite.short} →
+                  </Link>
+                )}
               </div>
 
               {/* Right: widget mock */}
@@ -579,6 +592,12 @@ export default function SuitesSection() {
           </div>
         </div>
       </div>
+
+      <UseCaseBubble
+        content={openSuiteId ? USE_CASE_CONTENT[openSuiteId] ?? null : null}
+        isOpen={openSuiteId !== null}
+        onClose={() => setOpenSuiteId(null)}
+      />
     </section>
   );
 }
