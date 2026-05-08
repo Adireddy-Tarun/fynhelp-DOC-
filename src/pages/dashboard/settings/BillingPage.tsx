@@ -24,7 +24,7 @@ const SectionTitle = ({ title, sub }: { title: string; sub?: string }) => (
 const PLANS = [
   {
     name: "Starter", original: "₹1,999", discounted: "₹1,399",
-    features: ["Cash intelligence", "GST alerts", "AI CFO Nidhi daily brief", "1 bank connection"],
+    features: ["Cash intelligence", "GST alerts", "CFO Fynny daily brief", "1 bank connection"],
   },
   {
     name: "Growth", original: "₹4,999", discounted: "₹3,499",
@@ -87,7 +87,7 @@ const BillingPage = () => {
             <ul style={{ marginTop: 12, padding: 0, listStyle: "none" }}>
               {[
                 "All 50+ intelligence modules unlocked",
-                "AI CFO Nidhi AI CFO — full access",
+                "CFO Fynny AI CFO — full access",
                 "Priority support",
                 "30% permanent discount when paid plans launch",
                 "Early access to new features before public release",

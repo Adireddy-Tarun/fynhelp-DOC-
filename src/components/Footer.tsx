@@ -11,7 +11,7 @@ const productLinks = [
   { label: "Market Intelligence", href: "/#product-ecosystem" },
   { label: "Banking Intelligence", href: "/#product-ecosystem" },
   { label: "CA Partner Program", href: "/#product-ecosystem" },
-  { label: "AI CFO Nidhi", href: "/dashboard/nidhi" },
+  { label: "CFO Fynny", href: "/dashboard/nidhi" },
   { label: "Pricing", href: "/pricing" },
   { label: "Integrations", href: "/dashboard/settings/integrations" },
 ];

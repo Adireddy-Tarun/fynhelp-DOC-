@@ -533,7 +533,7 @@ export default function CAPortfolioHealthPage() {
       <Card className="mb-6">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-[15px] font-semibold">AI-Generated Portfolio Insights</h3>
-          <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: COLORS.gold }}>Powered by Nidhi</span>
+          <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: COLORS.gold }}>Powered by Fynny</span>
         </div>
         <p className="text-[12px] mb-4" style={{ color: "rgba(26,16,8,0.55)" }}>Auto-generated from your latest portfolio data</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

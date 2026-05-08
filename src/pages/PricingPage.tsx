@@ -112,7 +112,7 @@ const comparisonRows: Array<{
 ];
 
 const roles = [
-  { role: "CFO / Finance Head", human: "₹25–40L/yr", fyn: "AI CFO Nidhi" },
+  { role: "CFO / Finance Head", human: "₹25–40L/yr", fyn: "CFO Fynny" },
   { role: "Financial Analyst", human: "₹8–12L/yr", fyn: "Revenue & Cost Intelligence" },
   { role: "Accountant / Bookkeeper", human: "₹5–8L/yr", fyn: "Liquidity Intelligence" },
   { role: "GST / Tax Consultant", human: "₹6–10L/yr", fyn: "GST & Tax Intelligence" },
@@ -123,7 +123,7 @@ const roles = [
 const faqs = [
   {
     q: 'What counts as a "use case"?',
-    a: 'Each AI query to Nidhi (your AI CFO) counts as one use case. Examples: "What\'s my burn rate?", "Show overdue invoices", "Generate cash flow report".',
+    a: 'Each AI query to Fynny (your AI CFO) counts as one use case. Examples: "What\'s my burn rate?", "Show overdue invoices", "Generate cash flow report".',
   },
   {
     q: "Can I upgrade anytime?",
@@ -1139,7 +1139,7 @@ function EngagementPopup() {
                 marginBottom: 12,
               }}
             >
-              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Nidhi</strong> — real founders, not sales reps. Honest advice on what'll work for your business.
+              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Fynny</strong> — real founders, not sales reps. Honest advice on what'll work for your business.
             </p>
             <p
               style={{

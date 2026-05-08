@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const capabilities = [
-  { title: "Proactive, not reactive", desc: "AI CFO Nidhi identifies your top 3 financial risks every morning before you ask. Most problems are solved before they become crises." },
-  { title: "Speaks your language — literally", desc: "Hindi, Gujarati, Tamil, Marathi, English. AI CFO Nidhi auto-detects your preference. Switch mid-conversation. The intelligence doesn't change — only the language does." },
-  { title: "Grounded in live data — always", desc: "Every number AI CFO Nidhi speaks is fetched live from your bank, your Tally, your GST portal. She is architecturally prevented from estimating or guessing any financial figure." },
-  { title: "Action-first, not insight-last", desc: "Every AI CFO Nidhi insight includes a recommended action and a one-tap way to execute it — draft the WhatsApp, open the simulator, generate the report." },
-  { title: "Named after a real person", desc: "Nidhi Siddhpura, Co-Founder and Director of FynHelp, designed every insight this AI delivers. The product carries her name because it carries her character." },
+  { title: "Proactive, not reactive", desc: "CFO Fynny identifies your top 3 financial risks every morning before you ask. Most problems are solved before they become crises." },
+  { title: "Speaks your language — literally", desc: "Hindi, Gujarati, Tamil, Marathi, English. CFO Fynny auto-detects your preference. Switch mid-conversation. The intelligence doesn't change — only the language does." },
+  { title: "Grounded in live data — always", desc: "Every number CFO Fynny speaks is fetched live from your bank, your Tally, your GST portal. She is architecturally prevented from estimating or guessing any financial figure." },
+  { title: "Action-first, not insight-last", desc: "Every CFO Fynny insight includes a recommended action and a one-tap way to execute it — draft the WhatsApp, open the simulator, generate the report." },
+  { title: "Named after a real person", desc: "Fynny Siddhpura, Co-Founder and Director of FynHelp, designed every insight this AI delivers. The product carries her name because it carries her character." },
 ];
 
 export default function NidhiSection() {
@@ -16,14 +16,14 @@ export default function NidhiSection() {
     <section className="bg-fyn-ink py-24" ref={ref}>
       <div className="fyn-container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Left — Nidhi Profile */}
+          {/* Left — Fynny Profile */}
           <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 reveal-left">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-16 h-16 rounded-full bg-fyn-red flex items-center justify-center">
                 <span className="text-white font-display text-2xl font-bold">N</span>
               </div>
               <div>
-                <p className="text-white font-serif text-3xl">AI CFO Nidhi</p>
+                <p className="text-white font-serif text-3xl">CFO Fynny</p>
                 <p className="fyn-caption font-semibold text-sm text-primary-foreground">AI CFO · FynHelp</p>
               </div>
               <div className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full bg-fyn-success/20">
@@ -34,7 +34,7 @@ export default function NidhiSection() {
 
             <div className="space-y-3">
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/50 text-[10px] mb-1">AI CFO Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">CFO Fynny</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   Good morning. Your cash runway is 52 days at ₹23,846 daily burn.
                   That's 8 days less than last week — burn accelerated due to Diwali
@@ -42,7 +42,7 @@ export default function NidhiSection() {
                 </p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/50 text-[10px] mb-1">AI CFO Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">CFO Fynny</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   ABC Electronics owes ₹8.4L and is 62 days overdue. Collecting this
                   today adds 15 days to your runway. Want me to draft a reminder?
@@ -53,7 +53,7 @@ export default function NidhiSection() {
                 <p className="text-white/80 text-sm">What should I do today?</p>
               </div>
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/50 text-[10px] mb-1">AI CFO Nidhi</p>
+                <p className="text-white/50 text-[10px] mb-1">CFO Fynny</p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   Three actions with highest impact:<br/>
                   1. Chase ABC Electronics (₹8.4L, 62 days) — adds 15 days runway.<br/>
@@ -76,7 +76,7 @@ export default function NidhiSection() {
               The intelligence of a world-class CFO. In your language. On your phone. Every single morning.
             </h2>
             <p className="text-white/60 text-lg leading-relaxed mb-10 reveal-right" style={{ transitionDelay: "200ms" }}>
-              AI CFO Nidhi is not a chatbot. She is a financial reasoning engine trained on Indian SME data —
+              CFO Fynny is not a chatbot. She is a financial reasoning engine trained on Indian SME data —
               GST filing patterns, seasonal cash cycles, working capital norms by industry, RBI regulations,
               CBIC circulars, and the payment behavior of Indian buyers and suppliers.
             </p>
@@ -94,7 +94,7 @@ export default function NidhiSection() {
             </div>
 
             <Link to="/waitlist" className="inline-block bg-fyn-red text-white font-semibold px-8 py-3.5 rounded-lg mt-10 hover-btn-primary">
-              Talk to AI CFO Nidhi — free for 15 days →
+              Talk to CFO Fynny — free for 15 days →
             </Link>
           </div>
         </div>

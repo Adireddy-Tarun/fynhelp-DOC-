@@ -552,7 +552,7 @@ export default function NeuralNetwork() {
         })}
       </svg>
 
-      {/* ============ Center node — AI CFO Nidhi ============ */}
+      {/* ============ Center node — CFO Fynny ============ */}
       <div
         className="absolute flex flex-col items-center center-node"
         style={{
@@ -574,7 +574,7 @@ export default function NeuralNetwork() {
         }}
         role="button"
         tabIndex={0}
-        aria-label="AI CFO Nidhi — Central Intelligence. Click to get started."
+        aria-label="CFO Fynny — Central Intelligence. Click to get started."
       >
         <div
           className="rounded-full flex items-center justify-center"
@@ -616,7 +616,7 @@ export default function NeuralNetwork() {
               lineHeight: 1.2,
             }}
           >
-            AI CFO Nidhi
+            CFO Fynny
           </div>
           <div
             style={{

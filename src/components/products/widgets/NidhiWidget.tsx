@@ -70,7 +70,7 @@ export default function NidhiWidget() {
             ))}
           </motion.div>
 
-          {/* Nidhi bubble */}
+          {/* Fynny bubble */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
@@ -116,7 +116,7 @@ export default function NidhiWidget() {
         </div>
       </WidgetShell>
 
-      <ImpactStat stat="Get CFO-grade answers in seconds, 24/7" source="AI CFO Nidhi — live now" />
+      <ImpactStat stat="Get CFO-grade answers in seconds, 24/7" source="CFO Fynny — live now" />
     </div>
   );
 }

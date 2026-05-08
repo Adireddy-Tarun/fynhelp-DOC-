@@ -7,8 +7,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { Search, Bell, Menu } from "lucide-react";
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard/cockpit": "AI CFO Nidhi Cockpit",
-  "/dashboard/nidhi": "Talk to AI CFO Nidhi",
+  "/dashboard/cockpit": "CFO Fynny Cockpit",
+  "/dashboard/nidhi": "Talk to CFO Fynny",
   "/dashboard/runway": "Liquidity",
   "/dashboard/cash-flow": "Revenue",
   "/dashboard/cost": "Cost",

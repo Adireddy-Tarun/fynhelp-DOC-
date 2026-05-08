@@ -29,7 +29,7 @@ const plans: Plan[] = [
       "Cash flow projection (30 day)",
       "GST filing calendar + deadline alerts",
       "Basic ITC reconciliation (100 invoices/month)",
-      "AI CFO Nidhi morning brief in English",
+      "CFO Fynny morning brief in English",
       "1 bank account via Account Aggregator",
       "Bank statement PDF parser",
       "WhatsApp alerts for critical thresholds",
@@ -53,7 +53,7 @@ const plans: Plan[] = [
       "GST notice risk scorer + vendor compliance",
       "HR & Workforce intelligence (all modules)",
       "Decision Simulator (4 scenarios)",
-      "AI CFO Nidhi in Hindi + Gujarati",
+      "CFO Fynny in Hindi + Gujarati",
       "Up to 5 bank accounts via AA",
       "Tally Prime + Zoho Books + QuickBooks",
       "Working capital marketplace access",
@@ -92,7 +92,7 @@ export default function PricingSection() {
       <div className="fyn-container">
         <span className="fyn-caption text-fyn-gold block mb-4 text-center reveal-up text-base">Pricing</span>
         <h2 className="text-3xl lg:text-[44px] leading-[1.2] text-white text-center mb-12 reveal-up">
-          A real CFO costs ₹30–50 lakh per year. AI CFO Nidhi costs a fraction.
+          A real CFO costs ₹30–50 lakh per year. CFO Fynny costs a fraction.
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children items-start">

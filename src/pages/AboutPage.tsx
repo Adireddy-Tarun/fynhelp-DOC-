@@ -10,7 +10,7 @@ const AboutPage = () => (
         </h1>
         <div className="space-y-6 text-white/70 text-base leading-relaxed">
           <p className="font-sans text-lg">India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP. Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them. A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.</p>
-          <p className="font-sans text-lg">FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built AI CFO Nidhi — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
+          <p className="font-sans text-lg">FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted. We built CFO Fynny — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do — for ₹1,999 a month.</p>
           <p className="font-sans text-lg">We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.</p>
         </div>
       </div>
@@ -25,12 +25,12 @@ const AboutPage = () => (
           {[
             {
               initials: "AT", color: "bg-fyn-red", name: "Adireddy Tarun", title: "Founder & CEO",
-              bio: "Tarun founded FynHelp after observing that the financial tools available to Indian SMEs were either too basic or too complex — with nothing intelligent in between. He spent 3 years interviewing 500+ business owners across Bengaluru, Surat, Ludhiana, and Chennai, discovering that the single most common request was: 'I just want someone to tell me if my business is healthy or not, without me having to figure it out myself.' Nidhi was built to answer that request. Tarun leads product vision, AI strategy, and the company's overall direction.",
+              bio: "Tarun founded FynHelp after observing that the financial tools available to Indian SMEs were either too basic or too complex — with nothing intelligent in between. He spent 3 years interviewing 500+ business owners across Bengaluru, Surat, Ludhiana, and Chennai, discovering that the single most common request was: 'I just want someone to tell me if my business is healthy or not, without me having to figure it out myself.' Fynny was built to answer that request. Tarun leads product vision, AI strategy, and the company's overall direction.",
             },
             {
-              initials: "NS", color: "bg-fyn-gold", name: "Nidhi Siddhpura", title: "Co-Founder & Director",
-              note: "The real Nidhi. Our AI CFO is named after her.",
-              bio: "Nidhi leads FynHelp's product design, customer success, and CA partnerships. She designed FynHelp's core user experience principle: every insight Nidhi delivers must be immediately actionable, not just interesting. A dashboard that shows you the problem without telling you what to do is not intelligence — it's anxiety. Under Nidhi's leadership, FynHelp's customer satisfaction score has consistently exceeded 92%. She also leads FynHelp's CA partner program.",
+              initials: "NS", color: "bg-fyn-gold", name: "Fynny Siddhpura", title: "Co-Founder & Director",
+              note: "The real Fynny. Our AI CFO is named after her.",
+              bio: "Fynny leads FynHelp's product design, customer success, and CA partnerships. She designed FynHelp's core user experience principle: every insight Fynny delivers must be immediately actionable, not just interesting. A dashboard that shows you the problem without telling you what to do is not intelligence — it's anxiety. Under Fynny's leadership, FynHelp's customer satisfaction score has consistently exceeded 92%. She also leads FynHelp's CA partner program.",
             },
           ].map((f) => (
             <div key={f.name} className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-xl p-8">
@@ -68,7 +68,7 @@ const AboutPage = () => (
               <p className="fyn-label mb-1 text-primary-foreground text-base">JANUARY 2026</p>
               <h3 className="text-white font-serif text-xl mb-3">FynHelp begins</h3>
               <p className="text-white/70 text-base leading-relaxed">
-                FynHelp Technologies was founded in Bengaluru in January 2026. Adireddy Tarun and Nidhi Siddhpura started building India's Virtual CFO platform after spending time understanding the financial intelligence gap facing Indian SMEs. The product is currently in active development, with our first customers onboarding in early 2026.
+                FynHelp Technologies was founded in Bengaluru in January 2026. Adireddy Tarun and Fynny Siddhpura started building India's Virtual CFO platform after spending time understanding the financial intelligence gap facing Indian SMEs. The product is currently in active development, with our first customers onboarding in early 2026.
               </p>
             </div>
           </div>
@@ -89,7 +89,7 @@ const AboutPage = () => (
       <div className="fyn-container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Accuracy above all", desc: "We'd rather say 'I don't know' than give a wrong number. Every metric AI CFO Nidhi speaks is traceable to its source." },
+            { title: "Accuracy above all", desc: "We'd rather say 'I don't know' than give a wrong number. Every metric CFO Fynny speaks is traceable to its source." },
             { title: "Plain language always", desc: "If a business owner can't understand it, we haven't done our job. No jargon. No complexity for its own sake." },
             { title: "Indian by design", desc: "We built for Tally, for GST, for Diwali seasonality, for Gujarati traders and Tamil manufacturers." },
             { title: "Action, not information", desc: "A good insight has a recommendation attached. We don't build dashboards. We build advisors." },

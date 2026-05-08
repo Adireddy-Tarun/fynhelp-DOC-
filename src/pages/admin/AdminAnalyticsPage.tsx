@@ -230,7 +230,7 @@ export default function AdminAnalyticsPage() {
           <h4 style={subTitle}>Feature Usage</h4>
           <ResponsiveContainer width="100%" height={310}>
             <BarChart layout="vertical" data={[
-              { f:"AI CFO Nidhi", v:89 },{ f:"Liquidity Intelligence", v:78 },
+              { f:"CFO Fynny", v:89 },{ f:"Liquidity Intelligence", v:78 },
               { f:"GST Intelligence", v:67 },{ f:"Revenue Intelligence", v:54 },
               { f:"Cost Intelligence", v:52 },{ f:"Decision Simulator", v:34 },
               { f:"HR Intelligence", v:28 },{ f:"Governance Intelligence", v:23 },

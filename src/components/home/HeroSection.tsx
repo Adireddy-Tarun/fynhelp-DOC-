@@ -229,7 +229,7 @@ export default function HeroSection() {
                     color: "#1A1A1A",
                   }}
                 >
-                  AI CFO Nidhi
+                  CFO Fynny
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span
@@ -336,8 +336,8 @@ export default function HeroSection() {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKey}
-                placeholder="Ask Nidhi anything about your business..."
-                aria-label="Ask Nidhi a question"
+                placeholder="Ask Fynny anything about your business..."
+                aria-label="Ask Fynny a question"
                 className="flex-1 bg-transparent outline-none border-0"
                 style={{
                   fontFamily: "'Roboto', sans-serif",

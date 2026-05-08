@@ -132,7 +132,7 @@ const IntegrationsPage = () => {
           <div style={{ width: `${pct}%`, height: "100%", background: "#16A34A", transition: "width 300ms" }} />
         </div>
         <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "#166534" }}>
-          Add more to improve AI CFO Nidhi's accuracy
+          Add more to improve CFO Fynny's accuracy
         </span>
       </div>
 

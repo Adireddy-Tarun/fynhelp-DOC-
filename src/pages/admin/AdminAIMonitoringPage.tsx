@@ -64,7 +64,7 @@ export default function AdminAIMonitoringPage() {
 
   return (
     <div>
-      <PageHeader title="AI System Monitoring" subtitle="Track Nidhi AI CFO usage, cost, and performance" />
+      <PageHeader title="AI System Monitoring" subtitle="Track Fynny AI CFO usage, cost, and performance" />
 
       <div className="grid gap-6" style={{ gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))" }}>
         <Metric label="Total AI Queries" value={metrics.queries.toLocaleString("en-IN")} trend={145} icon={<MessageCircle size={22} color="#8B6914" />} />

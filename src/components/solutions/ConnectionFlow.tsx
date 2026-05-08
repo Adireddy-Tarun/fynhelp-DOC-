@@ -284,7 +284,7 @@ function CenterBrain({ size, inView }: { size: number; inView: boolean }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div
-        aria-label="AI CFO Nidhi"
+        aria-label="CFO Fynny"
         style={{
           width: size,
           height: size,
@@ -311,7 +311,7 @@ function CenterBrain({ size, inView }: { size: number; inView: boolean }) {
           textAlign: "center",
         }}
       >
-        AI CFO Nidhi
+        CFO Fynny
       </div>
       <div
         style={{
