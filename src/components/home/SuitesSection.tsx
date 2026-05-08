@@ -359,6 +359,7 @@ export default function SuitesSection() {
   const ref = useScrollReveal();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [openSuiteId, setOpenSuiteId] = useState<string | null>(null);
   const touchStart = useRef<number | null>(null);
 
   const next = useCallback(() => setIndex((i) => (i + 1) % SUITES.length), []);
