@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
-import WaitlistForm from "@/components/WaitlistForm";
 
 const categories = [
   "Cash Flow & Liquidity", "GST & Tax Questions", "Tally Integration Help",
@@ -26,10 +25,18 @@ const threads = [
 ];
 
 const CommunityPage = () => {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [eventEmail1, setEventEmail1] = useState("");
   const [eventEmail2, setEventEmail2] = useState("");
   const [event1Submitted, setEvent1Submitted] = useState(false);
   const [event2Submitted, setEvent2Submitted] = useState(false);
+
+  const handleWaitlist = (e: React.FormEvent) => {
+    e.preventDefault();
+    // BACKEND: POST to community_waitlist table { email, joined_at }
+    setSubmitted(true);
+  };
 
   return (
     <Layout>
@@ -71,9 +78,23 @@ const CommunityPage = () => {
             ))}
           </div>
 
-          <div id="waitlist" className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-8 mb-16 max-w-xl">
-            <h3 className="font-serif text-xl text-fyn-ink mb-4">Join the waitlist and be among the first 100 members.</h3>
-            <WaitlistForm compact />
+          <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-8 mb-16 max-w-xl">
+            <h3 className="font-serif text-xl text-fyn-ink mb-2">Join the waitlist and be among the first 100 members.</h3>
+            {submitted ? (
+              <p className="text-fyn-success text-sm">You're on the list. We'll email you when the forum opens. ✓</p>
+            ) : (
+              <form onSubmit={handleWaitlist} className="flex gap-2 mt-4">
+                <input
+                  type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm"
+                  aria-label="Email for community waitlist"
+                />
+                <button type="submit" className="px-6 py-2.5 bg-fyn-red text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+                  Join waitlist
+                </button>
+              </form>
+            )}
           </div>
 
           {/* Example threads */}

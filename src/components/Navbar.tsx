@@ -7,7 +7,7 @@ import FYNIcon, { type FYNIconName } from "./FYNIcon";
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
-  
+  { label: "Use Cases", href: "/use-cases" },
   { label: "Pricing", href: "/pricing" },
   { label: "Security", href: "/security" },
   { label: "About", href: "/about" },

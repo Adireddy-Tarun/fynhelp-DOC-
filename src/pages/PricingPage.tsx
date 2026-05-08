@@ -4,7 +4,6 @@ import { motion, useInView, useMotionValue, useTransform, animate } from "framer
 import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";
-import WaitlistForm from "@/components/WaitlistForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -196,6 +195,7 @@ function Counter({ to, prefix = "", suffix = "" }: { to: number; prefix?: string
 
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [email, setEmail] = useState("");
 
   return (
     <Layout>
@@ -460,15 +460,61 @@ export default function PricingPage() {
             today — no credit card required.
           </motion.p>
 
-          <motion.div
+          <motion.form
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="relative z-10 mx-auto max-w-2xl"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const url = `/waitlist${email ? `?email=${encodeURIComponent(email)}` : ""}`;
+              window.location.href = url;
+            }}
+            className="relative z-10 mx-auto flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 max-w-2xl"
           >
-            <WaitlistForm variant="dark" compact />
-          </motion.div>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="flex-1 outline-none font-body"
+              style={{
+                background: "rgba(244,237,218,0.12)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "2px solid rgba(244,237,218,0.25)",
+                borderRadius: 24,
+                padding: "20px 28px",
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                fontSize: 16,
+                color: "#F4EDDA",
+              }}
+            />
+            <motion.button
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="font-button"
+              style={{
+                background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)",
+                color: "#FFFFFF",
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 700,
+                fontSize: 16,
+                textTransform: "uppercase",
+                letterSpacing: "1.2px",
+                padding: "20px 48px",
+                borderRadius: 24,
+                border: "none",
+                boxShadow: "0 8px 24px rgba(196,30,30,0.4)",
+                cursor: "pointer",
+              }}
+            >
+              Join Waitlist
+            </motion.button>
+          </motion.form>
         </div>
       </section>
 
