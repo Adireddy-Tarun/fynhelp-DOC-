@@ -93,7 +93,7 @@ const VendorsPage = () => {
     return (
       <DashboardLayout>
         <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
-          <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 64, height: 64, background: "#F4EDDA", border: "1px solid #1A1008", boxShadow: "inset 0 -2px 0 0 #C41E1E", color: "#C41E1E" }}>
+          <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 64, height: 64, background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", boxShadow: "inset 0 -2px 0 0 #C41E1E", color: "#C41E1E" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
               <path d="M3 7h18v13H3zM8 7V4h8v3" />
             </svg>

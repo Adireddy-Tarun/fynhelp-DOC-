@@ -82,7 +82,7 @@ const SettingsCard = ({
 }) => (
   <Link
     to={href}
-    className="bg-white border rounded-lg p-6 hover:shadow-lg hover:border-[#C41E1E] hover:-translate-y-[3px] transition-all duration-250 block"
+    className="bg-card border rounded-lg p-6 hover:shadow-lg hover:border-[#C41E1E] hover:-translate-y-[3px] transition-all duration-250 block"
     style={{ borderColor: "#E0D9C8" }}
   >
     <div className="flex items-start gap-4">
@@ -122,7 +122,7 @@ const SettingsLayout = () => {
 
       <div className="flex gap-0 min-h-[calc(100vh-240px)]">
         {/* Settings sidebar nav */}
-        <aside className="hidden lg:block w-[220px] flex-shrink-0 bg-white border-r sticky top-[120px] self-start" style={{ borderColor: "#E0D9C8" }}>
+        <aside className="hidden lg:block w-[220px] flex-shrink-0 bg-card border-r sticky top-[120px] self-start" style={{ borderColor: "#E0D9C8" }}>
           <nav className="py-6">
             {settingsNav.map((group) => (
               <div key={group.title} className="mb-5">

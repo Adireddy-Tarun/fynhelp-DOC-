@@ -138,7 +138,7 @@ const FilingCalendarPage = () => {
                   return (
                     <div
                       key={ev.id}
-                      className={`flex items-center gap-4 bg-white rounded-lg p-4 border-l-4 ${
+                      className={`flex items-center gap-4 bg-card rounded-lg p-4 border-l-4 ${
                         isUrgent || isCritical ? "border-[#C41E1E]" : "border-fyn-ink/20"
                       }`}
                     >
@@ -161,7 +161,7 @@ const FilingCalendarPage = () => {
                           className={`text-[11px] px-2 py-0.5 rounded ${
                             isCritical
                               ? "bg-[#C41E1E]/10 text-[#C41E1E]"
-                              : "bg-gray-100 text-gray-600"
+                              : "bg-muted text-muted-foreground"
                           }`}
                         >
                           {ev.urgency || "normal"}

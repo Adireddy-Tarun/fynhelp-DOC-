@@ -257,7 +257,7 @@ const CFOReportDetailPage = () => {
                 readOnly
                 onFocus={(e) => e.currentTarget.select()}
                 onClick={(e) => e.currentTarget.select()}
-                className="flex-1 bg-white border border-fyn-ink/15 rounded px-2.5 py-2.5 min-h-10 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
+                className="flex-1 bg-card border border-fyn-ink/15 rounded px-2.5 py-2.5 min-h-10 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
               />
               <button
                 onClick={() => {

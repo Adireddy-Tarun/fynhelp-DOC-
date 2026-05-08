@@ -124,7 +124,7 @@ const TDSTaxPage = () => {
     const isOverdue = new Date(filing.due_date) < now && filing.status === "pending";
     if (filing.status === "filed") return { label: "Filed", className: "bg-[#1A6B3C]/10 text-[#1A6B3C]" };
     if (isOverdue) return { label: "Late", className: "bg-[#C41E1E]/10 text-[#C41E1E]" };
-    return { label: "Pending", className: "bg-gray-100 text-gray-500" };
+    return { label: "Pending", className: "bg-muted text-muted-foreground/70" };
   };
 
   return (
@@ -320,7 +320,7 @@ const TDSTaxPage = () => {
                   const badge = getStatusStyle(f);
                   const isMatch = matchesBucket(f);
                   const dim = !!bucketFilter && !isMatch;
-                  const baseBg = i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-white";
+                  const baseBg = i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-card";
                   return (
                     <tr
                       key={f.id}
