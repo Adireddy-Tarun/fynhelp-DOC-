@@ -189,118 +189,14 @@ export default function WaitlistPage() {
                 </p>
               </header>
 
-              <form
-                onSubmit={handleSubmit}
-                className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8 space-y-5"
-              >
-                <Field label="Name" htmlFor="wl-name" required>
-                  <input
-                    id="wl-name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={update("name")}
-                    placeholder="Your full name"
-                    className={inputCls}
-                    maxLength={100}
-                  />
-                </Field>
-
-                <Field label="Email" htmlFor="wl-email" required>
-                  <input
-                    id="wl-email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={update("email")}
-                    placeholder="you@company.com"
-                    className={inputCls}
-                    maxLength={255}
-                  />
-                </Field>
-
-                <Field label="Phone Number" htmlFor="wl-phone" required>
-                  <input
-                    id="wl-phone"
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={update("phone")}
-                    placeholder="+91 98765 43210"
-                    className={inputCls}
-                    maxLength={20}
-                  />
-                </Field>
-
-                <Field label="Company Name" htmlFor="wl-company" required>
-                  <input
-                    id="wl-company"
-                    type="text"
-                    required
-                    value={formData.companyName}
-                    onChange={update("companyName")}
-                    placeholder="Your company name"
-                    className={inputCls}
-                    maxLength={150}
-                  />
-                </Field>
-
-                <Field label="Company Type" htmlFor="wl-ctype" required>
-                  <select
-                    id="wl-ctype"
-                    required
-                    value={formData.companyType}
-                    onChange={update("companyType")}
-                    className={inputCls}
-                  >
-                    <option value="">Select company type</option>
-                    {COMPANY_TYPES.map((t) => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Company Size" htmlFor="wl-csize" required>
-                  <select
-                    id="wl-csize"
-                    required
-                    value={formData.companySize}
-                    onChange={update("companySize")}
-                    className={inputCls}
-                  >
-                    <option value="">Select company size</option>
-                    {COMPANY_SIZES.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Location / City" htmlFor="wl-loc" required>
-                  <input
-                    id="wl-loc"
-                    type="text"
-                    required
-                    value={formData.location}
-                    onChange={update("location")}
-                    placeholder="Bengaluru"
-                    className={inputCls}
-                    maxLength={100}
-                  />
-                </Field>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full font-semibold text-white py-3.5 rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-                  style={{ background: "#C41E1E" }}
-                >
-                  {isSubmitting ? "Joining…" : "Join the Waitlist →"}
-                </button>
-
-                <p className="text-xs text-fyn-ink/50 text-center pt-1">
-                  No spam. We'll only email you about FYNHelp launch updates.
-                </p>
-              </form>
+              <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8">
+                <WaitlistFormShared
+                  onSuccess={(pos) => {
+                    setPosition(pos);
+                    setShowSuccess(true);
+                  }}
+                />
+              </div>
             </>
           ) : (
             <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-8 md:p-12 text-center">
