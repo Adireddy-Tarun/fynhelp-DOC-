@@ -1,4 +1,5 @@
 import { useState, FormEvent } from "react";
+import { Loader2 } from "lucide-react";
 
 const WAITLIST_FN_URL =
   "https://wiknwxniwqvsxgyzqqxu.supabase.co/functions/v1/waitlist-signup";
@@ -36,57 +37,56 @@ const initial: FormData = {
   location: "",
 };
 
-type Variant = "light" | "dark";
-
-interface WaitlistFormProps {
-  variant?: Variant;
-  /** Show only the most-essential fields (email, name, company). */
-  compact?: boolean;
+export interface WaitlistFormProps {
+  variant?: "simple" | "detailed";
+  inline?: boolean;
+  /** Visual theme of the form (light backgrounds vs. dark/red backgrounds). */
+  theme?: "light" | "dark";
   className?: string;
 }
 
 export default function WaitlistForm({
-  variant = "light",
-  compact = false,
+  variant = "detailed",
+  inline = false,
+  theme = "light",
   className = "",
 }: WaitlistFormProps) {
-  const [data, setData] = useState<FormData>(initial);
+  const [formData, setFormData] = useState<FormData>(initial);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error" | ""; text: string }>({
-    type: "",
-    text: "",
-  });
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(
+    null,
+  );
 
-  const set = (field: keyof FormData) =>
+  const updateField = (field: keyof FormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setData((p) => ({ ...p, [field]: e.target.value }));
+      setFormData((p) => ({ ...p, [field]: e.target.value }));
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    const email = data.email.trim();
+    const email = formData.email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setMessage({ type: "error", text: "Please enter a valid email address." });
+      setMessage({ type: "error", text: "Valid email required" });
       return;
     }
 
     setLoading(true);
-    setMessage({ type: "", text: "" });
+    setMessage(null);
 
     try {
       const res = await fetch(WAITLIST_FN_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, email: email.toLowerCase() }),
+        body: JSON.stringify({ ...formData, email }),
       });
       const body = await res.json().catch(() => ({}));
 
       if (res.ok && (body?.success ?? true)) {
         setMessage({
           type: "success",
-          text: "✅ Successfully joined! Check your email.",
+          text: "✅ Successfully joined! Check your email for confirmation.",
         });
-        setData(initial);
+        setFormData(initial);
       } else {
         setMessage({
           type: "error",
@@ -94,33 +94,45 @@ export default function WaitlistForm({
         });
       }
     } catch {
-      setMessage({ type: "error", text: "Network error. Please try again." });
+      setMessage({
+        type: "error",
+        text: "Network error. Please check your connection and try again.",
+      });
     } finally {
       setLoading(false);
     }
   }
 
-  const isDark = variant === "dark";
+  const isSimple = variant === "simple";
+  const isDark = theme === "dark";
 
   const inputCls = isDark
-    ? "w-full px-4 py-3 rounded-lg border border-white/30 bg-white text-fyn-ink placeholder-fyn-ink/50 text-sm focus:outline-none focus:ring-4 focus:ring-white/40 disabled:opacity-60"
-    : "w-full px-4 py-3 rounded-lg border border-fyn-ink/15 bg-white text-fyn-ink placeholder-fyn-ink/40 text-sm focus:outline-none focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/20 transition-all";
+    ? "w-full px-4 py-3 rounded-lg border border-white/30 bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-none focus:ring-4 focus:ring-white/40 disabled:opacity-60"
+    : "w-full px-4 py-3 rounded-lg border border-border bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-all disabled:opacity-60";
 
   const labelCls = isDark
     ? "block text-sm font-medium text-white mb-1.5"
-    : "block text-sm font-medium text-fyn-ink mb-1.5";
+    : "block text-sm font-medium text-foreground mb-1.5";
 
   const buttonCls = isDark
     ? "w-full inline-flex items-center justify-center gap-2 bg-white text-fyn-ink font-bold text-base md:text-lg px-10 py-4 rounded-lg shadow-md hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-    : "w-full font-semibold text-white py-3.5 rounded-lg bg-fyn-red transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed";
+    : "w-full inline-flex items-center justify-center gap-2 font-semibold text-white py-3.5 rounded-lg bg-fyn-red transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed";
 
   const helperCls = isDark
     ? "text-white/70 text-xs text-center pt-1"
     : "text-xs text-fyn-ink/50 text-center pt-1";
 
+  const successCls = isDark
+    ? "text-sm font-medium text-center text-white bg-white/15 py-2.5 px-3 rounded-lg"
+    : "text-green-600 text-sm mt-2 text-center";
+
+  const errorCls = isDark
+    ? "text-sm font-medium text-center text-white bg-black/20 py-2.5 px-3 rounded-lg"
+    : "text-red-600 text-sm mt-2 text-center";
+
   return (
     <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className={isSimple ? "space-y-4" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
         <div>
           <label htmlFor="wl-email" className={labelCls}>
             Email <span className={isDark ? "text-white" : "text-fyn-red"}>*</span>
@@ -129,9 +141,9 @@ export default function WaitlistForm({
             id="wl-email"
             type="email"
             required
-            value={data.email}
-            onChange={set("email")}
-            placeholder="you@company.com"
+            value={formData.email}
+            onChange={updateField("email")}
+            placeholder="your@email.com"
             className={inputCls}
             disabled={loading}
             maxLength={255}
@@ -139,13 +151,15 @@ export default function WaitlistForm({
         </div>
 
         <div>
-          <label htmlFor="wl-name" className={labelCls}>Name</label>
+          <label htmlFor="wl-name" className={labelCls}>
+            Name {isSimple ? "" : <span className="text-fyn-ink/40 font-normal">(optional)</span>}
+          </label>
           <input
             id="wl-name"
             type="text"
-            value={data.name}
-            onChange={set("name")}
-            placeholder="Your full name"
+            value={formData.name}
+            onChange={updateField("name")}
+            placeholder="Your name"
             className={inputCls}
             disabled={loading}
             maxLength={100}
@@ -153,7 +167,7 @@ export default function WaitlistForm({
         </div>
       </div>
 
-      {!compact && (
+      {!isSimple && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -161,8 +175,8 @@ export default function WaitlistForm({
               <input
                 id="wl-company"
                 type="text"
-                value={data.company_name}
-                onChange={set("company_name")}
+                value={formData.company_name}
+                onChange={updateField("company_name")}
                 placeholder="Your company"
                 className={inputCls}
                 disabled={loading}
@@ -174,8 +188,8 @@ export default function WaitlistForm({
               <input
                 id="wl-phone"
                 type="tel"
-                value={data.phone}
-                onChange={set("phone")}
+                value={formData.phone}
+                onChange={updateField("phone")}
                 placeholder="9876543210"
                 className={inputCls}
                 disabled={loading}
@@ -189,8 +203,8 @@ export default function WaitlistForm({
               <label htmlFor="wl-ctype" className={labelCls}>Company Type</label>
               <select
                 id="wl-ctype"
-                value={data.company_type}
-                onChange={set("company_type")}
+                value={formData.company_type}
+                onChange={updateField("company_type")}
                 className={inputCls}
                 disabled={loading}
               >
@@ -204,8 +218,8 @@ export default function WaitlistForm({
               <label htmlFor="wl-csize" className={labelCls}>Company Size</label>
               <select
                 id="wl-csize"
-                value={data.company_size}
-                onChange={set("company_size")}
+                value={formData.company_size}
+                onChange={updateField("company_size")}
                 className={inputCls}
                 disabled={loading}
               >
@@ -222,8 +236,8 @@ export default function WaitlistForm({
             <input
               id="wl-loc"
               type="text"
-              value={data.location}
-              onChange={set("location")}
+              value={formData.location}
+              onChange={updateField("location")}
               placeholder="Bengaluru"
               className={inputCls}
               disabled={loading}
@@ -234,22 +248,21 @@ export default function WaitlistForm({
       )}
 
       <button type="submit" disabled={loading} className={buttonCls}>
-        {loading ? "Joining..." : "Join the Waitlist →"}
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Joining...
+          </>
+        ) : (
+          <>Join the Waitlist →</>
+        )}
       </button>
 
-      {message.text && (
+      {message && (
         <p
           role="status"
           aria-live="polite"
-          className={
-            message.type === "success"
-              ? isDark
-                ? "text-sm font-medium text-center text-white bg-white/15 py-2.5 px-3 rounded-lg"
-                : "text-green-600 text-sm mt-2 text-center"
-              : isDark
-                ? "text-sm font-medium text-center text-white bg-black/20 py-2.5 px-3 rounded-lg"
-                : "text-red-600 text-sm mt-2 text-center"
-          }
+          className={message.type === "success" ? successCls : errorCls}
         >
           {message.text}
         </p>
