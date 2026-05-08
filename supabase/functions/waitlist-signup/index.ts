@@ -29,11 +29,6 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function deriveName(name: string, email: string) {
-  if (name.trim()) return name.trim();
-  const localPart = email.split("@")[0] ?? "Founder";
-  return localPart.replace(/[._-]+/g, " ").trim() || "Founder";
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
