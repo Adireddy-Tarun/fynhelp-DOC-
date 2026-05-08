@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import UseCaseBubble, { USE_CASE_CONTENT } from "@/components/UseCaseBubble";
 import {
   Droplets,
   TrendingUp,
