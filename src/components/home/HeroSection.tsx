@@ -112,10 +112,10 @@ export default function HeroSection() {
             animationFillMode: "both",
             fontFamily: "'Oswald', sans-serif",
             fontWeight: 700,
-            fontSize: "clamp(36px, 5vw, 56px)",
+            fontSize: "clamp(40px, 6vw, 72px)",
             lineHeight: 1.2,
             color: "#FFFFFF",
-            maxWidth: 800,
+            maxWidth: 900,
             marginTop: 24,
           }}
         >
@@ -130,16 +130,18 @@ export default function HeroSection() {
             animationDelay: "220ms",
             animationFillMode: "both",
             fontFamily: "'Roboto', sans-serif",
-            fontSize: "clamp(16px, 1.4vw, 18px)",
+            fontSize: "clamp(18px, 1.7vw, 22px)",
             lineHeight: 1.6,
             color: "rgba(255,255,255,0.9)",
-            maxWidth: 700,
+            maxWidth: 760,
             marginTop: 20,
           }}
         >
           Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
           <br /><br />
-          While other tools build board decks, Fynny provides the strategy. Upload any model or connect your stack to get predictive 'What-If' scenarios and instant financial clarity.
+          <span style={{ fontSize: "clamp(16px, 1.5vw, 20px)" }}>
+            While other tools build board decks, Fynny provides the strategy. Upload any model or connect your stack to get predictive 'What-If' scenarios and instant financial clarity.
+          </span>
         </p>
 
         {/* Suites note */}
@@ -149,7 +151,7 @@ export default function HeroSection() {
             animationDelay: "300ms",
             animationFillMode: "both",
             fontFamily: "'Roboto', sans-serif",
-            fontSize: 14,
+            fontSize: "clamp(14px, 1.1vw, 16px)",
             color: "rgba(255,255,255,0.7)",
             marginTop: 16,
           }}
