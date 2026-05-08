@@ -592,6 +592,12 @@ export default function SuitesSection() {
           </div>
         </div>
       </div>
+
+      <UseCaseBubble
+        content={openSuiteId ? USE_CASE_CONTENT[openSuiteId] ?? null : null}
+        isOpen={openSuiteId !== null}
+        onClose={() => setOpenSuiteId(null)}
+      />
     </section>
   );
 }
