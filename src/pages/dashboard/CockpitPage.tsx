@@ -156,7 +156,7 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 250, damping: 22 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="text-left bg-card border border-border rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+      className="text-left bg-card border border-border rounded-xl p-6 h-full w-full flex flex-col hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
     >
       <div className="flex items-start justify-between mb-fyn-sm">
         <div
@@ -177,8 +177,8 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
         )}
       </div>
       <h3 className="font-serif text-foreground text-base mb-fyn-xs">{module.name}</h3>
-      <p className="text-fyn-small text-muted-foreground leading-relaxed mb-fyn-sm">{module.desc}</p>
-      <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em]"
+      <p className="text-fyn-small text-muted-foreground leading-relaxed mb-fyn-sm flex-grow">{module.desc}</p>
+      <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] mt-auto"
         style={{ color: isSoon ? "hsl(var(--fyn-ink) / 0.35)" : locked ? "hsl(var(--fyn-gold))" : "#16A34A" }}>
         {isSoon ? "Coming soon" : locked ? "Locked" : "Active"}
       </p>
