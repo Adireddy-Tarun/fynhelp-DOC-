@@ -103,7 +103,7 @@ function StatCard({
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
+      className="bg-card border border-border rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
     >
       <div className="flex items-center gap-fyn-sm mb-fyn-sm">
         <div
@@ -112,9 +112,9 @@ function StatCard({
         >
           <Icon size={18} />
         </div>
-        <FynLabel>{label}</FynLabel>
+        <FynLabel className="text-foreground">{label}</FynLabel>
       </div>
-      <p className="font-mono text-fyn-metric text-fyn-ink">{value}</p>
+      <p className="font-mono text-fyn-metric text-foreground">{value}</p>
       {trend !== undefined && (
         <div className="mt-fyn-xs flex items-center gap-1.5 text-fyn-small">
           {trend >= 0 ? (
@@ -156,7 +156,7 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 250, damping: 22 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="text-left bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+      className="text-left bg-card border border-border rounded-lg p-fyn-lg hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
     >
       <div className="flex items-start justify-between mb-fyn-sm">
         <div
@@ -176,8 +176,8 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
           <CheckCircle size={14} style={{ color: "#16A34A" }} />
         )}
       </div>
-      <h3 className="font-serif text-fyn-ink text-base mb-fyn-xs">{module.name}</h3>
-      <p className="text-fyn-small text-fyn-ink-60 leading-relaxed mb-fyn-sm">{module.desc}</p>
+      <h3 className="font-serif text-foreground text-base mb-fyn-xs">{module.name}</h3>
+      <p className="text-fyn-small text-muted-foreground leading-relaxed mb-fyn-sm">{module.desc}</p>
       <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em]"
         style={{ color: isSoon ? "hsl(var(--fyn-ink) / 0.35)" : locked ? "hsl(var(--fyn-gold))" : "#16A34A" }}>
         {isSoon ? "Coming soon" : locked ? "Locked" : "Active"}
@@ -439,16 +439,16 @@ const CockpitPage = () => {
       </motion.div>
 
       {/* Cash flow chart */}
-      <FynCard className="mb-fyn-lg">
+      <FynCard className="mb-fyn-lg bg-card border-border">
         <div className="flex items-center justify-between mb-fyn-md">
-          <h3 className="font-serif text-fyn-h3 text-fyn-ink">Cash Flow</h3>
+          <h3 className="font-serif text-fyn-h3 text-foreground">Cash Flow</h3>
           <Link to="/dashboard/cash-flow" className="text-fyn-small font-medium text-fyn-red hover:underline">
             View detail →
           </Link>
         </div>
         {view.cashFlow.length === 0 ? (
           <div className="h-[240px] flex items-center justify-center">
-            <p className="text-fyn-ink/45 text-fyn-small italic">
+            <p className="text-muted-foreground text-fyn-small italic">
               No transactions yet. Toggle Demo mode to preview.
             </p>
           </div>
@@ -539,18 +539,18 @@ const CockpitPage = () => {
         </div>
 
         {/* Recent activity */}
-        <FynCard>
-          <h3 className="font-serif text-fyn-h3 text-fyn-ink mb-fyn-md">Recent Activity</h3>
+        <FynCard className="bg-card border-border">
+          <h3 className="font-serif text-fyn-h3 text-foreground mb-fyn-md">Recent Activity</h3>
           {view.activity.length > 0 ? (
             <ul className="space-y-fyn-sm">
               {view.activity.map((a, idx) => (
                 <li key={idx} className="flex items-start gap-fyn-sm pb-fyn-sm border-b border-fyn-ink-10 last:border-0 last:pb-0">
-                  <div className="w-7 h-7 rounded-md flex items-center justify-center bg-fyn-beige flex-shrink-0">
+                  <div className="w-7 h-7 rounded-md flex items-center justify-center bg-muted flex-shrink-0">
                     <ActivityIcon type={a.type} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-fyn-small text-fyn-ink">{a.desc}</p>
-                    <p className="text-fyn-tiny text-fyn-ink-45 mt-0.5">{a.time}</p>
+                    <p className="text-fyn-small text-foreground">{a.desc}</p>
+                    <p className="text-fyn-tiny text-muted-foreground mt-0.5">{a.time}</p>
                   </div>
                   {a.amount !== null && (
                     <span
@@ -565,8 +565,8 @@ const CockpitPage = () => {
             </ul>
           ) : (
             <div className="text-center py-fyn-lg">
-              <p className="text-fyn-ink text-fyn-body font-semibold">No activity yet</p>
-              <p className="text-fyn-small text-fyn-ink-60 mt-fyn-xs">
+              <p className="text-foreground text-fyn-body font-semibold">No activity yet</p>
+              <p className="text-fyn-small text-muted-foreground mt-fyn-xs">
                 Connect your accounts to see transactions appear here.
               </p>
             </div>
