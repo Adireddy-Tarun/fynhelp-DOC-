@@ -140,7 +140,7 @@ const ProfilePage = () => {
               onBlur={validate} />
           </Field>
 
-          <Field label="Display Name" helper="AI CFO Nidhi will call you by this name in briefs">
+          <Field label="Display Name" helper="CFO Fynny will call you by this name in briefs">
             <input value={form.display_name} onChange={e => setForm(f => ({ ...f, display_name: e.target.value }))}
               placeholder="e.g. Tarun"
               className="w-full px-3 py-2.5 border rounded-lg text-sm outline-none focus:border-[#C41E1E]"
@@ -156,7 +156,7 @@ const ProfilePage = () => {
             </div>
           </Field>
 
-          <Field label="Mobile Number *" helper="Used for WhatsApp alerts from AI CFO Nidhi" error={errors.mobile}>
+          <Field label="Mobile Number *" helper="Used for WhatsApp alerts from CFO Fynny" error={errors.mobile}>
             <div className="flex gap-2">
               <span className="px-3 py-2.5 border rounded-lg text-sm" style={{ borderColor: "#E0D9C8", color: "#1A1008", background: "#FAF7F0" }}>+91</span>
               <input value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
@@ -167,7 +167,7 @@ const ProfilePage = () => {
             </div>
           </Field>
 
-          <Field label="WhatsApp Number" helper="AI CFO Nidhi sends daily briefs to this number">
+          <Field label="WhatsApp Number" helper="CFO Fynny sends daily briefs to this number">
             <label className="flex items-center gap-2 mb-2 cursor-pointer">
               <input type="checkbox" checked={form.whatsapp_same}
                 onChange={e => setForm(f => ({ ...f, whatsapp_same: e.target.checked }))}
@@ -190,7 +190,7 @@ const ProfilePage = () => {
             </select>
           </Field>
 
-          <Field label="Language preference" helper="AI CFO Nidhi speaks to you in this language">
+          <Field label="Language preference" helper="CFO Fynny speaks to you in this language">
             <div className="flex gap-2">
               {languages.map(l => (
                 <button key={l.code}
@@ -236,7 +236,7 @@ const ProfilePage = () => {
         <div className="rounded-lg p-5" style={{ background: "#1A1008" }}>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: "#C41E1E" }}>N</div>
-            <span className="text-[13px] font-medium text-white">AI CFO Nidhi</span>
+            <span className="text-[13px] font-medium text-white">CFO Fynny</span>
           </div>
           <p className="text-[13px] leading-relaxed" style={{ color: "rgba(255,255,255,0.80)" }}>
             Good morning, {form.display_name || form.full_name || "there"}! Here's your business update for today...

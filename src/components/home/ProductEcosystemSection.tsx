@@ -62,7 +62,7 @@ export default function ProductEcosystemSection() {
             textAlign: "center",
           }}
         >
-          Every module feeds AI CFO Nidhi. AI CFO Nidhi connects everything. You get one coherent answer — not 6 separate dashboards.
+          Every module feeds CFO Fynny. CFO Fynny connects everything. You get one coherent answer — not 6 separate dashboards.
         </p>
       </div>
     </section>

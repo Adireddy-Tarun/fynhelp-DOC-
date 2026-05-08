@@ -24,7 +24,7 @@ const menuSections = [
     title: "OVERVIEW",
     items: [
       { icon: Home, label: "Dashboard", path: "/dashboard/cockpit", color: "#3B82F6" },
-      { icon: MessageSquare, label: "AI CFO Nidhi", path: "/dashboard/nidhi", color: "#8B5CF6" },
+      { icon: MessageSquare, label: "CFO Fynny", path: "/dashboard/nidhi", color: "#8B5CF6" },
     ],
   },
   {

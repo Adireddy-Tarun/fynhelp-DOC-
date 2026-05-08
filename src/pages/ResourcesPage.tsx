@@ -70,7 +70,7 @@ const VIDEOS: VideoItem[] = [
   { id: "v2", step: "DAY 1", title: "Syncing Tally or accounting software", description: "One-click sync with Tally Prime, Zoho Books, QuickBooks and more.", duration: "15 min" },
   { id: "v3", step: "DAY 1", title: "Setting up GSTIN & compliance calendar", description: "Add your GSTIN and auto-populate every filing deadline for the year.", duration: "10 min" },
   { id: "v4", step: "WEEK 1", title: "Understanding your first dashboard", description: "Read your cash flow, runway, and receivables panels like a CFO.", duration: "20 min" },
-  { id: "v5", step: "WEEK 1", title: "First conversation with AI CFO Nidhi", description: "Ask questions in Hindi or English and get founder-grade answers.", duration: "10 min" },
+  { id: "v5", step: "WEEK 1", title: "First conversation with CFO Fynny", description: "Ask questions in Hindi or English and get founder-grade answers.", duration: "10 min" },
   { id: "v6", step: "WEEK 2", title: "Running your first hiring simulation", description: "Model the impact of a new hire on burn, runway and breakeven.", duration: "15 min" },
   { id: "v7", step: "WEEK 2", title: "ITC reconciliation walkthrough", description: "Match GSTR-2B against your purchase register in minutes.", duration: "8 min" },
   { id: "v8", step: "MONTH 1", title: "WhatsApp alerts setup", description: "Get daily cash, GST and overdue invoice nudges on WhatsApp.", duration: "3 min" },

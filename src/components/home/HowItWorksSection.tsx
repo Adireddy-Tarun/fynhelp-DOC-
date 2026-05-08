@@ -29,9 +29,9 @@ const steps: Step[] = [
     Icon: Receipt,
   },
   {
-    title: "AI CFO Nidhi delivers your first brief",
+    title: "CFO Fynny delivers your first brief",
     sub: "Within minutes — and every morning after",
-    detail: "AI CFO Nidhi assembles your financial picture: cash from bank, receivables from books, GST from portal. She computes 50+ metrics, identifies your top 3 risks, and delivers a plain-language brief. Every morning at 8 AM, you wake up to a message from your AI CFO.",
+    detail: "CFO Fynny assembles your financial picture: cash from bank, receivables from books, GST from portal. She computes 50+ metrics, identifies your top 3 risks, and delivers a plain-language brief. Every morning at 8 AM, you wake up to a message from your AI CFO.",
     Icon: Sparkles,
   },
 ];

@@ -149,7 +149,7 @@ const BusinessProfilePage = () => {
     <div style={PAGE_WRAP}>
       <h1 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 28, color: "#1A1008" }}>Business Profile</h1>
       <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 15, color: "rgba(26,16,8,0.60)", marginTop: 6 }}>
-        Your business details are used by AI CFO Nidhi to personalise every insight, compliance calendar, and alert.
+        Your business details are used by CFO Fynny to personalise every insight, compliance calendar, and alert.
       </p>
 
       {/* Completion banner */}
@@ -203,7 +203,7 @@ const BusinessProfilePage = () => {
 
       {/* SECTION 2: Business Details */}
       <Section title="Business Details">
-        <Field label="Industry Vertical *" helper={industry ? `AI CFO Nidhi will use ${industry} benchmarks for your gross margin, DSO, and working capital analysis.` : undefined}>
+        <Field label="Industry Vertical *" helper={industry ? `CFO Fynny will use ${industry} benchmarks for your gross margin, DSO, and working capital analysis.` : undefined}>
           {/* BACKEND: businesses.industry */}
           <Select value={industry} onChange={setIndustry}
             options={["Textile & Apparel", "Manufacturing", "IT & Services", "Healthcare & Clinics", "Real Estate & Construction", "Trading & Distribution", "Export & Import", "Food & Beverage", "Retail", "Agriculture", "Education", "Logistics", "Pharma", "Other"]} />

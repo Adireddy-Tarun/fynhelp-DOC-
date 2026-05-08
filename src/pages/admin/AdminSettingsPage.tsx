@@ -294,7 +294,7 @@ function SecurityTab() {
             <tbody>
               {[
                 { a: "Tarun", ip: "103.x.x.x", d: "Chrome / macOS", l: "May 5, 14:35", la: "2 min ago" },
-                { a: "Nidhi", ip: "103.y.y.y", d: "Safari / iOS", l: "May 5, 09:20", la: "1 hour ago" },
+                { a: "Fynny", ip: "103.y.y.y", d: "Safari / iOS", l: "May 5, 09:20", la: "1 hour ago" },
               ].map((r, i) => (
                 <tr key={r.ip} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(26,16,8,0.06)" }}>
                   <td style={cell}>{r.a}</td>

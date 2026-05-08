@@ -46,9 +46,9 @@ const articles: Article[] = [
         "Subtract all of that from ₹18L and you have ₹2.2L — which at their burn rate is 9 days of runway. Not 18 lakh of comfort. 9 days of crisis.",
         "The bank balance is lying to you. Not maliciously. Just incompletely.",
       ]},
-      { heading: "How AI CFO Nidhi Monitors Your Runway", level: 2, content: [
-        "FynHelp's AI CFO Nidhi computes your runway every six hours using live bank data from RBI's Account Aggregator. She doesn't just look at today's balance — she projects forward using your scheduled receivables (due dates from your invoices), committed payables (from your bills and purchase orders), payroll dates, GST filing obligations, and loan EMI schedules.",
-        "The result is a 180-day cash projection with confidence intervals. When your projected runway drops below 60 days, AI CFO Nidhi alerts you — in your language, on WhatsApp, with the specific action that will have the highest impact on your runway.",
+      { heading: "How CFO Fynny Monitors Your Runway", level: 2, content: [
+        "FynHelp's CFO Fynny computes your runway every six hours using live bank data from RBI's Account Aggregator. She doesn't just look at today's balance — she projects forward using your scheduled receivables (due dates from your invoices), committed payables (from your bills and purchase orders), payroll dates, GST filing obligations, and loan EMI schedules.",
+        "The result is a 180-day cash projection with confidence intervals. When your projected runway drops below 60 days, CFO Fynny alerts you — in your language, on WhatsApp, with the specific action that will have the highest impact on your runway.",
         "CALLOUT:At FynHelp, we measure our success by one metric above all others: the number of cash crises we prevented before they happened.",
         "The 52-day rule is simple. Know your runway. Know it daily. Act when it drops below 60. The business owners who survive long enough to build something great are almost always the ones who treat runway as their most important number — not an afterthought.",
       ]},
@@ -95,7 +95,7 @@ const articles: Article[] = [
   {
     slug: "bank-balance-lying", title: "Why Your Bank Balance is Lying to You",
     category: "FINANCIAL LITERACY", categoryColor: "bg-fyn-success", time: "6 min read", date: "March 2025",
-    author: "Nidhi Siddhpura", authorTitle: "Co-Founder & Director", initials: "NS", initialsColor: "bg-fyn-gold",
+    author: "Fynny Siddhpura", authorTitle: "Co-Founder & Director", initials: "NS", initialsColor: "bg-fyn-gold",
     sections: [
       { heading: "", level: 0, content: [
         "Every Indian business owner I've spoken to — and I've spoken to hundreds — checks their bank balance at least once a day. Many check it three or four times. It's the reflex: open the banking app, see the number, feel either relief or anxiety.",
@@ -122,7 +122,7 @@ const articles: Article[] = [
       { heading: "The Mental Shift Required", level: 2, content: [
         "CALLOUT:Stop asking \"how much money do I have?\" Start asking \"how many days can I operate?\"",
         "The shift from balance-watching to runway-tracking is the single most important financial mindset change an Indian SME owner can make. It transforms every decision: Can I hire? Check the runway impact. Can I order inventory? Check the runway impact. Should I chase that ₹8L receivable today or next week? If your runway is 40 days, today. Not next week.",
-        "This is what AI CFO Nidhi does every morning. She doesn't tell you your balance — your banking app does that. She tells you your runway, the biggest risk to it, and the single action that will improve it the most. That's the difference between information and intelligence.",
+        "This is what CFO Fynny does every morning. She doesn't tell you your balance — your banking app does that. She tells you your runway, the biggest risk to it, and the single action that will improve it the most. That's the difference between information and intelligence.",
       ]},
     ],
     related: ["the-52-day-rule", "hidden-cost-of-hiring", "itc-mismatch-silent-loss"],
@@ -200,8 +200,8 @@ const articles: Article[] = [
         "For banks not yet on the AA network, FynHelp provides a PDF bank statement parser that supports all major Indian bank formats — you upload, we extract and categorise.",
       ]},
       { heading: "How FynHelp Uses Account Aggregator", level: 2, content: [
-        "When you connect your bank account via AA in FynHelp (a 2-minute process), here's what happens: AI CFO Nidhi fetches your transaction data every 6 hours. Each transaction is automatically categorised (revenue, supplier payment, salary, GST, loan EMI, etc.). Your cash balance, burn rate, and runway are computed in real-time. Any unusual transactions — large debits, unexpected patterns — trigger instant alerts.",
-        "The result: you wake up to a morning brief from AI CFO Nidhi that knows exactly how much cash you have, where it went, and what's coming next. No spreadsheets. No manual data entry. No waiting for your accountant.",
+        "When you connect your bank account via AA in FynHelp (a 2-minute process), here's what happens: CFO Fynny fetches your transaction data every 6 hours. Each transaction is automatically categorised (revenue, supplier payment, salary, GST, loan EMI, etc.). Your cash balance, burn rate, and runway are computed in real-time. Any unusual transactions — large debits, unexpected patterns — trigger instant alerts.",
+        "The result: you wake up to a morning brief from CFO Fynny that knows exactly how much cash you have, where it went, and what's coming next. No spreadsheets. No manual data entry. No waiting for your accountant.",
       ]},
       { heading: "The Privacy Framework", level: 2, content: [
         "AA is built on four principles that protect your data: explicit consent (you must approve every data request), purpose limitation (the app must state why it needs the data), time-bound access (consent expires automatically), and revocability (you can revoke access anytime from your bank app).",

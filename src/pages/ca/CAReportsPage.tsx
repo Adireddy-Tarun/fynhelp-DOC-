@@ -601,7 +601,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
                 ["charts", "Include charts and graphs"],
                 ["raw", "Include raw data tables"],
                 ["audit", "Include audit trail"],
-                ["nidhi", "Add AI CFO Nidhi recommendations"],
+                ["nidhi", "Add CFO Fynny recommendations"],
                 ["history", "Include historical comparison"],
               ] as const).map(([k, l]) => (
                 <label key={k} className="flex items-center gap-2 text-sm">

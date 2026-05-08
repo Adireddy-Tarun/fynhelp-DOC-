@@ -190,7 +190,7 @@ const CFOReportsPage = () => {
             No Reports Generated Yet
           </h2>
           <p className="text-fyn-ink/60 text-sm mb-6">
-            Nidhi will automatically generate CFO reports based on your data
+            Fynny will automatically generate CFO reports based on your data
           </p>
           <button
             onClick={() => setOpen(true)}

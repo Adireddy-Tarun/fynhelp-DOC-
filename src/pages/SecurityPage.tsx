@@ -108,7 +108,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
           </Section>
 
           <Section title="5. AI & Machine Learning">
-            <strong>Nidhi (AI CFO):</strong> Analyzes your financial data in real-time; results are returned to you, not stored in AI training datasets. We do <em>not</em> use your proprietary financial data to train or improve our models. Nidhi learns from anonymized, aggregated industry benchmarks.
+            <strong>Fynny (AI CFO):</strong> Analyzes your financial data in real-time; results are returned to you, not stored in AI training datasets. We do <em>not</em> use your proprietary financial data to train or improve our models. Fynny learns from anonymized, aggregated industry benchmarks.
             <br /><br />
             <strong>Anonymization:</strong> Any aggregated data used for product improvement strips all identifiers — no company names, transaction details, or sensitive figures.
           </Section>
@@ -550,7 +550,7 @@ const SecurityPage = () => {
                 icon: <Lock size={32} color="#FFFFFF" />,
                 title: "Your Data is Yours — And Only Yours",
                 bullets: [
-                  ["No AI Training on Your Data", "Your proprietary financial information is never used to train our AI models. Nidhi learns from general benchmarks, not your books."],
+                  ["No AI Training on Your Data", "Your proprietary financial information is never used to train our AI models. Fynny learns from general benchmarks, not your books."],
                   ["No Third-Party Sharing", "We don't sell, rent, lease, or share your financial data with advertisers, brokers, or anyone outside your organization. Period."],
                   ["Complete Data Portability", "Export everything anytime in CSV, Excel, or JSON. No vendor lock-in, no export fees, no delays."],
                   ["Client-Controlled Lifecycle", "We store only contact details and onboarding metadata. Your actual financial data stays in Razorpay, Zoho, your bank — you control retention."],
@@ -766,7 +766,7 @@ const SecurityPage = () => {
                   Founder-Built · India-First
                 </div>
                 <div className="mt-8 inline-block px-5 py-2 rounded-full" style={{ background: "rgba(244,237,218,0.1)", border: `1px solid ${GOLD}` }}>
-                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 13, color: BEIGE }}>Tarun &amp; Nidhi · Co-Founders</span>
+                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 13, color: BEIGE }}>Tarun &amp; Fynny · Co-Founders</span>
                 </div>
               </div>
             </motion.div>

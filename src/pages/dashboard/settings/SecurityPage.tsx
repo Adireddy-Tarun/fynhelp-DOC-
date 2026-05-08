@@ -128,7 +128,7 @@ const SecurityPage = () => {
       <div className="border rounded-lg p-6" style={{ background: "#FDEAEA", borderColor: "#C41E1E" }}>
         <h3 className="font-semibold text-[15px]" style={{ color: "#C41E1E" }}>Delete Account</h3>
         <p className="text-[13px] mt-1 mb-4" style={{ color: "#1A1008" }}>
-          This permanently deletes your business data, all transactions, GST records, and AI CFO Nidhi history. This cannot be undone.
+          This permanently deletes your business data, all transactions, GST records, and CFO Fynny history. This cannot be undone.
         </p>
         <button onClick={() => setShowDeleteModal(true)}
           className="px-4 py-2 rounded-lg text-[13px] font-semibold border bg-card"

@@ -100,7 +100,7 @@ export default function NidhiChatPage() {
     setMessages([{
       id: "1",
       role: "assistant",
-      content: "Good morning. I'm AI CFO Nidhi, your CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 3 days from last week\n• Electronics owes ₹8.4L, now 67 days overdue\n• Your GSTR-3B is due in 8 days — ready for review\n\nWhat would you like to know?",
+      content: "Good morning. I'm CFO Fynny, your CFO. I've been monitoring your business overnight. Here's a quick update:\n\n• Your cash runway is 52 days — down 3 days from last week\n• Electronics owes ₹8.4L, now 67 days overdue\n• Your GSTR-3B is due in 8 days — ready for review\n\nWhat would you like to know?",
       timestamp: new Date(),
       cards: [
         { type: "metric", title: "Cash Position", data: { value: 420000, change: -12 }},
@@ -179,7 +179,7 @@ export default function NidhiChatPage() {
               }} />
             </div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>AI CFO Nidhi</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>CFO Fynny</div>
               <div style={{ fontSize: 12, color: C.textDim }}>Monitoring your business · Live</div>
             </div>
           </div>
@@ -259,7 +259,7 @@ export default function NidhiChatPage() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
-                  placeholder="Ask AI CFO Nidhi anything about your business..."
+                  placeholder="Ask CFO Fynny anything about your business..."
                   disabled={isThinking}
                   style={{
                     width: "100%", height: 52,

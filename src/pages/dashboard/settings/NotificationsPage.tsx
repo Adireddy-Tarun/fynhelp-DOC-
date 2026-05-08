@@ -53,11 +53,11 @@ const NotificationsPage = () => {
   return (
     <div className="max-w-3xl">
       <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Notifications</h2>
-      <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Choose how and when AI CFO Nidhi contacts you.</p>
+      <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Choose how and when CFO Fynny contacts you.</p>
 
       {/* Channels */}
       <div className="mb-8">
-        <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>How AI CFO Nidhi reaches you</h3>
+        <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>How CFO Fynny reaches you</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { label: "WhatsApp", key: "whatsapp" as const, status: channels.whatsapp, sub: "+91-XXXXXXXXXX" },
@@ -85,7 +85,7 @@ const NotificationsPage = () => {
       </div>
 
       {/* Alert types */}
-      <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>What AI CFO Nidhi alerts you about</h3>
+      <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>What CFO Fynny alerts you about</h3>
       <div className="bg-card border rounded-lg overflow-hidden" style={{ borderColor: "#E0D9C8" }}>
         <div className="grid grid-cols-[1fr_auto_auto_auto] gap-0 text-[12px] font-semibold px-4 py-2" style={{ background: "#FAF7F0", color: "rgba(26,16,8,0.50)" }}>
           <span>Alert</span>

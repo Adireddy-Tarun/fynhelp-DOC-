@@ -3,7 +3,7 @@ import Layout from "@/components/Layout";
 
 const categories = [
   "Cash Flow & Liquidity", "GST & Tax Questions", "Tally Integration Help",
-  "AI CFO Nidhi — Tips & Tricks", "Industry Discussions", "Success Stories", "Feature Requests",
+  "CFO Fynny — Tips & Tricks", "Industry Discussions", "Success Stories", "Feature Requests",
 ];
 
 const threads = [

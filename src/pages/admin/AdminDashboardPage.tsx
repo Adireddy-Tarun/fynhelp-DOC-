@@ -70,7 +70,7 @@ const systemServices = [
 ];
 
 const featureAdoption = [
-  { feature: "AI CFO Nidhi", adoption: 89 },
+  { feature: "CFO Fynny", adoption: 89 },
   { feature: "Liquidity Intelligence", adoption: 78 },
   { feature: "GST Intelligence", adoption: 67 },
   { feature: "Revenue Intelligence", adoption: 54 },

@@ -202,7 +202,7 @@ export default function AdminUserDetailPage() {
             <div className="space-y-2">
               {[
                 { author: "Tarun", time: "2 hours ago", text: "Called user about billing issue. Resolved." },
-                { author: "Nidhi", time: "1 day ago", text: "User interested in Enterprise plan. Follow up next week." },
+                { author: "Fynny", time: "1 day ago", text: "User interested in Enterprise plan. Follow up next week." },
               ].map((n, i) => (
                 <div key={i} className="rounded-lg p-3" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.12)" }}>
                   <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>{n.text}</div>
@@ -290,7 +290,7 @@ function PlaceholderTab({ text }: { text: string }) {
 
 function UsageTab() {
   const modules = [
-    { module: "AI CFO Nidhi", usage: 89 },
+    { module: "CFO Fynny", usage: 89 },
     { module: "Liquidity Intelligence", usage: 78 },
     { module: "GST Intelligence", usage: 67 },
     { module: "Revenue Intelligence", usage: 54 },

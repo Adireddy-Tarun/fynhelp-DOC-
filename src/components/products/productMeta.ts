@@ -51,14 +51,14 @@ export const PRODUCT_ITEMS: ProductItem[] = SUITES.map((s) => ({
   longDescription: longDesc[s.id] ?? s.description,
 }));
 
-// AI CFO Nidhi as a special platform feature item
+// CFO Fynny as a special platform feature item
 export const NIDHI_ITEM = {
   id: "nidhi",
-  name: "AI CFO Nidhi",
-  shortLabel: "Nidhi",
+  name: "CFO Fynny",
+  shortLabel: "Fynny",
   description: "Conversational financial intelligence, available 24/7",
   longDescription:
-    "Ask Nidhi anything about your business — burn rate, runway, vendor cuts, hiring decisions. She replies instantly with actionable advice grounded in your real data.",
+    "Ask Fynny anything about your business — burn rate, runway, vendor cuts, hiring decisions. She replies instantly with actionable advice grounded in your real data.",
   status: "live" as const,
   quarter: "Live" as const,
   href: "/dashboard/nidhi",

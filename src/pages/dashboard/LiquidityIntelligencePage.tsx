@@ -151,7 +151,7 @@ export default function LiquidityIntelligencePage() {
               boxShadow: `0 4px 16px ${C.ai}66`,
             }}>
               <MessageCircle size={16} />
-              Ask Nidhi
+              Ask Fynny
             </button>
           </div>
         </div>

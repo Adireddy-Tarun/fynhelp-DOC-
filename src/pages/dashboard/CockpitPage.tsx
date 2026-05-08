@@ -506,9 +506,9 @@ const CockpitPage = () => {
         ))}
       </motion.div>
 
-      {/* Bottom: Nidhi insight + Recent activity */}
+      {/* Bottom: Fynny insight + Recent activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-lg mb-fyn-lg">
-        {/* Nidhi insight */}
+        {/* Fynny insight */}
         <div className="rounded-lg p-fyn-lg bg-card border border-border shadow-[0_12px_30px_rgba(26,16,8,0.18)]">
           <div className="flex items-start gap-fyn-sm">
             <div
@@ -519,7 +519,7 @@ const CockpitPage = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-muted-foreground mb-fyn-xs">
-                Latest insight from AI CFO Nidhi
+                Latest insight from CFO Fynny
               </p>
               <p className="text-foreground text-fyn-body leading-relaxed">
                 {view.insight ||
@@ -529,7 +529,7 @@ const CockpitPage = () => {
                 onClick={() => setShowNidhiChat(true)}
                 className="mt-fyn-md inline-flex items-center gap-2 px-4 py-2 rounded-md text-fyn-small font-medium bg-muted text-foreground border border-border hover:bg-muted/80"
               >
-                <MessageCircle size={14} /> Chat with Nidhi
+                <MessageCircle size={14} /> Chat with Fynny
               </button>
             </div>
           </div>
@@ -571,7 +571,7 @@ const CockpitPage = () => {
         </FynCard>
       </div>
 
-      {/* Floating Nidhi FAB */}
+      {/* Floating Fynny FAB */}
       <motion.button
         onClick={() => setShowNidhiChat(true)}
         whileHover={{ scale: 1.08 }}
@@ -581,12 +581,12 @@ const CockpitPage = () => {
           background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)",
           boxShadow: "0 10px 28px hsl(var(--fyn-red) / 0.40)",
         }}
-        aria-label="Chat with AI CFO Nidhi"
+        aria-label="Chat with CFO Fynny"
       >
         <Sparkles size={22} />
       </motion.button>
 
-      {/* Nidhi modal */}
+      {/* Fynny modal */}
       <AnimatePresence>
         {showNidhiChat && (
           <motion.div
@@ -609,7 +609,7 @@ const CockpitPage = () => {
                     N
                   </div>
                   <div>
-                    <h3 className="font-serif text-fyn-h3 text-foreground">AI CFO Nidhi</h3>
+                    <h3 className="font-serif text-fyn-h3 text-foreground">CFO Fynny</h3>
                     <p className="text-fyn-tiny text-muted-foreground">Your financial intelligence assistant</p>
                   </div>
                 </div>
@@ -633,7 +633,7 @@ const CockpitPage = () => {
                   boxShadow: "0 4px 12px hsl(var(--fyn-red) / 0.30)",
                 }}
               >
-                Open Nidhi Chat →
+                Open Fynny Chat →
               </Link>
             </motion.div>
           </motion.div>

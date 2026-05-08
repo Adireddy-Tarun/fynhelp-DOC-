@@ -58,7 +58,7 @@ Free. For 6 months. No catches. No credit card. Just you, your business, and an 
 
 Before we tell you what FYNHelp does, let us tell you why we built it.
 
-A few years ago, Tarun and Nidhi — the two humans behind FYNHelp — were running Dark Capital. An elite, luxury, sugar-free chocolate company. Sounds fancy. It was. Until it wasn't.
+A few years ago, Tarun and Fynny — the two humans behind FYNHelp — were running Dark Capital. An elite, luxury, sugar-free chocolate company. Sounds fancy. It was. Until it wasn't.
 
 We had orders. We had customers. We had a brand we were genuinely proud of.
 
@@ -82,7 +82,7 @@ That moment is why FYNHelp exists.
 
 Because we genuinely believe that if we'd had real-time financial intelligence — not reports, not spreadsheets, not a CA who replies after the fire is out — Dark Capital might still be alive today.
 
-We built the AI CFO we desperately needed back then. We named her Nidhi.
+We built the AI CFO we desperately needed back then. We named her Fynny.
 
 She doesn't ghost you. She doesn't send reports 3 days late. She doesn't sleep. And she will never, ever make you feel stupid for not knowing your burn rate at 11pm on a Tuesday.
 
@@ -92,7 +92,7 @@ As one of our first 100 founders, here's what you get:
 
 ✦ Full access to FYNHelp — free for 6 months
 ✦ Founding Member badge — permanently on your account
-✦ Direct line to us — Tarun and Nidhi — for feedback, feature requests, and the occasional rant about CAs
+✦ Direct line to us — Tarun and Fynny — for feedback, feature requests, and the occasional rant about CAs
 ✦ Locked-in early adopter pricing when we go paid — forever
 
 ---
@@ -105,12 +105,12 @@ You're one of the first 100 people who believed in that before anyone else did.
 
 That means something to us. More than you know.
 
-Welcome to FYNHelp. Nidhi is ready when you are.
+Welcome to FYNHelp. Fynny is ready when you are.
 
 → Access Your Dashboard - Coming Week of May 15
 
 With gratitude (and mild sleep deprivation),
-Tarun & Nidhi
+Tarun & Fynny
 Co-Founders, FYNHelp
 
 P.S. — If you have a CA who ghosts you too, tell us. We have a support group. It's called FYNHelp. You're already in it.`;
@@ -126,7 +126,7 @@ P.S. — If you have a CA who ghosts you too, tell us. We have a support group. 
     .slice(2)
     .join("\n\n")
     .replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!))}</pre>
-<p style="margin-top:32px;color:#8B6914;font-size:13px;">— Tarun &amp; Nidhi, Co-Founders, FYNHelp</p>
+<p style="margin-top:32px;color:#8B6914;font-size:13px;">— Tarun &amp; Fynny, Co-Founders, FYNHelp</p>
 </div></body></html>`;
 
   return { subject, text, html };
@@ -212,7 +212,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Tarun & Nidhi <hello@fynhelp.com>",
+        from: "Tarun & Fynny <hello@fynhelp.com>",
         to: [email],
         subject,
         text,

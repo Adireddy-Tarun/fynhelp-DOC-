@@ -343,7 +343,7 @@ const OnboardingPage = () => {
                   Tell us about your business
                 </h1>
                 <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-                  This helps AI CFO Nidhi personalize your financial intelligence.
+                  This helps CFO Fynny personalize your financial intelligence.
                 </p>
                 <div
                   className="rounded-xl p-6 space-y-4"
@@ -446,7 +446,7 @@ const OnboardingPage = () => {
             {step === 3 && (
               <div className="max-w-2xl">
                 <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
-                  AI CFO Nidhi is ready. Here's what she's found.
+                  CFO Fynny is ready. Here's what she's found.
                 </h1>
                 <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
                   {selectedBanks.length > 0
@@ -482,7 +482,7 @@ const OnboardingPage = () => {
                       N
                     </div>
                     <p className="text-primary-foreground text-base">
-                      Welcome! I'm AI CFO Nidhi, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.
+                      Welcome! I'm CFO Fynny, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.
                     </p>
                   </div>
                 </div>
