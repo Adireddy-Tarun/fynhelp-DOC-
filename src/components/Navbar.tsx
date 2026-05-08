@@ -313,10 +313,7 @@ const Navbar = () => {
             ))}
 
             <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <span className="text-white/70 text-sm">Theme</span>
-                <ThemeToggle />
-              </div>
+
               <Link
                 to="/waitlist"
                 onClick={() => setMobileOpen(false)}
