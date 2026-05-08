@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
 import ProfileCompletionBadge from "@/components/ProfileCompletionBadge";
-import ThemeToggle from "@/components/ThemeToggle";
+
 import { Search, Bell, Menu } from "lucide-react";
 
 const PAGE_TITLES: Record<string, string> = {
@@ -121,7 +121,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 3
               </span>
             </button>
-            <ThemeToggle />
+            
             <ProfileCompletionBadge />
             <Link
               to="/dashboard/settings/profile"

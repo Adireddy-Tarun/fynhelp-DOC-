@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import FynLogo from "./FynLogo";
 import ProductsNav from "./products/ProductsNav";
 import FYNIcon, { type FYNIconName } from "./FYNIcon";
-import ThemeToggle from "./ThemeToggle";
+
 import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
@@ -214,7 +214,6 @@ const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
-            <ThemeToggle />
             <Link
               to="/waitlist"
               className="bg-fyn-red text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover-btn-primary"
@@ -314,10 +313,7 @@ const Navbar = () => {
             ))}
 
             <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <span className="text-white/70 text-sm">Theme</span>
-                <ThemeToggle />
-              </div>
+
               <Link
                 to="/waitlist"
                 onClick={() => setMobileOpen(false)}
