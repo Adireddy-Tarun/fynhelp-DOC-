@@ -116,7 +116,7 @@ export default function HeroSection() {
             lineHeight: 1.2,
             color: "#FFFFFF",
             maxWidth: 900,
-            marginTop: 24,
+            marginTop: 48,
           }}
         >
           Don't just track your data.{" "}
@@ -134,7 +134,7 @@ export default function HeroSection() {
             lineHeight: 1.6,
             color: "rgba(255,255,255,0.9)",
             maxWidth: 760,
-            marginTop: 20,
+            marginTop: 32,
           }}
         >
           Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
@@ -153,7 +153,7 @@ export default function HeroSection() {
             fontFamily: "'Roboto', sans-serif",
             fontSize: "clamp(14px, 1.1vw, 16px)",
             color: "rgba(255,255,255,0.7)",
-            marginTop: 16,
+            marginTop: 32,
           }}
         >
           <span style={{ color: "#FFFFFF", fontWeight: 600 }}>10 Intelligence Suites</span> —
@@ -163,7 +163,7 @@ export default function HeroSection() {
         {/* Language pills */}
         <div
           className="animate-fade-in flex flex-wrap justify-center"
-          style={{ animationDelay: "380ms", animationFillMode: "both", gap: 8, marginTop: 20 }}
+          style={{ animationDelay: "380ms", animationFillMode: "both", gap: 8, marginTop: 40 }}
         >
           {["हिंदी", "English", "తెలుగు", "தமிழ்", "ಕನ್ನಡ"].map((lang) => (
             <span
