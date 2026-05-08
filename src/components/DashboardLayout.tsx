@@ -61,7 +61,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#EDE4CB" }}>
+    <div className="min-h-screen flex bg-background text-foreground">
       <Sidebar
         isOpen={drawerOpen}
         onToggle={() => setDrawerOpen((v) => !v)}
@@ -73,10 +73,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         className="flex-1 flex flex-col min-h-screen transition-[margin] duration-300"
         style={{ marginLeft: isDesktop ? sidebarWidth : 0 }}
       >
-        <header
-          className="h-16 border-b flex items-center px-4 lg:px-6 sticky top-0 z-30"
-          style={{ background: "#EDE4CB", borderColor: "rgba(26,16,8,0.10)" }}
-        >
+        <header className="h-16 border-b border-border bg-background flex items-center px-4 lg:px-6 sticky top-0 z-30">
           <button
             className="lg:hidden mr-3 text-fyn-ink"
             onClick={() => setDrawerOpen(true)}
@@ -138,7 +135,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto" style={{ minHeight: "calc(100vh - 64px)" }}>
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto bg-background" style={{ minHeight: "calc(100vh - 64px)" }}>
           {children}
         </main>
       </div>
