@@ -163,7 +163,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
             style={{ background: "transparent", border: "none", cursor: "pointer" }}
             aria-label="Close menu"
           >
-            <X size={24} color="#1A1008" strokeWidth={2.5} />
+            <X size={24} className="text-foreground" strokeWidth={2.5} />
           </button>
         </div>
 
