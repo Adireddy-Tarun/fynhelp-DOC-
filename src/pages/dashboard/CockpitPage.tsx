@@ -439,16 +439,16 @@ const CockpitPage = () => {
       </motion.div>
 
       {/* Cash flow chart */}
-      <FynCard className="mb-fyn-lg">
+      <FynCard className="mb-fyn-lg bg-card border-border">
         <div className="flex items-center justify-between mb-fyn-md">
-          <h3 className="font-serif text-fyn-h3 text-fyn-ink">Cash Flow</h3>
+          <h3 className="font-serif text-fyn-h3 text-foreground">Cash Flow</h3>
           <Link to="/dashboard/cash-flow" className="text-fyn-small font-medium text-fyn-red hover:underline">
             View detail →
           </Link>
         </div>
         {view.cashFlow.length === 0 ? (
           <div className="h-[240px] flex items-center justify-center">
-            <p className="text-fyn-ink/45 text-fyn-small italic">
+            <p className="text-muted-foreground text-fyn-small italic">
               No transactions yet. Toggle Demo mode to preview.
             </p>
           </div>
