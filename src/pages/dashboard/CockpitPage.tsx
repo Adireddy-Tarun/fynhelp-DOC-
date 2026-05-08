@@ -382,7 +382,7 @@ const CockpitPage = () => {
             <motion.span
               animate={{ x: demoMode ? 22 : 2 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md"
+              className="absolute top-0.5 w-5 h-5 rounded-full bg-card shadow-md"
             />
           </button>
           {demoMode && <FynBadge tone="warning">DEMO</FynBadge>}
@@ -470,8 +470,8 @@ const CockpitPage = () => {
               <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }}
                 tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
               <Tooltip
-                contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff" }}
-                labelStyle={{ color: "rgba(255,255,255,0.5)" }}
+                contentStyle={{ background: "hsl(var(--foreground))", border: "none", borderRadius: 8, color: "hsl(var(--background))" }}
+                labelStyle={{ color: "hsl(var(--background) / 0.5)" }}
               />
               <Area type="monotone" dataKey="cashIn" stroke="#16A34A" strokeWidth={2} fill="url(#ckIn)" />
               <Area type="monotone" dataKey="cashOut" stroke="#DC2626" strokeWidth={2} fill="url(#ckOut)" />
