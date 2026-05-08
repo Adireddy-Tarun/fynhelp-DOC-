@@ -22,7 +22,7 @@ export default function FinalCTASection() {
         </p>
 
         <div className="mt-8 text-left">
-          <WaitlistForm variant="simple" theme="dark" />
+          <WaitlistForm variant="detailed" theme="dark" />
         </div>
 
         <p className="text-white font-medium text-base mt-5">
