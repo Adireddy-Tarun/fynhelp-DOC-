@@ -506,13 +506,24 @@ export default function SuitesSection() {
                   {suite.desc}
                 </p>
 
-                <Link
-                  to={suite.href}
-                  className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
-                  style={{ fontFamily: "'Raleway', sans-serif" }}
-                >
-                  Explore {suite.short} →
-                </Link>
+                {USE_CASE_CONTENT[suite.id] ? (
+                  <button
+                    type="button"
+                    onClick={() => setOpenSuiteId(suite.id)}
+                    className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
+                    style={{ fontFamily: "'Raleway', sans-serif" }}
+                  >
+                    See {suite.short} use cases →
+                  </button>
+                ) : (
+                  <Link
+                    to={suite.href}
+                    className="inline-flex items-center gap-2 self-start px-5 py-3 rounded-md bg-fyn-red text-white text-sm font-medium hover:bg-fyn-red/90 transition-colors"
+                    style={{ fontFamily: "'Raleway', sans-serif" }}
+                  >
+                    Explore {suite.short} →
+                  </Link>
+                )}
               </div>
 
               {/* Right: widget mock */}
