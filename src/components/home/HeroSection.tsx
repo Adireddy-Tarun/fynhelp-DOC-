@@ -119,8 +119,8 @@ export default function HeroSection() {
             marginTop: 24,
           }}
         >
-          Every Indian SME deserves a CFO.{" "}
-          <span style={{ color: "#FF6B6B" }}>Now they have one.</span>
+          Don't just track your data.{" "}
+          <span style={{ color: "#FF6B6B" }}>Interrogate it.</span>
         </h1>
 
         {/* Description */}
@@ -137,9 +137,7 @@ export default function HeroSection() {
             marginTop: 20,
           }}
         >
-          Meet AI CFO Nidhi — the AI CFO built for Indian business. She monitors your cash,
-          protects your GST, predicts your risks, and tells you exactly what to do — in your
-          language, every morning.
+          Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
         </p>
 
         {/* Suites note */}
