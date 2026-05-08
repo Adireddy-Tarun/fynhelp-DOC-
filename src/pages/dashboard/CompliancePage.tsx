@@ -998,7 +998,7 @@ const CompliancePage = () => {
               />
               <Tooltip
                 formatter={(v: number | null) => (v === null ? "No filings" : `${v}%`)}
-                contentStyle={{ background: "#F4EDDA", border: "1px solid rgba(26,16,8,0.1)" }}
+                contentStyle={{ background: "hsl(var(--background))", border: "1px solid rgba(26,16,8,0.1)" }}
               />
               <Legend />
               <Line
