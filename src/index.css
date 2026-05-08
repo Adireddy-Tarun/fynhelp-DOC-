@@ -155,6 +155,25 @@
     --sidebar-accent-foreground: 40 52% 91%;
     --sidebar-border: 40 52% 91% / 0.08;
     --sidebar-ring: 0 73% 44%;
+
+    /* Fyn brand tokens — dark mode overrides
+       Invert ink/beige so dashboard surfaces (which use fyn-* tokens
+       by design-system rule) adapt with the theme. Brand red/gold stay. */
+    --fyn-ink: 40 52% 91%;
+    --fyn-ink-95: 40 52% 91% / 0.95;
+    --fyn-ink-80: 40 52% 91% / 0.80;
+    --fyn-ink-60: 40 52% 91% / 0.60;
+    --fyn-ink-45: 40 52% 91% / 0.45;
+    --fyn-ink-40: 40 52% 91% / 0.40;
+    --fyn-ink-20: 40 52% 91% / 0.18;
+    --fyn-ink-10: 40 52% 91% / 0.12;
+    --fyn-ink-05: 40 52% 91% / 0.06;
+    --fyn-ink-02: 40 52% 91% / 0.03;
+
+    --fyn-beige: 24 53% 7%;
+    --fyn-beige-dark: 24 53% 12%;
+    --fyn-beige-deep: 24 53% 15%;
+    --fyn-beige-card: 24 53% 10%;
   }
 }
 
