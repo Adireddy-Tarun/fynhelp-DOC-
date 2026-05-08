@@ -125,6 +125,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 3
               </span>
             </button>
+            <ThemeToggle />
             <ProfileCompletionBadge />
             <Link
               to="/dashboard/settings/profile"
