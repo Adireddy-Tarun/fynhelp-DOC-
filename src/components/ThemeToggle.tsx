@@ -1,34 +1,60 @@
-import { Moon, Sun } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
 
   return (
     <button
       onClick={toggleTheme}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="relative inline-flex items-center w-16 h-8 rounded-full border border-fyn-ink/20 bg-fyn-beige dark:bg-fyn-ink dark:border-fyn-beige/20 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-fyn-red/40"
+      className="relative w-14 h-8 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:ring-offset-2"
+      style={{
+        background: theme === "dark" ? "hsl(24 53% 7% / 0.2)" : "hsl(0 73% 44% / 0.1)",
+        border: theme === "dark" ? "1px solid hsl(40 52% 91% / 0.2)" : "1px solid hsl(0 73% 44% / 0.2)",
+      }}
+      aria-label="Toggle theme"
+      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
-      {/* Background icons */}
-      <span className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none">
-        <Sun size={14} className="text-fyn-gold" />
-        <Moon size={14} className="text-fyn-beige" />
-      </span>
-
       {/* Sliding circle */}
-      <span
-        className={`relative z-10 inline-flex items-center justify-center w-6 h-6 rounded-full bg-white dark:bg-fyn-beige shadow-md transform transition-transform duration-300 ${
-          isDark ? 'translate-x-9' : 'translate-x-1'
-        }`}
+      <div
+        className="absolute w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg"
+        style={{
+          left: theme === "dark" ? "calc(100% - 28px)" : "4px",
+          top: "4px",
+          background:
+            theme === "dark"
+              ? "linear-gradient(135deg, #C41E1E 0%, #8B1515 100%)"
+              : "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+        }}
       >
-        {isDark ? (
-          <Moon size={14} className="text-fyn-ink" />
+        {theme === "dark" ? (
+          <Moon size={14} color="#FFF" strokeWidth={2.5} />
         ) : (
-          <Sun size={14} className="text-fyn-gold" />
+          <Sun size={14} color="#FFF" strokeWidth={2.5} />
         )}
-      </span>
+      </div>
+
+      {/* Background icons */}
+      <div className="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+        <Sun
+          size={14}
+          className="transition-opacity duration-300"
+          style={{
+            opacity: theme === "light" ? 0.5 : 0.2,
+            color: theme === "dark" ? "#F4EDDA" : "#1A1008",
+          }}
+          strokeWidth={2.5}
+        />
+        <Moon
+          size={14}
+          className="transition-opacity duration-300"
+          style={{
+            opacity: theme === "dark" ? 0.5 : 0.2,
+            color: theme === "dark" ? "#F4EDDA" : "#1A1008",
+          }}
+          strokeWidth={2.5}
+        />
+      </div>
     </button>
   );
 }
