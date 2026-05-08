@@ -1,8 +1,6 @@
 import { useState, FormEvent } from "react";
 import { Loader2 } from "lucide-react";
-
-const WAITLIST_FN_URL =
-  "https://wiknwxniwqvsxgyzqqxu.supabase.co/functions/v1/waitlist-signup";
+import { supabase } from "@/integrations/supabase/client";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",
@@ -74,23 +72,22 @@ export default function WaitlistForm({
     setMessage(null);
 
     try {
-      const res = await fetch(WAITLIST_FN_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, email }),
+      const { data: body, error } = await supabase.functions.invoke("waitlist-signup", {
+        body: { ...formData, email },
       });
-      const body = await res.json().catch(() => ({}));
 
-      if (res.ok && (body?.success ?? true)) {
+      if (!error && (body?.success ?? true)) {
         setMessage({
           type: "success",
-          text: "✅ Successfully joined! Check your email for confirmation.",
+          text: body?.already_exists
+            ? "✅ You're already on the waitlist. We'll be in touch soon."
+            : "✅ Successfully joined! Check your email for confirmation.",
         });
         setFormData(initial);
       } else {
         setMessage({
           type: "error",
-          text: body?.error || "Something went wrong. Please try again.",
+          text: error?.message || body?.error || "Something went wrong. Please try again.",
         });
       }
     } catch {
