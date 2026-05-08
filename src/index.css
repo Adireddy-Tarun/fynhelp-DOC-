@@ -122,7 +122,7 @@
     --background: 24 53% 7%;
     --foreground: 40 52% 91%;
 
-    --card: 24 53% 10%;
+    --card: 24 53% 15%;
     --card-foreground: 40 52% 91%;
 
     --popover: 24 53% 7%;
@@ -173,7 +173,7 @@
     --fyn-beige: 24 53% 7%;
     --fyn-beige-dark: 24 53% 12%;
     --fyn-beige-deep: 24 53% 15%;
-    --fyn-beige-card: 24 53% 10%;
+    --fyn-beige-card: 24 53% 15%;
   }
 }
 
