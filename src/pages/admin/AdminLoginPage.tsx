@@ -2,14 +2,12 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabaseExternal } from "@/integrations/supabase/external";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { logAdminAction } from "@/lib/adminAudit";
 
 export default function AdminLoginPage() {
-  const { user } = useAuth();
-  const { isAdmin, loading: adminLoading, refresh } = useAdminAuth();
+  const { user, isAdmin, loading: adminLoading, refresh } = useAdminAuth();
   const nav = useNavigate();
   const loc = useLocation() as { state?: { denied?: boolean } };
   const [email, setEmail] = useState("");
