@@ -27,24 +27,7 @@ const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   past_due:  { bg: "rgba(234,140,30,0.15)",  fg: "#C26B00" },
 };
 
-const SAMPLE_SUBS: Sub[] = [
-  { id:"s1", user_id:null, business_id:null, plan_type:"pro",        status:"active",    mrr:7500,  billing_cycle:"monthly", next_billing_date:"2026-05-15", started_at:"2026-03-15" },
-  { id:"s2", user_id:null, business_id:null, plan_type:"starter",    status:"active",    mrr:2500,  billing_cycle:"annual",  next_billing_date:"2026-06-20", started_at:"2026-04-10" },
-  { id:"s3", user_id:null, business_id:null, plan_type:"free_trial", status:"active",    mrr:0,     billing_cycle:"monthly", next_billing_date:null,         started_at:"2026-05-01" },
-  { id:"s4", user_id:null, business_id:null, plan_type:"pro",        status:"suspended", mrr:7500,  billing_cycle:"monthly", next_billing_date:null,         started_at:"2026-02-20" },
-  { id:"s5", user_id:null, business_id:null, plan_type:"enterprise", status:"active",    mrr:15000, billing_cycle:"annual",  next_billing_date:"2026-12-15", started_at:"2026-01-05" },
-  { id:"s6", user_id:null, business_id:null, plan_type:"starter",    status:"past_due",  mrr:2500,  billing_cycle:"monthly", next_billing_date:"2026-04-28", started_at:"2025-11-12" },
-  { id:"s7", user_id:null, business_id:null, plan_type:"pro",        status:"cancelled", mrr:0,     billing_cycle:"monthly", next_billing_date:null,         started_at:"2025-09-30" },
-];
-const SAMPLE_NAMES = ["Rajesh Kumar","Priya Sharma","Amit Patel","Neha Singh","Vikram Reddy","Sneha Iyer","Karan Mehta"];
-const SAMPLE_BIZ   = ["TechCorp Pvt Ltd","Growth Labs","Patel Ent","Singh & Co","Reddy Ventures","Iyer Foods","Mehta Trading"];
-
-const REVENUE_TREND = [
-  { m:"Jun", mrr:2.8 },{ m:"Jul", mrr:3.1 },{ m:"Aug", mrr:3.4 },
-  { m:"Sep", mrr:3.7 },{ m:"Oct", mrr:3.9 },{ m:"Nov", mrr:4.0 },
-  { m:"Dec", mrr:4.1 },{ m:"Jan", mrr:4.2 },{ m:"Feb", mrr:4.3 },
-  { m:"Mar", mrr:4.4 },{ m:"Apr", mrr:4.3 },{ m:"May", mrr:4.2 },
-];
+const REVENUE_TREND: { m: string; mrr: number }[] = [];
 
 const fmtINR = (n: number) =>
   n >= 100000 ? `₹${(n/100000).toFixed(1)}L` : n >= 1000 ? `₹${(n/1000).toFixed(1)}K` : `₹${n}`;
@@ -62,7 +45,7 @@ export default function AdminSubscriptionsPage() {
       .from("subscriptions")
       .select("id,user_id,business_id,plan_type,status,mrr,billing_cycle,next_billing_date,started_at")
       .order("started_at", { ascending: false }).limit(200);
-    setSubs(((data as Sub[]) ?? []).length ? (data as Sub[]) : SAMPLE_SUBS);
+    setSubs((data as Sub[]) ?? []);
   };
   useEffect(() => { load(); }, []);
 
@@ -262,8 +245,8 @@ export default function AdminSubscriptionsPage() {
                   background: i%2 ? "rgba(244,237,218,0.3)" : "#fff",
                   borderBottom: "1px solid rgba(26,16,8,0.06)",
                 }}>
-                  <td style={td}>{SAMPLE_NAMES[i % SAMPLE_NAMES.length]}</td>
-                  <td style={td}>{SAMPLE_BIZ[i % SAMPLE_BIZ.length]}</td>
+                  <td style={td}>{s.user_id ? s.user_id.slice(0,8) : "—"}</td>
+                  <td style={td}>{s.business_id ? s.business_id.slice(0,8) : "—"}</td>
                   <td style={td}><PlanBadge plan={s.plan_type} /></td>
                   <td style={td}><StatusBadge status={s.status} /></td>
                   <td style={{ ...td, textAlign:"right", fontFamily:"JetBrains Mono, monospace" }}>{fmtINR(Number(s.mrr))}</td>
