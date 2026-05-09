@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -43,7 +43,7 @@ import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
-import RunwayPage from "./pages/dashboard/RunwayPage.tsx";
+
 import LiquidityIntelligencePage from "./pages/dashboard/LiquidityIntelligencePage.tsx";
 import ReceivablesPage from "./pages/dashboard/ReceivablesPage.tsx";
 import PayablesPage from "./pages/dashboard/PayablesPage.tsx";
@@ -61,7 +61,7 @@ import CostPage from "./pages/dashboard/CostPage.tsx";
 import CompliancePage from "./pages/dashboard/CompliancePage.tsx";
 import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
 import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
-import WorkingCapitalPage from "./pages/dashboard/WorkingCapitalPage.tsx";
+
 import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
 import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
@@ -147,7 +147,7 @@ const App = () => (
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
-            <Route path="/dashboard/runway" element={<RunwayPage />} />
+            <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/liquidity" element={<LiquidityIntelligencePage />} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
@@ -167,7 +167,7 @@ const App = () => (
             <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
-            <Route path="/dashboard/working-capital" element={<WorkingCapitalPage />} />
+            <Route path="/dashboard/working-capital" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
             <Route path="/dashboard/banking" element={<BankingPage />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
