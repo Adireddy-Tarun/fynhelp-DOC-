@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null); setNeedsVerify(false); setBusy(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseExternal.auth.signInWithPassword({
       email: email.trim(), password: pw,
     });
     if (error || !data.user) {
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
     const isAdminRole = (roles ?? []).some((r) =>
       ["admin","super_admin","ops_admin","support_agent","analyst"].includes(r.role as string));
     if (!isAdminRole) {
-      await supabase.auth.signOut();
+      await supabaseExternal.auth.signOut();
       setBusy(false);
       setErr("Access denied. This account is not authorized for the admin portal.");
       return;
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
       toast.error("Enter your email above first");
       return;
     }
-    const { error } = await supabase.auth.resend({
+    const { error } = await supabaseExternal.auth.resend({
       type: "signup",
       email: email.trim(),
       options: { emailRedirectTo: `${window.location.origin}/admin/login` },
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     if (!resetEmail.trim()) return;
     setResetBusy(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+    const { error } = await supabaseExternal.auth.resetPasswordForEmail(resetEmail.trim(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setResetBusy(false);
