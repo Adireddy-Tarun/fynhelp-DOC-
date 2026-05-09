@@ -45,7 +45,7 @@ export default function AdminSubscriptionsPage() {
       .from("subscriptions")
       .select("id,user_id,business_id,plan_type,status,mrr,billing_cycle,next_billing_date,started_at")
       .order("started_at", { ascending: false }).limit(200);
-    setSubs(((data as Sub[]) ?? []).length ? (data as Sub[]) : SAMPLE_SUBS);
+    setSubs((data as Sub[]) ?? []);
   };
   useEffect(() => { load(); }, []);
 
