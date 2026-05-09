@@ -70,11 +70,11 @@ export default function AdminDashboardPage() {
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", since30),
         supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", since60).lt("created_at", since30),
-        supabase.from("subscriptions").select("plan, mrr, status, created_at"),
+        supabase.from("subscriptions").select("plan_type, mrr, status, created_at"),
         supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active").gte("created_at", since30),
         supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active").gte("created_at", since60).lt("created_at", since30),
-        supabase.from("support_tickets").select("status, priority, updated_at, created_at"),
-        supabase.from("support_tickets").select("*", { count: "exact", head: true }).eq("status", "resolved").gte("updated_at", startToday.toISOString()),
+        supabase.from("support_tickets").select("status, priority, resolved_at, created_at"),
+        supabase.from("support_tickets").select("*", { count: "exact", head: true }).eq("status", "resolved").gte("resolved_at", startToday.toISOString()),
         supabase.from("profiles").select("created_at").gte("created_at", since6mo).order("created_at", { ascending: true }),
         supabase.from("ai_usage_logs").select("created_at, cost_usd, response_time_ms").gte("created_at", since30),
         supabase.from("admin_audit_logs").select("id, action, created_at, admin_user_id").order("created_at", { ascending: false }).limit(10),
@@ -83,13 +83,13 @@ export default function AdminDashboardPage() {
       if (cancelled) return;
 
       // ---- Subscriptions aggregation
-      const subsAll = (subsAllRes.data ?? []) as { plan: string | null; mrr: number | string | null; status: string }[];
+      const subsAll = (subsAllRes.data ?? []) as { plan_type: string | null; mrr: number | string | null; status: string }[];
       const activeSubs = subsAll.filter((s) => s.status === "active");
       const monthlyRevenue = activeSubs.reduce((sum, r) => sum + Number(r.mrr ?? 0), 0);
       const planRevMap: Record<string, number> = {};
       const planCountMap: Record<string, number> = {};
       activeSubs.forEach((s) => {
-        const k = (s.plan ?? "unknown").toLowerCase();
+        const k = (s.plan_type ?? "unknown").toLowerCase();
         planRevMap[k] = (planRevMap[k] ?? 0) + Number(s.mrr ?? 0);
         planCountMap[k] = (planCountMap[k] ?? 0) + 1;
       });
