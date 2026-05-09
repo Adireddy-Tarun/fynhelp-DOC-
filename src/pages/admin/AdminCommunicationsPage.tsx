@@ -1,32 +1,18 @@
-import { useState } from "react";
-import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send, Calendar } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { EmptyState } from "@/components/admin/EmptyState";
 import { toast } from "sonner";
 import { logAdminAction } from "@/lib/adminAudit";
 import { supabase } from "@/integrations/supabase/client";
 
 type Platform = "whatsapp" | "meta" | "twitter" | "email";
 
-const CHANNELS: { id: Platform; title: string; subtitle: string; icon: typeof MessageCircle; color: string; status: "connected" | "not"; lastSent: string }[] = [
-  { id: "whatsapp", title: "WhatsApp Blast", subtitle: "Broadcast & 1:1 messages", icon: MessageCircle, color: "#25D366", status: "not", lastSent: "Never" },
-  { id: "meta",     title: "Facebook & Instagram", subtitle: "Feed posts & stories", icon: Share2, color: "#1877F2", status: "not", lastSent: "Never" },
-  { id: "twitter",  title: "Twitter / X", subtitle: "Tweets & threads", icon: Twitter, color: "#1DA1F2", status: "not", lastSent: "Never" },
-  { id: "email",    title: "Email Blast", subtitle: "Powered by Resend", icon: Mail, color: "#8B6914", status: "connected", lastSent: "2 days ago" },
-];
-
-const ACTIVITY = [
-  { time: "May 5, 14:35", platform: "whatsapp", type: "Blast", content: "New feature launch! Decision Simulator is live…", recipients: "247 users", status: "sent" },
-  { time: "May 5, 12:20", platform: "meta",     type: "Post",  content: "Customer success story: How TechCorp saved ₹4.2L…", recipients: "—", status: "sent" },
-  { time: "May 4, 18:45", platform: "email",    type: "Blast", content: "Your trial is ending in 3 days — don't lose access", recipients: "89 users", status: "sent" },
-  { time: "May 4, 09:15", platform: "twitter",  type: "Tweet", content: "Weekly tip: Optimize your cash conversion cycle…", recipients: "—", status: "sent" },
-  { time: "May 3, 11:00", platform: "whatsapp", type: "Blast", content: "Reminder: GST returns due in 5 days", recipients: "412 users", status: "sent" },
-  { time: "May 2, 16:22", platform: "email",    type: "Draft", content: "Monthly newsletter — May edition", recipients: "All users", status: "draft" },
-];
-
-const SCHEDULED = [
-  { platform: "whatsapp", content: "New feature launch announcement", when: "Today, 6:00 PM" },
-  { platform: "meta",     content: "Customer success story carousel post", when: "Tomorrow, 10:00 AM" },
-  { platform: "twitter",  content: "Weekly tip #42 — receivables hygiene", when: "May 8, 9:00 AM" },
+const CHANNELS: { id: Platform; title: string; subtitle: string; icon: typeof MessageCircle; color: string; status: "connected" | "not" }[] = [
+  { id: "whatsapp", title: "WhatsApp Blast", subtitle: "Broadcast & 1:1 messages", icon: MessageCircle, color: "#25D366", status: "not" },
+  { id: "meta",     title: "Facebook & Instagram", subtitle: "Feed posts & stories", icon: Share2, color: "#1877F2", status: "not" },
+  { id: "twitter",  title: "Twitter / X", subtitle: "Tweets & threads", icon: Twitter, color: "#1DA1F2", status: "not" },
+  { id: "email",    title: "Email Blast", subtitle: "Powered by Resend", icon: Mail, color: "#8B6914", status: "connected" },
 ];
 
 const PLATFORM_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -36,20 +22,63 @@ const PLATFORM_META: Record<string, { label: string; color: string; bg: string }
   email:    { label: "Email",    color: "#8B6914", bg: "rgba(139,105,20,0.15)" },
 };
 
+type ActivityRow = {
+  id: string; created_at: string; action: string;
+  platform: string; details: any;
+};
+
+function platformFromAction(a: string): string {
+  if (a.startsWith("email_")) return "email";
+  if (a.startsWith("whatsapp_")) return "whatsapp";
+  if (a.startsWith("meta_")) return "meta";
+  if (a.startsWith("twitter_")) return "twitter";
+  return "email";
+}
+
+
 export default function AdminCommunicationsPage() {
   const [openModal, setOpenModal] = useState<Platform | null>(null);
+  const [activity, setActivity] = useState<ActivityRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadActivity = async () => {
+    const { data } = await supabase
+      .from("admin_audit_logs")
+      .select("id, created_at, action, details")
+      .like("action", "%_blast_sent")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    const rows: ActivityRow[] = ((data ?? []) as any[]).map((r) => ({
+      id: r.id, created_at: r.created_at, action: r.action,
+      platform: platformFromAction(r.action), details: r.details ?? {},
+    }));
+    setActivity(rows);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadActivity(); }, []);
+
+  const lastSentByPlatform: Record<string, string> = {};
+  for (const r of activity) {
+    if (!lastSentByPlatform[r.platform]) lastSentByPlatform[r.platform] = r.created_at;
+  }
+  const fmtRel = (iso: string) => {
+    const ms = Date.now() - new Date(iso).getTime();
+    const h = Math.floor(ms / 3600000);
+    if (h < 1) return "just now";
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  };
 
   return (
     <div>
-      <PageHeader
-        title="Communications Hub"
-        subtitle="Send messages and manage social media from one place"
-      />
+      <PageHeader title="Communications Hub" subtitle="Send messages and manage social media from one place" />
 
       {/* Channels */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {CHANNELS.map((c) => {
           const Icon = c.icon;
+          const last = lastSentByPlatform[c.id];
           return (
             <Card key={c.id}>
               <div className="flex items-start justify-between mb-4">
@@ -73,7 +102,7 @@ export default function AdminCommunicationsPage() {
                 {c.subtitle}
               </p>
               <div className="mt-3 flex items-center gap-1.5" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.5)" }}>
-                <Clock size={12} /> Last sent: {c.lastSent}
+                <Clock size={12} /> Last sent: {last ? fmtRel(last) : "Never"}
               </div>
               <button
                 onClick={() => setOpenModal(c.id)}
@@ -90,89 +119,66 @@ export default function AdminCommunicationsPage() {
         })}
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity (from admin_audit_logs) */}
       <Card className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>
-            Recent Activity
-          </h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
-                {["Time", "Platform", "Type", "Content", "Recipients", "Status", ""].map((h) => (
-                  <th key={h} className="text-left py-2.5 px-2"
-                    style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ACTIVITY.map((row, i) => {
-                const meta = PLATFORM_META[row.platform];
-                return (
-                  <tr key={i} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
-                    <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{row.time}</td>
-                    <td className="py-3 px-2">
-                      <span style={{
-                        padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11,
-                        background: meta.bg, color: meta.color,
-                      }}>{meta.label}</span>
-                    </td>
-                    <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))" }}>{row.type}</td>
-                    <td className="py-3 px-2 max-w-md truncate" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{row.content}</td>
-                    <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{row.recipients}</td>
-                    <td className="py-3 px-2">
-                      <StatusBadge status={row.status} />
-                    </td>
-                    <td className="py-3 px-2">
-                      <button className="p-1.5 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.06)]" aria-label="View">
-                        <Eye size={15} color="hsl(var(--fyn-ink) / 0.6)" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>
+          Recent Activity
+        </h2>
+        {loading ? (
+          <div className="animate-pulse rounded-lg" style={{ height: 120, background: "rgba(139,105,20,0.06)" }} />
+        ) : activity.length === 0 ? (
+          <EmptyState icon={Send} title="No messages sent yet" hint="Sent broadcasts and posts will appear here." />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+                  {["Time", "Platform", "Action", "Recipients", ""].map((h) => (
+                    <th key={h} className="text-left py-2.5 px-2"
+                      style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {activity.map((row) => {
+                  const meta = PLATFORM_META[row.platform];
+                  const recipients = row.details?.sent ?? row.details?.total ?? "—";
+                  return (
+                    <tr key={row.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
+                      <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{new Date(row.created_at).toLocaleString("en-IN")}</td>
+                      <td className="py-3 px-2">
+                        <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: meta.bg, color: meta.color }}>{meta.label}</span>
+                      </td>
+                      <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))" }}>{row.action}</td>
+                      <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{String(recipients)}</td>
+                      <td className="py-3 px-2">
+                        <button className="p-1.5 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.06)]" aria-label="View">
+                          <Eye size={15} color="hsl(var(--fyn-ink) / 0.6)" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
 
-      {/* Scheduled */}
+      {/* Scheduled — empty state, not yet implemented */}
       <Card>
         <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>
-          Scheduled Posts <span style={{ color: "hsl(var(--fyn-ink) / 0.5)", fontSize: 14, fontWeight: 400 }}>(Next 7 days)</span>
+          Scheduled Posts
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {SCHEDULED.map((s, i) => {
-            const meta = PLATFORM_META[s.platform];
-            return (
-              <div key={i} className="rounded-xl p-4" style={{ background: "rgba(244,237,218,0.5)", border: "1px solid rgba(139,105,20,0.15)" }}>
-                <div className="flex items-center justify-between mb-2">
-                  <span style={{
-                    padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11,
-                    background: meta.bg, color: meta.color,
-                  }}>{meta.label}</span>
-                  <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>{s.when}</span>
-                </div>
-                <p className="mt-1" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
-                  {s.content}
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <button onClick={() => toast.info("Edit scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "hsl(var(--fyn-ink))" }}>Edit</button>
-                  <button onClick={() => toast.info("Cancel scheduled post coming in Part 4")} className="text-xs px-3 py-1.5 rounded-lg" style={{ border: "1px solid rgba(196,30,30,0.3)", fontFamily: "Raleway, sans-serif", fontWeight: 500, color: "#C41E1E" }}>Cancel</button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <EmptyState icon={Calendar} title="No scheduled posts" hint="Scheduling will be available once we wire up a scheduler. For now, all messages send immediately." />
       </Card>
 
-      {openModal && <ComposeModal platform={openModal} onClose={() => setOpenModal(null)} />}
+      {openModal && <ComposeModal platform={openModal} onClose={() => { setOpenModal(null); loadActivity(); }} />}
     </div>
   );
+
 }
 
 function StatusBadge({ status }: { status: string }) {
