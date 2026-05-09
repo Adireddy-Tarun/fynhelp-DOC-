@@ -159,8 +159,15 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
   const lp = data.liquidity_position || {};
   const cf = data.cash_flow || {};
   const runwayDays = num(data.runway?.days);
-  const runwayTone = runwayDays >= 180 ? "success" : runwayDays >= 90 ? "warning" : "danger";
-  const runwayLabel = runwayDays >= 180 ? "Healthy" : runwayDays >= 90 ? "Caution" : "Critical";
+  const runwayMonths = runwayDays / 30;
+  // Tier badge: Safe (>6mo) / Watch (3-6mo) / Critical (<3mo) — ported from RunwayPage
+  const runwayTone = runwayMonths > 6 ? "success" : runwayMonths >= 3 ? "warning" : "danger";
+  const runwayLabel = runwayMonths > 6 ? "Safe" : runwayMonths >= 3 ? "Watch" : "Critical";
+  const crisisDate = runwayDays > 0 && runwayDays < 3650
+    ? new Date(Date.now() + runwayDays * 86400000).toLocaleDateString("en-IN", {
+        day: "numeric", month: "short", year: "numeric",
+      })
+    : null;
 
   const trend = (data.trend || []).map((t) => ({
     period: t.period,
@@ -198,6 +205,7 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
           label="Runway"
           value={`${runwayDays} days`}
           badge={<FynBadge tone={runwayTone}>{runwayLabel}</FynBadge>}
+          footer={crisisDate ? `Crisis date: ${crisisDate}` : undefined}
         />
         <Kpi
           icon={<TrendingDown className="h-5 w-5" />}
@@ -224,7 +232,12 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
 
       {/* Cash Flow */}
       <div>
-        <FynSectionTitle>Cash Flow (Last 90 Days)</FynSectionTitle>
+        <div className="flex items-center justify-between gap-fyn-md flex-wrap">
+          <FynSectionTitle>Cash Flow (Last 90 Days)</FynSectionTitle>
+          <Link to="/dashboard/cash-flow">
+            <FynButton variant="secondary">View All Transactions →</FynButton>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-fyn-md mb-fyn-md">
           <FynCard>
             <MiniMetric label="Total Inflows" value={formatINR(num(cf.total_inflows))} positive />
@@ -326,7 +339,7 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
   );
 }
 
-function Kpi({ icon, label, value, badge }: { icon: React.ReactNode; label: string; value: string; badge?: React.ReactNode }) {
+function Kpi({ icon, label, value, badge, footer }: { icon: React.ReactNode; label: string; value: string; badge?: React.ReactNode; footer?: string }) {
   return (
     <FynCard>
       <div className="flex items-start justify-between mb-fyn-sm">
@@ -335,6 +348,7 @@ function Kpi({ icon, label, value, badge }: { icon: React.ReactNode; label: stri
       </div>
       <FynLabel>{label}</FynLabel>
       <p className="font-mono text-fyn-metric text-fyn-ink mt-fyn-xs">{value}</p>
+      {footer && <p className="text-fyn-small text-fyn-ink-60 mt-fyn-xs">{footer}</p>}
     </FynCard>
   );
 }

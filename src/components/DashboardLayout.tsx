@@ -9,7 +9,7 @@ import { Search, Bell, Menu } from "lucide-react";
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard/cockpit": "CFO Fynny Cockpit",
   "/dashboard/nidhi": "Talk to CFO Fynny",
-  "/dashboard/runway": "Liquidity",
+  "/dashboard/liquidity": "Liquidity",
   "/dashboard/cash-flow": "Revenue",
   "/dashboard/cost": "Cost",
   "/dashboard/gst": "GST & Tax",

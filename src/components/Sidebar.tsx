@@ -30,7 +30,7 @@ const menuSections = [
   {
     title: "INTELLIGENCE",
     items: [
-      { icon: Droplet, label: "Liquidity", path: "/dashboard/runway", color: "#06B6D4", badge: "Active" },
+      { icon: Droplet, label: "Liquidity", path: "/dashboard/liquidity", color: "#06B6D4", badge: "Active" },
       { icon: TrendingUp, label: "Revenue", path: "/dashboard/cash-flow", color: "#10B981", badge: "Active" },
       { icon: DollarSign, label: "Cost", path: "/dashboard/cost", color: "#F59E0B", badge: "Active" },
       { icon: FileText, label: "GST & Tax", path: "/dashboard/gst", color: "#EF4444", badge: "Active" },
