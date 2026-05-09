@@ -1,4 +1,4 @@
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 
 export type AdminAuditPayload = {
   action: string;
