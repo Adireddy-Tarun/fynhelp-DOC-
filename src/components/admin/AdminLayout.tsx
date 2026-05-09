@@ -32,7 +32,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const ROLE_LABEL: Record<AdminRole, string> = {
-  super_admin: "Super Admin", ops_admin: "Ops Admin",
+  super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",
   support_agent: "Support Agent", analyst: "Analyst", user: "User",
 };
 

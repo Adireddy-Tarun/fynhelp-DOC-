@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { logAdminAction } from "@/lib/adminAudit";
 
@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null); setNeedsVerify(false); setBusy(true);
-    const { data, error } = await supabaseExternal.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(), password: pw,
     });
     if (error || !data.user) {
@@ -44,12 +44,12 @@ export default function AdminLoginPage() {
       return;
     }
     // Verify admin role
-    const { data: roles } = await supabaseExternal
-      .from("user_roles").select("app_role").eq("user_id", data.user.id);
-    const isAdminRole = (roles ?? []).some((r: { app_role: string }) =>
-      ["super_admin","ops_admin","support_agent","analyst"].includes(r.app_role));
+    const { data: roles } = await supabase
+      .from("user_roles").select("role").eq("user_id", data.user.id);
+    const isAdminRole = (roles ?? []).some((r: { role: string }) =>
+      ["super_admin","admin","ops_admin","support_agent","analyst"].includes(r.role));
     if (!isAdminRole) {
-      await supabaseExternal.auth.signOut();
+      await supabase.auth.signOut();
       setBusy(false);
       setErr("Access denied. This account is not authorized for the admin portal.");
       return;
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
       toast.error("Enter your email above first");
       return;
     }
-    const { error } = await supabaseExternal.auth.resend({
+    const { error } = await supabase.auth.resend({
       type: "signup",
       email: email.trim(),
       options: { emailRedirectTo: `${window.location.origin}/admin/login` },
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     if (!resetEmail.trim()) return;
     setResetBusy(true);
-    const { error } = await supabaseExternal.auth.resetPasswordForEmail(resetEmail.trim(), {
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setResetBusy(false);
