@@ -20,7 +20,7 @@ export async function logAdminAction(p: AdminAuditPayload): Promise<void> {
       action: p.action,
       target_type: p.target_type ?? null,
       target_id: p.target_id ?? null,
-      details: p.details ?? {},
+      details: (p.details ?? {}) as never,
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
     });
     if (error) console.warn("[admin audit]", error.message);
