@@ -1,15 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 
 export default function ProtectedCeoRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading: authLoading } = useAuth();
-  const { loading: roleLoading, hasRole } = useAdminAuth();
+  const { user, loading, hasRole } = useAdminAuth();
   const toastedRef = useRef(false);
-
-  const loading = authLoading || roleLoading;
   const isSuper = hasRole("super_admin");
 
   useEffect(() => {
