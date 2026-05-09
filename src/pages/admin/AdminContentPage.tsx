@@ -19,17 +19,9 @@ type BlogPost = {
   created_at: string;
 };
 
-const RESOURCES = [
-  { id: "r1", title: "Cash Flow Template (Excel)",  type: "Template", category: "Finance", date: "May 2"  },
-  { id: "r2", title: "GST Filing Checklist",         type: "Article",  category: "Tax",     date: "Apr 30" },
-  { id: "r3", title: "Runway Calculation Tutorial",  type: "Video",    category: "Finance", date: "Apr 25" },
-];
+const RESOURCES: { id: string; title: string; type: string; category: string; date: string }[] = [];
 
-const GLOSSARY = [
-  { id: "g1", term: "ARR",        definition: "Annual Recurring Revenue — predictable revenue normalized to a 12-month period.", category: "Metrics", date: "May 1"  },
-  { id: "g2", term: "Burn Rate",  definition: "The rate at which a company spends its cash reserves.",                          category: "Finance", date: "Apr 28" },
-  { id: "g3", term: "Churn",      definition: "The percentage of customers who cancel their subscription in a period.",          category: "Metrics", date: "Apr 20" },
-];
+const GLOSSARY: { id: string; term: string; definition: string; category: string; date: string }[] = [];
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
   published: { bg: "rgba(16,185,129,0.12)", color: "#0F7B4F", label: "Published" },
