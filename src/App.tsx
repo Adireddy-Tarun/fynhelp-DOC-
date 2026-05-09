@@ -150,6 +150,7 @@ const App = () => (
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/liquidity" element={<LiquidityIntelligencePage />} />
+            <Route path="/dashboard/revenue-intelligence" element={<RevenueIntelligencePage />} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<SimulatorPage />} />
