@@ -1,70 +1,92 @@
-import { useEffect, useState } from "react";
-import { Database, CreditCard, FileText, Bot, Mail, BarChart, CheckCircle2, AlertTriangle, XCircle, RefreshCw } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Database, Bot, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Activity, AlertOctagon, CalendarRange } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { EmptyState } from "@/components/admin/EmptyState";
+import { supabase } from "@/integrations/supabase/client";
 
-type ServiceStatus = "operational" | "degraded" | "down";
+type ServiceStatus = "operational" | "degraded" | "down" | "unknown";
 type Service = {
-  key: string; name: string; icon: typeof Database; status: ServiceStatus;
-  responseMs: number; uptime: string; lastIncident: string;
+  key: string;
+  name: string;
+  icon: typeof Database;
+  status: ServiceStatus;
+  responseMs: number | null;
+  detail: string;
 };
-
-const SERVICES: Service[] = [
-  { key: "supabase", name: "Lovable Cloud Database", icon: Database,   status: "operational", responseMs: 45, uptime: "99.98% (30d)", lastIncident: "None in last 30 days" },
-  { key: "razorpay", name: "Razorpay Payments",      icon: CreditCard, status: "operational", responseMs: 220, uptime: "99.94% (30d)", lastIncident: "Apr 22 (8 mins)" },
-  { key: "zoho",     name: "Zoho Books API",          icon: FileText,   status: "degraded",    responseMs: 1800, uptime: "98.21% (30d)", lastIncident: "Today, 13:20" },
-  { key: "claude",   name: "Lovable AI Gateway",     icon: Bot,        status: "operational", responseMs: 880, uptime: "99.92% (30d)", lastIncident: "May 3, 18:42" },
-  { key: "resend",   name: "Resend Email",           icon: Mail,       status: "operational", responseMs: 110, uptime: "99.99% (30d)", lastIncident: "None in last 30 days" },
-  { key: "posthog",  name: "PostHog Analytics",      icon: BarChart,   status: "operational", responseMs: 95,  uptime: "100.00% (30d)", lastIncident: "None in last 30 days" },
-];
-
-const ERRORS = [
-  { time: "May 5, 14:35", service: "Lovable AI Gateway", type: "Timeout",   message: "Request timed out after 30s", count: 12 },
-  { time: "May 5, 12:20", service: "Razorpay",           type: "Rate Limit", message: "Too many requests",            count: 3 },
-  { time: "May 4, 18:42", service: "Lovable Cloud DB",  type: "Connection", message: "Connection pool exhausted",     count: 1 },
-  { time: "May 3, 09:11", service: "Zoho Books",        type: "Auth",       message: "OAuth token expired",            count: 5 },
-];
-
-function genResponseSeries() {
-  const out: Record<string, number>[] = [];
-  for (let i = 0; i < 12; i++) {
-    out.push({
-      hour: i * 2,
-      Supabase: 35 + Math.round(Math.random() * 25),
-      Razorpay: 180 + Math.round(Math.random() * 80),
-      Zoho:     900 + Math.round(Math.random() * 1200),
-      Claude:   700 + Math.round(Math.random() * 400),
-    });
-  }
-  return out;
-}
 
 const STATUS_META: Record<ServiceStatus, { color: string; bg: string; label: string; icon: typeof CheckCircle2 }> = {
-  operational: { color: "#0F7B4F", bg: "rgba(16,185,129,0.12)",  label: "Operational", icon: CheckCircle2 },
-  degraded:    { color: "#B45309", bg: "rgba(245,158,11,0.15)",  label: "Degraded",    icon: AlertTriangle },
-  down:        { color: "#C41E1E", bg: "rgba(196,30,30,0.15)",   label: "Down",        icon: XCircle },
+  operational: { color: "#0F7B4F", bg: "rgba(16,185,129,0.12)", label: "Operational", icon: CheckCircle2 },
+  degraded:    { color: "#B45309", bg: "rgba(245,158,11,0.15)", label: "Degraded",    icon: AlertTriangle },
+  down:        { color: "#C41E1E", bg: "rgba(196,30,30,0.15)",  label: "Down",        icon: XCircle },
+  unknown:     { color: "#6B7280", bg: "rgba(107,114,128,0.12)", label: "Unknown",    icon: AlertTriangle },
 };
 
-export default function AdminSystemHealthPage() {
-  const [series, setSeries] = useState(genResponseSeries());
-  const [tick, setTick] = useState(0);
+async function pingDatabase(): Promise<{ status: ServiceStatus; ms: number | null; detail: string }> {
+  const start = performance.now();
+  try {
+    const { error } = await supabase.from("profiles").select("user_id", { count: "exact", head: true }).limit(1);
+    const ms = Math.round(performance.now() - start);
+    if (error) return { status: "down", ms, detail: error.message };
+    if (ms > 1500) return { status: "degraded", ms, detail: "High latency" };
+    return { status: "operational", ms, detail: "Query OK" };
+  } catch (e: any) {
+    return { status: "down", ms: null, detail: e?.message ?? "Unreachable" };
+  }
+}
 
-  useEffect(() => {
-    const id = setInterval(() => { setTick((t) => t + 1); setSeries(genResponseSeries()); }, 60_000);
-    return () => clearInterval(id);
+async function pingAuth(): Promise<{ status: ServiceStatus; ms: number | null; detail: string }> {
+  const start = performance.now();
+  try {
+    const { error } = await supabase.auth.getSession();
+    const ms = Math.round(performance.now() - start);
+    if (error) return { status: "down", ms, detail: error.message };
+    return { status: "operational", ms, detail: "Auth reachable" };
+  } catch (e: any) {
+    return { status: "down", ms: null, detail: e?.message ?? "Unreachable" };
+  }
+}
+
+export default function AdminSystemHealthPage() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    const [db, auth] = await Promise.all([pingDatabase(), pingAuth()]);
+    setServices([
+      { key: "db",   name: "Lovable Cloud Database", icon: Database, status: db.status,   responseMs: db.ms,   detail: db.detail },
+      { key: "auth", name: "Authentication",        icon: Bot,      status: auth.status, responseMs: auth.ms, detail: auth.detail },
+    ]);
+    setLastChecked(new Date());
+    setLoading(false);
   }, []);
 
-  const degradedCount = SERVICES.filter((s) => s.status !== "operational").length;
-  const overall: ServiceStatus = degradedCount === 0 ? "operational" : SERVICES.some((s) => s.status === "down") ? "down" : "degraded";
+  useEffect(() => {
+    refresh();
+    const id = setInterval(refresh, 60_000);
+    return () => clearInterval(id);
+  }, [refresh]);
+
+  const degradedCount = services.filter((s) => s.status !== "operational" && s.status !== "unknown").length;
+  const overall: ServiceStatus = services.length === 0
+    ? "unknown"
+    : services.some((s) => s.status === "down") ? "down"
+    : degradedCount > 0 ? "degraded"
+    : "operational";
   const Banner = STATUS_META[overall].icon;
 
   return (
     <div>
       <div className="flex items-start justify-between gap-4 mb-6">
-        <PageHeader title="System Health" subtitle="Monitor API status, uptime, and errors" />
-        <button onClick={() => setSeries(genResponseSeries())} className="flex items-center gap-2 px-4 py-2 rounded-lg"
-          style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
-          <RefreshCw size={14} /> Refresh
+        <PageHeader title="System Health" subtitle="Live status of core platform services" />
+        <button
+          onClick={refresh}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
+          style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}
+        >
+          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
       </div>
 
@@ -73,17 +95,20 @@ export default function AdminSystemHealthPage() {
         <Banner size={32} color={STATUS_META[overall].color} />
         <div className="flex-1">
           <div style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: STATUS_META[overall].color }}>
-            {overall === "operational" ? "All Systems Operational" : `${degradedCount} Service${degradedCount > 1 ? "s" : ""} Degraded`}
+            {overall === "operational" && "All Systems Operational"}
+            {overall === "degraded" && `${degradedCount} Service${degradedCount > 1 ? "s" : ""} Degraded`}
+            {overall === "down" && "Service Disruption"}
+            {overall === "unknown" && "Checking…"}
           </div>
           <div style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>
-            Updated {tick === 0 ? "just now" : `${tick} min ago`} · auto-refresh every 60s
+            {lastChecked ? `Last checked ${lastChecked.toLocaleTimeString()}` : "Running checks…"} · auto-refresh every 60s
           </div>
         </div>
       </div>
 
       {/* Service status grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        {SERVICES.map((s) => {
+        {services.map((s) => {
           const Icon = s.icon;
           const meta = STATUS_META[s.status];
           return (
@@ -99,97 +124,60 @@ export default function AdminSystemHealthPage() {
               <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 700, fontSize: 16, color: "hsl(var(--fyn-ink))" }}>{s.name}</div>
               <div className="mt-2 grid grid-cols-2 gap-3" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }}>
                 <div>
-                  <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Avg response</div>
-                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>{s.responseMs}ms</div>
+                  <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Response</div>
+                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>
+                    {s.responseMs != null ? `${s.responseMs}ms` : "—"}
+                  </div>
                 </div>
                 <div>
-                  <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Uptime</div>
-                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>{s.uptime}</div>
+                  <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Status</div>
+                  <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>
+                    {s.status}
+                  </div>
                 </div>
               </div>
               <div className="mt-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>
-                Last incident: {s.lastIncident}
+                {s.detail}
               </div>
             </Card>
           );
         })}
       </div>
 
-      {/* Response time chart */}
+      {/* Response time history — no historical store yet */}
       <Card className="mb-6">
-        <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
-          API Response Times (Last 24 hours)
+        <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+          Response Time History
         </h2>
-        <div style={{ height: 280 }}>
-          <ResponsiveContainer>
-            <LineChart data={series}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.06)" vertical={false} />
-              <XAxis dataKey="hour" stroke="hsl(var(--fyn-ink) / 0.5)" fontSize={11} tickFormatter={(v) => `${v}h`} />
-              <YAxis stroke="hsl(var(--fyn-ink) / 0.5)" fontSize={11} unit="ms" />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="Supabase" stroke="#1877F2" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="Razorpay" stroke="#0F7B4F" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="Zoho"     stroke="#B45309" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="Claude"   stroke="#C41E1E" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <EmptyState
+          icon={Activity}
+          title="Historical metrics coming soon"
+          hint="Latency is measured live on each refresh. Long-term trends will appear once a metrics store is wired up."
+        />
       </Card>
 
-      {/* Error log */}
+      {/* Error log — no error log table yet */}
       <Card className="mb-6">
-        <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
-          Recent Errors (Last 7 days)
+        <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+          Recent Errors
         </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
-                {["Timestamp","Service","Error Type","Message","Count"].map((h) => (
-                  <th key={h} className="text-left py-2.5 px-2"
-                    style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ERRORS.map((e, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
-                  <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{e.time}</td>
-                  <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))" }}>{e.service}</td>
-                  <td className="py-3 px-2">
-                    <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: "rgba(196,30,30,0.12)", color: "#C41E1E" }}>{e.type}</span>
-                  </td>
-                  <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{e.message}</td>
-                  <td className="py-3 px-2" style={{ fontFamily: "JetBrains Mono, monospace", color: "hsl(var(--fyn-ink))" }}>{e.count}×</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <EmptyState
+          icon={AlertOctagon}
+          title="No errors recorded"
+          hint="Centralised error logging will surface here once wired up."
+        />
       </Card>
 
-      {/* 30-day uptime calendar */}
+      {/* 30-day uptime — no uptime history yet */}
       <Card>
-        <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+        <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
           30-Day Uptime
         </h2>
-        <div className="space-y-3">
-          {SERVICES.map((s) => (
-            <div key={s.key} className="flex items-center gap-3">
-              <div style={{ width: 180, fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
-                {s.name}
-              </div>
-              <div className="flex-1 grid gap-0.5" style={{ gridTemplateColumns: "repeat(30, minmax(0, 1fr))" }}>
-                {Array.from({ length: 30 }).map((_, i) => {
-                  const r = Math.random();
-                  const c = r > 0.97 ? "#C41E1E" : r > 0.92 ? "#F59E0B" : "#10B981";
-                  return <div key={i} title={`Day ${i + 1}`} className="h-6 rounded-sm" style={{ background: c, opacity: 0.85 }} />;
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <EmptyState
+          icon={CalendarRange}
+          title="Uptime history coming soon"
+          hint="Daily uptime will appear here once status snapshots are being recorded."
+        />
       </Card>
     </div>
   );
