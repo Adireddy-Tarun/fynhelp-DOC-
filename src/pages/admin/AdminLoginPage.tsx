@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { logAdminAction } from "@/lib/adminAudit";
 
