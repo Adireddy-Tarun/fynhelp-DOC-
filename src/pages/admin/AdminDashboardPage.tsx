@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-  Users, CreditCard, TrendingDown, IndianRupee, ArrowUp, ArrowDown, ArrowRight,
-  MessageCircle, Clock, CheckCircle2, AlertTriangle, AlertCircle, TrendingUp,
-  UserPlus, Send, Bot, Flag, UserMinus,
+  Users, CreditCard, IndianRupee, ArrowUp, ArrowDown, ArrowRight,
+  MessageCircle, TrendingUp, Activity, AlertTriangle, Bot, BarChart3, ServerCog,
 } from "lucide-react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, PieChart, Pie, Cell, Legend, LineChart, Line,
 } from "recharts";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import WaitlistStatsWidget from "@/components/admin/WaitlistStatsWidget";
+import { EmptyState } from "@/components/admin/EmptyState";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -17,173 +18,216 @@ const fmtINR = (n: number) =>
   : n >= 1000 ? `₹${(n / 1000).toFixed(1)}K`
   : `₹${n}`;
 
-const metrics = {
-  totalUsers: 1247, totalUsersTrend: 23,
-  activeBusinesses: 856, activeBusinessesTrend: 18,
-  mrr: 1250000, mrrTrend: 22.5,
-  churnRate: 2.8, churnRateTrend: -0.5,
+const PLAN_COLORS: Record<string, string> = {
+  trial: "#94A3B8", free_trial: "#94A3B8",
+  starter: "#3B82F6", pro: "#10B981", enterprise: "#8B4513",
 };
 
-const userGrowthData = [
-  { month: "Dec", users: 950 }, { month: "Jan", users: 1020 },
-  { month: "Feb", users: 1085 }, { month: "Mar", users: 1145 },
-  { month: "Apr", users: 1224 }, { month: "May", users: 1247 },
-];
-
-const recentSignups = [
-  { name: "TechCorp Pvt Ltd", plan: "Pro", date: "2 hours ago" },
-  { name: "Design Studio", plan: "Starter", date: "5 hours ago" },
-  { name: "Growth Labs", plan: "Pro", date: "1 day ago" },
-  { name: "E-Commerce Co", plan: "Enterprise", date: "2 days ago" },
-];
-
-const topPerformers = [
-  { name: "Enterprise Client A", mrr: 45000 },
-  { name: "SaaS Solutions", mrr: 22500 },
-  { name: "Tech Startup B", mrr: 15000 },
-];
-
-const revenueByPlan = [
-  { plan: "Starter", revenue: 342000 },
-  { plan: "Pro", revenue: 690000 },
-  { plan: "Enterprise", revenue: 218000 },
-];
-
-const subscriptionDist = [
-  { name: "Free Trial", value: 124, color: "#94A3B8" },
-  { name: "Starter", value: 342, color: "#3B82F6" },
-  { name: "Pro", value: 345, color: "#10B981" },
-  { name: "Enterprise", value: 45, color: "#8B4513" },
-];
-
-const supportMetrics = [
-  { icon: MessageCircle, label: "Open Tickets", value: "23", trend: "-5 vs last week", positive: true },
-  { icon: Clock, label: "Avg Response Time", value: "2.4h", trend: "-0.3h improvement", positive: true },
-  { icon: CheckCircle2, label: "Resolved Today", value: "12", trend: "+3 vs yesterday", positive: true },
-  { icon: AlertTriangle, label: "Escalated", value: "3", trend: "Same as last week", positive: false },
-];
-
-const systemServices = [
-  { service: "API Server", status: "operational", uptime: 99.8, responseTime: 145 },
-  { service: "Database", status: "operational", uptime: 99.9, responseTime: 23 },
-  { service: "Claude API", status: "operational", uptime: 99.5, responseTime: 1840 },
-  { service: "Payment Gateway", status: "operational", uptime: 99.7, responseTime: 320 },
-];
-
-const featureAdoption = [
-  { feature: "CFO Fynny", adoption: 89 },
-  { feature: "Liquidity Intelligence", adoption: 78 },
-  { feature: "GST Intelligence", adoption: 67 },
-  { feature: "Revenue Intelligence", adoption: 54 },
-];
-
-const alertsList = [
-  { priority: "high", text: "23 users at risk of churn (no activity in 14 days)", icon: AlertTriangle },
-  { priority: "medium", text: "Server costs up 15% this month — optimize cloud resources", icon: AlertCircle },
-  { priority: "positive", text: "Pro plan conversion rate improved to 18% (+3%)", icon: TrendingUp },
-  { priority: "info", text: "API usage increased 22% — consider rate limit adjustments", icon: Bot },
-];
-
-const PRIORITY_COLOR: Record<string, string> = {
-  high: "#C41E1E", medium: "#B45309", positive: "#0F7B4F", info: "#1D4ED8",
+type Live = {
+  loading: boolean;
+  totalUsers: number | null;
+  totalUsersTrend: number | null;
+  activeSubs: number | null;
+  activeSubsTrend: number | null;
+  monthlyRevenue: number | null;
+  openTickets: number | null;
+  userGrowth: { month: string; users: number }[];
+  revenueByPlan: { plan: string; revenue: number }[];
+  subDist: { name: string; value: number; color: string }[];
+  support: { open: number; inProgress: number; resolvedToday: number; urgent: number };
+  apiDaily: { day: string; queries: number }[];
+  apiTotal: number;
+  apiCostUsd: number;
+  apiAvgMs: number;
+  recentActivity: { id: string; action: string; created_at: string; admin_user_id: string }[];
 };
 
-const apiDailyData = Array.from({ length: 30 }, (_, i) => ({
-  day: `D${i + 1}`, queries: Math.floor(Math.random() * 500) + 400,
-}));
-
-const recentActivity = [
-  { icon: UserPlus, text: "New user signup: TechCorp Pvt Ltd (Pro plan)", time: "2 hours ago" },
-  { icon: IndianRupee, text: "Payment received: ₹7,500 from Growth Labs", time: "3 hours ago" },
-  { icon: AlertTriangle, text: "Support ticket escalated: #TKT-001234", time: "5 hours ago" },
-  { icon: Flag, text: "Feature flag updated: Decision Simulator enabled", time: "8 hours ago" },
-  { icon: Bot, text: "AI query spike detected: 245 queries in 1 hour", time: "1 day ago" },
-  { icon: UserMinus, text: "User churned: Design Studio (Starter plan)", time: "1 day ago" },
-];
-
-const PLAN_BADGE: Record<string, { bg: string; fg: string }> = {
-  "Free Trial": { bg: "rgba(148,163,184,0.18)", fg: "#475569" },
-  Starter: { bg: "rgba(59,130,246,0.15)", fg: "#1D4ED8" },
-  Pro: { bg: "rgba(16,185,129,0.15)", fg: "#0F7B4F" },
-  Enterprise: { bg: "rgba(139,69,19,0.18)", fg: "#7C3D11" },
+const initial: Live = {
+  loading: true, totalUsers: null, totalUsersTrend: null, activeSubs: null, activeSubsTrend: null,
+  monthlyRevenue: null, openTickets: null, userGrowth: [], revenueByPlan: [], subDist: [],
+  support: { open: 0, inProgress: 0, resolvedToday: 0, urgent: 0 },
+  apiDaily: [], apiTotal: 0, apiCostUsd: 0, apiAvgMs: 0, recentActivity: [],
 };
 
 export default function AdminDashboardPage() {
-  const [live, setLive] = useState<{
-    totalUsers: number | null;
-    activeSubs: number | null;
-    monthlyRevenue: number | null;
-    openTickets: number | null;
-    loading: boolean;
-  }>({ totalUsers: null, activeSubs: null, monthlyRevenue: null, openTickets: null, loading: true });
+  const [d, setD] = useState<Live>(initial);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [usersRes, subsCountRes, subsRevRes, ticketsRes] = await Promise.all([
+      const now = Date.now();
+      const since30 = new Date(now - 30 * 86400000).toISOString();
+      const since60 = new Date(now - 60 * 86400000).toISOString();
+      const since6mo = new Date(now - 180 * 86400000).toISOString();
+      const startToday = new Date(); startToday.setHours(0, 0, 0, 0);
+
+      const [
+        usersAllRes, usersLast30Res, usersPrev30Res,
+        subsAllRes, subsLast30Res, subsPrev30Res,
+        ticketsRes, ticketsResolvedTodayRes,
+        profilesGrowthRes, aiLogsRes, auditRes,
+      ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("subscriptions").select("mrr").eq("status", "active"),
-        supabase.from("support_tickets").select("*", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", since30),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", since60).lt("created_at", since30),
+        supabase.from("subscriptions").select("plan, mrr, status, created_at"),
+        supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active").gte("created_at", since30),
+        supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active").gte("created_at", since60).lt("created_at", since30),
+        supabase.from("support_tickets").select("status, priority, updated_at, created_at"),
+        supabase.from("support_tickets").select("*", { count: "exact", head: true }).eq("status", "resolved").gte("updated_at", startToday.toISOString()),
+        supabase.from("profiles").select("created_at").gte("created_at", since6mo).order("created_at", { ascending: true }),
+        supabase.from("ai_usage_logs").select("created_at, cost_usd, response_time_ms").gte("created_at", since30),
+        supabase.from("admin_audit_logs").select("id, action, created_at, admin_user_id").order("created_at", { ascending: false }).limit(10),
       ]);
+
       if (cancelled) return;
-      const revenue = subsRevRes.error
-        ? null
-        : (subsRevRes.data ?? []).reduce((sum, r: { mrr: number | string | null }) => sum + Number(r.mrr ?? 0), 0);
-      setLive({
-        totalUsers: usersRes.error ? null : usersRes.count ?? 0,
-        activeSubs: subsCountRes.error ? null : subsCountRes.count ?? 0,
-        monthlyRevenue: revenue,
-        openTickets: ticketsRes.error ? null : ticketsRes.count ?? 0,
+
+      // ---- Subscriptions aggregation
+      const subsAll = (subsAllRes.data ?? []) as { plan: string | null; mrr: number | string | null; status: string }[];
+      const activeSubs = subsAll.filter((s) => s.status === "active");
+      const monthlyRevenue = activeSubs.reduce((sum, r) => sum + Number(r.mrr ?? 0), 0);
+      const planRevMap: Record<string, number> = {};
+      const planCountMap: Record<string, number> = {};
+      activeSubs.forEach((s) => {
+        const k = (s.plan ?? "unknown").toLowerCase();
+        planRevMap[k] = (planRevMap[k] ?? 0) + Number(s.mrr ?? 0);
+        planCountMap[k] = (planCountMap[k] ?? 0) + 1;
+      });
+      const revenueByPlan = Object.entries(planRevMap)
+        .map(([plan, revenue]) => ({ plan: plan.charAt(0).toUpperCase() + plan.slice(1), revenue }))
+        .sort((a, b) => b.revenue - a.revenue);
+      const subDist = Object.entries(planCountMap)
+        .map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value, color: PLAN_COLORS[name] ?? "#8B6914" }));
+
+      // ---- Tickets
+      const tickets = (ticketsRes.data ?? []) as { status: string; priority: string }[];
+      const open = tickets.filter((t) => t.status === "open").length;
+      const inProgress = tickets.filter((t) => t.status === "in_progress").length;
+      const urgent = tickets.filter((t) => t.priority === "urgent" && !["resolved", "closed"].includes(t.status)).length;
+
+      // ---- User growth (6 months)
+      const monthBuckets: Record<string, number> = {};
+      const labels: string[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const dt = new Date(); dt.setMonth(dt.getMonth() - i); dt.setDate(1);
+        const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+        monthBuckets[key] = 0;
+        labels.push(dt.toLocaleDateString("en-US", { month: "short" }));
+      }
+      ((profilesGrowthRes.data ?? []) as { created_at: string }[]).forEach((p) => {
+        const dt = new Date(p.created_at);
+        const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+        if (key in monthBuckets) monthBuckets[key] += 1;
+      });
+      const totalSoFar = (usersAllRes.count ?? 0);
+      const recent6 = Object.values(monthBuckets).reduce((a, b) => a + b, 0);
+      let cum = totalSoFar - recent6;
+      const userGrowth = Object.values(monthBuckets).map((v, i) => {
+        cum += v;
+        return { month: labels[i], users: cum };
+      });
+
+      // ---- AI usage 30d
+      const ai = (aiLogsRes.data ?? []) as { created_at: string; cost_usd: number | string | null; response_time_ms: number | null }[];
+      const apiBuckets: Record<string, number> = {};
+      for (let i = 29; i >= 0; i--) {
+        const k = new Date(now - i * 86400000).toISOString().slice(0, 10);
+        apiBuckets[k] = 0;
+      }
+      ai.forEach((l) => {
+        const k = l.created_at.slice(0, 10);
+        if (k in apiBuckets) apiBuckets[k] += 1;
+      });
+      const apiDaily = Object.entries(apiBuckets).map(([k, v]) => ({
+        day: new Date(k).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        queries: v,
+      }));
+      const apiCostUsd = ai.reduce((a, l) => a + Number(l.cost_usd ?? 0), 0);
+      const apiAvgMs = ai.length ? ai.reduce((a, l) => a + Number(l.response_time_ms ?? 0), 0) / ai.length : 0;
+
+      // ---- Trend deltas
+      const u30 = usersLast30Res.count ?? 0;
+      const uPrev = usersPrev30Res.count ?? 0;
+      const totalUsersTrend = uPrev > 0 ? Math.round(((u30 - uPrev) / uPrev) * 100) : (u30 > 0 ? 100 : 0);
+
+      const s30 = subsLast30Res.count ?? 0;
+      const sPrev = subsPrev30Res.count ?? 0;
+      const activeSubsTrend = sPrev > 0 ? Math.round(((s30 - sPrev) / sPrev) * 100) : (s30 > 0 ? 100 : 0);
+
+      setD({
         loading: false,
+        totalUsers: usersAllRes.count ?? 0,
+        totalUsersTrend,
+        activeSubs: activeSubs.length,
+        activeSubsTrend,
+        monthlyRevenue,
+        openTickets: open + inProgress,
+        userGrowth,
+        revenueByPlan,
+        subDist,
+        support: {
+          open, inProgress,
+          resolvedToday: ticketsResolvedTodayRes.count ?? 0,
+          urgent,
+        },
+        apiDaily,
+        apiTotal: ai.length,
+        apiCostUsd,
+        apiAvgMs,
+        recentActivity: (auditRes.data ?? []) as Live["recentActivity"],
       });
     })();
     return () => { cancelled = true; };
   }, []);
 
-  const liveValue = (n: number | null, fmt: (v: number) => string) =>
-    live.loading ? "…" : n === null ? "—" : fmt(n);
+  const fmtVal = (v: number | null, fmt: (n: number) => string) =>
+    d.loading ? "…" : v === null ? "—" : fmt(v);
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Overview of FYNHelp platform" />
+      <PageHeader title="Dashboard" subtitle="Live overview of FYNHelp platform" />
 
       {/* Top metrics */}
       <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <MetricCard icon={<Users size={22} color="#8B6914" />} label="Total Users"
-          value={liveValue(live.totalUsers, (v) => v.toLocaleString("en-IN"))} trend={metrics.totalUsersTrend}
-          trendLabel={`+${metrics.totalUsersTrend} this month`} />
+          value={fmtVal(d.totalUsers, (v) => v.toLocaleString("en-IN"))}
+          trend={d.totalUsersTrend ?? undefined}
+          trendLabel={d.totalUsersTrend === null ? undefined : `${d.totalUsersTrend >= 0 ? "+" : ""}${d.totalUsersTrend}% vs prev 30d`} />
         <MetricCard icon={<CreditCard size={22} color="#8B6914" />} label="Active Subscriptions"
-          value={liveValue(live.activeSubs, (v) => v.toLocaleString("en-IN"))} trend={metrics.activeBusinessesTrend}
-          trendLabel={`+${metrics.activeBusinessesTrend} this month`} />
+          value={fmtVal(d.activeSubs, (v) => v.toLocaleString("en-IN"))}
+          trend={d.activeSubsTrend ?? undefined}
+          trendLabel={d.activeSubsTrend === null ? undefined : `${d.activeSubsTrend >= 0 ? "+" : ""}${d.activeSubsTrend}% vs prev 30d`} />
         <MetricCard icon={<IndianRupee size={22} color="#8B6914" />} label="Monthly Recurring Revenue"
-          value={liveValue(live.monthlyRevenue, fmtINR)} trend={metrics.mrrTrend}
-          trendLabel={`+${metrics.mrrTrend}% growth`} />
+          value={fmtVal(d.monthlyRevenue, fmtINR)} />
         <MetricCard icon={<MessageCircle size={22} color="#8B6914" />} label="Open Support Tickets"
-          value={liveValue(live.openTickets, (v) => v.toLocaleString("en-IN"))} trend={0} positiveTrend
+          value={fmtVal(d.openTickets, (v) => v.toLocaleString("en-IN"))}
           trendLabel="Open + In Progress" />
       </div>
 
-      {/* User growth + signups */}
+      {/* User growth + waitlist */}
       <div className="mt-10 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2" style={{ minHeight: 380 }}>
           <h3 style={cardTitle}>User Growth (6 months)</h3>
           <div style={{ width: "100%", height: 300 }}>
-            <ResponsiveContainer>
-              <AreaChart data={userGrowthData} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="adminUserGrowth" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-                <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <YAxis stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 13 }} />
-                <Area type="monotone" dataKey="users" stroke="#C41E1E" strokeWidth={2} fill="url(#adminUserGrowth)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {d.loading ? <ChartSkeleton /> : d.userGrowth.every((p) => p.users === 0) ? (
+              <EmptyState icon={Users} title="No users yet" hint="The growth chart will populate as users sign up." />
+            ) : (
+              <ResponsiveContainer>
+                <AreaChart data={d.userGrowth} margin={{ top: 16, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="adminUserGrowth" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                  <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <YAxis stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} allowDecimals={false} />
+                  <Tooltip contentStyle={tipStyle} />
+                  <Area type="monotone" dataKey="users" stroke="#C41E1E" strokeWidth={2} fill="url(#adminUserGrowth)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
 
@@ -195,31 +239,39 @@ export default function AdminDashboardPage() {
         <Card style={{ minHeight: 360 }}>
           <h3 style={cardTitle}>Revenue Breakdown by Plan</h3>
           <div style={{ width: "100%", height: 280 }}>
-            <ResponsiveContainer>
-              <BarChart data={revenueByPlan}>
-                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-                <XAxis dataKey="plan" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(v) => fmtINR(v)} stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <Tooltip formatter={(v: number) => fmtINR(v)} contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 13 }} />
-                <Bar dataKey="revenue" fill="#8B6914" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {d.loading ? <ChartSkeleton /> : d.revenueByPlan.length === 0 ? (
+              <EmptyState icon={IndianRupee} title="No revenue yet" hint="Revenue will appear once subscriptions are active." />
+            ) : (
+              <ResponsiveContainer>
+                <BarChart data={d.revenueByPlan}>
+                  <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                  <XAxis dataKey="plan" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={fmtINR} stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <Tooltip formatter={(v: number) => fmtINR(v)} contentStyle={tipStyle} />
+                  <Bar dataKey="revenue" fill="#8B6914" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
 
         <Card style={{ minHeight: 360 }}>
           <h3 style={cardTitle}>Subscription Distribution</h3>
           <div style={{ width: "100%", height: 280 }}>
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={subscriptionDist} dataKey="value" nameKey="name" cx="50%" cy="50%"
-                  innerRadius={60} outerRadius={95} paddingAngle={2}
-                  label={(e: any) => `${e.name}: ${e.value}`}>
-                  {subscriptionDist.map((d) => <Cell key={d.name} fill={d.color} />)}
-                </Pie>
-                <Legend wrapperStyle={{ fontSize: 12, fontFamily: "Roboto, sans-serif" }} />
-              </PieChart>
-            </ResponsiveContainer>
+            {d.loading ? <ChartSkeleton /> : d.subDist.length === 0 ? (
+              <EmptyState icon={CreditCard} title="No subscriptions yet" hint="Plan distribution will show up once users subscribe." />
+            ) : (
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie data={d.subDist} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                    innerRadius={60} outerRadius={95} paddingAngle={2}
+                    label={(e: any) => `${e.name}: ${e.value}`}>
+                    {d.subDist.map((p) => <Cell key={p.name} fill={p.color} />)}
+                  </Pie>
+                  <Legend wrapperStyle={{ fontSize: 12, fontFamily: "Roboto, sans-serif" }} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
       </div>
@@ -227,134 +279,100 @@ export default function AdminDashboardPage() {
       {/* Support metrics */}
       <h3 className="mt-10 mb-4" style={sectionTitle}>Support Overview</h3>
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-        {supportMetrics.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Card key={s.label} style={{ minHeight: 130 }}>
-              <div className="flex items-center justify-between mb-2">
-                <Icon size={20} color="#8B6914" />
-              </div>
-              <div style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 28, color: "hsl(var(--fyn-ink))" }}>{s.value}</div>
-              <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", marginTop: 4 }}>{s.label}</div>
-              <div style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: s.positive ? "#0F7B4F" : "hsl(var(--fyn-ink) / 0.5)", marginTop: 6, fontWeight: 600 }}>
-                {s.trend}
-              </div>
-            </Card>
-          );
-        })}
+        <SupportStat icon={MessageCircle} label="Open" value={d.support.open} />
+        <SupportStat icon={Activity} label="In Progress" value={d.support.inProgress} />
+        <SupportStat icon={TrendingUp} label="Resolved Today" value={d.support.resolvedToday} positive />
+        <SupportStat icon={AlertTriangle} label="Urgent" value={d.support.urgent} negative={d.support.urgent > 0} />
       </div>
 
-      {/* System Health + Engagement */}
+      {/* System Health (link out) + Engagement (empty) */}
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card>
-          <h3 style={cardTitle}>System Health Status</h3>
-          <div className="space-y-3">
-            {systemServices.map((s) => (
-              <div key={s.service} className="flex items-center justify-between py-2"
-                style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
-                <div className="flex items-center gap-3">
-                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 0 3px rgba(16,185,129,0.18)" }} />
-                  <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{s.service}</span>
-                </div>
-                <div className="flex items-center gap-4" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12 }}>
-                  <span style={{ color: "hsl(var(--fyn-ink) / 0.65)" }}>{s.uptime}% uptime</span>
-                  <span style={{ color: "hsl(var(--fyn-ink) / 0.85)", fontWeight: 600 }}>{s.responseTime}ms</span>
-                </div>
-              </div>
-            ))}
+          <h3 style={cardTitle}>System Health</h3>
+          <EmptyState
+            icon={ServerCog}
+            title="Live monitoring not connected"
+            hint="Connect uptime monitoring to see API status, latency, and incidents."
+          />
+          <div className="mt-2 text-center">
+            <Link to="/admin/system-health" style={{ color: "#8B6914", fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
+              Open System Health →
+            </Link>
           </div>
         </Card>
 
         <Card>
           <h3 style={cardTitle}>User Engagement</h3>
-          <div className="grid grid-cols-3 gap-3 mb-5">
-            <EngagementStat value="542" label="Daily Active" />
-            <EngagementStat value="856" label="Monthly Active" />
-            <EngagementStat value="63%" label="DAU/MAU" />
-          </div>
-          <h4 style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))", marginBottom: 10 }}>
-            Feature Adoption
-          </h4>
-          <div className="space-y-3">
-            {featureAdoption.map((f) => (
-              <div key={f.feature}>
-                <div className="flex justify-between mb-1.5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12 }}>
-                  <span style={{ color: "hsl(var(--fyn-ink))" }}>{f.feature}</span>
-                  <span style={{ color: "hsl(var(--fyn-ink) / 0.65)", fontWeight: 600 }}>{f.adoption}%</span>
-                </div>
-                <div style={{ height: 6, background: "rgba(26,16,8,0.08)", borderRadius: 3, overflow: "hidden" }}>
-                  <div style={{ width: `${f.adoption}%`, height: "100%", background: "linear-gradient(90deg,#C41E1E,#8B6914)" }} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <EmptyState
+            icon={BarChart3}
+            title="No engagement data yet"
+            hint="DAU / MAU and feature adoption will appear once we capture product analytics events."
+          />
         </Card>
       </div>
 
-      {/* Alerts + API Usage */}
+      {/* Alerts (empty) + API Usage */}
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card>
-          <h3 style={cardTitle}>Alerts & Recommendations</h3>
-          <div className="space-y-3">
-            {alertsList.map((a, i) => {
-              const Icon = a.icon;
-              const c = PRIORITY_COLOR[a.priority];
-              return (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-lg"
-                  style={{ background: "rgba(26,16,8,0.03)", borderLeft: `3px solid ${c}` }}>
-                  <Icon size={18} color={c} style={{ marginTop: 1, flexShrink: 0 }} />
-                  <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))", lineHeight: 1.5 }}>
-                    {a.text}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <h3 style={cardTitle}>Alerts &amp; Recommendations</h3>
+          <EmptyState
+            icon={AlertTriangle}
+            title="No active alerts"
+            hint="Operational alerts and growth recommendations will appear here."
+          />
         </Card>
 
         <Card>
-          <h3 style={cardTitle}>API Usage (Claude)</h3>
+          <h3 style={cardTitle}>AI Usage (Lovable AI)</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <EngagementStat value="12.8K" label="Queries (30d)" />
-            <EngagementStat value="$487" label="API Cost (30d)" />
-            <EngagementStat value="3.2s" label="Avg Response" />
+            <EngagementStat value={d.loading ? "…" : d.apiTotal.toLocaleString("en-IN")} label="Queries (30d)" />
+            <EngagementStat value={d.loading ? "…" : `$${d.apiCostUsd.toFixed(2)}`} label="API Cost (30d)" />
+            <EngagementStat value={d.loading ? "…" : `${(d.apiAvgMs / 1000).toFixed(1)}s`} label="Avg Response" />
           </div>
           <div style={{ width: "100%", height: 160 }}>
-            <ResponsiveContainer>
-              <LineChart data={apiDailyData}>
-                <XAxis dataKey="day" hide />
-                <YAxis hide />
-                <Tooltip contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }} />
-                <Line type="monotone" dataKey="queries" stroke="#8B6914" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+            {d.loading ? <ChartSkeleton /> : d.apiTotal === 0 ? (
+              <EmptyState compact icon={Bot} title="No AI usage yet" />
+            ) : (
+              <ResponsiveContainer>
+                <LineChart data={d.apiDaily}>
+                  <XAxis dataKey="day" hide />
+                  <YAxis hide />
+                  <Tooltip contentStyle={tipStyle} />
+                  <Line type="monotone" dataKey="queries" stroke="#8B6914" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
       </div>
 
-      {/* Recent activity */}
-      <h3 className="mt-10 mb-4" style={sectionTitle}>Recent Activity</h3>
+      {/* Recent activity (audit logs) */}
+      <h3 className="mt-10 mb-4" style={sectionTitle}>Recent Admin Activity</h3>
       <Card style={{ padding: 0, maxHeight: 500, overflowY: "auto" }}>
-        {recentActivity.map((a, i) => {
-          const Icon = a.icon;
-          return (
-            <div key={i} className="flex items-start gap-4 px-5 py-4"
-              style={{ borderBottom: i < recentActivity.length - 1 ? "1px solid rgba(26,16,8,0.05)" : "none" }}>
-              <span className="grid place-items-center rounded-full text-white shrink-0"
-                style={{ width: 32, height: 32, background: "linear-gradient(135deg,#C41E1E,#8B6914)" }}>
-                <Icon size={14} />
-              </span>
-              <div className="flex-1 min-w-0">
-                <div style={{ fontFamily: "Roboto, sans-serif", fontWeight: 500, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
-                  {a.text}
-                </div>
+        {d.loading ? (
+          <div className="p-6"><ChartSkeleton compact /></div>
+        ) : d.recentActivity.length === 0 ? (
+          <EmptyState icon={Activity} title="No activity yet" hint="Admin actions will be logged here as they happen." />
+        ) : d.recentActivity.map((a, i) => (
+          <div key={a.id} className="flex items-start gap-4 px-5 py-4"
+            style={{ borderBottom: i < d.recentActivity.length - 1 ? "1px solid rgba(26,16,8,0.05)" : "none" }}>
+            <span className="grid place-items-center rounded-full text-white shrink-0"
+              style={{ width: 32, height: 32, background: "linear-gradient(135deg,#C41E1E,#8B6914)" }}>
+              <Activity size={14} />
+            </span>
+            <div className="flex-1 min-w-0">
+              <div style={{ fontFamily: "Roboto, sans-serif", fontWeight: 500, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
+                {a.action}
               </div>
-              <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.5)", whiteSpace: "nowrap" }}>
-                {a.time}
-              </span>
+              <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>
+                {a.admin_user_id.slice(0, 8)}…
+              </div>
             </div>
-          );
-        })}
+            <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.5)", whiteSpace: "nowrap" }}>
+              {new Date(a.created_at).toLocaleString("en-IN")}
+            </span>
+          </div>
+        ))}
       </Card>
     </div>
   );
@@ -365,6 +383,9 @@ const cardTitle: React.CSSProperties = {
 };
 const sectionTitle: React.CSSProperties = {
   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))",
+};
+const tipStyle: React.CSSProperties = {
+  background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
 };
 
 export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
@@ -402,9 +423,23 @@ function EngagementStat({ value, label }: { value: string; label: string }) {
   );
 }
 
-function MetricCard({ icon, label, value, trend, trendLabel, positiveTrend }: {
-  icon: React.ReactNode; label: string; value: string;
-  trend?: number; trendLabel?: string; positiveTrend?: boolean;
+function SupportStat({ icon: Icon, label, value, positive, negative }: {
+  icon: typeof MessageCircle; label: string; value: number; positive?: boolean; negative?: boolean;
+}) {
+  const color = negative ? "#C41E1E" : positive ? "#0F7B4F" : "hsl(var(--fyn-ink))";
+  return (
+    <Card style={{ minHeight: 130 }}>
+      <Icon size={20} color="#8B6914" />
+      <div className="mt-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 28, color }}>
+        {value.toLocaleString("en-IN")}
+      </div>
+      <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", marginTop: 4 }}>{label}</div>
+    </Card>
+  );
+}
+
+function MetricCard({ icon, label, value, trend, trendLabel }: {
+  icon: React.ReactNode; label: string; value: string; trend?: number; trendLabel?: string;
 }) {
   return (
     <Card style={{ minHeight: 140, position: "relative" }}>
@@ -413,7 +448,7 @@ function MetricCard({ icon, label, value, trend, trendLabel, positiveTrend }: {
           style={{ width: 48, height: 48, background: "linear-gradient(135deg, rgba(196,30,30,0.1), rgba(139,105,20,0.1))" }}>
           {icon}
         </span>
-        {typeof trend === "number" && <TrendBadge value={trend} positive={positiveTrend} />}
+        {typeof trend === "number" && <TrendBadge value={trend} />}
       </div>
       <div className="mt-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 38, color: "hsl(var(--fyn-ink))", lineHeight: 1 }}>
         {value}
@@ -422,7 +457,7 @@ function MetricCard({ icon, label, value, trend, trendLabel, positiveTrend }: {
         {label}
       </div>
       {trendLabel && (
-        <div style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "#0F7B4F", marginTop: 6, fontWeight: 600 }}>
+        <div style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)", marginTop: 6, fontWeight: 600 }}>
           {trendLabel}
         </div>
       )}
@@ -430,13 +465,19 @@ function MetricCard({ icon, label, value, trend, trendLabel, positiveTrend }: {
   );
 }
 
-function TrendBadge({ value, positive }: { value: number; positive?: boolean }) {
-  const isPos = positive ?? value > 0;
-  const color = isPos ? "#10B981" : value < 0 ? "#DC2626" : "rgba(26,16,8,0.5)";
-  const Icon = isPos ? ArrowUp : value < 0 ? ArrowDown : ArrowRight;
+function TrendBadge({ value }: { value: number }) {
+  const color = value > 0 ? "#10B981" : value < 0 ? "#DC2626" : "rgba(26,16,8,0.5)";
+  const Icon = value > 0 ? ArrowUp : value < 0 ? ArrowDown : ArrowRight;
   return (
     <span className="flex items-center gap-1" style={{ color, fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
-      <Icon size={14} /> {isPos && value > 0 ? "+" : ""}{value}%
+      <Icon size={14} /> {value > 0 ? "+" : ""}{value}%
     </span>
+  );
+}
+
+function ChartSkeleton({ compact }: { compact?: boolean }) {
+  return (
+    <div className="w-full h-full animate-pulse rounded-lg"
+      style={{ minHeight: compact ? 80 : 200, background: "rgba(139,105,20,0.06)" }} />
   );
 }
