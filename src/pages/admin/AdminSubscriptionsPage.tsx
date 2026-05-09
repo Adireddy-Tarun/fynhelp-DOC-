@@ -245,8 +245,8 @@ export default function AdminSubscriptionsPage() {
                   background: i%2 ? "rgba(244,237,218,0.3)" : "#fff",
                   borderBottom: "1px solid rgba(26,16,8,0.06)",
                 }}>
-                  <td style={td}>{SAMPLE_NAMES[i % SAMPLE_NAMES.length]}</td>
-                  <td style={td}>{SAMPLE_BIZ[i % SAMPLE_BIZ.length]}</td>
+                  <td style={td}>{s.user_id ? s.user_id.slice(0,8) : "—"}</td>
+                  <td style={td}>{s.business_id ? s.business_id.slice(0,8) : "—"}</td>
                   <td style={td}><PlanBadge plan={s.plan_type} /></td>
                   <td style={td}><StatusBadge status={s.status} /></td>
                   <td style={{ ...td, textAlign:"right", fontFamily:"JetBrains Mono, monospace" }}>{fmtINR(Number(s.mrr))}</td>
