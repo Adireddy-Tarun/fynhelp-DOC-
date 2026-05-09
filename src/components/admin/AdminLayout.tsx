@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard, Lock,
+  Search, Bell, LayoutDashboard, Lock, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
   { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin"] },
   { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
+  { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent","admin"] },

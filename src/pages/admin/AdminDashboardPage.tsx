@@ -9,6 +9,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, Legend, LineChart, Line,
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import WaitlistStatsWidget from "@/components/admin/WaitlistStatsWidget";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -186,43 +187,7 @@ export default function AdminDashboardPage() {
           </div>
         </Card>
 
-        <Card style={{ minHeight: 380 }}>
-          <h3 style={cardTitle}>Recent Signups (7d)</h3>
-          <div className="space-y-3">
-            {recentSignups.map((s) => {
-              const b = PLAN_BADGE[s.plan];
-              return (
-                <div key={s.name} className="flex items-center justify-between gap-2 py-2"
-                  style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
-                  <div className="min-w-0">
-                    <div style={{ fontFamily: "Roboto, sans-serif", fontWeight: 500, fontSize: 13, color: "hsl(var(--fyn-ink))", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {s.name}
-                    </div>
-                    <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>
-                      {s.date}
-                    </div>
-                  </div>
-                  <span style={{ background: b.bg, color: b.fg, padding: "3px 10px", borderRadius: 6, fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 11 }}>
-                    {s.plan}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          <h4 className="mt-5 mb-2" style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
-            Top Revenue Contributors
-          </h4>
-          <div className="space-y-2">
-            {topPerformers.map((t) => (
-              <div key={t.name} className="flex items-center justify-between"
-                style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
-                <span style={{ color: "hsl(var(--fyn-ink) / 0.85)" }}>{t.name}</span>
-                <strong style={{ fontFamily: "Oswald, sans-serif", color: "#0F7B4F" }}>{fmtINR(t.mrr)}</strong>
-              </div>
-            ))}
-          </div>
-        </Card>
+        <WaitlistStatsWidget />
       </div>
 
       {/* Revenue + Pie */}
