@@ -52,7 +52,7 @@ import GSTPage from "./pages/dashboard/GSTPage.tsx";
 import TDSTaxPage from "./pages/dashboard/TDSTaxPage.tsx";
 import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
-import NidhiChatPage from "./pages/dashboard/NidhiChatPage.tsx";
+import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
 import CFOReportDetailPage from "./pages/dashboard/CFOReportDetailPage.tsx";
 import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
@@ -156,7 +156,9 @@ const App = () => (
             <Route path="/dashboard/tds-tax" element={<TDSTaxPage />} />
             <Route path="/dashboard/hr" element={<HRPage />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
-            <Route path="/dashboard/nidhi" element={<NidhiChatPage />} />
+            <Route path="/dashboard/nidhi" element={<FynnyChatPage />} />
+            <Route path="/dashboard/nidhi-chat" element={<FynnyChatPage />} />
+            <Route path="/dashboard/fynny-chat" element={<FynnyChatPage />} />
             <Route path="/dashboard/reports" element={<CFOReportsPage />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
