@@ -143,6 +143,9 @@ export default function AdminContentPage() {
       {tab === "resources" && (
         <Card>
           <Table headers={["Title", "Type", "Category", "Last Updated", ""]}>
+            {RESOURCES.length === 0 && (
+              <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", fontFamily: "Roboto, sans-serif", color: "hsl(var(--fyn-ink) / 0.5)" }}>No resources yet.</td></tr>
+            )}
             {RESOURCES.map((r) => (
               <tr key={r.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                 <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{r.title}</td>
