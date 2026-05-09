@@ -93,18 +93,7 @@ describe("Dashboard page snapshots — shared-primitive layout regression", () =
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it("TDSTaxPage (empty state): disconnected banner + 'YOU\\'LL NEED' checklist", async () => {
-    // Profile lookup → business_id; tds_filings → empty → empty state renders.
-    fromMock.mockImplementation((table: string) => {
-      if (table === "profiles") return makeQuery({ business_id: "biz-1" });
-      return makeQuery([]);
-    });
-    const { default: TDSTaxPage } = await import("../TDSTaxPage");
-    const { container, findByText } = renderPage(<TDSTaxPage />);
-    // Wait for the empty state to land (queries resolve async).
-    await findByText(/No TDS Data/i);
-    expect(container.firstChild).toMatchSnapshot();
-  });
+  // TDSTaxPage was merged into GSTPage as the "TDS Filings" tab — snapshot retired.
 
   it("CompliancePage (empty state): FynEmpty + FynCard troubleshooting use brand tokens", async () => {
     // profiles → business_id (so queries enable); businesses.gstin → null;
