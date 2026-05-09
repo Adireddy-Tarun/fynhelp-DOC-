@@ -44,10 +44,10 @@ export default function AdminLoginPage() {
       return;
     }
     // Verify admin role
-    const { data: roles } = await supabase
-      .from("user_roles").select("role").eq("user_id", data.user.id);
-    const isAdminRole = (roles ?? []).some((r) =>
-      ["admin","super_admin","ops_admin","support_agent","analyst"].includes(r.role as string));
+    const { data: roles } = await supabaseExternal
+      .from("user_roles").select("app_role").eq("user_id", data.user.id);
+    const isAdminRole = (roles ?? []).some((r: { app_role: string }) =>
+      ["super_admin","ops_admin","support_agent","analyst"].includes(r.app_role));
     if (!isAdminRole) {
       await supabaseExternal.auth.signOut();
       setBusy(false);
