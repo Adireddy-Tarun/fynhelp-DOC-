@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import type { User } from "@supabase/supabase-js";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 
-export type AdminRole = "super_admin" | "ops_admin" | "support_agent" | "analyst" | "user";
+export type AdminRole = "super_admin" | "admin" | "ops_admin" | "support_agent" | "analyst" | "user";
 
-const ADMIN_ROLES: AdminRole[] = ["super_admin", "ops_admin", "support_agent", "analyst"];
+const ADMIN_ROLES: AdminRole[] = ["super_admin", "admin", "ops_admin", "support_agent", "analyst"];
 
 interface AdminAuthContextType {
   user: User | null;
@@ -18,7 +18,7 @@ interface AdminAuthContextType {
 }
 
 const ROLE_RANK: Record<AdminRole, number> = {
-  super_admin: 5, ops_admin: 4, support_agent: 3, analyst: 2, user: 1,
+  super_admin: 6, admin: 5, ops_admin: 4, support_agent: 3, analyst: 2, user: 1,
 };
 
 const AdminAuthContext = createContext<AdminAuthContextType>({
@@ -35,9 +35,9 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchRoles = useCallback(async (uid: string | null) => {
     if (!uid) { setRoles([]); return; }
-    const { data, error } = await supabaseExternal
+    const { data, error } = await supabase
       .from("user_roles")
-      .select("app_role")
+      .select("role")
       .eq("user_id", uid);
     if (error) {
       console.warn("[admin auth] role fetch failed", error.message);
@@ -45,31 +45,30 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     const r = (data ?? [])
-      .map((row: { app_role: string }) => row.app_role as AdminRole)
+      .map((row: { role: string }) => row.role as AdminRole)
       .filter((x) => x in ROLE_RANK);
     setRoles(r);
   }, []);
 
   const refresh = useCallback(async () => {
-    const { data: { user: u } } = await supabaseExternal.auth.getUser();
+    const { data: { user: u } } = await supabase.auth.getUser();
     setUser(u ?? null);
     await fetchRoles(u?.id ?? null);
     setLoading(false);
   }, [fetchRoles]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabaseExternal.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         const u = session?.user ?? null;
         setUser(u);
-        // Defer to avoid deadlocks in the auth callback.
         setTimeout(() => {
           fetchRoles(u?.id ?? null).finally(() => setLoading(false));
         }, 0);
       }
     );
 
-    supabaseExternal.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user ?? null;
       setUser(u);
       fetchRoles(u?.id ?? null).finally(() => setLoading(false));
@@ -88,7 +87,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     needed.some((n) => roles.includes(n)) || roles.includes("super_admin");
 
   const signOut = async () => {
-    await supabaseExternal.auth.signOut();
+    await supabase.auth.signOut();
     setUser(null);
     setRoles([]);
   };
