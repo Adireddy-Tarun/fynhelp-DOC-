@@ -15,26 +15,26 @@ type NavItem =
   | { divider?: false; to: string; label: string; icon: typeof BarChart3; roles: AdminRole[] };
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
+  { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst"] },
   { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin"] },
-  { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent","admin"] },
-  { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
-  { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin","admin"] },
-  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","admin"] },
-  { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent","admin"] },
-  { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst","admin"] },
-  { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst","admin"] },
-  { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin","admin"] },
-  { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin","admin"] },
-  { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin","admin"] },
-  { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin","admin"] },
+  { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent"] },
+  { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst"] },
+  { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent"] },
+  { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },
+  { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
+  { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin"] },
+  { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin"] },
   { divider: true },
-  { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst","admin"] },
+  { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst"] },
 ];
 
 const ROLE_LABEL: Record<AdminRole, string> = {
-  super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",
-  support_agent: "Support Agent", analyst: "Analyst",
+  super_admin: "Super Admin", ops_admin: "Ops Admin",
+  support_agent: "Support Agent", analyst: "Analyst", user: "User",
 };
 
 export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
