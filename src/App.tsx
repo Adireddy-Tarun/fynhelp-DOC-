@@ -50,7 +50,6 @@ import ReceivablesPage from "./pages/dashboard/ReceivablesPage.tsx";
 import PayablesPage from "./pages/dashboard/PayablesPage.tsx";
 import SimulatorPage from "./pages/dashboard/SimulatorPage.tsx";
 import GSTPage from "./pages/dashboard/GSTPage.tsx";
-import TDSTaxPage from "./pages/dashboard/TDSTaxPage.tsx";
 import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
@@ -155,7 +154,7 @@ const App = () => (
             <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<SimulatorPage />} />
             <Route path="/dashboard/gst" element={<GSTPage />} />
-            <Route path="/dashboard/tds-tax" element={<TDSTaxPage />} />
+            <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
             <Route path="/dashboard/hr" element={<HRPage />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/nidhi" element={<FynnyChatPage />} />
