@@ -59,7 +59,7 @@ interface Module {
 
 const MODULES: Module[] = [
   { id: "liquidity",  name: "Liquidity Intelligence",   icon: Droplet,      status: "active", desc: "Cash flow, runway forecast, burn alerts",        path: "/dashboard/liquidity",       lockReason: "Connect a bank account to unlock" },
-  { id: "revenue",    name: "Revenue Intelligence",     icon: TrendingUp,   status: "active", desc: "MRR/ARR, cohorts, churn signals",                path: "/dashboard/receivables",     lockReason: "Connect Razorpay or upload invoices" },
+  { id: "revenue",    name: "Revenue Intelligence",     icon: TrendingUp,   status: "active", desc: "MRR/ARR, cohorts, churn signals",                path: "/dashboard/revenue-intelligence",     lockReason: "Connect Razorpay or upload invoices" },
   { id: "cost",       name: "Cost Intelligence",        icon: DollarSign,   status: "active", desc: "Expense categorization, vendor spend",           path: "/dashboard/cost",            lockReason: "Upload transactions to unlock" },
   { id: "gst",        name: "GST & Tax Intelligence",   icon: FileText,     status: "active", desc: "Compliance, deadlines, audit readiness",         path: "/dashboard/gst",             lockReason: "Connect GST data to unlock" },
   { id: "governance", name: "Governance Intelligence",  icon: Shield,       status: "soon",   desc: "Board reporting, compliance automation",         path: "/dashboard/compliance",      lockReason: "Coming soon" },
