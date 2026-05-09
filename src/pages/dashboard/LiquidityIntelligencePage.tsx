@@ -1,542 +1,398 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import {
-  Droplet, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2,
-  Calendar, Clock, ArrowUpRight, ArrowDownRight, RefreshCw, Download,
-  ChevronRight, Info, Zap, Activity, BarChart3, Target, MessageCircle,
-  ArrowLeft, Wallet, Flame, Heart,
+  Wallet, Clock, TrendingDown, Scale, RefreshCw, Download,
+  AlertTriangle, AlertCircle, Info, Database, ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, ReferenceLine,
+  AreaChart, Area, LineChart, Line, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import DashboardLayout from "@/components/DashboardLayout";
+import {
+  FynPage, FynPageTitle, FynCard, FynCardTitle, FynSectionTitle,
+  FynLabel, FynBadge, FynButton, FynLoading, FynEmpty,
+} from "@/components/dashboard/ui";
+import { supabaseExternal } from "@/integrations/supabase/external";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatINR } from "@/lib/indian-format";
+import { exportToCsv } from "@/utils/csvExport";
+import { toast } from "sonner";
 
-// ===== Design tokens =====
-const C = {
-  bg: "#0A0B0D",
-  bg2: "#111214",
-  card: "rgba(255,255,255,0.03)",
-  cardHover: "rgba(255,255,255,0.05)",
-  border: "rgba(255,255,255,0.08)",
-  borderStrong: "rgba(255,255,255,0.14)",
-  text: "#E5E7EB",
-  textDim: "rgba(229,231,235,0.6)",
-  textMuted: "rgba(229,231,235,0.4)",
-  critical: "#EF4444",
-  warning: "#F59E0B",
-  success: "#10B981",
-  info: "#3B82F6",
-  ai: "#C41E1E",
-  liquidity: "#3B82F6",
-};
+interface LiquidityResponse {
+  liquidity_position?: {
+    cash_on_hand?: number;
+    current_assets?: number;
+    current_liabilities?: number;
+    working_capital?: number;
+    current_ratio?: number;
+    quick_ratio?: number;
+  };
+  runway?: { days?: number; months?: number; status?: string };
+  cash_flow?: {
+    monthly_burn?: number;
+    total_inflows?: number;
+    total_outflows?: number;
+    net_cash_flow?: number;
+  };
+  trend?: Array<{ period: string; inflow?: number; outflow?: number; net?: number; balance?: number }>;
+  forecast?: Array<{ month: string; ending_balance: number }>;
+  alerts?: Array<{ severity: "critical" | "warning" | "info"; message: string; title?: string }>;
+  expense_categories?: Array<{ category: string; amount: number }>;
+  revenue_categories?: Array<{ category: string; amount: number }>;
+}
 
-const formatCurrency = (amount: number) => {
-  if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(2)}Cr`;
-  if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
-  if (amount >= 1000) return `₹${(amount / 1000).toFixed(0)}K`;
-  return `₹${amount}`;
-};
-
-const demoData = {
-  cashBalance: 420000,
-  runway: 52,
-  burnRate: 110000,
-  liquidityRatio: 1.8,
-  workingCapital: 580000,
-  cashFlowTrend: [
-    { month: "Dec", inflow: 850000, outflow: 920000, net: -70000, balance: 560000 },
-    { month: "Jan", inflow: 780000, outflow: 890000, net: -110000, balance: 510000 },
-    { month: "Feb", inflow: 820000, outflow: 950000, net: -130000, balance: 480000 },
-    { month: "Mar", inflow: 900000, outflow: 980000, net: -80000, balance: 450000 },
-    { month: "Apr", inflow: 840000, outflow: 1020000, net: -180000, balance: 430000 },
-    { month: "May", inflow: 880000, outflow: 1100000, net: -220000, balance: 420000 },
-  ],
-  inflows: [
-    { category: "Customer Payments", amount: 680000, percentage: 77 },
-    { category: "Other Income", amount: 120000, percentage: 14 },
-    { category: "Investments", amount: 80000, percentage: 9 },
-  ],
-  outflows: [
-    { category: "Personnel Costs", amount: 640000, percentage: 58 },
-    { category: "Vendor Payments", amount: 240000, percentage: 22 },
-    { category: "Software & Tech", amount: 130000, percentage: 12 },
-    { category: "Marketing", amount: 90000, percentage: 8 },
-  ],
-  alerts: [
-    {
-      severity: "critical", title: "Cash Runway Critical",
-      message: "Working capital below safety threshold",
-      metric: "52 days remaining (Target: 90 days)",
-      recommendation: "Accelerate collections or reduce operating expenses by 15%",
-      impact: "₹180K monthly savings needed",
-    },
-    {
-      severity: "warning", title: "Burn Rate Increasing",
-      message: "Monthly operating expenses up 8%",
-      metric: "₹1.02L → ₹1.1L monthly average",
-      recommendation: "Review vendor contracts and discretionary spending",
-      impact: "Current trajectory exhausts cash by July 18",
-    },
-    {
-      severity: "warning", title: "Liquidity Ratio Below Target",
-      message: "Current ratio: 1.8:1 (Industry: 2.5:1)",
-      metric: "Gap: -0.7 points",
-      recommendation: "Improve working capital position",
-      impact: "Need ₹400K additional liquid assets",
-    },
-  ],
-};
+const num = (v: unknown) => (typeof v === "number" && isFinite(v) ? v : 0);
 
 export default function LiquidityIntelligencePage() {
-  const navigate = useNavigate();
-  const [refreshing, setRefreshing] = useState(false);
-  const [data] = useState(demoData);
+  const { businessId } = useAuth();
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 900);
+  const { data, isLoading, error, refetch, isFetching } = useQuery<LiquidityResponse>({
+    queryKey: ["liquidity-intelligence", businessId],
+    queryFn: async () => {
+      if (!businessId) throw new Error("No business ID");
+      const { data, error } = await supabaseExternal.functions.invoke(
+        "liquidity-intelligence",
+        { body: { business_id: businessId, org_id: businessId } },
+      );
+      if (error) throw error;
+      return data as LiquidityResponse;
+    },
+    enabled: !!businessId,
+    refetchInterval: 60_000,
+  });
+
+  const isEmpty = useMemo(() => {
+    if (!data) return false;
+    return (
+      num(data.liquidity_position?.cash_on_hand) === 0 &&
+      num(data.cash_flow?.monthly_burn) === 0 &&
+      num(data.cash_flow?.total_inflows) === 0 &&
+      num(data.cash_flow?.total_outflows) === 0
+    );
+  }, [data]);
+
+  const handleExport = () => {
+    if (!data) return;
+    const lp = data.liquidity_position || {};
+    const cf = data.cash_flow || {};
+    const rows = [
+      { metric: "Cash on Hand", value: num(lp.cash_on_hand) },
+      { metric: "Current Assets", value: num(lp.current_assets) },
+      { metric: "Current Liabilities", value: num(lp.current_liabilities) },
+      { metric: "Working Capital", value: num(lp.working_capital) },
+      { metric: "Current Ratio", value: num(lp.current_ratio) },
+      { metric: "Quick Ratio", value: num(lp.quick_ratio) },
+      { metric: "Runway (days)", value: num(data.runway?.days) },
+      { metric: "Monthly Burn", value: num(cf.monthly_burn) },
+      { metric: "Total Inflows (90d)", value: num(cf.total_inflows) },
+      { metric: "Total Outflows (90d)", value: num(cf.total_outflows) },
+      { metric: "Net Cash Flow", value: num(cf.net_cash_flow) },
+    ];
+    exportToCsv(rows, "liquidity-intelligence");
+  };
+
+  const handleRefresh = async () => {
+    await refetch();
+    toast.success("Liquidity refreshed");
   };
 
   return (
     <DashboardLayout>
-      <style>{`
-        .liq-scroll::-webkit-scrollbar { width: 10px; }
-        .liq-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 5px; }
-        .liq-btn:hover { background: rgba(255,255,255,0.08) !important; }
-      `}</style>
-      <div style={{
-        background: C.bg, color: C.text, minHeight: "calc(100vh - 64px)",
-        fontFamily: "Inter, sans-serif",
-      }}>
-        {/* Header */}
-        <div style={{
-          position: "sticky", top: 0, zIndex: 10,
-          padding: "16px clamp(16px, 3vw, 24px)",
-          background: C.bg2, borderBottom: `1px solid ${C.border}`,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          gap: 16, flexWrap: "wrap",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-            <button onClick={() => navigate("/dashboard")} className="liq-btn" style={{
-              padding: 8, borderRadius: 8, background: C.card,
-              border: `1px solid ${C.border}`, color: C.text, cursor: "pointer",
-              display: "flex", alignItems: "center",
-            }}>
-              <ArrowLeft size={18} />
-            </button>
-            <div style={{
-              width: 44, height: 44, borderRadius: 12,
-              background: `${C.liquidity}1A`, border: `1px solid ${C.liquidity}55`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <Droplet size={22} color={C.liquidity} />
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 20, fontWeight: 700, color: C.text }}>Liquidity Intelligence</div>
-              <div style={{ fontSize: 13, color: C.textDim }}>Cash flow, runway & working capital analysis</div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <HeaderButton icon={RefreshCw} label="Refresh" onClick={handleRefresh} spinning={refreshing} />
-            <HeaderButton icon={Download} label="Export" />
-            <button onClick={() => navigate("/dashboard/nidhi")} style={{
-              padding: "10px 16px", borderRadius: 8, border: "none",
-              background: `linear-gradient(135deg, ${C.ai} 0%, #8B1515 100%)`,
-              color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer",
-              display: "flex", alignItems: "center", gap: 8,
-              boxShadow: `0 4px 16px ${C.ai}66`,
-            }}>
-              <MessageCircle size={16} />
-              Ask Fynny
-            </button>
+      <FynPage>
+        <div className="flex items-start justify-between gap-fyn-md flex-wrap">
+          <FynPageTitle sub="Real-time view of cash, runway, working capital and risk">
+            Liquidity Intelligence
+          </FynPageTitle>
+          <div className="flex items-center gap-fyn-sm">
+            <FynButton variant="secondary" onClick={handleRefresh} disabled={isFetching} aria-label="Refresh data">
+              <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+              Refresh
+            </FynButton>
+            <FynButton variant="secondary" onClick={handleExport} disabled={!data || isEmpty} aria-label="Export to CSV">
+              <Download className="h-4 w-4" />
+              Export
+            </FynButton>
           </div>
         </div>
 
-        {/* Body */}
-        <div style={{
-          padding: "24px clamp(16px, 3vw, 32px)",
-          display: "flex", flexDirection: "column", gap: 24,
-          maxWidth: 1440, margin: "0 auto",
-        }}>
-          <AIInsightCard data={data} />
+        {isLoading && <FynLoading rows={4} />}
 
-          {/* Metrics grid */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: 16,
-          }}>
-            <MetricCard
-              icon={Wallet} label="Cash Balance" value={formatCurrency(data.cashBalance)}
-              change={-12} trend="down" color={C.liquidity} subtitle="Current liquid assets"
-            />
-            <MetricCard
-              icon={Clock} label="Runway" value={`${data.runway} days`}
-              change={-3} trend="down"
-              color={data.runway < 60 ? C.critical : data.runway < 90 ? C.warning : C.success}
-              subtitle="At current burn rate" alert
-            />
-            <MetricCard
-              icon={Flame} label="Monthly Burn" value={formatCurrency(data.burnRate)}
-              change={8} trend="up" color={C.warning} subtitle="Operating expenses/mo"
-            />
-            <MetricCard
-              icon={Heart} label="Liquidity Ratio" value={`${data.liquidityRatio}:1`}
-              change={-5} trend="down" color={C.warning} subtitle="Industry target: 2.5:1"
-            />
-          </div>
+        {error && !isLoading && (
+          <FynCard className="border-fyn-red/40">
+            <div className="flex items-start gap-fyn-md">
+              <AlertCircle className="h-5 w-5 text-fyn-red shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-serif text-fyn-h3 text-fyn-ink mb-fyn-xs">Couldn't load liquidity data</h3>
+                <p className="text-fyn-body text-fyn-ink-60 mb-fyn-md">
+                  {(error as Error).message || "The liquidity engine is unreachable right now."}
+                </p>
+                <FynButton onClick={handleRefresh}>Try again</FynButton>
+              </div>
+            </div>
+          </FynCard>
+        )}
 
-          <CashFlowChart data={data.cashFlowTrend} />
+        {!isLoading && !error && data && isEmpty && (
+          <FynEmpty
+            icon={<Database className="h-7 w-7" />}
+            title="No liquidity data yet"
+            description="Upload your bank statements and transactions to see live runway, burn and working-capital analysis."
+            action={
+              <Link to="/dashboard/data-import">
+                <FynButton>Upload data</FynButton>
+              </Link>
+            }
+          />
+        )}
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: 16,
-          }}>
-            <FlowBreakdownCard
-              title="Cash Inflows" subtitle="Current month breakdown"
-              icon={ArrowUpRight} color={C.success} data={data.inflows} kind="inflow"
-            />
-            <FlowBreakdownCard
-              title="Cash Outflows" subtitle="Current month breakdown"
-              icon={ArrowDownRight} color={C.critical} data={data.outflows} kind="outflow"
-            />
-          </div>
-
-          <AlertsSection alerts={data.alerts} />
-        </div>
-      </div>
+        {!isLoading && !error && data && !isEmpty && (
+          <LiquidityContent data={data} />
+        )}
+      </FynPage>
     </DashboardLayout>
   );
 }
 
-// ============ Sub-components ============
+function LiquidityContent({ data }: { data: LiquidityResponse }) {
+  const lp = data.liquidity_position || {};
+  const cf = data.cash_flow || {};
+  const runwayDays = num(data.runway?.days);
+  const runwayTone = runwayDays >= 180 ? "success" : runwayDays >= 90 ? "warning" : "danger";
+  const runwayLabel = runwayDays >= 180 ? "Healthy" : runwayDays >= 90 ? "Caution" : "Critical";
 
-function HeaderButton({ icon: Icon, label, onClick, spinning }: any) {
+  const trend = (data.trend || []).map((t) => ({
+    period: t.period,
+    inflow: num(t.inflow),
+    outflow: num(t.outflow),
+    net: num(t.net ?? num(t.inflow) - num(t.outflow)),
+    balance: num(t.balance),
+  }));
+
+  const forecast = (data.forecast || []).map((f) => ({
+    month: f.month,
+    balance: num(f.ending_balance),
+  }));
+
+  const expenseCats = (data.expense_categories || [])
+    .slice()
+    .sort((a, b) => num(b.amount) - num(a.amount))
+    .slice(0, 5);
+  const revenueCats = (data.revenue_categories || [])
+    .slice()
+    .sort((a, b) => num(b.amount) - num(a.amount))
+    .slice(0, 5);
+
   return (
-    <button onClick={onClick} className="liq-btn" style={{
-      padding: "10px 14px", borderRadius: 8,
-      background: C.card, border: `1px solid ${C.border}`,
-      color: C.text, fontSize: 14, fontWeight: 500, cursor: "pointer",
-      display: "flex", alignItems: "center", gap: 8,
-    }}>
-      <Icon size={15} style={spinning ? { animation: "spin 1s linear infinite" } : {}} />
-      {label}
-    </button>
-  );
-}
+    <>
+      {/* Top KPI cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-fyn-md">
+        <Kpi
+          icon={<Wallet className="h-5 w-5" />}
+          label="Cash on Hand"
+          value={formatINR(num(lp.cash_on_hand))}
+        />
+        <Kpi
+          icon={<Clock className="h-5 w-5" />}
+          label="Runway"
+          value={`${runwayDays} days`}
+          badge={<FynBadge tone={runwayTone}>{runwayLabel}</FynBadge>}
+        />
+        <Kpi
+          icon={<TrendingDown className="h-5 w-5" />}
+          label="Monthly Burn"
+          value={formatINR(num(cf.monthly_burn))}
+        />
+        <Kpi
+          icon={<Scale className="h-5 w-5" />}
+          label="Working Capital"
+          value={formatINR(num(lp.working_capital))}
+        />
+      </div>
 
-function AIInsightCard({ data }: any) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      style={{
-        position: "relative", borderRadius: 16, overflow: "hidden",
-        background: `linear-gradient(135deg, rgba(196,30,30,0.08) 0%, rgba(17,18,20,0.6) 100%)`,
-        border: `1px solid ${C.ai}44`,
-        padding: 24,
-      }}
-    >
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 2,
-        background: `linear-gradient(90deg, transparent, ${C.ai}, transparent)`,
-      }} />
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: "50%",
-            background: `linear-gradient(135deg, ${C.ai}, #8B0000)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontSize: 18, fontWeight: 800,
-            boxShadow: `0 0 20px ${C.ai}66`,
-          }}>N</div>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>AI CFO Analysis</div>
-            <div style={{ fontSize: 12, color: C.textDim }}>Live monitoring · Updated 2m ago</div>
-          </div>
-        </div>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          padding: "6px 12px", borderRadius: 999,
-          background: `${C.critical}1A`, border: `1px solid ${C.critical}55`,
-          color: C.critical, fontSize: 12, fontWeight: 600,
-        }}>
-          <AlertTriangle size={13} />
-          CRITICAL ATTENTION
+      {/* Liquidity Position */}
+      <div>
+        <FynSectionTitle>Liquidity Position</FynSectionTitle>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-fyn-md">
+          <FynCard><MiniMetric label="Current Assets" value={formatINR(num(lp.current_assets))} /></FynCard>
+          <FynCard><MiniMetric label="Current Liabilities" value={formatINR(num(lp.current_liabilities))} /></FynCard>
+          <FynCard><MiniMetric label="Current Ratio" value={num(lp.current_ratio).toFixed(2)} /></FynCard>
+          <FynCard><MiniMetric label="Quick Ratio" value={num(lp.quick_ratio).toFixed(2)} /></FynCard>
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <p style={{ fontSize: 16, lineHeight: 1.6, color: C.text, margin: 0 }}>
-          Cash runway critical at <strong style={{ color: C.critical }}>{data.runway} days</strong>. At current burn rate of <strong>{formatCurrency(data.burnRate)}/month</strong>, liquid assets will be exhausted by July 18, 2026.
-        </p>
-        <div style={{ fontSize: 14, fontWeight: 600, color: C.text, marginTop: 4 }}>Immediate actions required:</div>
-        <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
-          {[
-            `Accelerate collections on ${formatCurrency(210000)} overdue receivables (60+ days)`,
-            `Freeze discretionary marketing spend — potential savings: ${formatCurrency(90000)}/month`,
-            "Negotiate 15-day payment term extension with top 3 vendors",
-            "Review personnel costs (58% of expenses) for optimization opportunities",
-          ].map((line, i) => (
-            <li key={i} style={{ display: "flex", gap: 10, fontSize: 14, color: C.textDim, lineHeight: 1.55 }}>
-              <CheckCircle2 size={15} color={C.success} style={{ flexShrink: 0, marginTop: 2 }} />
-              <span>{line}</span>
-            </li>
-          ))}
-        </ul>
-        <div style={{
-          marginTop: 8, padding: 12, borderRadius: 8,
-          background: `${C.success}10`, border: `1px solid ${C.success}33`,
-          fontSize: 13, color: C.text, lineHeight: 1.55,
-        }}>
-          <strong style={{ color: C.success }}>Net effect:</strong> These actions would extend runway to approximately 90 days and improve liquidity ratio to industry standard 2.5:1.
+      {/* Cash Flow */}
+      <div>
+        <FynSectionTitle>Cash Flow (Last 90 Days)</FynSectionTitle>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-fyn-md mb-fyn-md">
+          <FynCard>
+            <MiniMetric label="Total Inflows" value={formatINR(num(cf.total_inflows))} positive />
+          </FynCard>
+          <FynCard>
+            <MiniMetric label="Total Outflows" value={formatINR(num(cf.total_outflows))} negative />
+          </FynCard>
+          <FynCard>
+            <MiniMetric label="Net Cash Flow" value={formatINR(num(cf.net_cash_flow))} positive={num(cf.net_cash_flow) >= 0} negative={num(cf.net_cash_flow) < 0} />
+          </FynCard>
         </div>
-      </div>
-    </motion.div>
-  );
-}
 
-function MetricCard({ icon: Icon, label, value, change, trend, color, subtitle, alert }: any) {
-  return (
-    <div style={{
-      position: "relative", padding: 20, borderRadius: 14,
-      background: C.card, border: `1px solid ${C.border}`,
-      display: "flex", flexDirection: "column", gap: 10,
-      overflow: "hidden",
-    }}>
-      {alert && (
-        <div style={{
-          position: "absolute", top: 12, right: 12,
-          width: 8, height: 8, borderRadius: "50%",
-          background: C.critical,
-          boxShadow: `0 0 0 4px ${C.critical}33`,
-          animation: "pulse 2s ease-in-out infinite",
-        }} />
-      )}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 10,
-          background: `${color}1A`, border: `1px solid ${color}33`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Icon size={20} color={color} />
-        </div>
-        {change !== 0 && (
-          <div style={{
-            display: "flex", alignItems: "center", gap: 3,
-            fontSize: 12, fontWeight: 600,
-            color: trend === "up" ? C.critical : C.success,
-            padding: "3px 8px", borderRadius: 999,
-            background: trend === "up" ? `${C.critical}14` : `${C.success}14`,
-          }}>
-            {trend === "up" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {Math.abs(change)}%
-          </div>
+        {trend.length > 0 && (
+          <FynCard>
+            <FynCardTitle>Cash Flow Trend</FynCardTitle>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trend} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="inflowFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#16A34A" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#16A34A" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="outflowFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#C41E1E" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
+                  <XAxis dataKey="period" tick={{ fill: "#1A1008", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <Tooltip
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    formatter={(v: number) => formatINR(v)}
+                  />
+                  <Area type="monotone" dataKey="inflow" stroke="#16A34A" fill="url(#inflowFill)" strokeWidth={2} name="Inflow" />
+                  <Area type="monotone" dataKey="outflow" stroke="#C41E1E" fill="url(#outflowFill)" strokeWidth={2} name="Outflow" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </FynCard>
         )}
       </div>
-      <div style={{ fontSize: 12, color: C.textDim, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: C.text, fontFamily: "'JetBrains Mono', monospace", wordBreak: "break-word" }}>
+
+      {/* Forecast */}
+      {forecast.length > 0 && (
+        <div>
+          <FynSectionTitle>6-Month Cash Forecast</FynSectionTitle>
+          <FynCard>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={forecast} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
+                  <XAxis dataKey="month" tick={{ fill: "#1A1008", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <Tooltip
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    formatter={(v: number) => formatINR(v)}
+                  />
+                  <Line type="monotone" dataKey="balance" stroke="#C41E1E" strokeWidth={2.5} dot={{ r: 4, fill: "#C41E1E" }} name="Ending Balance" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </FynCard>
+        </div>
+      )}
+
+      {/* Alerts */}
+      {data.alerts && data.alerts.length > 0 && (
+        <div>
+          <FynSectionTitle>Alerts</FynSectionTitle>
+          <div className="space-y-fyn-sm">
+            {data.alerts.map((a, i) => <AlertRow key={i} alert={a} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Category breakdowns */}
+      {(expenseCats.length > 0 || revenueCats.length > 0) && (
+        <div>
+          <FynSectionTitle>Category Breakdown</FynSectionTitle>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-md">
+            {expenseCats.length > 0 && (
+              <FynCard>
+                <FynCardTitle>Top 5 Expense Categories</FynCardTitle>
+                <CategoryChart data={expenseCats} color="#C41E1E" />
+              </FynCard>
+            )}
+            {revenueCats.length > 0 && (
+              <FynCard>
+                <FynCardTitle>Top 5 Revenue Categories</FynCardTitle>
+                <CategoryChart data={revenueCats} color="#16A34A" />
+              </FynCard>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Kpi({ icon, label, value, badge }: { icon: React.ReactNode; label: string; value: string; badge?: React.ReactNode }) {
+  return (
+    <FynCard>
+      <div className="flex items-start justify-between mb-fyn-sm">
+        <div className="text-fyn-ink-45">{icon}</div>
+        {badge}
+      </div>
+      <FynLabel>{label}</FynLabel>
+      <p className="font-mono text-fyn-metric text-fyn-ink mt-fyn-xs">{value}</p>
+    </FynCard>
+  );
+}
+
+function MiniMetric({ label, value, positive, negative }: { label: string; value: string; positive?: boolean; negative?: boolean }) {
+  return (
+    <div>
+      <FynLabel>{label}</FynLabel>
+      <p
+        className={`font-mono text-[22px] font-semibold mt-fyn-xs ${
+          positive ? "text-[#16A34A]" : negative ? "text-fyn-red" : "text-fyn-ink"
+        }`}
+      >
+        {positive && <ArrowUpRight className="inline h-4 w-4 mr-1" />}
+        {negative && <ArrowDownRight className="inline h-4 w-4 mr-1" />}
         {value}
-      </div>
-      <div style={{ fontSize: 12, color: C.textMuted }}>{subtitle}</div>
-      <style>{`
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
+      </p>
     </div>
   );
 }
 
-function CashFlowChart({ data }: any) {
+function AlertRow({ alert }: { alert: { severity: string; message: string; title?: string } }) {
+  const tone = alert.severity === "critical" ? "danger" : alert.severity === "warning" ? "warning" : "neutral";
+  const Icon = alert.severity === "critical" ? AlertCircle : alert.severity === "warning" ? AlertTriangle : Info;
+  const iconColor =
+    alert.severity === "critical" ? "text-fyn-red" :
+    alert.severity === "warning" ? "text-[#8B5A00]" : "text-[#475569]";
   return (
-    <div style={{
-      padding: 24, borderRadius: 14,
-      background: C.card, border: `1px solid ${C.border}`,
-    }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <Activity size={20} color={C.liquidity} />
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: C.text }}>Cash Flow Analysis</div>
-            <div style={{ fontSize: 13, color: C.textDim }}>6-month trend with projections</div>
+    <FynCard className="py-fyn-md">
+      <div className="flex items-start gap-fyn-md">
+        <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${iconColor}`} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-fyn-sm mb-fyn-xs">
+            {alert.title && <span className="font-medium text-fyn-ink">{alert.title}</span>}
+            <FynBadge tone={tone as any}>{alert.severity}</FynBadge>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 12, color: C.textDim }}>
-          <Legend dot={C.success} label="Inflows" />
-          <Legend dot={C.critical} label="Outflows" />
-          <Legend dot={C.liquidity} label="Net Balance" />
+          <p className="text-fyn-body text-fyn-ink-60">{alert.message}</p>
         </div>
       </div>
-
-      <div style={{ width: "100%", height: 320 }}>
-        <ResponsiveContainer>
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="gIn" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={C.success} stopOpacity={0.4} />
-                <stop offset="100%" stopColor={C.success} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gOut" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={C.critical} stopOpacity={0.4} />
-                <stop offset="100%" stopColor={C.critical} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gNet" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={C.liquidity} stopOpacity={0.4} />
-                <stop offset="100%" stopColor={C.liquidity} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-            <XAxis dataKey="month" stroke={C.textMuted} fontSize={12} />
-            <YAxis stroke={C.textMuted} fontSize={12} tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`} />
-            <Tooltip
-              contentStyle={{ background: C.bg2, border: `1px solid ${C.border}`, borderRadius: 8, color: C.text }}
-              formatter={(v: any) => [`₹${(v / 100000).toFixed(1)}L`, ""]}
-            />
-            <ReferenceLine y={0} stroke={C.textMuted} />
-            <Area type="monotone" dataKey="inflow" stroke={C.success} strokeWidth={2} fill="url(#gIn)" />
-            <Area type="monotone" dataKey="outflow" stroke={C.critical} strokeWidth={2} fill="url(#gOut)" />
-            <Area type="monotone" dataKey="balance" stroke={C.liquidity} strokeWidth={2.5} fill="url(#gNet)" />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div style={{
-        marginTop: 16, padding: 14, borderRadius: 8,
-        background: `${C.warning}10`, border: `1px solid ${C.warning}33`,
-        fontSize: 13, color: C.textDim, lineHeight: 1.55,
-      }}>
-        <strong style={{ color: C.warning }}>Trend Analysis:</strong> Net cash outflow accelerating over 6 months. Current trajectory shows cash exhaustion in 52 days without intervention. Immediate action required on collections and expense management.
-      </div>
-    </div>
+    </FynCard>
   );
 }
 
-function Legend({ dot, label }: { dot: string; label: string }) {
+function CategoryChart({ data, color }: { data: Array<{ category: string; amount: number }>; color: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ width: 10, height: 10, borderRadius: 2, background: dot, display: "inline-block" }} />
-      {label}
+    <div className="h-64">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" horizontal={false} />
+          <XAxis type="number" tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+          <YAxis dataKey="category" type="category" tick={{ fill: "#1A1008", fontSize: 12 }} width={110} />
+          <Tooltip
+            contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+            formatter={(v: number) => formatINR(v)}
+          />
+          <Bar dataKey="amount" fill={color} radius={[0, 4, 4, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
-  );
-}
-
-function FlowBreakdownCard({ title, subtitle, icon: Icon, color, data, kind }: any) {
-  const total = data.reduce((s: number, i: any) => s + i.amount, 0);
-  return (
-    <div style={{
-      padding: 24, borderRadius: 14,
-      background: C.card, border: `1px solid ${C.border}`,
-      display: "flex", flexDirection: "column", gap: 16,
-    }}>
-      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 10,
-          background: `${color}1A`, border: `1px solid ${color}33`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Icon size={20} color={color} />
-        </div>
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{title}</div>
-          <div style={{ fontSize: 12, color: C.textDim }}>{subtitle}</div>
-        </div>
-      </div>
-
-      <div style={{ fontSize: 32, fontWeight: 700, color, fontFamily: "'JetBrains Mono', monospace" }}>
-        {formatCurrency(total)}
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {data.map((item: any, idx: number) => (
-          <div key={idx}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 14 }}>
-              <span style={{ color: C.textDim }}>{item.category}</span>
-              <span style={{ color: C.text, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
-                {formatCurrency(item.amount)}
-              </span>
-            </div>
-            <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${item.percentage}%` }}
-                transition={{ duration: 0.8, delay: idx * 0.1 }}
-                style={{ height: "100%", background: color, borderRadius: 3 }}
-              />
-            </div>
-            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>
-              {item.percentage}% of total {kind}s
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AlertsSection({ alerts }: any) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-        <Target size={20} color={C.warning} />
-        <div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: C.text }}>Priority Actions Required</div>
-          <div style={{ fontSize: 13, color: C.textDim }}>AI-recommended interventions</div>
-        </div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {alerts.map((a: any, i: number) => <AlertCard key={i} alert={a} delay={i * 0.05} />)}
-      </div>
-    </div>
-  );
-}
-
-function AlertCard({ alert, delay }: any) {
-  const color = alert.severity === "critical" ? C.critical : alert.severity === "warning" ? C.warning : C.info;
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-      transition={{ delay }}
-      style={{
-        padding: 20, borderRadius: 12,
-        background: C.card, border: `1px solid ${color}44`,
-        borderLeft: `4px solid ${color}`,
-        display: "flex", gap: 16,
-      }}
-    >
-      <div style={{
-        width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-        background: `${color}1A`, border: `1px solid ${color}33`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <AlertTriangle size={20} color={color} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: C.text }}>{alert.title}</div>
-        <div style={{ fontSize: 14, color: C.textDim, lineHeight: 1.5 }}>{alert.message}</div>
-        <div style={{
-          fontSize: 13, color, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
-          padding: "6px 10px", borderRadius: 6, alignSelf: "flex-start",
-          background: `${color}14`, border: `1px solid ${color}33`,
-        }}>
-          {alert.metric}
-        </div>
-        <div style={{ marginTop: 4 }}>
-          <div style={{ fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-            Recommended Action
-          </div>
-          <div style={{ fontSize: 14, color: C.text, lineHeight: 1.5 }}>{alert.recommendation}</div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: C.textDim, marginTop: 4 }}>
-          <Zap size={14} color={C.warning} />
-          <span><strong style={{ color: C.text }}>Impact:</strong> {alert.impact}</span>
-        </div>
-      </div>
-      <ChevronRight size={20} color={C.textMuted} style={{ flexShrink: 0, alignSelf: "center" }} />
-    </motion.div>
   );
 }
