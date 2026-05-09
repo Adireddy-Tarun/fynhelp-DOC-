@@ -162,6 +162,9 @@ export default function AdminContentPage() {
       {tab === "glossary" && (
         <Card>
           <Table headers={["Term", "Definition", "Category", "Updated", ""]}>
+            {GLOSSARY.length === 0 && (
+              <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", fontFamily: "Roboto, sans-serif", color: "hsl(var(--fyn-ink) / 0.5)" }}>No glossary terms yet.</td></tr>
+            )}
             {GLOSSARY.map((g) => (
               <tr key={g.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                 <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "Oswald, sans-serif" }}>{g.term}</td>
