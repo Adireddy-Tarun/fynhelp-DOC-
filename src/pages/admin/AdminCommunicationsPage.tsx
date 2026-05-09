@@ -1,32 +1,18 @@
-import { useState } from "react";
-import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send, Calendar } from "lucide-react";
 import { Card, PageHeader } from "./AdminDashboardPage";
+import { EmptyState } from "@/components/admin/EmptyState";
 import { toast } from "sonner";
 import { logAdminAction } from "@/lib/adminAudit";
 import { supabase } from "@/integrations/supabase/client";
 
 type Platform = "whatsapp" | "meta" | "twitter" | "email";
 
-const CHANNELS: { id: Platform; title: string; subtitle: string; icon: typeof MessageCircle; color: string; status: "connected" | "not"; lastSent: string }[] = [
-  { id: "whatsapp", title: "WhatsApp Blast", subtitle: "Broadcast & 1:1 messages", icon: MessageCircle, color: "#25D366", status: "not", lastSent: "Never" },
-  { id: "meta",     title: "Facebook & Instagram", subtitle: "Feed posts & stories", icon: Share2, color: "#1877F2", status: "not", lastSent: "Never" },
-  { id: "twitter",  title: "Twitter / X", subtitle: "Tweets & threads", icon: Twitter, color: "#1DA1F2", status: "not", lastSent: "Never" },
-  { id: "email",    title: "Email Blast", subtitle: "Powered by Resend", icon: Mail, color: "#8B6914", status: "connected", lastSent: "2 days ago" },
-];
-
-const ACTIVITY = [
-  { time: "May 5, 14:35", platform: "whatsapp", type: "Blast", content: "New feature launch! Decision Simulator is live…", recipients: "247 users", status: "sent" },
-  { time: "May 5, 12:20", platform: "meta",     type: "Post",  content: "Customer success story: How TechCorp saved ₹4.2L…", recipients: "—", status: "sent" },
-  { time: "May 4, 18:45", platform: "email",    type: "Blast", content: "Your trial is ending in 3 days — don't lose access", recipients: "89 users", status: "sent" },
-  { time: "May 4, 09:15", platform: "twitter",  type: "Tweet", content: "Weekly tip: Optimize your cash conversion cycle…", recipients: "—", status: "sent" },
-  { time: "May 3, 11:00", platform: "whatsapp", type: "Blast", content: "Reminder: GST returns due in 5 days", recipients: "412 users", status: "sent" },
-  { time: "May 2, 16:22", platform: "email",    type: "Draft", content: "Monthly newsletter — May edition", recipients: "All users", status: "draft" },
-];
-
-const SCHEDULED = [
-  { platform: "whatsapp", content: "New feature launch announcement", when: "Today, 6:00 PM" },
-  { platform: "meta",     content: "Customer success story carousel post", when: "Tomorrow, 10:00 AM" },
-  { platform: "twitter",  content: "Weekly tip #42 — receivables hygiene", when: "May 8, 9:00 AM" },
+const CHANNELS: { id: Platform; title: string; subtitle: string; icon: typeof MessageCircle; color: string; status: "connected" | "not" }[] = [
+  { id: "whatsapp", title: "WhatsApp Blast", subtitle: "Broadcast & 1:1 messages", icon: MessageCircle, color: "#25D366", status: "not" },
+  { id: "meta",     title: "Facebook & Instagram", subtitle: "Feed posts & stories", icon: Share2, color: "#1877F2", status: "not" },
+  { id: "twitter",  title: "Twitter / X", subtitle: "Tweets & threads", icon: Twitter, color: "#1DA1F2", status: "not" },
+  { id: "email",    title: "Email Blast", subtitle: "Powered by Resend", icon: Mail, color: "#8B6914", status: "connected" },
 ];
 
 const PLATFORM_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -35,6 +21,20 @@ const PLATFORM_META: Record<string, { label: string; color: string; bg: string }
   twitter:  { label: "Twitter",  color: "#0F6AB4", bg: "rgba(29,161,242,0.15)" },
   email:    { label: "Email",    color: "#8B6914", bg: "rgba(139,105,20,0.15)" },
 };
+
+type ActivityRow = {
+  id: string; created_at: string; action: string;
+  platform: string; details: any;
+};
+
+function platformFromAction(a: string): string {
+  if (a.startsWith("email_")) return "email";
+  if (a.startsWith("whatsapp_")) return "whatsapp";
+  if (a.startsWith("meta_")) return "meta";
+  if (a.startsWith("twitter_")) return "twitter";
+  return "email";
+}
+
 
 export default function AdminCommunicationsPage() {
   const [openModal, setOpenModal] = useState<Platform | null>(null);
