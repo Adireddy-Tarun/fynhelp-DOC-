@@ -41,6 +41,8 @@ export default function TestSecureImportPage() {
     setLoading(true);
     setResult(null);
     const bId = overrides?.businessId !== undefined ? overrides.businessId : (overrideBusinessId ?? businessId);
+    console.log("[TestSecureImport] businessId from useAuth:", businessId);
+    console.log("[TestSecureImport] business_id sent in body:", bId);
     try {
       const { data, error } = await supabaseExternal.functions.invoke("secure-data-import", {
         body: {
