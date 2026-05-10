@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { supabaseExternal } from "@/integrations/supabase/external";
 
 type DataType = "transactions" | "invoices" | "vendor_payments";
@@ -44,7 +45,14 @@ export default function TestSecureImportPage() {
     console.log("[TestSecureImport] businessId from useAuth:", businessId);
     console.log("[TestSecureImport] business_id sent in body:", bId);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
       const { data, error } = await supabaseExternal.functions.invoke("secure-data-import", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: {
           data_type: dataType,
           business_id: bId,
