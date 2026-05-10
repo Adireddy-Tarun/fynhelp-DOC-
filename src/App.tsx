@@ -65,6 +65,7 @@ import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
 import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
 import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
+import TestSecureImportPage from "./pages/dashboard/TestSecureImportPage.tsx";
 import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
