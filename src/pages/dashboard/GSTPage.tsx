@@ -505,112 +505,330 @@ const GSTPage = () => {
   };
 
   /* ────────────── Overview tab ────────────── */
+  const handleExportTax = () => {
+    if (!taxData) return;
+    const rows: any[] = [
+      { metric: "Overall Compliance %", value: taxData.compliance.overall_compliance_rate.toFixed(1) },
+      { metric: "GST Compliance %", value: taxData.compliance.gst_compliance_rate.toFixed(1) },
+      { metric: "TDS Compliance %", value: taxData.compliance.tds_compliance_rate.toFixed(1) },
+      { metric: "Current Liability", value: taxData.tax_liability.current_liability },
+      { metric: "Output Tax", value: taxData.tax_liability.output_tax },
+      { metric: "Input Tax (ITC)", value: taxData.tax_liability.input_tax },
+      { metric: "ITC Utilization %", value: taxData.tax_liability.itc_utilization_percent.toFixed(1) },
+    ];
+    exportToCsv(rows, "tax-intelligence");
+  };
+
   const renderOverviewTab = () => {
-    if (gstLoading || tdsLoading) {
+    if (gstLoading || tdsLoading || (taxLoading && !taxData)) {
       return (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => <div key={i} className="h-24 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />)}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[0, 1, 2, 3].map((i) => <div key={i} className="h-24 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />)}
+          </div>
+          <div className="h-64 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="h-48 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />
+            <div className="h-48 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse" />
+          </div>
         </div>
       );
     }
-    if (allEmpty) {
+    if (taxError) {
+      return (
+        <div className="bg-fyn-beige-dark border border-[#C41E1E]/30 rounded-lg p-8 text-center">
+          <AlertTriangle className="w-10 h-10 mx-auto text-[#C41E1E] mb-3" />
+          <h3 className="text-fyn-ink text-lg font-serif mb-2">Couldn't load tax intelligence</h3>
+          <p className="text-fyn-ink/60 text-sm mb-5">{(taxError as Error).message}</p>
+          <button onClick={() => refetchTax()} className="bg-fyn-ink text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 inline-flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" /> Retry
+          </button>
+        </div>
+      );
+    }
+    const isAllZero = taxData
+      ? taxData.tax_liability.current_liability === 0 &&
+        taxData.tax_liability.output_tax === 0 &&
+        taxData.gst_summary.total_filings === 0 &&
+        taxData.tds_summary.total_filings === 0
+      : allEmpty;
+
+    if (isAllZero) {
       return (
         <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-12 text-center">
-          <h3 className="text-fyn-ink text-xl font-serif mb-2">No Tax Data Yet</h3>
-          <p className="text-fyn-ink/60 text-sm mb-6">
-            Connect your accounting system to see combined GST + TDS compliance health.
-          </p>
+          <TrendingUp className="w-12 h-12 mx-auto text-fyn-ink/40 mb-3" />
+          <h3 className="text-fyn-ink text-xl font-serif mb-2">No tax data yet</h3>
+          <p className="text-fyn-ink/60 text-sm mb-6">Upload filings or connect your accounting system to see live compliance and forecasts.</p>
           <button
-            onClick={() => navigate("/dashboard/settings/integrations")}
+            onClick={() => navigate("/dashboard/data-import")}
             className="bg-[#C41E1E] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
           >
-            Connect Accounting →
+            Upload Data →
           </button>
         </div>
       );
     }
 
+    if (!taxData) return null;
+
+    const itcPct = taxData.tax_liability.itc_utilization_percent;
+    const itcBadgeColor = itcPct > 70 ? "#1A6B3C" : itcPct >= 50 ? "#8B5A00" : "#C41E1E";
+    const itcBadgeLabel = itcPct > 70 ? "Healthy" : itcPct >= 50 ? "Watch" : "Low";
+
+    const sevIcon = (s: string) =>
+      s === "critical" ? <AlertTriangle className="w-4 h-4 text-[#C41E1E]" /> :
+      s === "warning" ? <AlertCircle className="w-4 h-4 text-[#8B5A00]" /> :
+      <Info className="w-4 h-4 text-fyn-ink/60" />;
+    const sevBg = (s: string) =>
+      s === "critical" ? "bg-[#C41E1E]/5 border-[#C41E1E]/30" :
+      s === "warning" ? "bg-[#8B5A00]/5 border-[#8B5A00]/30" :
+      "bg-fyn-ink/5 border-fyn-ink-10";
+
+    const priorityBadge = (p: string) => {
+      const c = p === "high" ? "#C41E1E" : p === "medium" ? "#8B5A00" : "#1A6B3C";
+      return <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium" style={{ background: `${c}15`, color: c }}>{p}</span>;
+    };
+
     return (
       <>
-        {/* Combined metrics */}
+        {/* Action bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <p className="text-fyn-ink/60 text-xs">
+            Live compliance · refreshed every minute{taxFetching ? " · updating…" : ""}
+          </p>
+          <div className="flex items-center gap-2 print:hidden">
+            <button onClick={() => refetchTax()} disabled={taxFetching} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-fyn-ink-10 text-fyn-ink hover:bg-fyn-beige-card disabled:opacity-50">
+              <RefreshCw className={`w-3.5 h-3.5 ${taxFetching ? "animate-spin" : ""}`} /> Refresh
+            </button>
+            <button onClick={handleExportTax} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-fyn-ink-10 text-fyn-ink hover:bg-fyn-beige-card">
+              <Download className="w-3.5 h-3.5" /> Export
+            </button>
+            <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-fyn-ink-10 text-fyn-ink hover:bg-fyn-beige-card">
+              Print
+            </button>
+          </div>
+        </div>
+
+        {/* Combined health metrics (existing) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Metric
             label="ON-TIME FILING %"
-            value={overview.onTimeRate === null ? "—" : `${overview.onTimeRate}%`}
-            sub={overview.filedCount > 0 ? `${overview.filedCount} filings completed` : "No filings yet"}
+            value={`${taxData.compliance.overall_compliance_rate.toFixed(0)}%`}
+            sub={`${taxData.gst_summary.filed + taxData.tds_summary.filed} filings completed`}
           />
-          <Metric label="OVERDUE (TOTAL)" value={overview.overdue} sub={overview.overdue > 0 ? "Requires attention" : "All on track"} danger={overview.overdue > 0} />
+          <Metric
+            label="OVERDUE (TOTAL)"
+            value={taxData.gst_summary.overdue + taxData.tds_summary.overdue}
+            sub={taxData.gst_summary.overdue + taxData.tds_summary.overdue > 0 ? "Requires attention" : "All on track"}
+            danger={taxData.gst_summary.overdue + taxData.tds_summary.overdue > 0}
+          />
           <Metric
             label="NEXT DEADLINE"
-            value={overview.next ? fmtDate(overview.next.due) : "—"}
-            sub={overview.next ? `${overview.next.type} · ${overview.next.label}` : "No upcoming filings"}
+            value={taxData.upcoming_deadlines[0] ? fmtDate(taxData.upcoming_deadlines[0].due_date) : "—"}
+            sub={taxData.upcoming_deadlines[0] ? `${taxData.upcoming_deadlines[0].type} · ${taxData.upcoming_deadlines[0].filing_type}` : "No upcoming filings"}
           />
           <Metric
             label="TAX HEALTH"
-            value={<span style={{ color: overview.health.color }}>{overview.health.label}</span>}
-            sub={overview.health.tone}
+            value={<span style={{ color: taxData.compliance.health.color }}>{taxData.compliance.health.label}</span>}
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Upcoming */}
+        {/* Tax Liability section */}
+        <h3 className="text-fyn-ink font-serif text-lg mb-3">Tax Liability {taxData.tax_liability.period && <span className="text-fyn-ink/50 text-sm">· {taxData.tax_liability.period}</span>}</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Metric label="CURRENT LIABILITY" value={formatINR(taxData.tax_liability.current_liability)} sub="Net payable" />
+          <Metric label="OUTPUT TAX" value={formatINR(taxData.tax_liability.output_tax)} sub="GST on sales" />
+          <Metric label="INPUT TAX (ITC)" value={formatINR(taxData.tax_liability.input_tax)} sub="Credit available" />
+          <div className="bg-fyn-ink rounded-lg p-5">
+            <p className="text-white/40 text-[13px] fyn-label">ITC UTILIZATION</p>
+            <p className="text-[28px] font-bold mt-1 font-sans text-white">{itcPct.toFixed(0)}%</p>
+            <span className="inline-block text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium mt-1" style={{ background: `${itcBadgeColor}30`, color: itcBadgeColor }}>{itcBadgeLabel}</span>
+          </div>
+        </div>
+
+        {/* Trend chart */}
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
+          <h3 className="text-fyn-ink font-serif text-lg mb-4">12-Month Tax Trend</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={taxData.trend} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="outputGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#C41E1E" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="#C41E1E" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="inputGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#1A6B3C" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="#1A6B3C" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1A100815" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#1A1008" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#1A1008" }} tickFormatter={(v) => formatINR(v)} />
+                <RTooltip
+                  contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
+                  formatter={(v: any, name: string) => [formatINR(Number(v)), name]}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Area type="monotone" dataKey="output_tax" stackId="1" stroke="#C41E1E" fill="url(#outputGrad)" name="Output Tax" />
+                <Area type="monotone" dataKey="input_tax" stackId="2" stroke="#1A6B3C" fill="url(#inputGrad)" name="Input Tax (ITC)" />
+                <Line type="monotone" dataKey="net_liability" stroke="#1A1008" strokeWidth={2} dot={{ r: 3 }} name="Net Liability" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Forecast */}
+        <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6">
+          <h3 className="text-fyn-ink font-serif text-lg mb-4">3-Month Liability Forecast</h3>
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={taxData.forecast} margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1A100815" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#1A1008" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#1A1008" }} tickFormatter={(v) => formatINR(v)} />
+                <RTooltip
+                  contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
+                  formatter={(v: any, _n, p: any) => [`${formatINR(Number(v))} (${p?.payload?.confidence})`, "Estimate"]}
+                />
+                <Line type="monotone" dataKey="estimated_liability" stroke="#8B6914" strokeWidth={2} strokeDasharray="6 4" dot={{ r: 5, fill: "#8B6914" }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {taxData.forecast.map((f) => (
+              <span key={f.month} className="text-[11px] px-2 py-0.5 rounded bg-fyn-ink/5 text-fyn-ink/70">
+                {f.month}: <span className="fyn-metric text-fyn-ink">{formatINR(f.estimated_liability)}</span> · {f.confidence}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Compliance breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {[
+            { label: "GST Compliance", rate: taxData.compliance.gst_compliance_rate, on: taxData.gst_summary.on_time, total: taxData.gst_summary.filed, tab: "gst" },
+            { label: "TDS Compliance", rate: taxData.compliance.tds_compliance_rate, on: taxData.tds_summary.on_time, total: taxData.tds_summary.filed, tab: "tds" },
+          ].map((c) => {
+            const r = Math.round(c.rate);
+            const color = r >= 80 ? "#1A6B3C" : r >= 50 ? "#8B5A00" : "#C41E1E";
+            const circ = 2 * Math.PI * 36;
+            return (
+              <button
+                key={c.label}
+                onClick={() => handleTabChange(c.tab)}
+                className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 text-left hover:border-fyn-ink/30 transition-colors flex items-center gap-5"
+              >
+                <svg width="92" height="92" viewBox="0 0 92 92">
+                  <circle cx="46" cy="46" r="36" stroke="#1A100815" strokeWidth="8" fill="none" />
+                  <circle cx="46" cy="46" r="36" stroke={color} strokeWidth="8" fill="none"
+                    strokeDasharray={`${(circ * r) / 100} ${circ}`} strokeLinecap="round"
+                    transform="rotate(-90 46 46)" />
+                  <text x="46" y="51" textAnchor="middle" fontSize="18" fontWeight="700" fill="#1A1008" fontFamily="JetBrains Mono, monospace">{r}%</text>
+                </svg>
+                <div>
+                  <p className="text-fyn-ink font-serif text-lg">{c.label}</p>
+                  <p className="text-fyn-ink/60 text-sm fyn-metric">{c.on}/{c.total} on time</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Upcoming deadlines table + Alerts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-            <h3 className="text-fyn-ink font-serif text-lg mb-4">Upcoming Deadlines</h3>
-            {overview.upcoming.length === 0 ? (
+            <h3 className="text-fyn-ink font-serif text-lg mb-3">Upcoming Deadlines</h3>
+            {taxData.upcoming_deadlines.length === 0 ? (
               <p className="text-fyn-ink/60 text-sm">Nothing pending. You're caught up.</p>
             ) : (
-              <ul className="space-y-2">
-                {overview.upcoming.slice(0, 8).map((r, i) => {
-                  const days = Math.ceil((new Date(r.due).getTime() - now.getTime()) / 86400000);
-                  const urgent = days <= 7;
-                  return (
-                    <li key={i} className="flex items-center justify-between gap-3 py-2 border-b border-fyn-ink-10 last:border-0">
-                      <div className="min-w-0">
-                        <p className="text-fyn-ink text-sm font-medium truncate">
-                          <span className="text-[10px] uppercase tracking-wider mr-2 px-1.5 py-0.5 rounded bg-fyn-ink/10 text-fyn-ink/70">{r.type}</span>
-                          {r.label}
-                        </p>
-                        <p className="text-fyn-ink/60 text-xs fyn-metric">{fmtDate(r.due)}</p>
-                      </div>
-                      <span className={`text-[11px] px-2 py-0.5 rounded ${urgent ? "bg-[#C41E1E]/10 text-[#C41E1E]" : "bg-fyn-ink/5 text-fyn-ink/70"}`}>
-                        {days <= 0 ? "Today" : `${days}d`}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-fyn-ink/40 text-[11px] fyn-label border-b border-fyn-ink-10">
+                      <th className="text-left py-2">Type</th>
+                      <th className="text-left py-2">Filing</th>
+                      <th className="text-left py-2">Period</th>
+                      <th className="text-left py-2">Due</th>
+                      <th className="text-right py-2">Days</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {taxData.upcoming_deadlines.slice(0, 8).map((d, i) => {
+                      const days = d.days_remaining;
+                      const tone = days <= 7 ? "#C41E1E" : days <= 15 ? "#8B5A00" : "#1A6B3C";
+                      return (
+                        <tr key={i} onClick={() => handleTabChange(d.type === "GST" ? "gst" : "tds")}
+                          className="border-b border-fyn-ink-10 last:border-0 cursor-pointer hover:bg-fyn-beige-card"
+                          style={{ boxShadow: `inset 3px 0 0 0 ${tone}` }}
+                        >
+                          <td className="py-2 text-fyn-ink font-medium text-xs">{d.type}</td>
+                          <td className="py-2 text-fyn-ink/80 text-xs">{d.filing_type}</td>
+                          <td className="py-2 text-fyn-ink/70 text-xs">{d.period}</td>
+                          <td className="py-2 text-fyn-ink/70 fyn-metric text-xs">{fmtDate(d.due_date)}</td>
+                          <td className="py-2 text-right">
+                            <span className="text-[11px] px-2 py-0.5 rounded fyn-metric" style={{ background: `${tone}15`, color: tone }}>
+                              {days <= 0 ? "Today" : `${days}d`}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
-          {/* Recent */}
           <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
-            <h3 className="text-fyn-ink font-serif text-lg mb-4">Recent Filings</h3>
-            {overview.recent.length === 0 ? (
-              <p className="text-fyn-ink/60 text-sm">No filings completed yet.</p>
+            <h3 className="text-fyn-ink font-serif text-lg mb-3">Alerts</h3>
+            {taxData.alerts.length === 0 ? (
+              <p className="text-fyn-ink/60 text-sm">No active alerts. Everything looks good.</p>
             ) : (
               <ul className="space-y-2">
-                {overview.recent.map((r, i) => (
-                  <li key={i} className="flex items-center justify-between gap-3 py-2 border-b border-fyn-ink-10 last:border-0">
-                    <div className="min-w-0">
-                      <p className="text-fyn-ink text-sm font-medium truncate">
-                        <span className="text-[10px] uppercase tracking-wider mr-2 px-1.5 py-0.5 rounded bg-fyn-ink/10 text-fyn-ink/70">{r.type}</span>
-                        {r.label}
-                      </p>
-                      <p className="text-fyn-ink/60 text-xs fyn-metric">Filed {r.filedDate ? fmtDate(r.filedDate) : "—"}</p>
+                {taxData.alerts.map((a, i) => (
+                  <li key={i} className={`border rounded-md p-3 ${sevBg(a.severity)}`}>
+                    <div className="flex items-start gap-2">
+                      {sevIcon(a.severity)}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-fyn-ink text-sm font-medium">{a.title}</p>
+                        <p className="text-fyn-ink/70 text-xs mt-0.5">{a.message}</p>
+                        {a.action && <p className="text-fyn-ink/60 text-[11px] mt-1 italic">→ {a.action}</p>}
+                      </div>
                     </div>
-                    <span
-                      className={`text-[11px] px-2 py-0.5 rounded ${
-                        r.bucket === "on-time" ? "bg-[#1A6B3C]/10 text-[#1A6B3C]" : "bg-[#8B5A00]/10 text-[#8B5A00]"
-                      }`}
-                    >
-                      {r.bucket === "on-time" ? "On time" : "Late"}
-                    </span>
                   </li>
                 ))}
               </ul>
             )}
           </div>
         </div>
+
+        {/* Suggestions */}
+        {taxData.suggestions.length > 0 && (
+          <div className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-4 h-4 text-fyn-gold" />
+              <h3 className="text-fyn-ink font-serif text-lg">Tax Optimization Suggestions</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {taxData.suggestions.map((s, i) => (
+                <div key={i} className="border border-fyn-ink-10 rounded-md p-4 bg-card flex flex-col">
+                  <div className="flex items-center justify-between mb-2">
+                    {priorityBadge(s.priority)}
+                    <span className="text-[10px] uppercase tracking-wider text-fyn-ink/50">{s.type.replace(/_/g, " ")}</span>
+                  </div>
+                  <p className="text-fyn-ink text-sm flex-1">{s.message}</p>
+                  {s.potential_savings && s.potential_savings > 0 && (
+                    <p className="text-fyn-success text-xs fyn-metric mt-2">Est. savings: {formatINR(s.potential_savings)}</p>
+                  )}
+                  <button className="mt-3 inline-flex items-center gap-1 text-xs text-fyn-ink hover:underline self-start">
+                    Review <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </>
     );
   };
