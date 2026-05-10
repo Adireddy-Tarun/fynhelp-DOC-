@@ -2,9 +2,45 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseExternal } from "@/integrations/supabase/external";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatINR } from "@/lib/indian-format";
+import { exportToCsv } from "@/utils/csvExport";
+import {
+  ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis,
+  CartesianGrid, Tooltip as RTooltip, Legend,
+} from "recharts";
+import {
+  RefreshCw, Download, AlertTriangle, AlertCircle, Info, TrendingUp,
+  Sparkles, ArrowRight,
+} from "lucide-react";
+
+/* ────────────── Tax Intelligence (edge function) types ────────────── */
+interface TaxIntelligenceResponse {
+  compliance: {
+    overall_compliance_rate: number;
+    gst_compliance_rate: number;
+    tds_compliance_rate: number;
+    health: { label: string; color: string };
+  };
+  gst_summary: { total_filings: number; filed: number; on_time: number; overdue: number };
+  tds_summary: { total_filings: number; filed: number; on_time: number; overdue: number };
+  tax_liability: {
+    current_liability: number;
+    output_tax: number;
+    input_tax: number;
+    itc_utilization_percent: number;
+    period: string | null;
+  };
+  trend: Array<{ month: string; output_tax: number; input_tax: number; net_liability: number }>;
+  forecast: Array<{ month: string; estimated_liability: number; confidence: string }>;
+  upcoming_deadlines: Array<{
+    type: "GST" | "TDS"; filing_type: string; period: string; due_date: string; days_remaining: number;
+  }>;
+  alerts: Array<{ severity: "critical" | "warning" | "info"; title: string; message: string; action?: string }>;
+  suggestions: Array<{ priority: "high" | "medium" | "low"; type: string; message: string; potential_savings?: number }>;
+}
 
 /* ────────────── Types ────────────── */
 
