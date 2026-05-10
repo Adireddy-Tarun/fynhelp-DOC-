@@ -169,6 +169,20 @@ const GSTPage = () => {
     enabled: !!businessId,
   });
 
+  const { data: taxData, isLoading: taxLoading, error: taxError, refetch: refetchTax, isFetching: taxFetching } = useQuery<TaxIntelligenceResponse>({
+    queryKey: ["tax-intelligence", businessId],
+    queryFn: async () => {
+      if (!businessId) throw new Error("No business ID");
+      const { data, error } = await supabaseExternal.functions.invoke("tax-intelligence", {
+        body: { business_id: businessId, org_id: businessId },
+      });
+      if (error) throw error;
+      return data as TaxIntelligenceResponse;
+    },
+    enabled: !!businessId,
+    refetchInterval: 60000,
+  });
+
   const { data: tdsFilings, isLoading: tdsLoading } = useQuery({
     queryKey: ["tds-filings", businessId],
     queryFn: async (): Promise<TdsFiling[]> => {
