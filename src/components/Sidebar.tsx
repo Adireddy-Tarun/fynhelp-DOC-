@@ -47,6 +47,7 @@ const menuSections = [
     items: [
       { icon: Receipt, label: "Transactions", path: "/dashboard/data-import", color: "#64748B" },
       { icon: FileSpreadsheet, label: "Reports", path: "/dashboard/reports", color: "#64748B" },
+      { icon: Receipt, label: "Test Secure Import", path: "/dashboard/test-secure-import", color: "#C41E1E" },
     ],
   },
   {

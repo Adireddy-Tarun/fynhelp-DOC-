@@ -65,6 +65,7 @@ import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
 import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
 import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
+import TestSecureImportPage from "./pages/dashboard/TestSecureImportPage.tsx";
 import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
@@ -172,6 +173,7 @@ const App = () => (
             <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
             <Route path="/dashboard/banking" element={<BankingPage />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
+            <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
