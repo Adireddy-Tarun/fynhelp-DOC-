@@ -45,14 +45,7 @@ export default function TestSecureImportPage() {
     console.log("[TestSecureImport] businessId from useAuth:", businessId);
     console.log("[TestSecureImport] business_id sent in body:", bId);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error("Not authenticated");
-      }
       const { data, error } = await supabaseExternal.functions.invoke("secure-data-import", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: {
           data_type: dataType,
           business_id: bId,
