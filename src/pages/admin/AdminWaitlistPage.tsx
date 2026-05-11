@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Users, UserPlus, Calendar, CalendarRange, Search, Download, RefreshCw,
   CheckCircle2, RotateCcw, Trash2, ChevronUp, ChevronDown, X,
@@ -24,8 +24,11 @@ type WaitlistRow = {
 
 type SortKey = keyof WaitlistRow;
 type SortDir = "asc" | "desc";
+type SearchField = "all" | "email" | "name" | "company_name";
 
 const PAGE_SIZE = 20;
+const EXPORT_LIMIT = 10000;
+const DISTINCT_LIMIT = 1000;
 
 function convertedBadge(c: boolean | null) {
   const cfg = c
@@ -58,15 +61,51 @@ function csvEscape(v: unknown) {
   return s;
 }
 
+// Escape value for use inside a PostgREST .or() filter — commas, parens, quotes break the parser.
+function escOrValue(v: string) {
+  return v.replace(/[(),]/g, " ").replace(/"/g, '""').trim();
+}
+
+type Filters = {
+  searchField: SearchField;
+  search: string;
+  convertedFilter: "all" | "converted" | "pending";
+  companyFilter: string;
+  locationFilter: string;
+};
+
+// Apply filters to a Supabase query builder. Returns the same builder for chaining.
+function applyFilters<T extends { ilike: any; or: any; eq: any }>(q: T, f: Filters): T {
+  const term = f.search.trim();
+  if (term) {
+    if (f.searchField === "all") {
+      const v = `%${escOrValue(term)}%`;
+      q = q.or(`email.ilike.${v},name.ilike.${v},company_name.ilike.${v}`);
+    } else {
+      q = q.ilike(f.searchField, `%${term}%`);
+    }
+  }
+  if (f.convertedFilter !== "all") {
+    q = q.eq("is_converted", f.convertedFilter === "converted");
+  }
+  if (f.companyFilter !== "all") q = q.eq("company_name", f.companyFilter);
+  if (f.locationFilter !== "all") q = q.eq("location", f.locationFilter);
+  return q;
+}
+
 export default function AdminWaitlistPage() {
   const { user, isAdmin, roles, loading: authLoading } = useAdminAuth();
   const [testing, setTesting] = useState(false);
 
   const [rows, setRows] = useState<WaitlistRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [search, setSearch] = useState("");
+  // Filters / search / sort / page
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState(""); // debounced
+  const [searchField, setSearchField] = useState<SearchField>("all");
   const [convertedFilter, setConvertedFilter] = useState<"all" | "converted" | "pending">("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
   const [locationFilter, setLocationFilter] = useState<string>("all");
@@ -75,28 +114,103 @@ export default function AdminWaitlistPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  async function load() {
+  // Stats (server-counted)
+  const [stats, setStats] = useState({ total: 0, converted: 0, today: 0, week: 0, month: 0 });
+
+  // Distinct dropdown options (loaded once / on refresh)
+  const [companyOptions, setCompanyOptions] = useState<string[]>([]);
+  const [locationOptions, setLocationOptions] = useState<string[]>([]);
+
+  // Debounce search input → search
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput), 350);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const filters: Filters = useMemo(() => ({
+    searchField, search, convertedFilter, companyFilter, locationFilter,
+  }), [searchField, search, convertedFilter, companyFilter, locationFilter]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => { setPage(1); }, [searchField, search, convertedFilter, companyFilter, locationFilter, sortKey, sortDir]);
+
+  // Server-paginated load
+  const load = useCallback(async () => {
     setLoading(true); setError(null);
-    const { data, error } = await supabase
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
+    let q = supabase
       .from("waitlist")
-      .select("id,email,name,company_name,phone,company_type,company_size,location,position,is_converted,created_at")
-      .order("created_at", { ascending: false });
+      .select(
+        "id,email,name,company_name,phone,company_type,company_size,location,position,is_converted,created_at",
+        { count: "exact" }
+      );
+    q = applyFilters(q, filters);
+    q = q.order(sortKey as string, { ascending: sortDir === "asc", nullsFirst: false }).range(from, to);
+
+    const { data, error, count } = await q;
     if (error) {
       setError(error.message);
       setRows([]);
+      setTotalCount(0);
     } else {
       setRows((data ?? []) as WaitlistRow[]);
+      setTotalCount(count ?? 0);
     }
     setLoading(false);
-  }
+  }, [page, filters, sortKey, sortDir]);
 
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { load(); }, [load]);
 
-  // Realtime — new signups appear immediately without manual refresh.
+  // Stats — fire 5 head-only count queries in parallel; refire on filter changes? Keep stats global (unfiltered) so they stay meaningful.
+  const loadStats = useCallback(async () => {
+    const now = new Date();
+    const startOfDay = new Date(now); startOfDay.setHours(0,0,0,0);
+    const startOfWeek = new Date(startOfDay);
+    const dow = (startOfWeek.getDay() + 6) % 7;
+    startOfWeek.setDate(startOfWeek.getDate() - dow);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const head = () => supabase.from("waitlist").select("id", { count: "exact", head: true });
+    const [total, converted, today, week, month] = await Promise.all([
+      head(),
+      head().eq("is_converted", true),
+      head().gte("created_at", startOfDay.toISOString()),
+      head().gte("created_at", startOfWeek.toISOString()),
+      head().gte("created_at", startOfMonth.toISOString()),
+    ]);
+    setStats({
+      total: total.count ?? 0,
+      converted: converted.count ?? 0,
+      today: today.count ?? 0,
+      week: week.count ?? 0,
+      month: month.count ?? 0,
+    });
+  }, []);
+
+  // Distinct company / location values for the dropdowns
+  const loadDistincts = useCallback(async () => {
+    const [companies, locations] = await Promise.all([
+      supabase.from("waitlist").select("company_name").not("company_name", "is", null).limit(DISTINCT_LIMIT),
+      supabase.from("waitlist").select("location").not("location", "is", null).limit(DISTINCT_LIMIT),
+    ]);
+    const dedupSort = (rows: { [k: string]: any }[] | null, k: string) =>
+      Array.from(new Set((rows ?? []).map((r) => (r[k] ?? "").toString().trim()).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b));
+    setCompanyOptions(dedupSort(companies.data, "company_name"));
+    setLocationOptions(dedupSort(locations.data, "location"));
+  }, []);
+
+  useEffect(() => { loadStats(); loadDistincts(); }, [loadStats, loadDistincts]);
+
+  // Realtime — refresh current page + stats on any change
+  const reloadAllRef = useRef<() => void>(() => {});
+  reloadAllRef.current = () => { load(); loadStats(); loadDistincts(); };
   useEffect(() => {
     const ch = supabase
       .channel("waitlist-admin")
-      .on("postgres_changes", { event: "*", schema: "public", table: "waitlist" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "waitlist" }, () => reloadAllRef.current())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
@@ -104,7 +218,14 @@ export default function AdminWaitlistPage() {
   async function runTestSignup() {
     setTesting(true);
     const stamp = Date.now();
-    const nextPos = (rows.reduce((m, r) => Math.max(m, r.position ?? 0), 0) || 0) + 1;
+    // Get current max position from server to avoid stale local state.
+    const { data: maxRow } = await supabase
+      .from("waitlist")
+      .select("position")
+      .order("position", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+    const nextPos = ((maxRow?.position as number | null) ?? 0) + 1;
     const payload = {
       email: `test+${stamp}@fynhelp.test`,
       name: "Admin Test Signup",
@@ -117,94 +238,19 @@ export default function AdminWaitlistPage() {
     };
     const { error } = await supabase.from("waitlist").insert(payload);
     setTesting(false);
-    if (error) {
-      toast.error(`Test signup failed: ${error.message}`);
-      return;
-    }
+    if (error) { toast.error(`Test signup failed: ${error.message}`); return; }
     toast.success(`Test entry created (${payload.email})`);
-    await load();
+    // realtime will refresh; trigger an immediate reload too in case the channel is slow.
+    reloadAllRef.current();
   }
 
-  // Stats
-  const stats = useMemo(() => {
-    const now = new Date();
-    const startOfDay = new Date(now); startOfDay.setHours(0,0,0,0);
-    const startOfWeek = new Date(startOfDay);
-    const dow = (startOfWeek.getDay() + 6) % 7;
-    startOfWeek.setDate(startOfWeek.getDate() - dow);
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    let today = 0, week = 0, month = 0, converted = 0;
-    for (const r of rows) {
-      const t = new Date(r.created_at).getTime();
-      if (t >= startOfDay.getTime()) today++;
-      if (t >= startOfWeek.getTime()) week++;
-      if (t >= startOfMonth.getTime()) month++;
-      if (r.is_converted) converted++;
-    }
-    return { total: rows.length, today, week, month, converted };
-  }, [rows]);
-
-  // Distinct dropdown options
-  const companyOptions = useMemo(() => {
-    const s = new Set<string>();
-    rows.forEach((r) => { const v = (r.company_name ?? "").trim(); if (v) s.add(v); });
-    return Array.from(s).sort((a, b) => a.localeCompare(b));
-  }, [rows]);
-
-  const locationOptions = useMemo(() => {
-    const s = new Set<string>();
-    rows.forEach((r) => { const v = (r.location ?? "").trim(); if (v) s.add(v); });
-    return Array.from(s).sort((a, b) => a.localeCompare(b));
-  }, [rows]);
-
-  // Filter — search matches name OR email; dropdowns narrow by converted/company/location.
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
-      if (convertedFilter === "converted" && !r.is_converted) return false;
-      if (convertedFilter === "pending" && r.is_converted) return false;
-      if (companyFilter !== "all" && (r.company_name ?? "").trim() !== companyFilter) return false;
-      if (locationFilter !== "all" && (r.location ?? "").trim() !== locationFilter) return false;
-      if (!q) return true;
-      return [r.name, r.email].some(
-        (v) => (v ?? "").toString().toLowerCase().includes(q)
-      );
-    });
-  }, [rows, search, convertedFilter, companyFilter, locationFilter]);
-
-  // Sort
-  const sorted = useMemo(() => {
-    const arr = [...filtered];
-    arr.sort((a, b) => {
-      let av: unknown, bv: unknown;
-      if (sortKey === "created_at") {
-        av = new Date(a.created_at).getTime(); bv = new Date(b.created_at).getTime();
-      } else if (sortKey === "position") {
-        av = a.position ?? 0; bv = b.position ?? 0;
-      } else if (sortKey === "is_converted") {
-        av = a.is_converted ? 1 : 0; bv = b.is_converted ? 1 : 0;
-      } else {
-        av = (a[sortKey] ?? "") as string; bv = (b[sortKey] ?? "") as string;
-      }
-      if (typeof av === "number" && typeof bv === "number") {
-        return sortDir === "asc" ? av - bv : bv - av;
-      }
-      const as = String(av).toLowerCase(), bs = String(bv).toLowerCase();
-      return sortDir === "asc" ? as.localeCompare(bs) : bs.localeCompare(as);
-    });
-    return arr;
-  }, [filtered, sortKey, sortDir]);
-
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  // Pagination math
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageRows = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  useEffect(() => { setPage(1); }, [search, convertedFilter, companyFilter, locationFilter]);
 
   function toggleSort(k: SortKey) {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(k); setSortDir("asc"); }
+    else { setSortKey(k); setSortDir("desc"); }
   }
 
   function toggleRow(id: string) {
@@ -216,44 +262,50 @@ export default function AdminWaitlistPage() {
   }
 
   function toggleAllOnPage() {
-    const allSelected = pageRows.every((r) => selected.has(r.id));
+    const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
     setSelected((prev) => {
       const next = new Set(prev);
-      if (allSelected) pageRows.forEach((r) => next.delete(r.id));
-      else pageRows.forEach((r) => next.add(r.id));
+      if (allSelected) rows.forEach((r) => next.delete(r.id));
+      else rows.forEach((r) => next.add(r.id));
       return next;
     });
   }
 
   async function setConverted(ids: string[], value: boolean) {
     if (!ids.length) return;
-    const { error } = await supabase
-      .from("waitlist")
-      .update({ is_converted: value })
-      .in("id", ids);
+    const { error } = await supabase.from("waitlist").update({ is_converted: value }).in("id", ids);
     if (error) { toast.error(`Update failed: ${error.message}`); return; }
-    setRows((prev) => prev.map((r) => ids.includes(r.id) ? { ...r, is_converted: value } : r));
     toast.success(`${value ? "Marked" : "Unmarked"} ${ids.length} as converted`);
+    reloadAllRef.current();
   }
 
   async function deleteRows(ids: string[]) {
     if (!ids.length) return;
     if (!confirm(`Delete ${ids.length} waitlist ${ids.length === 1 ? "entry" : "entries"}? This cannot be undone.`)) return;
-    const { error } = await supabase
-      .from("waitlist")
-      .delete()
-      .in("id", ids);
+    const { error } = await supabase.from("waitlist").delete().in("id", ids);
     if (error) { toast.error(`Delete failed: ${error.message}`); return; }
-    setRows((prev) => prev.filter((r) => !ids.includes(r.id)));
     setSelected((prev) => {
       const next = new Set(prev);
       ids.forEach((id) => next.delete(id));
       return next;
     });
     toast.success(`Deleted ${ids.length} ${ids.length === 1 ? "entry" : "entries"}`);
+    reloadAllRef.current();
   }
 
-  function exportCsv() {
+  const [exporting, setExporting] = useState(false);
+  async function exportCsv() {
+    setExporting(true);
+    let q = supabase
+      .from("waitlist")
+      .select("id,email,name,company_name,phone,company_type,company_size,location,position,is_converted,created_at");
+    q = applyFilters(q, filters);
+    q = q.order(sortKey as string, { ascending: sortDir === "asc", nullsFirst: false }).range(0, EXPORT_LIMIT - 1);
+
+    const { data, error } = await q;
+    setExporting(false);
+    if (error) { toast.error(`Export failed: ${error.message}`); return; }
+    const all = (data ?? []) as WaitlistRow[];
     const cols: { key: keyof WaitlistRow | "converted"; label: string }[] = [
       { key: "position", label: "Position" },
       { key: "email", label: "Email" },
@@ -267,7 +319,7 @@ export default function AdminWaitlistPage() {
       { key: "created_at", label: "Created At" },
     ];
     const header = cols.map((c) => csvEscape(c.label)).join(",");
-    const lines = sorted.map((r) =>
+    const lines = all.map((r) =>
       cols.map((c) => {
         if (c.key === "converted") return csvEscape(r.is_converted ? "yes" : "no");
         return csvEscape((r as any)[c.key]);
@@ -280,19 +332,21 @@ export default function AdminWaitlistPage() {
     a.download = `waitlist-${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
-    toast.success(`Exported ${sorted.length} rows`);
+    toast.success(`Exported ${all.length} rows`);
   }
 
   function clearFilters() {
+    setSearchInput("");
     setSearch("");
+    setSearchField("all");
     setConvertedFilter("all");
     setCompanyFilter("all");
     setLocationFilter("all");
   }
 
-  const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
+  const allOnPageSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
   const selectedIds = Array.from(selected);
-  const hasFilters = search || convertedFilter !== "all" || companyFilter !== "all" || locationFilter !== "all";
+  const hasFilters = !!search || searchField !== "all" || convertedFilter !== "all" || companyFilter !== "all" || locationFilter !== "all";
 
   return (
     <div>
@@ -310,17 +364,17 @@ export default function AdminWaitlistPage() {
           <button onClick={runTestSignup} disabled={testing} style={btnGhost} title="Insert a fake waitlist row to verify the live pipeline">
             <Beaker size={16} className={testing ? "animate-pulse" : ""} /> {testing ? "Testing…" : "Test signup"}
           </button>
-          <button onClick={load} disabled={loading} style={btnGhost} aria-label="Refresh">
+          <button onClick={() => reloadAllRef.current()} disabled={loading} style={btnGhost} aria-label="Refresh">
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
           </button>
-          <button onClick={exportCsv} disabled={!sorted.length} style={btnPrimary}>
-            <Download size={16} /> Export CSV
+          <button onClick={exportCsv} disabled={exporting || totalCount === 0} style={btnPrimary}>
+            <Download size={16} /> {exporting ? "Exporting…" : "Export CSV"}
           </button>
         </div>
       </div>
 
       {/* Auth status banner */}
-      <AuthStatusBanner authLoading={authLoading} user={user} isAdmin={isAdmin} roles={roles} rowCount={rows.length} loading={loading} error={error} />
+      <AuthStatusBanner authLoading={authLoading} user={user} isAdmin={isAdmin} roles={roles} rowCount={totalCount} loading={loading} error={error} />
 
 
       {/* Stats */}
@@ -335,19 +389,32 @@ export default function AdminWaitlistPage() {
       {/* Toolbar */}
       <div style={cardStyle} className="mb-4">
         <div className="flex flex-wrap items-center gap-3">
+          {/* Search field selector */}
+          <select value={searchField} onChange={(e) => setSearchField(e.target.value as SearchField)} style={{ ...selectStyle, maxWidth: 160 }} title="Field to search">
+            <option value="all">All fields</option>
+            <option value="email">Email</option>
+            <option value="name">Name</option>
+            <option value="company_name">Company</option>
+          </select>
+
           <div className="flex items-center gap-2 flex-1 min-w-[240px]" style={{
             background: "#fff", border: "1px solid rgba(26,16,8,0.12)",
             borderRadius: 10, padding: "8px 12px",
           }}>
             <Search size={16} color="hsl(var(--fyn-ink) / 0.5)" />
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={
+                searchField === "email" ? "Search emails…" :
+                searchField === "name" ? "Search names…" :
+                searchField === "company_name" ? "Search companies…" :
+                "Search email, name or company…"
+              }
               style={{ flex: 1, border: "none", outline: "none", fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", background: "transparent" }}
             />
-            {search && (
-              <button onClick={() => setSearch("")} aria-label="Clear search" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2 }}>
+            {searchInput && (
+              <button onClick={() => setSearchInput("")} aria-label="Clear search" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2 }}>
                 <X size={14} color="hsl(var(--fyn-ink) / 0.5)" />
               </button>
             )}
@@ -376,7 +443,7 @@ export default function AdminWaitlistPage() {
           )}
 
           <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>
-            {sorted.length} {sorted.length === 1 ? "result" : "results"}
+            {totalCount} {totalCount === 1 ? "result" : "results"}
           </span>
         </div>
 
@@ -411,11 +478,11 @@ export default function AdminWaitlistPage() {
           <div className="py-12 text-center" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.6)" }}>
             Loading…
           </div>
-        ) : sorted.length === 0 ? (
+        ) : rows.length === 0 ? (
           <div className="py-16 text-center">
             <UserPlus size={36} color="hsl(var(--fyn-ink) / 0.3)" style={{ margin: "0 auto 12px" }} />
             <p style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 16, color: "hsl(var(--fyn-ink))" }}>
-              {rows.length === 0 ? "No waitlist signups yet" : "No matches for your filters"}
+              {hasFilters ? "No matches for your filters" : "No waitlist signups yet"}
             </p>
           </div>
         ) : (
@@ -441,7 +508,7 @@ export default function AdminWaitlistPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pageRows.map((r) => (
+                  {rows.map((r) => (
                     <tr key={r.id} style={{
                       borderBottom: "1px solid rgba(26,16,8,0.06)",
                       background: selected.has(r.id) ? "rgba(139,105,20,0.06)" : "transparent",
@@ -484,11 +551,13 @@ export default function AdminWaitlistPage() {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid rgba(26,16,8,0.06)" }}>
               <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>
-                Page {safePage} of {totalPages} · {sorted.length} total
+                Page {safePage} of {totalPages} · {totalCount} total
               </span>
               <div className="flex items-center gap-2">
+                <button onClick={() => setPage(1)} disabled={safePage <= 1} style={btnGhost}>« First</button>
                 <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage <= 1} style={btnGhost}>Prev</button>
                 <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages} style={btnGhost}>Next</button>
+                <button onClick={() => setPage(totalPages)} disabled={safePage >= totalPages} style={btnGhost}>Last »</button>
               </div>
             </div>
           </>
@@ -652,4 +721,3 @@ function AuthStatusBanner({
     </div>
   );
 }
-
