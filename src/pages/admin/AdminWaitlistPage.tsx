@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Users, UserPlus, Calendar, CalendarRange, Search, Download, RefreshCw,
   CheckCircle2, RotateCcw, Trash2, ChevronUp, ChevronDown, X,
+  ShieldCheck, ShieldAlert, ShieldX, Beaker,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 
 type WaitlistRow = {
   id: string;
