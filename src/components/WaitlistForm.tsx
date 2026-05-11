@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import { Loader2 } from "lucide-react";
-import { supabaseExternal as supabase } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",

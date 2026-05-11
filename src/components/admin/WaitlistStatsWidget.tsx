@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, UserPlus } from "lucide-react";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase as supabaseExternal } from "@/integrations/supabase/client";
 
 type Row = {
   id: string;
