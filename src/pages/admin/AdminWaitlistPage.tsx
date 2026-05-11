@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Users, UserPlus, Calendar, CalendarRange, Search, Download, RefreshCw,
-  CheckCircle2, Trash2, ChevronUp, ChevronDown, X,
+  CheckCircle2, RotateCcw, Trash2, ChevronUp, ChevronDown, X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 
 type WaitlistRow = {
   id: string;
@@ -15,24 +15,20 @@ type WaitlistRow = {
   company_type: string | null;
   company_size: string | null;
   location: string | null;
-  status: string | null;
+  position: number | null;
+  is_converted: boolean | null;
   created_at: string;
 };
 
-type SortKey = keyof WaitlistRow | "position";
+type SortKey = keyof WaitlistRow;
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 20;
 
-const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
-  new:       { bg: "rgba(139,105,20,0.15)", fg: "#8B6914", label: "New" },
-  contacted: { bg: "rgba(15,123,79,0.15)",  fg: "#0F7B4F", label: "Contacted" },
-  archived:  { bg: "rgba(26,16,8,0.10)",    fg: "rgba(26,16,8,0.55)", label: "Archived" },
-};
-
-function statusBadge(s: string | null) {
-  const key = (s ?? "new").toLowerCase();
-  const cfg = STATUS_STYLE[key] ?? { bg: "rgba(26,16,8,0.08)", fg: "hsl(var(--fyn-ink))", label: s ?? "—" };
+function convertedBadge(c: boolean | null) {
+  const cfg = c
+    ? { bg: "rgba(15,123,79,0.15)",  fg: "#0F7B4F", label: "Converted" }
+    : { bg: "rgba(139,105,20,0.15)", fg: "#8B6914", label: "Pending" };
   return (
     <span style={{
       background: cfg.bg, color: cfg.fg,
@@ -66,7 +62,9 @@ export default function AdminWaitlistPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [convertedFilter, setConvertedFilter] = useState<"all" | "converted" | "pending">("all");
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [locationFilter, setLocationFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
@@ -74,9 +72,9 @@ export default function AdminWaitlistPage() {
 
   async function load() {
     setLoading(true); setError(null);
-    const { data, error } = await supabaseExternal
+    const { data, error } = await supabase
       .from("waitlist")
-      .select("*")
+      .select("id,email,name,company_name,phone,company_type,company_size,location,position,is_converted,created_at")
       .order("created_at", { ascending: false });
     if (error) {
       setError(error.message);
@@ -89,55 +87,64 @@ export default function AdminWaitlistPage() {
 
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
-  // Position is 1-based rank by created_at ascending across ALL rows (oldest = #1).
-  const positionMap = useMemo(() => {
-    const sorted = [...rows].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-    const m = new Map<string, number>();
-    sorted.forEach((r, i) => m.set(r.id, i + 1));
-    return m;
-  }, [rows]);
-
   // Stats
   const stats = useMemo(() => {
     const now = new Date();
     const startOfDay = new Date(now); startOfDay.setHours(0,0,0,0);
     const startOfWeek = new Date(startOfDay);
-    const dow = (startOfWeek.getDay() + 6) % 7; // Mon=0
+    const dow = (startOfWeek.getDay() + 6) % 7;
     startOfWeek.setDate(startOfWeek.getDate() - dow);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    let today = 0, week = 0, month = 0;
+    let today = 0, week = 0, month = 0, converted = 0;
     for (const r of rows) {
       const t = new Date(r.created_at).getTime();
       if (t >= startOfDay.getTime()) today++;
       if (t >= startOfWeek.getTime()) week++;
       if (t >= startOfMonth.getTime()) month++;
+      if (r.is_converted) converted++;
     }
-    return { total: rows.length, today, week, month };
+    return { total: rows.length, today, week, month, converted };
   }, [rows]);
 
-  // Filter
+  // Distinct dropdown options
+  const companyOptions = useMemo(() => {
+    const s = new Set<string>();
+    rows.forEach((r) => { const v = (r.company_name ?? "").trim(); if (v) s.add(v); });
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [rows]);
+
+  const locationOptions = useMemo(() => {
+    const s = new Set<string>();
+    rows.forEach((r) => { const v = (r.location ?? "").trim(); if (v) s.add(v); });
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [rows]);
+
+  // Filter — search matches name OR email; dropdowns narrow by converted/company/location.
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter((r) => {
-      if (statusFilter !== "all" && (r.status ?? "new").toLowerCase() !== statusFilter) return false;
+      if (convertedFilter === "converted" && !r.is_converted) return false;
+      if (convertedFilter === "pending" && r.is_converted) return false;
+      if (companyFilter !== "all" && (r.company_name ?? "").trim() !== companyFilter) return false;
+      if (locationFilter !== "all" && (r.location ?? "").trim() !== locationFilter) return false;
       if (!q) return true;
-      return [r.email, r.name, r.company_name, r.phone].some(
+      return [r.name, r.email].some(
         (v) => (v ?? "").toString().toLowerCase().includes(q)
       );
     });
-  }, [rows, search, statusFilter]);
+  }, [rows, search, convertedFilter, companyFilter, locationFilter]);
 
   // Sort
   const sorted = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a, b) => {
       let av: unknown, bv: unknown;
-      if (sortKey === "position") {
-        av = positionMap.get(a.id) ?? 0; bv = positionMap.get(b.id) ?? 0;
-      } else if (sortKey === "created_at") {
+      if (sortKey === "created_at") {
         av = new Date(a.created_at).getTime(); bv = new Date(b.created_at).getTime();
+      } else if (sortKey === "position") {
+        av = a.position ?? 0; bv = b.position ?? 0;
+      } else if (sortKey === "is_converted") {
+        av = a.is_converted ? 1 : 0; bv = b.is_converted ? 1 : 0;
       } else {
         av = (a[sortKey] ?? "") as string; bv = (b[sortKey] ?? "") as string;
       }
@@ -148,14 +155,14 @@ export default function AdminWaitlistPage() {
       return sortDir === "asc" ? as.localeCompare(bs) : bs.localeCompare(as);
     });
     return arr;
-  }, [filtered, sortKey, sortDir, positionMap]);
+  }, [filtered, sortKey, sortDir]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageRows = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  useEffect(() => { setPage(1); }, [search, statusFilter]);
+  useEffect(() => { setPage(1); }, [search, convertedFilter, companyFilter, locationFilter]);
 
   function toggleSort(k: SortKey) {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -180,21 +187,21 @@ export default function AdminWaitlistPage() {
     });
   }
 
-  async function markContacted(ids: string[]) {
+  async function setConverted(ids: string[], value: boolean) {
     if (!ids.length) return;
-    const { error } = await supabaseExternal
+    const { error } = await supabase
       .from("waitlist")
-      .update({ status: "contacted" })
+      .update({ is_converted: value })
       .in("id", ids);
     if (error) { toast.error(`Update failed: ${error.message}`); return; }
-    setRows((prev) => prev.map((r) => ids.includes(r.id) ? { ...r, status: "contacted" } : r));
-    toast.success(`Marked ${ids.length} as contacted`);
+    setRows((prev) => prev.map((r) => ids.includes(r.id) ? { ...r, is_converted: value } : r));
+    toast.success(`${value ? "Marked" : "Unmarked"} ${ids.length} as converted`);
   }
 
   async function deleteRows(ids: string[]) {
     if (!ids.length) return;
     if (!confirm(`Delete ${ids.length} waitlist ${ids.length === 1 ? "entry" : "entries"}? This cannot be undone.`)) return;
-    const { error } = await supabaseExternal
+    const { error } = await supabase
       .from("waitlist")
       .delete()
       .in("id", ids);
@@ -209,7 +216,7 @@ export default function AdminWaitlistPage() {
   }
 
   function exportCsv() {
-    const cols: { key: SortKey; label: string }[] = [
+    const cols: { key: keyof WaitlistRow | "converted"; label: string }[] = [
       { key: "position", label: "Position" },
       { key: "email", label: "Email" },
       { key: "name", label: "Name" },
@@ -218,13 +225,13 @@ export default function AdminWaitlistPage() {
       { key: "company_type", label: "Type" },
       { key: "company_size", label: "Size" },
       { key: "location", label: "Location" },
-      { key: "status", label: "Status" },
+      { key: "converted", label: "Converted" },
       { key: "created_at", label: "Created At" },
     ];
     const header = cols.map((c) => csvEscape(c.label)).join(",");
     const lines = sorted.map((r) =>
       cols.map((c) => {
-        if (c.key === "position") return csvEscape(positionMap.get(r.id) ?? "");
+        if (c.key === "converted") return csvEscape(r.is_converted ? "yes" : "no");
         return csvEscape((r as any)[c.key]);
       }).join(",")
     );
@@ -238,8 +245,16 @@ export default function AdminWaitlistPage() {
     toast.success(`Exported ${sorted.length} rows`);
   }
 
+  function clearFilters() {
+    setSearch("");
+    setConvertedFilter("all");
+    setCompanyFilter("all");
+    setLocationFilter("all");
+  }
+
   const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
   const selectedIds = Array.from(selected);
+  const hasFilters = search || convertedFilter !== "all" || companyFilter !== "all" || locationFilter !== "all";
 
   return (
     <div>
@@ -266,6 +281,7 @@ export default function AdminWaitlistPage() {
       {/* Stats */}
       <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
         <StatCard icon={<Users size={20} color="#8B6914" />} label="Total Signups" value={stats.total} />
+        <StatCard icon={<CheckCircle2 size={20} color="#0F7B4F" />} label="Converted" value={stats.converted} />
         <StatCard icon={<UserPlus size={20} color="#8B6914" />} label="Today" value={stats.today} />
         <StatCard icon={<Calendar size={20} color="#8B6914" />} label="This Week" value={stats.week} />
         <StatCard icon={<CalendarRange size={20} color="#8B6914" />} label="This Month" value={stats.month} />
@@ -282,7 +298,7 @@ export default function AdminWaitlistPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search email, name, company, phone…"
+              placeholder="Search by name or email…"
               style={{ flex: 1, border: "none", outline: "none", fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", background: "transparent" }}
             />
             {search && (
@@ -291,20 +307,29 @@ export default function AdminWaitlistPage() {
               </button>
             )}
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{
-              background: "#fff", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 10,
-              padding: "10px 14px", fontFamily: "Roboto, sans-serif", fontSize: 14,
-              color: "hsl(var(--fyn-ink))", outline: "none",
-            }}
-          >
+
+          <select value={convertedFilter} onChange={(e) => setConvertedFilter(e.target.value as any)} style={selectStyle}>
             <option value="all">All status</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="archived">Archived</option>
+            <option value="converted">Converted</option>
+            <option value="pending">Pending</option>
           </select>
+
+          <select value={companyFilter} onChange={(e) => setCompanyFilter(e.target.value)} style={selectStyle}>
+            <option value="all">All companies ({companyOptions.length})</option>
+            {companyOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+
+          <select value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} style={selectStyle}>
+            <option value="all">All locations ({locationOptions.length})</option>
+            {locationOptions.map((l) => <option key={l} value={l}>{l}</option>)}
+          </select>
+
+          {hasFilters && (
+            <button onClick={clearFilters} style={btnGhost}>
+              <X size={14} /> Clear
+            </button>
+          )}
+
           <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.6)" }}>
             {sorted.length} {sorted.length === 1 ? "result" : "results"}
           </span>
@@ -315,8 +340,11 @@ export default function AdminWaitlistPage() {
             <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
               {selectedIds.length} selected
             </span>
-            <button onClick={() => markContacted(selectedIds)} style={btnGhost}>
-              <CheckCircle2 size={14} /> Mark contacted
+            <button onClick={() => setConverted(selectedIds, true)} style={btnGhost}>
+              <CheckCircle2 size={14} /> Mark converted
+            </button>
+            <button onClick={() => setConverted(selectedIds, false)} style={btnGhost}>
+              <RotateCcw size={14} /> Mark pending
             </button>
             <button onClick={() => deleteRows(selectedIds)} style={{ ...btnGhost, color: "#C41E1E", borderColor: "rgba(196,30,30,0.3)" }}>
               <Trash2 size={14} /> Delete
@@ -362,7 +390,7 @@ export default function AdminWaitlistPage() {
                     <SortableTh label="Size" k="company_size" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
                     <SortableTh label="Location" k="location" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
                     <SortableTh label="Position" k="position" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
-                    <SortableTh label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+                    <SortableTh label="Status" k="is_converted" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
                     <SortableTh label="Created" k="created_at" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
                     <Th>Actions</Th>
                   </tr>
@@ -383,13 +411,17 @@ export default function AdminWaitlistPage() {
                       <Td>{r.company_type ?? "—"}</Td>
                       <Td>{r.company_size ?? "—"}</Td>
                       <Td>{r.location ?? "—"}</Td>
-                      <Td><span style={{ fontFamily: "JetBrains Mono, monospace", color: "#8B6914", fontWeight: 600 }}>#{positionMap.get(r.id)}</span></Td>
-                      <Td>{statusBadge(r.status)}</Td>
+                      <Td><span style={{ fontFamily: "JetBrains Mono, monospace", color: "#8B6914", fontWeight: 600 }}>{r.position != null ? `#${r.position}` : "—"}</span></Td>
+                      <Td>{convertedBadge(r.is_converted)}</Td>
                       <Td><span style={{ color: "hsl(var(--fyn-ink) / 0.7)", whiteSpace: "nowrap" }}>{fmtDate(r.created_at)}</span></Td>
                       <Td>
                         <div className="flex items-center gap-1">
-                          {(r.status ?? "new").toLowerCase() !== "contacted" && (
-                            <button onClick={() => markContacted([r.id])} title="Mark contacted" style={iconBtn}>
+                          {r.is_converted ? (
+                            <button onClick={() => setConverted([r.id], false)} title="Mark pending" style={iconBtn}>
+                              <RotateCcw size={15} color="#8B6914" />
+                            </button>
+                          ) : (
+                            <button onClick={() => setConverted([r.id], true)} title="Mark converted" style={iconBtn}>
                               <CheckCircle2 size={15} color="#0F7B4F" />
                             </button>
                           )}
@@ -447,10 +479,19 @@ const btnPrimary: React.CSSProperties = {
   cursor: "pointer", boxShadow: "0 2px 8px rgba(196,30,30,0.25)",
 };
 
+const selectStyle: React.CSSProperties = {
+  background: "#fff", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 10,
+  padding: "10px 14px", fontFamily: "Roboto, sans-serif", fontSize: 14,
+  color: "hsl(var(--fyn-ink))", outline: "none", maxWidth: 240,
+};
+
 const iconBtn: React.CSSProperties = {
   background: "transparent", border: "none", cursor: "pointer",
   padding: 6, borderRadius: 6, display: "grid", placeItems: "center",
 };
+
+type SortKey2 = SortKey;
+type SortDir2 = SortDir;
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
@@ -476,7 +517,7 @@ function Th({ children }: { children: React.ReactNode }) {
 
 function SortableTh({
   label, k, sortKey, sortDir, onSort,
-}: { label: string; k: SortKey; sortKey: SortKey; sortDir: SortDir; onSort: (k: SortKey) => void }) {
+}: { label: string; k: SortKey2; sortKey: SortKey2; sortDir: SortDir2; onSort: (k: SortKey2) => void }) {
   const active = sortKey === k;
   return (
     <th style={{ textAlign: "left", padding: "10px 12px" }}>
