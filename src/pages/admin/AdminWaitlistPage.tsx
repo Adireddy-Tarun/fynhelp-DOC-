@@ -104,6 +104,7 @@ export default function AdminWaitlistPage() {
   async function runTestSignup() {
     setTesting(true);
     const stamp = Date.now();
+    const nextPos = (rows.reduce((m, r) => Math.max(m, r.position ?? 0), 0) || 0) + 1;
     const payload = {
       email: `test+${stamp}@fynhelp.test`,
       name: "Admin Test Signup",
@@ -112,6 +113,7 @@ export default function AdminWaitlistPage() {
       company_type: "SaaS & Technology",
       company_size: "1-10",
       location: "Bengaluru",
+      position: nextPos,
     };
     const { error } = await supabase.from("waitlist").insert(payload);
     setTesting(false);
