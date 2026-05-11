@@ -92,6 +92,37 @@ export default function AdminWaitlistPage() {
 
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
+  // Realtime — new signups appear immediately without manual refresh.
+  useEffect(() => {
+    const ch = supabase
+      .channel("waitlist-admin")
+      .on("postgres_changes", { event: "*", schema: "public", table: "waitlist" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  async function runTestSignup() {
+    setTesting(true);
+    const stamp = Date.now();
+    const payload = {
+      email: `test+${stamp}@fynhelp.test`,
+      name: "Admin Test Signup",
+      company_name: "FynHelp QA",
+      phone: `9${String(stamp).slice(-9)}`,
+      company_type: "SaaS & Technology",
+      company_size: "1-10",
+      location: "Bengaluru",
+    };
+    const { error } = await supabase.from("waitlist").insert(payload);
+    setTesting(false);
+    if (error) {
+      toast.error(`Test signup failed: ${error.message}`);
+      return;
+    }
+    toast.success(`Test entry created (${payload.email})`);
+    await load();
+  }
+
   // Stats
   const stats = useMemo(() => {
     const now = new Date();
