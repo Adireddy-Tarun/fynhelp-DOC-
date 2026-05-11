@@ -307,6 +307,9 @@ export default function AdminWaitlistPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={runTestSignup} disabled={testing} style={btnGhost} title="Insert a fake waitlist row to verify the live pipeline">
+            <Beaker size={16} className={testing ? "animate-pulse" : ""} /> {testing ? "Testing…" : "Test signup"}
+          </button>
           <button onClick={load} disabled={loading} style={btnGhost} aria-label="Refresh">
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
           </button>
@@ -315,6 +318,10 @@ export default function AdminWaitlistPage() {
           </button>
         </div>
       </div>
+
+      {/* Auth status banner */}
+      <AuthStatusBanner authLoading={authLoading} user={user} isAdmin={isAdmin} roles={roles} rowCount={rows.length} loading={loading} error={error} />
+
 
       {/* Stats */}
       <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
