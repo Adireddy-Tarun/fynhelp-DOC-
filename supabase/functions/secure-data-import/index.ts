@@ -1,0 +1,135 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { z } from "npm:zod@3.23.8";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+const TransactionRecord = z.object({
+  transaction_date: z.string().refine((v) => !isNaN(Date.parse(v)), "invalid date"),
+  amount: z.number().positive("amount must be > 0"),
+  description: z.string().trim().max(500).optional().default(""),
+  category: z.string().trim().max(100).optional().default(""),
+  direction: z.enum(["in", "out"]).optional().default("out"),
+});
+
+const BodySchema = z.object({
+  data_type: z.enum(["transactions", "invoices", "vendor_payments"]),
+  business_id: z.string().uuid("business_id must be a valid UUID"),
+  records: z.array(z.record(z.unknown())).min(1, "records must be non-empty"),
+});
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return json({ error: "Unauthorized" }, 401);
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claims, error: authErr } = await supabase.auth.getClaims(token);
+    if (authErr || !claims?.claims) {
+      return json({ error: "Unauthorized" }, 401);
+    }
+    const userId = claims.claims.sub;
+
+    const raw = await req.json().catch(() => null);
+    const parsed = BodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json(
+        { error: "Invalid request body", errors: parsed.error.flatten().fieldErrors },
+        400,
+      );
+    }
+    const { data_type, business_id, records } = parsed.data;
+
+    // Verify caller has access to the business
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("business_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!profile?.business_id || profile.business_id !== business_id) {
+      return json({ error: "Forbidden: business_id does not match user" }, 403);
+    }
+
+    if (data_type !== "transactions") {
+      return json(
+        { error: `data_type '${data_type}' not yet supported`, inserted_count: 0 },
+        400,
+      );
+    }
+
+    // Validate each record
+    const validationErrors: Array<{ index: number; errors: unknown }> = [];
+    const valid: Array<z.infer<typeof TransactionRecord>> = [];
+    records.forEach((r, i) => {
+      const p = TransactionRecord.safeParse({
+        ...r,
+        amount: typeof r.amount === "string" ? Number(r.amount) : r.amount,
+      });
+      if (!p.success) {
+        validationErrors.push({ index: i, errors: p.error.flatten().fieldErrors });
+        return;
+      }
+      // Reject future dates
+      if (new Date(p.data.transaction_date) > new Date(today() + "T23:59:59Z")) {
+        validationErrors.push({ index: i, errors: { transaction_date: ["future date not allowed"] } });
+        return;
+      }
+      valid.push(p.data);
+    });
+
+    if (validationErrors.length > 0) {
+      return json(
+        { inserted_count: 0, errors: validationErrors, message: "Validation failed" },
+        400,
+      );
+    }
+
+    const rows = valid.map((r) => ({
+      business_id,
+      date: r.transaction_date,
+      transaction_date: r.transaction_date,
+      amount: r.amount,
+      direction: r.direction,
+      description: r.description || null,
+      category: r.category || null,
+    }));
+
+    const { data: inserted, error: insertErr } = await supabase
+      .from("transactions")
+      .insert(rows)
+      .select("id");
+
+    if (insertErr) {
+      return json({ error: insertErr.message, inserted_count: 0 }, 400);
+    }
+
+    return json({ inserted_count: inserted?.length ?? 0, errors: [] });
+  } catch (e) {
+    return json({ error: (e as Error).message }, 500);
+  }
+});
