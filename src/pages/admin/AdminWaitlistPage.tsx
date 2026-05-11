@@ -59,6 +59,9 @@ function csvEscape(v: unknown) {
 }
 
 export default function AdminWaitlistPage() {
+  const { user, isAdmin, roles, loading: authLoading } = useAdminAuth();
+  const [testing, setTesting] = useState(false);
+
   const [rows, setRows] = useState<WaitlistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
