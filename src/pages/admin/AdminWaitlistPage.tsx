@@ -586,3 +586,70 @@ function SortableTh({
 function Td({ children }: { children: React.ReactNode }) {
   return <td style={{ padding: "12px", color: "hsl(var(--fyn-ink) / 0.85)", verticalAlign: "middle" }}>{children}</td>;
 }
+
+function AuthStatusBanner({
+  authLoading, user, isAdmin, roles, rowCount, loading, error,
+}: {
+  authLoading: boolean;
+  user: { email?: string | null; id?: string } | null;
+  isAdmin: boolean;
+  roles: string[];
+  rowCount: number;
+  loading: boolean;
+  error: string | null;
+}) {
+  // Decide tone
+  let tone: "ok" | "warn" | "bad" = "ok";
+  let title = "";
+  let detail = "";
+  let Icon = ShieldCheck;
+
+  if (authLoading) {
+    return null;
+  }
+
+  if (!user) {
+    tone = "bad"; Icon = ShieldX;
+    title = "Not signed in";
+    detail = "RLS requires an authenticated session to read the waitlist. Sign in via /admin/login, then return to this page.";
+  } else if (!isAdmin) {
+    tone = "warn"; Icon = ShieldAlert;
+    title = `Signed in as ${user.email ?? user.id} — no admin role`;
+    detail = `Roles: ${roles.length ? roles.join(", ") : "(none)"}. The "Authenticated can read waitlist" policy still allows reads, but admin-only update/delete will fail.`;
+  } else if (error) {
+    tone = "bad"; Icon = ShieldX;
+    title = "Authorized, but the query failed";
+    detail = error;
+  } else if (!loading && rowCount === 0) {
+    tone = "warn"; Icon = ShieldAlert;
+    title = `Authorized as ${user.email ?? user.id} (${roles.join(", ") || "admin"}) — but the table is empty`;
+    detail = "The query succeeded with 0 rows. Click \"Test signup\" to insert a row and confirm the live pipeline end-to-end.";
+  } else {
+    tone = "ok"; Icon = ShieldCheck;
+    title = `Authorized as ${user.email ?? user.id} (${roles.join(", ") || "admin"})`;
+    detail = `Reading from Lovable Cloud · ${rowCount} ${rowCount === 1 ? "row" : "rows"} loaded · realtime subscription active.`;
+  }
+
+  const palette =
+    tone === "ok"   ? { bg: "rgba(15,123,79,0.08)",  border: "rgba(15,123,79,0.35)",  fg: "#0F7B4F" } :
+    tone === "warn" ? { bg: "rgba(139,105,20,0.08)", border: "rgba(139,105,20,0.35)", fg: "#8B6914" } :
+                      { bg: "rgba(196,30,30,0.08)",  border: "rgba(196,30,30,0.35)",  fg: "#C41E1E" };
+
+  return (
+    <div className="mb-4" style={{
+      background: palette.bg, border: `1px solid ${palette.border}`, borderRadius: 10,
+      padding: "12px 14px", display: "flex", gap: 12, alignItems: "flex-start",
+    }}>
+      <Icon size={18} color={palette.fg} style={{ flexShrink: 0, marginTop: 2 }} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 13, color: palette.fg }}>
+          {title}
+        </div>
+        <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)", marginTop: 4 }}>
+          {detail}
+        </div>
+      </div>
+    </div>
+  );
+}
+
