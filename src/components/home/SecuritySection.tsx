@@ -1,3 +1,5 @@
+import { useAnimationControls, motion } from "framer-motion";
+import { useEffect } from "react";
 import {
   Shield,
   Lock,
@@ -33,8 +35,22 @@ const CARDS: Card[] = [
   { icon: Download, title: "One-Click Data Export", desc: "Download all data anytime in CSV or Excel. No vendor lock-in. Your data is portable. Delete account deletes all data permanently." },
 ];
 
+const CARD_W = 340;
+const GAP = 20;
+const DISTANCE = (CARD_W + GAP) * CARDS.length; // distance for one full set
+
 export default function SecuritySection() {
-  const loop = [...CARDS, ...CARDS];
+  const allCards = [...CARDS, ...CARDS];
+  const controls = useAnimationControls();
+
+  useEffect(() => {
+    controls.start({
+      x: [0, -DISTANCE],
+      transition: {
+        x: { repeat: Infinity, repeatType: "loop", duration: 50, ease: "linear" },
+      },
+    });
+  }, [controls]);
 
   return (
     <section
@@ -42,29 +58,6 @@ export default function SecuritySection() {
       className="bg-fyn-beige"
       style={{ padding: "120px 80px" }}
     >
-      <style>{`
-        @keyframes fynScrollCards {
-          0% { transform: translate3d(0,0,0); }
-          100% { transform: translate3d(-50%,0,0); }
-        }
-        .fyn-sec-track {
-          display: inline-flex;
-          will-change: transform;
-          animation: fynScrollCards 50s linear infinite;
-        }
-        .fyn-sec-mask {
-          mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
-        }
-        .fyn-sec-carousel:hover .fyn-sec-track { animation-play-state: paused; }
-        @media (max-width: 1199px) {
-          .fyn-sec-track { animation-duration: 40s; }
-        }
-        @media (max-width: 767px) {
-          .fyn-sec-track { animation-duration: 30s; }
-        }
-      `}</style>
-
       <div className="mx-auto" style={{ maxWidth: 1400 }}>
         {/* Header */}
         <div className="flex flex-col items-center text-center">
@@ -102,32 +95,49 @@ export default function SecuritySection() {
 
         {/* Carousel */}
         <div
-          className="fyn-sec-carousel fyn-sec-mask relative overflow-hidden"
-          style={{ height: 340, width: "100%" }}
+          onMouseEnter={() => controls.stop()}
+          onMouseLeave={() =>
+            controls.start({
+              x: [0, -DISTANCE],
+              transition: {
+                x: { repeat: Infinity, repeatType: "loop", duration: 50, ease: "linear" },
+              },
+            })
+          }
+          style={{
+            height: 340,
+            width: "100%",
+            overflow: "hidden",
+            position: "relative",
+            maskImage:
+              "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)",
+          }}
         >
-          <div className="fyn-sec-track">
-            {loop.map((c, i) => {
+          <motion.div
+            animate={controls}
+            style={{
+              display: "flex",
+              gap: `${GAP}px`,
+              willChange: "transform",
+              transform: "translateZ(0)",
+            }}
+          >
+            {allCards.map((c, i) => {
               const Icon = c.icon;
               return (
-                <div
+                <motion.div
                   key={i}
-                  className="group shrink-0 transition-all duration-300 hover:-translate-y-2"
+                  whileHover={{ y: -8, boxShadow: "0 12px 32px rgba(196, 30, 30, 0.12)" }}
+                  transition={{ duration: 0.3 }}
                   style={{
-                    width: 340,
+                    minWidth: CARD_W,
                     height: 300,
-                    marginRight: 20,
                     padding: 32,
                     background: "hsl(var(--card))",
                     border: "1.5px solid hsl(var(--primary))",
                     borderRadius: 16,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "0 12px 32px rgba(196,30,30,0.12)";
-                    e.currentTarget.style.borderColor = "hsl(var(--primary) / 0.85)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "";
-                    e.currentTarget.style.borderColor = "hsl(var(--primary))";
                   }}
                 >
                   <Icon
@@ -147,10 +157,10 @@ export default function SecuritySection() {
                   >
                     {c.desc}
                   </p>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
 
         {/* Bottom CTA */}
