@@ -4,6 +4,7 @@ import ProblemSection from "@/components/home/ProblemSection";
 import ProductEcosystemSection from "@/components/home/ProductEcosystemSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import SimulatorSection from "@/components/home/SimulatorSection";
+import SecuritySection from "@/components/home/SecuritySection";
 
 import SocialProofSection from "@/components/home/SocialProofSection";
 import IntegrationsSection from "@/components/home/IntegrationsSection";
@@ -18,6 +19,7 @@ const HomePage = () => {
       <ProductEcosystemSection />
       <HowItWorksSection />
       <SimulatorSection />
+      <SecuritySection />
 
       <SocialProofSection />
       <IntegrationsSection />

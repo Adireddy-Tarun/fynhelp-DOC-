@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Download, ArrowRight } from "lucide-react";
+import { Lock, Download, ArrowRight, Shield } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { SCENARIOS, type Tone, type ScenarioResult } from "./simulator/scenarios";
 import SignupGateModal from "./simulator/SignupGateModal";
@@ -284,6 +284,28 @@ export default function SimulatorSection() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Security & Trust nav button */}
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={() => {
+              document.getElementById("security")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="inline-flex items-center gap-2 rounded-lg transition-colors hover:bg-fyn-red/10"
+            style={{
+              background: "hsl(var(--card))",
+              border: "1.5px solid hsl(var(--primary))",
+              color: "hsl(var(--primary))",
+              padding: "12px 24px",
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 600,
+              fontSize: 15,
+            }}
+          >
+            <Shield className="w-4 h-4" strokeWidth={2} />
+            Security &amp; Trust
+          </button>
         </div>
       </div>
 
