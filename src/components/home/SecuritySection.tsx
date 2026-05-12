@@ -38,20 +38,35 @@ const CARDS: Card[] = [
 ];
 
 const N = CARDS.length;
+const SWIPE_THRESHOLD = 10000;
+const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
+
+function useViewport() {
+  const [w, setW] = useState(typeof window === "undefined" ? 1280 : window.innerWidth);
+  useEffect(() => {
+    const onR = () => setW(window.innerWidth);
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, []);
+  return { isMobile: w < 768, isTablet: w >= 768 && w < 1100 };
+}
 
 export default function SecuritySection() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [autoOn, setAutoOn] = useState(true);
   const pauseUntilRef = useRef(0);
+  const { isMobile, isTablet } = useViewport();
 
   useEffect(() => {
+    if (!autoOn) return;
     const id = window.setInterval(() => {
       if (Date.now() < pauseUntilRef.current) return;
       setDirection(1);
       setIndex((i) => (i + 1) % N);
     }, 4000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [autoOn]);
 
   const pauseAuto = () => {
     pauseUntilRef.current = Date.now() + 10000;
