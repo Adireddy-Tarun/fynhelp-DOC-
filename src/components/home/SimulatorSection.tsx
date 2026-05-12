@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Download, ArrowRight } from "lucide-react";
+import { Lock, Download, ArrowRight, Shield } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { SCENARIOS, type Tone, type ScenarioResult } from "./simulator/scenarios";
 import SignupGateModal from "./simulator/SignupGateModal";
