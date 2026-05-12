@@ -805,6 +805,7 @@ function BadgeCard({
         {badge.sub}
       </div>
     </motion.div>
+    </motion.div>
   );
 }
 
