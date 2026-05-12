@@ -169,6 +169,8 @@ export default function SecuritySection() {
           </p>
         </div>
 
+        <InfraBadges />
+
         {/* Slider */}
         <div
           className="relative w-full flex items-center justify-center"
