@@ -143,7 +143,7 @@ export default function ProductsDropdown({
           border: "1px solid rgba(196,30,30,0.08)",
         }}
       >
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1.2fr", gap: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr", gap: 28 }}>
           <div>
             <ColHeader>Intelligence Suites</ColHeader>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -154,20 +154,6 @@ export default function ProductsDropdown({
                   description={m.description}
                   status={m.status}
                   onSelect={() => onSelectIntelligence(m.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <ColHeader>By Business Type</ColHeader>
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {businessItems.map((b, i) => (
-                <Item
-                  key={b.name}
-                  name={b.name}
-                  status={b.status}
-                  onSelect={() => onSelectBusiness(i)}
                 />
               ))}
             </div>
