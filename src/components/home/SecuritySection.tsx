@@ -16,39 +16,48 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-type Card = { icon: LucideIcon; title: string; desc: string };
+type Card = {
+  icon: LucideIcon;
+  title: string;
+  desc: string;
+  pos: { left?: string; right?: string; top: string };
+  z: number;
+  rotY: number;
+};
 
 const CARDS: Card[] = [
-  { icon: Shield, title: "Bank-Level Encryption", desc: "AES-256 encryption for data at rest. TLS 1.3 for data in transit. Same security standards used by HDFC, ICICI, and Axis Bank." },
-  { icon: Lock, title: "Row-Level Security", desc: "PostgreSQL RLS policies isolate your business data. Zero cross-contamination between accounts. Database-level protection." },
-  { icon: Key, title: "Zero-Knowledge Architecture", desc: "Your financial data encrypted before reaching servers. We cannot decrypt or access your raw transaction data." },
-  { icon: Database, title: "Indian Data Residency", desc: "All data in Mumbai AWS data centers. Compliant with RBI data localization. No data leaves Indian jurisdiction." },
-  { icon: Activity, title: "99.9% Accuracy Guarantee", desc: "Real-time calculations validated against CA standards. Deterministic algorithms. No AI guesswork. Auditable by your chartered accountant." },
-  { icon: Eye, title: "Complete Transparency", desc: "Every calculation shows formula. Every insight shows source data. No black box AI. Verify every number yourself." },
-  { icon: UserX, title: "Your Data Stays Yours", desc: "We never use your financial data to train Fynny or any AI models. Your business intelligence remains confidential forever." },
-  { icon: FileCheck, title: "SOC 2 Compliance Ready", desc: "Annual third-party security audits. Quarterly vulnerability assessments. Bi-annual penetration testing by certified firms." },
-  { icon: Clock, title: "Complete Audit Trail", desc: "Every data import, change, and access logged with timestamp and user ID. Full forensic trail for compliance and tax audits." },
-  { icon: AlertTriangle, title: "Real-Time Threat Detection", desc: "Automatic rate limiting. Suspicious activity alerts. IP-based access controls. Enterprise security without enterprise cost." },
-  { icon: Users, title: "Role-Based Access Control", desc: "Granular permissions for team members. Your CA sees tax data only. You control who sees what. Complete access audit trail." },
-  { icon: Download, title: "One-Click Data Export", desc: "Download all data anytime in CSV or Excel. No vendor lock-in. Your data is portable. Delete account deletes all data permanently." },
+  // Row 1 — back layer
+  { icon: Shield,         title: "Bank-Level Encryption",       desc: "AES-256 encryption for data at rest. TLS 1.3 for data in transit. Same security used by major banks.", pos: { left: "5%",  top: "10%" }, z: -100, rotY:  2 },
+  { icon: Lock,           title: "Row-Level Security",          desc: "PostgreSQL RLS policies isolate your data. Zero cross-contamination. Database-level protection.", pos: { left: "30%", top: "5%"  }, z: -100, rotY: -1 },
+  { icon: Key,            title: "Zero-Knowledge Architecture", desc: "Financial data encrypted before reaching servers. We cannot decrypt your raw data.", pos: { left: "55%", top: "15%" }, z: -100, rotY:  1 },
+  { icon: Database,       title: "Indian Data Residency",       desc: "Mumbai AWS data centers. RBI compliant. No data leaves Indian jurisdiction.", pos: { right: "5%", top: "8%"  }, z: -100, rotY: -2 },
+  // Row 2 — middle layer
+  { icon: Activity,       title: "99.9% Accuracy Guarantee",    desc: "Real-time calculations validated against CA standards. Deterministic algorithms. Auditable.", pos: { left: "10%", top: "35%" }, z: -50,  rotY: -1 },
+  { icon: Eye,            title: "Complete Transparency",       desc: "Every calculation shows formula. Every insight shows source. No black box AI.", pos: { left: "35%", top: "30%" }, z: -50,  rotY:  2 },
+  { icon: UserX,          title: "Your Data Stays Yours",       desc: "Never used to train Fynny or AI models. Your intelligence remains confidential forever.", pos: { left: "60%", top: "40%" }, z: -50,  rotY: -1 },
+  { icon: FileCheck,      title: "SOC 2 Compliance Ready",      desc: "Annual security audits. Quarterly vulnerability assessments. Bi-annual penetration testing.", pos: { right: "10%", top: "35%" }, z: -50, rotY:  1 },
+  // Row 3 — front layer
+  { icon: Clock,          title: "Complete Audit Trail",        desc: "Every import, change, access logged with timestamp and user ID. Full forensic trail.", pos: { left: "15%", top: "60%" }, z: 0,   rotY:  1 },
+  { icon: AlertTriangle,  title: "Real-Time Threat Detection",  desc: "Automatic rate limiting. Suspicious activity alerts. IP-based access controls.", pos: { left: "40%", top: "55%" }, z: 0,   rotY: -2 },
+  { icon: Users,          title: "Role-Based Access Control",   desc: "Granular permissions for team. Your CA sees tax data only. Complete access audit.", pos: { left: "65%", top: "65%" }, z: 0,   rotY:  1 },
+  { icon: Download,       title: "One-Click Data Export",       desc: "Download all data anytime. No vendor lock-in. Your data is portable and deletable.", pos: { right: "15%", top: "60%" }, z: 0,  rotY: -1 },
 ];
 
-const containerVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] as const },
-  },
-};
+function useViewport() {
+  const [w, setW] = useState(typeof window === "undefined" ? 1280 : window.innerWidth);
+  useEffect(() => {
+    const onR = () => setW(window.innerWidth);
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, []);
+  return { isMobile: w < 768, isTablet: w >= 768 && w < 1100 };
+}
 
 export default function SecuritySection() {
+  const { isMobile, isTablet } = useViewport();
+
   return (
     <section
       id="security"
@@ -61,18 +70,19 @@ export default function SecuritySection() {
           50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        .fyn-sec-card {
-          position: relative;
+        .fyn-3d-card {
           background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
           border: 2px solid transparent;
           border-radius: 20px;
-          padding: 36px;
-          height: 320px;
+          padding: 32px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          backdrop-filter: blur(10px);
+          transform-style: preserve-3d;
+          transition: box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          position: relative;
           overflow: hidden;
-          cursor: pointer;
-          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .fyn-sec-card::before {
+        .fyn-3d-card::before {
           content: "";
           position: absolute;
           inset: -2px;
@@ -81,8 +91,7 @@ export default function SecuritySection() {
           padding: 2px;
           background: conic-gradient(from 0deg, #C41E1E, #8B6914, #1A1008, #C41E1E);
           background-size: 200% 200%;
-          animation: fynBorderRotate 4s linear infinite;
-          filter: blur(0.5px);
+          animation: fynBorderRotate 6s linear infinite;
           -webkit-mask:
             linear-gradient(#000 0 0) content-box,
             linear-gradient(#000 0 0);
@@ -90,29 +99,25 @@ export default function SecuritySection() {
                   mask-composite: exclude;
           opacity: 0.55;
           transition: opacity 0.4s ease;
+          pointer-events: none;
         }
-        .fyn-sec-card::after {
+        .fyn-3d-card::after {
           content: "";
           position: absolute;
-          top: -60px;
-          right: -60px;
-          width: 200px;
-          height: 200px;
+          top: -40px;
+          right: -40px;
+          width: 150px;
+          height: 150px;
           border-radius: 50%;
           background: radial-gradient(circle, hsl(var(--primary) / 0.20) 0%, transparent 70%);
-          filter: blur(60px);
-          opacity: 0.4;
-          transition: opacity 0.4s ease;
+          filter: blur(50px);
+          opacity: 0.5;
           pointer-events: none;
           z-index: 0;
         }
-        .fyn-sec-card:hover {
-          transform: translateY(-12px) scale(1.02);
-          box-shadow: 0 20px 60px rgba(196, 30, 30, 0.25);
-        }
-        .fyn-sec-card:hover::before { opacity: 1; }
-        .fyn-sec-card:hover::after  { opacity: 0.7; }
-        .fyn-sec-card > * { position: relative; z-index: 1; }
+        .fyn-3d-card:hover { box-shadow: 0 30px 80px rgba(196, 30, 30, 0.3); }
+        .fyn-3d-card:hover::before { opacity: 1; }
+        .fyn-3d-card > * { position: relative; z-index: 1; }
 
         .fyn-sec-headline {
           background: linear-gradient(90deg, #1A1008 0%, #C41E1E 100%);
@@ -159,68 +164,31 @@ export default function SecuritySection() {
           </p>
         </div>
 
-        {/* Card grid */}
-        <motion.div
-          className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
-        >
-          {CARDS.map((c) => {
-            const Icon = c.icon;
-            return (
-              <motion.div key={c.title} variants={cardVariants} className="fyn-sec-card">
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 12,
-                    background: "hsl(var(--primary) / 0.10)",
-                    boxShadow: "0 8px 24px rgba(196,30,30,0.15)",
-                    marginBottom: 24,
-                  }}
-                >
-                  <Icon size={48} strokeWidth={1.8} style={{ color: "hsl(var(--primary))" }} />
-                </div>
-
-                <h3
-                  className="text-fyn-ink"
-                  style={{
-                    fontFamily: "Georgia, serif",
-                    fontWeight: 700,
-                    fontSize: 24,
-                    marginBottom: 12,
-                    textShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  {c.title}
-                </h3>
-
-                <div
-                  style={{
-                    width: 60,
-                    height: 3,
-                    background: "linear-gradient(90deg, #C41E1E 0%, transparent 100%)",
-                    borderRadius: 2,
-                    marginBottom: 16,
-                  }}
-                />
-
-                <p
-                  className="text-fyn-ink/65"
-                  style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 16, lineHeight: 1.7 }}
-                >
-                  {c.desc}
-                </p>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+        {/* 3D floating cards */}
+        {isMobile ? (
+          <div className="grid grid-cols-1 gap-5">
+            {CARDS.map((c, i) => (
+              <FloatingCard key={c.title} card={c} index={i} mode="stack" />
+            ))}
+          </div>
+        ) : (
+          <div
+            className="relative mx-auto"
+            style={{
+              maxWidth: 1200,
+              height: 600,
+              perspective: "1000px",
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {CARDS.map((c, i) => (
+              <FloatingCard key={c.title} card={c} index={i} mode={isTablet ? "tablet" : "desktop"} />
+            ))}
+          </div>
+        )}
 
         {/* Bottom CTA */}
-        <div className="flex flex-col items-center text-center" style={{ marginTop: 100 }}>
+        <div className="flex flex-col items-center text-center" style={{ marginTop: 120 }}>
           <p
             className="text-fyn-ink/60 mb-4"
             style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: 16 }}
@@ -246,5 +214,125 @@ export default function SecuritySection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function FloatingCard({
+  card,
+  index,
+  mode,
+}: {
+  card: Card;
+  index: number;
+  mode: "desktop" | "tablet" | "stack";
+}) {
+  const Icon = card.icon;
+
+  if (mode === "stack") {
+    return (
+      <motion.div
+        className="fyn-3d-card"
+        style={{ width: "100%", height: 280 }}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.5, delay: index * 0.05 }}
+      >
+        <CardInner Icon={Icon} title={card.title} desc={card.desc} />
+      </motion.div>
+    );
+  }
+
+  const z = mode === "tablet" ? card.z / 2 : card.z;
+
+  return (
+    <motion.div
+      className="fyn-3d-card"
+      style={{
+        position: "absolute",
+        width: 320,
+        height: 280,
+        ...card.pos,
+        zIndex: 100 + Math.round(z),
+      }}
+      initial={{
+        opacity: 0,
+        y: 30,
+        rotateY: card.rotY,
+        translateZ: z,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: [0, -15, 0],
+        x: [0, 5, 0],
+        rotateY: [card.rotY, card.rotY + 2, card.rotY],
+        rotateX: [0, 1, 0],
+        translateZ: z,
+      }}
+      viewport={{ once: false, amount: 0.05 }}
+      transition={{
+        opacity: { duration: 0.6, delay: index * 0.08 },
+        y: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
+        x: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
+        rotateY: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
+        rotateX: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
+      }}
+      whileHover={{
+        scale: 1.05,
+        translateZ: z + 50,
+        zIndex: 999,
+        transition: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] },
+      }}
+    >
+      <CardInner Icon={Icon} title={card.title} desc={card.desc} />
+    </motion.div>
+  );
+}
+
+function CardInner({
+  Icon,
+  title,
+  desc,
+}: {
+  Icon: LucideIcon;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <>
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: 12,
+          background: "hsl(var(--primary) / 0.10)",
+          boxShadow: "0 8px 20px rgba(196,30,30,0.12)",
+          marginBottom: 20,
+        }}
+      >
+        <Icon size={44} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
+      </div>
+
+      <h3
+        className="text-fyn-ink"
+        style={{
+          fontFamily: "Georgia, serif",
+          fontWeight: 700,
+          fontSize: 20,
+          marginBottom: 12,
+          textShadow: "0 2px 4px rgba(0,0,0,0.04)",
+        }}
+      >
+        {title}
+      </h3>
+
+      <p
+        className="text-fyn-ink/65"
+        style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 14, lineHeight: 1.6 }}
+      >
+        {desc}
+      </p>
+    </>
   );
 }
