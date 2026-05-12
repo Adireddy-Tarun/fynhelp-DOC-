@@ -160,31 +160,6 @@ export default function HeroSection() {
           Liquidity, Revenue, Cost, and GST &amp; Tax Intelligence live now. 6 additional suites in active development.
         </p>
 
-        {/* Language pills */}
-        <div
-          className="animate-fade-in flex flex-wrap justify-center"
-          style={{ animationDelay: "380ms", animationFillMode: "both", gap: 8, marginTop: 40 }}
-        >
-          {["हिंदी", "English", "తెలుగు", "தமிழ்", "ಕನ್ನಡ"].map((lang) => (
-            <span
-              key={lang}
-              style={{
-                border: "1px solid rgba(255,255,255,0.18)",
-                borderRadius: 100,
-                padding: "4px 12px",
-                fontFamily: "'Roboto', sans-serif",
-                fontWeight: 500,
-                fontSize: 12,
-                color: "#FFFFFF",
-                background: "rgba(255,255,255,0.08)",
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              {lang}
-            </span>
-          ))}
-        </div>
-
         {/* Chat Widget */}
         <div
           className="animate-fade-in w-full"
