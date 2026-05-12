@@ -15,7 +15,7 @@ const PLATFORM_ICONS: Record<string, LucideIcon> = {
   "ca-partner-feature": UserCheck,
 };
 
-function StatusBadge({ status }: { status: "live" | "coming_soon" }) {
+export function StatusBadge({ status }: { status: "live" | "coming_soon"; small?: boolean }) {
   if (status === "live") {
     return (
       <span
