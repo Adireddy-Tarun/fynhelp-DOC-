@@ -19,6 +19,7 @@ const HomePage = () => {
       <ProductEcosystemSection />
       <HowItWorksSection />
       <SimulatorSection />
+      <SecuritySection />
 
       <SocialProofSection />
       <IntegrationsSection />
