@@ -258,7 +258,15 @@ export default function ProductsDropdown({
               -webkit-backdrop-filter: blur(24px) saturate(110%);
               border: 1px solid rgba(61,40,23,0.08);
               border-radius: 20px;
-              overflow: hidden;
+              overflow-x: hidden;
+              overflow-y: auto;
+              max-height: calc(100vh - 120px);
+              scroll-behavior: smooth;
+              -webkit-overflow-scrolling: touch;
+              scrollbar-width: thin;
+              scrollbar-color: rgba(196,30,30,0.3) rgba(61,40,23,0.05);
+              overscroll-behavior: contain;
+              contain: layout style paint;
               box-shadow:
                 inset 0 2px 0 rgba(0,0,0,0.02),
                 0 8px 16px rgba(0,0,0,0.08),
@@ -269,6 +277,28 @@ export default function ProductsDropdown({
               background-size: 20px 20px;
               background-position: 0 0;
               background-color: rgba(255,255,255,0.97);
+            }
+            .fyn-products-panel::-webkit-scrollbar { width: 8px; }
+            .fyn-products-panel::-webkit-scrollbar-track {
+              background: rgba(61,40,23,0.05);
+              border-radius: 4px;
+            }
+            .fyn-products-panel::-webkit-scrollbar-thumb {
+              background: rgba(196,30,30,0.3);
+              border-radius: 4px;
+              transition: background 0.2s ease;
+            }
+            .fyn-products-panel::-webkit-scrollbar-thumb:hover {
+              background: rgba(196,30,30,0.5);
+            }
+            @media (max-height: 899px) {
+              .fyn-products-panel { max-height: calc(100vh - 100px); }
+            }
+            @media (max-height: 699px) {
+              .fyn-products-panel { max-height: calc(100vh - 80px); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .fyn-products-panel { scroll-behavior: auto; }
             }
             .fyn-accent-bar {
               position: absolute; top: 0; left: 0; right: 0; height: 3px;
