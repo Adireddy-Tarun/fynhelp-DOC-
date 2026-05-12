@@ -168,48 +168,60 @@ export default function SecuritySection() {
         {/* Single-card slider */}
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: 500, overflow: "hidden" }}
+          style={{ height: 520, overflow: "hidden", touchAction: "pan-y", userSelect: "none" }}
         >
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={index}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 50 }}
+              initial={{ opacity: 0, x: direction * 100 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -50 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              exit={{ opacity: 0, x: direction * -100 }}
+              transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              whileDrag={{ scale: 0.98, opacity: 0.9, cursor: "grabbing" }}
+              dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+              onDragEnd={(_, info) => {
+                const power = swipePower(info.offset.x, info.velocity.x);
+                if (power < -SWIPE_THRESHOLD) goNext();
+                else if (power > SWIPE_THRESHOLD) goPrev();
+              }}
               style={{
-                width: 420,
+                width: cardW,
                 maxWidth: "92vw",
-                height: 340,
+                height: cardH,
                 background: "#ffffff",
                 border: "2px solid #C41E1E",
                 borderRadius: 24,
-                padding: 40,
+                padding: cardPad,
                 boxShadow: "0 20px 60px rgba(196,30,30,0.2)",
                 display: "flex",
                 flexDirection: "column",
+                cursor: "grab",
               }}
             >
               <div
                 className="flex items-center justify-center"
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 16,
+                  width: iconBoxSize,
+                  height: iconBoxSize,
+                  borderRadius: 20,
                   background: "hsl(var(--primary) / 0.10)",
-                  marginBottom: 24,
+                  marginBottom: 28,
                 }}
               >
-                <Icon size={48} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
+                <Icon size={iconSize} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
               </div>
               <h3
                 className="text-fyn-ink"
                 style={{
                   fontFamily: "Georgia, serif",
                   fontWeight: 700,
-                  fontSize: 24,
-                  marginBottom: 12,
+                  fontSize: titleSize,
+                  lineHeight: 1.3,
+                  marginBottom: 16,
                 }}
               >
                 {card.title}
@@ -219,8 +231,8 @@ export default function SecuritySection() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 400,
-                  fontSize: 16,
-                  lineHeight: 1.7,
+                  fontSize: descSize,
+                  lineHeight: 1.8,
                 }}
               >
                 {card.desc}
