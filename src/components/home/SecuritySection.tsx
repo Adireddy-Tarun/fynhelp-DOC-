@@ -1,5 +1,4 @@
-import { useAnimationControls, motion } from "framer-motion";
-import { useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   Shield,
   Lock,
@@ -35,136 +34,193 @@ const CARDS: Card[] = [
   { icon: Download, title: "One-Click Data Export", desc: "Download all data anytime in CSV or Excel. No vendor lock-in. Your data is portable. Delete account deletes all data permanently." },
 ];
 
-const CARD_W = 340;
-const GAP = 20;
-const DISTANCE = (CARD_W + GAP) * CARDS.length; // distance for one full set
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] as const },
+  },
+};
 
 export default function SecuritySection() {
-  const allCards = [...CARDS, ...CARDS];
-  const controls = useAnimationControls();
-
-  useEffect(() => {
-    controls.start({
-      x: [0, -DISTANCE],
-      transition: {
-        x: { repeat: Infinity, repeatType: "loop", duration: 50, ease: "linear" },
-      },
-    });
-  }, [controls]);
-
   return (
     <section
       id="security"
-      className="bg-fyn-beige"
-      style={{ padding: "120px 80px" }}
+      className="bg-fyn-beige relative overflow-hidden"
+      style={{ padding: "120px 0" }}
     >
-      <div className="mx-auto" style={{ maxWidth: 1400 }}>
+      <style>{`
+        @keyframes fynBorderRotate {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .fyn-sec-card {
+          position: relative;
+          background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
+          border: 2px solid transparent;
+          border-radius: 20px;
+          padding: 36px;
+          height: 320px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .fyn-sec-card::before {
+          content: "";
+          position: absolute;
+          inset: -2px;
+          z-index: 0;
+          border-radius: 22px;
+          padding: 2px;
+          background: conic-gradient(from 0deg, #C41E1E, #8B6914, #1A1008, #C41E1E);
+          background-size: 200% 200%;
+          animation: fynBorderRotate 4s linear infinite;
+          filter: blur(0.5px);
+          -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+                  mask-composite: exclude;
+          opacity: 0.55;
+          transition: opacity 0.4s ease;
+        }
+        .fyn-sec-card::after {
+          content: "";
+          position: absolute;
+          top: -60px;
+          right: -60px;
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          background: radial-gradient(circle, hsl(var(--primary) / 0.20) 0%, transparent 70%);
+          filter: blur(60px);
+          opacity: 0.4;
+          transition: opacity 0.4s ease;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .fyn-sec-card:hover {
+          transform: translateY(-12px) scale(1.02);
+          box-shadow: 0 20px 60px rgba(196, 30, 30, 0.25);
+        }
+        .fyn-sec-card:hover::before { opacity: 1; }
+        .fyn-sec-card:hover::after  { opacity: 0.7; }
+        .fyn-sec-card > * { position: relative; z-index: 1; }
+
+        .fyn-sec-headline {
+          background: linear-gradient(90deg, #1A1008 0%, #C41E1E 100%);
+          -webkit-background-clip: text;
+                  background-clip: text;
+          -webkit-text-fill-color: transparent;
+                  color: transparent;
+        }
+      `}</style>
+
+      <div className="mx-auto" style={{ maxWidth: 1400, padding: "0 40px" }}>
         {/* Header */}
         <div className="flex flex-col items-center text-center">
           <span
             className="inline-flex items-center gap-2 rounded-full"
             style={{
-              background: "hsl(var(--primary) / 0.10)",
-              color: "hsl(var(--primary))",
-              padding: "8px 16px",
+              background: "linear-gradient(90deg, #C41E1E 0%, #8a1414 100%)",
+              color: "#fff",
+              padding: "10px 20px",
               fontSize: 11,
               letterSpacing: "1.5px",
               textTransform: "uppercase",
-              fontWeight: 600,
+              fontWeight: 700,
               fontFamily: "Inter, sans-serif",
+              boxShadow: "0 4px 16px rgba(196,30,30,0.3)",
             }}
           >
-            <Shield size={16} strokeWidth={1.75} />
+            <Shield size={18} strokeWidth={2} />
             Trusted by 1000+ Beta Users
           </span>
 
           <h2
-            className="text-fyn-ink mt-6 text-[32px] md:text-[48px] leading-[1.15]"
-            style={{ fontFamily: "Georgia, serif", fontWeight: 700, maxWidth: 800, marginBottom: 16 }}
+            className="fyn-sec-headline mt-6 text-[36px] md:text-[56px] leading-[1.1]"
+            style={{ fontFamily: "Georgia, serif", fontWeight: 700, marginBottom: 20 }}
           >
             Enterprise-Grade Security. Zero Compromise.
           </h2>
 
           <p
-            className="text-fyn-ink/60 text-base md:text-xl"
-            style={{ fontFamily: "Inter, sans-serif", maxWidth: 700, marginBottom: 64 }}
+            className="text-fyn-ink/65 text-[18px] md:text-[22px]"
+            style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, maxWidth: 800, marginBottom: 80 }}
           >
             Your financial data deserves military-grade protection. Here's how we keep it safe.
           </p>
         </div>
 
-        {/* Carousel */}
-        <div
-          onMouseEnter={() => controls.stop()}
-          onMouseLeave={() =>
-            controls.start({
-              x: [0, -DISTANCE],
-              transition: {
-                x: { repeat: Infinity, repeatType: "loop", duration: 50, ease: "linear" },
-              },
-            })
-          }
-          style={{
-            height: 340,
-            width: "100%",
-            overflow: "hidden",
-            position: "relative",
-            maskImage:
-              "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)",
-          }}
+        {/* Card grid */}
+        <motion.div
+          className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
         >
-          <motion.div
-            animate={controls}
-            style={{
-              display: "flex",
-              gap: `${GAP}px`,
-              willChange: "transform",
-              transform: "translateZ(0)",
-            }}
-          >
-            {allCards.map((c, i) => {
-              const Icon = c.icon;
-              return (
-                <motion.div
-                  key={i}
-                  whileHover={{ y: -8, boxShadow: "0 12px 32px rgba(196, 30, 30, 0.12)" }}
-                  transition={{ duration: 0.3 }}
+          {CARDS.map((c) => {
+            const Icon = c.icon;
+            return (
+              <motion.div key={c.title} variants={cardVariants} className="fyn-sec-card">
+                <div
+                  className="flex items-center justify-center"
                   style={{
-                    minWidth: CARD_W,
-                    height: 300,
-                    padding: 32,
-                    background: "hsl(var(--card))",
-                    border: "1.5px solid hsl(var(--primary))",
-                    borderRadius: 16,
+                    width: 80,
+                    height: 80,
+                    borderRadius: 12,
+                    background: "hsl(var(--primary) / 0.10)",
+                    boxShadow: "0 8px 24px rgba(196,30,30,0.15)",
+                    marginBottom: 24,
                   }}
                 >
-                  <Icon
-                    size={40}
-                    strokeWidth={1.5}
-                    style={{ color: "hsl(var(--primary))", marginBottom: 20 }}
-                  />
-                  <h3
-                    className="text-fyn-ink"
-                    style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 22, marginBottom: 12 }}
-                  >
-                    {c.title}
-                  </h3>
-                  <p
-                    className="text-fyn-ink/60"
-                    style={{ fontFamily: "Inter, sans-serif", fontSize: 15, lineHeight: 1.6 }}
-                  >
-                    {c.desc}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </div>
+                  <Icon size={48} strokeWidth={1.8} style={{ color: "hsl(var(--primary))" }} />
+                </div>
+
+                <h3
+                  className="text-fyn-ink"
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    fontWeight: 700,
+                    fontSize: 24,
+                    marginBottom: 12,
+                    textShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  {c.title}
+                </h3>
+
+                <div
+                  style={{
+                    width: 60,
+                    height: 3,
+                    background: "linear-gradient(90deg, #C41E1E 0%, transparent 100%)",
+                    borderRadius: 2,
+                    marginBottom: 16,
+                  }}
+                />
+
+                <p
+                  className="text-fyn-ink/65"
+                  style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 16, lineHeight: 1.7 }}
+                >
+                  {c.desc}
+                </p>
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
         {/* Bottom CTA */}
-        <div className="flex flex-col items-center text-center" style={{ marginTop: 80 }}>
+        <div className="flex flex-col items-center text-center" style={{ marginTop: 100 }}>
           <p
             className="text-fyn-ink/60 mb-4"
             style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: 16 }}
@@ -173,14 +229,15 @@ export default function SecuritySection() {
           </p>
           <Link
             to="/security"
-            className="inline-flex items-center gap-2 rounded-lg transition-colors hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-lg transition-all hover:-translate-y-0.5"
             style={{
-              background: "hsl(var(--primary))",
+              background: "linear-gradient(90deg, #C41E1E 0%, #a01818 100%)",
               color: "white",
-              padding: "12px 28px",
+              padding: "14px 28px",
               fontFamily: "Inter, sans-serif",
               fontWeight: 600,
               fontSize: 15,
+              boxShadow: "0 8px 24px rgba(196,30,30,0.3)",
             }}
           >
             Read Security Documentation
