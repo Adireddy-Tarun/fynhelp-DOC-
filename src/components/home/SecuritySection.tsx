@@ -15,6 +15,9 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Cloud,
+  FileSearch,
+  HardDrive,
   type LucideIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
