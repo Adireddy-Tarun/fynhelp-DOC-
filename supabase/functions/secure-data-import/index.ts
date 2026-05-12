@@ -8,8 +8,11 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") as string;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") as string;
+const EXTERNAL_URL = Deno.env.get("EXTERNAL_SUPABASE_URL") as string;
+const EXTERNAL_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_KEY") as string;
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -38,22 +41,31 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
+  if (!EXTERNAL_URL || !EXTERNAL_KEY) {
+    return json({ error: "External Supabase not configured" }, 500);
+  }
+
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return json({ error: "Unauthorized" }, 401);
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    // Local (Lovable Cloud) client — used for auth + profile lookup.
+    const localClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Local client scoped to the caller's JWT for token validation.
+    const localAuthClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
+    // External Supabase client — used for ALL data writes.
+    const externalClient = createClient(EXTERNAL_URL, EXTERNAL_KEY);
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: authErr } = await supabase.auth.getClaims(token);
-    if (authErr || !claims?.claims) {
+    const { data: userData, error: authErr } = await localAuthClient.auth.getUser(token);
+    if (authErr || !userData?.user) {
       return json({ error: "Unauthorized" }, 401);
     }
-    const userId = claims.claims.sub;
+    const userId = userData.user.id;
 
     const raw = await req.json().catch(() => null);
     const parsed = BodySchema.safeParse(raw);
@@ -65,8 +77,8 @@ Deno.serve(async (req) => {
     }
     const { data_type, business_id, records } = parsed.data;
 
-    // Verify caller has access to the business
-    const { data: profile } = await supabase
+    // Verify caller has access to the business (Lovable Cloud profiles table).
+    const { data: profile } = await localClient
       .from("profiles")
       .select("business_id")
       .eq("user_id", userId)
@@ -94,7 +106,6 @@ Deno.serve(async (req) => {
         validationErrors.push({ index: i, errors: p.error.flatten().fieldErrors });
         return;
       }
-      // Reject future dates
       if (new Date(p.data.transaction_date) > new Date(today() + "T23:59:59Z")) {
         validationErrors.push({ index: i, errors: { transaction_date: ["future date not allowed"] } });
         return;
@@ -119,14 +130,24 @@ Deno.serve(async (req) => {
       category: r.category || null,
     }));
 
-    const { data: inserted, error: insertErr } = await supabase
-      .from("transactions")
+    // Insert into External Supabase.
+    const { data: inserted, error: insertErr } = await externalClient
+      .from(data_type)
       .insert(rows)
       .select("id");
 
     if (insertErr) {
       return json({ error: insertErr.message, inserted_count: 0 }, 400);
     }
+
+    // Audit log into External Supabase.
+    await externalClient.from("audit_log").insert({
+      user_id: userId,
+      business_id,
+      action: "secure_data_import",
+      resource_type: data_type,
+      metadata: { inserted_count: inserted?.length ?? 0 },
+    });
 
     return json({ inserted_count: inserted?.length ?? 0, errors: [] });
   } catch (e) {
