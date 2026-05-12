@@ -217,6 +217,27 @@ export default function SecuritySection() {
   );
 }
 
+// Unique floating motion patterns per card (12 cards) — organic, varied
+const FLOAT_PATTERNS: Array<{
+  y: [number, number];
+  x: [number, number];
+  rz: [number, number];
+  duration: number;
+}> = [
+  { y: [-20, 20],  x: [-8, 8],   rz: [-1.5, 1.5], duration: 7.0 },
+  { y: [15, -15],  x: [10, -10], rz: [2, -2],     duration: 8.5 },
+  { y: [-12, 18],  x: [-6, 9],   rz: [-1, 2],     duration: 6.5 },
+  { y: [18, -10],  x: [7, -5],   rz: [1.5, -1],   duration: 9.0 },
+  { y: [-18, 12],  x: [-10, 6],  rz: [-2, 1],     duration: 7.5 },
+  { y: [10, -20],  x: [5, -8],   rz: [1, -2],     duration: 6.0 },
+  { y: [-15, 15],  x: [-7, 10],  rz: [-1.8, 1.8], duration: 8.0 },
+  { y: [20, -12],  x: [9, -6],   rz: [2, -1.2],   duration: 7.2 },
+  { y: [-10, 18],  x: [-9, 7],   rz: [-1.2, 2],   duration: 8.8 },
+  { y: [16, -18],  x: [6, -10],  rz: [1.8, -1.8], duration: 6.8 },
+  { y: [-20, 10],  x: [-5, 9],   rz: [-2, 1.5],   duration: 9.0 },
+  { y: [12, -16],  x: [8, -7],   rz: [1.2, -2],   duration: 7.8 },
+];
+
 function FloatingCard({
   card,
   index,
@@ -227,16 +248,30 @@ function FloatingCard({
   mode: "desktop" | "tablet" | "stack";
 }) {
   const Icon = card.icon;
+  const p = FLOAT_PATTERNS[index % FLOAT_PATTERNS.length];
+  const delay = index * 0.3;
+
+  const floatAnim = {
+    y: p.y,
+    x: p.x,
+    rotateZ: p.rz,
+  };
+  const floatTransition = {
+    duration: p.duration,
+    repeat: Infinity,
+    repeatType: "reverse" as const,
+    ease: "easeInOut" as const,
+    delay,
+  };
 
   if (mode === "stack") {
     return (
       <motion.div
-        className="fyn-3d-card"
+        className="fyn-3d-card cursor-pointer"
         style={{ width: "100%", height: 280 }}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.5, delay: index * 0.05 }}
+        animate={floatAnim}
+        transition={floatTransition}
+        whileHover={{ scale: 1.05, y: 0, x: 0, rotateZ: 0, transition: { duration: 0.3 } }}
       >
         <CardInner Icon={Icon} title={card.title} desc={card.desc} />
       </motion.div>
@@ -247,39 +282,22 @@ function FloatingCard({
 
   return (
     <motion.div
-      className="fyn-3d-card"
+      className="fyn-3d-card cursor-pointer"
       style={{
         position: "absolute",
         width: 320,
         height: 280,
         ...card.pos,
         zIndex: 100 + Math.round(z),
-      }}
-      initial={{
-        opacity: 0,
-        y: 30,
-        rotateY: card.rotY,
         translateZ: z,
       }}
-      whileInView={{
-        opacity: 1,
-        y: [0, -15, 0],
-        x: [0, 5, 0],
-        rotateY: [card.rotY, card.rotY + 2, card.rotY],
-        rotateX: [0, 1, 0],
-        translateZ: z,
-      }}
-      viewport={{ once: false, amount: 0.05 }}
-      transition={{
-        opacity: { duration: 0.6, delay: index * 0.08 },
-        y: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
-        x: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
-        rotateY: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
-        rotateX: { duration: 5 + index * 0.3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 },
-      }}
+      animate={floatAnim}
+      transition={floatTransition}
       whileHover={{
         scale: 1.05,
-        translateZ: z + 50,
+        y: 0,
+        x: 0,
+        rotateZ: 0,
         zIndex: 999,
         transition: { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] },
       }}
