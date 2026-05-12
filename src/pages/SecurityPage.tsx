@@ -1043,6 +1043,136 @@ const SecurityPage = () => {
           0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(139,105,20,0.6), 0 0 80px rgba(196,30,30,0.3); }
           50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(139,105,20,0.8), 0 0 120px rgba(196,30,30,0.45); }
         }
+        @keyframes fynCtaShieldBreath {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.02); }
+        }
+        @keyframes fynCtaShine {
+          0% { left: -100%; }
+          50%, 100% { left: 100%; }
+        }
+        .fyn-cta-badge:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 28px rgba(196,30,30,0.3);
+        }
+        .fyn-cta-trustrow {
+          display: flex; justify-content: center; flex-wrap: wrap;
+          gap: 32px; margin-bottom: 40px;
+        }
+        .fyn-cta-trustitem {
+          display: inline-flex; align-items: center; gap: 12px;
+        }
+        .fyn-cta-icon3d {
+          position: relative;
+          width: 48px; height: 48px;
+          background: linear-gradient(135deg, rgba(196,30,30,0.2), rgba(196,30,30,0.1));
+          border: 1px solid rgba(196,30,30,0.3);
+          border-radius: 12px;
+          display: inline-flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .fyn-cta-icon3d::before {
+          content: ""; position: absolute; inset: -8px;
+          background: radial-gradient(circle, rgba(196,30,30,0.3), transparent);
+          filter: blur(12px); z-index: 0; border-radius: 50%;
+        }
+        .fyn-cta-icon3d::after {
+          content: ""; position: absolute; top: 8px; left: 8px;
+          width: 16px; height: 16px;
+          background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
+          border-radius: 50%; filter: blur(4px); pointer-events: none;
+        }
+        .fyn-cta-btnrow {
+          display: flex; gap: 20px; justify-content: center;
+          flex-wrap: wrap; margin-bottom: 48px;
+        }
+        .fyn-cta-btn-primary {
+          position: relative; overflow: hidden;
+          display: inline-flex; align-items: center; justify-content: center;
+          font-family: 'Inter', sans-serif; font-weight: 700; font-size: 17px;
+          text-transform: uppercase; letter-spacing: 0.5px;
+          padding: 18px 40px; border-radius: 14px;
+          color: #FFFFFF; background: ${RED};
+          border: 2px solid ${RED};
+          box-shadow: 0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.5);
+          transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .fyn-cta-btn-shine {
+          position: absolute; top: 0; left: -100%;
+          width: 100%; height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          animation: fynCtaShine 3s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .fyn-cta-btn-primary:hover {
+          transform: translateY(-4px); filter: brightness(1.05);
+          box-shadow: 0 6px 0 rgba(160,25,25,1), 0 12px 32px rgba(196,30,30,0.7);
+        }
+        .fyn-cta-btn-primary:active {
+          transform: translateY(2px);
+          box-shadow: 0 2px 0 rgba(160,25,25,1), 0 4px 16px rgba(196,30,30,0.5);
+        }
+        .fyn-cta-btn-secondary {
+          display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+          font-family: 'Inter', sans-serif; font-weight: 600; font-size: 17px;
+          color: #FFFFFF; background: transparent;
+          border: 2px solid rgba(255,255,255,0.3);
+          padding: 18px 36px; border-radius: 14px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 2px 0 rgba(255,255,255,0.1), 0 4px 16px rgba(0,0,0,0.3);
+          transition: all 0.2s ease;
+        }
+        .fyn-cta-btn-secondary:hover {
+          background: rgba(196,30,30,0.15);
+          border-color: ${RED};
+          transform: translateY(-2px);
+          box-shadow: 0 3px 0 rgba(196,30,30,0.3), 0 8px 24px rgba(196,30,30,0.25);
+        }
+        .fyn-cta-btn-secondary:active { transform: translateY(1px); }
+        .fyn-cta-support {
+          display: inline-flex; align-items: center; gap: 16px;
+          background: rgba(255,255,255,0.06);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 16px;
+          padding: 24px 36px; margin-top: 48px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .fyn-cta-support-text { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+        .fyn-cta-mailicon {
+          position: relative; flex-shrink: 0;
+          width: 56px; height: 56px;
+          background: linear-gradient(135deg, rgba(196,30,30,0.25), rgba(196,30,30,0.15));
+          border: 1px solid rgba(196,30,30,0.4);
+          border-radius: 50%;
+          display: inline-flex; align-items: center; justify-content: center;
+        }
+        .fyn-cta-mailicon::before {
+          content: ""; position: absolute; inset: -12px;
+          background: radial-gradient(circle, rgba(196,30,30,0.4), transparent);
+          filter: blur(20px); z-index: 0; border-radius: 50%;
+        }
+        .fyn-cta-mailicon::after {
+          content: ""; position: absolute; top: 12px; left: 12px;
+          width: 20px; height: 20px;
+          background: radial-gradient(circle, rgba(255,255,255,0.3), transparent);
+          border-radius: 50%; filter: blur(6px); pointer-events: none;
+        }
+        .fyn-cta-support-link {
+          font-family: 'Inter', sans-serif; font-weight: 700; font-size: 17px;
+          color: #FFFFFF; text-decoration: none; transition: color 0.2s ease;
+        }
+        .fyn-cta-support-link:hover { color: ${RED}; text-decoration: underline; }
+        @media (max-width: 768px) {
+          .fyn-cta-trustrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+          .fyn-cta-trustitem { gap: 8px; }
+          .fyn-cta-icon3d { width: 40px; height: 40px; }
+          .fyn-cta-trustitem span:last-child { font-size: 13px; white-space: normal; }
+          .fyn-cta-btnrow { flex-direction: column; gap: 16px; align-items: stretch; }
+          .fyn-cta-btn-primary, .fyn-cta-btn-secondary { width: 100%; padding: 16px 32px; }
+          .fyn-cta-support { flex-direction: column; text-align: center; padding: 20px 28px; }
+          .fyn-cta-support-text { text-align: center; align-items: center; }
+        }
       `}</style>
     </Layout>
   );
