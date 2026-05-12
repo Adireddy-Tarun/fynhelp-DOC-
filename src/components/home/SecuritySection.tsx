@@ -20,21 +20,27 @@ import {
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
-type Card = { icon: LucideIcon; title: string; desc: string };
+type Card = {
+  icon: LucideIcon;
+  label: string;
+  title: string;
+  desc: string;
+  stat?: { value: string; caption: string };
+};
 
 const CARDS: Card[] = [
-  { icon: Shield,        title: "Bank-Level Encryption",       desc: "AES-256 encryption for data at rest. TLS 1.3 for data in transit. Same security standards used by HDFC, ICICI, and Axis Bank." },
-  { icon: Lock,          title: "Row-Level Security",          desc: "PostgreSQL RLS policies isolate your business data. Zero cross-contamination between accounts. Database-level protection." },
-  { icon: Key,           title: "Zero-Knowledge Architecture", desc: "Your financial data encrypted before reaching servers. We cannot decrypt or access your raw transaction data." },
-  { icon: Database,      title: "Indian Data Residency",       desc: "All data stored in Mumbai AWS data centers. Compliant with RBI data localization regulations. No data leaves Indian jurisdiction." },
-  { icon: Activity,      title: "99.9% Accuracy Guarantee",    desc: "Real-time calculations validated against CA standards. Deterministic algorithms, not AI guesswork. Auditable by your chartered accountant." },
-  { icon: Eye,           title: "Complete Transparency",       desc: "Every calculation shows its formula. Every insight shows its source data. No black box AI making decisions you cannot verify." },
-  { icon: UserX,         title: "Your Data Stays Yours",       desc: "We never use your financial data to train Fynny or any AI models. Your business intelligence remains confidential forever." },
-  { icon: FileCheck,     title: "SOC 2 Compliance Ready",      desc: "Annual third-party security audits. Quarterly vulnerability assessments. Bi-annual penetration testing by certified firms." },
-  { icon: Clock,         title: "Complete Audit Trail",        desc: "Every data import, every change, every access logged with timestamp and user ID. Complete forensic trail for compliance and tax audits." },
-  { icon: AlertTriangle, title: "Real-Time Threat Detection",  desc: "Automatic rate limiting. Suspicious activity alerts. IP-based access controls. Enterprise security without enterprise cost." },
-  { icon: Users,         title: "Role-Based Access Control",   desc: "Granular permissions for team members. Your CA sees tax data only. Founders see everything. You control who sees what." },
-  { icon: Download,      title: "One-Click Data Export",       desc: "Download all your data anytime in CSV or Excel format. No vendor lock-in. Your data is portable and yours to keep forever." },
+  { icon: Shield,        label: "ENCRYPTION STANDARD", title: "Bank-level encryption protects every byte of your data.", desc: "AES-256 encryption for data at rest. TLS 1.3 for data in transit. Same security standards used by HDFC, ICICI, and Axis Bank." },
+  { icon: Lock,          label: "DATABASE SECURITY",   title: "Row-level security ensures zero data leakage.",            desc: "PostgreSQL RLS policies isolate your business data at database level. Zero cross-contamination between accounts. Your data stays yours." },
+  { icon: Key,           label: "PRIVACY ARCHITECTURE",title: "We can't see your data. By design.",                       desc: "Your financial data is encrypted before reaching our servers. Zero-knowledge architecture means we cannot decrypt or access your raw transaction data." },
+  { icon: Database,      label: "DATA RESIDENCY",      title: "Your data never leaves India.",                            desc: "All data stored in Mumbai AWS data centers. Compliant with RBI data localization regulations. No international data transfer. Period." },
+  { icon: Activity,      label: "ACCURACY PROMISE",    title: "99.9% calculation accuracy. Auditable by your CA.",        desc: "Real-time calculations validated against CA standards. Deterministic algorithms, not AI guesswork. Every number is verifiable.", stat: { value: "99.9%", caption: "Accuracy Rate" } },
+  { icon: Eye,           label: "TRANSPARENCY CORE",   title: "Every calculation shows its source. No black boxes.",      desc: "Every insight shows its formula. Every number shows its source data. No hidden AI making decisions you can't verify or challenge." },
+  { icon: UserX,         label: "DATA ETHICS",         title: "Your data will never train our AI. Ever.",                 desc: "We never use your financial data to train Fynny or any AI models. Your business intelligence remains confidential forever. Zero exceptions." },
+  { icon: FileCheck,     label: "COMPLIANCE READY",    title: "Enterprise-grade audits without enterprise cost.",         desc: "Annual third-party security audits. Quarterly vulnerability assessments. Bi-annual penetration testing by certified firms. SOC 2 compliance ready." },
+  { icon: Clock,         label: "AUDIT SYSTEM",        title: "Complete forensic trail for every action.",                desc: "Every data import, every change, every access logged with timestamp and user ID. Full audit trail for compliance, tax filing, and dispute resolution." },
+  { icon: AlertTriangle, label: "THREAT DETECTION",    title: "Real-time protection against suspicious activity.",        desc: "Automatic rate limiting. Instant suspicious activity alerts. IP-based access controls. Enterprise security infrastructure at startup pricing." },
+  { icon: Users,         label: "ACCESS CONTROL",      title: "Granular permissions for every team member.",              desc: "Role-based access control. Your CA sees tax data only. Your CFO sees everything. You decide who sees what. Complete access audit log." },
+  { icon: Download,      label: "DATA FREEDOM",        title: "Export everything. Delete everything. Anytime.",           desc: "One-click data export in CSV or Excel format. No vendor lock-in. Your data is portable and deletable. We don't hold your data hostage." },
 ];
 
 const N = CARDS.length;
@@ -68,9 +74,7 @@ export default function SecuritySection() {
     return () => window.clearInterval(id);
   }, [autoOn]);
 
-  const pauseAuto = () => {
-    pauseUntilRef.current = Date.now() + 10000;
-  };
+  const pauseAuto = () => { pauseUntilRef.current = Date.now() + 10000; };
 
   const goPrev = () => {
     pauseAuto();
@@ -90,7 +94,6 @@ export default function SecuritySection() {
     setIndex(i);
   };
 
-  // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") goPrev();
@@ -105,14 +108,12 @@ export default function SecuritySection() {
   const card = CARDS[index];
   const Icon = card.icon;
 
-  // Sizing
-  const cardW = isMobile ? "90vw" : isTablet ? 500 : 600;
-  const cardH = isMobile ? 380 : isTablet ? 360 : 400;
-  const cardPad = isMobile ? 32 : 48;
-  const titleSize = isMobile ? 24 : 28;
-  const descSize = isMobile ? 16 : 18;
-  const iconBoxSize = isMobile ? 84 : 96;
-  const iconSize = isMobile ? 48 : 56;
+  const cardW = isMobile ? "92vw" : isTablet ? 720 : 980;
+  const cardH = isMobile ? "auto" : isTablet ? 460 : 480;
+  const cardPad = isMobile ? 40 : 56;
+  const titleSize = isMobile ? 32 : 42;
+  const descSize = isMobile ? 15 : 17;
+  const showStat = !!card.stat && !isMobile;
 
   return (
     <section
@@ -159,92 +160,21 @@ export default function SecuritySection() {
 
           <p
             className="text-fyn-ink/65 text-[18px] md:text-[22px]"
-            style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, maxWidth: 800, marginBottom: 40 }}
+            style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, maxWidth: 800, marginBottom: 56 }}
           >
             Your financial data deserves military-grade protection. Here's how we keep it safe.
           </p>
         </div>
 
-        {/* Single-card slider */}
-        <style>{`
-          @keyframes fynSecBorderGlow {
-            0%, 100% { filter: hue-rotate(0deg) brightness(1); }
-            50%      { filter: hue-rotate(90deg) brightness(1.2); }
-          }
-          @keyframes fynSecFloatA { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-18px) } }
-          @keyframes fynSecFloatB { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-26px) } }
-          @keyframes fynSecFloatC { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
-          .fyn-sec-card {
-            position: relative;
-            background:
-              linear-gradient(rgba(45,27,105,0.92), rgba(26,26,46,0.92)),
-              url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M0 0h40v40H0z' fill='none'/><path d='M0 0h40M0 0v40' stroke='rgba(255,255,255,0.05)' stroke-width='1'/></svg>");
-            background-size: auto, 40px 40px;
-            border-radius: 28px;
-            transform-style: preserve-3d;
-            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
-            isolation: isolate;
-          }
-          .fyn-sec-card::before {
-            content: "";
-            position: absolute;
-            inset: -3px;
-            border-radius: 31px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1, #F7B731, #FF6B6B);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: fynSecBorderGlow 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 12px rgba(78,205,196,0.35));
-          }
-          .fyn-sec-card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 200px;
-            background: radial-gradient(ellipse at 50% 0%, rgba(255,107,107,0.30), transparent 70%);
-            filter: blur(60px);
-            pointer-events: none;
-            border-radius: 28px 28px 0 0;
-          }
-          .fyn-sec-card:hover { transform: translateY(-8px) scale(1.02) rotateX(2deg) rotateY(2deg); }
-          .fyn-sec-icon-wrap {
-            position: relative;
-            background: linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%);
-            border: 2px solid rgba(255,255,255,0.20);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(78,205,196,0.40);
-            transform: translateZ(20px);
-          }
-          .fyn-sec-icon-wrap::after {
-            content: "";
-            position: absolute;
-            inset: -20px;
-            background: radial-gradient(circle, rgba(78,205,196,0.55), transparent 70%);
-            filter: blur(30px);
-            opacity: 0.6;
-            z-index: -1;
-            border-radius: 50%;
-          }
-          .fyn-sec-title {
-            background: linear-gradient(180deg, #ffffff 0%, #E0F7FA 100%);
-            -webkit-background-clip: text;
-                    background-clip: text;
-            -webkit-text-fill-color: transparent;
-                    color: transparent;
-            text-shadow: 0 0 30px rgba(255,255,255,0.30);
-          }
-          .fyn-sec-accent {
-            width: 80px; height: 4px; border-radius: 2px;
-            background: linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);
-            box-shadow: 0 0 20px rgba(78,205,196,0.6);
-          }
-          .fyn-sec-corner-dot {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-          }
-        `}</style>
-
+        {/* Slider */}
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: 540, overflow: "visible", touchAction: "pan-y", userSelect: "none", perspective: 1200 }}
+          style={{
+            minHeight: isMobile ? 480 : 520,
+            overflow: "visible",
+            touchAction: "pan-y",
+            userSelect: "none",
+          }}
         >
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
@@ -257,137 +187,211 @@ export default function SecuritySection() {
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.2}
-              whileDrag={{ scale: 0.98, opacity: 0.9, cursor: "grabbing" }}
+              whileDrag={{ scale: 0.99, opacity: 0.92, cursor: "grabbing" }}
               dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
               onDragEnd={(_, info) => {
                 const power = swipePower(info.offset.x, info.velocity.x);
                 if (power < -SWIPE_THRESHOLD) goNext();
                 else if (power > SWIPE_THRESHOLD) goPrev();
               }}
-              className="fyn-sec-card"
               style={{
+                position: "relative",
                 width: cardW,
                 maxWidth: "92vw",
                 height: cardH,
                 padding: cardPad,
+                background: "#1a1412",
+                borderRadius: 24,
+                overflow: "hidden",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+                cursor: "grab",
                 display: "flex",
                 flexDirection: "column",
-                cursor: "grab",
-                boxShadow:
-                  "0 10px 40px rgba(255,107,107,0.30), 0 20px 60px rgba(78,205,196,0.20), 0 30px 80px rgba(0,0,0,0.40)",
               }}
             >
-              {/* Glassmorphism overlay */}
+              {/* Subtle radial gradient atmosphere */}
               <div
                 aria-hidden
                 style={{
-                  position: "absolute", inset: 0, borderRadius: 28,
-                  background: "rgba(255,255,255,0.05)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "radial-gradient(ellipse at 50% 40%, rgba(196,30,30,0.08) 0%, transparent 70%)",
                   pointerEvents: "none",
                 }}
               />
 
-              {/* Floating particles */}
-              <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: 28, pointerEvents: "none" }}>
-                {[
-                  { size: 6,  top: "12%", left: "18%", color: "rgba(78,205,196,0.45)",  anim: "fynSecFloatA 4s ease-in-out infinite" },
-                  { size: 10, top: "70%", left: "10%", color: "rgba(255,107,107,0.40)", anim: "fynSecFloatB 5.5s ease-in-out infinite" },
-                  { size: 4,  top: "30%", left: "85%", color: "rgba(247,183,49,0.45)",  anim: "fynSecFloatC 3.5s ease-in-out infinite" },
-                  { size: 8,  top: "55%", left: "78%", color: "rgba(69,183,209,0.45)",  anim: "fynSecFloatA 6s ease-in-out infinite" },
-                  { size: 5,  top: "85%", left: "55%", color: "rgba(78,205,196,0.40)",  anim: "fynSecFloatB 4.5s ease-in-out infinite" },
-                  { size: 12, top: "8%",  left: "70%", color: "rgba(255,107,107,0.30)", anim: "fynSecFloatC 5s ease-in-out infinite" },
-                ].map((p, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      position: "absolute",
-                      top: p.top, left: p.left,
-                      width: p.size, height: p.size,
-                      borderRadius: "50%",
-                      background: p.color,
-                      boxShadow: `0 0 16px ${p.color}`,
-                      animation: p.anim,
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Corner accents */}
-              <span className="fyn-sec-corner-dot" style={{ top: 16, right: 16, background: "#4ECDC4", boxShadow: "0 0 20px #4ECDC4" }} />
-              <span className="fyn-sec-corner-dot" style={{ bottom: 16, left: 16, background: "#FF6B6B", boxShadow: "0 0 20px #FF6B6B" }} />
-
               {/* Content */}
-              <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
-                <div
-                  className="fyn-sec-icon-wrap flex items-center justify-center"
-                  style={{ width: 100, height: 100, marginBottom: 24 }}
+              <div
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  maxWidth: showStat ? "calc(100% - 360px)" : "100%",
+                }}
+              >
+                {/* Top label badge */}
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    alignSelf: "flex-start",
+                    background: "rgba(196,30,30,0.08)",
+                    color: "#C41E1E",
+                    padding: "8px 16px",
+                    borderRadius: 6,
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 11,
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                    marginBottom: 32,
+                  }}
                 >
-                  <Icon
-                    size={52}
-                    strokeWidth={2.5}
-                    style={{ color: "#ffffff", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))" }}
-                  />
-                </div>
+                  <Icon size={18} strokeWidth={2.2} color="#C41E1E" />
+                  {card.label}
+                </span>
 
+                {/* Title */}
                 <h3
-                  className="fyn-sec-title"
                   style={{
                     fontFamily: "Georgia, serif",
                     fontWeight: 800,
-                    fontSize: 26,
-                    lineHeight: 1.3,
+                    fontSize: titleSize,
+                    lineHeight: 1.2,
+                    color: "#FFFFFF",
+                    marginBottom: 24,
+                    maxWidth: 600,
                     letterSpacing: "-0.5px",
-                    marginBottom: 20,
                   }}
                 >
                   {card.title}
                 </h3>
 
-                <div className="fyn-sec-accent" style={{ marginBottom: 20 }} />
-
+                {/* Description */}
                 <p
                   style={{
                     fontFamily: "Inter, sans-serif",
-                    fontWeight: 500,
-                    fontSize: 17,
-                    lineHeight: 1.8,
-                    color: "rgba(255,255,255,0.85)",
-                    textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                    fontWeight: 400,
+                    fontSize: descSize,
+                    lineHeight: 1.7,
+                    color: "rgba(255,255,255,0.7)",
+                    maxWidth: 550,
                   }}
                 >
                   {card.desc}
                 </p>
               </div>
+
+              {/* Stat card */}
+              {showStat && card.stat && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: cardPad,
+                    right: cardPad,
+                    width: 320,
+                    background: "#252220",
+                    border: "1px solid rgba(196,30,30,0.2)",
+                    borderRadius: 16,
+                    padding: 32,
+                    zIndex: 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "Georgia, serif",
+                      fontWeight: 900,
+                      fontSize: 72,
+                      color: "#C41E1E",
+                      lineHeight: 1,
+                      marginBottom: 12,
+                      letterSpacing: "-2px",
+                    }}
+                  >
+                    {card.stat.value}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 400,
+                      fontSize: 14,
+                      color: "rgba(255,255,255,0.6)",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    {card.stat.caption}
+                  </div>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Arrows */}
+        {/* Arrows + Counter */}
         <div className="flex items-center justify-center" style={{ gap: 24, marginTop: 40 }}>
           <button
             onClick={goPrev}
             aria-label="Previous"
-            className="flex items-center justify-center transition-transform hover:-translate-y-0.5"
+            className="flex items-center justify-center transition-all"
             style={{
               width: 56, height: 56, borderRadius: "50%",
-              background: "linear-gradient(135deg, #C41E1E 0%, #a01818 100%)",
-              color: "#fff", border: "none", cursor: "pointer",
-              boxShadow: "0 8px 24px rgba(196,30,30,0.35)",
+              background: "transparent",
+              border: "2px solid rgba(26,16,8,0.2)",
+              color: "#1A1008",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(196,30,30,0.9)";
+              e.currentTarget.style.borderColor = "#C41E1E";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.borderColor = "rgba(26,16,8,0.2)";
+              e.currentTarget.style.color = "#1A1008";
             }}
           >
             <ChevronLeft size={26} />
           </button>
+
+          <span
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: 14,
+              color: "rgba(26,16,8,0.5)",
+              fontWeight: 500,
+              minWidth: 70,
+              textAlign: "center",
+              letterSpacing: "1px",
+            }}
+          >
+            {String(index + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}
+          </span>
+
           <button
             onClick={goNext}
             aria-label="Next"
-            className="flex items-center justify-center transition-transform hover:-translate-y-0.5"
+            className="flex items-center justify-center transition-all"
             style={{
               width: 56, height: 56, borderRadius: "50%",
-              background: "linear-gradient(135deg, #C41E1E 0%, #a01818 100%)",
-              color: "#fff", border: "none", cursor: "pointer",
-              boxShadow: "0 8px 24px rgba(196,30,30,0.35)",
+              background: "transparent",
+              border: "2px solid rgba(26,16,8,0.2)",
+              color: "#1A1008",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(196,30,30,0.9)";
+              e.currentTarget.style.borderColor = "#C41E1E";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.borderColor = "rgba(26,16,8,0.2)";
+              e.currentTarget.style.color = "#1A1008";
             }}
           >
             <ChevronRight size={26} />
@@ -404,11 +408,11 @@ export default function SecuritySection() {
                 onClick={() => goTo(i)}
                 aria-label={`Go to card ${i + 1}`}
                 style={{
-                  width: active ? 12 : 8,
-                  height: active ? 12 : 8,
+                  width: active ? 10 : 8,
+                  height: active ? 10 : 8,
                   borderRadius: "50%",
-                  background: active ? "#C41E1E" : "rgba(196,30,30,0.3)",
-                  border: "none",
+                  background: active ? "#C41E1E" : "transparent",
+                  border: active ? "none" : "1.5px solid rgba(26,16,8,0.25)",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                   padding: 0,
