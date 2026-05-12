@@ -634,7 +634,7 @@ function BadgeCard({
         rotateY: finePointer ? tx * 8 : 0,
         rotateX: finePointer ? -ty * 8 : 0,
       }}
-      transition-spring={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
+      transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
       style={{
         position: "relative",
         display: "flex",
