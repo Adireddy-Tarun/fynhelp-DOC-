@@ -144,22 +144,6 @@ export default function HeroSection() {
           </span>
         </p>
 
-        {/* Suites note */}
-        <p
-          className="animate-fade-in text-center"
-          style={{
-            animationDelay: "300ms",
-            animationFillMode: "both",
-            fontFamily: "'Roboto', sans-serif",
-            fontSize: "clamp(14px, 1.1vw, 16px)",
-            color: "rgba(255,255,255,0.7)",
-            marginTop: 32,
-          }}
-        >
-          <span style={{ color: "#FFFFFF", fontWeight: 600 }}>10 Intelligence Suites</span> —
-          Liquidity, Revenue, Cost, and GST &amp; Tax Intelligence live now. 6 additional suites in active development.
-        </p>
-
         {/* Chat Widget */}
         <div
           className="animate-fade-in w-full"
