@@ -166,9 +166,85 @@ export default function SecuritySection() {
         </div>
 
         {/* Single-card slider */}
+        <style>{`
+          @keyframes fynSecBorderGlow {
+            0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+            50%      { filter: hue-rotate(90deg) brightness(1.2); }
+          }
+          @keyframes fynSecFloatA { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-18px) } }
+          @keyframes fynSecFloatB { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-26px) } }
+          @keyframes fynSecFloatC { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
+          .fyn-sec-card {
+            position: relative;
+            background:
+              linear-gradient(rgba(45,27,105,0.92), rgba(26,26,46,0.92)),
+              url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M0 0h40v40H0z' fill='none'/><path d='M0 0h40M0 0v40' stroke='rgba(255,255,255,0.05)' stroke-width='1'/></svg>");
+            background-size: auto, 40px 40px;
+            border-radius: 28px;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
+            isolation: isolate;
+          }
+          .fyn-sec-card::before {
+            content: "";
+            position: absolute;
+            inset: -3px;
+            border-radius: 31px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1, #F7B731, #FF6B6B);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: fynSecBorderGlow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(78,205,196,0.35));
+          }
+          .fyn-sec-card::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 200px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,107,107,0.30), transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            border-radius: 28px 28px 0 0;
+          }
+          .fyn-sec-card:hover { transform: translateY(-8px) scale(1.02) rotateX(2deg) rotateY(2deg); }
+          .fyn-sec-icon-wrap {
+            position: relative;
+            background: linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%);
+            border: 2px solid rgba(255,255,255,0.20);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(78,205,196,0.40);
+            transform: translateZ(20px);
+          }
+          .fyn-sec-icon-wrap::after {
+            content: "";
+            position: absolute;
+            inset: -20px;
+            background: radial-gradient(circle, rgba(78,205,196,0.55), transparent 70%);
+            filter: blur(30px);
+            opacity: 0.6;
+            z-index: -1;
+            border-radius: 50%;
+          }
+          .fyn-sec-title {
+            background: linear-gradient(180deg, #ffffff 0%, #E0F7FA 100%);
+            -webkit-background-clip: text;
+                    background-clip: text;
+            -webkit-text-fill-color: transparent;
+                    color: transparent;
+            text-shadow: 0 0 30px rgba(255,255,255,0.30);
+          }
+          .fyn-sec-accent {
+            width: 80px; height: 4px; border-radius: 2px;
+            background: linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);
+            box-shadow: 0 0 20px rgba(78,205,196,0.6);
+          }
+          .fyn-sec-corner-dot {
+            position: absolute; width: 8px; height: 8px; border-radius: 50%;
+          }
+        `}</style>
+
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: 520, overflow: "hidden", touchAction: "pan-y", userSelect: "none" }}
+          style={{ height: 540, overflow: "visible", touchAction: "pan-y", userSelect: "none", perspective: 1200 }}
         >
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
@@ -188,55 +264,102 @@ export default function SecuritySection() {
                 if (power < -SWIPE_THRESHOLD) goNext();
                 else if (power > SWIPE_THRESHOLD) goPrev();
               }}
+              className="fyn-sec-card"
               style={{
                 width: cardW,
                 maxWidth: "92vw",
                 height: cardH,
-                background: "#ffffff",
-                border: "2px solid #C41E1E",
-                borderRadius: 24,
                 padding: cardPad,
-                boxShadow: "0 20px 60px rgba(196,30,30,0.2)",
                 display: "flex",
                 flexDirection: "column",
                 cursor: "grab",
+                boxShadow:
+                  "0 10px 40px rgba(255,107,107,0.30), 0 20px 60px rgba(78,205,196,0.20), 0 30px 80px rgba(0,0,0,0.40)",
               }}
             >
+              {/* Glassmorphism overlay */}
               <div
-                className="flex items-center justify-center"
+                aria-hidden
                 style={{
-                  width: iconBoxSize,
-                  height: iconBoxSize,
-                  borderRadius: 20,
-                  background: "hsl(var(--primary) / 0.10)",
-                  marginBottom: 28,
+                  position: "absolute", inset: 0, borderRadius: 28,
+                  background: "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  pointerEvents: "none",
                 }}
-              >
-                <Icon size={iconSize} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
+              />
+
+              {/* Floating particles */}
+              <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: 28, pointerEvents: "none" }}>
+                {[
+                  { size: 6,  top: "12%", left: "18%", color: "rgba(78,205,196,0.45)",  anim: "fynSecFloatA 4s ease-in-out infinite" },
+                  { size: 10, top: "70%", left: "10%", color: "rgba(255,107,107,0.40)", anim: "fynSecFloatB 5.5s ease-in-out infinite" },
+                  { size: 4,  top: "30%", left: "85%", color: "rgba(247,183,49,0.45)",  anim: "fynSecFloatC 3.5s ease-in-out infinite" },
+                  { size: 8,  top: "55%", left: "78%", color: "rgba(69,183,209,0.45)",  anim: "fynSecFloatA 6s ease-in-out infinite" },
+                  { size: 5,  top: "85%", left: "55%", color: "rgba(78,205,196,0.40)",  anim: "fynSecFloatB 4.5s ease-in-out infinite" },
+                  { size: 12, top: "8%",  left: "70%", color: "rgba(255,107,107,0.30)", anim: "fynSecFloatC 5s ease-in-out infinite" },
+                ].map((p, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      position: "absolute",
+                      top: p.top, left: p.left,
+                      width: p.size, height: p.size,
+                      borderRadius: "50%",
+                      background: p.color,
+                      boxShadow: `0 0 16px ${p.color}`,
+                      animation: p.anim,
+                    }}
+                  />
+                ))}
               </div>
-              <h3
-                className="text-fyn-ink"
-                style={{
-                  fontFamily: "Georgia, serif",
-                  fontWeight: 700,
-                  fontSize: titleSize,
-                  lineHeight: 1.3,
-                  marginBottom: 16,
-                }}
-              >
-                {card.title}
-              </h3>
-              <p
-                className="text-fyn-ink/65"
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 400,
-                  fontSize: descSize,
-                  lineHeight: 1.8,
-                }}
-              >
-                {card.desc}
-              </p>
+
+              {/* Corner accents */}
+              <span className="fyn-sec-corner-dot" style={{ top: 16, right: 16, background: "#4ECDC4", boxShadow: "0 0 20px #4ECDC4" }} />
+              <span className="fyn-sec-corner-dot" style={{ bottom: 16, left: 16, background: "#FF6B6B", boxShadow: "0 0 20px #FF6B6B" }} />
+
+              {/* Content */}
+              <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+                <div
+                  className="fyn-sec-icon-wrap flex items-center justify-center"
+                  style={{ width: 100, height: 100, marginBottom: 24 }}
+                >
+                  <Icon
+                    size={52}
+                    strokeWidth={2.5}
+                    style={{ color: "#ffffff", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))" }}
+                  />
+                </div>
+
+                <h3
+                  className="fyn-sec-title"
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    fontWeight: 800,
+                    fontSize: 26,
+                    lineHeight: 1.3,
+                    letterSpacing: "-0.5px",
+                    marginBottom: 20,
+                  }}
+                >
+                  {card.title}
+                </h3>
+
+                <div className="fyn-sec-accent" style={{ marginBottom: 20 }} />
+
+                <p
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 500,
+                    fontSize: 17,
+                    lineHeight: 1.8,
+                    color: "rgba(255,255,255,0.85)",
+                    textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                  }}
+                >
+                  {card.desc}
+                </p>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
