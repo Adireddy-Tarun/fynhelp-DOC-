@@ -865,7 +865,7 @@ const SecurityPage = () => {
 
       {/* ───── Section 7: Final CTA ───── */}
       <section
-        className="relative overflow-hidden"
+        className="relative overflow-hidden fyn-cta-section"
         style={{
           background: "linear-gradient(180deg, #1a1412 0%, #0a0a0a 100%)",
           padding: "100px 40px",
