@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Lock, Eye, RefreshCw, CheckCircle2, X, KeyRound, Server, Users, FileCheck, Clock, Calendar, Rocket } from "lucide-react";
+import { Shield, Lock, Eye, RefreshCw, CheckCircle2, X, KeyRound, Server, Users, FileCheck, Clock, Calendar, Rocket, ShieldCheck, ArrowRight, MessageCircle, CreditCard, XCircle, Sparkles, Mail } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const INK = "#1A1008";
