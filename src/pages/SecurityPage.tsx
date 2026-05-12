@@ -1163,15 +1163,99 @@ const SecurityPage = () => {
           color: #FFFFFF; text-decoration: none; transition: color 0.2s ease;
         }
         .fyn-cta-support-link:hover { color: ${RED}; text-decoration: underline; }
-        @media (max-width: 768px) {
-          .fyn-cta-trustrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-          .fyn-cta-trustitem { gap: 8px; }
+        @media (max-width: 767px) {
+          .fyn-cta-section {
+            padding: 60px 24px !important;
+            min-height: auto !important;
+          }
+          .fyn-cta-section h2 {
+            font-size: 32px !important;
+            line-height: 1.2 !important;
+            letter-spacing: -0.3px !important;
+            margin-bottom: 16px !important;
+            padding: 0 8px;
+          }
+          .fyn-cta-section p {
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+          }
+          .fyn-cta-badge {
+            font-size: 12px !important;
+            padding: 8px 16px !important;
+            max-width: 90vw;
+          }
+          .fyn-cta-trustrow {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 12px;
+            max-width: 400px;
+            margin: 0 auto 32px;
+            padding: 0 8px;
+          }
+          .fyn-cta-trustitem {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            padding: 12px 8px;
+          }
           .fyn-cta-icon3d { width: 40px; height: 40px; }
-          .fyn-cta-trustitem span:last-child { font-size: 13px; white-space: normal; }
-          .fyn-cta-btnrow { flex-direction: column; gap: 16px; align-items: stretch; }
-          .fyn-cta-btn-primary, .fyn-cta-btn-secondary { width: 100%; padding: 16px 32px; }
-          .fyn-cta-support { flex-direction: column; text-align: center; padding: 20px 28px; }
-          .fyn-cta-support-text { text-align: center; align-items: center; }
+          .fyn-cta-icon3d::before { filter: blur(8px); inset: -4px; }
+          .fyn-cta-trustitem span:last-child {
+            font-size: 13px !important;
+            white-space: normal !important;
+            line-height: 1.3;
+            text-align: center;
+          }
+          .fyn-cta-btnrow {
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+            max-width: 400px;
+            margin: 0 auto 32px;
+            padding: 0 8px;
+            width: 100%;
+          }
+          .fyn-cta-btn-primary, .fyn-cta-btn-secondary {
+            width: 100%;
+            padding: 16px 24px !important;
+            font-size: 15px !important;
+            border-radius: 12px !important;
+            min-height: 54px;
+          }
+          .fyn-cta-btn-primary {
+            box-shadow: 0 3px 0 rgba(160,25,25,1), 0 6px 20px rgba(196,30,30,0.4) !important;
+          }
+          .fyn-cta-btn-secondary {
+            box-shadow: 0 2px 0 rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.25) !important;
+          }
+          .fyn-cta-support {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px 24px !important;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto !important;
+            width: calc(100% - 16px);
+          }
+          .fyn-cta-mailicon { width: 48px; height: 48px; }
+          .fyn-cta-mailicon::before { filter: blur(12px); }
+          .fyn-cta-support-text {
+            text-align: center;
+            align-items: center;
+            gap: 4px;
+          }
+          .fyn-cta-support-text span:first-child { font-size: 13px !important; }
+          .fyn-cta-support-link {
+            font-size: 15px !important;
+            word-break: break-word;
+          }
+        }
+        @media (max-width: 399px) {
+          .fyn-cta-section { padding: 60px 20px !important; }
+          .fyn-cta-section h2 { font-size: 28px !important; }
+          .fyn-cta-section p { font-size: 15px !important; }
         }
       `}</style>
     </Layout>
