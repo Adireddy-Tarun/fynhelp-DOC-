@@ -865,61 +865,168 @@ const SecurityPage = () => {
 
       {/* ───── Section 7: Final CTA ───── */}
       <section
-        className="relative bg-sidebar"
+        className="relative overflow-hidden"
         style={{
-          background: `linear-gradient(145deg, ${INK} 0%, ${INK} 40%, rgba(196,30,30,0.15) 75%, rgba(139,105,20,0.15) 100%)`,
-          padding: "100px 24px",
-          borderRadius: "48px 48px 0 0",
+          background: "linear-gradient(180deg, #1a1412 0%, #0a0a0a 100%)",
+          padding: "100px 40px",
+          minHeight: 600,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <div className="max-w-[1000px] mx-auto text-center">
-          <motion.h2 {...fadeUp} style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 4.4vw, 52px)", color: "#FFFFFF", lineHeight: 1.2, marginBottom: 24, textShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
-            Ready to Experience Financial Intelligence You Can Trust?
+        {/* Center radial glow */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute", top: "50%", left: "50%",
+            width: 1200, height: 1200, transform: "translate(-50%, -50%)",
+            background: "radial-gradient(circle, rgba(196,30,30,0.12) 0%, rgba(196,30,30,0.06) 40%, transparent 70%)",
+            filter: "blur(80px)", pointerEvents: "none", zIndex: 0,
+          }}
+        />
+        {/* Grid pattern */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute", inset: 0, opacity: 0.5, pointerEvents: "none", zIndex: 0,
+            backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* Top vignette */}
+        <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, height: 150, background: "linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%)", pointerEvents: "none", zIndex: 0 }} />
+        {/* Bottom vignette */}
+        <div aria-hidden style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 150, background: "linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%)", pointerEvents: "none", zIndex: 0 }} />
+
+        {/* 3D Shield watermark */}
+        <div
+          aria-hidden
+          className="hidden md:block"
+          style={{
+            position: "absolute", top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500, height: 500, zIndex: 0, pointerEvents: "none",
+            animation: "fynCtaShieldBreath 4s ease-in-out infinite",
+          }}
+        >
+          <div style={{ position: "absolute", inset: -60, background: "radial-gradient(circle, rgba(196,30,30,0.15), transparent)", filter: "blur(60px)" }} />
+          <ShieldCheck size={500} strokeWidth={1} style={{ position: "absolute", inset: 0, color: "rgba(255,255,255,0.03)" }} />
+          <ShieldCheck size={480} strokeWidth={1} style={{ position: "absolute", top: -10, left: -10, color: "rgba(196,30,30,0.04)" }} />
+        </div>
+
+        <div className="relative w-full max-w-[1000px] mx-auto text-center" style={{ zIndex: 2 }}>
+          {/* Social proof badge */}
+          <motion.div {...fadeUp} style={{ marginBottom: 24 }}>
+            <span
+              className="fyn-cta-badge"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                background: "rgba(196,30,30,0.12)",
+                border: "1px solid rgba(196,30,30,0.25)",
+                padding: "10px 20px", borderRadius: 100,
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 4px 20px rgba(196,30,30,0.2)",
+                color: "#FFFFFF", fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13,
+                transition: "0.3s ease",
+              }}
+            >
+              <Users size={18} style={{ color: RED }} />
+              Trusted by 1,000+ Beta Users
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h2
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.4, 0, 0.2, 1] as const }}
+            style={{
+              fontFamily: "Georgia, serif", fontWeight: 900,
+              fontSize: "clamp(36px, 5vw, 56px)", lineHeight: 1.15, letterSpacing: "-0.5px",
+              marginBottom: 20, textShadow: "0 4px 12px rgba(0,0,0,0.6)",
+            }}
+          >
+            <span style={{ color: "#FFFFFF" }}>Your Data Is Safe. </span>
+            <span style={{ color: "rgba(255,200,190,1)" }}>Your Trial Is Free.</span>
           </motion.h2>
-          <motion.p {...fadeUp} className="mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: "clamp(16px, 1.4vw, 20px)", color: "rgba(244,237,218,1)", lineHeight: 1.6, maxWidth: 800, marginBottom: 48, textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
-            See how FYNHelp keeps your data secure while giving you the insights you need. Start your 6-month free trial — no credit card, no risk, no obligations.
+
+          {/* Subheadline */}
+          <motion.p
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+            style={{
+              fontFamily: "'Inter', sans-serif", fontWeight: 500,
+              fontSize: "clamp(17px, 1.5vw, 20px)", lineHeight: 1.6,
+              color: "rgba(255,255,255,0.75)", maxWidth: 600, margin: "0 auto 48px",
+              textShadow: "0 2px 8px rgba(0,0,0,0.4)",
+            }}
+          >
+            Start your 6-month free trial. No credit card. No obligations.
           </motion.p>
 
-          <motion.div {...fadeUp} className="flex flex-wrap items-center justify-center gap-5">
-            <Link
-              to="/waitlist"
-              className="transition-all hover:-translate-y-0.5"
-              style={{
-                fontFamily: "'DM Sans'", fontWeight: 700, fontSize: 17, textTransform: "uppercase", letterSpacing: "0.5px",
-                padding: "20px 52px", borderRadius: 16,
-                color: "#FFFFFF",
-                background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`,
-                boxShadow: "0 12px 32px rgba(196,30,30,0.5)",
-                display: "inline-block",
-              }}
-            >
-              Start Your Free Trial
-            </Link>
+          {/* Trust badges */}
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.4, 0, 0.2, 1] as const }}
+            className="fyn-cta-trustrow"
+          >
+            {[
+              { Icon: CreditCard, label: "No Credit Card Required" },
+              { Icon: XCircle, label: "Cancel Anytime" },
+              { Icon: Calendar, label: "6 Months Free Access" },
+              { Icon: Sparkles, label: "Full Feature Access" },
+            ].map(({ Icon, label }, i) => (
+              <div key={i} className="fyn-cta-trustitem">
+                <span className="fyn-cta-icon3d">
+                  <Icon size={24} strokeWidth={2} style={{ color: RED, position: "relative", zIndex: 1, filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))" }} />
+                </span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 15, color: "#FFFFFF", whiteSpace: "nowrap" }}>{label}</span>
+              </div>
+            ))}
+          </motion.div>
 
-            <a
-              href="mailto:support@fynhelp.com"
-              className="transition-all hover:-translate-y-0.5"
-              style={{
-                fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 17,
-                padding: "20px 44px", borderRadius: 16,
-                background: "transparent",
-                border: "2px solid rgba(244,237,218,0.8)",
-                color: BEIGE,
-                display: "inline-block",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = BEIGE; e.currentTarget.style.color = INK; e.currentTarget.style.borderColor = BEIGE; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = BEIGE; e.currentTarget.style.borderColor = "rgba(244,237,218,0.8)"; }}
-            >
+          {/* Buttons */}
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.4, 0, 0.2, 1] as const }}
+            className="fyn-cta-btnrow"
+          >
+            <Link to="/waitlist" className="fyn-cta-btn-primary">
+              <span className="fyn-cta-btn-shine" aria-hidden />
+              <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", gap: 12 }}>
+                START YOUR FREE TRIAL
+                <ArrowRight size={22} />
+              </span>
+            </Link>
+            <a href="mailto:support@fynhelp.com" className="fyn-cta-btn-secondary">
+              <MessageCircle size={22} />
               Talk to Our Security Team
             </a>
           </motion.div>
 
-          <div className="mt-12 flex items-center justify-center gap-2 flex-wrap" style={{ color: "rgba(244,237,218,0.8)" }}>
-            <Users size={16} />
-            <span style={{ fontFamily: "'Roboto'", fontSize: 16 }}>
-              Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
+          {/* Support card */}
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 0.9, ease: [0.4, 0, 0.2, 1] as const }}
+            className="fyn-cta-support"
+          >
+            <span className="fyn-cta-mailicon">
+              <Mail size={28} strokeWidth={2} style={{ color: RED, position: "relative", zIndex: 1 }} />
             </span>
-          </div>
+            <div className="fyn-cta-support-text">
+              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, color: "rgba(255,255,255,0.6)" }}>Security questions?</span>
+              <a href="mailto:support@fynhelp.com" className="fyn-cta-support-link">support@fynhelp.com</a>
+            </div>
+          </motion.div>
+
+          {/* Fine print */}
+          <motion.p
+            {...fadeUp}
+            transition={{ duration: 0.7, delay: 1, ease: [0.4, 0, 0.2, 1] as const }}
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 24 }}
+          >
+            Full access to all features. Cancel anytime.
+          </motion.p>
         </div>
       </section>
 
