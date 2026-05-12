@@ -76,11 +76,13 @@ export default function SecuritySection() {
     pauseAuto();
     setDirection(-1);
     setIndex((i) => (i === 0 ? N - 1 : i - 1));
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(10);
   };
   const goNext = () => {
     pauseAuto();
     setDirection(1);
     setIndex((i) => (i === N - 1 ? 0 : i + 1));
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(10);
   };
   const goTo = (i: number) => {
     pauseAuto();
@@ -88,8 +90,29 @@ export default function SecuritySection() {
     setIndex(i);
   };
 
+  // Keyboard navigation
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+      else if (e.key === "Escape") setAutoOn(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
   const card = CARDS[index];
   const Icon = card.icon;
+
+  // Sizing
+  const cardW = isMobile ? "90vw" : isTablet ? 500 : 600;
+  const cardH = isMobile ? 380 : isTablet ? 360 : 400;
+  const cardPad = isMobile ? 32 : 48;
+  const titleSize = isMobile ? 24 : 28;
+  const descSize = isMobile ? 16 : 18;
+  const iconBoxSize = isMobile ? 84 : 96;
+  const iconSize = isMobile ? 48 : 56;
 
   return (
     <section
