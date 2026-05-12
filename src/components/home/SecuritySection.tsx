@@ -620,19 +620,22 @@ function BadgeCard({
 
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0, y: 60, scale: 0.9 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
+      style={{ width: "100%", display: "flex", justifyContent: "center" }}
+    >
+    <motion.div
+      ref={ref}
       onMouseEnter={() => setHovered(true)}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
       animate={{
         y: hovered ? -12 : 0,
         scale: hovered ? 1.03 : 1,
-        rotateY: finePointer ? tx * 8 : 0,
-        rotateX: finePointer ? -ty * 8 : 0,
+        rotateY: finePointer && hovered ? mp.x * 8 : 0,
+        rotateX: finePointer && hovered ? -mp.y * 8 : 0,
       }}
       transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
       style={{
