@@ -38,20 +38,35 @@ const CARDS: Card[] = [
 ];
 
 const N = CARDS.length;
+const SWIPE_THRESHOLD = 10000;
+const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
+
+function useViewport() {
+  const [w, setW] = useState(typeof window === "undefined" ? 1280 : window.innerWidth);
+  useEffect(() => {
+    const onR = () => setW(window.innerWidth);
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, []);
+  return { isMobile: w < 768, isTablet: w >= 768 && w < 1100 };
+}
 
 export default function SecuritySection() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [autoOn, setAutoOn] = useState(true);
   const pauseUntilRef = useRef(0);
+  const { isMobile, isTablet } = useViewport();
 
   useEffect(() => {
+    if (!autoOn) return;
     const id = window.setInterval(() => {
       if (Date.now() < pauseUntilRef.current) return;
       setDirection(1);
       setIndex((i) => (i + 1) % N);
     }, 4000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [autoOn]);
 
   const pauseAuto = () => {
     pauseUntilRef.current = Date.now() + 10000;
@@ -61,11 +76,13 @@ export default function SecuritySection() {
     pauseAuto();
     setDirection(-1);
     setIndex((i) => (i === 0 ? N - 1 : i - 1));
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(10);
   };
   const goNext = () => {
     pauseAuto();
     setDirection(1);
     setIndex((i) => (i === N - 1 ? 0 : i + 1));
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(10);
   };
   const goTo = (i: number) => {
     pauseAuto();
@@ -73,8 +90,29 @@ export default function SecuritySection() {
     setIndex(i);
   };
 
+  // Keyboard navigation
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+      else if (e.key === "Escape") setAutoOn(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
   const card = CARDS[index];
   const Icon = card.icon;
+
+  // Sizing
+  const cardW = isMobile ? "90vw" : isTablet ? 500 : 600;
+  const cardH = isMobile ? 380 : isTablet ? 360 : 400;
+  const cardPad = isMobile ? 32 : 48;
+  const titleSize = isMobile ? 24 : 28;
+  const descSize = isMobile ? 16 : 18;
+  const iconBoxSize = isMobile ? 84 : 96;
+  const iconSize = isMobile ? 48 : 56;
 
   return (
     <section
@@ -130,48 +168,60 @@ export default function SecuritySection() {
         {/* Single-card slider */}
         <div
           className="relative w-full flex items-center justify-center"
-          style={{ height: 500, overflow: "hidden" }}
+          style={{ height: 520, overflow: "hidden", touchAction: "pan-y", userSelect: "none" }}
         >
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={index}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 50 }}
+              initial={{ opacity: 0, x: direction * 100 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction * -50 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              exit={{ opacity: 0, x: direction * -100 }}
+              transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              whileDrag={{ scale: 0.98, opacity: 0.9, cursor: "grabbing" }}
+              dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+              onDragEnd={(_, info) => {
+                const power = swipePower(info.offset.x, info.velocity.x);
+                if (power < -SWIPE_THRESHOLD) goNext();
+                else if (power > SWIPE_THRESHOLD) goPrev();
+              }}
               style={{
-                width: 420,
+                width: cardW,
                 maxWidth: "92vw",
-                height: 340,
+                height: cardH,
                 background: "#ffffff",
                 border: "2px solid #C41E1E",
                 borderRadius: 24,
-                padding: 40,
+                padding: cardPad,
                 boxShadow: "0 20px 60px rgba(196,30,30,0.2)",
                 display: "flex",
                 flexDirection: "column",
+                cursor: "grab",
               }}
             >
               <div
                 className="flex items-center justify-center"
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 16,
+                  width: iconBoxSize,
+                  height: iconBoxSize,
+                  borderRadius: 20,
                   background: "hsl(var(--primary) / 0.10)",
-                  marginBottom: 24,
+                  marginBottom: 28,
                 }}
               >
-                <Icon size={48} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
+                <Icon size={iconSize} strokeWidth={2} style={{ color: "hsl(var(--primary))" }} />
               </div>
               <h3
                 className="text-fyn-ink"
                 style={{
                   fontFamily: "Georgia, serif",
                   fontWeight: 700,
-                  fontSize: 24,
-                  marginBottom: 12,
+                  fontSize: titleSize,
+                  lineHeight: 1.3,
+                  marginBottom: 16,
                 }}
               >
                 {card.title}
@@ -181,8 +231,8 @@ export default function SecuritySection() {
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontWeight: 400,
-                  fontSize: 16,
-                  lineHeight: 1.7,
+                  fontSize: descSize,
+                  lineHeight: 1.8,
                 }}
               >
                 {card.desc}
