@@ -462,37 +462,64 @@ type Badge = {
   icon: LucideIcon;
   label: string;
   sub: string;
-  from: string;
-  to: string;
-  glow: string;
 };
 
 const BADGES: Badge[] = [
-  { micro: "INFRASTRUCTURE", icon: Cloud,      label: "AWS Mumbai",    sub: "Enterprise Cloud",     from: "#45B7D1", to: "#2E86AB", glow: "rgba(46,134,171,0.45)" },
-  { micro: "ENCRYPTION",     icon: Shield,     label: "256-bit AES",   sub: "Bank-Grade",           from: "#E85D5D", to: "#C41E1E", glow: "rgba(196,30,30,0.45)" },
-  { micro: "DATABASE",       icon: Database,   label: "PostgreSQL",    sub: "Enterprise Security",  from: "#6C5CE7", to: "#5849BE", glow: "rgba(108,92,231,0.45)" },
-  { micro: "COMPLIANCE",     icon: FileSearch, label: "Audit Trail",   sub: "Complete Logging",     from: "#00B894", to: "#00916E", glow: "rgba(0,184,148,0.45)" },
-  { micro: "PRIVACY",        icon: Lock,       label: "Zero-Knowledge",sub: "Architecture",         from: "#F39C12", to: "#E67E22", glow: "rgba(243,156,18,0.45)" },
-  { micro: "BACKUP",         icon: HardDrive,  label: "Daily Backups", sub: "Automated",            from: "#4ECDC4", to: "#3BB5AD", glow: "rgba(78,205,196,0.45)" },
+  { micro: "INFRASTRUCTURE", icon: Cloud,      label: "AWS Mumbai",     sub: "Enterprise Cloud" },
+  { micro: "ENCRYPTION",     icon: Shield,     label: "256-bit AES",    sub: "Bank-Grade" },
+  { micro: "DATABASE",       icon: Database,   label: "PostgreSQL",     sub: "Enterprise Security" },
+  { micro: "COMPLIANCE",     icon: FileSearch, label: "Audit Trail",    sub: "Complete Logging" },
+  { micro: "PRIVACY",        icon: Lock,       label: "Zero-Knowledge", sub: "Architecture" },
+  { micro: "BACKUP",         icon: HardDrive,  label: "Daily Backups",  sub: "Automated" },
 ];
 
+function useWidth() {
+  const [w, setW] = useState(typeof window === "undefined" ? 1280 : window.innerWidth);
+  useEffect(() => {
+    const onR = () => setW(window.innerWidth);
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, []);
+  return w;
+}
+
 function InfraBadges() {
-  const { isMobile, isTablet } = useViewport();
-  const orbSize = isMobile ? 80 : isTablet ? 100 : 120;
-  const iconSize = isMobile ? 36 : isTablet ? 44 : 52;
-  const cols = isMobile ? "repeat(2,1fr)" : isTablet ? "repeat(3,1fr)" : "repeat(6,1fr)";
+  const w = useWidth();
+  const isMobile = w < 640;
+  const isSmTablet = w >= 640 && w < 900;
+  const isLgTablet = w >= 900 && w < 1200;
+
+  const cols = isMobile
+    ? "1fr"
+    : isSmTablet
+    ? "repeat(2,1fr)"
+    : isLgTablet
+    ? "repeat(3,1fr)"
+    : "repeat(6,1fr)";
+  const gap = isMobile ? 32 : isSmTablet ? 24 : isLgTablet ? 32 : 48;
 
   return (
     <div
       style={{
         position: "relative",
         overflow: "hidden",
-        margin: "64px -40px 80px",
-        padding: "80px 40px",
-        background: "linear-gradient(180deg, #F4EDDA 0%, #ECE3CC 100%)",
+        margin: isMobile ? "48px -20px 64px" : "64px -40px 80px",
+        padding: isMobile ? "56px 20px" : "80px 40px",
+        background: "hsl(var(--background))",
         borderRadius: 24,
       }}
     >
+      {/* Subtle depth overlay */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 100%)",
+          pointerEvents: "none",
+        }}
+      />
       {/* Grid pattern overlay */}
       <div
         aria-hidden
@@ -502,6 +529,7 @@ function InfraBadges() {
           backgroundImage:
             "linear-gradient(rgba(26,16,8,0.05) 2px, transparent 2px), linear-gradient(90deg, rgba(26,16,8,0.05) 2px, transparent 2px)",
           backgroundSize: "48px 48px",
+          opacity: 0.5,
           pointerEvents: "none",
         }}
       />
@@ -514,9 +542,9 @@ function InfraBadges() {
           fontSize: 13,
           letterSpacing: "2.5px",
           textTransform: "uppercase",
-          color: "#C41E1E",
+          color: "hsl(var(--primary))",
           textAlign: "center",
-          marginBottom: 48,
+          marginBottom: isMobile ? 36 : 48,
         }}
       >
         Built on Enterprise Infrastructure
@@ -527,174 +555,257 @@ function InfraBadges() {
           position: "relative",
           display: "grid",
           gridTemplateColumns: cols,
-          columnGap: 48,
-          rowGap: 56,
+          columnGap: gap,
+          rowGap: gap,
           maxWidth: 1300,
           margin: "0 auto",
+          justifyItems: "center",
         }}
       >
-        {BADGES.map((b, i) => {
-          const Icon = b.icon;
-          return (
-            <motion.div
-              key={b.label}
-              initial={{ opacity: 0, y: 60, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
-              whileHover="hover"
-              variants={{
-                hover: { y: -12, scale: 1.03 },
-              }}
-              style={{
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "32px 24px",
-                background: "#FFFFFF",
-                borderRadius: 20,
-                cursor: "pointer",
-                boxShadow:
-                  "0 4px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.08), 0 24px 48px rgba(0,0,0,0.04)",
-                transition: "box-shadow 0.4s cubic-bezier(0.34,1.56,0.64,1)",
-              }}
-            >
-              {/* Top accent line */}
-              <motion.div
-                variants={{ hover: { width: 80 } }}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: 60,
-                  height: 4,
-                  background: `linear-gradient(90deg, ${b.from}, ${b.to})`,
-                  borderRadius: "0 0 4px 4px",
-                  boxShadow: `0 2px 8px ${b.glow}`,
-                }}
-              />
-
-              {/* Orb container */}
-              <div
-                style={{
-                  position: "relative",
-                  width: orbSize,
-                  height: orbSize,
-                  marginBottom: 24,
-                  perspective: 600,
-                }}
-              >
-                {/* Back glow */}
-                <motion.div
-                  variants={{ hover: { opacity: 1 } }}
-                  initial={{ opacity: 0.6 }}
-                  style={{
-                    position: "absolute",
-                    inset: -20,
-                    background: `radial-gradient(circle, ${b.glow} 0%, transparent 70%)`,
-                    filter: "blur(30px)",
-                    zIndex: 0,
-                  }}
-                />
-
-                {/* Sphere */}
-                <motion.div
-                  variants={{ hover: { rotateY: 10, rotateX: 5 } }}
-                  transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                  style={{
-                    position: "relative",
-                    width: orbSize,
-                    height: orbSize,
-                    borderRadius: "50%",
-                    background: `linear-gradient(135deg, ${b.from} 0%, ${b.to} 100%)`,
-                    boxShadow: `inset -4px -4px 12px rgba(0,0,0,0.3), inset 4px 4px 12px rgba(255,255,255,0.3), 0 12px 32px ${b.glow}`,
-                    zIndex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transformStyle: "preserve-3d",
-                  }}
-                >
-                  {/* Glossy highlight */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "15%",
-                      left: "20%",
-                      width: orbSize * 0.33,
-                      height: orbSize * 0.33,
-                      background:
-                        "radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 70%)",
-                      borderRadius: "50%",
-                      opacity: 0.6,
-                      filter: "blur(8px)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                  <Icon
-                    size={iconSize}
-                    color="#FFFFFF"
-                    strokeWidth={2.5}
-                    style={{
-                      position: "relative",
-                      zIndex: 2,
-                      filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))",
-                    }}
-                  />
-                </motion.div>
-              </div>
-
-              {/* Micro label */}
-              <div
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  fontSize: 10,
-                  letterSpacing: "1.5px",
-                  textTransform: "uppercase",
-                  color: "rgba(196,30,30,0.6)",
-                  marginBottom: 4,
-                }}
-              >
-                {b.micro}
-              </div>
-
-              {/* Main label */}
-              <div
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: isMobile ? 14 : 16,
-                  color: "#1A1008",
-                  lineHeight: 1.4,
-                  textAlign: "center",
-                  maxWidth: 160,
-                  marginTop: 8,
-                  textShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                }}
-              >
-                {b.label}
-              </div>
-
-              {/* Sub label */}
-              <div
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 500,
-                  fontSize: 12,
-                  color: "rgba(26,16,8,0.55)",
-                  marginTop: 4,
-                  textAlign: "center",
-                }}
-              >
-                {b.sub}
-              </div>
-            </motion.div>
-          );
-        })}
+        {BADGES.map((b, i) => (
+          <BadgeCard key={b.label} badge={b} index={i} isMobile={isMobile} />
+        ))}
       </div>
     </div>
   );
 }
+
+function BadgeCard({
+  badge,
+  index,
+  isMobile,
+}: {
+  badge: Badge;
+  index: number;
+  isMobile: boolean;
+}) {
+  const Icon = badge.icon;
+  const ref = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [mp, setMp] = useState({ x: 0, y: 0 }); // -1..1
+  const rafRef = useRef<number | null>(null);
+
+  // Detect fine pointer (desktop)
+  const [finePointer, setFinePointer] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const m = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const onChange = () => setFinePointer(m.matches);
+    onChange();
+    m.addEventListener?.("change", onChange);
+    return () => m.removeEventListener?.("change", onChange);
+  }, []);
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!finePointer || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+    const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => setMp({ x, y }));
+  };
+  const handleLeave = () => {
+    setHovered(false);
+    setMp({ x: 0, y: 0 });
+  };
+
+  const orbSize = isMobile ? 100 : 120;
+  const iconSize = isMobile ? 44 : 52;
+  const tx = hovered && finePointer ? mp.x : 0;
+  const ty = hovered && finePointer ? mp.y : 0;
+
+  const cardShadow = hovered
+    ? "0 8px 12px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.12), 0 32px 64px rgba(196,30,30,0.08)"
+    : "0 4px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.08), 0 24px 48px rgba(0,0,0,0.04)";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 60, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.34, 1.56, 0.64, 1] }}
+      style={{ width: "100%", display: "flex", justifyContent: "center" }}
+    >
+    <motion.div
+      ref={ref}
+      onMouseEnter={() => setHovered(true)}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      animate={{
+        y: hovered ? -12 : 0,
+        scale: hovered ? 1.03 : 1,
+        rotateY: finePointer && hovered ? mp.x * 8 : 0,
+        rotateX: finePointer && hovered ? -mp.y * 8 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
+      style={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+        maxWidth: isMobile ? 320 : "none",
+        padding: isMobile ? 28 : "32px 24px",
+        background: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border) / 0.5)",
+        borderRadius: 20,
+        cursor: "pointer",
+        boxShadow: cardShadow,
+        transformStyle: "preserve-3d",
+        transformPerspective: 1000,
+        willChange: "transform",
+        transition: "box-shadow 0.4s cubic-bezier(0.34,1.56,0.64,1)",
+      }}
+    >
+      {/* Top accent line */}
+      <motion.div
+        animate={{ width: hovered ? 80 : 60, x: finePointer && hovered ? mp.x * 8 : 0 }}
+        transition={{ type: "spring", stiffness: 180, damping: 22 }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          marginLeft: -30,
+          height: 4,
+          background: "hsl(var(--primary))",
+          borderRadius: "0 0 4px 4px",
+          boxShadow: "0 2px 8px hsl(var(--primary) / 0.35)",
+        }}
+      />
+
+      {/* Orb container */}
+      <div
+        style={{
+          position: "relative",
+          width: orbSize,
+          height: orbSize,
+          marginBottom: 20,
+        }}
+      >
+        {/* Back glow */}
+        <motion.div
+          aria-hidden
+          animate={{
+            opacity: hovered ? 1 : 0.5,
+            x: tx * 12,
+            y: ty * 12,
+            scale: hovered ? 1.2 : 1,
+          }}
+          transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
+          style={{
+            position: "absolute",
+            inset: -20,
+            background:
+              "radial-gradient(circle, hsl(var(--primary) / 0.45) 0%, transparent 70%)",
+            filter: hovered ? "blur(45px)" : "blur(30px)",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Sphere */}
+        <motion.div
+          animate={{
+            x: tx * 8,
+            y: ty * 8,
+            rotateY: finePointer && hovered ? 10 + mp.x * 5 : 0,
+            rotateX: finePointer && hovered ? 5 - mp.y * 5 : 0,
+            scale: hovered ? 1.02 : 1,
+          }}
+          transition={{ type: "spring", stiffness: 150, damping: 20, mass: 0.5 }}
+          style={{
+            position: "relative",
+            width: orbSize,
+            height: orbSize,
+            borderRadius: "50%",
+            background:
+              "linear-gradient(135deg, #E85D5D 0%, hsl(var(--primary)) 100%)",
+            boxShadow:
+              "inset -4px -4px 12px rgba(0,0,0,0.3), inset 4px 4px 12px rgba(255,255,255,0.3), 0 12px 32px hsl(var(--primary) / 0.4)",
+            zIndex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transformStyle: "preserve-3d",
+            willChange: "transform",
+          }}
+        >
+          {/* Glossy highlight */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: "15%",
+              left: "20%",
+              width: orbSize * 0.33,
+              height: orbSize * 0.33,
+              background:
+                "radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 70%)",
+              borderRadius: "50%",
+              opacity: 0.6,
+              filter: "blur(8px)",
+              pointerEvents: "none",
+            }}
+          />
+          <Icon
+            size={iconSize}
+            color="#FFFFFF"
+            strokeWidth={2.5}
+            style={{
+              position: "relative",
+              zIndex: 2,
+              filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))",
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* Micro label */}
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 600,
+          fontSize: isMobile ? 12 : 10,
+          letterSpacing: "1.5px",
+          textTransform: "uppercase",
+          color: "hsl(var(--primary) / 0.7)",
+          marginBottom: 4,
+        }}
+      >
+        {badge.micro}
+      </div>
+
+      {/* Main label */}
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 700,
+          fontSize: isMobile ? 14 : 16,
+          color: "hsl(var(--foreground))",
+          lineHeight: 1.4,
+          textAlign: "center",
+          maxWidth: 180,
+          marginTop: 6,
+        }}
+      >
+        {badge.label}
+      </div>
+
+      {/* Sub label */}
+      <div
+        style={{
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 500,
+          fontSize: 12,
+          color: "hsl(var(--muted-foreground))",
+          marginTop: 4,
+          textAlign: "center",
+        }}
+      >
+        {badge.sub}
+      </div>
+    </motion.div>
+    </motion.div>
+  );
+}
+
