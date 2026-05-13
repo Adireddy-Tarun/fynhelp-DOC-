@@ -22,6 +22,7 @@ import {
   Clock,
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import ProblemSection from "@/components/home/ProblemSection";
 
 const TERRACOTTA = "#C41E1E";
 const TERRACOTTA_LIGHT = "#E85D5D";
@@ -204,139 +205,6 @@ function Hero() {
             );
           })}
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- PROBLEM ---------- */
-function ProblemSection() {
-  const stats = [
-    { icon: Building2, num: "63M", label: "Businesses" },
-    { icon: Users, num: "110M", label: "People Employed" },
-    { icon: PieChart, num: "30%", label: "of GDP" },
-  ];
-  return (
-    <section style={{ background: DARK }} className="py-[60px] md:py-[120px] px-5 md:px-[60px]">
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-[60%_40%] gap-10 md:gap-20 items-center">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeUp}
-          className="text-center md:text-left"
-        >
-          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, fontSize: 12, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
-            The Problem
-          </p>
-          <h2
-            style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", lineHeight: 1.2 }}
-            className="text-[32px] md:text-[48px] mb-6 md:mb-8"
-          >
-            India's SMEs Are{" "}
-            <span style={{ color: TERRACOTTA, position: "relative", display: "inline-block" }}>
-              Flying Blind
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: -4,
-                  height: 3,
-                  width: "100%",
-                  background: TERRACOTTA,
-                }}
-              />
-            </span>
-          </h2>
-          <div
-            style={{ color: "rgba(255,255,255,0.75)", fontFamily: "Inter" }}
-            className="text-[15px] md:text-[17px] leading-[1.6] md:leading-[1.7] space-y-4 text-left"
-          >
-            <p>
-              India has <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>63 million</strong> small and medium businesses. Together, they employ{" "}
-              <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>110 million</strong> people and contribute nearly{" "}
-              <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>30%</strong> of our GDP.
-            </p>
-            <p>
-              Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them.
-            </p>
-            <p>
-              A CFO costs <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>₹30–50 lakh</strong> a year. Most SMEs can't afford one.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 md:gap-5 mt-8 md:mt-12">
-            {stats.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div
-                  key={s.label}
-                  className="about-stat-card text-center"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                    padding: "16px 12px",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <Icon className="mx-auto mb-2 md:mb-3" size={24} color={TERRACOTTA} />
-                  <div style={{ fontFamily: "Georgia", fontWeight: 900, color: TERRACOTTA, lineHeight: 1 }} className="text-[24px] md:text-[36px] mb-1 md:mb-2">
-                    {s.num}
-                  </div>
-                  <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.3 }} className="text-[10px] md:text-[13px]">
-                    {s.label}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeIn}
-          style={{
-            borderRadius: 16,
-            overflow: "hidden",
-            position: "relative",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 8px 32px rgba(196,30,30,0.15)",
-            background: "linear-gradient(135deg, #3D2817, #1a1412)",
-          }}
-          className="h-[300px] md:h-[500px]"
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <AlertCircle size={80} color="rgba(255,255,255,0.1)" />
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: "40%",
-              background: "linear-gradient(transparent, rgba(26,20,18,0.95))",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: 24,
-              left: 24,
-              right: 24,
-              fontFamily: "Inter",
-              fontWeight: 600,
-              color: "white",
-            }}
-            className="text-[12px] md:text-[14px]"
-          >
-            Most Indian SMEs operate without visibility
-          </div>
-        </motion.div>
       </div>
     </section>
   );
