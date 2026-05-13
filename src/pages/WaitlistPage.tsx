@@ -423,7 +423,7 @@ export default function WaitlistPage() {
               >
                 Schedule Your Call Now
                 <ArrowRight size={20} />
-              </button>
+              </a>
 
               <div
                 style={{
