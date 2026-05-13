@@ -384,9 +384,10 @@ export default function WaitlistPage() {
                 ))}
               </div>
 
-              <button
-                type="button"
-                onClick={openCalendly}
+              <a
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Schedule demo call with FynHelp founders"
                 className="calendly-cta"
                 style={{
