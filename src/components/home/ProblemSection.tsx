@@ -69,38 +69,7 @@ export default function ProblemSection() {
       }}
       aria-labelledby="problem-heading"
     >
-      <div
-        className="mx-auto w-full max-w-[1280px] grid items-center"
-        style={{
-          gap: "clamp(40px, 5vw, 60px)",
-          gridTemplateColumns: "minmax(0,1fr)",
-        }}
-      >
-        <div
-          className="grid items-center"
-          style={{
-            gridTemplateColumns: "minmax(0,1fr)",
-            gap: "clamp(40px, 5vw, 60px)",
-          }}
-        >
-          <div
-            className="grid items-center"
-            style={{
-              gridTemplateColumns: "minmax(0,1fr)",
-              gap: "clamp(40px, 5vw, 60px)",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Actual content grid (responsive 55/45) */}
-      <div
-        className="mx-auto w-full max-w-[1280px] -mt-[1px] grid items-center"
-        style={{
-          gap: "clamp(40px, 5vw, 60px)",
-          gridTemplateColumns: "minmax(0,1fr)",
-        }}
-      >
+      <div className="mx-auto w-full max-w-[1280px]">
         <div className="problem-grid">
           {/* LEFT */}
           <div>
