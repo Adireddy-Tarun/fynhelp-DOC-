@@ -1,447 +1,519 @@
-import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
-  EyeOff,
+  Building2,
+  Users,
+  PieChart,
   AlertTriangle,
+  EyeOff,
+  BellOff,
   TrendingDown,
-  LineChart,
-  Calculator,
-  ChevronLeft,
-  ChevronRight,
-  type LucideIcon,
+  AlertCircle,
 } from "lucide-react";
 
-type Slide = {
-  id: string;
-  Icon: LucideIcon;
-  eyebrow: string;
-  headline: string;
-  statValue: string;
-  statLabel: string;
-  body: string;
-  accent: string; // hex
+const TERRACOTTA = "#C41E1E";
+const TERRACOTTA_LIGHT = "#E85D5D";
+const RED = "#EF4444";
+const ORANGE = "#F59E0B";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" as const },
+  }),
 };
 
-const SLIDES: Slide[] = [
-  {
-    id: "blindness",
-    Icon: EyeOff,
-    eyebrow: "Cash Flow Blindness",
-    headline:
-      "63 million Indian businesses make ₹Crore decisions with zero financial intelligence.",
-    statValue: "₹0",
-    statLabel: "Average financial intelligence budget for Indian SMEs",
-    body: "No CFO. No analyst. No financial model. Just gut feeling and a bank balance check.",
-    accent: "#C41E1E",
-  },
-  {
-    id: "crisis",
-    Icon: AlertTriangle,
-    eyebrow: "Cash Crisis Reality",
-    headline: "42% of Indian SMEs cite cash flow as their #1 challenge.",
-    statValue: "14 days",
-    statLabel: "Average time before a cash crisis is discovered",
-    body: "Most owners discover a cash crisis 14 days before it happens — not 60 days out, when something can still be done about it.",
-    accent: "#C41E1E",
-  },
-  {
-    id: "leak",
-    Icon: TrendingDown,
-    eyebrow: "Hidden Money Loss",
-    headline: "₹3.2L lost per SME annually to GST mismatches.",
-    statValue: "₹3.2L",
-    statLabel: "Lost per business yearly to ITC leakage",
-    body: "Vendor non-compliance, missed reconciliations, and unclaimed credit silently drain Indian businesses that can least afford it.",
-    accent: "#8B6914",
-  },
-  {
-    id: "failure",
-    Icon: LineChart,
-    eyebrow: "Business Failure Rate",
-    headline: "50% of Indian businesses fail within 5 years.",
-    statValue: "50%",
-    statLabel: "SMEs that fail within 5 years of starting up",
-    body: "Most failures are not caused by bad products or poor sales — they are caused by cash flow mismanagement and compliance surprises.",
-    accent: "#C41E1E",
-  },
-  {
-    id: "cost",
-    Icon: Calculator,
-    eyebrow: "The Real Cost",
-    headline: "98% of Indian SMEs operate financially blind.",
-    statValue: "98%",
-    statLabel: "SMEs that cannot afford a CFO today",
-    body: "Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — making critical calls on hiring, credit, inventory, and compliance purely on gut feel.",
-    accent: "#8B6914",
-  },
+const STAT_BADGES = [
+  { Icon: Building2, number: "63M", label: "Businesses" },
+  { Icon: Users, number: "110M", label: "People" },
+  { Icon: PieChart, number: "30%", label: "of GDP" },
 ];
 
-const AUTO_MS = 6000;
+const CRISIS_CARDS = [
+  { Icon: EyeOff, color: RED, text: "No cash flow visibility" },
+  { Icon: BellOff, color: ORANGE, text: "No proactive alerts" },
+  { Icon: TrendingDown, color: RED, text: "No runway forecasting" },
+];
+
+function Highlight({
+  children,
+  color = TERRACOTTA,
+}: {
+  children: React.ReactNode;
+  color?: string;
+}) {
+  return (
+    <span
+      style={{
+        fontWeight: 700,
+        color,
+        background: `${color}1A`,
+        padding: "2px 6px",
+        borderRadius: 4,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
 export default function ProblemSection() {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const touchStart = useRef<number | null>(null);
-
-  // Auto-advance + progress bar
-  useEffect(() => {
-    if (paused) return;
-    setProgress(0);
-    const tick = 50;
-    const step = (100 / AUTO_MS) * tick;
-    const progressTimer = setInterval(() => {
-      setProgress((p) => Math.min(100, p + step));
-    }, tick);
-    const advance = setTimeout(() => {
-      setIndex((i) => (i + 1) % SLIDES.length);
-    }, AUTO_MS);
-    return () => {
-      clearInterval(progressTimer);
-      clearTimeout(advance);
-    };
-  }, [index, paused]);
-
-  const goTo = (i: number) => {
-    setIndex((i + SLIDES.length) % SLIDES.length);
-    setProgress(0);
-  };
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart.current == null) return;
-    const dx = e.changedTouches[0].clientX - touchStart.current;
-    if (Math.abs(dx) > 50) goTo(index + (dx < 0 ? 1 : -1));
-    touchStart.current = null;
-  };
-
   return (
-    <section className="bg-fyn-beige py-24">
-      <div className="fyn-container">
-        {/* Section heading */}
-        <div className="mb-10 text-center">
-          <span
-            className="block mb-3"
-            style={{
-              fontFamily: "'Work Sans', sans-serif",
-              fontWeight: 600,
-              fontSize: 12,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "#C41E1E",
-            }}
-          >
-            ◆ The Problem
-          </span>
-          <h2
-            className="text-fyn-ink"
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(28px, 3vw, 40px)",
-              lineHeight: 1.15,
-              letterSpacing: "0.005em",
-            }}
-          >
-            India's SMEs are flying blind.
-          </h2>
-        </div>
-
-        {/* Carousel */}
-        <div
-          className="relative"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          aria-roledescription="carousel"
-          aria-label="The problem facing Indian SMEs"
-        >
-          {/* Stage */}
-          <div
-            className="relative overflow-hidden rounded-2xl shadow-2xl"
-            style={{
-              background: "linear-gradient(180deg, #1F1610 0%, #15100A 100%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              minHeight: 460,
-              boxShadow:
-                "0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px rgba(196,30,30,0.06)",
-            }}
-          >
-            {/* Slides */}
-            {SLIDES.map((s, i) => (
-              <SlideView key={s.id} slide={s} active={i === index} idx={i} total={SLIDES.length} />
-            ))}
-
-            {/* Arrows */}
-            <button
-              aria-label="Previous slide"
-              onClick={() => goTo(index - 1)}
-              className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center transition-all hover:scale-110"
+    <section
+      className="relative"
+      style={{
+        background: "linear-gradient(180deg, #0a0a0a 0%, #1a1412 100%)",
+        padding: "clamp(80px, 10vw, 120px) clamp(20px, 5vw, 60px)",
+      }}
+      aria-labelledby="problem-heading"
+    >
+      <div className="mx-auto w-full max-w-[1280px]">
+        <div className="problem-grid">
+          {/* LEFT */}
+          <div>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={fadeUp}
               style={{
-                left: 16,
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "#FFFFFF",
-                backdropFilter: "blur(8px)",
-                zIndex: 5,
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 700,
+                fontSize: 12,
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                color: TERRACOTTA,
+                marginBottom: 24,
               }}
             >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              aria-label="Next slide"
-              onClick={() => goTo(index + 1)}
-              className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center transition-all hover:scale-110"
+              The Problem
+            </motion.div>
+
+            <motion.h2
+              id="problem-heading"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={fadeUp}
+              custom={1}
               style={{
-                right: 16,
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
+                fontFamily: "Georgia, serif",
+                fontWeight: 700,
+                fontSize: "clamp(32px, 4.5vw, 48px)",
+                lineHeight: 1.2,
                 color: "#FFFFFF",
-                backdropFilter: "blur(8px)",
-                zIndex: 5,
+                marginBottom: 32,
               }}
             >
-              <ChevronRight size={20} />
-            </button>
+              India's SMEs Are{" "}
+              <span
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  color: TERRACOTTA,
+                }}
+              >
+                Flying Blind
+                <motion.span
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "100%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+                  style={{
+                    position: "absolute",
+                    bottom: -4,
+                    left: 0,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${TERRACOTTA}, ${TERRACOTTA_LIGHT})`,
+                    boxShadow: "0 0 12px rgba(196, 30, 30, 0.6)",
+                    borderRadius: 2,
+                  }}
+                />
+              </span>
+            </motion.h2>
 
-            {/* Progress bar */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
+              custom={2}
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
+                fontSize: "clamp(15px, 1.4vw, 17px)",
+                lineHeight: 1.7,
+                color: "rgba(255, 255, 255, 0.85)",
+              }}
+            >
+              <p style={{ marginBottom: 16 }}>
+                India has <Highlight>63 million</Highlight> small and medium
+                businesses. Together, they employ{" "}
+                <Highlight>110 million</Highlight> people and contribute nearly{" "}
+                <Highlight>30%</Highlight> of our GDP.
+              </p>
+              <p style={{ marginBottom: 16 }}>
+                Yet the vast majority operate without even basic financial
+                intelligence — no cash flow visibility, no proactive
+                compliance, no way to model decisions before making them.
+              </p>
+              <p style={{ marginBottom: 40 }}>
+                A CFO costs <Highlight color={RED}>₹30–50 lakh</Highlight> a
+                year. Most SMEs can't afford one.
+              </p>
+            </motion.div>
+
+            {/* Stat badges */}
             <div
-              className="absolute left-0 right-0 bottom-0"
-              style={{ height: 3, background: "rgba(255,255,255,0.06)" }}
+              className="grid grid-cols-3"
+              style={{ gap: "clamp(12px, 1.5vw, 20px)", marginTop: 8 }}
+            >
+              {STAT_BADGES.map(({ Icon, number, label }, i) => (
+                <motion.div
+                  key={label}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={fadeUp}
+                  custom={i + 3}
+                  whileHover={{ y: -4 }}
+                  className="problem-badge"
+                  style={{
+                    position: "relative",
+                    overflow: "hidden",
+                    background: "rgba(255, 255, 255, 0.06)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(196, 30, 30, 0.25)",
+                    borderRadius: 12,
+                    padding: "clamp(16px, 2vw, 24px) clamp(12px, 1.5vw, 20px)",
+                    textAlign: "center",
+                    transition: "border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: "-50%",
+                      left: "50%",
+                      width: 100,
+                      height: 100,
+                      background:
+                        "radial-gradient(circle, rgba(196, 30, 30, 0.15), transparent)",
+                      transform: "translateX(-50%)",
+                      filter: "blur(20px)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <Icon
+                    size={32}
+                    strokeWidth={2}
+                    color={TERRACOTTA}
+                    style={{ margin: "0 auto 12px", display: "block" }}
+                    className="problem-badge-icon"
+                  />
+                  <div
+                    style={{
+                      fontFamily: "Georgia, serif",
+                      fontWeight: 900,
+                      fontSize: "clamp(24px, 3vw, 36px)",
+                      lineHeight: 1,
+                      color: TERRACOTTA_LIGHT,
+                      marginBottom: 8,
+                      textShadow: "0 2px 8px rgba(196, 30, 30, 0.4)",
+                    }}
+                  >
+                    {number}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "clamp(10px, 1vw, 13px)",
+                      color: "rgba(255, 255, 255, 0.75)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {label}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT - Crisis visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="problem-visual"
+            style={{
+              position: "relative",
+              background: "rgba(0, 0, 0, 0.4)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: 20,
+              padding: "clamp(24px, 3vw, 40px)",
+              backdropFilter: "blur(20px)",
+              overflow: "hidden",
+            }}
+          >
+            {/* Crisis alert */}
+            <div
+              className="problem-pulse"
+              style={{
+                background: "rgba(239, 68, 68, 0.1)",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+                borderRadius: 12,
+                padding: 20,
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 24,
+              }}
+            >
+              <AlertTriangle size={32} color={RED} strokeWidth={2} />
+              <div>
+                <div
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 700,
+                    fontSize: "clamp(14px, 1.4vw, 16px)",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  Cash Crisis Discovered
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 400,
+                    fontSize: 13,
+                    color: "rgba(255, 255, 255, 0.6)",
+                    marginTop: 2,
+                  }}
+                >
+                  14 days too late
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div
+              style={{
+                position: "relative",
+                height: 80,
+                background: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 10,
+                overflow: "visible",
+                marginBottom: 36,
+                marginTop: 36,
+              }}
             >
               <div
                 style={{
-                  height: "100%",
-                  width: `${progress}%`,
-                  background: "#C41E1E",
-                  transition: "width 50ms linear",
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: 10,
+                  overflow: "hidden",
                 }}
-              />
-            </div>
-          </div>
-
-          {/* Dots + counter */}
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <div className="flex items-center gap-2">
-              {SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  aria-label={`Go to slide ${i + 1}`}
-                  onClick={() => goTo(i)}
-                  className="transition-all"
+              >
+                <motion.div
+                  initial={{ width: "0%" }}
+                  whileInView={{ width: "77%" }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 2, ease: "easeOut" }}
                   style={{
-                    width: i === index ? 28 : 8,
-                    height: 8,
-                    borderRadius: 100,
-                    background: i === index ? "#C41E1E" : "rgba(26,16,8,0.25)",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    background:
+                      "linear-gradient(90deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1))",
+                    borderRight: `2px solid ${RED}`,
                   }}
                 />
+              </div>
+
+              {/* Crisis marker */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 1.8 }}
+                style={{
+                  position: "absolute",
+                  left: "77%",
+                  top: 0,
+                  bottom: 0,
+                  width: 3,
+                  background: RED,
+                  boxShadow: "0 0 12px rgba(239, 68, 68, 0.8)",
+                  pointerEvents: "none",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -32,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "rgba(239, 68, 68, 0.2)",
+                    border: `1px solid ${RED}`,
+                    padding: "4px 10px",
+                    borderRadius: 6,
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 600,
+                    fontSize: 11,
+                    color: "#FFFFFF",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Crisis Discovered
+                </div>
+              </motion.div>
+
+              <span
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 12,
+                  color: "rgba(255, 255, 255, 0.5)",
+                }}
+              >
+                Day 1
+              </span>
+              <span
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  fontSize: 12,
+                  color: "rgba(255, 255, 255, 0.5)",
+                }}
+              >
+                Day 60 (Bankrupt)
+              </span>
+            </div>
+
+            {/* Crisis cards */}
+            <div className="flex flex-col" style={{ gap: 12 }}>
+              {CRISIS_CARDS.map(({ Icon, color, text }, i) => (
+                <motion.div
+                  key={text}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.5, delay: 0.2 + i * 0.12 }}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.04)",
+                    borderLeft: `3px solid ${color}`,
+                    padding: 16,
+                    borderRadius: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <Icon size={20} color={color} strokeWidth={2} />
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 600,
+                      fontSize: 14,
+                      color: "rgba(255, 255, 255, 0.85)",
+                    }}
+                  >
+                    {text}
+                  </span>
+                </motion.div>
               ))}
             </div>
-            <span
+
+            {/* Footer caption */}
+            <div
               style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-                color: "rgba(26,16,8,0.55)",
+                marginTop: 24,
+                background: "rgba(26, 20, 18, 0.95)",
+                backdropFilter: "blur(15px)",
+                border: "1px solid rgba(196, 30, 30, 0.3)",
+                padding: 16,
+                borderRadius: 12,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
               }}
             >
-              {String(index + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
-            </span>
-          </div>
+              <AlertCircle size={24} color={TERRACOTTA} strokeWidth={2} />
+              <span
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "clamp(12px, 1.2vw, 14px)",
+                  color: "#FFFFFF",
+                  lineHeight: 1.4,
+                }}
+              >
+                Most Indian SMEs operate without visibility
+              </span>
+            </div>
+          </motion.div>
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-8">
+        <div className="text-center" style={{ marginTop: 48 }}>
           <Link
             to="/#product-ecosystem"
             className="inline-flex items-center gap-2 hover:underline"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 600,
               fontSize: 15,
-              color: "#C41E1E",
+              color: TERRACOTTA_LIGHT,
             }}
           >
             See how FynHelp fixes this →
           </Link>
         </div>
       </div>
+
+      <style>{`
+        .problem-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          gap: clamp(32px, 5vw, 60px);
+          align-items: center;
+        }
+        @media (min-width: 900px) {
+          .problem-grid {
+            grid-template-columns: 55fr 45fr;
+          }
+        }
+        .problem-badge:hover {
+          border-color: rgba(196, 30, 30, 0.5) !important;
+          background: rgba(255, 255, 255, 0.08) !important;
+          box-shadow: 0 8px 24px rgba(196, 30, 30, 0.2);
+        }
+        .problem-pulse {
+          animation: problemPulse 2s infinite;
+        }
+        @keyframes problemPulse {
+          0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+          70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+      `}</style>
     </section>
-  );
-}
-
-/* ── Single Slide ── */
-function SlideView({
-  slide,
-  active,
-  idx,
-  total,
-}: {
-  slide: Slide;
-  active: boolean;
-  idx: number;
-  total: number;
-}) {
-  const { Icon } = slide;
-  return (
-    <div
-      role="group"
-      aria-roledescription="slide"
-      aria-label={`${idx + 1} of ${total}`}
-      aria-hidden={!active}
-      className="absolute inset-0"
-      style={{
-        opacity: active ? 1 : 0,
-        transform: active ? "translateX(0)" : "translateX(20px)",
-        transition: "opacity 600ms ease, transform 600ms ease",
-        pointerEvents: active ? "auto" : "none",
-      }}
-    >
-      {/* Accent glow */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: -100,
-          right: -100,
-          width: 400,
-          height: 400,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${slide.accent}33, transparent 70%)`,
-          filter: "blur(40px)",
-        }}
-      />
-
-      <div className="grid lg:grid-cols-5 gap-8 items-center h-full p-8 md:p-12 lg:p-14">
-        {/* Left: copy */}
-        <div className="lg:col-span-3 flex flex-col">
-          <div className="flex items-center gap-3 mb-5">
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: `${slide.accent}1F`,
-                border: `1px solid ${slide.accent}55`,
-                color: slide.accent,
-              }}
-            >
-              <Icon size={22} strokeWidth={1.8} />
-            </div>
-            <span
-              style={{
-                fontFamily: "'Work Sans', sans-serif",
-                fontWeight: 600,
-                fontSize: 11,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: slide.accent,
-              }}
-            >
-              {slide.eyebrow}
-            </span>
-          </div>
-
-          <h3
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(26px, 2.6vw, 38px)",
-              lineHeight: 1.15,
-              color: "#FFFFFF",
-              marginBottom: 18,
-            }}
-          >
-            {slide.headline}
-          </h3>
-
-          <p
-            style={{
-              fontFamily: "'Roboto', sans-serif",
-              fontWeight: 400,
-              fontSize: 16,
-              lineHeight: 1.7,
-              color: "rgba(255,255,255,0.72)",
-              maxWidth: 560,
-            }}
-          >
-            {slide.body}
-          </p>
-        </div>
-
-        {/* Right: stat card */}
-        <div className="lg:col-span-2">
-          <div
-            className="relative"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-              border: "1px solid rgba(255,255,255,0.10)",
-              borderRadius: 14,
-              padding: "28px 26px",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 26,
-                right: 26,
-                height: 2,
-                background: slide.accent,
-                borderRadius: 2,
-              }}
-            />
-            <div
-              style={{
-                fontFamily: "'Work Sans', sans-serif",
-                fontWeight: 600,
-                fontSize: 10,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.45)",
-                marginBottom: 10,
-              }}
-            >
-              The Number
-            </div>
-            <div
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(56px, 7vw, 88px)",
-                lineHeight: 1,
-                color: slide.accent,
-                letterSpacing: "-0.02em",
-                marginBottom: 14,
-              }}
-            >
-              {slide.statValue}
-            </div>
-            <div
-              style={{
-                fontFamily: "'Roboto', sans-serif",
-                fontWeight: 400,
-                fontSize: 14,
-                lineHeight: 1.55,
-                color: "rgba(255,255,255,0.78)",
-              }}
-            >
-              {slide.statLabel}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
