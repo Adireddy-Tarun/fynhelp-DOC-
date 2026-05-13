@@ -1,12 +1,25 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
-  AlertCircle,
-  ArrowRight,
-  Droplet,
-  TrendingUp,
-  DollarSign,
-  FileText,
+  Lock,
+  MapPin,
   Shield,
+  Building2,
+  Users,
+  PieChart,
+  AlertCircle,
+  XCircle,
+  CheckCircle2,
+  X,
+  Check,
+  TrendingDown,
+  ArrowRight,
+  AlertTriangle,
+  Sparkles,
+  TimerOff,
+  Lightbulb,
+  Linkedin,
+  Clock,
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
@@ -16,683 +29,1193 @@ const DARK = "#1a1412";
 const DEEPER = "#0a0a0a";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 
-const Section = ({
-  children,
-  style,
-  className = "",
-}: {
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-  className?: string;
-}) => (
-  <section
-    className={className}
-    style={{
-      position: "relative",
-      overflow: "hidden",
-      ...style,
-    }}
-  >
-    <div
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.6 } },
+};
+
+/* ---------- HERO ---------- */
+function Hero() {
+  const badges = [
+    { icon: Lock, label: "Bank-Grade Security" },
+    { icon: MapPin, label: "Indian Data Residency" },
+    { icon: Shield, label: "SOC 2 Compliant" },
+  ];
+
+  return (
+    <section
       style={{
-        maxWidth: 1400,
-        margin: "0 auto",
-        padding: "0 var(--about-px, 60px)",
         position: "relative",
-        zIndex: 1,
+        overflow: "hidden",
+        background: `linear-gradient(180deg, ${DARK} 0%, ${DEEPER} 100%)`,
+        minHeight: 600,
       }}
+      className="about-hero py-[80px] md:py-[140px] px-5 md:px-[60px]"
     >
-      {children}
-    </div>
-  </section>
-);
-
-const Tag = ({ children }: { children: React.ReactNode }) => (
-  <div
-    style={{
-      fontFamily: "Inter, sans-serif",
-      fontWeight: 700,
-      fontSize: 12,
-      color: TERRACOTTA,
-      textTransform: "uppercase",
-      letterSpacing: "2px",
-      marginBottom: 24,
-    }}
-  >
-    {children}
-  </div>
-);
-
-const suites = [
-  { icon: Droplet, title: "Liquidity Intelligence", desc: "Real-time cash flow tracking, burn rate alerts, runway forecasting" },
-  { icon: TrendingUp, title: "Revenue Intelligence", desc: "MRR/ARR tracking, cohort analysis, churn prediction" },
-  { icon: DollarSign, title: "Cost Intelligence", desc: "Expense categorization, vendor spend analysis, optimization insights" },
-  { icon: FileText, title: "GST & Tax Intelligence", desc: "Compliance tracking, ITC reconciliation, deadline alerts" },
-  { icon: Shield, title: "Governance Intelligence", desc: "Audit readiness, compliance tracking, regulatory alerts" },
-];
-
-const partners = [
-  ["Razorpay", "Zoho Books", "AWS", "Supabase"],
-  ["Resend", "PostHog", "Sentry", "Stripe"],
-].flat();
-
-const AboutPage = () => (
-  <Layout>
-    <style>{`
-      .about-page { background: ${DARK}; color: rgba(255,255,255,0.95); font-family: 'Inter', sans-serif; }
-      .about-h { font-family: Georgia, serif; color: #fff; }
-      .about-grid-2 { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
-      .about-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
-      .about-pills { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 16px 60px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-      .about-pills::-webkit-scrollbar { display: none; }
-      .about-pill { width: 220px; min-width: 220px; height: 280px; background: #fff; border-radius: 20px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); scroll-snap-align: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; }
-      .about-pill:hover { transform: translateY(-12px); box-shadow: 0 20px 60px rgba(196,30,30,0.25); }
-      .about-stat:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(196,30,30,0.15); }
-      .about-stat { transition: all 0.3s ease; }
-      .about-cta { background: ${TERRACOTTA}; border: 2px solid ${TERRACOTTA}; color: #fff; font-family: Inter, sans-serif; font-weight: 700; font-size: 16px; padding: 16px 32px; border-radius: 12px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(196,30,30,0.4); transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); cursor: pointer; }
-      .about-cta:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(196,30,30,0.6); filter: brightness(1.1); }
-      .about-cta-lg { font-size: 18px; padding: 20px 48px; border-radius: 14px; box-shadow: 0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.5); }
-      .about-cta-lg:hover { transform: translateY(-4px); box-shadow: 0 6px 0 rgba(160,25,25,1), 0 12px 32px rgba(196,30,30,0.7); filter: brightness(1.05); }
-      .about-cta-lg:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(160,25,25,1), 0 4px 16px rgba(196,30,30,0.5); }
-      .about-founder-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px; margin-bottom: 24px; transition: all 0.3s ease; }
-      .about-founder-card:hover { background: rgba(255,255,255,0.08); transform: translateX(8px); }
-      .about-logo-cell { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 32px 24px; display: flex; align-items: center; justify-content: center; height: 100px; transition: all 0.3s ease; font-family: Inter, sans-serif; font-weight: 600; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; }
-      .about-logo-cell:hover { background: rgba(255,255,255,0.08); border-color: rgba(196,30,30,0.3); color: rgba(255,255,255,1); }
-      .about-logo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1000px; margin: 0 auto; }
-      @keyframes aboutWave { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-      .about-wave { animation: aboutWave 20s ease-in-out infinite; }
-      @media (min-width: 900px) {
-        .about-grid-60-40 { grid-template-columns: 60% 40%; gap: 80px; }
-        .about-grid-40-60 { grid-template-columns: 40% 60%; gap: 80px; }
-        .about-grid-50-50 { grid-template-columns: 1fr 1fr; gap: 80px; }
-        .about-grid-55-45 { grid-template-columns: 55% 45%; gap: 60px; }
-      }
-      @media (max-width: 768px) {
-        :root { --about-px: 24px; }
-        .about-logo-grid { grid-template-columns: repeat(2, 1fr); }
-        .about-pills { padding: 16px 24px; }
-        .about-stat-grid { gap: 12px; }
-      }
-    `}</style>
-
-    <div className="about-page">
-      {/* SECTION 1: HERO */}
-      <Section
+      {/* Radial glow */}
+      <div
+        aria-hidden
         style={{
-          background: `linear-gradient(180deg, ${DARK} 0%, ${DEEPER} 100%)`,
-          padding: "140px 0",
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "min(800px, 90vw)",
+          height: 400,
+          background: "radial-gradient(circle, rgba(196,30,30,0.08), transparent 70%)",
+          filter: "blur(80px)",
+          pointerEvents: "none",
+        }}
+      />
+      {/* Waves */}
+      <svg
+        aria-hidden
+        viewBox="0 0 1440 600"
+        preserveAspectRatio="none"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          opacity: 1,
+          pointerEvents: "none",
         }}
       >
-        <svg
-          className="about-wave"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 0 }}
-          viewBox="0 0 1440 800"
-          preserveAspectRatio="none"
-          aria-hidden
+        <path
+          d="M0,300 C360,200 720,400 1440,250 L1440,600 L0,600 Z"
+          fill="rgba(255,255,255,0.02)"
         >
-          <path
-            d="M0,400 C360,300 720,500 1440,350 L1440,800 L0,800 Z"
-            fill="rgba(255,255,255,0.02)"
+          <animate attributeName="d" dur="20s" repeatCount="indefinite"
+            values="M0,300 C360,200 720,400 1440,250 L1440,600 L0,600 Z;
+                    M0,320 C400,260 760,360 1440,280 L1440,600 L0,600 Z;
+                    M0,300 C360,200 720,400 1440,250 L1440,600 L0,600 Z" />
+        </path>
+        <path
+          d="M0,400 C480,320 960,460 1440,360 L1440,600 L0,600 Z"
+          fill="rgba(255,255,255,0.015)"
+        >
+          <animate attributeName="d" dur="24s" repeatCount="indefinite"
+            values="M0,400 C480,320 960,460 1440,360 L1440,600 L0,600 Z;
+                    M0,420 C520,380 960,420 1440,380 L1440,600 L0,600 Z;
+                    M0,400 C480,320 960,460 1440,360 L1440,600 L0,600 Z" />
+        </path>
+      </svg>
+
+      {/* Particles */}
+      <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {Array.from({ length: 20 }).map((_, i) => (
+          <span
+            key={i}
+            className="about-particle"
+            style={{
+              left: `${(i * 53) % 100}%`,
+              top: `${(i * 37) % 100}%`,
+              animationDuration: `${8 + (i % 7)}s`,
+              animationDelay: `${(i % 5) * 0.6}s`,
+            }}
           />
-          <path
-            d="M0,500 C480,400 960,600 1440,450 L1440,800 L0,800 Z"
-            fill="rgba(255,255,255,0.015)"
-          />
-        </svg>
+        ))}
+      </div>
+
+      <div style={{ position: "relative", zIndex: 10, maxWidth: 1400, margin: "0 auto", textAlign: "center" }}>
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 700,
+            fontSize: 11,
+            color: TERRACOTTA,
+            textTransform: "uppercase",
+            letterSpacing: 2,
+            marginBottom: 24,
+          }}
+        >
+          About FynHelp
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          style={{
+            fontFamily: "Georgia, serif",
+            fontWeight: 900,
+            color: "white",
+            maxWidth: 900,
+            margin: "0 auto 24px",
+            textShadow: "0 4px 12px rgba(0,0,0,0.6)",
+            lineHeight: 1.15,
+          }}
+          className="text-[36px] md:text-[64px] leading-[1.2] md:leading-[1.15]"
+        >
+          We're Building Financial Intelligence for 63 Million Indian Businesses
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 500,
+            color: "rgba(255,255,255,0.7)",
+            maxWidth: 700,
+            margin: "0 auto",
+            lineHeight: 1.6,
+          }}
+          className="text-[16px] md:text-[22px]"
+        >
+          Every SME deserves CFO-level clarity — without CFO-level cost
+        </motion.p>
+
         <div
           style={{
-            position: "absolute",
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 800,
-            height: 400,
-            background: "radial-gradient(circle, rgba(196,30,30,0.08), transparent)",
-            filter: "blur(80px)",
-            zIndex: 0,
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
           }}
-        />
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{ textAlign: "center", position: "relative", zIndex: 1 }}
+          className="gap-4 md:gap-8 mt-6 md:mt-10"
         >
-          <Tag>About FynHelp</Tag>
-          <h1
-            className="about-h"
-            style={{
-              fontWeight: 900,
-              fontSize: "clamp(40px, 6vw, 64px)",
-              lineHeight: 1.15,
-              maxWidth: 900,
-              margin: "0 auto 24px",
-              textShadow: "0 4px 12px rgba(0,0,0,0.6)",
-            }}
-          >
-            We're Building Financial Intelligence for 63 Million Indian Businesses
-          </h1>
-          <p
-            style={{
-              fontWeight: 500,
-              fontSize: "clamp(18px, 2vw, 22px)",
-              color: "rgba(255,255,255,0.7)",
-              lineHeight: 1.6,
-              maxWidth: 700,
-              margin: "0 auto",
-            }}
-          >
-            Every SME deserves CFO-level clarity — without CFO-level cost
-          </p>
-        </motion.div>
-      </Section>
+          {badges.map((b, i) => {
+            const Icon = b.icon;
+            return (
+              <motion.div
+                key={b.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.6)",
+                }}
+                className="text-[11px] md:text-[13px]"
+              >
+                <Icon size={16} color={TERRACOTTA} />
+                <span>{b.label}</span>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-      {/* SECTION 2: PROBLEM */}
-      <Section style={{ padding: "120px 0", background: DARK }}>
+/* ---------- PROBLEM ---------- */
+function ProblemSection() {
+  const stats = [
+    { icon: Building2, num: "63M", label: "Businesses" },
+    { icon: Users, num: "110M", label: "People Employed" },
+    { icon: PieChart, num: "30%", label: "of GDP" },
+  ];
+  return (
+    <section style={{ background: DARK }} className="py-[60px] md:py-[120px] px-5 md:px-[60px]">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-[60%_40%] gap-10 md:gap-20 items-center">
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.2 }}
           variants={fadeUp}
-          className="about-grid-2 about-grid-60-40"
+          className="text-center md:text-left"
         >
-          <div>
-            <Tag>The Problem</Tag>
-            <h2
-              className="about-h"
-              style={{ fontWeight: 700, fontSize: "clamp(36px, 4vw, 48px)", lineHeight: 1.2, marginBottom: 32 }}
-            >
-              India's SMEs Are <span style={{ color: TERRACOTTA }}>Flying Blind</span>
-            </h2>
-            {[
-              "India has 63 million small and medium businesses. Together, they employ 110 million people and contribute nearly 30% of our GDP.",
-              "Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them.",
-              "A CFO costs ₹30–50 lakh a year. Most SMEs can't afford one.",
-            ].map((t, i) => (
-              <p
-                key={i}
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, fontSize: 12, letterSpacing: 2, textTransform: "uppercase", marginBottom: 16 }}>
+            The Problem
+          </p>
+          <h2
+            style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", lineHeight: 1.2 }}
+            className="text-[32px] md:text-[48px] mb-6 md:mb-8"
+          >
+            India's SMEs Are{" "}
+            <span style={{ color: TERRACOTTA, position: "relative", display: "inline-block" }}>
+              Flying Blind
+              <span
+                aria-hidden
                 style={{
-                  fontSize: 17,
-                  color: "rgba(255,255,255,0.75)",
-                  lineHeight: 1.7,
-                  marginBottom: 16,
+                  position: "absolute",
+                  left: 0,
+                  bottom: -4,
+                  height: 3,
+                  width: "100%",
+                  background: TERRACOTTA,
                 }}
-              >
-                {t}
-              </p>
-            ))}
-            <div className="about-stat-grid">
-              {[
-                { num: "63M", label: "Businesses" },
-                { num: "110M", label: "People Employed" },
-                { num: "30%", label: "of GDP" },
-              ].map((s) => (
+              />
+            </span>
+          </h2>
+          <div
+            style={{ color: "rgba(255,255,255,0.75)", fontFamily: "Inter" }}
+            className="text-[15px] md:text-[17px] leading-[1.6] md:leading-[1.7] space-y-4 text-left"
+          >
+            <p>
+              India has <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>63 million</strong> small and medium businesses. Together, they employ{" "}
+              <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>110 million</strong> people and contribute nearly{" "}
+              <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>30%</strong> of our GDP.
+            </p>
+            <p>
+              Yet the vast majority operate without even basic financial intelligence — no cash flow visibility, no proactive compliance, no way to model decisions before making them.
+            </p>
+            <p>
+              A CFO costs <strong style={{ color: TERRACOTTA, fontWeight: 600 }}>₹30–50 lakh</strong> a year. Most SMEs can't afford one.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 md:gap-5 mt-8 md:mt-12">
+            {stats.map((s) => {
+              const Icon = s.icon;
+              return (
                 <div
                   key={s.label}
-                  className="about-stat"
+                  className="about-stat-card text-center"
                   style={{
                     background: "rgba(255,255,255,0.05)",
                     backdropFilter: "blur(10px)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 12,
-                    padding: "24px 20px",
-                    textAlign: "center",
+                    padding: "16px 12px",
+                    transition: "all 0.3s ease",
                   }}
                 >
-                  <div
-                    className="about-h"
-                    style={{ fontWeight: 900, fontSize: 36, color: TERRACOTTA, lineHeight: 1, marginBottom: 8 }}
-                  >
+                  <Icon className="mx-auto mb-2 md:mb-3" size={24} color={TERRACOTTA} />
+                  <div style={{ fontFamily: "Georgia", fontWeight: 900, color: TERRACOTTA, lineHeight: 1 }} className="text-[24px] md:text-[36px] mb-1 md:mb-2">
                     {s.num}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: "rgba(255,255,255,0.6)",
-                      textTransform: "uppercase",
-                      letterSpacing: "1px",
-                    }}
-                  >
+                  <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.3 }} className="text-[10px] md:text-[13px]">
                     {s.label}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeIn}
+          style={{
+            borderRadius: 16,
+            overflow: "hidden",
+            position: "relative",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 8px 32px rgba(196,30,30,0.15)",
+            background: "linear-gradient(135deg, #3D2817, #1a1412)",
+          }}
+          className="h-[300px] md:h-[500px]"
+        >
+          <div className="w-full h-full flex items-center justify-center">
+            <AlertCircle size={80} color="rgba(255,255,255,0.1)" />
           </div>
           <div
             style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: "40%",
+              background: "linear-gradient(transparent, rgba(26,20,18,0.95))",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 24,
+              left: 24,
+              right: 24,
+              fontFamily: "Inter",
+              fontWeight: 600,
+              color: "white",
+            }}
+            className="text-[12px] md:text-[14px]"
+          >
+            Most Indian SMEs operate without visibility
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- BEFORE / AFTER ---------- */
+function ComparisonSection() {
+  const without = [
+    "Discover cash crisis 14 days too late",
+    "Pay CA ₹30-50L per year for basic compliance",
+    "React to GST notices after they arrive",
+    "Make hiring/spending decisions blindly",
+  ];
+  const withFyn = [
+    "Prevent crises 60 days ahead with proactive alerts",
+    "Pay ₹30-90K per year for AI CFO intelligence",
+    "Avoid GST notices before they're issued",
+    "Make data-driven decisions with real-time insights",
+  ];
+  return (
+    <section
+      style={{
+        background: "rgba(0,0,0,0.3)",
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+      }}
+      className="py-[60px] md:py-[100px] px-5 md:px-[60px]"
+    >
+      <motion.h2
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeUp}
+        style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }}
+        className="text-[28px] md:text-[42px] mb-10 md:mb-16"
+      >
+        What Makes Us Different
+      </motion.h2>
+      <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          style={{
+            background: "linear-gradient(135deg, rgba(239,68,68,0.05), transparent)",
+            border: "1px solid rgba(239,68,68,0.2)",
+            borderRadius: 16,
+          }}
+          className="p-6 md:p-10"
+        >
+          <p style={{ color: "rgba(239,68,68,0.8)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[12px] md:text-[14px] mb-5 md:mb-8">
+            Without FynHelp
+          </p>
+          <ul className="space-y-3 md:space-y-4">
+            {without.map((t) => (
+              <li
+                key={t}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  background: "rgba(255,255,255,0.02)",
+                  borderRadius: 10,
+                }}
+                className="gap-3 md:gap-4 p-3 md:p-4"
+              >
+                <XCircle size={20} color="#EF4444" style={{ flexShrink: 0, marginTop: 2 }} />
+                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }} className="text-[14px] md:text-[16px]">
+                  {t}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          style={{
+            background: "linear-gradient(135deg, rgba(196,30,30,0.08), transparent)",
+            border: "1px solid rgba(196,30,30,0.3)",
+            borderRadius: 16,
+            boxShadow: "0 8px 32px rgba(196,30,30,0.15)",
+          }}
+          className="p-6 md:p-10"
+        >
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[12px] md:text-[14px] mb-5 md:mb-8">
+            With FynHelp
+          </p>
+          <ul className="space-y-3 md:space-y-4">
+            {withFyn.map((t) => (
+              <li
+                key={t}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  background: "rgba(255,255,255,0.03)",
+                  borderRadius: 10,
+                }}
+                className="gap-3 md:gap-4 p-3 md:p-4"
+              >
+                <CheckCircle2 size={20} color="#10B981" style={{ flexShrink: 0, marginTop: 2 }} />
+                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }} className="text-[14px] md:text-[16px]">
+                  {t}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- PRICING COMPARISON ---------- */
+function PricingComparison() {
+  return (
+    <section style={{ background: DARK }} className="py-[80px] md:py-[120px] px-5 md:px-[60px]">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-[45%_55%] gap-10 md:gap-[60px] items-center">
+        {/* Traditional CFO */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          style={{
+            background: "linear-gradient(135deg, rgba(0,0,0,0.6), rgba(26,20,18,0.4))",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 20,
+            position: "relative",
+            overflow: "hidden",
+          }}
+          className="p-8 md:p-12"
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: 24,
+              right: 24,
+              background: "rgba(239,68,68,0.2)",
+              border: "1px solid #EF4444",
+              padding: "6px 12px",
               borderRadius: 20,
-              overflow: "hidden",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 8px 32px rgba(196,30,30,0.15)",
-              background: `linear-gradient(135deg, #3D2817, ${DARK})`,
-              height: 500,
+              fontFamily: "Inter",
+              fontWeight: 600,
+              fontSize: 11,
+              color: "#EF4444",
+              textTransform: "uppercase",
+            }}
+          >
+            Unaffordable
+          </span>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 24 }} className="text-[12px] md:text-[14px]">
+            Traditional CFO
+          </p>
+          <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "rgba(255,255,255,0.6)", lineHeight: 1 }} className="text-[36px] md:text-[48px] mb-2">
+            ₹30-50 Lakh
+          </div>
+          <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.4)", marginBottom: 32 }} className="text-[14px] md:text-[16px]">
+            per year
+          </div>
+          <ul className="space-y-3 md:space-y-4">
+            {[
+              "Not affordable for most SMEs",
+              "3-6 months hiring process",
+              "Limited to business hours",
+              "Single person perspective",
+            ].map((t) => (
+              <li key={t} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "Inter", color: "rgba(255,255,255,0.5)" }} className="text-[14px] md:text-[15px]">
+                <X size={18} color="#EF4444" style={{ flexShrink: 0 }} />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        {/* FynHelp */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          style={{
+            background: "linear-gradient(135deg, rgba(196,30,30,0.15), rgba(229,93,93,0.08))",
+            border: "2px solid rgba(196,30,30,0.4)",
+            borderRadius: 20,
+            position: "relative",
+            boxShadow: "0 20px 60px rgba(196,30,30,0.3)",
+          }}
+          className="p-8 md:p-12"
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: 24,
+              right: 24,
+              background: TERRACOTTA,
+              padding: "6px 12px",
+              borderRadius: 20,
+              fontFamily: "Inter",
+              fontWeight: 700,
+              fontSize: 11,
+              color: "white",
+              textTransform: "uppercase",
+              boxShadow: "0 4px 12px rgba(196,30,30,0.4)",
+            }}
+          >
+            Recommended
+          </span>
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 32 }} className="text-[12px] md:text-[14px]">
+            FynHelp AI CFO
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            {[
+              { name: "BASIC", price: "₹30,000", monthly: "(₹2,500/month)", popular: false, features: ["5 Intelligence Suites", "1 User", "Email Support", "CSV Upload"] },
+              { name: "PRO", price: "₹90,000", monthly: "(₹7,500/month)", popular: true, features: ["Everything in Basic", "Unlimited Users", "Priority Support", "Custom Reports", "Dedicated Success Manager"] },
+            ].map((plan) => (
+              <div key={plan.name}>
+                {plan.popular && (
+                  <span style={{ background: "rgba(196,30,30,0.3)", padding: "4px 10px", borderRadius: 12, fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: "white", display: "inline-block", marginBottom: 8 }}>
+                    Popular
+                  </span>
+                )}
+                <div style={{ fontFamily: "Inter", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", marginBottom: 12 }} className="text-[12px]">
+                  {plan.name}
+                </div>
+                <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", lineHeight: 1 }} className="text-[28px] md:text-[36px]">
+                  {plan.price}
+                </div>
+                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.6)", marginTop: 4 }} className="text-[14px]">/year</div>
+                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.5)", marginBottom: 20 }} className="text-[13px]">{plan.monthly}</div>
+                <ul className="space-y-2">
+                  {plan.features.map((f) => (
+                    <li key={f} style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.7)", fontFamily: "Inter" }} className="text-[12px] md:text-[13px]">
+                      <Check size={16} color="#10B981" style={{ flexShrink: 0 }} />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              background: "rgba(16,185,129,0.1)",
+              border: "1px solid rgba(16,185,129,0.3)",
+              borderRadius: 12,
+              textAlign: "center",
+              marginTop: 24,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              gap: 8,
+              color: "#10B981",
+              fontFamily: "Inter",
+              fontWeight: 600,
             }}
+            className="p-3 md:p-4 text-[13px] md:text-[15px]"
           >
-            <AlertCircle size={80} color="rgba(255,255,255,0.1)" strokeWidth={1.5} />
+            <TrendingDown size={20} />
+            <span>Save 70-90% vs Traditional CFO</span>
           </div>
-        </motion.div>
-      </Section>
 
-      {/* SECTION 3: OUR SOLUTION */}
-      <Section style={{ padding: "120px 0", background: `linear-gradient(180deg, ${DARK}, ${DEEPER})` }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          className="about-grid-2 about-grid-40-60"
-        >
-          <div
+          <Link
+            to="/waitlist"
+            className="about-cta-button mt-8"
             style={{
-              borderRadius: 20,
-              overflow: "hidden",
-              position: "relative",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 8px 32px rgba(196,30,30,0.15)",
-              background: `linear-gradient(135deg, #2a1f1a, ${DARK})`,
-              height: 500,
+              background: TERRACOTTA,
+              border: `2px solid ${TERRACOTTA}`,
+              color: "white",
+              fontFamily: "Inter",
+              fontWeight: 700,
+              borderRadius: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              boxShadow: "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.5)",
+              transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              width: "100%",
+              textDecoration: "none",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                bottom: 24,
-                right: 24,
-                background: `linear-gradient(135deg, ${TERRACOTTA}, ${TERRACOTTA_LIGHT})`,
-                padding: "20px 28px",
-                borderRadius: 16,
-                boxShadow: "0 8px 32px rgba(196,30,30,0.6)",
-                backdropFilter: "blur(10px)",
-              }}
+            <span className="text-[15px] md:text-[16px] py-4 md:py-[18px]">Start Your Free Trial</span>
+            <ArrowRight size={20} />
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- VISION ---------- */
+function VisionSection() {
+  const nodes = [
+    { icon: AlertTriangle, color: "#EF4444", text: "Crisis Discovered\n14 Days Late" },
+    { icon: ArrowRight, color: TERRACOTTA, text: "FynHelp\nIntelligence Layer", center: true },
+    { icon: CheckCircle2, color: "#10B981", text: "Prevented\n60 Days Ahead" },
+  ];
+  return (
+    <section
+      style={{
+        background: DARK,
+        backgroundImage:
+          "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+        backgroundSize: "40px 40px",
+        position: "relative",
+      }}
+      className="py-[80px] md:py-[120px] px-5 md:px-[60px]"
+    >
+      <motion.div
+        initial={{ width: 0, opacity: 0 }}
+        whileInView={{ width: 60, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        style={{ height: 2, background: TERRACOTTA, margin: "0 auto 32px" }}
+      />
+      <motion.p
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }}
+        className="text-[12px] mb-5 md:mb-8"
+      >
+        The Vision
+      </motion.p>
+      <motion.h2
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", textAlign: "center", maxWidth: 800, margin: "0 auto", lineHeight: 1.2 }}
+        className="text-[32px] md:text-[56px] mb-6 md:mb-10"
+      >
+        Preventing Crises Before They Happen
+      </motion.h2>
+      <motion.p
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.8)", maxWidth: 700, margin: "0 auto", textAlign: "center" }}
+        className="text-[16px] md:text-[20px] leading-[1.7] md:leading-[1.8]"
+      >
+        We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.
+      </motion.p>
+      <motion.div
+        initial={{ width: 0, opacity: 0 }}
+        whileInView={{ width: 60, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        style={{ height: 2, background: TERRACOTTA, margin: "32px auto 0" }}
+      />
+
+      <div className="max-w-[900px] mx-auto mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10">
+        {nodes.map((n, i) => {
+          const Icon = n.icon;
+          const isCenter = !!n.center;
+          const size = isCenter ? 96 : 80;
+          return (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              transition={{ delay: i * 0.15 }}
+              className="flex flex-col items-center text-center gap-3 md:gap-4 flex-1"
             >
               <div
-                className="about-h"
-                style={{ fontWeight: 900, fontSize: 32, color: "#fff", lineHeight: 1, marginBottom: 4 }}
+                style={{
+                  width: size,
+                  height: size,
+                  borderRadius: "50%",
+                  background: `${n.color}1A`,
+                  border: `2px solid ${n.color}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                ₹1,999/month
+                <Icon size={isCenter ? 44 : 36} color={n.color} />
               </div>
-              <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(255,255,255,0.9)" }}>
-                vs ₹30-50L for CFO
+              <div style={{ fontFamily: "Inter", fontWeight: 600, color: "white", whiteSpace: "pre-line" }} className="text-[13px] md:text-[15px]">
+                {n.text}
               </div>
-            </div>
-          </div>
-          <div>
-            <Tag>Our Solution</Tag>
-            <h2
-              className="about-h"
-              style={{ fontWeight: 700, fontSize: "clamp(36px, 4vw, 48px)", lineHeight: 1.2, marginBottom: 32 }}
-            >
-              CFO-Level Intelligence. <span style={{ color: TERRACOTTA }}>Startup Pricing.</span>
-            </h2>
-            {[
-              "FynHelp was founded on a simple belief: every business that generates revenue deserves the same quality of financial intelligence that large corporations take for granted.",
-              "We built CFO Fynny — an AI CFO who speaks your language, knows your business, monitors your numbers every day, and tells you exactly what to do.",
-              "For ₹1,999 a month.",
-            ].map((t, i) => (
-              <p key={i} style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.7, marginBottom: 16 }}>
-                {t}
-              </p>
-            ))}
-            <button className="about-cta" style={{ marginTop: 32 }}>
-              Meet Fynny <ArrowRight size={20} />
-            </button>
-          </div>
-        </motion.div>
-      </Section>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
-      {/* SECTION 4: VISION */}
-      <Section
-        style={{
-          padding: "120px 0",
-          background: `${DARK} url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M0 0H40M0 0V40' stroke='rgba(255,255,255,0.02)' stroke-width='1'/></svg>")`,
-        }}
-      >
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          style={{ textAlign: "center" }}
-        >
-          <div style={{ width: 60, height: 2, background: TERRACOTTA, margin: "0 auto 40px" }} />
-          <Tag>The Vision</Tag>
-          <h2
-            className="about-h"
-            style={{
-              fontWeight: 900,
-              fontSize: "clamp(38px, 5vw, 56px)",
-              lineHeight: 1.2,
-              maxWidth: 800,
-              margin: "0 auto 40px",
-            }}
-          >
-            Preventing Crises Before They Happen
-          </h2>
-          <p
-            style={{
-              fontWeight: 500,
-              fontSize: "clamp(18px, 2vw, 20px)",
-              color: "rgba(255,255,255,0.8)",
-              lineHeight: 1.8,
-              maxWidth: 700,
-              margin: "0 auto",
-            }}
-          >
-            We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it.
-            Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is
-            made with full knowledge of the consequences.
-          </p>
-          <div style={{ width: 60, height: 2, background: TERRACOTTA, margin: "40px auto 0" }} />
-        </motion.div>
-      </Section>
+/* ---------- FOUNDER STORY TIMELINE ---------- */
+function StorySection() {
+  const events = [
+    { year: "2023", icon: Sparkles, color: "rgba(16,185,129,0.9)", title: "Started Dark Capital", desc: "Launched a luxury sugar-free chocolate brand with big dreams and optimism. Revenue growing, customers loving the product." },
+    { year: "2024", icon: AlertTriangle, color: "rgba(245,158,11,0.9)", title: "Hidden Payables Discovered", desc: "Realized we had zero visibility into our true cash position. Hidden vendor payables, delayed payments, no real-time tracking." },
+    { year: "2024", icon: TimerOff, color: "#EF4444", title: "14 Days from Bankruptcy", desc: "Discovered we were 14 days away from running out of cash — not 60 days out when we could have acted. No CFO. No warning system. Just sudden crisis." },
+    { year: "2025", icon: XCircle, color: "rgba(239,68,68,0.7)", title: "Shut Down Dark Capital", desc: "Made the painful decision to close the business. The product was great. The execution was solid. But we flew blind financially." },
+    { year: "2025", icon: Lightbulb, color: TERRACOTTA, title: "Built FynHelp", desc: "We decided to build what we wish we'd had. An AI CFO that gives every Indian SME the financial intelligence to prevent what happened to us." },
+  ];
+  return (
+    <section style={{ background: DEEPER }} className="py-[80px] md:py-[120px] px-5 md:px-[60px]">
+      <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }} className="text-[12px] mb-4 md:mb-6">
+        Our Story
+      </p>
+      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[32px] md:text-[48px] mb-10 md:mb-16">
+        Born from Personal Pain
+      </h2>
 
-      {/* SECTION 5: FOUNDER STORY */}
-      <Section style={{ padding: "120px 0", background: DARK }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          className="about-grid-2 about-grid-50-50"
-        >
-          <div
-            style={{
-              borderRadius: 20,
-              overflow: "hidden",
-              position: "relative",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-              background: `linear-gradient(135deg, #3D2817, ${DARK})`,
-              height: 500,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 24,
-                left: 24,
-                background: "rgba(26,20,18,0.9)",
-                backdropFilter: "blur(10px)",
-                border: "1px solid rgba(196,30,30,0.4)",
-                padding: "8px 16px",
-                borderRadius: 8,
-                fontWeight: 600,
-                fontSize: 12,
-                color: TERRACOTTA,
-              }}
-            >
-              Founded 2024
-            </div>
-          </div>
-          <div>
-            <Tag>Our Story</Tag>
-            <h2
-              className="about-h"
-              style={{ fontWeight: 700, fontSize: "clamp(32px, 3.5vw, 42px)", lineHeight: 1.2, marginBottom: 32 }}
-            >
-              Born from Personal Pain
-            </h2>
-            {[
-              "We ran a luxury chocolate brand that nearly went bankrupt because we couldn't see our cash position until it was too late.",
-              "Hidden payables. Zero visibility. We discovered our crisis 14 days before running out of money — not 60 days out, when we could have acted.",
-              "We shut down in late 2025. FynHelp is what we wish we'd had.",
-            ].map((t, i) => (
-              <p key={i} style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.8, marginBottom: 16 }}>
-                {t}
-              </p>
-            ))}
-            <p
-              style={{
-                fontWeight: 600,
-                fontSize: 16,
-                color: "rgba(255,255,255,0.9)",
-                fontStyle: "italic",
-                marginTop: 32,
-              }}
-            >
-              — Tarun & Nidhi, Co-founders
-            </p>
-          </div>
-        </motion.div>
-      </Section>
-
-      {/* SECTION 6: INTELLIGENCE SUITES */}
-      <Section style={{ padding: "120px 0", background: DEEPER }}>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          className="about-h"
+      <div className="max-w-[900px] mx-auto relative" style={{ paddingLeft: 0 }}>
+        <div
+          aria-hidden
           style={{
-            fontWeight: 700,
-            fontSize: "clamp(36px, 4vw, 48px)",
-            textAlign: "center",
-            marginBottom: 64,
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            width: 2,
+            background: "linear-gradient(rgba(196,30,30,0.3), rgba(196,30,30,0.1))",
           }}
-        >
-          5 Intelligence Suites Built for India
-        </motion.h2>
-        <div className="about-pills" style={{ marginLeft: -60, marginRight: -60 }}>
-          {suites.map((s, i) => {
-            const Icon = s.icon;
+          className="left-[20px] md:left-[40px]"
+        />
+        <div className="flex flex-col gap-8 md:gap-10">
+          {events.map((e, i) => {
+            const Icon = e.icon;
             return (
               <motion.div
-                key={s.title}
-                className="about-pill"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
+                key={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeUp}
+                className="relative pl-[60px] md:pl-[100px]"
               >
                 <div
+                  className="absolute top-0"
                   style={{
-                    width: 60,
-                    height: 60,
-                    background: "rgba(196,30,30,0.1)",
+                    left: 0,
+                    width: 40,
+                    height: 40,
                     borderRadius: "50%",
+                    background: "rgba(196,30,30,0.15)",
+                    border: `2px solid ${TERRACOTTA}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: 20,
+                    fontFamily: "Inter",
+                    fontWeight: 700,
+                    color: TERRACOTTA,
+                    fontSize: 12,
+                    zIndex: 2,
                   }}
                 >
-                  <Icon size={28} color={TERRACOTTA} strokeWidth={2} />
+                  {e.year}
                 </div>
-                <h3 style={{ fontWeight: 700, fontSize: 18, color: DARK, lineHeight: 1.3, marginBottom: 12 }}>
-                  {s.title}
-                </h3>
-                <p style={{ fontSize: 14, color: "rgba(26,20,18,0.7)", lineHeight: 1.5 }}>{s.desc}</p>
+                <div
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 12,
+                    backdropFilter: "blur(10px)",
+                  }}
+                  className="p-5 md:p-8"
+                >
+                  <Icon size={24} color={e.color} className="mb-3" />
+                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[18px] md:text-[22px] mb-3">
+                    {e.title}
+                  </h3>
+                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }} className="text-[14px] md:text-[16px]">
+                    {e.desc}
+                  </p>
+                </div>
               </motion.div>
             );
           })}
         </div>
-      </Section>
 
-      {/* SECTION 7: PARTNERS */}
-      <Section
+        {/* Desktop year badges adjustment */}
+        <style>{`
+          @media (min-width: 768px) {
+            .timeline-year { width: 60px; height: 60px; font-size: 16px; }
+          }
+        `}</style>
+      </div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp}
         style={{
-          padding: "100px 0",
-          background: `radial-gradient(circle at center, rgba(196,30,30,0.04), ${DARK})`,
+          background: "rgba(196,30,30,0.08)",
+          borderLeft: `4px solid ${TERRACOTTA}`,
+          borderRadius: 12,
+          maxWidth: 800,
+          margin: "32px auto 0",
         }}
+        className="p-5 md:p-8 mt-8 md:mt-12"
       >
+        <p style={{ fontFamily: "Georgia", fontWeight: 600, fontStyle: "italic", color: "rgba(255,255,255,0.9)", lineHeight: 1.7 }} className="text-[16px] md:text-[20px]">
+          "We're building what we wish we'd had. No founder should discover their crisis 14 days too late."
+        </p>
+        <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, marginTop: 16 }} className="text-[13px] md:text-[15px]">
+          — Tarun & Nidhi, Co-founders
+        </p>
+      </motion.div>
+    </section>
+  );
+}
+
+/* ---------- TEAM ---------- */
+function TeamSection() {
+  const founders = [
+    {
+      letter: "T",
+      name: "Adireddy Tarun",
+      title: "CEO & CO-FOUNDER",
+      bio: "B.Tech in Computer Science with 6 years of industry experience spanning technical development and management. Led engineering teams and product strategy at scale before founding FynHelp to solve the financial intelligence gap for Indian SMEs.",
+    },
+    {
+      letter: "N",
+      name: "Nidhi Siddhpura",
+      title: "CMO & CO-FOUNDER",
+      bio: "MBA in Data Analytics with 3 years of experience in marketing and management. Built brand strategies for multiple startups and maintains a growing presence as a micro-influencer in the business and finance space. Leads all go-to-market and community-building efforts at FynHelp.",
+    },
+  ];
+  return (
+    <section style={{ background: DARK }} className="py-[80px] md:py-[120px] px-5 md:px-[60px]">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-[55%_45%] gap-12 md:gap-20 items-center">
+        <div>
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2 }} className="text-[12px] mb-4 md:mb-6 text-center md:text-left">
+            The Team
+          </p>
+          <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[32px] md:text-[48px] mb-8 md:mb-12 text-center md:text-left">
+            The Minds Behind FynHelp
+          </h2>
+          <div className="flex flex-col gap-5 md:gap-6">
+            {founders.map((f) => (
+              <motion.div
+                key={f.name}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeUp}
+                className="about-founder-card md:flex md:gap-6"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderLeft: `4px solid ${TERRACOTTA}`,
+                  borderRadius: 16,
+                  padding: 24,
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <div
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 12,
+                    background: `linear-gradient(135deg, ${TERRACOTTA}, ${TERRACOTTA_LIGHT})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "Georgia",
+                    fontWeight: 900,
+                    color: "white",
+                    flexShrink: 0,
+                  }}
+                  className="text-[32px] md:text-[48px] mx-auto md:mx-0 mb-4 md:mb-0 md:w-[120px] md:h-[120px]"
+                >
+                  {f.letter}
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[20px] md:text-[24px] mb-2">
+                    {f.name}
+                  </h3>
+                  <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, textTransform: "uppercase", letterSpacing: 1 }} className="text-[12px] md:text-[14px] mb-3 md:mb-4">
+                    {f.title}
+                  </p>
+                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }} className="text-[14px] md:text-[15px]">
+                    {f.bio}
+                  </p>
+                  <a
+                    href="#"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontFamily: "Inter",
+                      fontWeight: 600,
+                      color: "rgba(255,255,255,0.6)",
+                      marginTop: 16,
+                      transition: "color 0.3s",
+                    }}
+                    className="text-[13px]"
+                    onMouseEnter={(e) => (e.currentTarget.style.color = TERRACOTTA)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+                  >
+                    <Linkedin size={16} />
+                    Connect
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center justify-center relative" style={{ minHeight: 400 }}>
+          <div
+            style={{
+              width: 400,
+              height: 400,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                background: "linear-gradient(135deg, rgba(196,30,30,0.15), rgba(229,93,93,0.08))",
+                border: "2px solid rgba(196,30,30,0.3)",
+                borderRadius: 20,
+                padding: 40,
+                transform: "rotate(-5deg)",
+                boxShadow: "0 20px 60px rgba(196,30,30,0.2)",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", fontSize: 96, lineHeight: 1, marginBottom: 12 }}>
+                63M
+              </div>
+              <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 18, color: "rgba(255,255,255,0.7)" }}>
+                Businesses
+              </div>
+              <div style={{ marginTop: "auto", fontFamily: "Inter", fontWeight: 700, color: TERRACOTTA, fontSize: 16 }}>
+                2 Founders, 1 Mission
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile alt */}
+        <div className="md:hidden">
+          <div
+            style={{
+              background: "rgba(196,30,30,0.1)",
+              border: "1px solid rgba(196,30,30,0.3)",
+              borderRadius: 16,
+              padding: 24,
+              textAlign: "center",
+              fontFamily: "Inter",
+              fontWeight: 600,
+              color: "white",
+              fontSize: 18,
+            }}
+          >
+            Building for 63M Indian Businesses
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- PARTNERS ---------- */
+function PartnersSection() {
+  const partners = ["Razorpay", "Zoho Books", "AWS", "Supabase", "Resend", "PostHog", "Sentry", "Stripe"];
+  return (
+    <section
+      style={{
+        background: DARK,
+        backgroundImage: "radial-gradient(circle at center, rgba(196,30,30,0.03), transparent 60%)",
+      }}
+      className="py-[60px] md:py-[100px] px-5 md:px-[60px]"
+    >
+      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[28px] md:text-[42px] mb-3 md:mb-4">
+        Powered by Enterprise Infrastructure
+      </h2>
+      <p style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.6)", textAlign: "center", maxWidth: 600, margin: "0 auto" }} className="text-[15px] md:text-[17px] mb-10 md:mb-16">
+        Built on the same platforms Fortune 500 companies trust
+      </p>
+      <div className="max-w-[1100px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {partners.map((p) => (
+          <div
+            key={p}
+            className="about-partner"
+            style={{
+              padding: "24px 16px",
+              borderRadius: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 80,
+              transition: "all 0.4s ease",
+              fontFamily: "Inter",
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.6)",
+            }}
+          >
+            <span className="text-[14px] md:text-[18px]">{p}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FINAL CTA ---------- */
+function FinalCTA() {
+  return (
+    <section
+      style={{
+        background: `linear-gradient(180deg, ${DARK} 0%, ${DEEPER} 100%)`,
+        position: "relative",
+        overflow: "hidden",
+      }}
+      className="py-[80px] md:py-[120px] px-5 md:px-[60px]"
+    >
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "min(600px, 90vw)",
+          height: "min(600px, 90vw)",
+          background: "radial-gradient(circle, rgba(196,30,30,0.12), transparent 70%)",
+          filter: "blur(100px)",
+          zIndex: 0,
+        }}
+      />
+      <div className="relative z-10 text-center">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          className="about-h"
-          style={{
-            fontWeight: 700,
-            fontSize: "clamp(32px, 3.5vw, 42px)",
-            textAlign: "center",
-            marginBottom: 64,
-          }}
+          style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", maxWidth: 700, margin: "0 auto 24px", lineHeight: 1.2 }}
+          className="text-[32px] md:text-[48px]"
         >
-          Integrated with India's Leading Platforms
+          Ready to Experience Financial Intelligence?
         </motion.h2>
-        <div className="about-logo-grid">
-          {partners.map((p) => (
-            <div key={p} className="about-logo-cell">
-              {p}
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* SECTION 8: TEAM */}
-      <Section style={{ padding: "120px 0", background: DARK }}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          className="about-grid-2 about-grid-55-45"
-        >
-          <div>
-            <Tag>The Team</Tag>
-            <h2
-              className="about-h"
-              style={{ fontWeight: 700, fontSize: "clamp(36px, 4vw, 48px)", lineHeight: 1.2, marginBottom: 48 }}
-            >
-              The Minds Behind FynHelp
-            </h2>
-            {[
-              {
-                name: "Adireddy Tarun",
-                title: "CEO & Founder",
-                bio: "B.Tech in Computer Science with 6 years of industry experience spanning technical development and management. Led engineering teams and product strategy at scale before founding FynHelp to solve the financial intelligence gap for Indian SMEs.",
-              },
-              {
-                name: "Nidhi Siddhpura",
-                title: "CMO & Co-Founder",
-                bio: "MBA in Data Analytics with 3 years of experience in marketing and management. Built brand strategies for multiple startups and maintains a growing presence as a micro-influencer in the business and finance space. Leads all go-to-market and community-building efforts at FynHelp.",
-              },
-            ].map((f) => (
-              <div key={f.name} className="about-founder-card">
-                <h3 className="about-h" style={{ fontWeight: 700, fontSize: 24, marginBottom: 8 }}>
-                  {f.name}
-                </h3>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 14,
-                    color: TERRACOTTA,
-                    textTransform: "uppercase",
-                    letterSpacing: "1px",
-                    marginBottom: 16,
-                  }}
-                >
-                  {f.title}
-                </div>
-                <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>{f.bio}</p>
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              width: "min(400px, 80vw)",
-              height: "min(400px, 80vw)",
-              borderRadius: "50%",
-              background: `linear-gradient(135deg, ${TERRACOTTA}, ${TERRACOTTA_LIGHT})`,
-              border: "8px solid white",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 16px rgba(255,255,255,0.1)",
-              position: "relative",
-              overflow: "hidden",
-              margin: "0 auto",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              className="about-h"
-              style={{ fontWeight: 900, fontSize: 96, color: "rgba(255,255,255,0.9)", letterSpacing: "-2px" }}
-            >
-              T&N
-            </span>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 20,
-                right: 20,
-                background: "rgba(26,20,18,0.95)",
-                backdropFilter: "blur(10px)",
-                border: `1px solid ${TERRACOTTA}`,
-                padding: "8px 16px",
-                borderRadius: 20,
-                fontWeight: 600,
-                fontSize: 11,
-                color: "#fff",
-              }}
-            >
-              Est. 2024
-            </div>
-          </div>
-        </motion.div>
-      </Section>
-
-      {/* SECTION 9: FINAL CTA */}
-      <Section
-        style={{
-          padding: "120px 0",
-          background: `linear-gradient(180deg, ${DARK} 0%, ${DEEPER} 100%)`,
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            height: 600,
-            background: "radial-gradient(circle, rgba(196,30,30,0.12), transparent)",
-            filter: "blur(100px)",
-            zIndex: 0,
-          }}
-        />
-        <motion.div
+        <motion.p
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          style={{ textAlign: "center", position: "relative", zIndex: 1 }}
+          style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.7)", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}
+          className="text-[15px] md:text-[18px] mb-8 md:mb-12"
         >
-          <h2
-            className="about-h"
-            style={{
-              fontWeight: 700,
-              fontSize: "clamp(36px, 4vw, 48px)",
-              maxWidth: 700,
-              margin: "0 auto 24px",
-            }}
-          >
-            Ready to Experience Financial Intelligence?
-          </h2>
-          <p
-            style={{
-              fontWeight: 500,
-              fontSize: "clamp(16px, 2vw, 18px)",
-              color: "rgba(255,255,255,0.7)",
-              maxWidth: 600,
-              margin: "0 auto 48px",
-            }}
-          >
-            Join 1,000+ beta users building the future of Indian SME finance
-          </p>
-          <button className="about-cta about-cta-lg">
-            Start Your Free Trial <ArrowRight size={22} />
-          </button>
-        </motion.div>
-      </Section>
-    </div>
-  </Layout>
-);
+          Join 1,000+ beta users building the future of Indian SME finance
+        </motion.p>
+        <Link
+          to="/waitlist"
+          className="about-cta-button inline-flex"
+          style={{
+            background: TERRACOTTA,
+            border: `2px solid ${TERRACOTTA}`,
+            color: "white",
+            fontFamily: "Inter",
+            fontWeight: 700,
+            borderRadius: 14,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            boxShadow: "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.5)",
+            transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            textDecoration: "none",
+          }}
+        >
+          <span className="text-[16px] md:text-[18px] py-[18px] md:py-5 px-9 md:px-12">Start Your Free Trial</span>
+          <ArrowRight size={22} style={{ marginRight: 24 }} />
+        </Link>
 
-export default AboutPage;
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-8">
+          {[
+            { icon: Check, label: "No credit card required" },
+            { icon: Clock, label: "6 months free for beta users" },
+            { icon: Shield, label: "Cancel anytime" },
+          ].map((b) => {
+            const Icon = b.icon;
+            return (
+              <div
+                key={b.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: "Inter",
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.5)",
+                }}
+                className="text-[11px] md:text-[13px]"
+              >
+                <Icon size={14} />
+                <span>{b.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- PAGE ---------- */
+export default function AboutPage() {
+  return (
+    <Layout>
+      <style>{`
+        .about-hero { isolation: isolate; }
+        .about-particle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          border-radius: 50%;
+          background: rgba(196, 30, 30, 0.3);
+          animation: aboutParticleFloat linear infinite;
+        }
+        @keyframes aboutParticleFloat {
+          0% { transform: translate(0, 0); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translate(40px, -120px); opacity: 0; }
+        }
+        @media (hover: hover) {
+          .about-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(196,30,30,0.15);
+          }
+          .about-founder-card:hover {
+            background: rgba(255,255,255,0.08) !important;
+            transform: translateX(8px);
+            border-left-width: 6px;
+          }
+          .about-cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 0 rgba(160,25,25,1), 0 12px 32px rgba(196,30,30,0.7);
+          }
+          .about-partner:hover {
+            transform: translateY(-4px) scale(1.05);
+            background: radial-gradient(circle, rgba(196,30,30,0.08), transparent);
+            color: white !important;
+          }
+        }
+        .about-cta-button:active {
+          transform: translateY(2px);
+          box-shadow: 0 2px 0 rgba(160,25,25,1), 0 4px 16px rgba(196,30,30,0.5);
+        }
+        @media (max-width: 767px) {
+          .about-particle { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .about-particle, * { animation: none !important; }
+        }
+        html, body { overflow-x: hidden; }
+      `}</style>
+      <main style={{ background: DARK, color: "white" }}>
+        <Hero />
+        <ProblemSection />
+        <ComparisonSection />
+        <PricingComparison />
+        <VisionSection />
+        <StorySection />
+        <TeamSection />
+        <PartnersSection />
+        <FinalCTA />
+      </main>
+    </Layout>
+  );
+}
