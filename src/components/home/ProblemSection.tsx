@@ -542,11 +542,12 @@ export default function ProblemSection() {
           display: grid;
           grid-template-columns: minmax(0, 1fr);
           gap: clamp(32px, 5vw, 60px);
-          align-items: center;
+          align-items: start;
         }
         @media (min-width: 900px) {
           .problem-grid {
             grid-template-columns: 55fr 45fr;
+            align-items: center;
           }
         }
         .problem-badge:hover {
@@ -557,21 +558,21 @@ export default function ProblemSection() {
 
         .problem-stage {
           position: relative;
-          height: 350px;
+          width: 100%;
           display: flex;
-          align-items: center;
+          align-items: stretch;
           justify-content: center;
-          perspective: 1200px;
+          perspective: 1400px;
+          min-height: 360px;
         }
         @media (min-width: 900px) {
-          .problem-stage { height: 560px; }
+          .problem-stage { min-height: 520px; }
         }
 
         .problem-card {
           position: relative;
           width: 100%;
-          height: 320px;
-          background: linear-gradient(135deg, rgba(26,20,18,0.85), rgba(10,10,10,0.92));
+          background: linear-gradient(135deg, rgba(26,20,18,0.9), rgba(10,10,10,0.95));
           border: 1px solid rgba(196,30,30,0.3);
           border-radius: 20px;
           padding: 20px;
@@ -587,12 +588,11 @@ export default function ProblemSection() {
         }
         @media (min-width: 900px) {
           .problem-card {
-            height: 480px;
-            padding: 32px;
-            transform: rotateX(2deg) rotateY(-5deg);
+            padding: 28px;
+            transform: rotateX(1deg) rotateY(-2deg);
           }
           .problem-card:hover {
-            transform: rotateX(0deg) rotateY(0deg) scale(1.02);
+            transform: rotateX(0deg) rotateY(0deg) scale(1.015);
           }
         }
 
