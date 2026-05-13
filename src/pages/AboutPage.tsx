@@ -130,7 +130,7 @@ function Hero() {
           style={{
             fontFamily: "Inter, sans-serif",
             fontWeight: 700,
-            fontSize: 11,
+            fontSize: 14,
             color: TERRACOTTA,
             textTransform: "uppercase",
             letterSpacing: 2,
@@ -152,7 +152,7 @@ function Hero() {
             textShadow: "0 4px 12px rgba(0,0,0,0.6)",
             lineHeight: 1.15,
           }}
-          className="text-[36px] md:text-[64px] leading-[1.2] md:leading-[1.15]"
+          className="text-[42px] md:text-[72px] leading-[1.2] md:leading-[1.15]"
         >
           We're Building Financial Intelligence for 63 Million Indian Businesses
         </motion.h1>
@@ -168,7 +168,7 @@ function Hero() {
             margin: "0 auto",
             lineHeight: 1.6,
           }}
-          className="text-[16px] md:text-[22px]"
+          className="text-[19px] md:text-[25px]"
         >
           Every SME deserves CFO-level clarity — without CFO-level cost
         </motion.p>
@@ -197,7 +197,7 @@ function Hero() {
                   fontWeight: 600,
                   color: "rgba(255,255,255,0.6)",
                 }}
-                className="text-[11px] md:text-[13px]"
+                className="text-[14px] md:text-[16px]"
               >
                 <Icon size={16} color={TERRACOTTA} />
                 <span>{b.label}</span>
@@ -239,7 +239,7 @@ function ComparisonSection() {
         viewport={{ once: true, amount: 0.3 }}
         variants={fadeUp}
         style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }}
-        className="text-[28px] md:text-[42px] mb-10 md:mb-16"
+        className="text-[32px] md:text-[50px] mb-10 md:mb-16"
       >
         What Makes Us Different
       </motion.h2>
@@ -256,7 +256,7 @@ function ComparisonSection() {
           }}
           className="p-6 md:p-10"
         >
-          <p style={{ color: "rgba(239,68,68,0.8)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[12px] md:text-[14px] mb-5 md:mb-8">
+          <p style={{ color: "rgba(239,68,68,0.8)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[15px] md:text-[17px] mb-5 md:mb-8">
             Without FynHelp
           </p>
           <ul className="space-y-3 md:space-y-4">
@@ -272,7 +272,7 @@ function ComparisonSection() {
                 className="gap-3 md:gap-4 p-3 md:p-4"
               >
                 <XCircle size={20} color="#EF4444" style={{ flexShrink: 0, marginTop: 2 }} />
-                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }} className="text-[14px] md:text-[16px]">
+                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }} className="text-[17px] md:text-[19px]">
                   {t}
                 </span>
               </li>
@@ -293,7 +293,7 @@ function ComparisonSection() {
           }}
           className="p-6 md:p-10"
         >
-          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[12px] md:text-[14px] mb-5 md:mb-8">
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, textAlign: "center" }} className="text-[15px] md:text-[17px] mb-5 md:mb-8">
             With FynHelp
           </p>
           <ul className="space-y-3 md:space-y-4">
@@ -309,7 +309,7 @@ function ComparisonSection() {
                 className="gap-3 md:gap-4 p-3 md:p-4"
               >
                 <CheckCircle2 size={20} color="#10B981" style={{ flexShrink: 0, marginTop: 2 }} />
-                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }} className="text-[14px] md:text-[16px]">
+                <span style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }} className="text-[17px] md:text-[19px]">
                   {t}
                 </span>
               </li>
@@ -352,20 +352,20 @@ function PricingComparison() {
               borderRadius: 20,
               fontFamily: "Inter",
               fontWeight: 600,
-              fontSize: 11,
+              fontSize: 14,
               color: "#EF4444",
               textTransform: "uppercase",
             }}
           >
             Unaffordable
           </span>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 24 }} className="text-[12px] md:text-[14px]">
+          <p style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 24 }} className="text-[15px] md:text-[17px]">
             Traditional CFO
           </p>
-          <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "rgba(255,255,255,0.6)", lineHeight: 1 }} className="text-[36px] md:text-[48px] mb-2">
+          <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "rgba(255,255,255,0.6)", lineHeight: 1 }} className="text-[42px] md:text-[56px] mb-2">
             ₹30-50 Lakh
           </div>
-          <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.4)", marginBottom: 32 }} className="text-[14px] md:text-[16px]">
+          <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.4)", marginBottom: 32 }} className="text-[17px] md:text-[19px]">
             per year
           </div>
           <ul className="space-y-3 md:space-y-4">
@@ -375,7 +375,7 @@ function PricingComparison() {
               "Limited to business hours",
               "Single person perspective",
             ].map((t) => (
-              <li key={t} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "Inter", color: "rgba(255,255,255,0.5)" }} className="text-[14px] md:text-[15px]">
+              <li key={t} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "Inter", color: "rgba(255,255,255,0.5)" }} className="text-[17px] md:text-[18px]">
                 <X size={18} color="#EF4444" style={{ flexShrink: 0 }} />
                 <span>{t}</span>
               </li>
@@ -408,7 +408,7 @@ function PricingComparison() {
               borderRadius: 20,
               fontFamily: "Inter",
               fontWeight: 700,
-              fontSize: 11,
+              fontSize: 14,
               color: "white",
               textTransform: "uppercase",
               boxShadow: "0 4px 12px rgba(196,30,30,0.4)",
@@ -416,7 +416,7 @@ function PricingComparison() {
           >
             Recommended
           </span>
-          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 32 }} className="text-[12px] md:text-[14px]">
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 32 }} className="text-[15px] md:text-[17px]">
             FynHelp AI CFO
           </p>
 
@@ -431,17 +431,17 @@ function PricingComparison() {
                     Popular
                   </span>
                 )}
-                <div style={{ fontFamily: "Inter", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", marginBottom: 12 }} className="text-[12px]">
+                <div style={{ fontFamily: "Inter", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", marginBottom: 12 }} className="text-[15px]">
                   {plan.name}
                 </div>
-                <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", lineHeight: 1 }} className="text-[28px] md:text-[36px]">
+                <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", lineHeight: 1 }} className="text-[32px] md:text-[42px]">
                   {plan.price}
                 </div>
-                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.6)", marginTop: 4 }} className="text-[14px]">/year</div>
-                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.5)", marginBottom: 20 }} className="text-[13px]">{plan.monthly}</div>
+                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.6)", marginTop: 4 }} className="text-[17px]">/year</div>
+                <div style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.5)", marginBottom: 20 }} className="text-[16px]">{plan.monthly}</div>
                 <ul className="space-y-2">
                   {plan.features.map((f) => (
-                    <li key={f} style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.7)", fontFamily: "Inter" }} className="text-[12px] md:text-[13px]">
+                    <li key={f} style={{ display: "flex", gap: 8, color: "rgba(255,255,255,0.7)", fontFamily: "Inter" }} className="text-[15px] md:text-[16px]">
                       <Check size={16} color="#10B981" style={{ flexShrink: 0 }} />
                       <span>{f}</span>
                     </li>
@@ -466,7 +466,7 @@ function PricingComparison() {
               fontFamily: "Inter",
               fontWeight: 600,
             }}
-            className="p-3 md:p-4 text-[13px] md:text-[15px]"
+            className="p-3 md:p-4 text-[16px] md:text-[18px]"
           >
             <TrendingDown size={20} />
             <span>Save 70-90% vs Traditional CFO</span>
@@ -492,7 +492,7 @@ function PricingComparison() {
               textDecoration: "none",
             }}
           >
-            <span className="text-[15px] md:text-[16px] py-4 md:py-[18px]">Start Your Free Trial</span>
+            <span className="text-[18px] md:text-[19px] py-4 md:py-[18px]">Start Your Free Trial</span>
             <ArrowRight size={20} />
           </Link>
         </motion.div>
@@ -532,7 +532,7 @@ function VisionSection() {
         viewport={{ once: true }}
         variants={fadeUp}
         style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }}
-        className="text-[12px] mb-5 md:mb-8"
+        className="text-[15px] mb-5 md:mb-8"
       >
         The Vision
       </motion.p>
@@ -542,7 +542,7 @@ function VisionSection() {
         viewport={{ once: true }}
         variants={fadeUp}
         style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", textAlign: "center", maxWidth: 800, margin: "0 auto", lineHeight: 1.2 }}
-        className="text-[32px] md:text-[56px] mb-6 md:mb-10"
+        className="text-[38px] md:text-[64px] mb-6 md:mb-10"
       >
         Preventing Crises Before They Happen
       </motion.h2>
@@ -552,7 +552,7 @@ function VisionSection() {
         viewport={{ once: true }}
         variants={fadeUp}
         style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.8)", maxWidth: 700, margin: "0 auto", textAlign: "center" }}
-        className="text-[16px] md:text-[20px] leading-[1.7] md:leading-[1.8]"
+        className="text-[19px] md:text-[23px] leading-[1.7] md:leading-[1.8]"
       >
         We are building toward a future where no Indian SME owner discovers a cash crisis too late to fix it. Where GST notices are prevented, not received. Where the decision to hire, borrow, or extend credit is made with full knowledge of the consequences.
       </motion.p>
@@ -593,7 +593,7 @@ function VisionSection() {
               >
                 <Icon size={isCenter ? 44 : 36} color={n.color} />
               </div>
-              <div style={{ fontFamily: "Inter", fontWeight: 600, color: "white", whiteSpace: "pre-line" }} className="text-[13px] md:text-[15px]">
+              <div style={{ fontFamily: "Inter", fontWeight: 600, color: "white", whiteSpace: "pre-line" }} className="text-[16px] md:text-[18px]">
                 {n.text}
               </div>
             </motion.div>
@@ -615,10 +615,10 @@ function StorySection() {
   ];
   return (
     <section style={{ background: DEEPER }} className="py-[80px] md:py-[120px] px-5 md:px-[60px]">
-      <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }} className="text-[12px] mb-4 md:mb-6">
+      <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, textAlign: "center" }} className="text-[15px] mb-4 md:mb-6">
         Our Story
       </p>
-      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[32px] md:text-[48px] mb-10 md:mb-16">
+      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[38px] md:text-[56px] mb-10 md:mb-16">
         Born from Personal Pain
       </h2>
 
@@ -661,7 +661,7 @@ function StorySection() {
                     fontFamily: "Inter",
                     fontWeight: 700,
                     color: TERRACOTTA,
-                    fontSize: 12,
+                    fontSize: 15,
                     zIndex: 2,
                   }}
                 >
@@ -677,10 +677,10 @@ function StorySection() {
                   className="p-5 md:p-8"
                 >
                   <Icon size={24} color={e.color} className="mb-3" />
-                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[18px] md:text-[22px] mb-3">
+                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[21px] md:text-[25px] mb-3">
                     {e.title}
                   </h3>
-                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }} className="text-[14px] md:text-[16px]">
+                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }} className="text-[17px] md:text-[19px]">
                     {e.desc}
                   </p>
                 </div>
@@ -692,7 +692,7 @@ function StorySection() {
         {/* Desktop year badges adjustment */}
         <style>{`
           @media (min-width: 768px) {
-            .timeline-year { width: 60px; height: 60px; font-size: 16px; }
+            .timeline-year { width: 60px; height: 60px; font-size: 19px; }
           }
         `}</style>
       </div>
@@ -711,10 +711,10 @@ function StorySection() {
         }}
         className="p-5 md:p-8 mt-8 md:mt-12"
       >
-        <p style={{ fontFamily: "Georgia", fontWeight: 600, fontStyle: "italic", color: "rgba(255,255,255,0.9)", lineHeight: 1.7 }} className="text-[16px] md:text-[20px]">
+        <p style={{ fontFamily: "Georgia", fontWeight: 600, fontStyle: "italic", color: "rgba(255,255,255,0.9)", lineHeight: 1.7 }} className="text-[19px] md:text-[23px]">
           "We're building what we wish we'd had. No founder should discover their crisis 14 days too late."
         </p>
-        <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, marginTop: 16 }} className="text-[13px] md:text-[15px]">
+        <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, marginTop: 16 }} className="text-[16px] md:text-[18px]">
           — Tarun & Nidhi, Co-founders
         </p>
       </motion.div>
@@ -742,10 +742,10 @@ function TeamSection() {
     <section style={{ background: DARK }} className="py-[80px] md:py-[120px] px-5 md:px-[60px]">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-[55%_45%] gap-12 md:gap-20 items-center">
         <div>
-          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2 }} className="text-[12px] mb-4 md:mb-6 text-center md:text-left">
+          <p style={{ color: TERRACOTTA, fontFamily: "Inter", fontWeight: 700, textTransform: "uppercase", letterSpacing: 2 }} className="text-[15px] mb-4 md:mb-6 text-center md:text-left">
             The Team
           </p>
-          <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[32px] md:text-[48px] mb-8 md:mb-12 text-center md:text-left">
+          <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[38px] md:text-[56px] mb-8 md:mb-12 text-center md:text-left">
             The Minds Behind FynHelp
           </h2>
           <div className="flex flex-col gap-5 md:gap-6">
@@ -781,18 +781,18 @@ function TeamSection() {
                     color: "white",
                     flexShrink: 0,
                   }}
-                  className="text-[32px] md:text-[48px] mx-auto md:mx-0 mb-4 md:mb-0 md:w-[120px] md:h-[120px]"
+                  className="text-[38px] md:text-[56px] mx-auto md:mx-0 mb-4 md:mb-0 md:w-[120px] md:h-[120px]"
                 >
                   {f.letter}
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[20px] md:text-[24px] mb-2">
+                  <h3 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white" }} className="text-[23px] md:text-[27px] mb-2">
                     {f.name}
                   </h3>
-                  <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, textTransform: "uppercase", letterSpacing: 1 }} className="text-[12px] md:text-[14px] mb-3 md:mb-4">
+                  <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, textTransform: "uppercase", letterSpacing: 1 }} className="text-[15px] md:text-[17px] mb-3 md:mb-4">
                     {f.title}
                   </p>
-                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }} className="text-[14px] md:text-[15px]">
+                  <p style={{ fontFamily: "Inter", color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }} className="text-[17px] md:text-[18px]">
                     {f.bio}
                   </p>
                   <a
@@ -807,7 +807,7 @@ function TeamSection() {
                       marginTop: 16,
                       transition: "color 0.3s",
                     }}
-                    className="text-[13px]"
+                    className="text-[16px]"
                     onMouseEnter={(e) => (e.currentTarget.style.color = TERRACOTTA)}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
                   >
@@ -843,13 +843,13 @@ function TeamSection() {
                 justifyContent: "center",
               }}
             >
-              <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", fontSize: 96, lineHeight: 1, marginBottom: 12 }}>
+              <div style={{ fontFamily: "Georgia", fontWeight: 900, color: "white", fontSize: 108, lineHeight: 1, marginBottom: 12 }}>
                 63M
               </div>
-              <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 18, color: "rgba(255,255,255,0.7)" }}>
+              <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 21, color: "rgba(255,255,255,0.7)" }}>
                 Businesses
               </div>
-              <div style={{ marginTop: "auto", fontFamily: "Inter", fontWeight: 700, color: TERRACOTTA, fontSize: 16 }}>
+              <div style={{ marginTop: "auto", fontFamily: "Inter", fontWeight: 700, color: TERRACOTTA, fontSize: 19 }}>
                 2 Founders, 1 Mission
               </div>
             </div>
@@ -868,7 +868,7 @@ function TeamSection() {
               fontFamily: "Inter",
               fontWeight: 600,
               color: "white",
-              fontSize: 18,
+              fontSize: 21,
             }}
           >
             Building for 63M Indian Businesses
@@ -890,10 +890,10 @@ function PartnersSection() {
       }}
       className="py-[60px] md:py-[100px] px-5 md:px-[60px]"
     >
-      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[28px] md:text-[42px] mb-3 md:mb-4">
+      <h2 style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", textAlign: "center" }} className="text-[32px] md:text-[50px] mb-3 md:mb-4">
         Powered by Enterprise Infrastructure
       </h2>
-      <p style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.6)", textAlign: "center", maxWidth: 600, margin: "0 auto" }} className="text-[15px] md:text-[17px] mb-10 md:mb-16">
+      <p style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.6)", textAlign: "center", maxWidth: 600, margin: "0 auto" }} className="text-[18px] md:text-[20px] mb-10 md:mb-16">
         Built on the same platforms Fortune 500 companies trust
       </p>
       <div className="max-w-[1100px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -914,7 +914,7 @@ function PartnersSection() {
               color: "rgba(255,255,255,0.6)",
             }}
           >
-            <span className="text-[14px] md:text-[18px]">{p}</span>
+            <span className="text-[17px] md:text-[21px]">{p}</span>
           </div>
         ))}
       </div>
@@ -954,7 +954,7 @@ function FinalCTA() {
           viewport={{ once: true }}
           variants={fadeUp}
           style={{ fontFamily: "Georgia", fontWeight: 700, color: "white", maxWidth: 700, margin: "0 auto 24px", lineHeight: 1.2 }}
-          className="text-[32px] md:text-[48px]"
+          className="text-[38px] md:text-[56px]"
         >
           Ready to Experience Financial Intelligence?
         </motion.h2>
@@ -964,7 +964,7 @@ function FinalCTA() {
           viewport={{ once: true }}
           variants={fadeUp}
           style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.7)", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}
-          className="text-[15px] md:text-[18px] mb-8 md:mb-12"
+          className="text-[18px] md:text-[21px] mb-8 md:mb-12"
         >
           Join 1,000+ beta users building the future of Indian SME finance
         </motion.p>
@@ -986,7 +986,7 @@ function FinalCTA() {
             textDecoration: "none",
           }}
         >
-          <span className="text-[16px] md:text-[18px] py-[18px] md:py-5 px-9 md:px-12">Start Your Free Trial</span>
+          <span className="text-[19px] md:text-[21px] py-[18px] md:py-5 px-9 md:px-12">Start Your Free Trial</span>
           <ArrowRight size={22} style={{ marginRight: 24 }} />
         </Link>
 
@@ -1008,7 +1008,7 @@ function FinalCTA() {
                   fontWeight: 600,
                   color: "rgba(255,255,255,0.5)",
                 }}
-                className="text-[11px] md:text-[13px]"
+                className="text-[14px] md:text-[16px]"
               >
                 <Icon size={14} />
                 <span>{b.label}</span>
