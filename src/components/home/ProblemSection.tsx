@@ -542,11 +542,12 @@ export default function ProblemSection() {
           display: grid;
           grid-template-columns: minmax(0, 1fr);
           gap: clamp(32px, 5vw, 60px);
-          align-items: center;
+          align-items: start;
         }
         @media (min-width: 900px) {
           .problem-grid {
             grid-template-columns: 55fr 45fr;
+            align-items: center;
           }
         }
         .problem-badge:hover {
