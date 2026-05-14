@@ -38,10 +38,45 @@ Deno.serve(async (req) => {
       });
     }
 
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const authClient = createClient(
+      supabaseUrl,
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: userData, error: userErr } = await authClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
+      supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
+
+    const [{ data: profile }, { data: roles }] = await Promise.all([
+      supabase.from("profiles").select("business_id").eq("user_id", userData.user.id).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", userData.user.id),
+    ]);
+    const isAdmin = (roles || []).some((r: any) =>
+      ["admin", "super_admin", "ops_admin", "support_agent", "analyst"].includes(r.role)
+    );
+    if (!isAdmin && profile?.business_id !== businessId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const periodStart = new Date(Date.now() - periodDays * 86400_000).toISOString();
     const sixMonthsAgo = new Date(Date.now() - 180 * 86400_000).toISOString();
