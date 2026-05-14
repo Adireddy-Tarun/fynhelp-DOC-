@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Droplet, TrendingUp, DollarSign, FileText, Bot } from 'lucide-react'
+import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
