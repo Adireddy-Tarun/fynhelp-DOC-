@@ -937,6 +937,35 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_insights: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_insights_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "demo_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demo_organizations: {
         Row: {
           business_name: string
