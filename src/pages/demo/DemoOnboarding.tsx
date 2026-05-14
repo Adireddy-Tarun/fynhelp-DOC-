@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Bot, Send } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/integrations/supabase/client'
 
 const QUESTIONS = [
   "Hi! I'm Fynny, your AI CFO. What's your business name?",
