@@ -1,0 +1,159 @@
+import { useState } from 'react'
+import { Upload, FileText, AlertCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+export function DemoUpload() {
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const navigate = useNavigate()
+
+  const hasAccess = sessionStorage.getItem('demo_access') === 'true'
+  if (!hasAccess) {
+    window.location.href = '/demo/login'
+    return null
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
+      setFile(selectedFile)
+    }
+  }
+
+  const handleUpload = async () => {
+    if (!file) return
+    setUploading(true)
+    setTimeout(() => {
+      sessionStorage.setItem('demo_file', file.name)
+      navigate('/demo/onboarding')
+    }, 2000)
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+      {/* Header */}
+      <div className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-georgia font-bold text-white">
+            FynHelp Demo
+          </h1>
+          <button
+            onClick={() => {
+              sessionStorage.clear()
+              window.location.href = '/demo/login'
+            }}
+            className="text-white/70 hover:text-white text-sm"
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-georgia font-bold text-white mb-4">
+            Upload Your Financial Data
+          </h2>
+          <p className="text-xl text-white/70">
+            Upload a bank statement or invoice CSV to get started
+          </p>
+        </div>
+
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-12">
+          <label className="block cursor-pointer">
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-16 text-center hover:border-[#C41E1E]/50 transition-colors">
+              {file ? (
+                <div className="flex flex-col items-center gap-4">
+                  <FileText size={64} className="text-[#C41E1E]" />
+                  <div>
+                    <p className="text-white font-semibold text-lg mb-1">
+                      {file.name}
+                    </p>
+                    <p className="text-white/60 text-sm">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setFile(null)
+                    }}
+                    className="text-white/60 hover:text-white text-sm underline"
+                  >
+                    Remove file
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Upload size={64} className="text-[#C41E1E] mx-auto mb-6" />
+                  <p className="text-white font-semibold text-xl mb-2">
+                    Drop your file here or click to browse
+                  </p>
+                  <p className="text-white/60 text-sm">
+                    Supports CSV, Excel (XLSX, XLS)
+                  </p>
+                </>
+              )}
+            </div>
+
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
+
+          <div className="mt-8 flex items-start gap-3 bg-[#C41E1E]/10 border border-[#C41E1E]/30 rounded-lg p-4">
+            <AlertCircle size={20} className="text-[#C41E1E] flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-white/80">
+              <p className="font-semibold mb-1">Sample data format:</p>
+              <p>Date, Description, Amount, Type (Income/Expense)</p>
+            </div>
+          </div>
+
+          {file && (
+            <button
+              onClick={handleUpload}
+              disabled={uploading}
+              className="w-full mt-8 px-8 py-4 bg-[#C41E1E] text-white font-bold text-lg rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {uploading ? 'Processing...' : 'Continue to Onboarding →'}
+            </button>
+          )}
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-white/60 text-sm mb-3">
+            Don't have data handy? Download sample CSV
+          </p>
+          <button
+            onClick={() => {
+              const csv = `Date,Description,Amount,Type
+2026-05-01,Client Payment,85000,Income
+2026-05-02,Office Rent,45000,Expense
+2026-05-05,Vendor Payment,32000,Expense
+2026-05-10,Client Payment,120000,Income
+2026-05-12,Salaries,180000,Expense
+2026-05-15,Software Subscription,15000,Expense`
+
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = window.URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = 'sample-transactions.csv'
+              a.click()
+            }}
+            className="text-[#C41E1E] hover:underline text-sm font-semibold"
+          >
+            Download Sample CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default DemoUpload
