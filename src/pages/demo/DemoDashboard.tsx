@@ -171,29 +171,9 @@ function GSTModule({ data: _data }: { data: any }) {
   )
 }
 
-function FynnyModule({ answers, orgId: _orgId }: { answers: string[]; orgId: string | null }) {
-  return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <Bot size={64} className="text-[#C41E1E] mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">Ask Fynny Anything</h2>
-      <p className="text-white/70 text-lg mb-8">
-        Your AI CFO is ready to answer questions about your finances
-      </p>
-
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-left max-w-2xl mx-auto">
-        <p className="text-white/80 text-sm font-semibold mb-4">Business context:</p>
-        <ul className="space-y-2 text-white/70 text-sm">
-          <li>📌 Business: {answers[0]}</li>
-          <li>🏭 Industry: {answers[1]}</li>
-          <li>👥 Employees: {answers[2]}</li>
-          <li>💰 Revenue: {answers[3]}</li>
-          <li>🎯 Challenge: {answers[4]}</li>
-        </ul>
-      </div>
-
-      <div className="mt-8 text-white/50 text-sm">Building AI chat interface...</div>
-    </div>
-  )
+function FynnyModule({ answers, orgId }: { answers: string[]; orgId: string | null }) {
+  if (!orgId) return null
+  return <FynnyChat orgId={orgId} answers={answers} />
 }
 
 export default DemoDashboard
