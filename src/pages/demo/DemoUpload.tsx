@@ -25,7 +25,7 @@ export function DemoUpload() {
     setUploading(true)
     setTimeout(() => {
       sessionStorage.setItem('demo_file', file.name)
-      navigate('/demo/onboarding')
+      navigate('/demo/dashboard')
     }, 2000)
   }
 
