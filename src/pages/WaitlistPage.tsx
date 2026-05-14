@@ -120,7 +120,7 @@ export default function WaitlistPage() {
           >
             {/* LEFT - Waitlist */}
             <article
-              className="reveal-up"
+              className=""
               style={{
                 background: "rgba(196, 30, 30, 0.03)",
                 border: "2px solid rgba(196, 30, 30, 0.15)",
@@ -236,7 +236,7 @@ export default function WaitlistPage() {
 
             {/* RIGHT - Calendly */}
             <article
-              className="reveal-up"
+              className=""
               style={{
                 background:
                   "linear-gradient(135deg, rgba(196,30,30,0.08), rgba(229,93,93,0.05))",
