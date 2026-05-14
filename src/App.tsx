@@ -79,6 +79,7 @@ import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
@@ -143,6 +144,7 @@ const App = () => (
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/waitlist" element={<WaitlistPage />} />
+            <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
