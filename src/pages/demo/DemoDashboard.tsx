@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Droplet, TrendingUp, DollarSign, FileText, Bot, Loader } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
+import { FynnyChat } from '@/components/demo/FynnyChat'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
