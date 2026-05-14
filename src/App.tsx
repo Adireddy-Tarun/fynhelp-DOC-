@@ -79,6 +79,7 @@ import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
