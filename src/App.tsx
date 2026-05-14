@@ -150,6 +150,7 @@ const App = () => (
             <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
+            <Route path="/demo/dashboard" element={<DemoDashboard />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
