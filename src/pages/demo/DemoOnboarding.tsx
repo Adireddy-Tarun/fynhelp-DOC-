@@ -60,7 +60,7 @@ export function DemoOnboarding() {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           role: 'fynny',
-          text: "Perfect! Now upload your data so I can give you real insights 🚀"
+          text: "Perfect! I now understand your business. Let's upload your financial data so I can give you real insights. 📊"
         }])
 
         sessionStorage.setItem('demo_answers', JSON.stringify(newAnswers))
