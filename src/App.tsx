@@ -82,6 +82,7 @@ import NotFound from "./pages/NotFound.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
+import DemoDashboard from "./pages/demo/DemoDashboard.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
