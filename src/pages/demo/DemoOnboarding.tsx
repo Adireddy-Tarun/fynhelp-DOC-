@@ -85,7 +85,7 @@ export function DemoOnboarding() {
 
           setMessages(prev => [...prev, {
             role: 'fynny',
-            text: "Got it! Now let's upload your financial data so I can give you real insights. 📊"
+            text: "Got it! Now upload your financial data so I can give you real insights. 📊"
           }])
 
           setTimeout(() => {
