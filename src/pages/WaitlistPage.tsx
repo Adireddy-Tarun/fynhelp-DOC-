@@ -52,183 +52,50 @@ export default function WaitlistPage() {
         </div>
 
         {/* Two-path choice section */}
-        <section
-          className="mx-auto px-6"
-          style={{ maxWidth: 900, margin: "80px auto 0" }}
-        >
+        <section className="max-w-5xl mx-auto px-6 mt-20">
           {/* OR divider */}
-          <div className="relative" style={{ margin: "60px 0 40px" }}>
-            <div
-              style={{
-                height: 1,
-                background: "rgba(0,0,0,0.1)",
-                width: "100%",
-              }}
-            />
-            <span
-              className="absolute"
-              style={{
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "#F5F5F5",
-                padding: "8px 24px",
-                border: "1px solid rgba(0,0,0,0.1)",
-                borderRadius: 20,
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 600,
-                fontSize: 13,
-                color: "rgba(0,0,0,0.6)",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="relative my-10">
+            <div className="h-px bg-black/10 w-full" />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#F5F5F5] px-6 py-2 border border-black/10 rounded-full font-sans font-semibold text-[13px] text-black/60 uppercase tracking-wider">
               OR
             </span>
           </div>
 
           <div className="text-center">
-            <h2
-              className="font-serif"
-              style={{
-                fontFamily: "Georgia, serif",
-                fontWeight: 700,
-                fontSize: "clamp(24px, 3vw, 32px)",
-                color: "#000",
-                marginBottom: 12,
-              }}
-            >
+            <h2 className="font-serif font-bold text-2xl md:text-[32px] text-black mb-3" style={{ fontFamily: "Georgia, serif" }}>
               Want Priority Access?
             </h2>
-            <p
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "clamp(15px, 1.6vw, 17px)",
-                color: "rgba(0,0,0,0.6)",
-                maxWidth: 600,
-                margin: "0 auto 48px",
-                lineHeight: 1.6,
-              }}
-            >
+            <p className="font-sans text-base md:text-[17px] text-black/60 max-w-xl mx-auto mb-12 leading-relaxed">
               Skip the waitlist. Book a 30-minute call with our founders and get early access if you're a good fit.
             </p>
           </div>
 
-          <div
-            className="grid gap-6 md:grid-cols-2"
-            style={{ marginBottom: 80 }}
-          >
+          <div className="grid gap-6 md:grid-cols-2 mb-20 items-stretch">
             {/* LEFT - Waitlist */}
-            <article
-              className=""
-              style={{
-                background: "rgba(196, 30, 30, 0.03)",
-                border: "2px solid rgba(196, 30, 30, 0.15)",
-                borderRadius: 16,
-                padding: "40px 32px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                position: "relative",
-              }}
-            >
-              <span
-                style={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  background: "rgba(196, 30, 30, 0.1)",
-                  border: "1px solid #C41E1E",
-                  padding: "4px 12px",
-                  borderRadius: 12,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  fontSize: 11,
-                  color: "#C41E1E",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
+            <article className="relative flex flex-col items-center text-center bg-[#C41E1E]/[0.03] border-2 border-[#C41E1E]/15 rounded-2xl p-8 md:p-10">
+              <span className="absolute top-4 right-4 bg-[#C41E1E]/10 border border-[#C41E1E] px-3 py-1 rounded-xl font-sans font-semibold text-[11px] text-[#C41E1E] uppercase tracking-wider">
                 Selected
               </span>
 
-              <Clock size={48} color="#C41E1E" style={{ marginBottom: 20 }} />
+              <Clock size={48} className="text-[#C41E1E] mb-5" />
 
-              <h3
-                style={{
-                  fontFamily: "Georgia, serif",
-                  fontWeight: 700,
-                  fontSize: 22,
-                  color: "#000",
-                  marginBottom: 12,
-                }}
-              >
+              <h3 className="font-serif font-bold text-[22px] text-black mb-3" style={{ fontFamily: "Georgia, serif" }}>
                 Join Waitlist
               </h3>
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 15,
-                  color: "rgba(0,0,0,0.6)",
-                  lineHeight: 1.6,
-                  marginBottom: 24,
-                }}
-              >
+              <p className="font-sans text-[15px] text-black/60 leading-relaxed mb-6">
                 You're in! We'll email you when your spot opens. Expected launch: 60 days.
               </p>
 
-              <ul
-                style={{
-                  width: "100%",
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  textAlign: "left",
-                }}
-              >
-                {[
-                  "6 months free access",
-                  "Email updates on progress",
-                  "No commitment required",
-                ].map((f) => (
-                  <li
-                    key={f}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 12,
-                      fontFamily: "Inter, sans-serif",
-                      fontWeight: 500,
-                      fontSize: 14,
-                      color: "rgba(0,0,0,0.7)",
-                    }}
-                  >
-                    <Check size={18} color="#10B981" />
+              <ul className="w-full list-none p-0 m-0 text-left space-y-3 mb-6">
+                {["6 months free access", "Email updates on progress", "No commitment required"].map((f) => (
+                  <li key={f} className="flex items-center gap-2 font-sans font-medium text-sm text-black/70">
+                    <Check size={18} className="text-emerald-500 shrink-0" />
                     {f}
                   </li>
                 ))}
               </ul>
 
-              <div
-                style={{
-                  background: "rgba(16, 185, 129, 0.1)",
-                  border: "1px solid rgba(16, 185, 129, 0.3)",
-                  padding: "12px 16px",
-                  borderRadius: 10,
-                  marginTop: 24,
-                  width: "100%",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: "#10B981",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                }}
-              >
+              <div className="mt-auto w-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 rounded-lg font-sans font-semibold text-sm text-emerald-600 flex items-center justify-center gap-2">
                 <CheckCircle2 size={20} />
                 You're in position #234
               </div>
@@ -236,150 +103,41 @@ export default function WaitlistPage() {
 
             {/* RIGHT - Calendly */}
             <article
-              className=""
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(196,30,30,0.08), rgba(229,93,93,0.05))",
-                border: "2px solid rgba(196, 30, 30, 0.3)",
-                borderRadius: 16,
-                padding: "40px 32px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                position: "relative",
-                boxShadow: "0 8px 24px rgba(196, 30, 30, 0.12)",
-              }}
+              className="relative flex flex-col items-center text-center border-2 border-[#C41E1E]/30 rounded-2xl p-8 md:p-10 shadow-[0_8px_24px_rgba(196,30,30,0.12)]"
+              style={{ background: "linear-gradient(135deg, rgba(196,30,30,0.08), rgba(229,93,93,0.05))" }}
             >
-              <span
-                className="animate-pulse"
-                style={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  background: "#C41E1E",
-                  padding: "4px 12px",
-                  borderRadius: 12,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 11,
-                  color: "white",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  boxShadow: "0 4px 12px rgba(196, 30, 30, 0.3)",
-                }}
-              >
+              <span className="animate-pulse absolute top-4 right-4 bg-[#C41E1E] px-3 py-1 rounded-xl font-sans font-bold text-[11px] text-white uppercase tracking-wider shadow-[0_4px_12px_rgba(196,30,30,0.3)]">
                 Faster
               </span>
 
-              <Zap size={48} color="#C41E1E" style={{ marginBottom: 20 }} />
+              <Zap size={48} className="text-[#C41E1E] mb-5" />
 
-              <h3
-                style={{
-                  fontFamily: "Georgia, serif",
-                  fontWeight: 700,
-                  fontSize: 22,
-                  color: "#000",
-                  marginBottom: 12,
-                }}
-              >
+              <h3 className="font-serif font-bold text-[22px] text-black mb-3" style={{ fontFamily: "Georgia, serif" }}>
                 Book a Demo Call
               </h3>
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 15,
-                  color: "rgba(0,0,0,0.6)",
-                  lineHeight: 1.6,
-                  marginBottom: 24,
-                }}
-              >
+              <p className="font-sans text-[15px] text-black/60 leading-relaxed mb-6">
                 Talk to our founders. Get early access if you're a great fit for FynHelp.
               </p>
 
-              <ul
-                style={{
-                  width: "100%",
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  textAlign: "left",
-                }}
-              >
-                {[
-                  "Skip the queue entirely",
-                  "Instant onboarding if qualified",
-                  "Custom setup guidance",
-                ].map((f) => (
-                  <li
-                    key={f}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      marginBottom: 12,
-                      fontFamily: "Inter, sans-serif",
-                      fontWeight: 500,
-                      fontSize: 14,
-                      color: "rgba(0,0,0,0.7)",
-                    }}
-                  >
-                    <Star size={18} color="#C41E1E" />
+              <ul className="w-full list-none p-0 m-0 text-left space-y-3 mb-4">
+                {["Skip the queue entirely", "Instant onboarding if qualified", "Custom setup guidance"].map((f) => (
+                  <li key={f} className="flex items-center gap-2 font-sans font-medium text-sm text-black/70">
+                    <Star size={18} className="text-[#C41E1E] shrink-0" />
                     {f}
                   </li>
                 ))}
               </ul>
 
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.6)",
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  padding: 16,
-                  borderRadius: 10,
-                  marginTop: 16,
-                  marginBottom: 24,
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "space-around",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
+              <div className="w-full bg-white/60 border border-black/10 p-4 rounded-lg mb-6 grid grid-cols-3 gap-3">
                 {[
-                  { Icon: Calendar, label: "Duration", value: "30 minutes" },
+                  { Icon: Calendar, label: "Duration", value: "30 min" },
                   { Icon: Video, label: "Platform", value: "Google Meet" },
                   { Icon: Users, label: "With", value: "Founders" },
                 ].map(({ Icon, label, value }) => (
-                  <div
-                    key={label}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    <Icon size={16} color="rgba(0,0,0,0.5)" />
-                    <span
-                      style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontWeight: 500,
-                        fontSize: 12,
-                        color: "rgba(0,0,0,0.5)",
-                      }}
-                    >
-                      {label}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontWeight: 600,
-                        fontSize: 14,
-                        color: "#000",
-                      }}
-                    >
-                      {value}
-                    </span>
+                  <div key={label} className="flex flex-col items-center gap-1">
+                    <Icon size={16} className="text-black/50" />
+                    <span className="font-sans font-medium text-[11px] text-black/50">{label}</span>
+                    <span className="font-sans font-semibold text-[13px] text-black text-center">{value}</span>
                   </div>
                 ))}
               </div>
@@ -389,55 +147,14 @@ export default function WaitlistPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Schedule demo call with FynHelp founders"
-                className="calendly-cta"
-                style={{
-                  background: "#C41E1E",
-                  border: "2px solid #C41E1E",
-                  color: "white",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 16,
-                  padding: "16px 32px",
-                  borderRadius: 12,
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 10,
-                  boxShadow:
-                    "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.4)",
-                  transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  cursor: "pointer",
-                  minHeight: 56,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 0 rgba(160,25,25,1), 0 12px 32px rgba(196,30,30,0.6)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.4)";
-                }}
+                className="mt-auto w-full inline-flex items-center justify-center gap-2.5 bg-[#C41E1E] border-2 border-[#C41E1E] text-white font-sans font-bold text-base px-8 py-4 rounded-xl no-underline transition-all duration-300 hover:-translate-y-0.5 min-h-[56px]"
+                style={{ boxShadow: "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.4)" }}
               >
                 Schedule Your Call Now
                 <ArrowRight size={20} />
               </a>
 
-              <div
-                style={{
-                  marginTop: 16,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 400,
-                  fontSize: 13,
-                  color: "rgba(0,0,0,0.5)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
+              <div className="mt-4 font-sans text-[13px] text-black/50 flex items-center justify-center gap-1.5">
                 <Shield size={16} />
                 No commitment • Free consultation
               </div>
