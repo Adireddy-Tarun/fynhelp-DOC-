@@ -937,6 +937,36 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_organizations: {
+        Row: {
+          business_name: string
+          challenge: string | null
+          created_at: string
+          employees: string | null
+          id: string
+          industry: string | null
+          monthly_revenue: string | null
+        }
+        Insert: {
+          business_name: string
+          challenge?: string | null
+          created_at?: string
+          employees?: string | null
+          id?: string
+          industry?: string | null
+          monthly_revenue?: string | null
+        }
+        Update: {
+          business_name?: string
+          challenge?: string | null
+          created_at?: string
+          employees?: string | null
+          id?: string
+          industry?: string | null
+          monthly_revenue?: string | null
+        }
+        Relationships: []
+      }
       early_access_requests: {
         Row: {
           created_at: string

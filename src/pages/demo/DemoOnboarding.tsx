@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Bot, Send } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/integrations/supabase/client'
 
 const QUESTIONS = [
   "Hi! I'm Fynny, your AI CFO. What's your business name?",
@@ -57,17 +58,46 @@ export function DemoOnboarding() {
         setStep(step + 1)
       }, 800)
     } else {
-      setTimeout(() => {
+      // SAVE TO SUPABASE
+      setTimeout(async () => {
         setMessages(prev => [...prev, {
           role: 'fynny',
-          text: "Perfect! I now understand your business. Let's upload your financial data so I can give you real insights. 📊"
+          text: "Perfect! Let me save your business info... 📝"
         }])
 
-        sessionStorage.setItem('demo_answers', JSON.stringify(newAnswers))
+        try {
+          const { data: org, error } = await supabase
+            .from('demo_organizations')
+            .insert({
+              business_name: newAnswers[0],
+              industry: newAnswers[1],
+              employees: newAnswers[2],
+              monthly_revenue: newAnswers[3],
+              challenge: newAnswers[4]
+            })
+            .select()
+            .single()
 
-        setTimeout(() => {
-          navigate('/demo/upload')
-        }, 2000)
+          if (error) throw error
+
+          sessionStorage.setItem('demo_org_id', org.id)
+          sessionStorage.setItem('demo_answers', JSON.stringify(newAnswers))
+
+          setMessages(prev => [...prev, {
+            role: 'fynny',
+            text: "Got it! Now let's upload your financial data so I can give you real insights. 📊"
+          }])
+
+          setTimeout(() => {
+            navigate('/demo/upload')
+          }, 2000)
+        } catch (error) {
+          console.error('Error saving:', error)
+          setMessages(prev => [...prev, {
+            role: 'fynny',
+            text: "Oops, something went wrong. Let me try again..."
+          }])
+        }
       }, 800)
     }
   }
