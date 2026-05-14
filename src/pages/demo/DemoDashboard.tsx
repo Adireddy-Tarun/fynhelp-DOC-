@@ -121,7 +121,7 @@ export function DemoDashboard() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {activeModule === 'liquidity' && <LiquidityDashboard />}
+        {activeModule === 'liquidity' && <LiquidityDashboard data={insightsData} />}
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
         {activeModule === 'gst' && <GSTModule data={insightsData} />}
