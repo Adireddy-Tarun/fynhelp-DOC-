@@ -82,28 +82,11 @@ export function DemoDashboard() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {activeModule === 'liquidity' && <LiquidityModule />}
+        {activeModule === 'liquidity' && <LiquidityDashboard />}
         {activeModule === 'revenue' && <RevenueModule />}
         {activeModule === 'cost' && <CostModule />}
         {activeModule === 'gst' && <GSTModule />}
         {activeModule === 'fynny' && <FynnyModule answers={answers} />}
-      </div>
-    </div>
-  )
-}
-
-function LiquidityModule() {
-  return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <Droplet size={64} className="text-blue-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">
-        Liquidity Intelligence
-      </h2>
-      <p className="text-white/70 text-lg">
-        Cash flow tracking, runway forecast, burn rate analysis
-      </p>
-      <div className="mt-8 text-white/50 text-sm">
-        Building real dashboard with charts...
       </div>
     </div>
   )
