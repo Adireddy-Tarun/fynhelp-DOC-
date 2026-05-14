@@ -14,7 +14,7 @@ export function DemoLogin() {
 
     if (password === DEMO_PASSWORD) {
       sessionStorage.setItem('demo_access', 'true')
-      navigate('/demo/upload')
+      navigate('/demo/onboarding')
     } else {
       setError('Wrong password')
       setPassword('')
