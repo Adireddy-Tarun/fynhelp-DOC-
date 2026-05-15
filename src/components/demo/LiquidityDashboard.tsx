@@ -158,10 +158,11 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             {/* Actions */}
             <div className="mb-6">
               <h4
-                className="font-semibold mb-3"
+                className="font-semibold mb-3 flex items-center gap-2"
                 style={{ color: colors.text.primary }}
               >
-                📊 3 Actions to Extend Runway:
+                <BarChart3 size={18} color={colors.accent[500]} />
+                3 Actions to Extend Runway:
               </h4>
               <div className="space-y-2">
                 {[
