@@ -10,11 +10,7 @@ export function DemoUpload() {
   const [progress, setProgress] = useState('')
   const navigate = useNavigate()
 
-  const hasAccess = sessionStorage.getItem('demo_access') === 'true'
-  if (!hasAccess) {
-    window.location.href = '/demo/login'
-    return null
-  }
+  // Access guard temporarily disabled for design review
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]

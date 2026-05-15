@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+// Demo access guards temporarily disabled — re-enable when design review complete
 import { Droplet, TrendingUp, DollarSign, FileText, Bot, Loader } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
@@ -17,12 +18,7 @@ export function DemoDashboard() {
   const [insightsData, setInsightsData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
-  const hasAccess = sessionStorage.getItem('demo_access') === 'true'
-  if (!hasAccess) {
-    window.location.href = '/demo/login'
-    return null
-  }
-
+  // Access guards temporarily disabled for design review
   const orgId = sessionStorage.getItem('demo_org_id')
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
@@ -32,8 +28,7 @@ export function DemoDashboard() {
   useEffect(() => {
     const fetchInsights = async () => {
       if (!orgId) {
-        alert('Session expired. Please restart demo.')
-        window.location.href = '/demo/login'
+        setLoading(false)
         return
       }
 
