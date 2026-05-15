@@ -15,34 +15,47 @@ import type { Variants, Transition } from "framer-motion";
 /* ------------------------------------------------------------------ */
 
 export const colors = {
-  // Brand
-  ink: "#1A1008",        // deep brand ink (near-black w/ warmth)
-  red: "#C41E1E",        // signature red accent
-  redDeep: "#8B0000",    // hover / pressed
-  redSoft: "#E85D5D",    // gradient pair / highlights
-  beige: "#F4EDDA",      // warm paper background
-  gold: "#8B6914",       // editorial accent
+  // PRIMARY — Deep Navy (trust, authority, banking)
+  primary: {
+    50: "#E8EAF6",
+    100: "#C5CAE9",
+    500: "#3949AB",
+    700: "#283593",
+    900: "#1A237E",
+  },
 
-  // Surfaces (dark CFO theme)
-  bg: "#0A0B0D",
-  bgElevated: "#111214",
-  surface: "rgba(255,255,255,0.04)",
-  surfaceHover: "rgba(255,255,255,0.07)",
-  border: "rgba(255,255,255,0.08)",
-  borderStrong: "rgba(255,255,255,0.16)",
+  // ACCENT — Rich Gold (premium, CFO-level)
+  accent: {
+    50: "#FFF8E1",
+    500: "#FFA726",
+    700: "#F57C00",
+  },
 
-  // Text
-  text: "#F5F0E8",
-  textMuted: "rgba(245,240,232,0.65)",
-  textDim: "rgba(245,240,232,0.45)",
-  textFaint: "rgba(245,240,232,0.25)",
+  // STATUS
+  success: "#059669",
+  warning: "#D97706",
+  danger: "#DC2626",
+  info: "#0284C7",
 
-  // Semantic
-  success: "#10B981",
-  warning: "#F59E0B",
-  danger: "#C41E1E",
-  info: "#3B82F6",
+  // SURFACES — Deep navy-black
+  background: {
+    primary: "#0A0E27",
+    secondary: "#1A1F3A",
+    tertiary: "#252B48",
+  },
+
+  // TEXT
+  text: {
+    primary: "#F8FAFC",
+    secondary: "#CBD5E1",
+    tertiary: "#64748B",
+  },
+
+  // Borders
+  border: "rgba(248,250,252,0.08)",
+  borderStrong: "rgba(248,250,252,0.16)",
 } as const;
+
 
 export const gradients = {
   redAccent: `linear-gradient(135deg, ${colors.red} 0%, ${colors.redDeep} 100%)`,
