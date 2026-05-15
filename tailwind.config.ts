@@ -15,8 +15,8 @@ export default {
     extend: {
       fontFamily: {
         display: ["'Oswald'", "Impact", "sans-serif"],
-        serif: ["'Oswald'", "Impact", "sans-serif"],
-        sans: ["'Roboto'", "-apple-system", "sans-serif"],
+        serif: ["'Instrument Serif'", "serif"],
+        sans: ["'Inter'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
         heading: ["'Oswald'", "Impact", "sans-serif"],
         subheading: ["'Raleway'", "-apple-system", "sans-serif"],
