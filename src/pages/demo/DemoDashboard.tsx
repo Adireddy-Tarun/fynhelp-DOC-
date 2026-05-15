@@ -54,6 +54,46 @@ export function DemoDashboard() {
     fetchInsights()
   }, [orgId])
 
+  // Temporary: Use fallback data if none exists
+  useEffect(() => {
+    if (!insightsData && !loading) {
+      setInsightsData({
+        liquidity: {
+          currentCash: 380000,
+          monthlyBurn: 210000,
+          runway: 1.8,
+          topExpenses: [
+            { category: 'salary', amount: 180000 },
+            { category: 'rent', amount: 45000 },
+            { category: 'vendor', amount: 85000 },
+            { category: 'software', amount: 32000 },
+            { category: 'marketing', amount: 28000 },
+          ],
+          cashFlowTimeline: [
+            { date: '2026-03-01', balance: 850000 },
+            { date: '2026-03-15', balance: 780000 },
+            { date: '2026-04-01', balance: 650000 },
+            { date: '2026-04-15', balance: 520000 },
+            { date: '2026-05-01', balance: 450000 },
+            { date: '2026-05-15', balance: 380000 },
+          ],
+        },
+        revenue: {
+          totalRevenue: 420000,
+          transactions: 8,
+        },
+        cost: {
+          totalCost: 630000,
+          topCategories: [
+            { category: 'salary', amount: 180000 },
+            { category: 'rent', amount: 45000 },
+            { category: 'vendor', amount: 85000 },
+          ],
+        },
+      })
+    }
+  }, [insightsData, loading])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a] flex items-center justify-center">
