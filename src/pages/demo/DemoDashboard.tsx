@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
 import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
+import { CostDashboard } from '@/components/demo/CostDashboard'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
@@ -177,21 +178,7 @@ function RevenueModule({ data }: { data: any }) {
 }
 
 function CostModule({ data }: { data: any }) {
-  return (
-    <div
-      className="rounded-2xl p-12 text-center border"
-      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
-    >
-      <DollarSign size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
-      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
-        Cost Intelligence
-      </h2>
-      <p style={{ color: "#CBD5E1" }} className="text-lg">
-        Total Expenses: ₹{data?.cost?.totalCost?.toLocaleString('en-IN') || 'N/A'}
-      </p>
-      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
-    </div>
-  )
+  return <CostDashboard data={data} />
 }
 
 function GSTModule({ data: _data }: { data: any }) {
