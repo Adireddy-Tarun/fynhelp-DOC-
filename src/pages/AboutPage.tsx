@@ -29,9 +29,9 @@ const TERRACOTTA_LIGHT = "#E85D5D";
 const DARK = "#1a1412";
 const DEEPER = "#0a0a0a";
 
-const fadeUp = {
+const fadeUp: import("framer-motion").Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 
 const fadeIn = {
