@@ -96,6 +96,9 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
     },
   };
 
+  // Burn Multiple = monthly burn / net new ARR (simplified: 70% of revenue)
+  const burnMultiple = monthlyBurn / Math.max(avgMonthlyRevenue * 0.7, 1);
+
   return (
     <motion.div
       variants={staggerContainer}
@@ -235,7 +238,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
       {/* Top Stats — CFO Cards */}
       <motion.div
         variants={fadeInUp}
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6"
       >
         <CFOCard
           title="Current Cash"
@@ -280,6 +283,15 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           status={ccc < 30 ? "good" : ccc < 60 ? "warning" : "danger"}
           subtitle="Cash tied up in operations"
           trend={ccc < 30 ? "Efficient" : ccc < 60 ? "Moderate" : "Needs improvement"}
+        />
+        <CFOCard
+          title="Burn Multiple"
+          value={burnMultiple.toFixed(2)}
+          suffix="x"
+          icon={TrendingDown}
+          status={burnMultiple < 1 ? "good" : burnMultiple < 2 ? "warning" : "danger"}
+          subtitle="Burn per ₹ of revenue"
+          trend={burnMultiple < 1 ? "Capital efficient" : burnMultiple < 2 ? "Moderate" : "High burn"}
         />
       </motion.div>
 
