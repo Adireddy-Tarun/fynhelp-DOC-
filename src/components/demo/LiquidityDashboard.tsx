@@ -87,17 +87,14 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
     best: {
       revenue: avgMonthlyRevenue * 1.2,
       expenses: monthlyBurn * 0.95,
-      runway: currentCash / Math.max(monthlyBurn * 0.95 - avgMonthlyRevenue * 0.2, 1) / 30 * 30 / 30,
+      runway: currentCash / Math.max(monthlyBurn * 0.95 - avgMonthlyRevenue * 0.2, 1),
     },
     worst: {
       revenue: avgMonthlyRevenue * 0.8,
       expenses: monthlyBurn * 1.1,
-      runway: currentCash / Math.max(monthlyBurn * 1.1 - avgMonthlyRevenue * 0.8 * 0.5, 1) / 30 * 30 / 30,
+      runway: currentCash / Math.max(monthlyBurn * 1.1 - avgMonthlyRevenue * 0.8 * 0.5, 1),
     },
   };
-  // Convert burn-difference runway to months (cash / net monthly burn)
-  scenarios.best.runway = currentCash / Math.max(monthlyBurn * 0.95 - avgMonthlyRevenue * 0.2, 1);
-  scenarios.worst.runway = currentCash / Math.max(monthlyBurn * 1.1 - avgMonthlyRevenue * 0.8 * 0.5, 1);
 
   return (
     <motion.div
