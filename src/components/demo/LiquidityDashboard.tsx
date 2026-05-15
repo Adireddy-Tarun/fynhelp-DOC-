@@ -434,6 +434,150 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
         </div>
       </motion.div>
 
+      {/* Scenario Planning */}
+      <motion.div
+        variants={fadeInUp}
+        className="rounded-2xl p-6"
+        style={{
+          background: `linear-gradient(135deg, ${colors.bg.secondary} 0%, ${colors.bg.tertiary} 100%)`,
+          border: `1px solid rgba(255, 255, 255, 0.1)`,
+        }}
+      >
+        <h3
+          className="text-2xl font-bold font-serif mb-6"
+          style={{ color: colors.text.primary }}
+        >
+          Scenario Planning
+        </h3>
+
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {(["base", "best", "worst"] as const).map((s) => {
+            const active = scenario === s;
+            const accent =
+              s === "best"
+                ? colors.success.main
+                : s === "worst"
+                ? colors.danger.main
+                : colors.primary[500];
+            const accentDark =
+              s === "best"
+                ? colors.success.dark
+                : s === "worst"
+                ? colors.danger.dark
+                : colors.primary[700];
+            const Icon =
+              s === "best" ? TrendingUp : s === "worst" ? AlertTriangle : BarChart3;
+            const label =
+              s === "base" ? "Base Case" : s === "best" ? "Best Case" : "Worst Case";
+            return (
+              <button
+                key={s}
+                onClick={() => setScenario(s)}
+                className="flex-1 px-6 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                style={{
+                  background: active
+                    ? `linear-gradient(135deg, ${accent} 0%, ${accentDark} 100%)`
+                    : colors.bg.tertiary,
+                  color: colors.text.primary,
+                  boxShadow: active ? `0 0 0 2px ${accent}66` : "none",
+                }}
+              >
+                <Icon size={18} />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>
+              Monthly Revenue
+            </p>
+            <p
+              className="text-3xl font-bold font-mono"
+              style={{ color: colors.success.main }}
+            >
+              ₹{(scenarios[scenario].revenue / 100000).toFixed(1)}L
+            </p>
+            {scenario !== "base" && (
+              <p className="text-sm mt-2" style={{ color: colors.text.tertiary }}>
+                {scenario === "best" ? "+20%" : "-20%"} vs base
+              </p>
+            )}
+          </div>
+
+          <div className="p-6 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>
+              Monthly Expenses
+            </p>
+            <p
+              className="text-3xl font-bold font-mono"
+              style={{ color: colors.danger.main }}
+            >
+              ₹{(scenarios[scenario].expenses / 100000).toFixed(1)}L
+            </p>
+            {scenario !== "base" && (
+              <p className="text-sm mt-2" style={{ color: colors.text.tertiary }}>
+                {scenario === "best" ? "-5%" : "+10%"} vs base
+              </p>
+            )}
+          </div>
+
+          <div className="p-6 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>
+              New Runway
+            </p>
+            <p
+              className="text-3xl font-bold font-mono"
+              style={{
+                color:
+                  scenarios[scenario].runway > 3
+                    ? colors.success.main
+                    : colors.danger.main,
+              }}
+            >
+              {scenarios[scenario].runway.toFixed(1)} mo
+            </p>
+            {scenario !== "base" && (
+              <p className="text-sm mt-2" style={{ color: colors.text.tertiary }}>
+                {scenarios[scenario].runway > runway ? "↑" : "↓"}{" "}
+                {Math.abs(scenarios[scenario].runway - runway).toFixed(1)} months
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div
+          className="mt-6 p-4 rounded-xl"
+          style={{
+            background: `${
+              scenario === "best"
+                ? colors.success.main
+                : scenario === "worst"
+                ? colors.danger.main
+                : colors.info.main
+            }15`,
+            border: `1px solid ${
+              scenario === "best"
+                ? colors.success.main
+                : scenario === "worst"
+                ? colors.danger.main
+                : colors.info.main
+            }40`,
+          }}
+        >
+          <p className="text-sm leading-relaxed" style={{ color: colors.text.secondary }}>
+            {scenario === "base" &&
+              "Current trajectory assuming no major changes in revenue or expenses."}
+            {scenario === "best" &&
+              "Optimistic scenario: 20% revenue growth + 5% cost reduction. Achieve this by closing 2-3 enterprise deals and optimizing vendor contracts."}
+            {scenario === "worst" &&
+              "Conservative scenario: 20% revenue drop + 10% cost increase. Prepare contingency plans if market conditions worsen or churn accelerates."}
+          </p>
+        </div>
+      </motion.div>
+
       {/* Two columns */}
       <motion.div
         variants={fadeInUp}
