@@ -1,161 +1,89 @@
 /**
- * FynHelp CFO-grade design system tokens.
- * Bloomberg-meets-Indian-fintech: serious, monochrome ink with a single
- * red accent and editorial serif typography.
- *
- * Use these constants in JS/TS (e.g. inline styles, framer-motion, charts)
- * where Tailwind tokens aren't ergonomic. For markup, prefer Tailwind
- * classes backed by the same tokens in `tailwind.config.ts` / `index.css`.
+ * FynHelp CFO-grade design system.
+ * Navy + Gold palette for trust, authority, and premium feel.
  */
+import type { Variants } from "framer-motion";
 
-import type { Variants, Transition } from "framer-motion";
-
-/* ------------------------------------------------------------------ */
-/* Colors                                                              */
-/* ------------------------------------------------------------------ */
-
+// ─── Colors ──────────────────────────────────────────────────────────
 export const colors = {
-  // PRIMARY — Deep Navy (trust, authority, banking)
+  // Primary: Deep Navy (Trust, Banking, Authority)
   primary: {
     50: "#E8EAF6",
     100: "#C5CAE9",
-    500: "#3949AB",
+    300: "#7986CB",
+    500: "#3949AB", // Main brand color
     700: "#283593",
     900: "#1A237E",
   },
 
-  // ACCENT — Rich Gold (premium, CFO-level)
+  // Accent: Rich Gold (Premium, Value, CFO-level)
   accent: {
     50: "#FFF8E1",
-    500: "#FFA726",
+    300: "#FFD54F",
+    500: "#FFA726", // Main accent
     700: "#F57C00",
+    900: "#E65100",
   },
 
-  // STATUS
-  success: "#059669",
-  warning: "#D97706",
-  danger: "#DC2626",
-  info: "#0284C7",
+  // Status colors
+  success: { light: "#34D399", main: "#059669", dark: "#047857" },
+  warning: { light: "#FBBF24", main: "#D97706", dark: "#B45309" },
+  danger:  { light: "#F87171", main: "#DC2626", dark: "#B91C1C" },
+  info:    { light: "#38BDF8", main: "#0284C7", dark: "#0369A1" },
 
-  // SURFACES — Deep navy-black
-  background: {
-    primary: "#0A0E27",
+  // Backgrounds
+  bg: {
+    primary:   "#0A0E27",
     secondary: "#1A1F3A",
-    tertiary: "#252B48",
+    tertiary:  "#252B48",
+    card:      "#1E2642",
   },
 
-  // TEXT
+  // Text hierarchy
   text: {
-    primary: "#F8FAFC",
+    primary:   "#F8FAFC",
     secondary: "#CBD5E1",
-    tertiary: "#64748B",
+    tertiary:  "#64748B",
+    muted:     "#475569",
   },
-
-  // Borders
-  border: "rgba(248,250,252,0.08)",
-  borderStrong: "rgba(248,250,252,0.16)",
 } as const;
 
-
-export const gradients = {
-  primaryAccent: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[900]} 100%)`,
-  surface: `linear-gradient(180deg, ${colors.background.secondary} 0%, ${colors.background.primary} 100%)`,
-  goldPremium: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
-} as const;
-
-export const shadows = {
-  sm: "0 1px 2px rgba(0,0,0,0.25)",
-  md: "0 4px 12px rgba(0,0,0,0.35)",
-  lg: "0 12px 32px rgba(0,0,0,0.45)",
-  glowPrimary: `0 0 24px ${colors.primary[500]}55`,
-  glowGold: `0 0 24px ${colors.accent[500]}55`,
-} as const;
-
-/* ------------------------------------------------------------------ */
-/* Typography                                                          */
-/* ------------------------------------------------------------------ */
-
-export const fonts = {
-  serif: "'Instrument Serif', Georgia, serif",
-  sans: "'Inter', -apple-system, sans-serif",
-  mono: "'JetBrains Mono', 'SF Mono', monospace",
-} as const;
-
-/* ------------------------------------------------------------------ */
-/* Motion                                                              */
-/* ------------------------------------------------------------------ */
-
-// Cubic-bezier tuple typed for framer-motion's `Easing`.
-export const easeOutExpo: [number, number, number, number] = [0.22, 1, 0.36, 1];
-export const easeInOut: [number, number, number, number] = [0.65, 0, 0.35, 1];
-
-export const transitions = {
-  fast: { duration: 0.25, ease: easeOutExpo } satisfies Transition,
-  base: { duration: 0.45, ease: easeOutExpo } satisfies Transition,
-  slow: { duration: 0.7, ease: easeOutExpo } satisfies Transition,
-} as const;
-
-export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: transitions.base },
+// ─── Framer Motion variants ──────────────────────────────────────────
+export const cardHover: Variants = {
+  rest:  { y: 0,  rotateX: 0, rotateY: 0, scale: 1,    transition: { duration: 0.3 } },
+  hover: { y: -8, rotateX: 2, rotateY: 2, scale: 1.02, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
-export const fadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: transitions.base },
+export const buttonRotate: Variants = {
+  rest:  { rotateY: 0,  rotateX: 0,  scale: 1 },
+  hover: { rotateY: 15, rotateX: -5, scale: 1.05, transition: { duration: 0.3, ease: "easeOut" } },
+  tap:   { rotateY: 0,  rotateX: 0,  scale: 0.95 },
 };
 
-export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.96 },
-  visible: { opacity: 1, scale: 1, transition: transitions.base },
-};
-
-export const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 32 },
-  visible: { opacity: 1, x: 0, transition: transitions.base },
+export const fadeInUp: Variants = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 export const staggerContainer: Variants = {
-  hidden: {},
+  hidden:  { opacity: 0 },
   visible: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
-export const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: transitions.base },
+export const pulseGlow = {
+  animate: {
+    opacity: [0.3, 0.6, 0.3],
+    scale:   [1, 1.05, 1],
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
+  },
 };
 
-/* ------------------------------------------------------------------ */
-/* Spacing & radii (numeric mirrors of Tailwind tokens)               */
-/* ------------------------------------------------------------------ */
-
-export const radius = {
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 20,
-  pill: 999,
-} as const;
-
-export const space = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-} as const;
-
-export const designSystem = {
-  colors,
-  gradients,
-  shadows,
-  fonts,
-  transitions,
-  radius,
-  space,
-} as const;
-
-export default designSystem;
+export const shimmer = {
+  animate: {
+    x: ["-100%", "100%"],
+    transition: { duration: 2, repeat: Infinity, ease: "linear" as const },
+  },
+};
