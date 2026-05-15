@@ -17,12 +17,7 @@ export function DemoDashboard() {
   const [insightsData, setInsightsData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
-  const hasAccess = sessionStorage.getItem('demo_access') === 'true'
-  if (!hasAccess) {
-    window.location.href = '/demo/login'
-    return null
-  }
-
+  // Access guards temporarily disabled for design review
   const orgId = sessionStorage.getItem('demo_org_id')
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
