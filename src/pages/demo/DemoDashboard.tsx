@@ -4,6 +4,7 @@ import { Droplet, TrendingUp, DollarSign, FileText, Bot, Loader } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
+import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
@@ -128,16 +129,7 @@ export function DemoDashboard() {
 }
 
 function RevenueModule({ data }: { data: any }) {
-  return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <TrendingUp size={64} className="text-green-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">Revenue Intelligence</h2>
-      <p className="text-white/70 text-lg">
-        Total Revenue: ₹{data?.revenue?.totalRevenue?.toLocaleString('en-IN') || 'N/A'}
-      </p>
-      <div className="mt-8 text-white/50 text-sm">Building full dashboard...</div>
-    </div>
-  )
+  return <RevenueDashboard data={data} />
 }
 
 function CostModule({ data }: { data: any }) {
