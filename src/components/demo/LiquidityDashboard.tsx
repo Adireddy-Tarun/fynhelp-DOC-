@@ -434,6 +434,92 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
         </div>
       </motion.div>
 
+      {/* 13-Week Cash Forecast */}
+      {(() => {
+        const forecast13Week = Array.from({ length: 13 }, (_, i) => {
+          const weekDate = new Date();
+          weekDate.setDate(weekDate.getDate() + i * 7);
+          return {
+            week: `W${i + 1}`,
+            date: weekDate.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+            projected: currentCash - (monthlyBurn / 4) * i,
+            actual: i < 2 ? currentCash - (monthlyBurn / 4) * i : null,
+          };
+        });
+        return (
+          <motion.div
+            variants={fadeInUp}
+            className="rounded-2xl p-6"
+            style={{
+              background: `linear-gradient(135deg, ${colors.bg.secondary} 0%, ${colors.bg.tertiary} 100%)`,
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <h3 className="text-2xl font-bold font-serif mb-6" style={{ color: colors.text.primary }}>
+              13-Week Cash Forecast
+            </h3>
+
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={forecast13Week}>
+                <defs>
+                  <linearGradient id="forecastGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={colors.accent[500]} stopOpacity={0.3} />
+                    <stop offset="100%" stopColor={colors.accent[500]} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="week"
+                  stroke={colors.text.tertiary}
+                  style={{ fontSize: "11px", fontFamily: "JetBrains Mono" }}
+                />
+                <YAxis
+                  stroke={colors.text.tertiary}
+                  style={{ fontSize: "11px", fontFamily: "JetBrains Mono" }}
+                  tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: colors.bg.tertiary,
+                    border: `1px solid ${colors.accent[500]}`,
+                    borderRadius: "12px",
+                    fontFamily: "JetBrains Mono",
+                  }}
+                  formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Balance"]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="projected"
+                  stroke={colors.accent[500]}
+                  strokeWidth={3}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  fill="url(#forecastGradient)"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="actual"
+                  stroke={colors.primary[500]}
+                  strokeWidth={3}
+                  dot={{ fill: colors.primary[500], r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+
+            <div
+              className="mt-4 p-4 rounded-xl"
+              style={{
+                background: `${colors.accent[500]}15`,
+                border: `1px solid ${colors.accent[500]}40`,
+              }}
+            >
+              <p className="text-sm" style={{ color: colors.text.secondary }}>
+                Dotted line = projection at current burn. Week 8 shows cash below ₹2L (alert threshold). Plan capital raise or cut burn by W6.
+              </p>
+            </div>
+          </motion.div>
+        );
+      })()}
+
       {/* Scenario Planning */}
       <motion.div
         variants={fadeInUp}
