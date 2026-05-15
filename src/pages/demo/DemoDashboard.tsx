@@ -6,6 +6,7 @@ import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
 import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 import { CostDashboard } from '@/components/demo/CostDashboard'
+import { GSTDashboard } from '@/components/demo/GSTDashboard'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
