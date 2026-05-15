@@ -26,9 +26,46 @@ export function DemoDashboard() {
   const answers: string[] = answersStr ? JSON.parse(answersStr) : []
   const businessName = answers[0] || 'Your Business'
 
+  const FALLBACK_DATA = {
+    liquidity: {
+      currentCash: 380000,
+      monthlyBurn: 210000,
+      runway: 1.8,
+      topExpenses: [
+        { category: 'salary', amount: 180000 },
+        { category: 'rent', amount: 45000 },
+        { category: 'vendor', amount: 85000 },
+        { category: 'software', amount: 32000 },
+        { category: 'marketing', amount: 28000 },
+      ],
+      cashFlowTimeline: [
+        { date: '2026-03-01', balance: 850000 },
+        { date: '2026-03-15', balance: 780000 },
+        { date: '2026-04-01', balance: 650000 },
+        { date: '2026-04-15', balance: 520000 },
+        { date: '2026-05-01', balance: 450000 },
+        { date: '2026-05-15', balance: 380000 },
+      ],
+    },
+    revenue: {
+      totalRevenue: 420000,
+      transactions: 8,
+    },
+    cost: {
+      totalCost: 630000,
+      byCategory: {},
+      topCategories: [
+        { category: 'salary', amount: 180000 },
+        { category: 'rent', amount: 45000 },
+        { category: 'vendor', amount: 85000 },
+      ],
+    },
+  }
+
   useEffect(() => {
     const fetchInsights = async () => {
       if (!orgId) {
+        setInsightsData(FALLBACK_DATA)
         setLoading(false)
         return
       }
@@ -40,59 +77,21 @@ export function DemoDashboard() {
           .eq('org_id', orgId)
           .order('created_at', { ascending: false })
           .limit(1)
-          .maybeSingle()
+          .single()
 
         if (error) throw error
-        setInsightsData(data?.data ?? null)
+        setInsightsData(data?.data ?? FALLBACK_DATA)
       } catch (error) {
         console.error('Error fetching insights:', error)
+        setInsightsData(FALLBACK_DATA)
       } finally {
         setLoading(false)
       }
     }
 
     fetchInsights()
-  }, [orgId])
-
-  // Temporary: Use fallback data if none exists
-  useEffect(() => {
-    if (!insightsData && !loading) {
-      setInsightsData({
-        liquidity: {
-          currentCash: 380000,
-          monthlyBurn: 210000,
-          runway: 1.8,
-          topExpenses: [
-            { category: 'salary', amount: 180000 },
-            { category: 'rent', amount: 45000 },
-            { category: 'vendor', amount: 85000 },
-            { category: 'software', amount: 32000 },
-            { category: 'marketing', amount: 28000 },
-          ],
-          cashFlowTimeline: [
-            { date: '2026-03-01', balance: 850000 },
-            { date: '2026-03-15', balance: 780000 },
-            { date: '2026-04-01', balance: 650000 },
-            { date: '2026-04-15', balance: 520000 },
-            { date: '2026-05-01', balance: 450000 },
-            { date: '2026-05-15', balance: 380000 },
-          ],
-        },
-        revenue: {
-          totalRevenue: 420000,
-          transactions: 8,
-        },
-        cost: {
-          totalCost: 630000,
-          topCategories: [
-            { category: 'salary', amount: 180000 },
-            { category: 'rent', amount: 45000 },
-            { category: 'vendor', amount: 85000 },
-          ],
-        },
-      })
-    }
-  }, [insightsData, loading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (loading) {
     return (
