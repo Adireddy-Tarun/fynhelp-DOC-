@@ -96,6 +96,9 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
     },
   };
 
+  // Burn Multiple = monthly burn / net new ARR (simplified: 70% of revenue)
+  const burnMultiple = monthlyBurn / Math.max(avgMonthlyRevenue * 0.7, 1);
+
   return (
     <motion.div
       variants={staggerContainer}
