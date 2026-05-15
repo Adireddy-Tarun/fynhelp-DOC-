@@ -192,7 +192,10 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               </div>
             </div>
 
-            <RotatingButton variant="danger">🎯 Generate Action Plan</RotatingButton>
+            <RotatingButton variant="danger">
+              <Target size={18} className="inline mr-2" />
+              Generate Action Plan
+            </RotatingButton>
           </div>
         </motion.div>
       )}
