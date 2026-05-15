@@ -38,33 +38,69 @@ export function CFOCard({
 
   return (
     <motion.div
-      variants={cardHover}
-      initial="rest"
-      whileHover="hover"
-      animate="rest"
-      style={{ transformStyle: "preserve-3d", perspective: 1000 }}
+      initial={{ y: 0 }}
+      whileHover={{
+        y: -8,
+        boxShadow:
+          "0 16px 48px rgba(57, 73, 171, 0.25), 0 8px 24px rgba(0,0,0,0.5)",
+      }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      style={{
+        boxShadow:
+          "0 8px 32px rgba(57, 73, 171, 0.15), 0 4px 16px rgba(0, 0, 0, 0.4)",
+        borderRadius: 16,
+      }}
       className="relative group"
     >
       {/* Main card */}
-      <div className="relative bg-gradient-to-br from-[#1A1F3A] to-[#252B48] rounded-2xl border border-white/10 overflow-hidden">
-        {/* Animated gradient overlay */}
+      <div
+        className="relative rounded-2xl border overflow-hidden"
+        style={{
+          background: "#1E2642",
+          borderColor: "rgba(255,255,255,0.08)",
+        }}
+      >
+        {/* Inner gradient overlay */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 100%)",
+          }}
+        />
+        {/* Animated accent glow */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-[#3949AB]/20 via-transparent to-[#FFA726]/10 pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 0%, rgba(57,73,171,0.20), transparent 60%), radial-gradient(circle at 80% 100%, rgba(255,167,38,0.10), transparent 60%)",
+          }}
           {...pulseGlow}
         />
 
         {/* Content */}
-        <div className="relative z-10 p-6" style={{ transform: "translateZ(20px)" }}>
+        <div className="relative z-10" style={{ padding: 32 }}>
           {/* Header with icon */}
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[#CBD5E1] text-xs font-semibold uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-5">
+            <span
+              className="font-inter font-semibold uppercase"
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.08em",
+                color: "#CBD5E1",
+              }}
+            >
               {title}
             </span>
             <motion.div
               whileHover={{ rotate: 360, scale: 1.15 }}
               transition={{ duration: 0.6 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3949AB] to-[#283593] flex items-center justify-center text-white shadow-lg"
-              style={{ transform: "translateZ(10px)" }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #3949AB 0%, #283593 100%)",
+                color: "#F8FAFC",
+              }}
             >
               <Icon size={18} />
             </motion.div>
@@ -72,7 +108,10 @@ export function CFOCard({
 
           {/* Value with count-up */}
           <div className="mb-2">
-            <div className="text-4xl md:text-5xl font-bold text-white font-mono leading-tight">
+            <div
+              className="font-mono font-bold leading-tight"
+              style={{ fontSize: 48, color: "#F8FAFC" }}
+            >
               {prefix}
               {animated && !isNaN(numericValue) ? (
                 <CountUp
@@ -91,7 +130,9 @@ export function CFOCard({
 
           {/* Subtitle */}
           {subtitle && (
-            <div className="text-[#CBD5E1] text-sm mb-2">{subtitle}</div>
+            <div className="text-sm mb-2" style={{ color: "#CBD5E1" }}>
+              {subtitle}
+            </div>
           )}
 
           {/* Trend indicator */}
@@ -103,7 +144,7 @@ export function CFOCard({
               <span className="text-base leading-none">
                 {status === "good" && "↑"}
                 {status === "danger" && "↓"}
-                {status === "warning" && "⚠"}
+                {status === "warning" && "→"}
                 {status === "neutral" && "→"}
               </span>
               <span>{trend}</span>
@@ -114,17 +155,15 @@ export function CFOCard({
         {/* Bottom accent line (shimmer) */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden">
           <motion.div
-            className="h-full w-full bg-gradient-to-r from-transparent via-[#FFA726] to-transparent"
+            className="h-full w-full"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #FFA726, transparent)",
+            }}
             {...shimmer}
           />
         </div>
       </div>
-
-      {/* Shadow layer */}
-      <div
-        className="absolute inset-0 bg-[#3949AB]/20 rounded-2xl blur-2xl -z-10 group-hover:bg-[#3949AB]/40 transition-all duration-300"
-        style={{ transform: "translateZ(-20px)" }}
-      />
     </motion.div>
   );
 }
