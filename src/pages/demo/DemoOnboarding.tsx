@@ -26,11 +26,7 @@ export function DemoOnboarding() {
   const navigate = useNavigate()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const hasAccess = sessionStorage.getItem('demo_access') === 'true'
-  if (!hasAccess) {
-    window.location.href = '/demo/login'
-    return null
-  }
+  // Access guard temporarily disabled for design review
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
