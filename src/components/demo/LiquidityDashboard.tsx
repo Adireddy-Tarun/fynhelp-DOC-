@@ -1,123 +1,521 @@
-import { AlertCircle, Calendar, Droplet } from 'lucide-react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { motion } from "framer-motion";
+import {
+  TrendingDown,
+  AlertCircle,
+  Calendar,
+  Droplet,
+  DollarSign,
+  Clock,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+import { CFOCard } from "@/components/ui/CFOCard";
+import { RotatingButton } from "@/components/ui/RotatingButton";
+import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
-export function LiquidityDashboard({ data }: { data?: any }) {
+interface LiquidityDashboardProps {
+  data?: any;
+}
+
+export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
   if (!data?.liquidity) {
     return (
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-        <p className="text-white/70">No liquidity data available</p>
+      <div
+        className="rounded-2xl p-12 text-center border"
+        style={{
+          background: colors.bg.card,
+          borderColor: "rgba(255,255,255,0.08)",
+          color: colors.text.secondary,
+        }}
+      >
+        <p>No liquidity data available</p>
       </div>
-    )
+    );
   }
 
-  const { currentCash, monthlyBurn, runway, topExpenses, cashFlowTimeline } = data.liquidity
+  const { currentCash, monthlyBurn, runway, topExpenses, cashFlowTimeline } =
+    data.liquidity;
+
+  const daysToZero = Math.floor(runway * 30);
+  const zeroCashDate = new Date();
+  zeroCashDate.setDate(zeroCashDate.getDate() + daysToZero);
+
+  const topExpensesSum =
+    topExpenses?.slice(0, 3).reduce(
+      (sum: number, cat: any) => sum + cat.amount,
+      0,
+    ) ?? 0;
 
   return (
-    <div className="space-y-6">
-      {/* Alert Banner */}
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
+      {/* Critical Alert Banner */}
       {runway < 3 && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle size={24} className="text-red-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-white font-semibold mb-1">Critical: Low Runway</p>
-            <p className="text-white/80 text-sm">
-              At current burn rate, you have {runway.toFixed(1)} months of cash remaining.
-            </p>
+        <motion.div
+          variants={fadeInUp}
+          className="relative overflow-hidden rounded-2xl border"
+          style={{
+            borderColor: `${colors.danger.main}55`,
+            background: `linear-gradient(135deg, ${colors.danger.dark}33 0%, ${colors.bg.secondary} 60%)`,
+          }}
+        >
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: `${colors.danger.main}15` }}
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          <div className="relative z-10 p-6 md:p-8">
+            <div className="flex items-start gap-4 mb-6">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: `${colors.danger.main}30` }}
+              >
+                <AlertCircle size={24} color={colors.danger.light} />
+              </div>
+              <div>
+                <h3
+                  className="font-serif text-2xl md:text-3xl font-bold mb-1"
+                  style={{ color: colors.text.primary }}
+                >
+                  🔴 URGENT: Cash Crisis in {daysToZero} Days
+                </h3>
+                <p style={{ color: colors.text.secondary }} className="text-sm">
+                  Runway is below 3 months. Take action now.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Stat
+                label="Current Position"
+                value={`₹${(currentCash / 100000).toFixed(1)}L`}
+                color={colors.text.primary}
+              />
+              <Stat
+                label="Monthly Burn"
+                value={`-₹${(monthlyBurn / 100000).toFixed(1)}L`}
+                color={colors.danger.light}
+              />
+              <Stat
+                label="Zero Cash Date"
+                value={zeroCashDate.toLocaleDateString("en-IN", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+                color={colors.warning.light}
+              />
+            </div>
+
+            {/* Countdown */}
+            <div
+              className="rounded-xl p-5 mb-6 text-center border"
+              style={{
+                background: `${colors.danger.main}15`,
+                borderColor: `${colors.danger.main}40`,
+              }}
+            >
+              <div
+                className="font-mono text-4xl md:text-5xl font-bold tracking-wider"
+                style={{ color: colors.danger.light }}
+              >
+                {daysToZero} DAYS
+              </div>
+              <div
+                style={{ color: colors.text.secondary }}
+                className="text-xs uppercase tracking-widest mt-2"
+              >
+                Until cash runs out
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="mb-6">
+              <h4
+                className="font-semibold mb-3"
+                style={{ color: colors.text.primary }}
+              >
+                📊 3 Actions to Extend Runway:
+              </h4>
+              <div className="space-y-2">
+                {[
+                  { label: "Delay vendor payments", impact: "+15 days" },
+                  { label: "Accelerate receivables", impact: "+22 days" },
+                  { label: "Cut marketing 50%", impact: "+18 days" },
+                ].map((a) => (
+                  <div
+                    key={a.label}
+                    className="flex items-center justify-between rounded-lg px-4 py-3 border"
+                    style={{
+                      background: colors.bg.tertiary,
+                      borderColor: "rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    <span style={{ color: colors.text.secondary }}>
+                      {a.label}
+                    </span>
+                    <span
+                      className="font-mono font-semibold text-sm"
+                      style={{ color: colors.success.light }}
+                    >
+                      {a.impact}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <RotatingButton variant="danger">🎯 Generate Action Plan</RotatingButton>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-white/70 text-sm font-semibold uppercase">Current Cash</span>
-            <Droplet size={20} className="text-blue-400" />
-          </div>
-          <div className="text-4xl font-georgia font-bold text-white mb-2">
-            ₹{(currentCash / 100000).toFixed(1)}L
-          </div>
-        </div>
-
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-white/70 text-sm font-semibold uppercase">Runway</span>
-            <Calendar size={20} className="text-amber-400" />
-          </div>
-          <div className="text-4xl font-georgia font-bold text-white mb-2">
-            {runway.toFixed(1)} months
-          </div>
-        </div>
-
-        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-white/70 text-sm font-semibold uppercase">Monthly Burn</span>
-            <AlertCircle size={20} className="text-red-400" />
-          </div>
-          <div className="text-4xl font-georgia font-bold text-white mb-2">
-            ₹{(monthlyBurn / 100000).toFixed(1)}L
-          </div>
-        </div>
-      </div>
+      {/* Top Stats — CFO Cards */}
+      <motion.div
+        variants={fadeInUp}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        <CFOCard
+          title="Current Cash"
+          value={currentCash / 100000}
+          prefix="₹"
+          suffix="L"
+          icon={Droplet}
+          status={runway < 3 ? "danger" : runway < 6 ? "warning" : "good"}
+          subtitle="Available liquidity"
+          trend={`${runway.toFixed(1)} months runway`}
+        />
+        <CFOCard
+          title="Monthly Burn"
+          value={monthlyBurn / 100000}
+          prefix="₹"
+          suffix="L"
+          icon={TrendingDown}
+          status="warning"
+          subtitle="Avg outflow per month"
+          trend="Trending up vs Q1"
+        />
+        <CFOCard
+          title="Runway"
+          value={runway}
+          suffix=" mo"
+          icon={Clock}
+          status={runway < 3 ? "danger" : runway < 6 ? "warning" : "good"}
+          subtitle="At current burn rate"
+          trend={
+            runway < 3
+              ? "Critical — act now"
+              : runway < 6
+              ? "Caution"
+              : "Healthy"
+          }
+        />
+      </motion.div>
 
       {/* Cash Flow Chart */}
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-        <h3 className="text-xl font-georgia font-bold text-white mb-6">Cash Flow Timeline</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={cashFlowTimeline}>
-            <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" style={{ fontSize: '12px' }} />
-            <YAxis
-              stroke="rgba(255,255,255,0.3)"
-              style={{ fontSize: '12px' }}
-              tickFormatter={(value) => `₹${(value / 100000).toFixed(0)}L`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgba(26, 20, 18, 0.95)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-              formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Balance']}
-            />
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="#C41E1E"
-              strokeWidth={3}
-              dot={{ fill: '#C41E1E', r: 4 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <motion.div
+        variants={fadeInUp}
+        className="relative rounded-2xl border overflow-hidden"
+        style={{
+          background: colors.bg.card,
+          borderColor: "rgba(255,255,255,0.08)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-40 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 20% 0%, ${colors.primary[500]}22, transparent 60%)`,
+          }}
+        />
+        <div className="relative z-10 p-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <h3
+              className="font-serif text-2xl font-bold"
+              style={{ color: colors.text.primary }}
+            >
+              Cash Flow Timeline
+            </h3>
+            <div className="flex gap-2">
+              {["30 Days", "90 Days"].map((p) => (
+                <button
+                  key={p}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold border"
+                  style={{
+                    background: colors.bg.tertiary,
+                    borderColor: "rgba(255,255,255,0.08)",
+                    color: colors.text.secondary,
+                  }}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Top Expenses */}
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-        <h3 className="text-xl font-georgia font-bold text-white mb-6">Top Expense Categories</h3>
-        <div className="space-y-4">
-          {topExpenses?.map((expense: any, idx: number) => {
-            const percent = (expense.amount / monthlyBurn) * 100
-            return (
-              <div key={idx}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/90 font-semibold text-sm capitalize">
-                    {expense.category}
-                  </span>
-                  <span className="text-white font-bold">
-                    ₹{(expense.amount / 1000).toFixed(0)}K
-                  </span>
-                </div>
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={cashFlowTimeline}>
+              <defs>
+                <linearGradient id="cashLine" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor={colors.primary[500]} />
+                  <stop offset="100%" stopColor={colors.accent[500]} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis
+                dataKey="date"
+                stroke={colors.text.tertiary}
+                style={{ fontSize: 12 }}
+              />
+              <YAxis
+                stroke={colors.text.tertiary}
+                style={{ fontSize: 12 }}
+                tickFormatter={(value: number) =>
+                  `₹${(value / 100000).toFixed(0)}L`
+                }
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: colors.bg.secondary,
+                  border: `1px solid rgba(255,255,255,0.1)`,
+                  borderRadius: 8,
+                  color: colors.text.primary,
+                }}
+                labelStyle={{ color: colors.text.secondary }}
+                formatter={(value: number) => [
+                  `₹${value.toLocaleString("en-IN")}`,
+                  "Balance",
+                ]}
+              />
+              <Line
+                type="monotone"
+                dataKey="balance"
+                stroke="url(#cashLine)"
+                strokeWidth={3}
+                dot={{ fill: colors.accent[500], r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </motion.div>
+
+      {/* Two columns */}
+      <motion.div
+        variants={fadeInUp}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
+        {/* Top Expenses */}
+        <Panel>
+          <PanelHeader title="Top Expense Categories" icon={<DollarSign size={18} color={colors.accent[500]} />} />
+          <div className="space-y-5">
+            {topExpenses?.map((expense: any, idx: number) => {
+              const percent = (expense.amount / monthlyBurn) * 100;
+              return (
+                <div key={idx}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span
+                      className="capitalize font-semibold text-sm"
+                      style={{ color: colors.text.primary }}
+                    >
+                      {expense.category}
+                    </span>
+                    <span
+                      className="font-mono font-bold"
+                      style={{ color: colors.text.primary }}
+                    >
+                      ₹{(expense.amount / 1000).toFixed(0)}K
+                    </span>
+                  </div>
                   <div
-                    className="h-full bg-gradient-to-r from-[#C41E1E] to-[#E85D5D]"
-                    style={{ width: `${Math.min(percent, 100)}%` }}
-                  />
+                    className="h-2 rounded-full overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.06)" }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(percent, 100)}%` }}
+                      transition={{ duration: 1, delay: idx * 0.1, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, ${colors.primary[500]}, ${colors.accent[500]})`,
+                      }}
+                    />
+                  </div>
+                  <div
+                    className="text-xs mt-1"
+                    style={{ color: colors.text.tertiary }}
+                  >
+                    {percent.toFixed(1)}% of total burn
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              );
+            })}
+          </div>
+        </Panel>
+
+        {/* CFO Insights */}
+        <Panel>
+          <PanelHeader title="CFO Recommendations" icon={<Calendar size={18} color={colors.accent[500]} />} />
+          <div className="space-y-3">
+            <Insight
+              emoji="⚠️"
+              title="Prioritize Cash Collection"
+              body={`With ${runway.toFixed(
+                1,
+              )} months runway, focus on accelerating receivables. Consider offering 2% early payment discounts.`}
+              accent={colors.warning.main}
+            />
+            <Insight
+              emoji="💡"
+              title="Optimize Working Capital"
+              body={`Negotiate extended payment terms with top 3 vendors. Could free up ₹${(
+                (topExpensesSum * 0.5) /
+                1000
+              ).toFixed(0)}K in cash.`}
+              accent={colors.info.main}
+            />
+            <Insight
+              emoji="🎯"
+              title="Revenue Acceleration Needed"
+              body={`Current burn requires ₹${(monthlyBurn / 100000).toFixed(
+                1,
+              )}L/month in new revenue to reach break-even. Consider upselling existing customers.`}
+              accent={colors.primary[500]}
+            />
+          </div>
+
+          <div className="mt-6">
+            <RotatingButton variant="primary">
+              📊 Run Cash Flow Scenarios
+            </RotatingButton>
+          </div>
+        </Panel>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── Local sub-components ──────────────────────────────────────── */
+
+function Stat({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div
+      className="rounded-xl p-4 border"
+      style={{
+        background: colors.bg.tertiary,
+        borderColor: "rgba(255,255,255,0.06)",
+      }}
+    >
+      <div
+        className="text-xs uppercase tracking-wider mb-1"
+        style={{ color: colors.text.tertiary }}
+      >
+        {label}
+      </div>
+      <div className="font-mono text-xl font-bold" style={{ color }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="rounded-2xl border p-6"
+      style={{
+        background: colors.bg.card,
+        borderColor: "rgba(255,255,255,0.08)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function PanelHeader({
+  title,
+  icon,
+}: {
+  title: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between mb-6">
+      <h3
+        className="font-serif text-xl font-bold"
+        style={{ color: colors.text.primary }}
+      >
+        {title}
+      </h3>
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center"
+        style={{ background: `${colors.accent[500]}15` }}
+      >
+        {icon}
+      </div>
+    </div>
+  );
+}
+
+function Insight({
+  emoji,
+  title,
+  body,
+  accent,
+}: {
+  emoji: string;
+  title: string;
+  body: string;
+  accent: string;
+}) {
+  return (
+    <div
+      className="rounded-xl p-4 border flex gap-3"
+      style={{
+        background: colors.bg.tertiary,
+        borderColor: `${accent}33`,
+      }}
+    >
+      <div className="text-xl leading-none mt-0.5">{emoji}</div>
+      <div>
+        <div
+          className="font-semibold mb-1"
+          style={{ color: colors.text.primary }}
+        >
+          {title}
+        </div>
+        <div
+          className="text-sm leading-relaxed"
+          style={{ color: colors.text.secondary }}
+        >
+          {body}
         </div>
       </div>
     </div>
-  )
+  );
 }
+
+export default LiquidityDashboard;
