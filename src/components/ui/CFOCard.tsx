@@ -38,20 +38,45 @@ export function CFOCard({
 
   return (
     <motion.div
-      initial={{ y: 0 }}
-      whileHover={{
-        y: -8,
-        boxShadow:
-          "0 16px 48px rgba(57, 73, 171, 0.25), 0 8px 24px rgba(0,0,0,0.5)",
+      initial="rest"
+      whileHover="hover"
+      animate="rest"
+      variants={{
+        rest: { y: 0, rotateX: 0, scale: 1 },
+        hover: {
+          y: -12,
+          rotateX: 5,
+          scale: 1.03,
+          transition: { type: "spring", stiffness: 300, damping: 20 },
+        },
       }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
       style={{
+        transformStyle: "preserve-3d",
+        perspective: 1000,
         boxShadow:
           "0 8px 32px rgba(57, 73, 171, 0.15), 0 4px 16px rgba(0, 0, 0, 0.4)",
         borderRadius: 16,
       }}
       className="relative group"
     >
+      {/* Shimmer sweep on hover */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none z-20"
+        style={{
+          background: `linear-gradient(110deg, transparent 0%, ${colors.primary[500]}33 50%, transparent 100%)`,
+          backgroundSize: "200% 100%",
+          backgroundPosition: "200% 0",
+          mixBlendMode: "screen",
+        }}
+        variants={{
+          rest: { backgroundPosition: "200% 0", opacity: 0 },
+          hover: {
+            backgroundPosition: "-200% 0",
+            opacity: 1,
+            transition: { duration: 1.2, ease: "linear" },
+          },
+        }}
+      />
       {/* Main card */}
       <div
         className="relative rounded-2xl border overflow-hidden"

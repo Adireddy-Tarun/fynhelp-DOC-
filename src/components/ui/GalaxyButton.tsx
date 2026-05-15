@@ -5,7 +5,7 @@ import { colors } from '@/lib/design-system'
 interface GalaxyButtonProps {
   children: ReactNode
   onClick?: () => void
-  variant?: 'primary' | 'secondary' | 'success'
+  variant?: 'primary' | 'secondary' | 'success' | 'danger'
   className?: string
 }
 
@@ -21,6 +21,7 @@ export function GalaxyButton({
     primary: { base: colors.primary[500], glow: colors.primary[300], particles: colors.accent[500] },
     secondary: { base: colors.accent[500], glow: colors.accent[300], particles: colors.primary[500] },
     success: { base: colors.success.main, glow: colors.success.light, particles: colors.accent[500] },
+    danger: { base: colors.danger.main, glow: colors.danger.light, particles: colors.accent[500] },
   }
 
   const colorScheme = variantColors[variant]

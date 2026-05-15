@@ -23,7 +23,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import { CFOCard } from "@/components/ui/CFOCard";
-import { RotatingButton } from "@/components/ui/RotatingButton";
+import { GalaxyButton } from "@/components/ui/GalaxyButton";
+import { RollingText } from "@/components/ui/RollingText";
 import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
 interface LiquidityDashboardProps {
@@ -227,10 +228,10 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               </div>
             </div>
 
-            <RotatingButton variant="danger">
+            <GalaxyButton variant="danger">
               <Target size={18} className="inline mr-2" />
-              Generate Action Plan
-            </RotatingButton>
+              <RollingText text="Generate Action Plan" />
+            </GalaxyButton>
           </div>
         </motion.div>
       )}
@@ -834,10 +835,10 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           </div>
 
           <div className="mt-6">
-            <RotatingButton variant="primary">
+            <GalaxyButton variant="primary">
               <BarChart3 size={18} className="inline mr-2" />
-              Run Cash Flow Scenarios
-            </RotatingButton>
+              <RollingText text="Run Cash Flow Scenarios" />
+            </GalaxyButton>
           </div>
         </Panel>
       </motion.div>
