@@ -94,14 +94,7 @@ export function DemoDashboard() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader size={48} className="text-[#C41E1E] animate-spin" />
-          <p className="text-white/70 font-semibold">Loading insights...</p>
-        </div>
-      </div>
-    )
+    return <DashboardSkeleton businessName={businessName} fileName={fileName} />
   }
 
   return (
