@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import CountUp from "react-countup";
-import { colors, shimmer, pulseGlow } from "@/lib/design-system";
+import { colors, shimmer, pulseGlow, typography } from "@/lib/design-system";
 
 interface CFOCardProps {
   title: string;
@@ -84,11 +84,11 @@ export function CFOCard({
           {/* Header with icon */}
           <div className="flex items-center justify-between mb-5">
             <span
-              className="font-inter font-semibold uppercase"
+              className="text-xs font-semibold uppercase"
               style={{
-                fontSize: 12,
-                letterSpacing: "0.08em",
-                color: "#CBD5E1",
+                color: colors.text.secondary,
+                fontFamily: typography.heading.fontFamily,
+                letterSpacing: "0.06em",
               }}
             >
               {title}
@@ -109,8 +109,14 @@ export function CFOCard({
           {/* Value with count-up */}
           <div className="mb-2">
             <div
-              className="font-mono font-bold leading-tight"
-              style={{ fontSize: 48, color: "#F8FAFC" }}
+              className="font-bold leading-tight"
+              style={{
+                fontSize: 48,
+                color: colors.text.primary,
+                fontFamily: typography.numbers.fontFamily,
+                fontFeatureSettings: typography.numbers.fontFeatureSettings,
+                letterSpacing: "-0.01em",
+              }}
             >
               {prefix}
               {animated && !isNaN(numericValue) ? (
@@ -130,7 +136,13 @@ export function CFOCard({
 
           {/* Subtitle */}
           {subtitle && (
-            <div className="text-sm mb-2" style={{ color: "#CBD5E1" }}>
+            <div
+              className="text-sm mb-2"
+              style={{
+                color: colors.text.tertiary,
+                fontFamily: typography.body.fontFamily,
+              }}
+            >
               {subtitle}
             </div>
           )}
