@@ -195,4 +195,93 @@ function FynnyModule({ answers, orgId }: { answers: string[]; orgId: string | nu
   return <FynnyChat orgId={orgId} answers={answers} />
 }
 
+function Shimmer({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-lg bg-white/5 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    </div>
+  )
+}
+
+function DashboardSkeleton({
+  businessName,
+  fileName,
+}: {
+  businessName: string
+  fileName: string
+}) {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+      {/* Top Nav (real, so no flash) */}
+      <nav className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-georgia font-bold text-white">{businessName}</h1>
+              <p className="text-white/60 text-sm mt-0.5">Data: {fileName}</p>
+            </div>
+            <div className="px-4 py-2 text-white/40 text-sm font-semibold border border-white/10 rounded-lg">
+              Loading…
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Module tab placeholders */}
+      <div className="border-b border-white/10 bg-[#1a1412]/50 sticky top-[73px] z-40">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex gap-6 py-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Shimmer key={i} className="h-6 w-24" />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Body skeleton */}
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        {/* Banner */}
+        <Shimmer className="h-28 w-full" />
+
+        {/* KPI cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4"
+            >
+              <Shimmer className="h-4 w-24" />
+              <Shimmer className="h-8 w-40" />
+              <Shimmer className="h-3 w-32" />
+            </div>
+          ))}
+        </div>
+
+        {/* Chart */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
+          <Shimmer className="h-5 w-48" />
+          <Shimmer className="h-64 w-full" />
+        </div>
+
+        {/* Two-column lower section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-3"
+            >
+              <Shimmer className="h-5 w-40" />
+              {Array.from({ length: 4 }).map((__, j) => (
+                <Shimmer key={j} className="h-4 w-full" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default DemoDashboard
