@@ -168,7 +168,7 @@ export function DemoDashboard() {
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
         {activeModule === 'gst' && <GSTModule data={insightsData} />}
-        {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} />}
+        {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
       </div>
     </div>
   )
