@@ -25,6 +25,7 @@ import {
 } from 'recharts'
 import { CFOCard } from '@/components/ui/CFOCard'
 import { GalaxyButton } from '@/components/ui/GalaxyButton'
+import { RollingText } from '@/components/ui/RollingText'
 import { colors, staggerContainer, fadeInUp } from '@/lib/design-system'
 
 export function GSTDashboard({ data }: { data: any }) {
@@ -184,7 +185,7 @@ export function GSTDashboard({ data }: { data: any }) {
                 ))}
               </div>
               <div className="flex gap-3 flex-wrap">
-                <GalaxyButton variant="danger">File Now</GalaxyButton>
+                <GalaxyButton variant="danger"><RollingText text="File Now" /></GalaxyButton>
                 <GalaxyButton variant="secondary">
                   View All ({pendingFilings.length + upcomingFilings.length})
                 </GalaxyButton>
@@ -631,7 +632,7 @@ export function GSTDashboard({ data }: { data: any }) {
                   </div>
                   {notice.status === 'pending' && (
                     <div className="mt-3">
-                      <GalaxyButton variant="danger">Respond Now</GalaxyButton>
+                      <GalaxyButton variant="danger"><RollingText text="Respond Now" /></GalaxyButton>
                     </div>
                   )}
                 </div>

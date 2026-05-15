@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { CFOCard } from "@/components/ui/CFOCard";
 import { GalaxyButton } from "@/components/ui/GalaxyButton";
+import { RollingText } from "@/components/ui/RollingText";
 import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
 interface LiquidityDashboardProps {
@@ -229,7 +230,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
 
             <GalaxyButton variant="danger">
               <Target size={18} className="inline mr-2" />
-              Generate Action Plan
+              <RollingText text="Generate Action Plan" />
             </GalaxyButton>
           </div>
         </motion.div>
@@ -836,7 +837,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           <div className="mt-6">
             <GalaxyButton variant="primary">
               <BarChart3 size={18} className="inline mr-2" />
-              Run Cash Flow Scenarios
+              <RollingText text="Run Cash Flow Scenarios" />
             </GalaxyButton>
           </div>
         </Panel>
