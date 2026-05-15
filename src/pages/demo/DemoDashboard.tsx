@@ -182,22 +182,8 @@ function CostModule({ data }: { data: any }) {
   return <CostDashboard data={data} />
 }
 
-function GSTModule({ data: _data }: { data: any }) {
-  return (
-    <div
-      className="rounded-2xl p-12 text-center border"
-      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
-    >
-      <FileText size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
-      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
-        GST & Tax Intelligence
-      </h2>
-      <p style={{ color: "#CBD5E1" }} className="text-lg">
-        Compliance tracking, ITC reconciliation, deadline alerts
-      </p>
-      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
-    </div>
-  )
+function GSTModule({ data }: { data: any }) {
+  return <GSTDashboard data={data} />
 }
 
 function FynnyModule({ answers, orgId }: { answers: string[]; orgId: string | null }) {
