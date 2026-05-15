@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   TrendingDown,
+  TrendingUp,
   AlertCircle,
   AlertTriangle,
   BarChart3,
