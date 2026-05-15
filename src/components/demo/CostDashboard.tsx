@@ -23,7 +23,7 @@ import {
   Legend,
 } from 'recharts'
 import { CFOCard } from '@/components/ui/CFOCard'
-import { RotatingButton } from '@/components/ui/RotatingButton'
+import { GalaxyButton } from '@/components/ui/GalaxyButton'
 import { colors, staggerContainer, fadeInUp } from '@/lib/design-system'
 
 const cardStyle = {
@@ -597,8 +597,8 @@ export function CostDashboard({ data }: { data: any }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <RotatingButton variant="primary">Take Action</RotatingButton>
-                <RotatingButton variant="secondary">Snooze</RotatingButton>
+                <GalaxyButton variant="primary">Take Action</GalaxyButton>
+                <GalaxyButton variant="secondary">Snooze</GalaxyButton>
               </div>
             </div>
           ))}
