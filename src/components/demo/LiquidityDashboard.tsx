@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import {
   TrendingDown,
   AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  Lightbulb,
+  Target,
   Calendar,
   Droplet,
   DollarSign,
@@ -95,10 +99,11 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               </div>
               <div>
                 <h3
-                  className="font-serif text-2xl md:text-3xl font-bold mb-1"
+                  className="font-serif text-2xl md:text-3xl font-bold mb-1 flex items-center gap-2"
                   style={{ color: colors.text.primary }}
                 >
-                  🔴 URGENT: Cash Crisis in {daysToZero} Days
+                  <AlertCircle size={22} color={colors.danger.light} />
+                  URGENT: Cash Crisis in {daysToZero} Days
                 </h3>
                 <p style={{ color: colors.text.secondary }} className="text-sm">
                   Runway is below 3 months. Take action now.
@@ -153,10 +158,11 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             {/* Actions */}
             <div className="mb-6">
               <h4
-                className="font-semibold mb-3"
+                className="font-semibold mb-3 flex items-center gap-2"
                 style={{ color: colors.text.primary }}
               >
-                📊 3 Actions to Extend Runway:
+                <BarChart3 size={18} color={colors.accent[500]} />
+                3 Actions to Extend Runway:
               </h4>
               <div className="space-y-2">
                 {[
@@ -186,7 +192,10 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               </div>
             </div>
 
-            <RotatingButton variant="danger">🎯 Generate Action Plan</RotatingButton>
+            <RotatingButton variant="danger">
+              <Target size={18} className="inline mr-2" />
+              Generate Action Plan
+            </RotatingButton>
           </div>
         </motion.div>
       )}
@@ -379,7 +388,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           <PanelHeader title="CFO Recommendations" icon={<Calendar size={18} color={colors.accent[500]} />} />
           <div className="space-y-3">
             <Insight
-              emoji="⚠️"
+              icon={<AlertTriangle size={18} color={colors.warning.main} />}
               title="Prioritize Cash Collection"
               body={`With ${runway.toFixed(
                 1,
@@ -387,7 +396,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               accent={colors.warning.main}
             />
             <Insight
-              emoji="💡"
+              icon={<Lightbulb size={18} color={colors.info.main} />}
               title="Optimize Working Capital"
               body={`Negotiate extended payment terms with top 3 vendors. Could free up ₹${(
                 (topExpensesSum * 0.5) /
@@ -396,7 +405,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               accent={colors.info.main}
             />
             <Insight
-              emoji="🎯"
+              icon={<Target size={18} color={colors.primary[500]} />}
               title="Revenue Acceleration Needed"
               body={`Current burn requires ₹${(monthlyBurn / 100000).toFixed(
                 1,
@@ -407,7 +416,8 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
 
           <div className="mt-6">
             <RotatingButton variant="primary">
-              📊 Run Cash Flow Scenarios
+              <BarChart3 size={18} className="inline mr-2" />
+              Run Cash Flow Scenarios
             </RotatingButton>
           </div>
         </Panel>
@@ -488,12 +498,12 @@ function PanelHeader({
 }
 
 function Insight({
-  emoji,
+  icon,
   title,
   body,
   accent,
 }: {
-  emoji: string;
+  icon: React.ReactNode;
   title: string;
   body: string;
   accent: string;
@@ -506,7 +516,12 @@ function Insight({
         borderColor: `${accent}33`,
       }}
     >
-      <div className="text-xl leading-none mt-0.5">{emoji}</div>
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: `${accent}15` }}
+      >
+        {icon}
+      </div>
       <div>
         <div
           className="font-semibold mb-1"

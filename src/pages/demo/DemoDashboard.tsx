@@ -98,14 +98,22 @@ export function DemoDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+    <div
+      className="min-h-screen"
+      style={{ background: "linear-gradient(135deg, #0A0E27 0%, #1A1F3A 100%)" }}
+    >
       {/* Top Nav */}
-      <nav className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <nav className="border-b border-white/10 bg-[#0A0E27]/80 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-georgia font-bold text-white">{businessName}</h1>
-              <p className="text-white/60 text-sm mt-0.5">Data: {fileName}</p>
+              <h1
+                className="font-serif font-bold"
+                style={{ fontSize: 32, color: "#F8FAFC", lineHeight: 1.1 }}
+              >
+                {businessName}
+              </h1>
+              <p style={{ color: "#CBD5E1" }} className="text-sm mt-1">Data: {fileName}</p>
             </div>
             <button
               onClick={() => {
@@ -114,7 +122,12 @@ export function DemoDashboard() {
                   window.location.href = '/demo/login'
                 }
               }}
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-semibold border border-white/20 rounded-lg hover:border-white/40 transition-colors"
+              className="text-sm font-semibold border rounded-lg transition-colors"
+              style={{
+                padding: "16px 32px",
+                color: "#CBD5E1",
+                borderColor: "rgba(255,255,255,0.2)",
+              }}
             >
               Exit Demo
             </button>
@@ -123,7 +136,7 @@ export function DemoDashboard() {
       </nav>
 
       {/* Module Tabs */}
-      <div className="border-b border-white/10 bg-[#1a1412]/50 sticky top-[73px] z-40">
+      <div className="border-b border-white/10 sticky top-[89px] z-40" style={{ background: "#0A0E27CC" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto">
             {MODULES.map((module) => {
@@ -133,14 +146,13 @@ export function DemoDashboard() {
                 <button
                   key={module.id}
                   onClick={() => setActiveModule(module.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'border-[#C41E1E] text-white'
-                      : 'border-transparent text-white/60 hover:text-white/80'
+                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap font-inter font-semibold ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white/80"
                   }`}
+                  style={{ borderColor: isActive ? "#FFA726" : "transparent" }}
                 >
-                  <Icon size={20} style={{ color: isActive ? module.color : undefined }} />
-                  <span className="font-semibold">{module.name}</span>
+                  <Icon size={20} style={{ color: isActive ? "#FFA726" : undefined }} />
+                  <span>{module.name}</span>
                 </button>
               )
             })}
@@ -149,7 +161,7 @@ export function DemoDashboard() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
         {activeModule === 'liquidity' && <LiquidityDashboard data={insightsData} />}
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
@@ -166,26 +178,36 @@ function RevenueModule({ data }: { data: any }) {
 
 function CostModule({ data }: { data: any }) {
   return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <DollarSign size={64} className="text-amber-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">Cost Intelligence</h2>
-      <p className="text-white/70 text-lg">
+    <div
+      className="rounded-2xl p-12 text-center border"
+      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
+    >
+      <DollarSign size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
+      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
+        Cost Intelligence
+      </h2>
+      <p style={{ color: "#CBD5E1" }} className="text-lg">
         Total Expenses: ₹{data?.cost?.totalCost?.toLocaleString('en-IN') || 'N/A'}
       </p>
-      <div className="mt-8 text-white/50 text-sm">Building full dashboard...</div>
+      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
     </div>
   )
 }
 
 function GSTModule({ data: _data }: { data: any }) {
   return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <FileText size={64} className="text-purple-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">GST & Tax Intelligence</h2>
-      <p className="text-white/70 text-lg">
+    <div
+      className="rounded-2xl p-12 text-center border"
+      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
+    >
+      <FileText size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
+      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
+        GST & Tax Intelligence
+      </h2>
+      <p style={{ color: "#CBD5E1" }} className="text-lg">
         Compliance tracking, ITC reconciliation, deadline alerts
       </p>
-      <div className="mt-8 text-white/50 text-sm">Building full dashboard...</div>
+      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
     </div>
   )
 }
