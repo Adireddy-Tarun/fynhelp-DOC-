@@ -178,26 +178,36 @@ function RevenueModule({ data }: { data: any }) {
 
 function CostModule({ data }: { data: any }) {
   return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <DollarSign size={64} className="text-amber-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">Cost Intelligence</h2>
-      <p className="text-white/70 text-lg">
+    <div
+      className="rounded-2xl p-12 text-center border"
+      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
+    >
+      <DollarSign size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
+      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
+        Cost Intelligence
+      </h2>
+      <p style={{ color: "#CBD5E1" }} className="text-lg">
         Total Expenses: ₹{data?.cost?.totalCost?.toLocaleString('en-IN') || 'N/A'}
       </p>
-      <div className="mt-8 text-white/50 text-sm">Building full dashboard...</div>
+      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
     </div>
   )
 }
 
 function GSTModule({ data: _data }: { data: any }) {
   return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-      <FileText size={64} className="text-purple-500 mx-auto mb-6" />
-      <h2 className="text-3xl font-georgia font-bold text-white mb-4">GST & Tax Intelligence</h2>
-      <p className="text-white/70 text-lg">
+    <div
+      className="rounded-2xl p-12 text-center border"
+      style={{ background: "#1E2642", borderColor: "rgba(255,255,255,0.08)" }}
+    >
+      <FileText size={64} style={{ color: "#FFA726" }} className="mx-auto mb-6" />
+      <h2 className="font-serif font-bold mb-4" style={{ fontSize: 32, color: "#F8FAFC" }}>
+        GST & Tax Intelligence
+      </h2>
+      <p style={{ color: "#CBD5E1" }} className="text-lg">
         Compliance tracking, ITC reconciliation, deadline alerts
       </p>
-      <div className="mt-8 text-white/50 text-sm">Building full dashboard...</div>
+      <div className="mt-8 text-sm" style={{ color: "#64748B" }}>Building full dashboard...</div>
     </div>
   )
 }
