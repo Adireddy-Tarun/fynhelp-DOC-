@@ -122,7 +122,12 @@ export function DemoDashboard() {
                   window.location.href = '/demo/login'
                 }
               }}
-              className="px-4 py-2 text-white/70 hover:text-white text-sm font-semibold border border-white/20 rounded-lg hover:border-white/40 transition-colors"
+              className="text-sm font-semibold border rounded-lg transition-colors"
+              style={{
+                padding: "16px 32px",
+                color: "#CBD5E1",
+                borderColor: "rgba(255,255,255,0.2)",
+              }}
             >
               Exit Demo
             </button>
@@ -131,7 +136,7 @@ export function DemoDashboard() {
       </nav>
 
       {/* Module Tabs */}
-      <div className="border-b border-white/10 bg-[#1a1412]/50 sticky top-[73px] z-40">
+      <div className="border-b border-white/10 sticky top-[89px] z-40" style={{ background: "#0A0E27CC" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto">
             {MODULES.map((module) => {
@@ -141,14 +146,13 @@ export function DemoDashboard() {
                 <button
                   key={module.id}
                   onClick={() => setActiveModule(module.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'border-[#C41E1E] text-white'
-                      : 'border-transparent text-white/60 hover:text-white/80'
+                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap font-inter font-semibold ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white/80"
                   }`}
+                  style={{ borderColor: isActive ? "#FFA726" : "transparent" }}
                 >
-                  <Icon size={20} style={{ color: isActive ? module.color : undefined }} />
-                  <span className="font-semibold">{module.name}</span>
+                  <Icon size={20} style={{ color: isActive ? "#FFA726" : undefined }} />
+                  <span>{module.name}</span>
                 </button>
               )
             })}
@@ -157,7 +161,7 @@ export function DemoDashboard() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
         {activeModule === 'liquidity' && <LiquidityDashboard data={insightsData} />}
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
