@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import {
   TrendingDown,
   AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  Lightbulb,
+  Target,
   Calendar,
   Droplet,
   DollarSign,
