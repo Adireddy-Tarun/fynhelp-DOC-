@@ -199,52 +199,42 @@ html.dark {
   }
   body {
     @apply bg-background text-foreground;
-    font-family:
-      "Roboto",
-      -apple-system,
-      sans-serif;
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
     font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   h1,
-  h2 {
-    font-family: "Oswald", Impact, sans-serif;
+  h2,
+  h3 {
+    font-family: "Space Grotesk", "DM Sans", sans-serif;
     font-weight: 700;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.02em;
   }
-  h3,
   h4,
   h5,
   h6 {
-    font-family:
-      "Raleway",
-      -apple-system,
-      sans-serif;
+    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
   button {
-    font-family:
-      "DM Sans",
-      -apple-system,
-      sans-serif;
+    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
   label {
-    font-family:
-      "Raleway",
-      -apple-system,
-      sans-serif;
+    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
     font-weight: 500;
   }
   th,
   thead {
-    font-family:
-      "Raleway",
-      -apple-system,
-      sans-serif;
+    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
     font-weight: 600;
   }
   nav a {
-    font-family: "Oswald", Impact, sans-serif;
+    font-family: "Space Grotesk", "DM Sans", sans-serif;
     font-weight: 500;
     letter-spacing: 0.02em;
   }
@@ -254,19 +244,19 @@ html.dark {
   footer span,
   footer li,
   footer div {
-    font-family:
-      "Roboto",
-      -apple-system,
-      sans-serif;
+    font-family: "DM Sans", system-ui, sans-serif;
   }
   [class*="badge"],
   .fyn-badge,
   [data-badge] {
-    font-family:
-      "Work Sans",
-      -apple-system,
-      sans-serif;
+    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
     font-weight: 600;
+  }
+  .font-mono,
+  code,
+  pre {
+    font-family: "SF Mono", "Monaco", "Menlo", monospace;
+    font-feature-settings: "tnum", "lnum";
   }
 }
 

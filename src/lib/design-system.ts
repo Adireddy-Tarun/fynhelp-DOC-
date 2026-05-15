@@ -4,6 +4,35 @@
  */
 import type { Variants } from "framer-motion";
 
+// ─── Typography ──────────────────────────────────────────────────────
+export const typography = {
+  display: {
+    fontFamily: "'Space Grotesk', 'DM Sans', sans-serif",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.1,
+  },
+  heading: {
+    fontFamily: "'Plus Jakarta Sans Variable', 'DM Sans', sans-serif",
+    fontWeight: 600,
+    letterSpacing: "-0.01em",
+    lineHeight: 1.2,
+  },
+  body: {
+    fontFamily: "'DM Sans', system-ui, sans-serif",
+    fontWeight: 400,
+    letterSpacing: "0em",
+    lineHeight: 1.6,
+  },
+  numbers: {
+    fontFamily: "'SF Mono', 'Monaco', 'Menlo', monospace",
+    fontWeight: 600,
+    letterSpacing: "-0.01em",
+    lineHeight: 1.3,
+    fontFeatureSettings: '"tnum", "lnum"',
+  },
+} as const;
+
 // ─── Colors ──────────────────────────────────────────────────────────
 export const colors = {
   // Primary: Deep Navy (Trust, Banking, Authority)
