@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+// Demo access guards temporarily disabled — re-enable when design review complete
 import { Droplet, TrendingUp, DollarSign, FileText, Bot, Loader } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
