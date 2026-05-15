@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import CountUp from "react-countup";
-import { colors, cardHover, shimmer, pulseGlow } from "@/lib/design-system";
+import { colors, shimmer, pulseGlow } from "@/lib/design-system";
 
 interface CFOCardProps {
   title: string;
