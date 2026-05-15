@@ -388,7 +388,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           <PanelHeader title="CFO Recommendations" icon={<Calendar size={18} color={colors.accent[500]} />} />
           <div className="space-y-3">
             <Insight
-              emoji="⚠️"
+              icon={<AlertTriangle size={18} color={colors.warning.main} />}
               title="Prioritize Cash Collection"
               body={`With ${runway.toFixed(
                 1,
@@ -396,7 +396,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               accent={colors.warning.main}
             />
             <Insight
-              emoji="💡"
+              icon={<Lightbulb size={18} color={colors.info.main} />}
               title="Optimize Working Capital"
               body={`Negotiate extended payment terms with top 3 vendors. Could free up ₹${(
                 (topExpensesSum * 0.5) /
@@ -405,7 +405,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               accent={colors.info.main}
             />
             <Insight
-              emoji="🎯"
+              icon={<Target size={18} color={colors.primary[500]} />}
               title="Revenue Acceleration Needed"
               body={`Current burn requires ₹${(monthlyBurn / 100000).toFixed(
                 1,
@@ -416,7 +416,8 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
 
           <div className="mt-6">
             <RotatingButton variant="primary">
-              📊 Run Cash Flow Scenarios
+              <BarChart3 size={18} className="inline mr-2" />
+              Run Cash Flow Scenarios
             </RotatingButton>
           </div>
         </Panel>
