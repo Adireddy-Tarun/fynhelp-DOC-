@@ -72,6 +72,33 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
   const dpo = 60; // Days Payable Outstanding
   const ccc = dso + dio - dpo;
 
+  // Scenario planning
+  const [scenario, setScenario] = useState<"base" | "best" | "worst">("base");
+  const avgMonthlyRevenue = data?.revenue?.totalRevenue
+    ? data.revenue.totalRevenue / 3
+    : 140000;
+
+  const scenarios = {
+    base: {
+      revenue: avgMonthlyRevenue,
+      expenses: monthlyBurn,
+      runway,
+    },
+    best: {
+      revenue: avgMonthlyRevenue * 1.2,
+      expenses: monthlyBurn * 0.95,
+      runway: currentCash / Math.max(monthlyBurn * 0.95 - avgMonthlyRevenue * 0.2, 1) / 30 * 30 / 30,
+    },
+    worst: {
+      revenue: avgMonthlyRevenue * 0.8,
+      expenses: monthlyBurn * 1.1,
+      runway: currentCash / Math.max(monthlyBurn * 1.1 - avgMonthlyRevenue * 0.8 * 0.5, 1) / 30 * 30 / 30,
+    },
+  };
+  // Convert burn-difference runway to months (cash / net monthly burn)
+  scenarios.best.runway = currentCash / Math.max(monthlyBurn * 0.95 - avgMonthlyRevenue * 0.2, 1);
+  scenarios.worst.runway = currentCash / Math.max(monthlyBurn * 1.1 - avgMonthlyRevenue * 0.8 * 0.5, 1);
+
   return (
     <motion.div
       variants={staggerContainer}
