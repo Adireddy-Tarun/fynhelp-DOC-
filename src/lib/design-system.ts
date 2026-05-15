@@ -58,16 +58,17 @@ export const colors = {
 
 
 export const gradients = {
-  redAccent: `linear-gradient(135deg, ${colors.red} 0%, ${colors.redDeep} 100%)`,
-  inkSurface: `linear-gradient(180deg, ${colors.bgElevated} 0%, ${colors.bg} 100%)`,
-  goldEditorial: `linear-gradient(135deg, ${colors.gold} 0%, #B8902A 100%)`,
+  primaryAccent: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[900]} 100%)`,
+  surface: `linear-gradient(180deg, ${colors.background.secondary} 0%, ${colors.background.primary} 100%)`,
+  goldPremium: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
 } as const;
 
 export const shadows = {
   sm: "0 1px 2px rgba(0,0,0,0.25)",
   md: "0 4px 12px rgba(0,0,0,0.35)",
   lg: "0 12px 32px rgba(0,0,0,0.45)",
-  glowRed: `0 0 24px ${colors.red}55`,
+  glowPrimary: `0 0 24px ${colors.primary[500]}55`,
+  glowGold: `0 0 24px ${colors.accent[500]}55`,
 } as const;
 
 /* ------------------------------------------------------------------ */
