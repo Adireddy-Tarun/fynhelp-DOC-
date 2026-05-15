@@ -27,8 +27,7 @@ export function DemoDashboard() {
   useEffect(() => {
     const fetchInsights = async () => {
       if (!orgId) {
-        alert('Session expired. Please restart demo.')
-        window.location.href = '/demo/login'
+        setLoading(false)
         return
       }
 
