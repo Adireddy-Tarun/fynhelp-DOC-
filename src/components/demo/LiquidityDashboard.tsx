@@ -64,6 +64,12 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
       0,
     ) ?? 0;
 
+  // Cash Conversion Cycle (simplified for demo)
+  const dso = 45; // Days Sales Outstanding
+  const dio = 30; // Days Inventory Outstanding
+  const dpo = 60; // Days Payable Outstanding
+  const ccc = dso + dio - dpo;
+
   return (
     <motion.div
       variants={staggerContainer}
