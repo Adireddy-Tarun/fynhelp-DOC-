@@ -284,6 +284,15 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           subtitle="Cash tied up in operations"
           trend={ccc < 30 ? "Efficient" : ccc < 60 ? "Moderate" : "Needs improvement"}
         />
+        <CFOCard
+          title="Burn Multiple"
+          value={burnMultiple.toFixed(2)}
+          suffix="x"
+          icon={TrendingDown}
+          status={burnMultiple < 1 ? "good" : burnMultiple < 2 ? "warning" : "danger"}
+          subtitle="Burn per ₹ of revenue"
+          trend={burnMultiple < 1 ? "Capital efficient" : burnMultiple < 2 ? "Moderate" : "High burn"}
+        />
       </motion.div>
 
       {/* CCC Breakdown */}
