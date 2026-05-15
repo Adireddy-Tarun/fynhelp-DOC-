@@ -578,6 +578,79 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
         </div>
       </motion.div>
 
+      {/* AR Aging Buckets */}
+      {(() => {
+        const arAging = [
+          { bucket: "0-30 days", amount: 125000, percent: 45, status: "good" as const },
+          { bucket: "31-60 days", amount: 85000, percent: 30, status: "warning" as const },
+          { bucket: "61-90 days", amount: 45000, percent: 16, status: "danger" as const },
+          { bucket: "90+ days", amount: 25000, percent: 9, status: "danger" as const },
+        ];
+        const colorFor = (s: "good" | "warning" | "danger") =>
+          s === "good" ? colors.success.main : s === "warning" ? colors.warning.main : colors.danger.main;
+        return (
+          <motion.div
+            variants={fadeInUp}
+            className="rounded-2xl p-6"
+            style={{
+              background: `linear-gradient(135deg, ${colors.bg.secondary} 0%, ${colors.bg.tertiary} 100%)`,
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold font-serif" style={{ color: colors.text.primary }}>
+                Accounts Receivable Aging
+              </h3>
+              <Calendar size={24} style={{ color: colors.accent[500] }} />
+            </div>
+
+            <div className="space-y-4">
+              {arAging.map((bucket, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold" style={{ color: colors.text.primary }}>
+                      {bucket.bucket}
+                    </span>
+                    <span className="font-bold font-mono" style={{ color: colorFor(bucket.status) }}>
+                      ₹{(bucket.amount / 1000).toFixed(0)}K
+                    </span>
+                  </div>
+                  <div className="h-3 rounded-full overflow-hidden" style={{ background: colors.bg.primary }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: colorFor(bucket.status) }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${bucket.percent}%` }}
+                      transition={{ duration: 1, delay: idx * 0.1 }}
+                    />
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
+                    {bucket.percent}% of receivables
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div
+              className="mt-6 p-4 rounded-xl"
+              style={{
+                background: `${colors.warning.main}15`,
+                border: `1px solid ${colors.warning.main}40`,
+              }}
+            >
+              <p className="text-sm" style={{ color: colors.text.secondary }}>
+                <strong style={{ color: colors.text.primary }}>Collection Priority:</strong> 25% overdue 60+ days. Focus on ₹70K in aging buckets. Consider 2% early payment discount.
+              </p>
+            </div>
+          </motion.div>
+        );
+      })()}
+
       {/* Two columns */}
       <motion.div
         variants={fadeInUp}
