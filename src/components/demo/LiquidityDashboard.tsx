@@ -498,12 +498,12 @@ function PanelHeader({
 }
 
 function Insight({
-  emoji,
+  icon,
   title,
   body,
   accent,
 }: {
-  emoji: string;
+  icon: React.ReactNode;
   title: string;
   body: string;
   accent: string;
@@ -516,7 +516,12 @@ function Insight({
         borderColor: `${accent}33`,
       }}
     >
-      <div className="text-xl leading-none mt-0.5">{emoji}</div>
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: `${accent}15` }}
+      >
+        {icon}
+      </div>
       <div>
         <div
           className="font-semibold mb-1"
