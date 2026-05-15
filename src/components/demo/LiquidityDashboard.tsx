@@ -246,6 +246,78 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               : "Healthy"
           }
         />
+        <CFOCard
+          title="Cash Conversion Cycle"
+          value={ccc}
+          suffix=" days"
+          icon={Clock}
+          status={ccc < 30 ? "good" : ccc < 60 ? "warning" : "danger"}
+          subtitle="Cash tied up in operations"
+          trend={ccc < 30 ? "Efficient" : ccc < 60 ? "Moderate" : "Needs improvement"}
+        />
+      </motion.div>
+
+      {/* CCC Breakdown */}
+      <motion.div
+        variants={fadeInUp}
+        className="rounded-2xl p-6"
+        style={{
+          background: `linear-gradient(135deg, ${colors.bg.secondary} 0%, ${colors.bg.tertiary} 100%)`,
+          border: `1px solid rgba(255, 255, 255, 0.1)`,
+        }}
+      >
+        <h4
+          className="text-lg font-bold font-serif mb-4"
+          style={{ color: colors.text.primary }}
+        >
+          Cash Conversion Cycle Breakdown
+        </h4>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center p-4 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>DSO</p>
+            <p className="text-3xl font-bold font-mono mb-1" style={{ color: colors.info.main }}>
+              {dso}
+            </p>
+            <p className="text-xs" style={{ color: colors.text.tertiary }}>Days to collect revenue</p>
+          </div>
+
+          <div className="text-center p-4 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>DIO</p>
+            <p className="text-3xl font-bold font-mono mb-1" style={{ color: colors.warning.main }}>
+              {dio}
+            </p>
+            <p className="text-xs" style={{ color: colors.text.tertiary }}>Inventory holding period</p>
+          </div>
+
+          <div className="text-center p-4 rounded-xl" style={{ background: colors.bg.tertiary }}>
+            <p className="text-sm mb-2" style={{ color: colors.text.secondary }}>DPO</p>
+            <p className="text-3xl font-bold font-mono mb-1" style={{ color: colors.success.main }}>
+              {dpo}
+            </p>
+            <p className="text-xs" style={{ color: colors.text.tertiary }}>Days to pay vendors</p>
+          </div>
+        </div>
+
+        <div
+          className="mt-4 p-4 rounded-xl"
+          style={{
+            background: `${colors.info.main}15`,
+            border: `1px solid ${colors.info.main}40`,
+          }}
+        >
+          <p className="text-sm" style={{ color: colors.text.secondary }}>
+            <strong style={{ color: colors.text.primary }}>CCC Formula:</strong> {dso} (DSO) + {dio} (DIO) - {dpo} (DPO) ={" "}
+            <strong style={{ color: colors.info.main }}>{ccc} days</strong>
+          </p>
+          <p className="text-xs mt-2" style={{ color: colors.text.tertiary }}>
+            {ccc < 30
+              ? "Excellent! Cash cycles quickly through operations."
+              : ccc < 60
+              ? "Moderate efficiency. Consider accelerating collections or extending payables."
+              : "Slow cycle. Cash is tied up too long - prioritize working capital optimization."}
+          </p>
+        </div>
       </motion.div>
 
       {/* Cash Flow Chart */}
