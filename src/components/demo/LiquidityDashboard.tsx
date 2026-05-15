@@ -209,7 +209,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
       {/* Top Stats — CFO Cards */}
       <motion.div
         variants={fadeInUp}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
       >
         <CFOCard
           title="Current Cash"
