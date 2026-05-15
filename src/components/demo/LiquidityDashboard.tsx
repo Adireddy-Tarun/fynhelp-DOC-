@@ -99,10 +99,11 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
               </div>
               <div>
                 <h3
-                  className="font-serif text-2xl md:text-3xl font-bold mb-1"
+                  className="font-serif text-2xl md:text-3xl font-bold mb-1 flex items-center gap-2"
                   style={{ color: colors.text.primary }}
                 >
-                  🔴 URGENT: Cash Crisis in {daysToZero} Days
+                  <AlertCircle size={22} color={colors.danger.light} />
+                  URGENT: Cash Crisis in {daysToZero} Days
                 </h3>
                 <p style={{ color: colors.text.secondary }} className="text-sm">
                   Runway is below 3 months. Take action now.
