@@ -168,7 +168,7 @@ export function DemoDashboard() {
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
         {activeModule === 'gst' && <GSTModule data={insightsData} />}
-        {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} />}
+        {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
       </div>
     </div>
   )
@@ -186,9 +186,8 @@ function GSTModule({ data }: { data: any }) {
   return <GSTDashboard data={data} />
 }
 
-function FynnyModule({ answers, orgId }: { answers: string[]; orgId: string | null }) {
-  if (!orgId) return null
-  return <FynnyChat orgId={orgId} answers={answers} />
+function FynnyModule({ answers, orgId, data }: { answers: string[]; orgId: string | null; data: any }) {
+  return <FynnyChat data={data} orgId={orgId} answers={answers} />
 }
 
 function Shimmer({ className = '' }: { className?: string }) {
