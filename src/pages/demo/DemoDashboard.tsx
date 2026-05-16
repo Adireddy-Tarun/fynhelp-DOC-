@@ -183,12 +183,22 @@ export function DemoDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1
-                className="font-serif font-bold"
-                style={{ fontSize: 32, color: "#F8FAFC", lineHeight: 1.1 }}
+                className="text-4xl font-bold mb-2"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  letterSpacing: '-0.02em',
+                  color: '#F8FAFC',
+                  lineHeight: 1.1,
+                }}
               >
                 {businessName}
               </h1>
-              <p style={{ color: "#CBD5E1" }} className="text-sm mt-1">Data: {fileName}</p>
+              <p
+                className="text-sm"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#64748B' }}
+              >
+                Data: {fileName}
+              </p>
             </div>
             <button
               onClick={() => {
@@ -197,11 +207,12 @@ export function DemoDashboard() {
                   window.location.href = '/demo/login'
                 }
               }}
-              className="text-sm font-semibold border rounded-lg transition-colors"
+              className="px-6 py-3 rounded-xl font-semibold transition-colors"
               style={{
-                padding: "16px 32px",
-                color: "#CBD5E1",
-                borderColor: "rgba(255,255,255,0.2)",
+                background: '#252B48',
+                color: '#F8FAFC',
+                fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                border: '1px solid rgba(57, 73, 171, 0.25)',
               }}
             >
               Exit Demo

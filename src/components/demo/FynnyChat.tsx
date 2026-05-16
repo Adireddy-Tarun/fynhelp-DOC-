@@ -405,13 +405,23 @@ export function FynnyChat({ data }: FynnyChatProps) {
             disabled={!inputValue.trim() || isTyping}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-14 h-14 rounded-2xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="relative w-14 h-14 rounded-2xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
             style={{
               background: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
               boxShadow: `0 8px 24px ${colors.accent[500]}40`,
             }}
           >
-            <Send size={20} color="#fff" />
+            <motion.span
+              aria-hidden
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${colors.accent[300]}66 0%, transparent 70%)`,
+                filter: 'blur(16px)',
+              }}
+              animate={{ opacity: [0.4, 0.9, 0.4], scale: [1, 1.25, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <Send size={20} color="#fff" className="relative z-10" />
           </motion.button>
         </div>
 
