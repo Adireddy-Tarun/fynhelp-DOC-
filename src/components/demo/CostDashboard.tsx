@@ -530,20 +530,17 @@ export function CostDashboard({ data }: { data: any }) {
 
       {/* Cost Trend */}
       <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 style={sectionTitle} className="mb-6">Cost Trend Analysis (6 Months)</h3>
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={costTrend}>
-            <XAxis dataKey="month" stroke={colors.text.tertiary} style={{ fontFamily: 'JetBrains Mono, monospace' }} />
-            <YAxis stroke={colors.text.tertiary} style={{ fontFamily: 'JetBrains Mono, monospace' }} tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`} />
-            <Tooltip
-              contentStyle={{ background: colors.bg.secondary, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-              formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
-            />
-            <Legend />
-            <Line type="monotone" dataKey="opex" stroke={colors.primary[500]} strokeWidth={3} dot={{ fill: colors.primary[500], r: 4 }} name="OpEx" />
-            <Line type="monotone" dataKey="cogs" stroke={colors.accent[500]} strokeWidth={3} dot={{ fill: colors.accent[500], r: 4 }} name="COGS" />
-          </LineChart>
-        </ResponsiveContainer>
+        <h3 style={sectionTitle} className="mb-6">
+          <RollingText text="Cost Trend Analysis (6 Months)" />
+        </h3>
+        <InteractiveGraph
+          data={costTrend.map((item: { month: string; opex: number; cogs: number }) => ({
+            label: item.month,
+            value: item.opex + item.cogs,
+          }))}
+          height={280}
+          formatValue={(v) => `₹${(v / 100000).toFixed(1)}L`}
+        />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
             <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>OpEx Growth (6mo)</p>
