@@ -346,46 +346,16 @@ export function RevenueDashboard({ data }: { data: any }) {
         {/* Revenue Trend Chart */}
         <div className="rounded-2xl p-6" style={sectionPanel}>
           <h3 className="text-xl font-bold font-serif mb-4" style={{ color: colors.text.primary }}>
-            Revenue Trend (6 Months)
+            <RollingText text="Revenue Trend (6 Months)" />
           </h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={monthlyRevenue}>
-              <XAxis
-                dataKey="month"
-                stroke={colors.text.tertiary}
-                style={{ fontSize: "11px", fontFamily: "JetBrains Mono" }}
-              />
-              <YAxis
-                stroke={colors.text.tertiary}
-                style={{ fontSize: "11px", fontFamily: "JetBrains Mono" }}
-                tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: colors.bg.tertiary,
-                  border: `1px solid ${colors.accent[500]}`,
-                  borderRadius: "12px",
-                  fontFamily: "JetBrains Mono",
-                }}
-                formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]}
-              />
-              <Line
-                type="monotone"
-                dataKey="target"
-                stroke={colors.text.tertiary}
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                stroke={colors.accent[500]}
-                strokeWidth={3}
-                dot={{ fill: colors.accent[500], r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <InteractiveGraph
+            data={monthlyRevenue.map((item: { month: string; revenue: number }) => ({
+              label: item.month,
+              value: item.revenue,
+            }))}
+            height={240}
+            formatValue={(v) => `₹${(v / 100000).toFixed(1)}L`}
+          />
         </div>
 
         {/* METRIC 3: Cohort Retention */}
