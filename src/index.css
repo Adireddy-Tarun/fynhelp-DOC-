@@ -876,3 +876,12 @@ a:focus-visible,
   outline-offset: 4px;
   border-radius: 12px;
 }
+
+/* ── Demo dashboards: typography normalization ───────── */
+.font-mono {
+  font-feature-settings: "tnum", "lnum";
+  letter-spacing: -0.01em;
+}
+.font-serif {
+  letter-spacing: -0.02em;
+}
