@@ -16,6 +16,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { CFOCard } from "@/components/ui/CFOCard";
+import { RollingText } from "@/components/ui/RollingText";
+import { InteractiveGraph } from "@/components/ui/InteractiveGraph";
 import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
 export function RevenueDashboard({ data }: { data: any }) {
