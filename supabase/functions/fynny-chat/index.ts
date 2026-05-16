@@ -107,7 +107,69 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const body = await req.json().catch(() => ({}));
     const auth = req.headers.get("Authorization") || "";
+
+    // ── Demo path: unauthenticated, single-shot JSON response ──────────
+    if (!auth.startsWith("Bearer ") && body?.org_id && body?.message) {
+      const ctx = body.context || {};
+      const systemPrompt = `You are Nidhi, an AI CFO assistant for Indian SMEs in a DEMO environment.
+Answer the user's question conversationally with specific numbers from the demo financial data below.
+Use Indian currency formatting (₹, lakhs, crores). Be concise, professional, and CFO-grade.
+If a metric is missing or zero, say so honestly — never invent numbers.
+
+DEMO FINANCIAL DATA:
+${JSON.stringify(ctx, null, 2)}
+
+Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Keep responses under 200 words.`;
+
+      const aiResp = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3-flash-preview",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: String(body.message) },
+            ],
+          }),
+        },
+      );
+
+      if (!aiResp.ok) {
+        const status = aiResp.status === 429 || aiResp.status === 402 ? aiResp.status : 500;
+        const msg =
+          aiResp.status === 429
+            ? "Rate limited. Try again in a moment."
+            : aiResp.status === 402
+            ? "AI credits exhausted."
+            : "AI gateway error";
+        return new Response(JSON.stringify({ error: msg }), {
+          status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const json = await aiResp.json();
+      const text = json?.choices?.[0]?.message?.content ?? "";
+      return new Response(
+        JSON.stringify({
+          response: text,
+          suggestions: [
+            "What's my biggest cost driver?",
+            "How can I extend my runway?",
+            "Am I GST compliant?",
+          ],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     if (!auth.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
