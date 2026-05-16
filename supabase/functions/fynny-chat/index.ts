@@ -180,7 +180,7 @@ Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Kee
       global: { headers: { Authorization: auth } },
     });
 
-    const { messages = [] } = await req.json();
+    const { messages = [] } = body || {};
     const context = await buildContext(supabase);
 
     const systemPrompt = `You are Fynny, an AI CFO assistant for Indian startups and SMEs.
