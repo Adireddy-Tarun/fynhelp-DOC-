@@ -25,6 +25,7 @@ import {
 import { CFOCard } from "@/components/ui/CFOCard";
 import { GalaxyButton } from "@/components/ui/GalaxyButton";
 import { RollingText } from "@/components/ui/RollingText";
+import { InteractiveGraph } from "@/components/ui/InteractiveGraph";
 import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
 interface LiquidityDashboardProps {
