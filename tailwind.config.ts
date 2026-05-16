@@ -17,6 +17,7 @@ export default {
         sans: ["'DM Sans'", "system-ui", "-apple-system", "sans-serif"],
         display: ["'Plus Jakarta Sans Variable'", "'DM Sans'", "sans-serif"],
         mono: ["'SF Mono'", "Monaco", "Menlo", "monospace"],
+        serif: ["'Space Grotesk'", "'DM Sans'", "sans-serif"],
         heading: ["'Space Grotesk'", "'DM Sans'", "sans-serif"],
         subheading: ["'Plus Jakarta Sans Variable'", "'DM Sans'", "sans-serif"],
         body: ["'DM Sans'", "system-ui", "sans-serif"],
