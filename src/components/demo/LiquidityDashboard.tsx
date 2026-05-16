@@ -310,7 +310,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           className="text-lg font-bold font-serif mb-4"
           style={{ color: colors.text.primary }}
         >
-          Cash Conversion Cycle Breakdown
+          <RollingText text="Cash Conversion Cycle Breakdown" />
         </h4>
 
         <div className="grid grid-cols-3 gap-4">
