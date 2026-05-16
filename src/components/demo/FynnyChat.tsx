@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { supabase } from '@/integrations/supabase/client'
 
 interface Message {
   id: string
@@ -105,7 +106,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
     }
   }
 
-  const handleSendMessage = (message?: string) => {
+  const handleSendMessage = async (message?: string) => {
     const content = (message ?? inputValue).trim()
     if (!content) return
 
@@ -119,20 +120,52 @@ export function FynnyChat({ data }: FynnyChatProps) {
     setInputValue('')
     setIsTyping(true)
 
-    setTimeout(() => {
+    try {
+      const orgId = sessionStorage.getItem('demo_org_id')
+      if (!orgId) throw new Error('Session expired')
+
+      const { data: resp, error } = await supabase.functions.invoke('fynny-chat', {
+        body: { org_id: orgId, message: content, context: data ?? {} },
+      })
+      if (error) throw error
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content:
+          resp?.response ||
+          'I apologize, I encountered an error. Please try again.',
+        timestamp: new Date(),
+        suggestions:
+          resp?.suggestions ?? [
+            "What's my biggest cost driver?",
+            'Show me revenue trends',
+            'Am I GST compliant?',
+          ],
+      }
+      setMessages((prev) => [...prev, assistantMessage])
+    } catch (err) {
+      console.error('Fynny chat error:', err)
       const ai = generateAIResponse(content)
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: ai.content,
+          content:
+            "I'm having trouble connecting right now. Let me help with what I know from your data...\n\n" +
+            ai.content,
           timestamp: new Date(),
-          suggestions: ai.suggestions,
+          suggestions: ai.suggestions ?? [
+            'Try asking about liquidity',
+            'Check revenue metrics',
+            'View cost breakdown',
+          ],
         },
       ])
+    } finally {
       setIsTyping(false)
-    }, 1200)
+    }
   }
 
   const renderContent = (text: string) => {
