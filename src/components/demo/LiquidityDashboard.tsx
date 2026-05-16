@@ -25,6 +25,7 @@ import {
 import { CFOCard } from "@/components/ui/CFOCard";
 import { GalaxyButton } from "@/components/ui/GalaxyButton";
 import { RollingText } from "@/components/ui/RollingText";
+import { InteractiveGraph } from "@/components/ui/InteractiveGraph";
 import { colors, staggerContainer, fadeInUp } from "@/lib/design-system";
 
 interface LiquidityDashboardProps {
@@ -309,7 +310,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           className="text-lg font-bold font-serif mb-4"
           style={{ color: colors.text.primary }}
         >
-          Cash Conversion Cycle Breakdown
+          <RollingText text="Cash Conversion Cycle Breakdown" />
         </h4>
 
         <div className="grid grid-cols-3 gap-4">
@@ -400,50 +401,14 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             </div>
           </div>
 
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={cashFlowTimeline}>
-              <defs>
-                <linearGradient id="cashLine" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor={colors.primary[500]} />
-                  <stop offset="100%" stopColor={colors.accent[500]} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis
-                dataKey="date"
-                stroke={colors.text.tertiary}
-                style={{ fontSize: 12 }}
-              />
-              <YAxis
-                stroke={colors.text.tertiary}
-                style={{ fontSize: 12 }}
-                tickFormatter={(value: number) =>
-                  `₹${(value / 100000).toFixed(0)}L`
-                }
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: colors.bg.secondary,
-                  border: `1px solid rgba(255,255,255,0.1)`,
-                  borderRadius: 8,
-                  color: colors.text.primary,
-                }}
-                labelStyle={{ color: colors.text.secondary }}
-                formatter={(value: number) => [
-                  `₹${value.toLocaleString("en-IN")}`,
-                  "Balance",
-                ]}
-              />
-              <Line
-                type="monotone"
-                dataKey="balance"
-                stroke="url(#cashLine)"
-                strokeWidth={3}
-                dot={{ fill: colors.accent[500], r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <InteractiveGraph
+            data={cashFlowTimeline.map((item: { date: string; balance: number }) => ({
+              label: new Date(item.date).toLocaleDateString('en-US', { month: 'short' }),
+              value: item.balance,
+            }))}
+            height={320}
+            formatValue={(v) => `₹${(v / 100000).toFixed(1)}L`}
+          />
         </div>
       </motion.div>
 
