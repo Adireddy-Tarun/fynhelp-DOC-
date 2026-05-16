@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { supabase } from '@/integrations/supabase/client'
 
 interface Message {
   id: string
