@@ -609,7 +609,9 @@ export function CostDashboard({ data }: CostDashboardProps) {
                   className="text-3xl font-bold"
                   style={{ color: tone, fontFamily: "'SF Mono', monospace" }}
                 >
-                  {fmtL(opp.savings || 0)}
+                  {opp.type === 'Payment Terms Extension' && opp.savings === 0
+                    ? 'Cash flow benefit'
+                    : fmtL(opp.savings || 0)}
                 </div>
 
                 <p className="text-sm" style={{ color: colors.text.secondary }}>
