@@ -9,7 +9,7 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
-  DollarSign,
+  IndianRupee,
   Calendar,
   Clock,
   Zap,
@@ -116,7 +116,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
 
       {/* SECTION 2: CASH POSITION OVERVIEW */}
       <section>
-        <SectionTitle icon={DollarSign}>Cash Position</SectionTitle>
+        <SectionTitle icon={IndianRupee}>Cash Position</SectionTitle>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
           <CFOCard
@@ -124,7 +124,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             value={(liq.cashPosition?.currentCash || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="good"
             subtitle="Total liquid balance"
           />
@@ -367,7 +367,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             title="Current (0-30d)"
             value={(liq.receivablesPayables?.arAging?.bucket_0_30 || 0) / 100000}
             prefix="₹" suffix="L"
-            icon={DollarSign} status="good"
+            icon={IndianRupee} status="good"
           />
           <CFOCard
             title="31-60 days"
