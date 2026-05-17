@@ -111,7 +111,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
 
   const hasGovernanceIssues =
     overallScore < 60 ||
-    (reconciliation.completeness || 0) < 95 ||
+    (reconciliation.completeness || 0) < 90 ||
     (audit.openFindings || 0) > 3 ||
     !boardReady ||
     Math.abs(variancePct) > 20
