@@ -118,10 +118,10 @@ export default function GlobalMascot() {
   }
 
   const returnToCorner = () => {
-    setTarget(null)
-    setAngle(0)
     setPhase('returning')
     window.setTimeout(() => {
+      setTarget(null)
+      setAngle(0)
       setPhase('idle')
       resetIdleTimer()
     }, 1500)
