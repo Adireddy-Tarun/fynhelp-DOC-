@@ -223,6 +223,7 @@ const App = () => (
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <GlobalMascot />
         </BrowserRouter>
       </TooltipProvider>
       </CAAuthProvider>
