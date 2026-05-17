@@ -288,7 +288,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
                 {fmtDate(reporting.boardMeetingDate)}
               </span>
             </div>
-            <div className="text-xs mt-1" style={{ color: boardColor, fontFamily: "'SF Mono', monospace" }}>
+            <div className="text-xs mt-1 font-semibold" style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}>
               {reporting.daysRemaining ?? 0} days remaining
             </div>
           </Card>
