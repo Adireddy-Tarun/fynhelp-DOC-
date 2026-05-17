@@ -62,13 +62,17 @@ export default function GlobalMascot() {
 
   const triggerRunToCursor = () => {
     const from = cornerPos()
+    // Fallback to viewport center if cursor was never tracked
+    const cursor =
+      cursorRef.current ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 }
     const to = {
       x: Math.min(
-        Math.max(cursorRef.current.x - MASCOT_SIZE / 2, 8),
+        Math.max(cursor.x - MASCOT_SIZE / 2, 8),
         window.innerWidth - MASCOT_SIZE - 8
       ),
       y: Math.min(
-        Math.max(cursorRef.current.y - MASCOT_SIZE - 20, 8),
+        // Leave room above the mascot for the speech bubble (~150px)
+        Math.max(cursor.y - MASCOT_SIZE - 20, 180),
         window.innerHeight - MASCOT_SIZE - 8
       ),
     }
