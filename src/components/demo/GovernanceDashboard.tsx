@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Clock,
   AlertTriangle,
-  DollarSign,
+  IndianRupee,
   Globe,
   Users,
   AlertCircle,
@@ -546,7 +546,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
               valueOverride={fmtPct(risk.creditConcentration || 0)}
               extra="Top 3 customers"
             />
-            <RiskTile label="Liquidity Risk" level={risk.liquidityRisk} icon={DollarSign} />
+            <RiskTile label="Liquidity Risk" level={risk.liquidityRisk} icon={IndianRupee} />
             <RiskTile label="Counterparty Risk" level={risk.counterpartyRisk} icon={Shield} />
             <RiskTile
               label="Insurance Coverage"

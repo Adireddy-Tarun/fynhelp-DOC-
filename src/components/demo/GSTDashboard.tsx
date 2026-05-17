@@ -8,7 +8,7 @@ import {
   Clock,
   AlertTriangle,
   FileText,
-  DollarSign,
+  IndianRupee,
   AlertCircle,
   XCircle,
   TrendingUp,
@@ -207,7 +207,7 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
             value={(itc.totalAvailable || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="neutral"
             subtitle="From GSTR-2A"
           />
@@ -339,7 +339,7 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
             value={(liability.netPayable || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status={(liability.netPayable || 0) > 0 ? STATUS_WARNING : STATUS_GOOD}
             subtitle={compliance.gstr3b?.dueDate ? `Due ${fmtDate(compliance.gstr3b.dueDate)}` : 'Output − Input'}
           />

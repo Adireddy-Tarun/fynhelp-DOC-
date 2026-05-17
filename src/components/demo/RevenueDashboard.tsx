@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import {
   TrendingUp,
   TrendingDown,
-  DollarSign,
+  IndianRupee,
   Users,
   Target,
   Repeat,
@@ -83,7 +83,7 @@ export function RevenueDashboard({ data }: RevenueDashboardProps) {
             value={(m.totalRevenue || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="good"
             subtitle="This month"
           />
@@ -224,7 +224,7 @@ export function RevenueDashboard({ data }: RevenueDashboardProps) {
             value={(m.totalRevenue || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="good"
             subtitle="Cumulative this period"
           />
@@ -439,7 +439,7 @@ export function RevenueDashboard({ data }: RevenueDashboardProps) {
             value={(pipeline.avgDealSize || 0) / 1000}
             prefix="₹"
             suffix="K"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="neutral"
             subtitle="Per opportunity"
           />
@@ -467,7 +467,7 @@ export function RevenueDashboard({ data }: RevenueDashboardProps) {
             value={(pipeline.billings || 0) / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status="good"
           />
           <CFOCard

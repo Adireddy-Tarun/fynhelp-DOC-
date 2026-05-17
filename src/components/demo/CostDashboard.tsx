@@ -10,7 +10,7 @@ import {
   TrendingDown,
   AlertTriangle,
   AlertCircle,
-  DollarSign,
+  IndianRupee,
   Package,
   Target,
   Users,
@@ -190,7 +190,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
 
       {/* SECTION 1: COST STRUCTURE OVERVIEW */}
       <section>
-        <SectionTitle icon={DollarSign}>
+        <SectionTitle icon={IndianRupee}>
           <RollingText text="Cost Structure Overview" />
         </SectionTitle>
 
@@ -200,7 +200,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
             value={totalOpex / 100000}
             prefix="₹"
             suffix="L"
-            icon={DollarSign}
+            icon={IndianRupee}
             status={STATUS_WARNING}
             subtitle="Total operating expenses"
           />
