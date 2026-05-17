@@ -41,6 +41,7 @@ export const colors = {
     100: "#C5CAE9",
     300: "#7986CB",
     500: "#3949AB", // Main brand color
+    600: "#3344AA",
     700: "#283593",
     900: "#1A237E",
   },
@@ -50,6 +51,7 @@ export const colors = {
     50: "#FFF8E1",
     300: "#FFD54F",
     500: "#FFA726", // Main accent
+    600: "#FB8C00",
     700: "#F57C00",
     900: "#E65100",
   },
@@ -64,7 +66,7 @@ export const colors = {
   bg: {
     primary:   "#0A0E27",
     secondary: "#1A1F3A",
-    tertiary:  "#252B48",
+    tertiary:  "#252B4A",
     card:      "#1E2642",
   },
 
