@@ -154,7 +154,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
               <p className="mt-1" style={{ color: colors.text.secondary }}>
                 {[
                   overallScore < 60 && `Control score ${overallScore}/100`,
-                  (reconciliation.completeness || 0) < 95 && `Reconciliation ${fmtPct(reconciliation.completeness || 0)}`,
+                  (reconciliation.completeness || 0) < 90 && `Reconciliation ${fmtPct(reconciliation.completeness || 0)}`,
                   (audit.openFindings || 0) > 3 && `${audit.openFindings} open audit findings`,
                   !boardReady && 'Board package not ready',
                   Math.abs(variancePct) > 20 && `Budget variance ${fmtSignedPct(variancePct)}`,
