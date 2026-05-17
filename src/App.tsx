@@ -79,6 +79,7 @@ import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import GlobalMascot from "@/components/GlobalMascot";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
