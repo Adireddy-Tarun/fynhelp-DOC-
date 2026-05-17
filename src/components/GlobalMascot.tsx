@@ -145,15 +145,14 @@ export default function GlobalMascot() {
           rotate: [0, angle, 0],
         }
       : phase === 'returning'
-      ? {
-          x: [cursorRef.current.x - MASCOT_SIZE / 2, (corner.x + cursorRef.current.x) / 2, corner.x],
-          y: [
-            cursorRef.current.y - MASCOT_SIZE - 20,
-            Math.min(corner.y, cursorRef.current.y) - 80,
-            corner.y,
-          ],
-          rotate: [0, -angle, 0],
-        }
+      ? (() => {
+          const last = target ?? corner
+          return {
+            x: [last.x, (corner.x + last.x) / 2, corner.x],
+            y: [last.y, Math.min(corner.y, last.y) - 80, corner.y],
+            rotate: [0, -angle, 0],
+          }
+        })()
       : { x: pos.x, y: pos.y, rotate: 0 }
 
   const transition =
