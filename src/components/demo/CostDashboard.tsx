@@ -1,617 +1,855 @@
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import {
-  TrendingDown,
-  DollarSign,
-  Users,
-  AlertTriangle,
-  Package,
-  Percent,
-  Target,
-  Award,
-  Zap,
-} from 'lucide-react'
-import {
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts'
 import { CFOCard } from '@/components/ui/CFOCard'
 import { GalaxyButton } from '@/components/ui/GalaxyButton'
-import { RollingText } from '@/components/ui/RollingText'
 import { InteractiveGraph } from '@/components/ui/InteractiveGraph'
-import { colors, staggerContainer, fadeInUp } from '@/lib/design-system'
+import { RollingText } from '@/components/ui/RollingText'
+import { Card } from '@/components/ui/card'
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  AlertCircle,
+  DollarSign,
+  Package,
+  Target,
+  Users,
+  User,
+  Percent,
+  CreditCard,
+  Flame,
+  Shield,
+  Copy,
+  Layers,
+  Calendar,
+  Globe,
+  Activity,
+  Briefcase,
+  Zap,
+} from 'lucide-react'
+import { colors } from '@/lib/design-system'
 
-const cardStyle = {
-  background: colors.bg.card,
-  border: `1px solid rgba(255,255,255,0.08)`,
+interface CostDashboardProps {
+  data: any
 }
 
-const sectionTitle = {
-  fontFamily: 'Georgia, serif',
-  fontSize: 24,
-  color: colors.text.primary,
+const fmtL = (n: number) => `₹${((n || 0) / 100000).toFixed(1)}L`
+const fmtK = (n: number) => `₹${((n || 0) / 1000).toFixed(0)}K`
+const fmtPct = (n: number) => `${(n || 0).toFixed(1)}%`
+
+const STATUS_GOOD = 'good' as const
+const STATUS_WARNING = 'warning' as const
+const STATUS_DANGER = 'danger' as const
+
+function impactTone(impact: string) {
+  const i = String(impact || '').toLowerCase()
+  if (i === 'high') return colors.success.main
+  if (i === 'medium') return colors.warning.main
+  return colors.primary[400]
 }
 
-export function CostDashboard({ data }: { data: any }) {
-  const costData = data?.cost || {
-    totalCost: 630000,
-    topCategories: [
-      { category: 'salary', amount: 180000 },
-      { category: 'rent', amount: 45000 },
-      { category: 'vendor', amount: 85000 },
-    ],
-  }
+function renewalTone(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'expired') return colors.danger.main
+  if (s === 'upcoming') return colors.warning.main
+  return colors.success.main
+}
 
-  const { totalCost } = costData
-  const revenue = data?.revenue?.totalRevenue || 420000
+function riskTone(level: string) {
+  const r = String(level || '').toLowerCase()
+  if (r === 'high') return colors.danger.main
+  if (r === 'medium') return colors.warning.main
+  return colors.success.main
+}
 
-  // METRIC 1: COGS & Gross Margin
-  const cogs = totalCost * 0.28
-  const grossProfit = revenue - cogs
-  const grossMargin = (grossProfit / revenue) * 100
+const OPP_META: Record<string, { icon: any; title: string }> = {
+  'over-provisioned': { icon: AlertCircle, title: 'Over-Provisioned Licenses' },
+  'duplicate': { icon: Copy, title: 'Duplicate Subscriptions' },
+  'consolidation': { icon: Layers, title: 'Vendor Consolidation' },
+  'payment-terms': { icon: Calendar, title: 'Payment Terms' },
+  'volume-discount': { icon: TrendingDown, title: 'Volume Discounts' },
+  'offshore': { icon: Globe, title: 'Offshore Opportunities' },
+}
 
-  // METRIC 2: OpEx Breakdown
-  const opex = totalCost - cogs
-  const salesMarketing = opex * 0.35
-  const researchDev = opex * 0.28
-  const generalAdmin = opex * 0.22
-  const other = opex * 0.15
+function oppMeta(type: string, fallbackIdx: number) {
+  const key = String(type || '').toLowerCase()
+  const direct = OPP_META[key]
+  if (direct) return direct
+  // try fuzzy
+  if (key.includes('over')) return OPP_META['over-provisioned']
+  if (key.includes('dup')) return OPP_META['duplicate']
+  if (key.includes('consol')) return OPP_META['consolidation']
+  if (key.includes('payment')) return OPP_META['payment-terms']
+  if (key.includes('volume') || key.includes('discount')) return OPP_META['volume-discount']
+  if (key.includes('offshore') || key.includes('outsource')) return OPP_META['offshore']
+  const fallbacks = Object.values(OPP_META)
+  return fallbacks[fallbackIdx % fallbacks.length]
+}
 
-  const opexBreakdown = [
-    { name: 'Sales & Marketing', value: salesMarketing, color: colors.primary[500], percent: 35 },
-    { name: 'R&D', value: researchDev, color: colors.accent[500], percent: 28 },
-    { name: 'G&A', value: generalAdmin, color: colors.info.main, percent: 22 },
-    { name: 'Other', value: other, color: colors.success.main, percent: 15 },
-  ]
+export function CostDashboard({ data }: CostDashboardProps) {
+  const cost = data?.cost || {}
+  const structure = cost.structure || {}
+  const breakdown = cost.breakdown || {}
+  const vendors = cost.vendors || {}
+  const unitEcon = cost.unitEconomics || {}
+  const personnel = cost.personnel || {}
+  const optimization = cost.optimization || {}
+  const efficiency = cost.efficiency || {}
 
-  // METRIC 3: EBITDA
-  const ebitda = revenue - opex
-  const ebitdaMargin = (ebitda / revenue) * 100
+  const totalOpex = structure.totalOpex || 0
+  const grossMargin = structure.grossMargin || 0
+  const ebitda = structure.ebitda || 0
 
-  // METRIC 4: Fixed vs Variable
-  const fixedCosts = totalCost * 0.62
-  const variableCosts = totalCost * 0.38
+  const grossMarginStatus = grossMargin > 70 ? STATUS_GOOD : grossMargin >= 50 ? STATUS_WARNING : STATUS_DANGER
+  const ebitdaStatus = ebitda > 0 ? STATUS_GOOD : STATUS_DANGER
 
-  // METRIC 5: Top 10 Vendors
-  const topVendors = [
-    { vendor: 'AWS', amount: 85000, percent: 13.5, paymentTerms: 'Net 30', renewalDate: '2026-08-15', risk: 'high' },
-    { vendor: 'Google Workspace', amount: 45000, percent: 7.1, paymentTerms: 'Net 15', renewalDate: '2026-06-01', risk: 'low' },
-    { vendor: 'Salesforce', amount: 38000, percent: 6.0, paymentTerms: 'Net 45', renewalDate: '2026-09-20', risk: 'medium' },
-    { vendor: 'Office Rent', amount: 45000, percent: 7.1, paymentTerms: 'Net 7', renewalDate: '2027-01-01', risk: 'low' },
-    { vendor: 'Stripe', amount: 32000, percent: 5.1, paymentTerms: 'Net 7', renewalDate: 'Rolling', risk: 'low' },
-    { vendor: 'HubSpot', amount: 28000, percent: 4.4, paymentTerms: 'Net 30', renewalDate: '2026-07-10', risk: 'medium' },
-    { vendor: 'LinkedIn Ads', amount: 42000, percent: 6.7, paymentTerms: 'Prepaid', renewalDate: 'Monthly', risk: 'high' },
-    { vendor: 'Slack', amount: 18000, percent: 2.9, paymentTerms: 'Net 30', renewalDate: '2026-11-05', risk: 'low' },
-    { vendor: 'Zoom', amount: 12000, percent: 1.9, paymentTerms: 'Net 30', renewalDate: '2026-10-15', risk: 'low' },
-    { vendor: 'GitHub', amount: 15000, percent: 2.4, paymentTerms: 'Net 30', renewalDate: '2026-12-01', risk: 'low' },
-  ]
-  const topVendorsTotal = topVendors.reduce((s, v) => s + v.amount, 0)
-  const vendorConcentration = (topVendorsTotal / totalCost) * 100
+  const maverick = vendors.maverickSpend || 0
+  const hasMaverickSpend = totalOpex > 0 && maverick / totalOpex > 0.05
+  const maverickPct = totalOpex > 0 ? (maverick / totalOpex) * 100 : 0
 
-  // METRIC 6: Efficiency
-  const headcount = 12
-  const revenuePerEmployee = revenue / headcount
-  const grossProfitPerEmployee = grossProfit / headcount
-  const netNewArr = revenue * 0.25
-  const salesEfficiency = netNewArr / salesMarketing
-
-  // METRIC 7: G&A
-  const gaPercent = (generalAdmin / revenue) * 100
-
-  // METRIC 8: Unit economics
-  const customers = 28
-  const transactions = data?.revenue?.transactions || 8
-  const costPerCustomer = totalCost / customers
-  const costToServe = opex / customers
-  const costPerTransaction = totalCost / transactions
-
-  // METRIC 9: Trend
-  const costTrend = [
-    { month: 'Oct', opex: opex * 0.78, cogs: cogs * 0.82 },
-    { month: 'Nov', opex: opex * 0.85, cogs: cogs * 0.88 },
-    { month: 'Dec', opex: opex * 0.91, cogs: cogs * 0.93 },
-    { month: 'Jan', opex: opex * 0.95, cogs: cogs * 0.96 },
-    { month: 'Feb', opex: opex * 0.98, cogs: cogs * 0.99 },
-    { month: 'Mar', opex, cogs },
-  ]
-
-  // METRIC 10: Optimization
-  const optimizationFlags = [
-    { issue: 'Over-provisioned AWS', savings: 28000, priority: 'high', action: 'Right-size 3 EC2 instances, remove unused EBS volumes' },
-    { issue: 'Duplicate Slack + Teams', savings: 9000, priority: 'medium', action: 'Consolidate to single platform, cancel redundant licenses' },
-    { issue: 'Unused Salesforce seats', savings: 12000, priority: 'high', action: '8 inactive users for 60+ days, downgrade tier' },
-    { issue: 'LinkedIn Ads ROI < 1.5x', savings: 18000, priority: 'medium', action: 'Pause underperforming campaigns, reallocate to organic' },
-    { issue: 'Vendor payment terms', savings: 0, priority: 'low', action: 'Renegotiate AWS to Net 45, free up ₹85K cash flow' },
-  ]
-  const totalOptimizationSavings = optimizationFlags.reduce((s, f) => s + f.savings, 0)
-  const highPriority = optimizationFlags.filter((f) => f.priority === 'high')
-  const highPrioritySavings = highPriority.reduce((s, f) => s + f.savings, 0)
-
-  const riskColor = (r: string) =>
-    r === 'high' ? colors.danger.main : r === 'medium' ? colors.warning.main : colors.success.main
-  const priorityColor = (p: string) =>
-    p === 'high' ? colors.danger.main : p === 'medium' ? colors.warning.main : colors.info.main
+  const trendBars = useMemo(() => {
+    const trends = efficiency.trends || []
+    return {
+      grossMargin: trends.map((t: any) => ({ label: t.month, value: t.grossMargin || 0 })),
+      opexPercent: trends.map((t: any) => ({ label: t.month, value: t.opexPercent || 0 })),
+      burnMultiple: trends.map((t: any) => ({ label: t.month, value: t.burnMultiple || 0 })),
+    }
+  }, [efficiency.trends])
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-      className="space-y-8"
-    >
-      {/* Banner */}
-      <motion.div
-        variants={fadeInUp}
-        className="rounded-2xl p-8"
-        style={{
-          background: `linear-gradient(135deg, ${colors.bg.secondary} 0%, ${colors.bg.tertiary} 100%)`,
-          border: `1px solid ${colors.warning.main}40`,
-        }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <AlertTriangle size={20} style={{ color: colors.warning.main }} />
-          <span className="font-inter font-semibold uppercase tracking-wider text-xs" style={{ color: colors.warning.main }}>
-            Cost Optimization Potential: ₹{(totalOptimizationSavings / 1000).toFixed(0)}K/month
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>Total Monthly Costs</p>
-            <p className="font-mono font-bold text-3xl" style={{ color: colors.text.primary }}>₹{(totalCost / 100000).toFixed(1)}L</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>Gross Margin</p>
-            <p className="font-mono font-bold text-3xl" style={{ color: grossMargin > 70 ? colors.success.main : colors.warning.main }}>
-              {grossMargin.toFixed(1)}%
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>EBITDA Margin</p>
-            <p className="font-mono font-bold text-3xl" style={{ color: ebitda > 0 ? colors.success.main : colors.danger.main }}>
-              {ebitdaMargin.toFixed(1)}%
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>OpEx</p>
-            <p className="font-mono font-semibold text-xl" style={{ color: colors.text.secondary }}>₹{(opex / 100000).toFixed(1)}L</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>COGS</p>
-            <p className="font-mono font-semibold text-xl" style={{ color: colors.text.secondary }}>₹{(cogs / 100000).toFixed(1)}L</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>G&A % Revenue</p>
-            <p className="font-mono font-semibold text-xl" style={{ color: gaPercent < 15 ? colors.success.main : colors.warning.main }}>
-              {gaPercent.toFixed(1)}%
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* 5 CFO Cards */}
-      <motion.div variants={fadeInUp} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-        <CFOCard
-          title="Total Costs"
-          value={(totalCost / 100000).toFixed(1)}
-          prefix="₹"
-          suffix="L"
-          icon={DollarSign}
-          trend="Monthly burn"
-          status="warning"
-          subtitle="All-in expenses"
-        />
-        <CFOCard
-          title="Gross Margin"
-          value={grossMargin.toFixed(1)}
-          suffix="%"
-          icon={Percent}
-          trend={grossMargin > 70 ? 'Healthy' : 'Needs work'}
-          status={grossMargin > 70 ? 'good' : 'warning'}
-          subtitle="Revenue - COGS"
-        />
-        <CFOCard
-          title="EBITDA"
-          value={(ebitda / 100000).toFixed(1)}
-          prefix="₹"
-          suffix="L"
-          icon={Target}
-          trend={ebitda > 0 ? 'Profitable' : 'Burning'}
-          status={ebitda > 0 ? 'good' : 'danger'}
-          subtitle="Revenue - OpEx"
-        />
-        <CFOCard
-          title="Rev / Employee"
-          value={(revenuePerEmployee / 1000).toFixed(0)}
-          prefix="₹"
-          suffix="K"
-          icon={Users}
-          trend={revenuePerEmployee > 50000 ? 'Above target' : 'Below target'}
-          status={revenuePerEmployee > 50000 ? 'good' : 'warning'}
-          subtitle={`${headcount} employees`}
-        />
-        <CFOCard
-          title="Vendor Concentration"
-          value={vendorConcentration.toFixed(0)}
-          suffix="%"
-          icon={Package}
-          trend={vendorConcentration > 60 ? 'Concentrated' : 'Diversified'}
-          status={vendorConcentration > 60 ? 'warning' : 'good'}
-          subtitle="Top 10 vendors"
-        />
-      </motion.div>
-
-      {/* COGS & Gross Margin */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 style={sectionTitle} className="mb-6">COGS & Gross Margin Analysis</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-xl p-5" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: colors.text.tertiary }}>Revenue</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.text.primary }}>₹{(revenue / 100000).toFixed(1)}L</p>
-          </div>
-          <div className="rounded-xl p-5" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: colors.text.tertiary }}>COGS</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.warning.main }}>₹{(cogs / 100000).toFixed(1)}L</p>
-            <p className="text-xs mt-1" style={{ color: colors.text.tertiary }}>{((cogs / revenue) * 100).toFixed(1)}% of revenue</p>
-          </div>
-          <div className="rounded-xl p-5" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: colors.text.tertiary }}>Gross Profit</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.success.main }}>₹{(grossProfit / 100000).toFixed(1)}L</p>
-            <p className="text-xs mt-1" style={{ color: colors.text.tertiary }}>{grossMargin.toFixed(1)}% margin</p>
-          </div>
-        </div>
-        <div
-          className="mt-6 p-4 rounded-xl"
+    <div className="flex flex-col gap-10" style={{ color: colors.text.primary }}>
+      {/* SECTION 8 (top): MAVERICK SPEND ALERT */}
+      {hasMaverickSpend && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-2xl p-6"
           style={{
-            background: `${grossMargin > 70 ? colors.success.main : colors.warning.main}15`,
-            border: `1px solid ${grossMargin > 70 ? colors.success.main : colors.warning.main}40`,
+            background: `linear-gradient(135deg, ${colors.warning.main}33, ${colors.warning.dark}22)`,
+            border: `1px solid ${colors.warning.main}55`,
           }}
         >
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            <strong style={{ color: colors.text.primary }}>Benchmark:</strong>{' '}
-            {grossMargin > 75
-              ? 'Excellent GM >75%. Strong pricing power.'
-              : grossMargin > 70
-              ? 'Good GM 70-75%. Healthy SaaS margins.'
-              : grossMargin > 60
-              ? 'Moderate GM 60-70%. Room for improvement in COGS.'
-              : 'Low GM <60%. Investigate COGS structure urgently.'}
-          </p>
-        </div>
-      </motion.div>
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: `radial-gradient(circle at 80% 0%, ${colors.warning.main}40, transparent 60%)` }}
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
 
-      {/* OpEx + EBITDA */}
-      <motion.div variants={fadeInUp} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* OpEx Pie */}
-        <div className="rounded-2xl p-6" style={cardStyle}>
-          <h3 style={sectionTitle} className="mb-6">Operating Expense Breakdown</h3>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie data={opexBreakdown} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={2}>
-                {opexBreakdown.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
+          <div className="relative flex items-start gap-4">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: colors.warning.main }}
+            >
+              <AlertTriangle size={24} color="#fff" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.text.primary }}>
+                Maverick Spend Detected
+              </h2>
+              <p className="mt-1" style={{ color: colors.text.secondary }}>
+                {fmtPct(maverickPct)} of OpEx (
+                <span style={{ color: colors.warning.light, fontWeight: 600 }}>{fmtL(maverick)}</span>
+                ) is flowing through unmanaged channels.
+              </p>
+            </div>
+          </div>
+
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <ActionCard
+              icon={Shield}
+              tone={colors.warning.main}
+              title="Implement Approval Workflow"
+              body="Require finance sign-off on any vendor spend over ₹25K"
+              impact="Impact: −60% maverick spend"
+            />
+            <ActionCard
+              icon={CreditCard}
+              tone={colors.primary[500]}
+              title="Centralize Procurement"
+              body="Route all SaaS purchases through a single buyer"
+              impact="Impact: +15% volume discounts"
+            />
+            <ActionCard
+              icon={AlertCircle}
+              tone={colors.danger.main}
+              title="Audit Last 90 Days"
+              body="Identify and consolidate shadow vendor relationships"
+              impact={`Impact: ${fmtL(maverick * 0.4)} recoverable`}
+            />
+          </div>
+
+          <div className="relative mt-6 flex justify-end">
+            <GalaxyButton variant="secondary">
+              <RollingText text="Set Up Spend Controls" />
+            </GalaxyButton>
+          </div>
+        </motion.div>
+      )}
+
+      {/* SECTION 1: COST STRUCTURE OVERVIEW */}
+      <section>
+        <SectionTitle icon={DollarSign}>
+          <RollingText text="Cost Structure Overview" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <CFOCard
+            title="Total OpEx"
+            value={totalOpex / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={DollarSign}
+            status={STATUS_WARNING}
+            subtitle="Total operating expenses"
+          />
+          <CFOCard
+            title="COGS"
+            value={(structure.cogs || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Package}
+            status="neutral"
+            subtitle="Cost of goods sold"
+          />
+          <CFOCard
+            title="Gross Margin"
+            value={grossMargin}
+            suffix="%"
+            icon={Percent}
+            status={grossMarginStatus}
+            subtitle="Revenue minus COGS"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <CFOCard
+            title="Sales & Marketing"
+            value={(structure.salesMarketing || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Target}
+            status="neutral"
+            subtitle="S&M spend"
+          />
+          <CFOCard
+            title="R&D"
+            value={(structure.rnd || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Zap}
+            status="neutral"
+            subtitle="Research & development"
+          />
+          <CFOCard
+            title="G&A"
+            value={(structure.generalAdmin || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Briefcase}
+            status="neutral"
+            subtitle="General & admin"
+          />
+          <CFOCard
+            title="EBITDA"
+            value={(structure.ebitda || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={TrendingUp}
+            status={ebitdaStatus}
+            subtitle={`Margin ${fmtPct(structure.ebitdaMargin || 0)}`}
+          />
+        </div>
+      </section>
+
+      {/* SECTION 2: TOP 10 VENDORS */}
+      <section>
+        <SectionTitle icon={Briefcase}>
+          <RollingText text="Top 10 Vendors" />
+        </SectionTitle>
+
+        <Card
+          className="mt-5 p-6"
+          style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[860px]">
+              <thead>
+                <tr style={{ color: colors.text.secondary, borderBottom: `1px solid ${colors.bg.tertiary}` }}>
+                  <th className="text-left py-2 px-3 font-semibold">Vendor</th>
+                  <th className="text-right py-2 px-3 font-semibold">Monthly Spend</th>
+                  <th className="text-left py-2 px-3 font-semibold">Category</th>
+                  <th className="text-left py-2 px-3 font-semibold">Contract End</th>
+                  <th className="text-left py-2 px-3 font-semibold">Terms</th>
+                  <th className="text-center py-2 px-3 font-semibold">Renewal</th>
+                  <th className="text-center py-2 px-3 font-semibold">Risk</th>
+                  <th className="text-right py-2 px-3 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(vendors.topTen || []).map((v: any, idx: number) => (
+                  <tr key={idx} style={{ borderBottom: `1px solid ${colors.bg.tertiary}80` }}>
+                    <td className="py-3 px-3 font-semibold" style={{ color: colors.text.primary }}>
+                      {v.name}
+                    </td>
+                    <td
+                      className="py-3 px-3 text-right"
+                      style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}
+                    >
+                      {fmtK(v.monthlySpend || 0)}
+                    </td>
+                    <td className="py-3 px-3" style={{ color: colors.text.secondary }}>
+                      {v.category || '—'}
+                    </td>
+                    <td
+                      className="py-3 px-3"
+                      style={{ color: colors.text.secondary, fontFamily: "'SF Mono', monospace" }}
+                    >
+                      {v.contractEnd || '—'}
+                    </td>
+                    <td className="py-3 px-3" style={{ color: colors.text.secondary }}>
+                      {v.paymentTerms || '—'}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <Pill tone={renewalTone(v.renewalStatus)} label={v.renewalStatus || '—'} />
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <Pill tone={riskTone(v.riskLevel)} label={v.riskLevel || '—'} />
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      <button
+                        className="px-3 py-1.5 rounded-md text-xs font-semibold"
+                        style={{ background: colors.primary[500], color: '#fff' }}
+                      >
+                        Review
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ background: colors.bg.secondary, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-                formatter={(value: number) => `₹${(value / 1000).toFixed(0)}K`}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 mt-4">
-            {opexBreakdown.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-2 rounded-lg" style={{ background: colors.bg.secondary }}>
-                <div className="flex items-center gap-3">
-                  <span className="w-3 h-3 rounded-full" style={{ background: item.color }} />
-                  <span className="text-sm" style={{ color: colors.text.secondary }}>{item.name}</span>
+                {(!vendors.topTen || vendors.topTen.length === 0) && (
+                  <tr>
+                    <td colSpan={8} className="py-6 text-center" style={{ color: colors.text.tertiary }}>
+                      No vendor data available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+          <CFOCard
+            title="Vendor Concentration"
+            value={vendors.vendorConcentration || 0}
+            suffix="%"
+            icon={Users}
+            status={(vendors.vendorConcentration || 0) > 60 ? STATUS_DANGER : (vendors.vendorConcentration || 0) > 40 ? STATUS_WARNING : STATUS_GOOD}
+            subtitle="% from top 3 vendors"
+          />
+          <CFOCard
+            title="Spend Under Management"
+            value={vendors.spendUnderManagement || 0}
+            suffix="%"
+            icon={Shield}
+            status={(vendors.spendUnderManagement || 0) > 80 ? STATUS_GOOD : (vendors.spendUnderManagement || 0) > 60 ? STATUS_WARNING : STATUS_DANGER}
+            subtitle="% routed through procurement"
+          />
+        </div>
+      </section>
+
+      {/* SECTION 3: COST BREAKDOWN */}
+      <section>
+        <SectionTitle icon={Layers}>
+          <RollingText text="Cost Breakdown" />
+        </SectionTitle>
+
+        <div
+          className="mt-5 rounded-2xl p-6"
+          style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}
+        >
+          <InteractiveGraph
+            data={(breakdown.byCategory || []).map((c: any) => ({
+              label: c.category,
+              value: c.amount || 0,
+            }))}
+            height={320}
+            formatValue={(v) => fmtL(v)}
+            barColor={colors.warning.main}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <CFOCard
+            title="Fixed Costs"
+            value={(breakdown.fixed || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Shield}
+            status="neutral"
+            subtitle="Recurring obligations"
+          />
+          <CFOCard
+            title="Variable Costs"
+            value={(breakdown.variable || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Activity}
+            status="neutral"
+            subtitle="Scales with volume"
+          />
+          <CFOCard
+            title="Fixed : Variable"
+            value={breakdown.fixedVariableRatio || '—'}
+            icon={Percent}
+            status="neutral"
+            subtitle="Cost structure ratio"
+            animated={false}
+          />
+        </div>
+      </section>
+
+      {/* SECTION 4: UNIT ECONOMICS */}
+      <section>
+        <SectionTitle icon={Target}>
+          <RollingText text="Unit Economics" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <CFOCard
+            title="CAC"
+            value={(unitEcon.cac || 0) / 1000}
+            prefix="₹"
+            suffix="K"
+            icon={Target}
+            status="neutral"
+            subtitle="Customer acquisition cost"
+          />
+          <CFOCard
+            title="Cost to Serve"
+            value={(unitEcon.costToServe || 0) / 1000}
+            prefix="₹"
+            suffix="K"
+            icon={User}
+            status="neutral"
+            subtitle="Per customer per month"
+          />
+          <CFOCard
+            title="Cost per Transaction"
+            value={unitEcon.costPerTransaction || 0}
+            prefix="₹"
+            icon={CreditCard}
+            status="neutral"
+            subtitle="Avg processing cost"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <CFOCard
+            title="Revenue per Employee"
+            value={(unitEcon.revenuePerEmployee || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={TrendingUp}
+            status={
+              (unitEcon.revenuePerEmployee || 0) > 5000000
+                ? STATUS_GOOD
+                : (unitEcon.revenuePerEmployee || 0) >= 3000000
+                ? STATUS_WARNING
+                : STATUS_DANGER
+            }
+            subtitle="Per FTE annualized"
+          />
+          <CFOCard
+            title="Gross Profit per Employee"
+            value={(unitEcon.grossProfitPerEmployee || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Activity}
+            status="good"
+            subtitle="Per FTE annualized"
+          />
+          <CFOCard
+            title="Burn Multiple"
+            value={unitEcon.burnMultiple || 0}
+            suffix="x"
+            icon={Flame}
+            status={
+              (unitEcon.burnMultiple || 0) < 1.5
+                ? STATUS_GOOD
+                : (unitEcon.burnMultiple || 0) <= 3
+                ? STATUS_WARNING
+                : STATUS_DANGER
+            }
+            subtitle="Net burn ÷ net new ARR"
+          />
+        </div>
+      </section>
+
+      {/* SECTION 5: PERSONNEL COSTS */}
+      <section>
+        <SectionTitle icon={Users}>
+          <RollingText text="Personnel Costs" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <CFOCard
+            title="Total Personnel Cost"
+            value={(personnel.totalCost || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Users}
+            status="warning"
+            subtitle="Salaries + benefits"
+          />
+          <CFOCard
+            title="Personnel % of Revenue"
+            value={personnel.percentOfRevenue || 0}
+            suffix="%"
+            icon={Percent}
+            status={
+              (personnel.percentOfRevenue || 0) < 50
+                ? STATUS_GOOD
+                : (personnel.percentOfRevenue || 0) < 70
+                ? STATUS_WARNING
+                : STATUS_DANGER
+            }
+            subtitle="Labor cost ratio"
+          />
+          <CFOCard
+            title="Avg Cost per Employee"
+            value={(personnel.avgCostPerEmployee || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={User}
+            status="neutral"
+            subtitle="Fully loaded annual"
+          />
+        </div>
+
+        <div
+          className="mt-5 rounded-2xl p-6"
+          style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}
+        >
+          <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text.primary }}>
+            Cost by Department
+          </h3>
+          <InteractiveGraph
+            data={(personnel.byDepartment || []).map((d: any) => ({
+              label: d.department,
+              value: d.totalCost || 0,
+            }))}
+            height={300}
+            formatValue={(v) => fmtL(v)}
+            barColor={colors.primary[500]}
+          />
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-6">
+            {(personnel.byDepartment || []).map((d: any, idx: number) => (
+              <div
+                key={idx}
+                className="rounded-lg p-3"
+                style={{ background: colors.bg.tertiary }}
+              >
+                <div className="text-xs" style={{ color: colors.text.secondary }}>
+                  {d.department}
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-sm" style={{ color: colors.text.primary }}>₹{(item.value / 1000).toFixed(0)}K</span>
-                  <span className="text-xs" style={{ color: colors.text.tertiary }}>{item.percent}%</span>
+                <div
+                  className="text-base font-bold mt-1"
+                  style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}
+                >
+                  {d.headcount || 0} FTEs
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: colors.text.tertiary }}>
+                  Avg {fmtL(d.avgCost || 0)}
                 </div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* EBITDA */}
-        <div className="rounded-2xl p-6" style={cardStyle}>
-          <h3 style={sectionTitle} className="mb-6">EBITDA Calculation</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: colors.bg.secondary }}>
-              <span style={{ color: colors.text.secondary }}>Revenue</span>
-              <span className="font-mono font-semibold" style={{ color: colors.success.main }}>+₹{(revenue / 100000).toFixed(1)}L</span>
+      {/* SECTION 6: COST OPTIMIZATION OPPORTUNITIES */}
+      <section>
+        <SectionTitle icon={Zap}>
+          <RollingText text="Cost Optimization Opportunities" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+          {(optimization.opportunities || []).map((opp: any, idx: number) => {
+            const meta = oppMeta(opp.type, idx)
+            const tone = impactTone(opp.impact)
+            const Icon = meta.icon
+            return (
+              <Card
+                key={idx}
+                className="p-5 flex flex-col gap-3"
+                style={{
+                  background: colors.bg.secondary,
+                  borderColor: colors.bg.tertiary,
+                }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ background: `${tone}22` }}
+                    >
+                      <Icon size={18} color={tone} />
+                    </div>
+                    <h4 className="font-semibold text-sm" style={{ color: colors.text.primary }}>
+                      {meta.title}
+                    </h4>
+                  </div>
+                  <Pill tone={tone} label={`${opp.impact || '—'} impact`} />
+                </div>
+
+                <div
+                  className="text-3xl font-bold"
+                  style={{ color: tone, fontFamily: "'SF Mono', monospace" }}
+                >
+                  {fmtL(opp.savings || 0)}
+                </div>
+
+                <p className="text-sm" style={{ color: colors.text.secondary }}>
+                  {opp.description}
+                </p>
+
+                <button
+                  className="self-start mt-1 px-3 py-1.5 rounded-md text-xs font-semibold"
+                  style={{ background: colors.primary[500], color: '#fff' }}
+                >
+                  Implement
+                </button>
+              </Card>
+            )
+          })}
+          {(!optimization.opportunities || optimization.opportunities.length === 0) && (
+            <div
+              className="md:col-span-2 lg:col-span-3 py-8 text-center rounded-2xl"
+              style={{ background: colors.bg.secondary, color: colors.text.tertiary }}
+            >
+              No optimization opportunities surfaced.
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: colors.bg.secondary }}>
-              <span style={{ color: colors.text.secondary }}>Operating Expenses</span>
-              <span className="font-mono font-semibold" style={{ color: colors.danger.main }}>-₹{(opex / 100000).toFixed(1)}L</span>
+          )}
+        </div>
+
+        <Card
+          className="mt-6 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          style={{
+            background: `linear-gradient(135deg, ${colors.success.main}22, ${colors.primary[500]}22)`,
+            borderColor: `${colors.success.main}55`,
+          }}
+        >
+          <div>
+            <div className="text-xs uppercase tracking-wide" style={{ color: colors.text.secondary }}>
+              Total Identified Savings
             </div>
             <div
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{
-                background: ebitda > 0 ? `${colors.success.main}20` : `${colors.danger.main}20`,
-                border: `2px solid ${ebitda > 0 ? colors.success.main : colors.danger.main}`,
-              }}
+              className="text-3xl font-bold mt-1"
+              style={{ color: colors.success.main, fontFamily: "'SF Mono', monospace" }}
             >
-              <span className="font-semibold" style={{ color: colors.text.primary }}>EBITDA</span>
-              <span className="font-mono font-bold text-xl" style={{ color: ebitda > 0 ? colors.success.main : colors.danger.main }}>
-                ₹{(ebitda / 100000).toFixed(1)}L
+              {fmtL(optimization.totalSavings || 0)}
+            </div>
+            <div className="text-sm mt-1" style={{ color: colors.text.secondary }}>
+              Extends runway by{' '}
+              <span style={{ color: colors.text.primary, fontWeight: 600 }}>
+                {(optimization.runwayExtension || 0).toFixed(1)} months
               </span>
             </div>
-            <div className="p-4 rounded-lg" style={{ background: colors.bg.secondary }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm" style={{ color: colors.text.secondary }}>EBITDA Margin</span>
-                <span className="font-mono font-bold text-lg" style={{ color: ebitda > 0 ? colors.success.main : colors.danger.main }}>
-                  {ebitdaMargin.toFixed(1)}%
-                </span>
-              </div>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                {ebitdaMargin > 20
-                  ? 'Excellent profitability'
-                  : ebitdaMargin > 10
-                  ? 'Good profitability'
-                  : ebitdaMargin > 0
-                  ? 'Break-even, room to improve'
-                  : 'Negative EBITDA - prioritize path to profitability'}
-              </p>
-            </div>
           </div>
-        </div>
-      </motion.div>
+          <GalaxyButton variant="primary">
+            <RollingText text="Generate Cost Optimization Roadmap" />
+          </GalaxyButton>
+        </Card>
+      </section>
 
-      {/* Fixed vs Variable */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 style={sectionTitle} className="mb-6">Fixed vs Variable Cost Structure</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-xl p-5" style={{ background: colors.bg.secondary, border: `1px solid ${colors.primary[500]}40` }}>
-            <div className="flex items-center gap-2 mb-3">
-              <Package size={18} style={{ color: colors.primary[500] }} />
-              <h4 className="font-semibold" style={{ color: colors.text.primary }}>Fixed Costs</h4>
-            </div>
-            <p className="font-mono font-bold text-3xl mb-1" style={{ color: colors.text.primary }}>₹{(fixedCosts / 100000).toFixed(1)}L</p>
-            <p className="text-xs mb-4" style={{ color: colors.text.tertiary }}>{((fixedCosts / totalCost) * 100).toFixed(0)}% of total costs</p>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>Salaries</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((fixedCosts * 0.58) / 1000).toFixed(0)}K</span></div>
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>Rent</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((fixedCosts * 0.14) / 1000).toFixed(0)}K</span></div>
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>Software</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((fixedCosts * 0.28) / 1000).toFixed(0)}K</span></div>
-            </div>
-          </div>
+      {/* SECTION 7: EFFICIENCY TRENDS */}
+      <section>
+        <SectionTitle icon={Activity}>
+          <RollingText text="Efficiency Trends" />
+        </SectionTitle>
 
-          <div className="rounded-xl p-5" style={{ background: colors.bg.secondary, border: `1px solid ${colors.accent[500]}40` }}>
-            <div className="flex items-center gap-2 mb-3">
-              <Zap size={18} style={{ color: colors.accent[500] }} />
-              <h4 className="font-semibold" style={{ color: colors.text.primary }}>Variable Costs</h4>
-            </div>
-            <p className="font-mono font-bold text-3xl mb-1" style={{ color: colors.text.primary }}>₹{(variableCosts / 100000).toFixed(1)}L</p>
-            <p className="text-xs mb-4" style={{ color: colors.text.tertiary }}>{((variableCosts / totalCost) * 100).toFixed(0)}% of total costs</p>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>COGS</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((variableCosts * 0.74) / 1000).toFixed(0)}K</span></div>
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>Commissions</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((variableCosts * 0.18) / 1000).toFixed(0)}K</span></div>
-              <div className="flex justify-between"><span style={{ color: colors.text.secondary }}>Usage-based</span><span className="font-mono" style={{ color: colors.text.primary }}>₹{((variableCosts * 0.08) / 1000).toFixed(0)}K</span></div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 p-4 rounded-xl" style={{ background: `${colors.info.main}15`, border: `1px solid ${colors.info.main}40` }}>
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            <strong style={{ color: colors.text.primary }}>Cost Structure:</strong>{' '}
-            {fixedCosts / totalCost > 0.7
-              ? 'High fixed cost base (>70%) reduces flexibility. Consider variable alternatives.'
-              : 'Balanced cost structure with healthy variable component. Scales with revenue.'}
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Top 10 Vendors */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 style={sectionTitle}>Top 10 Vendors by Spend</h3>
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-wider" style={{ color: colors.text.tertiary }}>Vendor Concentration</p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.warning.main }}>{vendorConcentration.toFixed(1)}%</p>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5">
+          <TrendCard
+            title="Gross Margin %"
+            data={trendBars.grossMargin}
+            color={colors.success.main}
+            formatter={(v) => fmtPct(v)}
+          />
+          <TrendCard
+            title="OpEx % of Revenue"
+            data={trendBars.opexPercent}
+            color={colors.danger.main}
+            formatter={(v) => fmtPct(v)}
+          />
+          <TrendCard
+            title="Burn Multiple"
+            data={trendBars.burnMultiple}
+            color={colors.primary[500]}
+            formatter={(v) => `${(v || 0).toFixed(2)}x`}
+          />
         </div>
 
-        <div className="overflow-x-auto rounded-xl" style={{ background: colors.bg.secondary }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                {['VENDOR', 'MONTHLY', '% TOTAL', 'TERMS', 'RENEWAL', 'RISK'].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-xs uppercase tracking-wider font-semibold" style={{ color: colors.text.tertiary }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {topVendors.map((v, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <td className="px-4 py-3 font-semibold" style={{ color: colors.text.primary }}>{v.vendor}</td>
-                  <td className="px-4 py-3 font-mono" style={{ color: colors.text.primary }}>₹{(v.amount / 1000).toFixed(0)}K</td>
-                  <td className="px-4 py-3 font-mono" style={{ color: colors.text.secondary }}>{v.percent.toFixed(1)}%</td>
-                  <td className="px-4 py-3" style={{ color: colors.text.secondary }}>{v.paymentTerms}</td>
-                  <td className="px-4 py-3" style={{ color: colors.text.secondary }}>{v.renewalDate}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className="px-2 py-1 rounded text-xs font-bold"
-                      style={{ background: `${riskColor(v.risk)}20`, color: riskColor(v.risk) }}
-                    >
-                      {v.risk.toUpperCase()}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+          <CFOCard
+            title="Sales Efficiency"
+            value={efficiency.salesEfficiency || 0}
+            icon={Target}
+            status={(efficiency.salesEfficiency || 0) >= 1 ? STATUS_GOOD : STATUS_WARNING}
+            subtitle="New ARR ÷ S&M spend"
+          />
+          <CFOCard
+            title="R&D Efficiency"
+            value={efficiency.rndEfficiency || 0}
+            icon={Zap}
+            status="neutral"
+            subtitle="New product ARR ÷ R&D"
+          />
+          <CFOCard
+            title="G&A %"
+            value={efficiency.gaAsPercent || 0}
+            suffix="%"
+            icon={Briefcase}
+            status={(efficiency.gaAsPercent || 0) < 15 ? STATUS_GOOD : STATUS_WARNING}
+            subtitle="G&A as % of revenue"
+          />
+          <CFOCard
+            title="Rule of 40"
+            value={efficiency.ruleOf40 || 0}
+            icon={Activity}
+            status={
+              (efficiency.ruleOf40 || 0) >= 40
+                ? STATUS_GOOD
+                : (efficiency.ruleOf40 || 0) >= 20
+                ? STATUS_WARNING
+                : STATUS_DANGER
+            }
+            subtitle="Growth% + EBITDA%"
+          />
         </div>
+      </section>
+    </div>
+  )
+}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>High Risk Vendors</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.danger.main }}>{topVendors.filter((v) => v.risk === 'high').length}</p>
-          </div>
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>Avg Payment Terms</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.text.primary }}>Net 28</p>
-          </div>
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>Top 3 = % Total</p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.warning.main }}>
-              {(((topVendors[0].amount + topVendors[1].amount + topVendors[2].amount) / totalCost) * 100).toFixed(0)}%
-            </p>
-          </div>
-        </div>
-      </motion.div>
+// ─── Helpers ───────────────────────────────────────────────
 
-      {/* Efficiency + Unit Economics */}
-      <motion.div variants={fadeInUp} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Efficiency */}
-        <div className="rounded-2xl p-6" style={cardStyle}>
-          <h3 style={sectionTitle} className="mb-6">Efficiency Metrics</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Revenue per Employee', value: `₹${(revenuePerEmployee / 1000).toFixed(0)}K`, sub: `${headcount} employees • Target: >₹50K/employee`, color: revenuePerEmployee > 50000 ? colors.success.main : colors.warning.main },
-              { label: 'Gross Profit per Employee', value: `₹${(grossProfitPerEmployee / 1000).toFixed(0)}K`, sub: 'After COGS • Target: >₹40K/employee', color: grossProfitPerEmployee > 40000 ? colors.success.main : colors.warning.main },
-              { label: 'Sales Efficiency', value: `${salesEfficiency.toFixed(2)}x`, sub: 'Net New ARR / S&M Spend • Target: >0.75x', color: salesEfficiency > 0.75 ? colors.success.main : colors.warning.main },
-              { label: 'G&A as % of Revenue', value: `${gaPercent.toFixed(1)}%`, sub: gaPercent < 15 ? '✓ Within target <15%' : '⚠ Above target, optimize overhead', color: gaPercent < 15 ? colors.success.main : colors.warning.main },
-            ].map((m, i) => (
-              <div key={i} className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm" style={{ color: colors.text.secondary }}>{m.label}</span>
-                  <span className="font-mono font-bold text-lg" style={{ color: m.color }}>{m.value}</span>
-                </div>
-                <p className="text-xs" style={{ color: colors.text.tertiary }}>{m.sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+function SectionTitle({ icon: Icon, children }: { icon: any; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center"
+        style={{ background: `${colors.primary[500]}22`, color: colors.primary[300] }}
+      >
+        <Icon size={18} />
+      </div>
+      <h2
+        className="text-2xl font-bold"
+        style={{ color: colors.text.primary, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      >
+        {children}
+      </h2>
+    </div>
+  )
+}
 
-        {/* Unit Economics */}
-        <div className="rounded-2xl p-6" style={cardStyle}>
-          <h3 style={sectionTitle} className="mb-6">Unit Economics</h3>
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm" style={{ color: colors.text.secondary }}>Cost per Customer</span>
-                <span className="font-mono font-bold text-lg" style={{ color: colors.accent[500] }}>₹{(costPerCustomer / 1000).toFixed(0)}K</span>
-              </div>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>Total costs / {customers} customers</p>
-            </div>
-            <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm" style={{ color: colors.text.secondary }}>Cost to Serve</span>
-                <span className="font-mono font-bold text-lg" style={{ color: colors.info.main }}>₹{(costToServe / 1000).toFixed(0)}K</span>
-              </div>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>OpEx only (excluding COGS)</p>
-            </div>
-            <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm" style={{ color: colors.text.secondary }}>Cost per Transaction</span>
-                <span className="font-mono font-bold text-lg" style={{ color: colors.primary[500] }}>₹{(costPerTransaction / 1000).toFixed(0)}K</span>
-              </div>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>{transactions} revenue transactions</p>
-            </div>
-            <div className="p-4 rounded-xl" style={{ background: `${colors.success.main}15`, border: `1px solid ${colors.success.main}40` }}>
-              <p className="text-sm" style={{ color: colors.text.secondary }}>
-                <strong style={{ color: colors.text.primary }}>Key Insight:</strong> As you scale to 100+ customers, cost/customer should drop by 40-60% through operational leverage.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+function ActionCard({
+  icon: Icon,
+  tone,
+  title,
+  body,
+  impact,
+}: {
+  icon: any
+  tone: string
+  title: string
+  body: string
+  impact: string
+}) {
+  return (
+    <div
+      className="rounded-xl p-4"
+      style={{ background: colors.bg.secondary, border: `1px solid ${tone}44` }}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <Icon size={16} color={tone} />
+        <h4 className="font-semibold text-sm" style={{ color: colors.text.primary }}>
+          {title}
+        </h4>
+      </div>
+      <p className="text-sm" style={{ color: colors.text.secondary }}>
+        {body}
+      </p>
+      <div className="text-xs mt-2 font-semibold" style={{ color: tone }}>
+        {impact}
+      </div>
+    </div>
+  )
+}
 
-      {/* Cost Trend */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 style={sectionTitle} className="mb-6">
-          <RollingText text="Cost Trend Analysis (6 Months)" />
-        </h3>
-        <InteractiveGraph
-          data={costTrend.map((item: { month: string; opex: number; cogs: number }) => ({
-            label: item.month,
-            value: item.opex + item.cogs,
-          }))}
-          height={280}
-          formatValue={(v) => `₹${(v / 100000).toFixed(1)}L`}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>OpEx Growth (6mo)</p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.warning.main }}>+28%</p>
-          </div>
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>COGS Growth (6mo)</p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.warning.main }}>+22%</p>
-          </div>
-          <div className="p-4 rounded-xl" style={{ background: colors.bg.secondary }}>
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: colors.text.tertiary }}>Total Growth (6mo)</p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.warning.main }}>+26%</p>
-          </div>
-        </div>
-      </motion.div>
+function Pill({ tone, label }: { tone: string; label: string }) {
+  return (
+    <span
+      className="inline-block px-2 py-1 rounded-md text-xs font-semibold"
+      style={{
+        background: `${tone}22`,
+        color: tone,
+        border: `1px solid ${tone}55`,
+      }}
+    >
+      {label}
+    </span>
+  )
+}
 
-      {/* Optimization Opportunities */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 style={sectionTitle}>Cost Optimization Opportunities</h3>
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-wider" style={{ color: colors.text.tertiary }}>Total Potential Savings</p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.success.main }}>
-              ₹{(totalOptimizationSavings / 1000).toFixed(0)}K/mo
-            </p>
-          </div>
-        </div>
+function TrendCard({
+  title,
+  data,
+  color,
+  formatter,
+}: {
+  title: string
+  data: Array<{ label: string; value: number }>
+  color: string
+  formatter: (v: number) => string
+}) {
+  const latest = data[data.length - 1]?.value ?? 0
+  const prev = data[data.length - 2]?.value ?? latest
+  const delta = latest - prev
+  const deltaTone = delta === 0 ? colors.text.tertiary : delta > 0 ? colors.success.main : colors.danger.main
 
-        <div className="space-y-3">
-          {optimizationFlags.map((flag, idx) => (
-            <div
-              key={idx}
-              className="p-4 rounded-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-              style={{ background: colors.bg.secondary, border: `1px solid ${priorityColor(flag.priority)}30` }}
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className="px-2 py-1 rounded text-xs font-bold"
-                    style={{ background: `${priorityColor(flag.priority)}20`, color: priorityColor(flag.priority) }}
-                  >
-                    {flag.priority.toUpperCase()}
-                  </span>
-                  <h4 className="font-semibold" style={{ color: colors.text.primary }}>{flag.issue}</h4>
-                </div>
-                <p className="text-sm" style={{ color: colors.text.secondary }}>{flag.action}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs uppercase tracking-wider" style={{ color: colors.text.tertiary }}>Saves</p>
-                <p className="font-mono font-bold text-lg" style={{ color: colors.success.main }}>
-                  {flag.savings > 0 ? `₹${(flag.savings / 1000).toFixed(0)}K` : 'Cash flow'}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <GalaxyButton variant="primary"><RollingText text="Take Action" /></GalaxyButton>
-                <GalaxyButton variant="secondary"><RollingText text="Snooze" /></GalaxyButton>
-              </div>
-            </div>
-          ))}
+  return (
+    <Card
+      className="p-5"
+      style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-semibold" style={{ color: colors.text.primary }}>
+          {title}
+        </h4>
+        <span
+          className="text-xs font-semibold"
+          style={{ color: deltaTone, fontFamily: "'SF Mono', monospace" }}
+        >
+          {delta > 0 ? '▲' : delta < 0 ? '▼' : '—'} {formatter(Math.abs(delta))}
+        </span>
+      </div>
+      <div
+        className="text-2xl font-bold mb-3"
+        style={{ color, fontFamily: "'SF Mono', monospace" }}
+      >
+        {formatter(latest)}
+      </div>
+      {data.length > 0 ? (
+        <InteractiveGraph data={data} height={140} formatValue={formatter} barColor={color} />
+      ) : (
+        <div className="text-xs text-center py-6" style={{ color: colors.text.tertiary }}>
+          No trend data.
         </div>
-
-        <div className="mt-6 p-4 rounded-xl" style={{ background: `${colors.success.main}15`, border: `1px solid ${colors.success.main}40` }}>
-          <p className="font-semibold mb-1" style={{ color: colors.text.primary }}>💰 Quick Wins Available</p>
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            {highPriority.length} high-priority actions identified. Implementing top 3 would save ₹{(highPrioritySavings / 1000).toFixed(0)}K/month, adding{' '}
-            {((highPrioritySavings / (totalCost / 3)) * 30).toFixed(0)} days to runway.
-          </p>
-        </div>
-      </motion.div>
-    </motion.div>
+      )}
+    </Card>
   )
 }
 
