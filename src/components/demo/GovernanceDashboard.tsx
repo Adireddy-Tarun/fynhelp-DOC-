@@ -187,7 +187,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
           </div>
 
           <div className="relative mt-5 flex justify-end">
-            <GalaxyButton variant="warning">
+            <GalaxyButton variant="danger">
               <RollingText text="Create Governance Action Plan" />
             </GalaxyButton>
           </div>
