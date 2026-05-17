@@ -1,90 +1,147 @@
 import { motion } from 'framer-motion'
-import { ReactNode, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { colors } from '@/lib/design-system'
 
 interface GalaxyButtonProps {
   children: ReactNode
-  onClick?: () => void
-  variant?: 'primary' | 'secondary' | 'success' | 'danger'
+  variant?: 'primary' | 'secondary' | 'danger' | 'success'
   className?: string
+  onClick?: () => void
+  disabled?: boolean
+  type?: 'button' | 'submit' | 'reset'
 }
 
 export function GalaxyButton({
   children,
-  onClick,
   variant = 'primary',
   className = '',
+  onClick,
+  disabled = false,
+  type = 'button',
 }: GalaxyButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
 
-  const variantColors = {
-    primary: { base: colors.primary[500], glow: colors.primary[300], particles: colors.accent[500] },
-    secondary: { base: colors.accent[500], glow: colors.accent[300], particles: colors.primary[500] },
-    success: { base: colors.success.main, glow: colors.success.light, particles: colors.accent[500] },
-    danger: { base: colors.danger.main, glow: colors.danger.light, particles: colors.accent[500] },
-  }
+  const variantConfig = {
+    primary: { bg: [colors.primary[500], colors.primary[700]], glow: colors.primary[500], particle: colors.accent[500] },
+    secondary: { bg: [colors.accent[500], colors.accent[600]], glow: colors.accent[500], particle: colors.primary[500] },
+    danger: { bg: [colors.danger.main, colors.danger.dark], glow: colors.danger.main, particle: colors.accent[500] },
+    success: { bg: [colors.success.main, colors.success.light], glow: colors.success.main, particle: colors.accent[500] },
+  } as const
 
-  const colorScheme = variantColors[variant]
+  const config = variantConfig[variant]
+
+  const particles = Array.from({ length: 12 }).map((_, i) => {
+    const angle = i * 30 * (Math.PI / 180)
+    return { x: Math.cos(angle) * 60, y: Math.sin(angle) * 60 }
+  })
+
+  const active = isHovered && !disabled
 
   return (
-    <motion.button
-      onClick={onClick}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className={`relative px-8 py-4 rounded-2xl font-semibold overflow-hidden ${className}`}
-      style={{
-        background: `linear-gradient(135deg, ${colorScheme.base} 0%, ${colorScheme.glow} 100%)`,
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-      }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.98 }}
-    >
+    <div className={`relative inline-block ${className}`} style={{ perspective: 1000 }}>
+      {/* Radial glow */}
       <motion.div
-        className="absolute inset-0"
+        aria-hidden
+        className="absolute inset-0 rounded-xl pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 50%, ${colorScheme.glow}60 0%, transparent 70%)`,
-          filter: 'blur(20px)',
+          background: `radial-gradient(circle at 50% 50%, ${config.glow}, transparent 70%)`,
+          filter: 'blur(40px)',
         }}
         animate={{
-          scale: isHovered ? [1, 1.5, 1.3] : 1,
-          opacity: isHovered ? [0.5, 1, 0.8] : 0.3,
+          scale: active ? 1.2 : 1,
+          opacity: active ? 0.9 : 0.6,
         }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
       />
 
-      {isHovered &&
-        Array.from({ length: 12 }).map((_, i) => (
-          <motion.div
+      <motion.button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        aria-disabled={disabled}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsHovered(true)}
+        onBlur={() => setIsHovered(false)}
+        className="relative px-6 py-3 rounded-xl text-white overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        style={{
+          background: `linear-gradient(135deg, ${config.bg[0]} 0%, ${config.bg[1]} 100%)`,
+          transformStyle: 'preserve-3d',
+          opacity: disabled ? 0.5 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          pointerEvents: disabled ? 'none' : 'auto',
+          fontFamily: "'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif",
+          fontWeight: 600,
+          fontSize: 16,
+          letterSpacing: '-0.01em',
+          // @ts-expect-error CSS custom prop for focus ring color
+          '--tw-ring-color': config.glow,
+          border: 'none',
+        }}
+        whileHover={disabled ? {} : { scale: 1.02, rotateX: -3, rotateY: 3 }}
+        whileTap={disabled ? {} : { scale: 0.98 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      >
+        {/* Shimmer sweep */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+            backgroundSize: '200% 100%',
+          }}
+          animate={{ backgroundPosition: active ? ['−200% 0%', '200% 0%'] : '−200% 0%' }}
+          transition={{ duration: 1.5, ease: 'linear', repeat: active ? Infinity : 0 }}
+        />
+
+        {/* Particles */}
+        {!disabled && particles.map((pos, i) => (
+          <motion.span
             key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{ background: colorScheme.particles, left: '50%', top: '50%' }}
-            initial={{ scale: 0, x: 0, y: 0, opacity: 0 }}
-            animate={{
-              scale: [0, 1.5, 0],
-              x: [0, Math.cos((i / 12) * Math.PI * 2) * 80],
-              y: [0, Math.sin((i / 12) * Math.PI * 2) * 80],
-              opacity: [0, 1, 0],
+            aria-hidden
+            className="motion-particle absolute rounded-full pointer-events-none"
+            style={{
+              width: 4, height: 4,
+              left: '50%', top: '50%',
+              background: config.particle,
+              boxShadow: `0 0 8px ${config.particle}`,
             }}
-            transition={{ duration: 1.2, delay: i * 0.05, ease: 'easeOut' }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+            animate={active
+              ? { x: pos.x, y: pos.y, opacity: [0, 0.8, 0], scale: [0, 1, 0] }
+              : { x: 0, y: 0, opacity: 0, scale: 0 }}
+            transition={{ duration: 1.2, delay: i * 0.05, repeat: active ? Infinity : 0, ease: 'easeOut' }}
           />
         ))}
 
-      <span className="relative z-10 flex items-center justify-center gap-2">{children}</span>
+        {/* Rotating conic border */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 rounded-xl pointer-events-none"
+          style={{
+            padding: 2,
+            background: `conic-gradient(from 0deg, ${config.glow}, ${config.particle}, ${config.glow})`,
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+        />
 
-      <motion.div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={{
-          background: `linear-gradient(90deg, ${colorScheme.glow}, ${colorScheme.particles}, ${colorScheme.glow})`,
-          padding: '2px',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-        }}
-        animate={{ backgroundPosition: isHovered ? ['0% 0%', '200% 0%'] : '0% 0%' }}
-        transition={{ duration: 2, repeat: isHovered ? Infinity : 0, ease: 'linear' }}
-      />
-    </motion.button>
+        {/* Content */}
+        <span className="relative z-10 inline-flex items-center justify-center gap-2">
+          {children}
+        </span>
+      </motion.button>
+
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .motion-particle { display: none !important; }
+        }
+      `}</style>
+    </div>
   )
 }
+
+export default GalaxyButton
