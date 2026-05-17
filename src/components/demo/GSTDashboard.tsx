@@ -1,869 +1,935 @@
 import { motion } from 'framer-motion'
-import {
-  FileText,
-  AlertTriangle,
-  Calendar,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  XCircle,
-  Bell,
-  Shield,
-  TrendingUp,
-} from 'lucide-react'
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  Legend,
-} from 'recharts'
 import { CFOCard } from '@/components/ui/CFOCard'
 import { GalaxyButton } from '@/components/ui/GalaxyButton'
 import { RollingText } from '@/components/ui/RollingText'
-import { colors, staggerContainer, fadeInUp } from '@/lib/design-system'
+import { Card } from '@/components/ui/card'
+import {
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  FileText,
+  DollarSign,
+  AlertCircle,
+  XCircle,
+  TrendingUp,
+  TrendingDown,
+  Percent,
+  Shield,
+  Target,
+  Calendar,
+  Calculator,
+  Receipt,
+  Activity,
+} from 'lucide-react'
+import { colors } from '@/lib/design-system'
 
-export function GSTDashboard({ data }: { data: any }) {
-  const revenue = data?.revenue?.totalRevenue || 420000
-  const costs = data?.cost?.totalCost || 630000
+interface GSTDashboardProps {
+  data: any
+}
 
-  // METRIC 1: GST Liability & ITC
-  const outputGst = revenue * 0.18
-  const inputGst = costs * 0.18
-  const itcAvailable = inputGst * 0.92
-  const gstPayable = outputGst - itcAvailable
-  const itcUtilization = (itcAvailable / inputGst) * 100
+const fmtL = (n: number) => {
+  const v = (n || 0) / 100000
+  const sign = v < 0 ? '−' : ''
+  return `${sign}₹${Math.abs(v).toFixed(2)}L`
+}
+const fmtK = (n: number) => `₹${((n || 0) / 1000).toFixed(0)}K`
+const fmtPct = (n: number) => `${(n || 0).toFixed(1)}%`
 
-  // METRIC 2: Filings
-  const filings = [
-    { return: 'GSTR-1', month: 'Feb 2026', dueDate: '2026-03-11', status: 'filed', filedOn: '2026-03-09' },
-    { return: 'GSTR-3B', month: 'Feb 2026', dueDate: '2026-03-20', status: 'filed', filedOn: '2026-03-18' },
-    { return: 'GSTR-1', month: 'Mar 2026', dueDate: '2026-04-11', status: 'pending', filedOn: null },
-    { return: 'GSTR-3B', month: 'Mar 2026', dueDate: '2026-04-20', status: 'pending', filedOn: null },
-    { return: 'GSTR-1', month: 'Apr 2026', dueDate: '2026-05-11', status: 'upcoming', filedOn: null },
-    { return: 'GSTR-3B', month: 'Apr 2026', dueDate: '2026-05-20', status: 'upcoming', filedOn: null },
-  ]
-  const pendingFilings = filings.filter((f) => f.status === 'pending')
-  const upcomingFilings = filings.filter((f) => f.status === 'upcoming')
+const STATUS_GOOD = 'good' as const
+const STATUS_WARNING = 'warning' as const
+const STATUS_DANGER = 'danger' as const
 
-  // METRIC 3: ITC Reconciliation
-  const itcReconciliation = {
-    asPerBooks: inputGst,
-    asPerGstr2A: inputGst * 0.96,
-    asPerGstr2B: inputGst * 0.94,
-    mismatch: inputGst - inputGst * 0.94,
-    blockedCredit: inputGst * 0.08,
+function filingTone(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'filed') return colors.success.main
+  if (s === 'overdue') return colors.danger.main
+  if (s === 'not due') return colors.text.tertiary
+  return colors.warning.main
+}
+
+function filingIcon(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'filed') return CheckCircle
+  if (s === 'overdue') return XCircle
+  return Clock
+}
+
+function reconTone(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'matched') return colors.success.main
+  if (s === 'mismatch') return colors.warning.main
+  return colors.danger.main
+}
+
+function calendarTone(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'overdue') return colors.danger.main
+  if (s === 'due soon') return colors.warning.main
+  return colors.primary[400]
+}
+
+function noticeTone(status: string) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'action required') return colors.danger.main
+  if (s === 'response submitted') return colors.warning.main
+  return colors.success.main
+}
+
+function riskTone(level: string) {
+  const r = String(level || '').toLowerCase()
+  if (r === 'high') return colors.danger.main
+  if (r === 'medium') return colors.warning.main
+  return colors.success.main
+}
+
+function fmtDate(d: string) {
+  if (!d) return '—'
+  try {
+    return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+  } catch {
+    return d
   }
-  const reconciliationGap = ((itcReconciliation.mismatch / itcReconciliation.asPerBooks) * 100).toFixed(1)
+}
 
-  // METRIC 4: TDS
-  const tdsOnSalaries = costs * 0.12 * 0.1
-  const tdsOnProfessional = costs * 0.08 * 0.1
-  const totalTdsDeducted = tdsOnSalaries + tdsOnProfessional
-  const tdsPayableDate = '2026-05-07'
+export function GSTDashboard({ data }: GSTDashboardProps) {
+  const gst = data?.gst || {}
+  const compliance = gst.compliance || {}
+  const itc = gst.itc || {}
+  const liability = gst.liability || {}
+  const audit = gst.auditReadiness || {}
+  const planning = gst.taxPlanning || {}
+  const calendar: any[] = gst.filingCalendar || []
+  const notices: any[] = gst.notices || []
+  const risk = gst.risk || {}
 
-  // METRIC 5: Tax Calendar
-  const taxPayments = [
-    { type: 'GST (Mar)', amount: gstPayable * 0.33, dueDate: '2026-04-20', status: 'pending', daysLeft: 5 },
-    { type: 'TDS (Apr)', amount: totalTdsDeducted, dueDate: '2026-05-07', status: 'upcoming', daysLeft: 22 },
-    { type: 'Advance Tax Q1', amount: 85000, dueDate: '2026-06-15', status: 'upcoming', daysLeft: 61 },
-    { type: 'GST (Apr)', amount: gstPayable * 0.33, dueDate: '2026-05-20', status: 'upcoming', daysLeft: 35 },
-  ]
-  const totalTaxDue30Days = taxPayments.filter((t) => t.daysLeft <= 30).reduce((s, t) => s + t.amount, 0)
+  const hasOverdueFilings =
+    compliance.gstr1?.status === 'Overdue' || compliance.gstr3b?.status === 'Overdue'
+  const hasNotices = notices.length > 0
 
-  // METRIC 6: GST Rate
-  const gstRates = [
-    { rate: '0%', transactions: 2, revenue: 25000, gst: 0 },
-    { rate: '5%', transactions: 5, revenue: 85000, gst: 4250 },
-    { rate: '12%', transactions: 8, revenue: 120000, gst: 14400 },
-    { rate: '18%', transactions: 45, revenue: 190000, gst: 34200 },
-  ]
-  const totalRateRevenue = gstRates.reduce((s, r) => s + r.revenue, 0)
-  const avgEffectiveRate = ((gstRates.reduce((s, r) => s + r.gst, 0) / totalRateRevenue) * 100).toFixed(1)
+  const itcGapPct = itc.gapPercent || 0
+  const itcGapStatus = itcGapPct > 10 ? STATUS_DANGER : itcGapPct > 5 ? STATUS_WARNING : STATUS_GOOD
 
-  // METRIC 7: Notices
-  const notices = [
-    { id: 'GST-NOT-2026-001', type: 'Mismatch in GSTR-3B', date: '2026-03-25', severity: 'medium', status: 'responded', dueDate: '2026-04-10' },
-    { id: 'GST-NOT-2026-002', type: 'ITC reversal demand', date: '2026-04-02', severity: 'high', status: 'pending', dueDate: '2026-04-20' },
-  ]
-  const activeNotices = notices.filter((n) => n.status === 'pending')
+  const etr = planning.etr || 0
+  const etrStatus = etr > 30 ? STATUS_DANGER : etr >= 25 ? STATUS_WARNING : STATUS_GOOD
 
-  // METRIC 8: Compliance Score
-  const complianceFactors: Record<string, number> = {
-    filingOnTime: 85,
-    itcReconciled: 94,
-    tdsCompliance: 100,
-    gstPaymentOnTime: 90,
-    noticeResponse: 50,
-  }
-  const overallComplianceScore =
-    Object.values(complianceFactors).reduce((s, v) => s + v, 0) / Object.keys(complianceFactors).length
+  const auditScore = audit.overallScore || 0
+  const auditColor = auditScore > 80 ? colors.success.main : auditScore >= 60 ? colors.warning.main : colors.danger.main
 
-  // METRIC 9: GST Trend
-  const gstTrend = [0.72, 0.81, 0.88, 0.94, 0.97, 1].map((m, i) => {
-    const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar']
-    const oFactor = [0.68, 0.78, 0.86, 0.92, 0.96, 1][i]
-    const input = inputGst * m
-    const output = outputGst * oFactor
-    return { month: months[i], input, output, payable: output - input * 0.92 }
-  })
+  const riskScore = risk.complianceScore || 0
+  const riskColor = riskScore < 30 ? colors.success.main : riskScore < 60 ? colors.warning.main : colors.danger.main
 
-  // METRIC 10: Vendor compliance
-  const vendors = [
-    { name: 'AWS India', gstin: '07AABCA1234F1Z5', itc: 85000, filingStatus: 'compliant', lastFiled: 'Mar 2026' },
-    { name: 'Google India', gstin: '27AABCG5678M1Z8', itc: 45000, filingStatus: 'compliant', lastFiled: 'Mar 2026' },
-    { name: 'Vendor ABC', gstin: '29AABCV9012P1ZA', itc: 38000, filingStatus: 'non-compliant', lastFiled: 'Jan 2026' },
-    { name: 'Supplier XYZ', gstin: '19AABCS3456K1ZD', itc: 32000, filingStatus: 'delayed', lastFiled: 'Feb 2026' },
-  ]
-  const nonCompliantVendors = vendors.filter((v) => v.filingStatus !== 'compliant')
-  const atRiskItc = nonCompliantVendors.reduce((s, v) => s + v.itc, 0)
-  const totalVendorItc = vendors.reduce((s, v) => s + v.itc, 0)
-
-  const cardStyle = {
-    background: colors.bg.card,
-    border: `1px solid rgba(255,255,255,0.08)`,
-  }
-
-  const statusColor = (s: string) =>
-    s === 'filed' || s === 'compliant' || s === 'responded'
-      ? colors.success.main
-      : s === 'pending' || s === 'non-compliant'
-      ? colors.danger.main
-      : s === 'delayed' || s === 'upcoming'
-      ? colors.warning.main
-      : colors.text.tertiary
-
-  const severityColor = (s: string) =>
-    s === 'high' ? colors.danger.main : s === 'medium' ? colors.warning.main : colors.info.main
-
-  const scoreColor =
-    overallComplianceScore > 80
-      ? colors.success.main
-      : overallComplianceScore > 60
-      ? colors.warning.main
-      : colors.danger.main
+  const totalDisputed = notices.reduce((s, n) => s + (n.disputedAmount || 0), 0)
 
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-8">
-      {/* Compliance Alert Banner */}
-      {(pendingFilings.length > 0 || activeNotices.length > 0) && (
+    <div className="flex flex-col gap-10" style={{ color: colors.text.primary }}>
+      {/* PENALTY BANNER (conditional) */}
+      {hasOverdueFilings && (
         <motion.div
-          variants={fadeInUp}
-          className="rounded-2xl p-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-2xl p-6"
           style={{
-            background: `linear-gradient(135deg, ${colors.danger.main}25, ${colors.warning.main}15)`,
-            border: `1px solid ${colors.danger.main}50`,
+            background: `linear-gradient(135deg, ${colors.danger.main}33, ${colors.danger.dark}22)`,
+            border: `1px solid ${colors.danger.main}55`,
           }}
         >
-          <div className="flex items-start gap-4">
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: `radial-gradient(circle at 80% 0%, ${colors.danger.main}40, transparent 60%)` }}
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <div className="relative flex items-start gap-4">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: colors.danger.main }}
             >
               <AlertTriangle size={24} color="#fff" />
             </div>
             <div className="flex-1">
-              <h3 className="font-serif font-bold mb-2" style={{ fontSize: 20, color: colors.text.primary }}>
-                ⚠️ URGENT: {pendingFilings.length} Pending Filings + {activeNotices.length} Active Notices
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                {pendingFilings.slice(0, 2).map((filing, idx) => (
-                  <div key={idx} className="p-3 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)' }}>
-                    <div className="font-semibold text-sm" style={{ color: colors.text.primary }}>
-                      {filing.return} - {filing.month}
-                    </div>
-                    <div className="text-xs mt-1" style={{ color: colors.text.secondary }}>
-                      Due:{' '}
-                      {new Date(filing.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-3 flex-wrap">
-                <GalaxyButton variant="danger"><RollingText text="File Now" /></GalaxyButton>
-                <GalaxyButton variant="secondary">
-                  View All ({pendingFilings.length + upcomingFilings.length})
-                </GalaxyButton>
-              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.text.primary }}>
+                Overdue GST Filings
+              </h2>
+              <p className="mt-1" style={{ color: colors.text.secondary }}>
+                Penalties accrued:{' '}
+                <span style={{ color: colors.danger.light, fontWeight: 600 }}>{fmtL(compliance.penalties || 0)}</span>
+                {' · '}Interest:{' '}
+                <span style={{ color: colors.danger.light, fontWeight: 600 }}>{fmtL(compliance.interest || 0)}</span>
+              </p>
             </div>
+            <GalaxyButton variant="danger">
+              <RollingText text="File Immediately" />
+            </GalaxyButton>
           </div>
         </motion.div>
       )}
 
-      {/* Top Stats: 5 KPI Cards */}
-      <motion.div
-        variants={fadeInUp}
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6"
-      >
-        <CFOCard
-          title="GST Payable"
-          value={(gstPayable / 1000).toFixed(0)}
-          prefix="₹"
-          suffix="K"
-          icon={DollarSign}
-          trend={`Due Apr 20`}
-          status="warning"
-          subtitle="Output - ITC"
-        />
-        <CFOCard
-          title="ITC Available"
-          value={(itcAvailable / 1000).toFixed(0)}
-          prefix="₹"
-          suffix="K"
-          icon={Shield}
-          trend={`${itcUtilization.toFixed(0)}% utilized`}
-          status="good"
-          subtitle="Of input GST"
-        />
-        <CFOCard
-          title="Pending Filings"
-          value={pendingFilings.length}
-          icon={FileText}
-          trend={pendingFilings.length > 0 ? 'Action needed' : 'All clear'}
-          status={pendingFilings.length > 0 ? 'danger' : 'good'}
-          subtitle="GST returns"
-        />
-        <CFOCard
-          title="Tax Due (30d)"
-          value={(totalTaxDue30Days / 1000).toFixed(0)}
-          prefix="₹"
-          suffix="K"
-          icon={Calendar}
-          trend={`${taxPayments.filter((t) => t.daysLeft <= 30).length} payments`}
-          status="warning"
-          subtitle="GST + TDS + Advance"
-        />
-        <CFOCard
-          title="Compliance Score"
-          value={overallComplianceScore.toFixed(0)}
-          suffix="%"
-          icon={CheckCircle}
-          trend={overallComplianceScore > 80 ? 'Healthy' : 'Needs work'}
-          status={overallComplianceScore > 80 ? 'good' : 'warning'}
-          subtitle="Overall health"
-        />
-      </motion.div>
+      {/* SECTION 1: COMPLIANCE STATUS */}
+      <section>
+        <SectionTitle icon={FileText}>
+          <RollingText text="Compliance Status" />
+        </SectionTitle>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <FilingCard
+            label="GSTR-1"
+            sub="Outward supplies"
+            status={compliance.gstr1?.status}
+            dueDate={compliance.gstr1?.dueDate}
+            extra={compliance.gstr1?.lastFiled ? `Last filed: ${fmtDate(compliance.gstr1.lastFiled)}` : compliance.gstr1?.period}
+          />
+          <FilingCard
+            label="GSTR-3B"
+            sub="Monthly summary"
+            status={compliance.gstr3b?.status}
+            dueDate={compliance.gstr3b?.dueDate}
+            extra={compliance.gstr3b?.netTaxPaid != null ? `Net tax: ${fmtL(compliance.gstr3b.netTaxPaid)}` : compliance.gstr3b?.period}
+          />
+          <FilingCard
+            label="GSTR-9"
+            sub="Annual return"
+            status={compliance.gstr9?.status}
+            dueDate={compliance.gstr9?.dueDate}
+            extra={compliance.gstr9?.fyear}
+          />
+        </div>
+      </section>
 
-      {/* METRIC 1: GST Liability Breakdown */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 className="font-serif font-bold mb-6" style={{ fontSize: 22, color: colors.text.primary }}>
-          GST Liability Calculation
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Output GST', value: outputGst, sub: `18% on ₹${(revenue / 100000).toFixed(1)}L`, color: colors.info.main },
-            { label: 'Input GST', value: inputGst, sub: `18% on ₹${(costs / 100000).toFixed(1)}L`, color: colors.primary[500] },
-            { label: 'ITC Available', value: itcAvailable, sub: `${itcUtilization.toFixed(0)}% of input`, color: colors.success.main },
-            { label: 'GST Payable', value: gstPayable, sub: 'Due Apr 20', color: colors.warning.main },
-          ].map((item, idx) => (
+      {/* SECTION 2: ITC RECONCILIATION */}
+      <section>
+        <SectionTitle icon={Receipt}>
+          <RollingText text="ITC Reconciliation" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+          <CFOCard
+            title="Total ITC Available"
+            value={(itc.totalAvailable || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={DollarSign}
+            status="neutral"
+            subtitle="From GSTR-2A"
+          />
+          <CFOCard
+            title="ITC Claimed"
+            value={(itc.claimed || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={CheckCircle}
+            status={STATUS_GOOD}
+            subtitle="In GSTR-3B"
+          />
+          <CFOCard
+            title="ITC Gap"
+            value={itcGapPct}
+            suffix="%"
+            icon={AlertCircle}
+            status={itcGapStatus}
+            subtitle={`Gap: ${fmtL(itc.gap || 0)}`}
+          />
+          <CFOCard
+            title="Blocked ITC"
+            value={(itc.ineligible || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={XCircle}
+            status={STATUS_DANGER}
+            subtitle="Ineligible credit"
+          />
+        </div>
+
+        <Card
+          className="mt-5 overflow-hidden"
+          style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ background: colors.bg.tertiary }}>
+                  {['Vendor GSTIN', 'Invoice #', 'Date', 'Value', 'GST', 'Status', 'Action'].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
+                      style={{ color: colors.text.tertiary }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(itc.reconciliation || []).map((row: any, i: number) => (
+                  <tr
+                    key={i}
+                    className="border-t"
+                    style={{ borderColor: colors.bg.tertiary }}
+                  >
+                    <td className="px-4 py-3" style={{ fontFamily: "'SF Mono', monospace", color: colors.text.primary }}>
+                      {row.vendorGstin}
+                    </td>
+                    <td className="px-4 py-3" style={{ color: colors.text.secondary }}>
+                      {row.invoiceNumber}
+                    </td>
+                    <td className="px-4 py-3" style={{ color: colors.text.tertiary }}>
+                      {fmtDate(row.invoiceDate)}
+                    </td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'SF Mono', monospace" }}>
+                      ₹{(row.invoiceValue || 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="px-4 py-3 text-right" style={{ fontFamily: "'SF Mono', monospace", color: colors.text.secondary }}>
+                      ₹{(row.gstAmount || 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Pill tone={reconTone(row.status)} label={row.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        className="text-xs px-3 py-1 rounded-md font-semibold"
+                        style={{
+                          background: `${colors.primary[500]}22`,
+                          color: colors.primary[300],
+                          border: `1px solid ${colors.primary[500]}44`,
+                        }}
+                      >
+                        Reconcile
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <MiniStat label="ITC at Risk" value={fmtL(itc.atRisk || 0)} tone={colors.warning.main} hint="Not yet uploaded by vendor" />
+          <MiniStat label="ITC Reversal Required" value={fmtL(itc.reversal || 0)} tone={colors.danger.main} hint="To be reversed in 3B" />
+          <MiniStat label="Invoice Matching Rate" value={fmtPct(itc.matchingRate || 0)} tone={colors.success.main} hint="2A vs Books" />
+        </div>
+      </section>
+
+      {/* SECTION 3: TAX LIABILITY */}
+      <section>
+        <SectionTitle icon={Calculator}>
+          <RollingText text="Tax Liability" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <CFOCard
+            title="Output GST"
+            value={(liability.outputGst || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={TrendingUp}
+            status="neutral"
+            subtitle="Tax collected"
+          />
+          <CFOCard
+            title="Input GST"
+            value={(liability.inputGst || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={TrendingDown}
+            status="neutral"
+            subtitle="ITC claimed"
+          />
+          <CFOCard
+            title="Net GST Payable"
+            value={(liability.netPayable || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={DollarSign}
+            status={(liability.netPayable || 0) > 0 ? STATUS_WARNING : STATUS_GOOD}
+            subtitle={compliance.gstr3b?.dueDate ? `Due ${fmtDate(compliance.gstr3b.dueDate)}` : 'Output − Input'}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <CFOCard
+            title="Paid to Date"
+            value={(liability.paidToDate || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={CheckCircle}
+            status="neutral"
+            subtitle="Settled"
+          />
+          <CFOCard
+            title="Outstanding GST"
+            value={(liability.outstanding || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={AlertCircle}
+            status={(liability.outstanding || 0) > 0 ? STATUS_DANGER : STATUS_GOOD}
+            subtitle="To be paid"
+          />
+          <CFOCard
+            title="Interest Accrued"
+            value={(liability.interest || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Percent}
+            status={(liability.interest || 0) > 0 ? STATUS_DANGER : STATUS_GOOD}
+            subtitle="On late payment"
+          />
+          <CFOCard
+            title="Cash Flow Impact"
+            value={(liability.cashFlowImpact || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Activity}
+            status={STATUS_WARNING}
+            subtitle="Total cash out"
+          />
+        </div>
+      </section>
+
+      {/* SECTION 4: AUDIT READINESS */}
+      <section>
+        <SectionTitle icon={Shield}>
+          <RollingText text="Audit Readiness" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+          <Card
+            className="p-6 flex flex-col items-center justify-center"
+            style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+          >
+            <ScoreRing score={auditScore} color={auditColor} />
+            <div className="text-sm mt-3" style={{ color: colors.text.secondary }}>Audit Readiness Score</div>
+          </Card>
+
+          <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <ScoreTile label="Invoice Matching" value={audit.invoiceMatchingRate} />
+            <ScoreTile label="GSTIN Validation" value={audit.gstinValidation} />
+            <ScoreTile label="HSN Accuracy" value={audit.hsnAccuracy} />
+            <ScoreTile label="E-way Compliance" value={audit.ewayCompliance} />
+            <ScoreTile label="Audit Trail" value={audit.auditTrail} />
+            <ScoreTile label="Place of Supply" value={audit.placeOfSupply} />
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-end">
+          <GalaxyButton>
+            <RollingText text="Run Full Audit Simulation" />
+          </GalaxyButton>
+        </div>
+      </section>
+
+      {/* SECTION 5: TAX PLANNING */}
+      <section>
+        <SectionTitle icon={Target}>
+          <RollingText text="Tax Planning" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+          <CFOCard
+            title="Effective Tax Rate"
+            value={etr}
+            suffix="%"
+            icon={Percent}
+            status={etrStatus}
+            subtitle="ETR vs statutory"
+          />
+          <CFOCard
+            title="Deferred Tax"
+            value={(planning.deferredTax || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Clock}
+            status="neutral"
+            subtitle="Timing differences"
+          />
+          <CFOCard
+            title="Loss Carryforwards"
+            value={(planning.lossCarryforwards || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={TrendingDown}
+            status={STATUS_GOOD}
+            subtitle={planning.lossExpiryYear ? `Expires ${planning.lossExpiryYear}` : 'Available'}
+          />
+          <CFOCard
+            title="Depreciation"
+            value={(planning.depreciation || 0) / 100000}
+            prefix="₹"
+            suffix="L"
+            icon={Calculator}
+            status="neutral"
+            subtitle="Deductible this year"
+          />
+        </div>
+
+        <Card
+          className="p-6 mt-4"
+          style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+        >
+          <h3 className="text-lg font-bold mb-4" style={{ color: colors.text.primary }}>
+            Tax Benefits & Optimization
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
-              key={idx}
-              className="p-5 rounded-xl"
-              style={{ background: `${item.color}15`, border: `1px solid ${item.color}40` }}
+              className="rounded-xl p-4"
+              style={{
+                background: planning.section80IAC?.eligible ? `${colors.success.main}11` : colors.bg.tertiary,
+                border: `1px solid ${planning.section80IAC?.eligible ? colors.success.main + '44' : colors.bg.tertiary}`,
+              }}
             >
-              <p className="text-xs uppercase tracking-wider mb-2" style={{ color: colors.text.secondary }}>
-                {item.label}
-              </p>
-              <p className="font-mono font-bold mb-1" style={{ fontSize: 28, color: item.color }}>
-                ₹{(item.value / 1000).toFixed(0)}K
-              </p>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                {item.sub}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: colors.text.tertiary }}>
+                  Section 80IAC
+                </span>
+                <Pill
+                  tone={
+                    planning.section80IAC?.status === 'Active'
+                      ? colors.success.main
+                      : planning.section80IAC?.status === 'Expired'
+                      ? colors.danger.main
+                      : colors.warning.main
+                  }
+                  label={planning.section80IAC?.status || 'Not Claimed'}
+                />
+              </div>
+              <div className="text-2xl font-bold" style={{ color: colors.success.main, fontFamily: "'SF Mono', monospace" }}>
+                {fmtL(planning.section80IAC?.savings || 0)}
+              </div>
+              <p className="text-xs mt-1" style={{ color: colors.text.secondary }}>
+                Startup tax exemption (100% deduction)
               </p>
             </div>
-          ))}
-        </div>
-        <div
-          className="mt-6 p-4 rounded-xl"
-          style={{ background: `${colors.accent[500]}15`, border: `1px solid ${colors.accent[500]}40` }}
-        >
-          <p className="text-sm font-semibold mb-1" style={{ color: colors.text.primary }}>
-            Formula: Output GST − ITC Available = GST Payable
-          </p>
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            ₹{(outputGst / 1000).toFixed(0)}K − ₹{(itcAvailable / 1000).toFixed(0)}K = ₹
-            {(gstPayable / 1000).toFixed(0)}K • Blocked credit: ₹
-            {((inputGst - itcAvailable) / 1000).toFixed(0)}K (ineligible expenses)
-          </p>
-        </div>
-      </motion.div>
 
-      {/* METRIC 2 & 3: Filing Status + ITC Reconciliation */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Filing Status */}
-        <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-          <h3 className="font-serif font-bold mb-5" style={{ fontSize: 20, color: colors.text.primary }}>
-            GST Filing Status
-          </h3>
-          <div className="space-y-3">
-            {filings.map((filing, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-3 rounded-lg"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
-              >
-                <div className="flex items-center gap-3">
-                  {filing.status === 'filed' ? (
-                    <CheckCircle size={18} color={colors.success.main} />
-                  ) : filing.status === 'pending' ? (
-                    <AlertTriangle size={18} color={colors.danger.main} />
-                  ) : (
-                    <Clock size={18} color={colors.warning.main} />
-                  )}
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                      {filing.return} — {filing.month}
-                    </p>
-                    <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                      Due:{' '}
-                      {new Date(filing.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
-                    </p>
+            <div
+              className="rounded-xl p-4"
+              style={{ background: colors.bg.tertiary, border: `1px solid ${colors.bg.tertiary}` }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: colors.text.tertiary }}>
+                  Section 54GB
+                </span>
+                <Pill tone={colors.primary[400]} label="Eligible" />
+              </div>
+              <div className="text-sm" style={{ color: colors.text.primary }}>
+                Capital gains exemption on reinvestment in eligible startup equity.
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <h4 className="text-sm font-semibold mb-3" style={{ color: colors.text.primary }}>
+              Optimization Strategies
+            </h4>
+            <ul className="space-y-2">
+              {(planning.optimizations || []).map((opt: any, i: number) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 p-3 rounded-lg"
+                  style={{ background: colors.bg.tertiary }}
+                >
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                    style={{ background: `${colors.primary[500]}33`, color: colors.primary[300], fontSize: 11, fontWeight: 700 }}
+                  >
+                    {i + 1}
                   </div>
-                </div>
-                <div className="text-right">
-                  <span
-                    className="text-xs font-bold uppercase px-2 py-1 rounded"
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold" style={{ color: colors.text.primary }}>
+                      {opt.strategy}
+                    </div>
+                    <div className="text-xs mt-0.5" style={{ color: colors.success.main }}>
+                      {opt.impact}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Card>
+
+        <div className="mt-5 flex justify-end">
+          <GalaxyButton variant="secondary">
+            <RollingText text="Generate Tax Planning Report" />
+          </GalaxyButton>
+        </div>
+      </section>
+
+      {/* SECTION 6: FILING CALENDAR */}
+      <section>
+        <SectionTitle icon={Calendar}>
+          <RollingText text="Filing Calendar" />
+        </SectionTitle>
+
+        <Card
+          className="p-5 mt-5"
+          style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+        >
+          <ul className="space-y-2">
+            {calendar.map((item, i) => {
+              const tone = calendarTone(item.status)
+              return (
+                <li
+                  key={i}
+                  className="flex items-center gap-4 p-3 rounded-lg"
+                  style={{ background: colors.bg.tertiary, borderLeft: `3px solid ${tone}` }}
+                >
+                  <div className="w-24 text-xs font-semibold" style={{ color: colors.text.tertiary, fontFamily: "'SF Mono', monospace" }}>
+                    {fmtDate(item.date)}
+                  </div>
+                  <div className="flex-1 text-sm font-semibold" style={{ color: colors.text.primary }}>
+                    {item.type}
+                  </div>
+                  <Pill tone={tone} label={item.status} />
+                  <button
+                    className="text-xs px-3 py-1 rounded-md font-semibold"
                     style={{
-                      background: `${statusColor(filing.status)}20`,
-                      color: statusColor(filing.status),
+                      background: `${tone}22`,
+                      color: tone,
+                      border: `1px solid ${tone}55`,
                     }}
                   >
-                    {filing.status}
-                  </span>
-                  {filing.filedOn && (
-                    <p className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
-                      Filed{' '}
-                      {new Date(filing.filedOn).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-3 gap-3 mt-5">
-            {[
-              { label: 'Filed', count: filings.filter((f) => f.status === 'filed').length, color: colors.success.main },
-              { label: 'Pending', count: pendingFilings.length, color: colors.danger.main },
-              { label: 'Upcoming', count: upcomingFilings.length, color: colors.warning.main },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className="p-3 rounded-lg text-center"
-                style={{ background: `${s.color}15`, border: `1px solid ${s.color}30` }}
-              >
-                <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-                  {s.label}
-                </p>
-                <p className="font-mono font-bold text-2xl" style={{ color: s.color }}>
-                  {s.count}
-                </p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+                    Prepare
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </Card>
+      </section>
 
-        {/* ITC Reconciliation */}
-        <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-          <h3 className="font-serif font-bold mb-5" style={{ fontSize: 20, color: colors.text.primary }}>
-            ITC Reconciliation (2A vs 2B vs Books)
-          </h3>
-          <div className="space-y-3">
-            {[
-              { label: 'As per Books', value: itcReconciliation.asPerBooks, sub: 'Internal records', color: colors.primary[500] },
-              { label: 'As per GSTR-2A', value: itcReconciliation.asPerGstr2A, sub: 'Vendor-reported', color: colors.info.main },
-              { label: 'As per GSTR-2B', value: itcReconciliation.asPerGstr2B, sub: 'Auto-drafted (final)', color: colors.success.main },
-            ].map((row, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-lg flex items-center justify-between"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
-              >
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                    {row.label}
-                  </p>
-                  <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                    {row.sub}
-                  </p>
-                </div>
-                <p className="font-mono font-bold text-xl" style={{ color: row.color }}>
-                  ₹{(row.value / 1000).toFixed(0)}K
-                </p>
-              </div>
-            ))}
-            <div
-              className="p-4 rounded-lg"
-              style={{ background: `${colors.warning.main}15`, border: `1px solid ${colors.warning.main}40` }}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                  Reconciliation Gap
-                </p>
-                <p className="font-mono font-bold text-xl" style={{ color: colors.warning.main }}>
-                  ₹{(itcReconciliation.mismatch / 1000).toFixed(0)}K
-                </p>
-              </div>
-              <p className="text-xs" style={{ color: colors.text.secondary }}>
-                {reconciliationGap}% variance • Action: verify {nonCompliantVendors.length} vendor invoices
-              </p>
-            </div>
-          </div>
-          <div
-            className="mt-5 p-3 rounded-lg"
-            style={{ background: `${colors.danger.main}15`, border: `1px solid ${colors.danger.main}30` }}
-          >
-            <p className="text-xs" style={{ color: colors.text.secondary }}>
-              <strong style={{ color: colors.text.primary }}>Blocked ITC:</strong> ₹
-              {(itcReconciliation.blockedCredit / 1000).toFixed(0)}K ineligible (personal use, exempt supplies)
-            </p>
-          </div>
-        </motion.div>
-      </div>
+      {/* SECTION 7: NOTICES (conditional) */}
+      {hasNotices && (
+        <section>
+          <SectionTitle icon={AlertCircle}>
+            <RollingText text="Notices & Assessments" />
+          </SectionTitle>
 
-      {/* METRIC 4: TDS */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 className="font-serif font-bold mb-5" style={{ fontSize: 22, color: colors.text.primary }}>
-          TDS Deducted & Payable
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { label: 'TDS on Salaries', value: tdsOnSalaries, sub: 'Section 192', color: colors.primary[500] },
-            { label: 'TDS on Professional Fees', value: tdsOnProfessional, sub: 'Section 194J', color: colors.info.main },
-            {
-              label: 'Total Payable',
-              value: totalTdsDeducted,
-              sub: `Due ${new Date(tdsPayableDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}`,
-              color: colors.warning.main,
-            },
-          ].map((t, i) => (
-            <div
-              key={i}
-              className="p-5 rounded-xl"
-              style={{ background: `${t.color}15`, border: `1px solid ${t.color}40` }}
-            >
-              <p className="text-xs uppercase tracking-wider mb-2" style={{ color: colors.text.secondary }}>
-                {t.label}
-              </p>
-              <p className="font-mono font-bold mb-1" style={{ fontSize: 28, color: t.color }}>
-                ₹{(t.value / 1000).toFixed(0)}K
-              </p>
-              <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                {t.sub}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div
-          className="mt-5 p-4 rounded-xl"
-          style={{ background: `${colors.info.main}15`, border: `1px solid ${colors.info.main}40` }}
-        >
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            <strong style={{ color: colors.text.primary }}>Monthly TDS Filing:</strong> Form 24Q (salaries) + 26Q
-            (others) must be filed by the 7th of the next month. Current month deductions: ₹
-            {(totalTdsDeducted / 1000).toFixed(0)}K.
-          </p>
-        </div>
-      </motion.div>
-
-      {/* METRIC 5: Tax Calendar */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-serif font-bold" style={{ fontSize: 22, color: colors.text.primary }}>
-            Upcoming Tax Payments
-          </h3>
-          <div className="text-right">
-            <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-              Due in 30 days
-            </p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.warning.main }}>
-              ₹{(totalTaxDue30Days / 1000).toFixed(0)}K
-            </p>
-          </div>
-        </div>
-        <div className="space-y-3">
-          {taxPayments.map((payment, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{ background: 'rgba(255,255,255,0.03)' }}
-            >
-              <div className="flex items-center gap-3">
-                <Calendar size={20} color={payment.daysLeft <= 7 ? colors.danger.main : colors.warning.main} />
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                    {payment.type}
-                  </p>
-                  <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                    Due:{' '}
-                    {new Date(payment.dueDate).toLocaleDateString('en-IN', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-mono font-bold text-lg" style={{ color: colors.text.primary }}>
-                  ₹{(payment.amount / 1000).toFixed(0)}K
-                </p>
-                <p
-                  className="text-xs font-semibold"
-                  style={{ color: payment.daysLeft <= 7 ? colors.danger.main : colors.text.secondary }}
-                >
-                  {payment.daysLeft} days left
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* METRIC 6 & 7: GST Rate Analysis + Notices */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* GST Rate Analysis */}
-        <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-          <h3 className="font-serif font-bold mb-5" style={{ fontSize: 20, color: colors.text.primary }}>
-            GST Rate-wise Breakdown
-          </h3>
-          <div className="space-y-4">
-            {gstRates.map((rate, idx) => (
-              <div key={idx}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="font-mono font-bold text-lg"
-                      style={{ color: colors.accent[500] }}
-                    >
-                      {rate.rate}
-                    </span>
-                    <span className="text-xs" style={{ color: colors.text.tertiary }}>
-                      {rate.transactions} transactions
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                      ₹{(rate.gst / 1000).toFixed(1)}K GST
-                    </p>
-                    <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                      on ₹{(rate.revenue / 1000).toFixed(0)}K
-                    </p>
-                  </div>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: colors.primary[500] }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(rate.revenue / totalRateRevenue) * 100}%` }}
-                    transition={{ duration: 1, delay: idx * 0.1 }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div
-            className="mt-5 p-3 rounded-lg"
-            style={{ background: `${colors.accent[500]}15`, border: `1px solid ${colors.accent[500]}30` }}
-          >
-            <p className="text-xs" style={{ color: colors.text.secondary }}>
-              <strong style={{ color: colors.text.primary }}>Avg Effective Rate:</strong> {avgEffectiveRate}% • Most
-              transactions at the 18% standard rate
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Notices */}
-        <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="font-serif font-bold" style={{ fontSize: 20, color: colors.text.primary }}>
-              Notices & Communications
-            </h3>
-            <Bell size={20} color={colors.warning.main} />
-          </div>
-          {notices.length > 0 ? (
-            <div className="space-y-3">
-              {notices.map((notice, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-lg"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${severityColor(notice.severity)}30` }}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+            {notices.map((n, i) => {
+              const tone = noticeTone(n.status)
+              return (
+                <Card
+                  key={i}
+                  className="p-5"
+                  style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary, borderLeft: `3px solid ${tone}` }}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className="text-xs font-bold uppercase px-2 py-0.5 rounded"
-                          style={{
-                            background: `${severityColor(notice.severity)}25`,
-                            color: severityColor(notice.severity),
-                          }}
-                        >
-                          {notice.severity}
-                        </span>
-                        <span className="text-xs font-mono" style={{ color: colors.text.tertiary }}>
-                          {notice.id}
-                        </span>
-                      </div>
-                      <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                        {notice.type}
-                      </p>
-                      <p className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
-                        Received:{' '}
-                        {new Date(notice.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} •
-                        Reply by:{' '}
-                        {new Date(notice.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
-                      </p>
+                    <div className="text-sm font-semibold" style={{ color: colors.text.primary }}>
+                      {n.type}
                     </div>
-                    <span
-                      className="text-xs font-bold uppercase px-2 py-1 rounded"
+                    <Pill tone={tone} label={n.status} />
+                  </div>
+                  <div className="text-xs mb-3" style={{ color: colors.text.tertiary, fontFamily: "'SF Mono', monospace" }}>
+                    {n.number}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                    <div>
+                      <div style={{ color: colors.text.tertiary }}>Issued</div>
+                      <div style={{ color: colors.text.primary }}>{fmtDate(n.issueDate)}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: colors.text.tertiary }}>Deadline</div>
+                      <div style={{ color: colors.text.primary }}>{fmtDate(n.deadline)}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs" style={{ color: colors.text.tertiary }}>Disputed</div>
+                      <div className="text-lg font-bold" style={{ color: colors.danger.main, fontFamily: "'SF Mono', monospace" }}>
+                        {fmtL(n.disputedAmount || 0)}
+                      </div>
+                    </div>
+                    <button
+                      className="text-xs px-3 py-1 rounded-md font-semibold"
                       style={{
-                        background: `${statusColor(notice.status)}20`,
-                        color: statusColor(notice.status),
+                        background: `${tone}22`,
+                        color: tone,
+                        border: `1px solid ${tone}55`,
                       }}
                     >
-                      {notice.status}
-                    </span>
+                      Respond
+                    </button>
                   </div>
-                  {notice.status === 'pending' && (
-                    <div className="mt-3">
-                      <GalaxyButton variant="danger"><RollingText text="Respond Now" /></GalaxyButton>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <CheckCircle size={48} color={colors.success.main} className="mx-auto mb-3" />
-              <p className="font-semibold" style={{ color: colors.text.primary }}>
-                No Active Notices
-              </p>
-              <p className="text-sm mt-1" style={{ color: colors.text.secondary }}>
-                All clear! No pending communications.
-              </p>
-            </div>
-          )}
-          <div className="grid grid-cols-2 gap-3 mt-5">
-            <div className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-              <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-                Total Notices
-              </p>
-              <p className="font-mono font-bold text-2xl" style={{ color: colors.text.primary }}>
-                {notices.length}
-              </p>
-            </div>
-            <div className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-              <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-                Pending
-              </p>
-              <p className="font-mono font-bold text-2xl" style={{ color: colors.danger.main }}>
-                {activeNotices.length}
-              </p>
-            </div>
+                </Card>
+              )
+            })}
           </div>
-        </motion.div>
-      </div>
 
-      {/* METRIC 8: Compliance Score */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-serif font-bold" style={{ fontSize: 22, color: colors.text.primary }}>
-            Compliance Health Score
-          </h3>
-          <div className="text-right">
-            <p className="font-mono font-bold" style={{ fontSize: 48, color: scoreColor, lineHeight: 1 }}>
-              {overallComplianceScore.toFixed(0)}%
-            </p>
-            <p className="text-xs uppercase mt-1" style={{ color: colors.text.secondary }}>
-              {overallComplianceScore > 80
-                ? 'Excellent'
-                : overallComplianceScore > 60
-                ? 'Good'
-                : 'Needs Attention'}
-            </p>
-          </div>
-        </div>
-        <div className="space-y-4">
-          {Object.entries(complianceFactors).map(([key, value], idx) => {
-            const c = value > 80 ? colors.success.main : value > 60 ? colors.warning.main : colors.danger.main
-            return (
-              <div key={key}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm capitalize" style={{ color: colors.text.secondary }}>
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                  </p>
-                  <p className="text-sm font-mono font-bold" style={{ color: c }}>
-                    {value}%
-                  </p>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: c }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${value}%` }}
-                    transition={{ duration: 1, delay: idx * 0.1 }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div
-          className="mt-6 p-4 rounded-xl"
-          style={{
-            background: `${overallComplianceScore > 80 ? colors.success.main : colors.warning.main}15`,
-            border: `1px solid ${overallComplianceScore > 80 ? colors.success.main : colors.warning.main}40`,
-          }}
-        >
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            <strong style={{ color: colors.text.primary }}>Action Required:</strong>{' '}
-            {overallComplianceScore > 80
-              ? 'Excellent compliance standing. Maintain current practices.'
-              : 'Notice response rate at 50% needs immediate attention. Reply to pending GST notice within 3 days to avoid penalties.'}
-          </p>
-        </div>
-      </motion.div>
+          <Card
+            className="p-5 mt-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+            style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+          >
+            <SummaryStat label="Total Disputed" value={fmtL(totalDisputed)} tone={colors.danger.main} />
+            <SummaryStat label="Provisions Made" value={fmtL(totalDisputed * 0.4)} tone={colors.warning.main} />
+            <SummaryStat label="Net Exposure" value={fmtL(totalDisputed * 0.6)} tone={colors.danger.light} />
+          </Card>
+        </section>
+      )}
 
-      {/* METRIC 9: GST Trend Chart */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <h3 className="font-serif font-bold mb-5" style={{ fontSize: 22, color: colors.text.primary }}>
-          GST Trend (Last 6 Months)
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={gstTrend}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="month" stroke={colors.text.tertiary} />
-            <YAxis stroke={colors.text.tertiary} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
-            <Tooltip
-              contentStyle={{
-                background: colors.bg.secondary,
-                border: `1px solid ${colors.primary[500]}40`,
-                borderRadius: 8,
-                color: colors.text.primary,
-              }}
-              formatter={(v: number) => `₹${v.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+      {/* SECTION 8: RISK ANALYSIS */}
+      <section>
+        <SectionTitle icon={Activity}>
+          <RollingText text="Risk Analysis" />
+        </SectionTitle>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+          <Card
+            className="p-6 flex flex-col items-center justify-center"
+            style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+          >
+            <ScoreRing score={riskScore} color={riskColor} reverse />
+            <div className="text-sm mt-3" style={{ color: colors.text.secondary }}>
+              Compliance Risk Score
+            </div>
+            <div className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
+              Lower is better
+            </div>
+          </Card>
+
+          <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <RiskTile label="Late Filing" level={risk.factors?.lateFiling} />
+            <RiskTile label="ITC Mismatch" level={risk.factors?.itcMismatch} />
+            <RiskTile label="Invoice Accuracy" level={risk.factors?.invoiceAccuracy} />
+            <RiskTile label="Cash Flow" level={risk.factors?.cashFlow} />
+            <RiskTile label="Audit Selection" level={risk.factors?.auditSelection} />
+            <RiskTile
+              label="Penalty Exposure"
+              level="High"
+              valueOverride={fmtL(risk.factors?.penaltyExposure || 0)}
             />
-            <Legend wrapperStyle={{ color: colors.text.secondary }} />
-            <Line type="monotone" dataKey="output" stroke={colors.info.main} strokeWidth={2} name="Output GST" />
-            <Line type="monotone" dataKey="input" stroke={colors.primary[500]} strokeWidth={2} name="Input GST" />
-            <Line type="monotone" dataKey="payable" stroke={colors.warning.main} strokeWidth={2} name="Payable" />
-          </LineChart>
-        </ResponsiveContainer>
-        <div className="grid grid-cols-3 gap-4 mt-5">
-          {[
-            { label: 'Avg Output GST', value: gstTrend.reduce((s, m) => s + m.output, 0) / gstTrend.length, color: colors.info.main },
-            { label: 'Avg Input GST', value: gstTrend.reduce((s, m) => s + m.input, 0) / gstTrend.length, color: colors.primary[500] },
-            { label: 'Avg Payable', value: gstTrend.reduce((s, m) => s + m.payable, 0) / gstTrend.length, color: colors.warning.main },
-          ].map((s, i) => (
-            <div key={i} className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-              <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-                {s.label}
-              </p>
-              <p className="font-mono font-bold text-xl" style={{ color: s.color }}>
-                ₹{(s.value / 1000).toFixed(0)}K
-              </p>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* METRIC 10: Vendor Compliance */}
-      <motion.div variants={fadeInUp} className="rounded-2xl p-6" style={cardStyle}>
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-serif font-bold" style={{ fontSize: 22, color: colors.text.primary }}>
-            Vendor GST Compliance (ITC Eligibility)
-          </h3>
-          <div className="text-right">
-            <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-              ITC at Risk
-            </p>
-            <p className="font-mono font-bold text-2xl" style={{ color: colors.danger.main }}>
-              ₹{(atRiskItc / 1000).toFixed(0)}K
-            </p>
           </div>
         </div>
-        <div className="space-y-3">
-          {vendors.map((vendor, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between p-4 rounded-lg"
-              style={{ background: 'rgba(255,255,255,0.03)' }}
-            >
-              <div>
-                <p className="text-sm font-semibold" style={{ color: colors.text.primary }}>
-                  {vendor.name}
-                </p>
-                <p className="text-xs font-mono" style={{ color: colors.text.tertiary }}>
-                  GSTIN: {vendor.gstin}
-                </p>
-                <p className="text-xs" style={{ color: colors.text.tertiary }}>
-                  Last Filed: {vendor.lastFiled}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="font-mono font-bold text-lg" style={{ color: colors.text.primary }}>
-                  ₹{(vendor.itc / 1000).toFixed(0)}K
-                </p>
-                <span
-                  className="text-xs font-bold uppercase px-2 py-1 rounded inline-block mt-1"
-                  style={{
-                    background: `${statusColor(vendor.filingStatus)}20`,
-                    color: statusColor(vendor.filingStatus),
-                  }}
-                >
-                  {vendor.filingStatus}
-                </span>
-              </div>
-            </div>
-          ))}
+
+        <div className="mt-5 flex justify-end">
+          <GalaxyButton variant="secondary">
+            <RollingText text="Generate Risk Mitigation Plan" />
+          </GalaxyButton>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+/* ───────── Helpers ───────── */
+
+function SectionTitle({ icon: Icon, children }: { icon: any; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center"
+        style={{ background: `${colors.primary[500]}22`, color: colors.primary[300] }}
+      >
+        <Icon size={18} />
+      </div>
+      <h2
+        className="text-2xl font-bold"
+        style={{ color: colors.text.primary, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      >
+        {children}
+      </h2>
+    </div>
+  )
+}
+
+function Pill({ tone, label }: { tone: string; label: string }) {
+  return (
+    <span
+      className="inline-block px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap"
+      style={{
+        background: `${tone}22`,
+        color: tone,
+        border: `1px solid ${tone}55`,
+      }}
+    >
+      {label}
+    </span>
+  )
+}
+
+function FilingCard({
+  label,
+  sub,
+  status,
+  dueDate,
+  extra,
+}: {
+  label: string
+  sub: string
+  status?: string
+  dueDate?: string
+  extra?: string
+}) {
+  const tone = filingTone(status || '')
+  const Icon = filingIcon(status || '')
+  return (
+    <Card
+      className="p-5"
+      style={{
+        background: colors.bg.secondary,
+        borderColor: colors.bg.tertiary,
+        borderLeft: `3px solid ${tone}`,
+      }}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="text-lg font-bold" style={{ color: colors.text.primary }}>
+            {label}
+          </div>
+          <div className="text-xs" style={{ color: colors.text.tertiary }}>
+            {sub}
+          </div>
         </div>
         <div
-          className="mt-5 p-4 rounded-xl"
-          style={{ background: `${colors.danger.main}15`, border: `1px solid ${colors.danger.main}40` }}
+          className="w-9 h-9 rounded-lg flex items-center justify-center"
+          style={{ background: `${tone}22`, color: tone }}
         >
-          <p className="text-sm font-semibold mb-1" style={{ color: colors.text.primary }}>
-            ⚠️ Action Required: {nonCompliantVendors.length} Non-Compliant Vendors
-          </p>
-          <p className="text-sm" style={{ color: colors.text.secondary }}>
-            ITC worth ₹{(atRiskItc / 1000).toFixed(0)}K at risk. Contact vendors immediately to ensure timely GST
-            filing. If vendors remain non-compliant for 2+ months, ITC may be reversed.
-          </p>
+          <Icon size={18} />
         </div>
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          <div className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-            <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-              Compliant
-            </p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.success.main }}>
-              {vendors.filter((v) => v.filingStatus === 'compliant').length}/{vendors.length}
-            </p>
-          </div>
-          <div className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-            <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-              Total ITC
-            </p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.text.primary }}>
-              ₹{(totalVendorItc / 1000).toFixed(0)}K
-            </p>
-          </div>
-          <div className="p-3 rounded-lg text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
-            <p className="text-xs uppercase" style={{ color: colors.text.secondary }}>
-              At Risk
-            </p>
-            <p className="font-mono font-bold text-xl" style={{ color: colors.danger.main }}>
-              {((atRiskItc / totalVendorItc) * 100).toFixed(0)}%
-            </p>
-          </div>
+      </div>
+      <Pill tone={tone} label={status || '—'} />
+      <div className="mt-3 text-xs" style={{ color: colors.text.secondary }}>
+        Due: <span style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}>{fmtDate(dueDate || '')}</span>
+      </div>
+      {extra && (
+        <div className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
+          {extra}
         </div>
-      </motion.div>
-    </motion.div>
+      )}
+    </Card>
+  )
+}
+
+function MiniStat({ label, value, tone, hint }: { label: string; value: string; tone: string; hint?: string }) {
+  return (
+    <Card
+      className="p-4"
+      style={{ background: colors.bg.secondary, borderColor: colors.bg.tertiary }}
+    >
+      <div className="text-xs uppercase tracking-wide font-semibold" style={{ color: colors.text.tertiary }}>
+        {label}
+      </div>
+      <div className="text-2xl font-bold mt-1" style={{ color: tone, fontFamily: "'SF Mono', monospace" }}>
+        {value}
+      </div>
+      {hint && (
+        <div className="text-xs mt-1" style={{ color: colors.text.tertiary }}>
+          {hint}
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function SummaryStat({ label, value, tone }: { label: string; value: string; tone: string }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide font-semibold" style={{ color: colors.text.tertiary }}>
+        {label}
+      </div>
+      <div className="text-2xl font-bold mt-1" style={{ color: tone, fontFamily: "'SF Mono', monospace" }}>
+        {value}
+      </div>
+    </div>
+  )
+}
+
+function ScoreRing({ score, color, reverse }: { score: number; color: string; reverse?: boolean }) {
+  const pct = Math.max(0, Math.min(100, score))
+  const visualPct = reverse ? 100 - pct : pct
+  const r = 56
+  const c = 2 * Math.PI * r
+  const offset = c - (visualPct / 100) * c
+  return (
+    <div className="relative" style={{ width: 140, height: 140 }}>
+      <svg width="140" height="140" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="70" cy="70" r={r} stroke={colors.bg.tertiary} strokeWidth="10" fill="none" />
+        <motion.circle
+          cx="70"
+          cy="70"
+          r={r}
+          stroke={color}
+          strokeWidth="10"
+          fill="none"
+          strokeLinecap="round"
+          initial={{ strokeDashoffset: c }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+          style={{ strokeDasharray: c }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="text-3xl font-bold" style={{ color, fontFamily: "'SF Mono', monospace" }}>
+          {pct}
+        </div>
+        <div className="text-xs" style={{ color: colors.text.tertiary }}>
+          / 100
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ScoreTile({ label, value }: { label: string; value?: number }) {
+  const v = value || 0
+  const tone = v > 80 ? colors.success.main : v >= 60 ? colors.warning.main : colors.danger.main
+  return (
+    <div
+      className="rounded-xl p-3"
+      style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}
+    >
+      <div className="text-xs font-semibold" style={{ color: colors.text.tertiary }}>
+        {label}
+      </div>
+      <div className="text-xl font-bold mt-1" style={{ color: tone, fontFamily: "'SF Mono', monospace" }}>
+        {fmtPct(v)}
+      </div>
+      <div className="h-1.5 mt-2 rounded-full overflow-hidden" style={{ background: colors.bg.tertiary }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(100, v)}%` }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
+          style={{ height: '100%', background: tone }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function RiskTile({
+  label,
+  level,
+  valueOverride,
+}: {
+  label: string
+  level?: string
+  valueOverride?: string
+}) {
+  const tone = riskTone(level || 'low')
+  const descMap: Record<string, string> = {
+    high: 'Immediate action required',
+    medium: 'Monitor closely',
+    low: 'Within tolerance',
+  }
+  const key = String(level || 'low').toLowerCase()
+  return (
+    <div
+      className="rounded-xl p-4"
+      style={{ background: colors.bg.secondary, border: `1px solid ${tone}44` }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-xs font-semibold" style={{ color: colors.text.tertiary }}>
+          {label}
+        </div>
+        <Pill tone={tone} label={level || 'Low'} />
+      </div>
+      {valueOverride && (
+        <div className="text-lg font-bold" style={{ color: tone, fontFamily: "'SF Mono', monospace" }}>
+          {valueOverride}
+        </div>
+      )}
+      <div className="text-xs mt-1" style={{ color: colors.text.secondary }}>
+        {descMap[key] || descMap.low}
+      </div>
+    </div>
   )
 }
 
