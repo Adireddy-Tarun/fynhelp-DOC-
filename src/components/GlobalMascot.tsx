@@ -23,7 +23,7 @@ export default function GlobalMascot() {
   const [target, setTarget] = useState<{ x: number; y: number } | null>(null)
   const [angle, setAngle] = useState(0)
 
-  const cursorRef = useRef({ x: 0, y: 0 })
+  const cursorRef = useRef<{ x: number; y: number } | null>(null)
   const idleTimerRef = useRef<number | null>(null)
 
   // Corner anchor (in viewport coords)
