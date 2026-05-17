@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
 // Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
 import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 import { CostDashboard } from '@/components/demo/CostDashboard'
 import { GSTDashboard } from '@/components/demo/GSTDashboard'
+import { GovernanceDashboard } from '@/components/demo/GovernanceDashboard'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
   { id: 'revenue', name: 'Revenue', icon: TrendingUp, color: '#10B981' },
   { id: 'cost', name: 'Cost', icon: DollarSign, color: '#F59E0B' },
   { id: 'gst', name: 'GST & Tax', icon: FileText, color: '#8B5CF6' },
+  { id: 'governance', name: 'Governance', icon: ShieldCheck, color: '#0EA5E9' },
   { id: 'fynny', name: 'Ask Fynny', icon: Bot, color: '#C41E1E' },
 ]
 
@@ -472,6 +474,99 @@ export function DemoDashboard() {
         },
       },
     },
+    governance: {
+      controls: {
+        overallScore: 82,
+        segregationOfDuties: 88,
+        approvalWorkflows: 94,
+        reconciliationStatus: 96,
+        policyCompliance: 85,
+      },
+      reporting: {
+        boardPackageReady: true,
+        boardMeetingDate: '2026-05-25',
+        daysRemaining: 8,
+        pnlAccuracy: 98.5,
+        balanceSheetHealth: 96.2,
+        statements: [
+          { type: 'P&L' as const, status: 'Complete' as const, lastUpdated: '2026-05-15', variance: 3.2 },
+          { type: 'Balance Sheet' as const, status: 'Complete' as const, lastUpdated: '2026-05-15', variance: 1.8, unreconciled: 2 },
+          { type: 'Cash Flow' as const, status: 'Complete' as const, lastUpdated: '2026-05-15', variance: -2.4 },
+        ],
+      },
+      budgeting: {
+        totalBudget: 1847000,
+        actualSpend: 1923000,
+        variance: 76000,
+        variancePercent: 4.1,
+        byDepartment: [
+          { department: 'Sales & Marketing', budget: 685000, actual: 712000, variance: 27000, variancePercent: 3.9 },
+          { department: 'R&D', budget: 842000, actual: 867000, variance: 25000, variancePercent: 3.0 },
+          { department: 'G&A', budget: 320000, actual: 344000, variance: 24000, variancePercent: 7.5 },
+        ],
+        trends: [
+          { month: 'Jul 2024', budget: 1245000, actual: 1198000 },
+          { month: 'Aug 2024', budget: 1298000, actual: 1267000 },
+          { month: 'Sep 2024', budget: 1342000, actual: 1321000 },
+          { month: 'Oct 2024', budget: 1389000, actual: 1378000 },
+          { month: 'Nov 2024', budget: 1435000, actual: 1442000 },
+          { month: 'Dec 2024', budget: 1487000, actual: 1523000 },
+          { month: 'Jan 2025', budget: 1542000, actual: 1589000 },
+          { month: 'Feb 2025', budget: 1598000, actual: 1645000 },
+          { month: 'Mar 2025', budget: 1657000, actual: 1712000 },
+          { month: 'Apr 2025', budget: 1718000, actual: 1789000 },
+          { month: 'May 2025', budget: 1782000, actual: 1856000 },
+          { month: 'Jun 2025', budget: 1847000, actual: 1923000 },
+        ],
+        forecastAccuracy: 92.3,
+        budgetAdherence: 88.7,
+      },
+      risk: {
+        financialRiskScore: 28,
+        fxExposure: 425000,
+        fxExposurePercent: 12.4,
+        fxHedged: 65,
+        creditConcentration: 18.4,
+        liquidityRisk: 'Low' as const,
+        counterpartyRisk: 'Medium' as const,
+        insuranceCoverage: 78,
+        operationalRisk: 'Low' as const,
+      },
+      reconciliation: {
+        tasks: [
+          { name: 'Bank Reconciliation', status: 'Complete' as const, owner: 'Priya Shah', dueDate: '2026-05-05' },
+          { name: 'Credit Card Reconciliation', status: 'Complete' as const, owner: 'Priya Shah', dueDate: '2026-05-05' },
+          { name: 'Accounts Receivable Aging', status: 'Complete' as const, owner: 'Rahul Verma', dueDate: '2026-05-07' },
+          { name: 'Accounts Payable Aging', status: 'Complete' as const, owner: 'Rahul Verma', dueDate: '2026-05-07' },
+          { name: 'Inventory Reconciliation', status: 'Not Started' as const, owner: 'Amit Kumar', dueDate: '2026-05-10' },
+          { name: 'Fixed Assets Verification', status: 'In Progress' as const, owner: 'Neha Reddy', dueDate: '2026-05-12' },
+          { name: 'Prepaid Expenses Roll-forward', status: 'Complete' as const, owner: 'Priya Shah', dueDate: '2026-05-08' },
+          { name: 'Deferred Revenue Schedule', status: 'Complete' as const, owner: 'Rahul Verma', dueDate: '2026-05-08' },
+        ],
+        completeness: 87.5,
+        avgCloseTime: 6,
+      },
+      audit: {
+        documentationCompleteness: 92,
+        policyDocumentation: 95,
+        auditTrailQuality: 89,
+        checklist: [
+          { item: 'Revenue recognition policy documented', status: 'Complete' as const },
+          { item: 'Expense approval matrix defined', status: 'Complete' as const },
+          { item: 'Capitalization policy approved', status: 'Complete' as const },
+          { item: 'Fixed asset register updated', status: 'In Progress' as const },
+          { item: 'Stock option plan documented', status: 'Complete' as const },
+          { item: 'Related party transactions disclosed', status: 'In Progress' as const },
+          { item: 'Bank reconciliations current', status: 'Complete' as const },
+          { item: 'AR/AP aging reports available', status: 'Complete' as const },
+          { item: 'Tax filings up to date', status: 'Complete' as const },
+          { item: 'Internal audit completed', status: 'Not Started' as const },
+        ],
+        lastInternalAudit: '2025-11-15',
+        monthsSinceAudit: 6,
+        openFindings: 2,
+      },
+    },
   }
 
   useEffect(() => {
@@ -589,6 +684,7 @@ export function DemoDashboard() {
         {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
         {activeModule === 'gst' && <GSTModule data={insightsData} />}
+        {activeModule === 'governance' && <GovernanceDashboard data={insightsData} />}
         {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
       </div>
     </div>
