@@ -25,6 +25,8 @@ interface OrgOption {
   business_name: string | null
 }
 
+export type TimeRange = '12m' | '24m' | 'all'
+
 export function DemoDashboard() {
   const [activeModule, setActiveModule] = useState('liquidity')
   const [insightsData, setInsightsData] = useState<any>(null)
@@ -34,6 +36,7 @@ export function DemoDashboard() {
   const [orgId, setOrgId] = useState<string | null>(() => sessionStorage.getItem('demo_org_id'))
   const [availableOrgs, setAvailableOrgs] = useState<OrgOption[]>([])
   const [orgReady, setOrgReady] = useState(false)
+  const [timeRange, setTimeRange] = useState<TimeRange>('12m')
 
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
@@ -750,6 +753,32 @@ export function DemoDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-1 p-1 rounded-xl"
+                style={{
+                  background: '#252B48',
+                  border: '1px solid rgba(57, 73, 171, 0.25)',
+                }}
+              >
+                {(['12m', '24m', 'all'] as TimeRange[]).map((r) => {
+                  const active = timeRange === r
+                  return (
+                    <button
+                      key={r}
+                      onClick={() => setTimeRange(r)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                      style={{
+                        background: active ? '#FFA726' : 'transparent',
+                        color: active ? '#0A0E27' : '#F8FAFC',
+                        fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                      }}
+                      aria-pressed={active}
+                    >
+                      {r === '12m' ? '12 Months' : r === '24m' ? '24 Months' : 'All Time'}
+                    </button>
+                  )
+                })}
+              </div>
               {availableOrgs.length > 1 && (
                 <select
                   value={orgId ?? ''}
@@ -834,7 +863,7 @@ export function DemoDashboard() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
         {activeModule === 'liquidity' && <LiquidityDashboard data={insightsData} />}
-        {activeModule === 'revenue' && <RevenueModule data={insightsData} />}
+        {activeModule === 'revenue' && <RevenueModule data={insightsData} timeRange={timeRange} />}
         {activeModule === 'cost' && <CostModule data={insightsData} />}
         {activeModule === 'gst' && <GSTModule data={insightsData} />}
         {activeModule === 'governance' && <GovernanceDashboard data={insightsData} />}
@@ -861,8 +890,8 @@ export function DemoDashboard() {
   )
 }
 
-function RevenueModule({ data }: { data: any }) {
-  return <RevenueDashboard data={data} />
+function RevenueModule({ data, timeRange }: { data: any; timeRange: TimeRange }) {
+  return <RevenueDashboard data={data} timeRange={timeRange} />
 }
 
 function CostModule({ data }: { data: any }) {
