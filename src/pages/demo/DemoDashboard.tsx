@@ -195,6 +195,7 @@ export function DemoDashboard() {
     }
   }
 
+  const FALLBACK_DATA = {
     liquidity: {
       cashPosition: {
         currentCash: 380000,
