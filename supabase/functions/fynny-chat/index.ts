@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
     // ── Demo path: unauthenticated, single-shot JSON response ──────────
     if (!auth.startsWith("Bearer ") && body?.org_id && body?.message) {
       const ctx = body.context || {};
-      const systemPrompt = `You are Nidhi, an AI CFO assistant for Indian SMEs in a DEMO environment.
+      const systemPrompt = `You are FYNNY, an AI CFO assistant for Indian SMEs in a DEMO environment.
 Answer the user's question conversationally with specific numbers from the demo financial data below.
 Use Indian currency formatting (₹, lakhs, crores). Be concise, professional, and CFO-grade.
 If a metric is missing or zero, say so honestly — never invent numbers.
