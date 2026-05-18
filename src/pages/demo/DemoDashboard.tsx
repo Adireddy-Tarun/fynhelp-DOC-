@@ -570,24 +570,66 @@ export function DemoDashboard() {
   }
 
   useEffect(() => {
-    const fetchInsights = async () => {
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+
+    const fetchInsights = async (organizationId: string) => {
+      // 1. Try cache
+      const { data: cached } = await supabase
+        .from('demo_insights')
+        .select('*')
+        .eq('org_id', organizationId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      // 2. Fresh cache hit (<24h)
+      if (cached?.data) {
+        const cacheAge = Date.now() - new Date(cached.created_at).getTime()
+        if (cacheAge < TWENTY_FOUR_HOURS) {
+          return cached.data
+        }
+      }
+
+      // 3. Cache miss/stale -> call Edge Function
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/generate-insights`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${supabaseAnonKey}`,
+            apikey: supabaseAnonKey,
+          },
+          body: JSON.stringify({ organization_id: organizationId }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`generate-insights failed: ${response.status}`)
+      }
+
+      const freshData = await response.json()
+
+      // 4. Persist for next time (best-effort)
+      await supabase
+        .from('demo_insights')
+        .insert({ org_id: organizationId, data: freshData })
+
+      return freshData
+    }
+
+    const run = async () => {
       if (!orgId) {
         setInsightsData(FALLBACK_DATA)
         setLoading(false)
         return
       }
-
       try {
-        const { data, error } = await supabase
-          .from('demo_insights')
-          .select('*')
-          .eq('org_id', orgId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (error) throw error
-        setInsightsData(data?.data ?? FALLBACK_DATA)
+        const data = await fetchInsights(orgId)
+        setInsightsData(data ?? FALLBACK_DATA)
       } catch (error) {
         console.error('Error fetching insights:', error)
         setInsightsData(FALLBACK_DATA)
@@ -596,7 +638,7 @@ export function DemoDashboard() {
       }
     }
 
-    fetchInsights()
+    run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
