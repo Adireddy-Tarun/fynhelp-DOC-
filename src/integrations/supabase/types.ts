@@ -963,28 +963,40 @@ export type Database = {
           business_name: string
           challenge: string | null
           created_at: string
+          demo_org_id: string
+          email: string | null
           employees: string | null
           id: string
           industry: string | null
+          metadata: Json
           monthly_revenue: string | null
+          name: string | null
         }
         Insert: {
           business_name: string
           challenge?: string | null
           created_at?: string
+          demo_org_id: string
+          email?: string | null
           employees?: string | null
           id?: string
           industry?: string | null
+          metadata?: Json
           monthly_revenue?: string | null
+          name?: string | null
         }
         Update: {
           business_name?: string
           challenge?: string | null
           created_at?: string
+          demo_org_id?: string
+          email?: string | null
           employees?: string | null
           id?: string
           industry?: string | null
+          metadata?: Json
           monthly_revenue?: string | null
+          name?: string | null
         }
         Relationships: []
       }

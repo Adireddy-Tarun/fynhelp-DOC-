@@ -19,19 +19,91 @@ const MODULES = [
   { id: 'fynny', name: 'Ask Fynny', icon: Bot, color: '#C41E1E' },
 ]
 
+interface OrgOption {
+  demo_org_id: string
+  name: string | null
+  business_name: string | null
+}
+
 export function DemoDashboard() {
   const [activeModule, setActiveModule] = useState('liquidity')
   const [insightsData, setInsightsData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showUpload, setShowUpload] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [orgId, setOrgId] = useState<string | null>(() => sessionStorage.getItem('demo_org_id'))
+  const [availableOrgs, setAvailableOrgs] = useState<OrgOption[]>([])
+  const [orgReady, setOrgReady] = useState(false)
 
-  // Access guards temporarily disabled for design review
-  const orgId = sessionStorage.getItem('demo_org_id')
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
   const answers: string[] = answersStr ? JSON.parse(answersStr) : []
-  const businessName = answers[0] || 'Your Business'
+  const currentOrgMeta = availableOrgs.find((o) => o.demo_org_id === orgId)
+  const businessName =
+    currentOrgMeta?.name || currentOrgMeta?.business_name || answers[0] || 'Your Business'
+
+  // Initialize or create org on mount
+  useEffect(() => {
+    let cancelled = false
+    const initOrg = async () => {
+      let id = sessionStorage.getItem('demo_org_id')
+      if (!id) {
+        try {
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+          const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+          const res = await fetch(`${supabaseUrl}/functions/v1/create-demo-org`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${supabaseAnonKey}`,
+              apikey: supabaseAnonKey,
+            },
+            body: JSON.stringify({ name: 'Demo Session' }),
+          })
+          const json = await res.json()
+          if (json?.organization_id) {
+            id = json.organization_id as string
+            sessionStorage.setItem('demo_org_id', id)
+          }
+        } catch (e) {
+          console.error('create-demo-org failed:', e)
+        }
+      }
+      if (!cancelled) {
+        setOrgId(id)
+        setOrgReady(true)
+      }
+    }
+    initOrg()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Load recent orgs for the switcher
+  useEffect(() => {
+    if (!orgReady) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase
+        .from('demo_organizations')
+        .select('demo_org_id, name, business_name')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      if (!cancelled) setAvailableOrgs((data as OrgOption[]) ?? [])
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [orgReady, refreshKey])
+
+  const switchOrg = (nextId: string) => {
+    if (!nextId || nextId === orgId) return
+    sessionStorage.setItem('demo_org_id', nextId)
+    setOrgId(nextId)
+    setLoading(true)
+    setRefreshKey((k) => k + 1)
+  }
 
   const FALLBACK_DATA = {
     liquidity: {
@@ -641,9 +713,9 @@ export function DemoDashboard() {
       }
     }
 
-    run()
+    if (orgReady) run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey])
+  }, [refreshKey, orgReady, orgId])
 
   if (loading) {
     return <DashboardSkeleton businessName={businessName} fileName={fileName} />
@@ -678,6 +750,27 @@ export function DemoDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {availableOrgs.length > 1 && (
+                <select
+                  value={orgId ?? ''}
+                  onChange={(e) => switchOrg(e.target.value)}
+                  className="px-3 py-2 rounded-xl text-sm font-semibold focus:outline-none"
+                  style={{
+                    background: '#252B48',
+                    color: '#F8FAFC',
+                    border: '1px solid rgba(57, 73, 171, 0.4)',
+                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    maxWidth: 220,
+                  }}
+                  aria-label="Switch demo organization"
+                >
+                  {availableOrgs.map((o) => (
+                    <option key={o.demo_org_id} value={o.demo_org_id}>
+                      {o.name || o.business_name || o.demo_org_id}
+                    </option>
+                  ))}
+                </select>
+              )}
               <button
                 onClick={() => setShowUpload(true)}
                 className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
