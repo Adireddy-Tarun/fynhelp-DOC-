@@ -747,6 +747,23 @@ export function DemoDashboard() {
         {activeModule === 'governance' && <GovernanceDashboard data={insightsData} />}
         {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
       </div>
+
+      {/* Upload modal */}
+      {showUpload && (
+        <div
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-6"
+          style={{ background: 'rgba(10, 14, 39, 0.85)', backdropFilter: 'blur(6px)' }}
+          onClick={() => setShowUpload(false)}
+        >
+          <div className="w-full max-w-4xl my-12" onClick={(e) => e.stopPropagation()}>
+            <TransactionUpload
+              organizationId={orgId ?? ''}
+              onClose={() => setShowUpload(false)}
+              onUploadComplete={() => setRefreshKey((k) => k + 1)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
