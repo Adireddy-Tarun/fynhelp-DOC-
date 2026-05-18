@@ -129,16 +129,41 @@ export function DemoDashboard() {
     }
   }, [orgId, refreshKey])
 
-  // Handle OAuth callback redirect params
+  // Handle OAuth callback redirect params (legacy edge-function flow + new DB-function flow)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
+
     if (params.get('zoho') === 'connected') {
       setZohoConnected(true)
       toast.success('Zoho Books connected successfully!')
       window.history.replaceState({}, '', '/demo/dashboard')
-    } else if (params.get('zoho') === 'error') {
+      return
+    }
+    if (params.get('zoho') === 'error') {
       toast.error(`Zoho connection failed: ${params.get('message') || 'Unknown error'}`)
       window.history.replaceState({}, '', '/demo/dashboard')
+      return
+    }
+
+    const code = params.get('code')
+    const state = params.get('state')
+    if (code && state) {
+      ;(async () => {
+        try {
+          const { error } = await (supabase as any).rpc('zoho_exchange_code', {
+            p_code: code,
+            p_state: state,
+          })
+          if (error) throw error
+          setZohoConnected(true)
+          toast.success('✅ Zoho Books connected successfully!')
+          window.history.replaceState({}, '', '/demo/dashboard')
+          setRefreshKey((k) => k + 1)
+        } catch (err) {
+          console.error('OAuth callback error:', err)
+          toast.error('Failed to connect Zoho Books')
+        }
+      })()
     }
   }, [])
 
@@ -148,23 +173,14 @@ export function DemoDashboard() {
       return
     }
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-auth`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          apikey: supabaseAnonKey,
-        },
-        body: JSON.stringify({ organization_id: orgId }),
+      const { data, error } = await (supabase as any).rpc('zoho_get_auth_url', {
+        p_organization_id: orgId,
       })
-      const { authorization_url, error } = await response.json()
-      if (error) throw new Error(error)
-      window.location.href = authorization_url
+      if (error) throw error
+      window.location.href = data.authorization_url
     } catch (error) {
       console.error('Zoho auth error:', error)
-      toast.error('Failed to connect Zoho Books. Please try again.')
+      toast.error('Failed to connect Zoho Books')
     }
   }
 
@@ -172,20 +188,11 @@ export function DemoDashboard() {
     if (!orgId) return
     try {
       setZohoSyncing(true)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          apikey: supabaseAnonKey,
-        },
-        body: JSON.stringify({ organization_id: orgId }),
+      const { data, error } = await (supabase as any).rpc('zoho_sync_transactions', {
+        p_organization_id: orgId,
       })
-      const result = await response.json()
-      if (!result.success) throw new Error(result.error || 'Sync failed')
-      toast.success(`Synced ${result.synced} transactions from Zoho Books`)
+      if (error) throw error
+      toast.success(`Successfully synced ${data?.synced || 0} transactions from Zoho Books!`)
       setRefreshKey((k) => k + 1)
     } catch (error) {
       console.error('Zoho sync error:', error)
