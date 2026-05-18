@@ -35,7 +35,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
       id: '1',
       role: 'assistant',
       content:
-        "Hi! I'm Nidhi, your AI CFO. I've analyzed your financial data and I'm ready to help. What would you like to know?",
+        "Hi! I'm FYNNY, your AI CFO. I've analyzed your financial data and I'm ready to help. What would you like to know?",
       timestamp: new Date(),
       suggestions: [
         "What's my biggest cost driver?",
@@ -215,7 +215,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
           </div>
           <div>
             <h3 className="font-serif font-bold text-xl" style={{ color: colors.text.primary }}>
-              Nidhi AI
+              FYNNY
             </h3>
             <p className="text-xs" style={{ color: colors.text.secondary }}>
               Your AI Chief Financial Officer
@@ -425,7 +425,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
                 handleSendMessage()
               }
             }}
-            placeholder="Ask Nidhi anything about your finances..."
+            placeholder="Ask FYNNY anything about your finances..."
             className="flex-1 px-5 py-3 rounded-2xl outline-none font-medium text-sm"
             style={{
               background: colors.bg.tertiary,
@@ -460,7 +460,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
 
         <div className="flex items-center justify-between mt-3 px-1">
           <p className="text-[11px]" style={{ color: colors.text.tertiary }}>
-            Powered by Nidhi AI • All data encrypted
+            Powered by FYNNY • All data encrypted
           </p>
           <div className="flex items-center gap-1.5">
             <Clock size={11} color={colors.text.tertiary} />
