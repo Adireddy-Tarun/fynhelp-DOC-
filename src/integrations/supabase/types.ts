@@ -956,15 +956,7 @@ export type Database = {
           id?: string
           org_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "demo_insights_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "demo_organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       demo_organizations: {
         Row: {
