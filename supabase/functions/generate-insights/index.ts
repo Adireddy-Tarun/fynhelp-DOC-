@@ -440,6 +440,183 @@ function recomputeFromTxns(base: ReturnType<typeof baseline>, txns: any[]) {
   return base;
 }
 
+// ── Historical trend analysis (up to 24 months) ────────────────────────
+type MonthBucket = { month: string; transactions: any[] };
+
+function isInflow(t: any) {
+  return t.type === "inflow" || t.direction === "in" || (Number(t.amount) > 0 && !t.type);
+}
+function isOutflow(t: any) {
+  return t.type === "outflow" || t.type === "expense" || t.direction === "out";
+}
+function sumByType(txns: any[], kind: "inflow" | "outflow") {
+  const pred = kind === "inflow" ? isInflow : isOutflow;
+  return txns.filter(pred).reduce((s, t) => s + Math.abs(Number(t.amount || 0)), 0);
+}
+function sumByCategory(txns: any[], cats: string[]) {
+  const set = new Set(cats.map((c) => c.toLowerCase()));
+  return txns
+    .filter((t) => set.has(String(t.category || "").toLowerCase()))
+    .reduce((s, t) => s + Math.abs(Number(t.amount || 0)), 0);
+}
+function calculateNetBurn(txns: any[]) {
+  return Math.max(0, sumByType(txns, "outflow") - sumByType(txns, "inflow"));
+}
+function sumMetric(txns: any[], metric: string) {
+  if (metric === "revenue") return sumByType(txns, "inflow");
+  if (metric === "cost" || metric === "costs") return sumByType(txns, "outflow");
+  if (metric === "margin") {
+    const rev = sumByType(txns, "inflow");
+    const cost = sumByType(txns, "outflow");
+    return rev > 0 ? ((rev - cost) / rev) * 100 : 0;
+  }
+  return 0;
+}
+
+function groupByMonth(transactions: any[], _months: number): MonthBucket[] {
+  const grouped: Record<string, any[]> = {};
+  for (const t of transactions) {
+    const key = String(t.date || "").substring(0, 7); // YYYY-MM
+    if (!key) continue;
+    (grouped[key] ||= []).push(t);
+  }
+  return Object.keys(grouped)
+    .sort()
+    .map((month) => ({ month, transactions: grouped[month] }));
+}
+
+function calculateGrowth(curr: MonthBucket, all: MonthBucket[]) {
+  const idx = all.findIndex((m) => m.month === curr.month);
+  if (idx <= 0) return 0;
+  const prevRev = sumByType(all[idx - 1].transactions, "inflow");
+  const currRev = sumByType(curr.transactions, "inflow");
+  return prevRev > 0 ? +(((currRev - prevRev) / prevRev) * 100).toFixed(2) : 0;
+}
+
+function calculateYoY(monthlyData: MonthBucket[], metric: string) {
+  const results: any[] = [];
+  for (const cur of monthlyData) {
+    const [yStr, mStr] = cur.month.split("-");
+    const prevKey = `${Number(yStr) - 1}-${mStr}`;
+    const prev = monthlyData.find((m) => m.month === prevKey);
+    if (!prev) continue;
+    const currentValue = sumMetric(cur.transactions, metric);
+    const previousValue = sumMetric(prev.transactions, metric);
+    const growth = previousValue > 0
+      ? +(((currentValue - previousValue) / previousValue) * 100).toFixed(2)
+      : 0;
+    results.push({
+      month: cur.month,
+      previousMonth: prev.month,
+      current: Math.round(currentValue),
+      previous: Math.round(previousValue),
+      growth,
+    });
+  }
+  return results;
+}
+
+function calculateMarginYoY(monthlyData: MonthBucket[]) {
+  const results: any[] = [];
+  for (const cur of monthlyData) {
+    const [yStr, mStr] = cur.month.split("-");
+    const prevKey = `${Number(yStr) - 1}-${mStr}`;
+    const prev = monthlyData.find((m) => m.month === prevKey);
+    if (!prev) continue;
+    const currMargin = sumMetric(cur.transactions, "margin");
+    const prevMargin = sumMetric(prev.transactions, "margin");
+    results.push({
+      month: cur.month,
+      current: +currMargin.toFixed(2),
+      previous: +prevMargin.toFixed(2),
+      improvement: +(currMargin - prevMargin).toFixed(2),
+    });
+  }
+  return results;
+}
+
+function detectSeasonality(monthlyData: MonthBucket[]) {
+  const monthlyAverages: Record<number, number> = {};
+  for (let month = 1; month <= 12; month++) {
+    const sameMonth = monthlyData.filter(
+      (m) => parseInt(m.month.split("-")[1] || "0", 10) === month,
+    );
+    if (sameMonth.length >= 2) {
+      const avg = sameMonth.reduce((s, m) => s + sumByType(m.transactions, "inflow"), 0) /
+        sameMonth.length;
+      monthlyAverages[month] = Math.round(avg);
+    }
+  }
+  const values = Object.values(monthlyAverages);
+  if (values.length === 0) {
+    return { monthlyAverages, peakMonths: [], lowMonths: [], hasSeasonality: false };
+  }
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  const stdDev = Math.sqrt(
+    values.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / values.length,
+  );
+  return {
+    monthlyAverages,
+    peakMonths: Object.keys(monthlyAverages)
+      .filter((m) => monthlyAverages[+m] > avg + stdDev)
+      .map((m) => parseInt(m, 10)),
+    lowMonths: Object.keys(monthlyAverages)
+      .filter((m) => monthlyAverages[+m] < avg - stdDev)
+      .map((m) => parseInt(m, 10)),
+    hasSeasonality: avg > 0 ? stdDev / avg > 0.15 : false,
+  };
+}
+
+function detectTrend(monthlyData: MonthBucket[], metric: string):
+  | "improving" | "declining" | "stable" | "insufficient_data" {
+  const last6 = monthlyData.slice(-6);
+  if (last6.length < 3) return "insufficient_data";
+  const values = last6.map((m) => sumMetric(m.transactions, metric));
+  const first3 = values.slice(0, 3);
+  const last3 = values.slice(-3);
+  const avgFirst = first3.reduce((a, b) => a + b, 0) / first3.length;
+  const avgLast = last3.reduce((a, b) => a + b, 0) / last3.length;
+  if (avgFirst === 0) return "insufficient_data";
+  const change = ((avgLast - avgFirst) / avgFirst) * 100;
+  if (change > 10) return "improving";
+  if (change < -10) return "declining";
+  return "stable";
+}
+
+function calculateHistoricalTrends(transactions: any[], months = 24) {
+  const monthlyData = groupByMonth(transactions, months);
+
+  return {
+    months,
+    revenueTrend: monthlyData.map((m) => ({
+      month: m.month,
+      revenue: Math.round(sumByType(m.transactions, "inflow")),
+      growth: calculateGrowth(m, monthlyData),
+    })),
+    costTrend: monthlyData.map((m) => ({
+      month: m.month,
+      costs: Math.round(sumByType(m.transactions, "outflow")),
+      growth: calculateGrowth(m, monthlyData),
+    })),
+    burnTrend: monthlyData.map((m) => ({
+      month: m.month,
+      grossBurn: Math.round(sumByCategory(m.transactions, ["expense", "salary", "payroll"])),
+      netBurn: Math.round(calculateNetBurn(m.transactions)),
+    })),
+    yoyComparison: {
+      revenueGrowth: calculateYoY(monthlyData, "revenue"),
+      costGrowth: calculateYoY(monthlyData, "cost"),
+      marginImprovement: calculateMarginYoY(monthlyData),
+    },
+    seasonality: detectSeasonality(monthlyData),
+    trendDirection: {
+      revenue: detectTrend(monthlyData, "revenue"),
+      costs: detectTrend(monthlyData, "costs"),
+      efficiency: detectTrend(monthlyData, "margin"),
+    },
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -458,6 +635,7 @@ Deno.serve(async (req) => {
     organization_id = body?.organization_id ?? null;
 
     const insights = baseline();
+    let historical: ReturnType<typeof calculateHistoricalTrends> | null = null;
 
     // Best-effort: try to recompute from demo_transactions if the table exists.
     if (organization_id) {
@@ -466,16 +644,23 @@ Deno.serve(async (req) => {
           Deno.env.get("SUPABASE_URL") ?? "",
           Deno.env.get("SUPABASE_ANON_KEY") ?? "",
         );
-        const cutoff = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
+        const twentyFourMonthsAgo = new Date();
+        twentyFourMonthsAgo.setMonth(twentyFourMonthsAgo.getMonth() - 24);
+        const cutoff = twentyFourMonthsAgo.toISOString().slice(0, 10);
         const { data: txns, error } = await supabase
           .from("demo_transactions")
           .select("*")
           .eq("organization_id", organization_id)
           .gte("date", cutoff)
           .order("date", { ascending: false })
-          .limit(1000);
+          .limit(5000);
         if (!error && txns && txns.length > 0) {
           recomputeFromTxns(insights, txns);
+          try {
+            historical = calculateHistoricalTrends(txns, 24);
+          } catch (he) {
+            console.warn("calculateHistoricalTrends failed:", (he as Error).message);
+          }
         }
       } catch (e) {
         // demo_transactions likely doesn't exist — fine, keep synthetic.
@@ -489,6 +674,7 @@ Deno.serve(async (req) => {
         generated_at: new Date().toISOString(),
         compute_ms: Date.now() - started,
         ...insights,
+        historical,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
