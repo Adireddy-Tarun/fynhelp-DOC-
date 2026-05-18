@@ -643,7 +643,7 @@ export function DemoDashboard() {
 
     run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshKey])
 
   if (loading) {
     return <DashboardSkeleton businessName={businessName} fileName={fileName} />
