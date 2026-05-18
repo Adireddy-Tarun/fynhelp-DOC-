@@ -23,6 +23,7 @@ import { colors } from '@/lib/design-system'
 
 interface RevenueDashboardProps {
   data: any
+  timeRange?: '12m' | '24m' | 'all'
 }
 
 type BreakdownKey = 'byProduct' | 'bySegment' | 'byChannel'
@@ -32,8 +33,19 @@ const fmtCr = (n: number) => `₹${((n || 0) / 10000000).toFixed(2)}Cr`
 const fmtK = (n: number) => `₹${((n || 0) / 1000).toFixed(0)}K`
 const fmtPct = (n: number) => `${(n || 0).toFixed(1)}%`
 
-export function RevenueDashboard({ data }: RevenueDashboardProps) {
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
+const fmtMonthKey = (ym: string) => {
+  const [y, mo] = ym.split('-')
+  const mi = Math.max(0, Math.min(11, parseInt(mo || '1', 10) - 1))
+  return `${MONTH_NAMES[mi]} ${y}`
+}
+
+export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardProps) {
   const rev = data?.revenue || {}
+  const historical = data?.historical || null
   const m = rev.metrics || {}
   const breakdown = rev.breakdown || {}
   const cohorts = rev.cohorts || {}
@@ -41,6 +53,26 @@ export function RevenueDashboard({ data }: RevenueDashboardProps) {
   const health = rev.health || {}
   const mrrTrend: Array<{ month: string; mrr: number }> = rev.mrrTrend || []
   const atRisk = rev.atRiskRevenue || {}
+
+  // Prefer real historical revenueTrend (up to 24 months) when available
+  const historicalRevenue: Array<{ month: string; revenue: number }> =
+    historical?.revenueTrend?.length
+      ? historical.revenueTrend.map((p: any) => ({
+          month: fmtMonthKey(p.month),
+          revenue: p.revenue,
+        }))
+      : mrrTrend.map((p) => ({ month: p.month, revenue: p.mrr }))
+
+  const trendLimit =
+    timeRange === '12m' ? 12 : timeRange === '24m' ? 24 : historicalRevenue.length
+  const trendForChart = historicalRevenue.slice(-trendLimit)
+
+  const yoyRows: Array<{
+    month: string
+    current: number
+    previous: number
+    growth: number
+  }> = historical?.yoyComparison?.revenueGrowth || []
 
   const [breakdownTab, setBreakdownTab] = useState<BreakdownKey>('byProduct')
 
