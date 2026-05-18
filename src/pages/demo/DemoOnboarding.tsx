@@ -62,21 +62,24 @@ export function DemoOnboarding() {
         }])
 
         try {
+          const demoOrgId = `org_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
           const { data: org, error } = await supabase
             .from('demo_organizations')
             .insert({
+              demo_org_id: demoOrgId,
+              name: newAnswers[0],
               business_name: newAnswers[0],
               industry: newAnswers[1],
               employees: newAnswers[2],
               monthly_revenue: newAnswers[3],
-              challenge: newAnswers[4]
+              challenge: newAnswers[4],
             })
             .select()
             .single()
 
           if (error) throw error
 
-          sessionStorage.setItem('demo_org_id', org.id)
+          sessionStorage.setItem('demo_org_id', org.demo_org_id)
           sessionStorage.setItem('demo_answers', JSON.stringify(newAnswers))
 
           setMessages(prev => [...prev, {
