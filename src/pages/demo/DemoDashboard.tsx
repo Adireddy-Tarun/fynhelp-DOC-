@@ -900,6 +900,60 @@ export function DemoDashboard() {
                 <Upload size={16} />
                 Upload Data
               </button>
+              {!zohoConnected ? (
+                <button
+                  onClick={connectZoho}
+                  className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
+                  style={{
+                    background: 'transparent',
+                    color: '#F8FAFC',
+                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    border: '1px solid rgba(57, 73, 171, 0.5)',
+                  }}
+                >
+                  <Link2 size={16} />
+                  Connect Zoho Books
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={syncZoho}
+                    disabled={zohoSyncing}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors disabled:opacity-60"
+                    style={{
+                      background: '#3949AB',
+                      color: '#F8FAFC',
+                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                      border: '1px solid #3949AB',
+                    }}
+                  >
+                    {zohoSyncing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Syncing…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw size={16} />
+                        Sync Zoho Data
+                      </>
+                    )}
+                  </button>
+                  <div
+                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
+                    style={{
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      color: '#34D399',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    }}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    Zoho Connected
+                  </div>
+                </>
+              )}
               <button
                 onClick={() => {
                   if (confirm('Exit demo? All data will be cleared.')) {
