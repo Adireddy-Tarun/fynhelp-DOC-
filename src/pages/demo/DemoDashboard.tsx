@@ -750,6 +750,27 @@ export function DemoDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {availableOrgs.length > 1 && (
+                <select
+                  value={orgId ?? ''}
+                  onChange={(e) => switchOrg(e.target.value)}
+                  className="px-3 py-2 rounded-xl text-sm font-semibold focus:outline-none"
+                  style={{
+                    background: '#252B48',
+                    color: '#F8FAFC',
+                    border: '1px solid rgba(57, 73, 171, 0.4)',
+                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    maxWidth: 220,
+                  }}
+                  aria-label="Switch demo organization"
+                >
+                  {availableOrgs.map((o) => (
+                    <option key={o.demo_org_id} value={o.demo_org_id}>
+                      {o.name || o.business_name || o.demo_org_id}
+                    </option>
+                  ))}
+                </select>
+              )}
               <button
                 onClick={() => setShowUpload(true)}
                 className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
