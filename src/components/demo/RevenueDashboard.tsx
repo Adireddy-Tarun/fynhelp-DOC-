@@ -263,22 +263,72 @@ export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardPr
         </div>
       </section>
 
-      {/* SECTION 3: 12-MONTH MRR TREND */}
+      {/* SECTION 3: REVENUE TREND */}
       <section>
-        <SectionTitle icon={Activity}>12-Month MRR Trend</SectionTitle>
+        <SectionTitle icon={Activity}>
+          Revenue Trend ·{' '}
+          {timeRange === '12m' ? '12 Months' : timeRange === '24m' ? '24 Months' : 'All Time'}
+        </SectionTitle>
 
         <div
           className="mt-5 rounded-2xl p-6"
           style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}
         >
           <InteractiveGraph
-            data={mrrTrend.map((p) => ({ label: p.month, value: p.mrr }))}
+            data={trendForChart.map((p) => ({ label: p.month, value: p.revenue }))}
             height={320}
             formatValue={(v) => fmtL(v)}
             barColor={colors.success.main}
           />
         </div>
       </section>
+
+      {/* SECTION 3B: YEAR-OVER-YEAR COMPARISON (real data only) */}
+      {yoyRows.length > 0 && (
+        <section>
+          <SectionTitle icon={TrendingUp}>Year-over-Year Revenue</SectionTitle>
+          <div
+            className="mt-5 rounded-2xl overflow-hidden"
+            style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}
+          >
+            <div className="grid grid-cols-12 px-6 py-3 text-xs uppercase tracking-wider"
+              style={{ color: colors.text.tertiary, borderBottom: `1px solid ${colors.bg.tertiary}` }}
+            >
+              <div className="col-span-3">Month</div>
+              <div className="col-span-3 text-right">This Year</div>
+              <div className="col-span-3 text-right">Last Year</div>
+              <div className="col-span-3 text-right">Growth</div>
+            </div>
+            {yoyRows.slice(-12).map((row) => {
+              const positive = row.growth >= 0
+              return (
+                <div
+                  key={row.month}
+                  className="grid grid-cols-12 px-6 py-3 text-sm items-center"
+                  style={{ borderTop: `1px solid ${colors.bg.tertiary}` }}
+                >
+                  <div className="col-span-3" style={{ color: colors.text.primary, fontWeight: 600 }}>
+                    {fmtMonthKey(row.month)}
+                  </div>
+                  <div className="col-span-3 text-right" style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}>
+                    {fmtL(row.current)}
+                  </div>
+                  <div className="col-span-3 text-right" style={{ color: colors.text.secondary, fontFamily: "'SF Mono', monospace" }}>
+                    {fmtL(row.previous)}
+                  </div>
+                  <div
+                    className="col-span-3 text-right inline-flex items-center justify-end gap-1 font-semibold"
+                    style={{ color: positive ? colors.success.main : colors.danger.main }}
+                  >
+                    {positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                    {fmtPct(row.growth)}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* SECTION 4: REVENUE BREAKDOWN */}
       <section>
