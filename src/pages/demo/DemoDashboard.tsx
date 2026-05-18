@@ -713,9 +713,9 @@ export function DemoDashboard() {
       }
     }
 
-    run()
+    if (orgReady) run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey])
+  }, [refreshKey, orgReady, orgId])
 
   if (loading) {
     return <DashboardSkeleton businessName={businessName} fileName={fileName} />
