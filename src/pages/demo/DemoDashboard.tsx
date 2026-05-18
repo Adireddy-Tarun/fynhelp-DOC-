@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 // Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
@@ -8,6 +8,7 @@ import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 import { CostDashboard } from '@/components/demo/CostDashboard'
 import { GSTDashboard } from '@/components/demo/GSTDashboard'
 import { GovernanceDashboard } from '@/components/demo/GovernanceDashboard'
+import { TransactionUpload } from '@/components/demo/TransactionUpload'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
