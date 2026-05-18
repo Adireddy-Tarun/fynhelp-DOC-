@@ -23,6 +23,8 @@ export function DemoDashboard() {
   const [activeModule, setActiveModule] = useState('liquidity')
   const [insightsData, setInsightsData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showUpload, setShowUpload] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Access guards temporarily disabled for design review
   const orgId = sessionStorage.getItem('demo_org_id')
