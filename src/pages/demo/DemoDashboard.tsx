@@ -38,6 +38,8 @@ export function DemoDashboard() {
   const [availableOrgs, setAvailableOrgs] = useState<OrgOption[]>([])
   const [orgReady, setOrgReady] = useState(false)
   const [timeRange, setTimeRange] = useState<TimeRange>('12m')
+  const [zohoConnected, setZohoConnected] = useState(false)
+  const [zohoSyncing, setZohoSyncing] = useState(false)
 
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
