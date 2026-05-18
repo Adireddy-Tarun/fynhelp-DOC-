@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 // Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
@@ -8,6 +8,7 @@ import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 import { CostDashboard } from '@/components/demo/CostDashboard'
 import { GSTDashboard } from '@/components/demo/GSTDashboard'
 import { GovernanceDashboard } from '@/components/demo/GovernanceDashboard'
+import { TransactionUpload } from '@/components/demo/TransactionUpload'
 
 const MODULES = [
   { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
@@ -22,6 +23,8 @@ export function DemoDashboard() {
   const [activeModule, setActiveModule] = useState('liquidity')
   const [insightsData, setInsightsData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showUpload, setShowUpload] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Access guards temporarily disabled for design review
   const orgId = sessionStorage.getItem('demo_org_id')
@@ -640,7 +643,7 @@ export function DemoDashboard() {
 
     run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [refreshKey])
 
   if (loading) {
     return <DashboardSkeleton businessName={businessName} fileName={fileName} />
@@ -674,23 +677,38 @@ export function DemoDashboard() {
                 Data: {fileName}
               </p>
             </div>
-            <button
-              onClick={() => {
-                if (confirm('Exit demo? All data will be cleared.')) {
-                  sessionStorage.clear()
-                  window.location.href = '/demo/login'
-                }
-              }}
-              className="px-6 py-3 rounded-xl font-semibold transition-colors"
-              style={{
-                background: '#252B48',
-                color: '#F8FAFC',
-                fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                border: '1px solid rgba(57, 73, 171, 0.25)',
-              }}
-            >
-              Exit Demo
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowUpload(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
+                style={{
+                  background: '#FFA726',
+                  color: '#0A0E27',
+                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                  border: '1px solid #FFA726',
+                }}
+              >
+                <Upload size={16} />
+                Upload Data
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Exit demo? All data will be cleared.')) {
+                    sessionStorage.clear()
+                    window.location.href = '/demo/login'
+                  }
+                }}
+                className="px-6 py-3 rounded-xl font-semibold transition-colors"
+                style={{
+                  background: '#252B48',
+                  color: '#F8FAFC',
+                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                  border: '1px solid rgba(57, 73, 171, 0.25)',
+                }}
+              >
+                Exit Demo
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -729,6 +747,23 @@ export function DemoDashboard() {
         {activeModule === 'governance' && <GovernanceDashboard data={insightsData} />}
         {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
       </div>
+
+      {/* Upload modal */}
+      {showUpload && (
+        <div
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-6"
+          style={{ background: 'rgba(10, 14, 39, 0.85)', backdropFilter: 'blur(6px)' }}
+          onClick={() => setShowUpload(false)}
+        >
+          <div className="w-full max-w-4xl my-12" onClick={(e) => e.stopPropagation()}>
+            <TransactionUpload
+              organizationId={orgId ?? ''}
+              onClose={() => setShowUpload(false)}
+              onUploadComplete={() => setRefreshKey((k) => k + 1)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
