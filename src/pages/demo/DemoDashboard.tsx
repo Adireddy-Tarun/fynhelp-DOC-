@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 // Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload, Link2, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
@@ -37,6 +38,8 @@ export function DemoDashboard() {
   const [availableOrgs, setAvailableOrgs] = useState<OrgOption[]>([])
   const [orgReady, setOrgReady] = useState(false)
   const [timeRange, setTimeRange] = useState<TimeRange>('12m')
+  const [zohoConnected, setZohoConnected] = useState(false)
+  const [zohoSyncing, setZohoSyncing] = useState(false)
 
   const fileName = sessionStorage.getItem('demo_file') || 'uploaded-data.csv'
   const answersStr = sessionStorage.getItem('demo_answers')
@@ -106,6 +109,90 @@ export function DemoDashboard() {
     setOrgId(nextId)
     setLoading(true)
     setRefreshKey((k) => k + 1)
+  }
+
+  // Check Zoho connection status whenever org changes
+  useEffect(() => {
+    if (!orgId) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase
+        .from('integrations')
+        .select('id')
+        .eq('organization_id', orgId)
+        .eq('provider', 'zoho_books')
+        .maybeSingle()
+      if (!cancelled) setZohoConnected(!!data)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [orgId, refreshKey])
+
+  // Handle OAuth callback redirect params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('zoho') === 'connected') {
+      setZohoConnected(true)
+      toast.success('Zoho Books connected successfully!')
+      window.history.replaceState({}, '', '/demo/dashboard')
+    } else if (params.get('zoho') === 'error') {
+      toast.error(`Zoho connection failed: ${params.get('message') || 'Unknown error'}`)
+      window.history.replaceState({}, '', '/demo/dashboard')
+    }
+  }, [])
+
+  const connectZoho = async () => {
+    if (!orgId) {
+      toast.error('Demo organization not ready yet')
+      return
+    }
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          apikey: supabaseAnonKey,
+        },
+        body: JSON.stringify({ organization_id: orgId }),
+      })
+      const { authorization_url, error } = await response.json()
+      if (error) throw new Error(error)
+      window.location.href = authorization_url
+    } catch (error) {
+      console.error('Zoho auth error:', error)
+      toast.error('Failed to connect Zoho Books. Please try again.')
+    }
+  }
+
+  const syncZoho = async () => {
+    if (!orgId) return
+    try {
+      setZohoSyncing(true)
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          apikey: supabaseAnonKey,
+        },
+        body: JSON.stringify({ organization_id: orgId }),
+      })
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error || 'Sync failed')
+      toast.success(`Synced ${result.synced} transactions from Zoho Books`)
+      setRefreshKey((k) => k + 1)
+    } catch (error) {
+      console.error('Zoho sync error:', error)
+      toast.error(`Sync failed: ${(error as Error).message}`)
+    } finally {
+      setZohoSyncing(false)
+    }
   }
 
   const FALLBACK_DATA = {
@@ -813,6 +900,60 @@ export function DemoDashboard() {
                 <Upload size={16} />
                 Upload Data
               </button>
+              {!zohoConnected ? (
+                <button
+                  onClick={connectZoho}
+                  className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
+                  style={{
+                    background: 'transparent',
+                    color: '#F8FAFC',
+                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    border: '1px solid rgba(57, 73, 171, 0.5)',
+                  }}
+                >
+                  <Link2 size={16} />
+                  Connect Zoho Books
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={syncZoho}
+                    disabled={zohoSyncing}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors disabled:opacity-60"
+                    style={{
+                      background: '#3949AB',
+                      color: '#F8FAFC',
+                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                      border: '1px solid #3949AB',
+                    }}
+                  >
+                    {zohoSyncing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Syncing…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw size={16} />
+                        Sync Zoho Data
+                      </>
+                    )}
+                  </button>
+                  <div
+                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
+                    style={{
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      color: '#34D399',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                    }}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    Zoho Connected
+                  </div>
+                </>
+              )}
               <button
                 onClick={() => {
                   if (confirm('Exit demo? All data will be cleared.')) {
