@@ -996,6 +996,60 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_transactions: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string | null
+          customer: string | null
+          date: string
+          description: string
+          gst_amount: number | null
+          id: string
+          invoice_number: string | null
+          metadata: Json | null
+          organization_id: string
+          payment_method: string | null
+          type: string
+          updated_at: string | null
+          vendor: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string | null
+          customer?: string | null
+          date: string
+          description: string
+          gst_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          metadata?: Json | null
+          organization_id: string
+          payment_method?: string | null
+          type: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string | null
+          customer?: string | null
+          date?: string
+          description?: string
+          gst_amount?: number | null
+          id?: string
+          invoice_number?: string | null
+          metadata?: Json | null
+          organization_id?: string
+          payment_method?: string | null
+          type?: string
+          updated_at?: string | null
+          vendor?: string | null
+        }
+        Relationships: []
+      }
       early_access_requests: {
         Row: {
           created_at: string
