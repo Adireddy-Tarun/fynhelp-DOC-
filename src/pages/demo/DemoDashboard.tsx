@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 // Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload, Link2, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
