@@ -677,23 +677,38 @@ export function DemoDashboard() {
                 Data: {fileName}
               </p>
             </div>
-            <button
-              onClick={() => {
-                if (confirm('Exit demo? All data will be cleared.')) {
-                  sessionStorage.clear()
-                  window.location.href = '/demo/login'
-                }
-              }}
-              className="px-6 py-3 rounded-xl font-semibold transition-colors"
-              style={{
-                background: '#252B48',
-                color: '#F8FAFC',
-                fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                border: '1px solid rgba(57, 73, 171, 0.25)',
-              }}
-            >
-              Exit Demo
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowUpload(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
+                style={{
+                  background: '#FFA726',
+                  color: '#0A0E27',
+                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                  border: '1px solid #FFA726',
+                }}
+              >
+                <Upload size={16} />
+                Upload Data
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Exit demo? All data will be cleared.')) {
+                    sessionStorage.clear()
+                    window.location.href = '/demo/login'
+                  }
+                }}
+                className="px-6 py-3 rounded-xl font-semibold transition-colors"
+                style={{
+                  background: '#252B48',
+                  color: '#F8FAFC',
+                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
+                  border: '1px solid rgba(57, 73, 171, 0.25)',
+                }}
+              >
+                Exit Demo
+              </button>
+            </div>
           </div>
         </div>
       </nav>
