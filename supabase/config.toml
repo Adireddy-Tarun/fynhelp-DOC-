@@ -1,1 +1,10 @@
 project_id = "ukmtzflxtcoqnwujvrqh"
+
+[functions.zoho-callback]
+verify_jwt = false
+
+[functions.zoho-auth]
+verify_jwt = false
+
+[functions.zoho-sync]
+verify_jwt = false
