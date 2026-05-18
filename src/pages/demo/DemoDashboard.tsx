@@ -111,7 +111,90 @@ export function DemoDashboard() {
     setRefreshKey((k) => k + 1)
   }
 
-  const FALLBACK_DATA = {
+  // Check Zoho connection status whenever org changes
+  useEffect(() => {
+    if (!orgId) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase
+        .from('integrations')
+        .select('id')
+        .eq('organization_id', orgId)
+        .eq('provider', 'zoho_books')
+        .maybeSingle()
+      if (!cancelled) setZohoConnected(!!data)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [orgId, refreshKey])
+
+  // Handle OAuth callback redirect params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('zoho') === 'connected') {
+      setZohoConnected(true)
+      toast.success('Zoho Books connected successfully!')
+      window.history.replaceState({}, '', '/demo/dashboard')
+    } else if (params.get('zoho') === 'error') {
+      toast.error(`Zoho connection failed: ${params.get('message') || 'Unknown error'}`)
+      window.history.replaceState({}, '', '/demo/dashboard')
+    }
+  }, [])
+
+  const connectZoho = async () => {
+    if (!orgId) {
+      toast.error('Demo organization not ready yet')
+      return
+    }
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          apikey: supabaseAnonKey,
+        },
+        body: JSON.stringify({ organization_id: orgId }),
+      })
+      const { authorization_url, error } = await response.json()
+      if (error) throw new Error(error)
+      window.location.href = authorization_url
+    } catch (error) {
+      console.error('Zoho auth error:', error)
+      toast.error('Failed to connect Zoho Books. Please try again.')
+    }
+  }
+
+  const syncZoho = async () => {
+    if (!orgId) return
+    try {
+      setZohoSyncing(true)
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      const response = await fetch(`${supabaseUrl}/functions/v1/zoho-sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          apikey: supabaseAnonKey,
+        },
+        body: JSON.stringify({ organization_id: orgId }),
+      })
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error || 'Sync failed')
+      toast.success(`Synced ${result.synced} transactions from Zoho Books`)
+      setRefreshKey((k) => k + 1)
+    } catch (error) {
+      console.error('Zoho sync error:', error)
+      toast.error(`Sync failed: ${(error as Error).message}`)
+    } finally {
+      setZohoSyncing(false)
+    }
+  }
+
     liquidity: {
       cashPosition: {
         currentCash: 380000,
