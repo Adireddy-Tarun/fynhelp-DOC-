@@ -264,14 +264,15 @@ export default function NeuralNetwork() {
 
   const layout: Layout = useMemo(() => {
     if (bp === "mobile") {
-      // Use full available width, clamped, with small horizontal padding.
-      // Keep the diagram square so the cluster is perfectly centered both axes.
+      // Use full available width, clamped. Square-ish, with extra vertical room
+      // for labels that sit beneath the outer modules.
       const w = Math.max(280, Math.min(vw - 24, 420));
-      const h = w + 120; // extra vertical room for labels below outer modules
-      const innerR = w * 0.28;
-      const outerR = w * 0.42;
-      return { w, h, cx: w / 2, cy: h / 2, centerSize: 78, moduleSize: 50, childSize: 36, innerR, outerR };
+      const h = w + 160;
+      const innerR = w * 0.34;
+      const outerR = w * 0.46;
+      return { w, h, cx: w / 2, cy: h / 2, centerSize: 72, moduleSize: 44, childSize: 32, innerR, outerR };
     }
+
     if (bp === "tablet") {
       const w = Math.min(vw - 48, 900);
       const h = Math.min(w + 80, 760);
