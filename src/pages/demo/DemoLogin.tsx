@@ -102,6 +102,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         @keyframes chatIn1 { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         @keyframes chatIn2 { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         @keyframes rotateSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes floatUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
         .fyn-input, .fyn-select {
           width: 100%; padding: 12px 14px;
