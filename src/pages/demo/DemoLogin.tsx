@@ -85,6 +85,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
       }}
     >
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
         @keyframes orbPulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.08);opacity:.9} }
         @keyframes cardDrift1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
         @keyframes cardDrift2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
@@ -94,6 +95,13 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
         @keyframes progressFill75 { from{width:0%} to{width:75%} }
         @keyframes progressFill89 { from{width:0%} to{width:89%} }
+        @keyframes scanMove { 0%{top:-20%} 100%{top:120%} }
+        @keyframes fw-ring-fill { from{stroke-dashoffset:151} to{stroke-dashoffset:0} }
+        @keyframes fw-ring-seq { from{stroke-dashoffset:82} }
+        @keyframes barGrow { from{width:0} }
+        @keyframes chatIn1 { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes chatIn2 { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes rotateSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
         .fyn-input, .fyn-select {
           width: 100%; padding: 12px 14px;
