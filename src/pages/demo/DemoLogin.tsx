@@ -22,6 +22,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
 
   useEffect(() => { setMounted(true); }, []);
 
+  const [screenWidth, setScreenWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1400
+  );
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const isDesktop = screenWidth >= 1280;
+  const isTablet = screenWidth >= 768 && screenWidth < 1280;
+  const isMobile = screenWidth < 768;
+
   const handleAccess = async () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 700));
