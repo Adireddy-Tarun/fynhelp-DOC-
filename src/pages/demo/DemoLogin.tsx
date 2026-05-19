@@ -1046,6 +1046,84 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           )}
         </div>
 
+        {/* BENEFITS STRIP */}
+        <div
+          style={{
+            width: "100%",
+            marginTop: "20px",
+            background: "#140d04",
+            border: "1px solid rgba(244,237,218,0.07)",
+            borderRadius: "18px",
+            overflow: "hidden",
+            animation: "floatUp 0.5s ease 0.5s forwards",
+            opacity: 0,
+          }}
+        >
+          <div
+            style={{
+              background: "linear-gradient(90deg,rgba(196,30,30,0.12),rgba(139,105,20,0.08),transparent)",
+              padding: "12px 20px",
+              borderBottom: "1px solid rgba(244,237,218,0.05)",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2">
+              <path d="M20 12V22H4V12" />
+              <path d="M22 7H2v5h20V7z" />
+              <path d="M12 22V7" />
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+            </svg>
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "15px", letterSpacing: "0.08em", color: "#F4EDDA" }}>
+              Waitlist Member Benefits
+            </span>
+            <div style={{ marginLeft: "auto" }}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  padding: "3px 10px",
+                  borderRadius: "100px",
+                  background: "rgba(196,30,30,0.12)",
+                  border: "1px solid rgba(196,30,30,0.2)",
+                }}
+              >
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#C41E1E", animation: "blink 2s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#C41E1E" }}>753 SPOTS LEFT</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
+            {[
+              { val: "6", unit: "MONTHS FREE", desc: "Full platform · No credit card", color: "#10B981" },
+              { val: "1st", unit: "PRIORITY ACCESS", desc: "Every new feature · Early", color: "#8B6914" },
+              { val: "50%", unit: "OFF PRO PLAN", desc: "Locked in · Forever yours", color: "#C41E1E" },
+              { val: "10x", unit: "AI USAGE LIMITS", desc: "Enterprise-grade · Included", color: "#8B6914" },
+            ].map((b, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "16px 18px",
+                  borderRight: i < 3 ? "1px solid rgba(244,237,218,0.05)" : "none",
+                }}
+              >
+                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "40px", lineHeight: 1, color: b.color, marginBottom: "2px" }}>
+                  {b.val}
+                </div>
+                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "12px", letterSpacing: "0.06em", color: "#F4EDDA", marginBottom: "4px" }}>
+                  {b.unit}
+                </div>
+                <div style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "11px", color: "rgba(244,237,218,0.3)", lineHeight: 1.5 }}>
+                  {b.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* BOTTOM BENEFITS */}
         <div style={{ ...fade(0.4), width: "100%", marginTop: 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
