@@ -323,11 +323,12 @@ export default function HeroSection() {
             {/* CTAs */}
             <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
               <button className="fyn-btn-primary" onClick={() => navigate("/waitlist")}>
-                Get Early Access <ArrowRight size={14} />
+                Join Waitlist <ArrowRight size={14} />
               </button>
-              <button className="fyn-btn-ghost" onClick={() => navigate("/demo")}>
+              <button className="fyn-btn-ghost" onClick={() => navigate("/demo/login")}>
                 <Play size={13} /> Watch Demo
               </button>
+
             </div>
 
             {/* STATS */}
