@@ -47,24 +47,24 @@ export default function ProductEcosystemSection() {
       </div>
 
       {/* Neural network diagram */}
-      <div className="text-center">
-        <NeuralNetwork />
+      <div className="flex flex-col items-center w-full overflow-x-hidden">
+        <div className="w-full flex justify-center">
+          <NeuralNetwork />
+        </div>
         <p
-          className="text-[15px] sm:text-[16px] md:text-[18px] mt-8 sm:mt-10 md:mt-12 px-5"
+          className="text-[15px] sm:text-[16px] md:text-[18px] mt-8 sm:mt-10 md:mt-12 px-5 text-center"
           style={{
             fontFamily: "'Roboto', sans-serif",
             lineHeight: 1.6,
             color: "#1A1A1A",
             maxWidth: 820,
-            marginLeft: "auto",
-            marginRight: "auto",
             marginBottom: 0,
-            textAlign: "center",
           }}
         >
           Every module feeds CFO Fynny. CFO Fynny connects everything. You get one coherent answer — not 6 separate dashboards.
         </p>
       </div>
+
     </section>
   );
 }
