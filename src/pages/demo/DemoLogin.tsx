@@ -801,6 +801,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* BACK TO HOME */}
       <div style={{ position: "absolute", top: 24, left: 24, zIndex: 10 }}>
