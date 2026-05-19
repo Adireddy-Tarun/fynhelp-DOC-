@@ -22,6 +22,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
 
   useEffect(() => { setMounted(true); }, []);
 
+  const [screenWidth, setScreenWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1400
+  );
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const isDesktop = screenWidth >= 1280;
+  const isTablet = screenWidth >= 768 && screenWidth < 1280;
+  const isMobile = screenWidth < 768;
+
   const handleAccess = async () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 700));
@@ -181,6 +193,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         .fyn-link { color: #8B6914; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 
         @media (max-width: 1100px) { .fyn-side-cards { display: none; } }
+        .fyn-mini-scroll::-webkit-scrollbar { display: none; }
       `}</style>
 
       {/* Grid background */}
@@ -208,6 +221,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         animation: "orbPulse 10s ease-in-out infinite",
       }} />
 
+      {isDesktop && (
+      <>
       {/* LEFT FLOATING WIDGETS */}
       <div
         className="fyn-side-cards"
@@ -787,6 +802,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* BACK TO HOME */}
       <div style={{ position: "absolute", top: 24, left: 24, zIndex: 10 }}>
@@ -850,6 +867,259 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             </div>
           ))}
         </div>
+
+        {/* MOBILE/TABLET PLATFORM STRIP */}
+        {(isTablet || isMobile) && (
+          <div
+            style={{
+              width: "100%",
+              marginTop: 20,
+              animation: "floatUp 0.5s ease 0.25s forwards",
+              opacity: 0,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <div style={{ flex: 1, height: 1, background: "rgba(244,237,218,0.06)" }} />
+              <span
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 9,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "rgba(244,237,218,0.2)",
+                }}
+              >
+                Platform Overview
+              </span>
+              <div style={{ flex: 1, height: 1, background: "rgba(244,237,218,0.06)" }} />
+            </div>
+
+            <div
+              className="fyn-mini-scroll"
+              style={{
+                display: "flex",
+                gap: 10,
+                overflowX: "auto",
+                paddingBottom: 8,
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
+            >
+              {/* MINI 1: SECURITY */}
+              <div
+                style={{
+                  minWidth: isMobile ? 200 : 220,
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  background: "#140d04",
+                  border: "1px solid rgba(244,237,218,0.07)",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ height: 2, background: "linear-gradient(90deg,#C41E1E,rgba(196,30,30,0.15))" }} />
+                <div style={{ padding: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)" }}>
+                      Infrastructure
+                    </div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981", fontWeight: 600 }}>SECURE</span>
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
+                    Bank-Grade<br />
+                    <span style={{ color: "#C41E1E" }}>Security</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    {[
+                      { label: "SSL Encrypted", status: "ACTIVE" },
+                      { label: "Row-Level Security", status: "ON" },
+                      { label: "DPDP Act 2023", status: "COMPLIANT" },
+                    ].map((row, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
+                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.5)" }}>{row.label}</span>
+                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981" }}>{row.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* MINI 2: CONNECTIVITY */}
+              <div
+                style={{
+                  minWidth: isMobile ? 200 : 220,
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  background: "#140d04",
+                  border: "1px solid rgba(244,237,218,0.07)",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ height: 2, background: "linear-gradient(90deg,#8B6914,rgba(139,105,20,0.15))" }} />
+                <div style={{ padding: 14 }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)", marginBottom: 10 }}>
+                    Data Layer
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
+                    Live<br />
+                    <span style={{ color: "#8B6914" }}>Connectivity</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    {[
+                      { label: "Razorpay", status: "LIVE SYNC", color: "#10B981" },
+                      { label: "Zoho Books", status: "CONNECTED", color: "#10B981" },
+                      { label: "CSV Upload", status: "READY", color: "#8B6914" },
+                    ].map((src, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
+                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: src.color, flexShrink: 0, animation: `blink ${1.8 + i * 0.6}s ease-in-out infinite` }} />
+                        <span style={{ flex: 1, fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.55)" }}>{src.label}</span>
+                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: src.color }}>{src.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* MINI 3: INTELLIGENCE */}
+              <div
+                style={{
+                  minWidth: isMobile ? 200 : 220,
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  background: "#140d04",
+                  border: "1px solid rgba(244,237,218,0.07)",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ height: 2, background: "linear-gradient(90deg,#8B6914,#C41E1E,rgba(196,30,30,0.1))" }} />
+                <div style={{ padding: 14 }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)", marginBottom: 10 }}>
+                    Coverage
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
+                    <span style={{ color: "#8B6914" }}>5</span> Intel<br />Modules
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                    {[
+                      { val: 92, label: "LIQD", color: "#C41E1E", offset: 9 },
+                      { val: 88, label: "REV", color: "#8B6914", offset: 14 },
+                      { val: 85, label: "COST", color: "#8B6914", offset: 17 },
+                      { val: 95, label: "GST", color: "#C41E1E", offset: 6 },
+                      { val: 80, label: "GOV", color: "#8B6914", offset: 23 },
+                    ].map((ring, i) => (
+                      <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                        <div style={{ position: "relative", width: 30, height: 30 }}>
+                          <svg width="30" height="30" viewBox="0 0 30 30" style={{ transform: "rotate(-90deg)" }}>
+                            <circle cx="15" cy="15" r="11" fill="none" stroke="rgba(244,237,218,0.05)" strokeWidth="2.5" />
+                            <circle
+                              cx="15"
+                              cy="15"
+                              r="11"
+                              fill="none"
+                              stroke={ring.color}
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeDasharray="69"
+                              style={{ animation: `fw-ring-seq 1.4s cubic-bezier(0.16,1,0.3,1) ${0.2 + i * 0.15}s both`, strokeDashoffset: ring.offset }}
+                            />
+                          </svg>
+                          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontFamily: "'Bebas Neue', sans-serif", fontSize: 9, color: "#F4EDDA" }}>
+                            {ring.val}
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 6, color: "rgba(244,237,218,0.25)", letterSpacing: "0.04em" }}>
+                          {ring.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ padding: "6px 8px", background: "rgba(196,30,30,0.07)", border: "1px solid rgba(196,30,30,0.12)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.5)" }}>GST &amp; Tax</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#C41E1E" }}>95% · LIVE</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* MINI 4: FYNNY AI */}
+              <div
+                style={{
+                  minWidth: isMobile ? 200 : 220,
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  background: "#140d04",
+                  border: "1px solid rgba(244,237,218,0.07)",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ height: 2, background: "linear-gradient(90deg,#C41E1E,#8B6914,rgba(139,105,20,0.1))" }} />
+                <div style={{ padding: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)" }}>
+                      AI CFO
+                    </div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981", fontWeight: 600 }}>ONLINE</span>
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
+                    FYNNY<br />
+                    <span style={{ color: "#C41E1E" }}>AI</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <div style={{ padding: "6px 9px", borderRadius: "8px 8px 2px 8px", background: "rgba(244,237,218,0.06)", fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.55)", animation: "chatIn1 0.4s ease 0.9s both", opacity: 0 }}>
+                        What is my runway?
+                      </div>
+                    </div>
+                    <div style={{ padding: "6px 9px", borderRadius: "2px 8px 8px 8px", background: "rgba(196,30,30,0.1)", border: "1px solid rgba(196,30,30,0.15)", fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "#F4EDDA", lineHeight: 1.5, animation: "chatIn2 0.4s ease 1.5s both", opacity: 0 }}>
+                      <span style={{ display: "block", fontFamily: "'JetBrains Mono', monospace", fontSize: 7, color: "rgba(196,30,30,0.6)", marginBottom: 2 }}>
+                        FYNNY · NOW
+                      </span>
+                      <strong>8.4 months</strong> at ₹2.1L/mo burn
+                      <span style={{ display: "inline-block", width: 2, height: 10, background: "#C41E1E", verticalAlign: "middle", marginLeft: 2, animation: "blink 1s step-end infinite" }} />
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+                    {[
+                      { val: "115+", label: "METRICS", color: "#F4EDDA" },
+                      { val: "<3s", label: "SPEED", color: "#8B6914" },
+                      { val: "24/7", label: "ONLINE", color: "#C41E1E" },
+                    ].map((s, i) => (
+                      <div key={i} style={{ padding: "5px 4px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.05)", borderRadius: 6, textAlign: "center" }}>
+                        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, color: s.color, lineHeight: 1 }}>{s.val}</div>
+                        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 6, color: "rgba(244,237,218,0.25)", marginTop: 1 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: i === 0 ? 16 : 4,
+                    height: 3,
+                    borderRadius: 2,
+                    background: i === 0 ? "#C41E1E" : "rgba(244,237,218,0.15)",
+                    transition: "all 0.3s",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* MAIN CARD */}
         <div style={{
