@@ -143,9 +143,10 @@ const SKEUOMORPHIC_CSS = `
     background-image: linear-gradient(to bottom, rgba(244,237,218,0.04) 0px, transparent 40px);
   }
   @keyframes fyn-panel-float {
-    0%,100% { transform: perspective(1000px) rotateY(-11deg) rotateX(3deg) translateY(0px); }
-    50% { transform: perspective(1000px) rotateY(-8deg) rotateX(4deg) translateY(-8px); }
+    0%,100% { transform: perspective(1400px) rotateY(-4deg) rotateX(1deg) translateY(0px); }
+    50% { transform: perspective(1400px) rotateY(-3deg) rotateX(1.5deg) translateY(-6px); }
   }
+
 
   .fyn-scan { position: absolute; left: 0; right: 0; height: 60px;
     background: linear-gradient(180deg, transparent 0%, rgba(196,30,30,0.04) 40%, rgba(196,30,30,0.04) 60%, transparent 100%);
