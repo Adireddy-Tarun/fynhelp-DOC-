@@ -4,7 +4,7 @@ import {
   ArrowLeft, Lock, Calendar, Users, TrendingUp, TrendingDown,
   Shield, FileText, AlertCircle, ChevronRight, CheckCircle,
   Clock, Zap, BarChart2, PieChart, Activity, IndianRupee,
-  Building2, UserCheck, Bell, Target,
+  Building2, UserCheck, Bell, Target, Mail,
 } from "lucide-react";
 
 const DEMO_PASSWORD = "fynhelp2026";
