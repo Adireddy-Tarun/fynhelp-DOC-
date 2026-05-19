@@ -193,6 +193,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         .fyn-link { color: #8B6914; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 
         @media (max-width: 1100px) { .fyn-side-cards { display: none; } }
+        .fyn-mini-scroll::-webkit-scrollbar { display: none; }
       `}</style>
 
       {/* Grid background */}
