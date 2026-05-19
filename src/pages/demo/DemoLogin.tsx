@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Lock, Calendar, Users, TrendingUp, TrendingDown,
@@ -31,6 +31,36 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const isDesktop = screenWidth >= 1280;
+
+  const [activeCard, setActiveCard] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const interval = setInterval(() => {
+      setActiveCard((prev) => {
+        const next = (prev + 1) % 4;
+        if (scrollContainerRef.current) {
+          const cardWidth = screenWidth < 768 ? 210 : 230;
+          scrollContainerRef.current.scrollTo({ left: next * cardWidth, behavior: "smooth" });
+        }
+        return next;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isDesktop, screenWidth]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const handleScroll = () => {
+      const cardWidth = screenWidth < 768 ? 210 : 230;
+      const index = Math.round(container.scrollLeft / cardWidth);
+      setActiveCard(index);
+    };
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [screenWidth, isDesktop]);
   const isTablet = screenWidth >= 768 && screenWidth < 1280;
   const isMobile = screenWidth < 768;
 
@@ -895,6 +925,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             </div>
 
             <div
+              ref={scrollContainerRef}
               className="fyn-mini-scroll"
               style={{
                 display: "flex",
@@ -1104,16 +1135,24 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 5, marginTop: 10 }}>
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
+                  onClick={() => {
+                    setActiveCard(i);
+                    if (scrollContainerRef.current) {
+                      const cardWidth = isMobile ? 210 : 230;
+                      scrollContainerRef.current.scrollTo({ left: i * cardWidth, behavior: "smooth" });
+                    }
+                  }}
                   style={{
-                    width: i === 0 ? 16 : 4,
+                    width: activeCard === i ? 20 : 5,
                     height: 3,
                     borderRadius: 2,
-                    background: i === 0 ? "#C41E1E" : "rgba(244,237,218,0.15)",
-                    transition: "all 0.3s",
+                    background: activeCard === i ? "#C41E1E" : "rgba(244,237,218,0.15)",
+                    transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+                    cursor: "pointer",
                   }}
                 />
               ))}
