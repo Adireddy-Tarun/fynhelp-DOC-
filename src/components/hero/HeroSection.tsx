@@ -186,28 +186,29 @@ const SKEUOMORPHIC_CSS = `
   }
   .fyn-btn-ghost:hover { background: rgba(244,237,218,0.07); color: #F4EDDA; border-color: rgba(244,237,218,0.18); }
 
-  .fyn-action-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 7px;
-    font-family: 'Instrument Sans', sans-serif; font-size: 10.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  .fyn-action-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 7px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
     transition: all 0.15s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 3px rgba(0,0,0,0.3);
     animation: fyn-actions-in 0.3s ease both;
   }
   .fyn-action-btn:hover { transform: translateY(-1px); }
 
-  .fyn-chat-user { display: flex; justify-content: flex-end; margin-bottom: 8px; animation: fyn-slide-right 0.35s ease both; }
-  .fyn-chat-user-bubble { padding: 8px 12px; background: rgba(244,237,218,0.06); border: 1px solid rgba(244,237,218,0.08);
-    border-radius: 11px 11px 2px 11px; font-size: 12.5px; color: rgba(244,237,218,0.85); max-width: 82%; line-height: 1.45;
+  .fyn-chat-user { display: flex; justify-content: flex-end; margin-bottom: 10px; animation: fyn-slide-right 0.35s ease both; }
+  .fyn-chat-user-bubble { padding: 10px 14px; background: rgba(244,237,218,0.08); border: 1px solid rgba(244,237,218,0.12);
+    border-radius: 11px 11px 2px 11px; font-size: 14.5px; font-weight: 500; color: #F4EDDA; max-width: 82%; line-height: 1.45;
     box-shadow: inset 0 1px 0 rgba(244,237,218,0.06);
   }
-  .fyn-chat-fynny { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; animation: fyn-slide-left 0.35s ease both; }
-  .fyn-chat-avatar { width: 24px; height: 24px; border-radius: 7px; background: rgba(196,30,30,0.12); border: 1px solid rgba(196,30,30,0.22);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: #C41E1E;
-    box-shadow: inset 0 1px 0 rgba(196,30,30,0.15), 0 2px 6px rgba(0,0,0,0.3);
+  .fyn-chat-fynny { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; animation: fyn-slide-left 0.35s ease both; }
+  .fyn-chat-avatar { width: 28px; height: 28px; border-radius: 7px; background: rgba(196,30,30,0.15); border: 1px solid rgba(196,30,30,0.28);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: #F4858A;
+    box-shadow: inset 0 1px 0 rgba(196,30,30,0.18), 0 2px 6px rgba(0,0,0,0.3);
   }
-  .fyn-chat-fynny-bubble { padding: 10px 13px; background: rgba(196,30,30,0.07); border: 1px solid rgba(196,30,30,0.13);
-    border-radius: 2px 11px 11px 11px; font-size: 12px; color: #F4EDDA; line-height: 1.6; max-width: 88%;
-    box-shadow: inset 0 1px 0 rgba(196,30,30,0.08);
+  .fyn-chat-fynny-bubble { padding: 12px 15px; background: rgba(196,30,30,0.1); border: 1px solid rgba(196,30,30,0.2);
+    border-radius: 2px 11px 11px 11px; font-size: 14px; color: #F4EDDA; line-height: 1.6; max-width: 88%;
+    box-shadow: inset 0 1px 0 rgba(196,30,30,0.1);
   }
-  .fyn-chat-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: rgba(196,30,30,0.7); margin-bottom: 4px; letter-spacing: 0.1em; }
+  .fyn-chat-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: #F4858A; margin-bottom: 6px; letter-spacing: 0.12em; }
+
 
   .fyn-stat-card { padding: 12px 14px; background: rgba(244,237,218,0.03); border: 1px solid rgba(244,237,218,0.06); border-radius: 10px;
     box-shadow: inset 0 1px 0 rgba(244,237,218,0.05), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.25);
