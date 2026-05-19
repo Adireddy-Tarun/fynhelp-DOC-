@@ -264,26 +264,27 @@ export default function NeuralNetwork() {
 
   const layout: Layout = useMemo(() => {
     if (bp === "mobile") {
-      // Use full available width, clamped, with small horizontal padding
-      const w = Math.max(280, Math.min(vw - 16, 480));
-      const min = w; // height-constrained by width on mobile for centering
-      const h = Math.max(520, Math.min(min + 80, 620));
-      const innerR = w * 0.30;
-      const outerR = w * 0.46;
-      return { w, h, cx: w / 2, cy: h / 2, centerSize: 84, moduleSize: 56, childSize: 42, innerR, outerR };
+      // Use full available width, clamped, with small horizontal padding.
+      // Keep the diagram square so the cluster is perfectly centered both axes.
+      const w = Math.max(280, Math.min(vw - 24, 420));
+      const h = w + 120; // extra vertical room for labels below outer modules
+      const innerR = w * 0.28;
+      const outerR = w * 0.42;
+      return { w, h, cx: w / 2, cy: h / 2, centerSize: 78, moduleSize: 50, childSize: 36, innerR, outerR };
     }
     if (bp === "tablet") {
-      const w = Math.min(vw - 48, 1000);
-      const h = 700;
+      const w = Math.min(vw - 48, 900);
+      const h = Math.min(w + 80, 760);
       const minDim = Math.min(w, h);
-      const innerR = minDim * 0.33;
-      const outerR = minDim * 0.50;
-      return { w, h, cx: w / 2, cy: h / 2, centerSize: 120, moduleSize: 75, childSize: 55, innerR, outerR };
+      const innerR = minDim * 0.30;
+      const outerR = minDim * 0.46;
+      return { w, h, cx: w / 2, cy: h / 2, centerSize: 110, moduleSize: 70, childSize: 50, innerR, outerR };
     }
     const w = Math.min(vw - 80, 1280);
     const h = 900;
     return { w, h, cx: w / 2, cy: h / 2, centerSize: 150, moduleSize: 90, childSize: 65, innerR: 280, outerR: 450 };
   }, [bp, vw]);
+
 
   /* ----- Compute node positions via trigonometry ----- */
   const nodes = useMemo(() => {
