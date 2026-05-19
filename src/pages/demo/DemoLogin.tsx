@@ -31,6 +31,36 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const isDesktop = screenWidth >= 1280;
+
+  const [activeCard, setActiveCard] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const interval = setInterval(() => {
+      setActiveCard((prev) => {
+        const next = (prev + 1) % 4;
+        if (scrollContainerRef.current) {
+          const cardWidth = screenWidth < 768 ? 210 : 230;
+          scrollContainerRef.current.scrollTo({ left: next * cardWidth, behavior: "smooth" });
+        }
+        return next;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isDesktop, screenWidth]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const handleScroll = () => {
+      const cardWidth = screenWidth < 768 ? 210 : 230;
+      const index = Math.round(container.scrollLeft / cardWidth);
+      setActiveCard(index);
+    };
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [screenWidth, isDesktop]);
   const isTablet = screenWidth >= 768 && screenWidth < 1280;
   const isMobile = screenWidth < 768;
 
