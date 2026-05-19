@@ -220,6 +220,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         animation: "orbPulse 10s ease-in-out infinite",
       }} />
 
+      {isDesktop && (
+      <>
       {/* LEFT FLOATING WIDGETS */}
       <div
         className="fyn-side-cards"
