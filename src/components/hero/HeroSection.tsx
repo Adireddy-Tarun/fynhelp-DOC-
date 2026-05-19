@@ -432,10 +432,11 @@ export default function HeroSection() {
             {/* Confidence badge */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
 
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.07)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 9.5, color: "rgba(244,237,218,0.5)", letterSpacing: "0.06em" }}>
-                <Shield size={10} color="#10B981" />
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", background: "rgba(244,237,218,0.05)", border: "1px solid rgba(244,237,218,0.12)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, color: "rgba(244,237,218,0.75)", letterSpacing: "0.06em" }}>
+                <Shield size={12} color="#10B981" />
                 Fynny Output · 94% Confidence · Powered by FYNHelp AI
               </div>
+
             </div>
           </div>
         </div>
