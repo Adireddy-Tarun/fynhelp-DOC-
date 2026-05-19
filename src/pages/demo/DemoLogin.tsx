@@ -1124,81 +1124,89 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </div>
         </div>
 
-        {/* BOTTOM BENEFITS */}
-        <div style={{ ...fade(0.4), width: "100%", marginTop: 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-            <div style={{ flex: 1, height: 1, background: "rgba(244,237,218,0.08)" }} />
-            <div style={{
-              fontSize: 11, color: "rgba(244,237,218,0.5)",
-              textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 600,
-            }}>
-              What you get
+        {/* CONTACT */}
+        <div
+          style={{
+            ...fade(0.4),
+            width: "100%",
+            marginTop: 28,
+            padding: "16px 18px",
+            background: "rgba(244,237,218,0.03)",
+            border: "1px solid rgba(244,237,218,0.08)",
+            borderRadius: 14,
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+          }}
+        >
+          <div
+            style={{
+              flexShrink: 0,
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: "rgba(139,105,20,0.12)",
+              border: "1px solid rgba(139,105,20,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Mail size={16} color="#8B6914" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: "#F4EDDA",
+              }}
+            >
+              Need help or have questions?
             </div>
-            <div style={{ flex: 1, height: 1, background: "rgba(244,237,218,0.08)" }} />
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                color: "rgba(244,237,218,0.5)",
+                marginTop: 2,
+              }}
+            >
+              support@fynhelp.com
+            </div>
           </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {[
-              {
-                icon: <PieChart size={16} color="#8B6914" />,
-                bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.2)",
-                title: "Live Financial Dashboard",
-                desc: "Liquidity, Revenue, Cost, GST and Governance — in one view",
-                tag: "Waitlist", tagColor: "#8B6914", tagBg: "rgba(139,105,20,0.12)",
-              },
-              {
-                icon: <Zap size={16} color="#C41E1E" />,
-                bg: "rgba(196,30,30,0.08)", border: "rgba(196,30,30,0.2)",
-                title: "AI CFO — Nidhi",
-                desc: "Ask financial questions in plain language. Get answers in seconds.",
-                tag: "Demo", tagColor: "#C41E1E", tagBg: "rgba(196,30,30,0.1)",
-              },
-              {
-                icon: <Bell size={16} color="#5FBF7F" />,
-                bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)",
-                title: "Proactive GST and Tax Alerts",
-                desc: "Never miss a filing deadline. ITC reconciliation automated.",
-                tag: "Both", tagColor: "#5FBF7F", tagBg: "rgba(16,185,129,0.08)",
-              },
-              {
-                icon: <FileText size={16} color="#8B6914" />,
-                bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.2)",
-                title: "Razorpay and Zoho Sync",
-                desc: "Connect your existing tools. Data flows automatically.",
-                tag: "Waitlist", tagColor: "#8B6914", tagBg: "rgba(139,105,20,0.12)",
-              },
-            ].map((b) => (
-              <div key={b.title} className="benefit-row">
-                <div style={{
-                  flexShrink: 0, width: 36, height: 36, borderRadius: 9,
-                  background: b.bg, border: `1px solid ${b.border}`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {b.icon}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: 14, fontWeight: 600, color: "#F4EDDA",
-                  }}>
-                    {b.title}
-                  </div>
-                  <div style={{ fontSize: 12, color: "rgba(244,237,218,0.55)", marginTop: 3, lineHeight: 1.4 }}>
-                    {b.desc}
-                  </div>
-                </div>
-                <span style={{
-                  flexShrink: 0,
-                  padding: "4px 10px", borderRadius: 100,
-                  fontSize: 10, fontWeight: 600, letterSpacing: "0.04em",
-                  color: b.tagColor, background: b.tagBg,
-                  textTransform: "uppercase",
-                }}>
-                  {b.tag}
-                </span>
-              </div>
-            ))}
-          </div>
+          <a
+            href="mailto:support@fynhelp.com"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 16px",
+              background: "#C41E1E",
+              border: "none",
+              borderRadius: 8,
+              fontFamily: "'Instrument Sans', sans-serif",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#F4EDDA",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              transition: "background 0.2s, transform 0.15s",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "#A01818";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "#C41E1E";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+            }}
+          >
+            <Mail size={12} />
+            Contact Us
+          </a>
         </div>
 
         {/* Footer */}
