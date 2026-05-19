@@ -1135,16 +1135,24 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 5, marginTop: 10 }}>
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
+                  onClick={() => {
+                    setActiveCard(i);
+                    if (scrollContainerRef.current) {
+                      const cardWidth = isMobile ? 210 : 230;
+                      scrollContainerRef.current.scrollTo({ left: i * cardWidth, behavior: "smooth" });
+                    }
+                  }}
                   style={{
-                    width: i === 0 ? 16 : 4,
+                    width: activeCard === i ? 20 : 5,
                     height: 3,
                     borderRadius: 2,
-                    background: i === 0 ? "#C41E1E" : "rgba(244,237,218,0.15)",
-                    transition: "all 0.3s",
+                    background: activeCard === i ? "#C41E1E" : "rgba(244,237,218,0.15)",
+                    transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+                    cursor: "pointer",
                   }}
                 />
               ))}
