@@ -359,32 +359,33 @@ export default function HeroSection() {
                     <Cpu size={17} color="#F4EDDA" />
                   </div>
                   <div>
-                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "0.05em", color: "#F4EDDA" }}>CFO FYNNY</div>
-                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "rgba(244,237,218,0.4)", letterSpacing: "0.08em" }}>AI FINANCIAL INTELLIGENCE</div>
+                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 17, letterSpacing: "0.05em", color: "#F4EDDA" }}>CFO FYNNY</div>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "rgba(244,237,218,0.65)", letterSpacing: "0.08em" }}>AI FINANCIAL INTELLIGENCE</div>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 100 }}>
-                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "#10B981", letterSpacing: "0.1em" }}>LIVE</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "#10B981", letterSpacing: "0.1em" }}>LIVE</span>
                 </div>
               </div>
 
               {/* CHIPS */}
               <div style={{ padding: "14px 20px 6px" }}>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "rgba(244,237,218,0.35)", letterSpacing: "0.12em", marginBottom: 8 }}>TRY ASKING</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "rgba(244,237,218,0.6)", letterSpacing: "0.14em", marginBottom: 10 }}>TRY ASKING</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                   {[
-                    { label: "Runway?", icon: <Clock size={9} /> },
-                    { label: "Hire now?", icon: <Users size={9} /> },
-                    { label: "GST status?", icon: <FileText size={9} /> },
-                    { label: "What-If -20%", icon: <TrendingDown size={9} /> },
+                    { label: "Runway?", icon: <Clock size={11} /> },
+                    { label: "Hire now?", icon: <Users size={11} /> },
+                    { label: "GST status?", icon: <FileText size={11} /> },
+                    { label: "What-If -20%", icon: <TrendingDown size={11} /> },
                   ].map((c, i) => (
-                    <div key={i} className="fyn-action-btn" style={{ color: "rgba(244,237,218,0.6)", background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.08)" }}>
+                    <div key={i} className="fyn-action-btn" style={{ color: "rgba(244,237,218,0.85)", background: "rgba(244,237,218,0.06)", border: "1px solid rgba(244,237,218,0.12)" }}>
                       {c.icon} {c.label}
                     </div>
                   ))}
                 </div>
               </div>
+
 
               {/* CHAT */}
               <div style={{ padding: "14px 20px", minHeight: 240 }}>
