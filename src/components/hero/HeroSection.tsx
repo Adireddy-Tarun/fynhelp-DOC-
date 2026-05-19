@@ -295,24 +295,6 @@ export default function HeroSection() {
         <div className="fyn-orb fyn-orb-2" />
         <div className="fyn-orb fyn-orb-3" />
 
-        {/* NAV */}
-        <nav style={{ position: "relative", zIndex: 10, maxWidth: 1320, margin: "0 auto", padding: "22px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "#C41E1E", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.4)" }}>
-              <Sparkles size={16} color="#F4EDDA" />
-            </div>
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: "0.08em", color: "#F4EDDA" }}>FYNHELP</span>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, padding: "2px 7px", borderRadius: 4, background: "rgba(196,30,30,0.15)", color: "#C41E1E", border: "1px solid rgba(196,30,30,0.3)", letterSpacing: "0.1em" }}>BETA</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-            {["Features", "For CAs", "Pricing"].map(l => (
-              <a key={l} href="#" className="fyn-nav-link">{l}</a>
-            ))}
-            <button className="fyn-btn-primary" style={{ padding: "9px 18px", fontSize: 12.5 }} onClick={() => navigate("/waitlist")}>
-              Join Waitlist <ArrowRight size={13} />
-            </button>
-          </div>
-        </nav>
 
         {/* HERO GRID */}
         <div style={{ position: "relative", zIndex: 5, maxWidth: 1320, margin: "0 auto", padding: "40px 32px 60px", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 60, alignItems: "center" }}>
