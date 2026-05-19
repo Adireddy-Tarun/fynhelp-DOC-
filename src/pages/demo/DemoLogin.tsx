@@ -925,6 +925,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             </div>
 
             <div
+              ref={scrollContainerRef}
               className="fyn-mini-scroll"
               style={{
                 display: "flex",
