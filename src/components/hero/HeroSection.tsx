@@ -416,21 +416,22 @@ export default function HeroSection() {
 
               {/* INPUT BAR */}
               <div style={{ padding: "12px 20px 16px", borderTop: "1px solid rgba(244,237,218,0.05)", display: "flex", alignItems: "center", gap: 8, background: "rgba(0,0,0,0.2)" }}>
-                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.08)", borderRadius: 8, boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4)" }}>
-                  <Zap size={12} color="rgba(244,237,218,0.4)" />
-                  <span style={{ fontSize: 12, color: "rgba(244,237,218,0.35)" }}>Ask Fynny anything about your business...</span>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "10px 13px", background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.1)", borderRadius: 8, boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4)" }}>
+                  <Zap size={13} color="rgba(244,237,218,0.55)" />
+                  <span style={{ fontSize: 13, color: "rgba(244,237,218,0.55)" }}>Ask Fynny anything about your business...</span>
                 </div>
-                <button className="fyn-action-btn" style={{ color: "#F4EDDA", background: "rgba(244,237,218,0.06)", border: "1px solid rgba(244,237,218,0.12)", padding: "8px 12px" }}>
-                  <FileText size={11} /> Report
+                <button className="fyn-action-btn" style={{ color: "#F4EDDA", background: "rgba(244,237,218,0.08)", border: "1px solid rgba(244,237,218,0.16)", padding: "9px 13px" }}>
+                  <FileText size={12} /> Report
                 </button>
-                <button style={{ width: 36, height: 36, borderRadius: 8, background: "#C41E1E", border: "none", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 0 #8B1414, inset 0 1px 0 rgba(255,255,255,0.15)" }}>
-                  <Send size={14} />
+                <button style={{ width: 38, height: 38, borderRadius: 8, background: "#C41E1E", border: "none", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 0 #8B1414, inset 0 1px 0 rgba(255,255,255,0.15)" }}>
+                  <Send size={15} />
                 </button>
               </div>
             </div>
 
             {/* Confidence badge */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
+
               <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.07)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 9.5, color: "rgba(244,237,218,0.5)", letterSpacing: "0.06em" }}>
                 <Shield size={10} color="#10B981" />
                 Fynny Output · 94% Confidence · Powered by FYNHelp AI
