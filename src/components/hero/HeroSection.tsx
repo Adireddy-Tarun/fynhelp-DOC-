@@ -143,9 +143,10 @@ const SKEUOMORPHIC_CSS = `
     background-image: linear-gradient(to bottom, rgba(244,237,218,0.04) 0px, transparent 40px);
   }
   @keyframes fyn-panel-float {
-    0%,100% { transform: perspective(1000px) rotateY(-11deg) rotateX(3deg) translateY(0px); }
-    50% { transform: perspective(1000px) rotateY(-8deg) rotateX(4deg) translateY(-8px); }
+    0%,100% { transform: perspective(1400px) rotateY(-4deg) rotateX(1deg) translateY(0px); }
+    50% { transform: perspective(1400px) rotateY(-3deg) rotateX(1.5deg) translateY(-6px); }
   }
+
 
   .fyn-scan { position: absolute; left: 0; right: 0; height: 60px;
     background: linear-gradient(180deg, transparent 0%, rgba(196,30,30,0.04) 40%, rgba(196,30,30,0.04) 60%, transparent 100%);
@@ -185,28 +186,29 @@ const SKEUOMORPHIC_CSS = `
   }
   .fyn-btn-ghost:hover { background: rgba(244,237,218,0.07); color: #F4EDDA; border-color: rgba(244,237,218,0.18); }
 
-  .fyn-action-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 7px;
-    font-family: 'Instrument Sans', sans-serif; font-size: 10.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  .fyn-action-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 7px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
     transition: all 0.15s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 3px rgba(0,0,0,0.3);
     animation: fyn-actions-in 0.3s ease both;
   }
   .fyn-action-btn:hover { transform: translateY(-1px); }
 
-  .fyn-chat-user { display: flex; justify-content: flex-end; margin-bottom: 8px; animation: fyn-slide-right 0.35s ease both; }
-  .fyn-chat-user-bubble { padding: 8px 12px; background: rgba(244,237,218,0.06); border: 1px solid rgba(244,237,218,0.08);
-    border-radius: 11px 11px 2px 11px; font-size: 12.5px; color: rgba(244,237,218,0.85); max-width: 82%; line-height: 1.45;
+  .fyn-chat-user { display: flex; justify-content: flex-end; margin-bottom: 10px; animation: fyn-slide-right 0.35s ease both; }
+  .fyn-chat-user-bubble { padding: 10px 14px; background: rgba(244,237,218,0.08); border: 1px solid rgba(244,237,218,0.12);
+    border-radius: 11px 11px 2px 11px; font-size: 14.5px; font-weight: 500; color: #F4EDDA; max-width: 82%; line-height: 1.45;
     box-shadow: inset 0 1px 0 rgba(244,237,218,0.06);
   }
-  .fyn-chat-fynny { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; animation: fyn-slide-left 0.35s ease both; }
-  .fyn-chat-avatar { width: 24px; height: 24px; border-radius: 7px; background: rgba(196,30,30,0.12); border: 1px solid rgba(196,30,30,0.22);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: #C41E1E;
-    box-shadow: inset 0 1px 0 rgba(196,30,30,0.15), 0 2px 6px rgba(0,0,0,0.3);
+  .fyn-chat-fynny { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; animation: fyn-slide-left 0.35s ease both; }
+  .fyn-chat-avatar { width: 28px; height: 28px; border-radius: 7px; background: rgba(196,30,30,0.15); border: 1px solid rgba(196,30,30,0.28);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; color: #F4858A;
+    box-shadow: inset 0 1px 0 rgba(196,30,30,0.18), 0 2px 6px rgba(0,0,0,0.3);
   }
-  .fyn-chat-fynny-bubble { padding: 10px 13px; background: rgba(196,30,30,0.07); border: 1px solid rgba(196,30,30,0.13);
-    border-radius: 2px 11px 11px 11px; font-size: 12px; color: #F4EDDA; line-height: 1.6; max-width: 88%;
-    box-shadow: inset 0 1px 0 rgba(196,30,30,0.08);
+  .fyn-chat-fynny-bubble { padding: 12px 15px; background: rgba(196,30,30,0.1); border: 1px solid rgba(196,30,30,0.2);
+    border-radius: 2px 11px 11px 11px; font-size: 14px; color: #F4EDDA; line-height: 1.6; max-width: 88%;
+    box-shadow: inset 0 1px 0 rgba(196,30,30,0.1);
   }
-  .fyn-chat-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: rgba(196,30,30,0.7); margin-bottom: 4px; letter-spacing: 0.1em; }
+  .fyn-chat-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: #F4858A; margin-bottom: 6px; letter-spacing: 0.12em; }
+
 
   .fyn-stat-card { padding: 12px 14px; background: rgba(244,237,218,0.03); border: 1px solid rgba(244,237,218,0.06); border-radius: 10px;
     box-shadow: inset 0 1px 0 rgba(244,237,218,0.05), inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.25);
@@ -357,32 +359,33 @@ export default function HeroSection() {
                     <Cpu size={17} color="#F4EDDA" />
                   </div>
                   <div>
-                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "0.05em", color: "#F4EDDA" }}>CFO FYNNY</div>
-                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "rgba(244,237,218,0.4)", letterSpacing: "0.08em" }}>AI FINANCIAL INTELLIGENCE</div>
+                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 17, letterSpacing: "0.05em", color: "#F4EDDA" }}>CFO FYNNY</div>
+                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "rgba(244,237,218,0.65)", letterSpacing: "0.08em" }}>AI FINANCIAL INTELLIGENCE</div>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 9px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 100 }}>
-                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "#10B981", letterSpacing: "0.1em" }}>LIVE</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "#10B981", letterSpacing: "0.1em" }}>LIVE</span>
                 </div>
               </div>
 
               {/* CHIPS */}
               <div style={{ padding: "14px 20px 6px" }}>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8.5, color: "rgba(244,237,218,0.35)", letterSpacing: "0.12em", marginBottom: 8 }}>TRY ASKING</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "rgba(244,237,218,0.6)", letterSpacing: "0.14em", marginBottom: 10 }}>TRY ASKING</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                   {[
-                    { label: "Runway?", icon: <Clock size={9} /> },
-                    { label: "Hire now?", icon: <Users size={9} /> },
-                    { label: "GST status?", icon: <FileText size={9} /> },
-                    { label: "What-If -20%", icon: <TrendingDown size={9} /> },
+                    { label: "Runway?", icon: <Clock size={11} /> },
+                    { label: "Hire now?", icon: <Users size={11} /> },
+                    { label: "GST status?", icon: <FileText size={11} /> },
+                    { label: "What-If -20%", icon: <TrendingDown size={11} /> },
                   ].map((c, i) => (
-                    <div key={i} className="fyn-action-btn" style={{ color: "rgba(244,237,218,0.6)", background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.08)" }}>
+                    <div key={i} className="fyn-action-btn" style={{ color: "rgba(244,237,218,0.85)", background: "rgba(244,237,218,0.06)", border: "1px solid rgba(244,237,218,0.12)" }}>
                       {c.icon} {c.label}
                     </div>
                   ))}
                 </div>
               </div>
+
 
               {/* CHAT */}
               <div style={{ padding: "14px 20px", minHeight: 240 }}>
@@ -413,25 +416,27 @@ export default function HeroSection() {
 
               {/* INPUT BAR */}
               <div style={{ padding: "12px 20px 16px", borderTop: "1px solid rgba(244,237,218,0.05)", display: "flex", alignItems: "center", gap: 8, background: "rgba(0,0,0,0.2)" }}>
-                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.08)", borderRadius: 8, boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4)" }}>
-                  <Zap size={12} color="rgba(244,237,218,0.4)" />
-                  <span style={{ fontSize: 12, color: "rgba(244,237,218,0.35)" }}>Ask Fynny anything about your business...</span>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "10px 13px", background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.1)", borderRadius: 8, boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4)" }}>
+                  <Zap size={13} color="rgba(244,237,218,0.55)" />
+                  <span style={{ fontSize: 13, color: "rgba(244,237,218,0.55)" }}>Ask Fynny anything about your business...</span>
                 </div>
-                <button className="fyn-action-btn" style={{ color: "#F4EDDA", background: "rgba(244,237,218,0.06)", border: "1px solid rgba(244,237,218,0.12)", padding: "8px 12px" }}>
-                  <FileText size={11} /> Report
+                <button className="fyn-action-btn" style={{ color: "#F4EDDA", background: "rgba(244,237,218,0.08)", border: "1px solid rgba(244,237,218,0.16)", padding: "9px 13px" }}>
+                  <FileText size={12} /> Report
                 </button>
-                <button style={{ width: 36, height: 36, borderRadius: 8, background: "#C41E1E", border: "none", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 0 #8B1414, inset 0 1px 0 rgba(255,255,255,0.15)" }}>
-                  <Send size={14} />
+                <button style={{ width: 38, height: 38, borderRadius: 8, background: "#C41E1E", border: "none", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 0 #8B1414, inset 0 1px 0 rgba(255,255,255,0.15)" }}>
+                  <Send size={15} />
                 </button>
               </div>
             </div>
 
             {/* Confidence badge */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", background: "rgba(244,237,218,0.03)", border: "1px solid rgba(244,237,218,0.07)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 9.5, color: "rgba(244,237,218,0.5)", letterSpacing: "0.06em" }}>
-                <Shield size={10} color="#10B981" />
+
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", background: "rgba(244,237,218,0.05)", border: "1px solid rgba(244,237,218,0.12)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, color: "rgba(244,237,218,0.75)", letterSpacing: "0.06em" }}>
+                <Shield size={12} color="#10B981" />
                 Fynny Output · 94% Confidence · Powered by FYNHelp AI
               </div>
+
             </div>
           </div>
         </div>
