@@ -782,17 +782,19 @@ export default function NeuralNetwork() {
               className="text-center"
               style={{
                 pointerEvents: "none",
-                marginTop: 12,
+                marginTop: 10,
                 fontFamily: "'Raleway', sans-serif",
                 fontWeight: 600,
-                fontSize: isMobile ? 12 : 15,
+                fontSize: isMobile ? 11 : 15,
                 color: "#1A1A1A",
-                maxWidth: 130,
-                lineHeight: 1.3,
+                maxWidth: isMobile ? 80 : 130,
+                lineHeight: 1.25,
+                whiteSpace: "normal",
               }}
             >
               {n.shortLabel}
             </div>
+
           </div>
         );
       })}
