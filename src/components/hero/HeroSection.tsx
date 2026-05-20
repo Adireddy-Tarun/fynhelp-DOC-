@@ -331,21 +331,6 @@ export default function HeroSection() {
 
             </div>
 
-            {/* STATS */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 36 }}>
-              {[
-                { icon: <Building2 size={14} />, value: "63M+", label: "Indian MSMEs", color: "#F4EDDA" },
-                { icon: <Users size={14} />, value: "500+", label: "CA Scenarios", color: "#8B6914" },
-                { icon: <IndianRupee size={14} />, value: "₹0", label: "CFO Cost", color: "#10B981" },
-                { icon: <Activity size={14} />, value: "24/7", label: "AI Always On", color: "#C41E1E" },
-              ].map((s, i) => (
-                <div key={i} className="fyn-stat-card">
-                  <div style={{ color: s.color, marginBottom: 6 }}>{s.icon}</div>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: s.color, letterSpacing: "0.02em", lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: "rgba(244,237,218,0.42)", marginTop: 5, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* RIGHT: 3D FYNNY PANEL */}
