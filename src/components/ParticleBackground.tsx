@@ -127,32 +127,45 @@ export default function ParticleBackground() {
     const tick = () => {
       ctx.clearRect(0, 0, width, height);
 
+      const REPEL_RADIUS = 160;
+      const REPEL_RADIUS_SQ = REPEL_RADIUS * REPEL_RADIUS;
+      const SPRING = 0.012;   // pull back to home
+      const DAMPING = 0.88;   // velocity damping (water viscosity)
+
       // Update particles
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0) { p.x = 0; p.vx = -p.vx; }
-        else if (p.x > width) { p.x = width; p.vx = -p.vx; }
-        if (p.y < 0) { p.y = 0; p.vy = -p.vy; }
-        else if (p.y > height) { p.y = height; p.vy = -p.vy; }
 
-        p.vx *= 0.99;
-        p.vy *= 0.99;
-        if (Math.abs(p.vx) < 0.1) p.vx += (Math.random() - 0.5) * 0.2;
-        if (Math.abs(p.vy) < 0.1) p.vy += (Math.random() - 0.5) * 0.2;
+        // Spring back toward home position
+        p.vx += (p.hx - p.x) * SPRING;
+        p.vy += (p.hy - p.y) * SPRING;
 
+        // Mouse repulsion — smooth eased displacement (water ripple)
         if (mouse.active) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100 && dist > 0) {
-            const force = (100 - dist) / 100;
-            const angle = Math.atan2(dy, dx);
-            p.vx += Math.cos(angle) * force * 0.5;
-            p.vy += Math.sin(angle) * force * 0.5;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < REPEL_RADIUS_SQ && d2 > 0.01) {
+            const dist = Math.sqrt(d2);
+            const t = 1 - dist / REPEL_RADIUS;
+            // eased falloff: smoothstep-like for water feel
+            const force = t * t * 2.2;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
           }
         }
+
+        // Apply velocity with viscous damping
+        p.vx *= DAMPING;
+        p.vy *= DAMPING;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Soft boundary clamp
+        if (p.x < 0) { p.x = 0; p.vx *= -0.5; }
+        else if (p.x > width) { p.x = width; p.vx *= -0.5; }
+        if (p.y < 0) { p.y = 0; p.vy *= -0.5; }
+        else if (p.y > height) { p.y = height; p.vy *= -0.5; }
       }
 
       // Draw particles
