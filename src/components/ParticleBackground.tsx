@@ -50,7 +50,7 @@ export default function ParticleBackground() {
     const LINK_DIST = 120;
     const CELL = LINK_DIST;
 
-    const getCount = () => (window.innerWidth > 768 ? 10000 : 4000);
+    const getCount = () => (window.innerWidth > 768 ? 20000 : 8000);
 
     const initParticles = () => {
       const count = getCount();
