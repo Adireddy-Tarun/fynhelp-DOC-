@@ -1,4 +1,5 @@
 import HeroSection from "@/components/hero/HeroSection";
+import ParticleBackground from "@/components/ParticleBackground";
 import TickerStrip from "@/components/home/TickerStrip";
 import ProblemSection from "@/components/home/ProblemSection";
 import ProductEcosystemSection from "@/components/home/ProductEcosystemSection";
@@ -13,6 +14,7 @@ import FinalCTASection from "@/components/home/FinalCTASection";
 const HomePage = () => {
   return (
     <div>
+      <ParticleBackground />
       <HeroSection />
       <TickerStrip />
       <ProblemSection />
