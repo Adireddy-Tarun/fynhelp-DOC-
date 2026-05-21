@@ -14,6 +14,7 @@ import FinalCTASection from "@/components/home/FinalCTASection";
 const HomePage = () => {
   return (
     <div>
+      <ParticleBackground />
       <HeroSection />
       <TickerStrip />
       <ProblemSection />
