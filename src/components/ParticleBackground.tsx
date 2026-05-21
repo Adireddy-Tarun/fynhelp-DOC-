@@ -62,12 +62,27 @@ export default function ParticleBackground() {
       }));
     };
 
+    const getDocHeight = () =>
+      Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        window.innerHeight
+      );
+
     const resize = () => {
       width = window.innerWidth;
-      height = window.innerHeight;
+      height = getDocHeight();
       canvas.width = width;
       canvas.height = height;
       initParticles();
+    };
+
+    const updateHeightOnly = () => {
+      const newH = getDocHeight();
+      if (Math.abs(newH - height) > 4) {
+        height = newH;
+        canvas.height = newH;
+      }
     };
 
     resize();
@@ -76,6 +91,12 @@ export default function ParticleBackground() {
     const onResize = () => {
       if (resizeTimer) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(resize, 200);
+    };
+
+    let scrollTimer: number | undefined;
+    const onScroll = () => {
+      if (scrollTimer) window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(updateHeightOnly, 150);
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -90,6 +111,7 @@ export default function ParticleBackground() {
     };
 
     window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseout", onMouseLeave);
 
