@@ -50,18 +50,24 @@ export default function ParticleBackground() {
     const LINK_DIST = 120;
     const CELL = LINK_DIST;
 
-    const getCount = () => (window.innerWidth > 768 ? 4000 : 1500);
+    const getCount = () => (window.innerWidth > 768 ? 6500 : 2500);
 
     const initParticles = () => {
       const count = getCount();
-      particles = new Array(count).fill(0).map(() => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        size: 1 + Math.random() * 1.5,
-        color: makeColor(),
-      }));
+      particles = new Array(count).fill(0).map(() => {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        return {
+          x,
+          y,
+          hx: x,
+          hy: y,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          size: 1 + Math.random() * 1.5,
+          color: makeColor(),
+        };
+      });
     };
 
     const getDocHeight = () =>
