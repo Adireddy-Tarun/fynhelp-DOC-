@@ -80,7 +80,7 @@ export default function ParticleBackground() {
 
     const onMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      mouse.y = e.clientY + window.scrollY;
       mouse.active = true;
     };
     const onMouseLeave = () => {
