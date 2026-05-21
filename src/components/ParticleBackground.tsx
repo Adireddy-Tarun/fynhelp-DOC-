@@ -214,9 +214,11 @@ export default function ParticleBackground() {
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseout", onMouseLeave);
       if (resizeTimer) window.clearTimeout(resizeTimer);
+      if (scrollTimer) window.clearTimeout(scrollTimer);
     };
   }, []);
 
@@ -226,11 +228,10 @@ export default function ParticleBackground() {
       id="particleCanvas"
       aria-hidden="true"
       style={{
-        position: "fixed",
+        position: "absolute",
         top: 0,
         left: 0,
         width: "100%",
-        height: "100%",
         zIndex: 50,
         pointerEvents: "none",
         mixBlendMode: "screen",
