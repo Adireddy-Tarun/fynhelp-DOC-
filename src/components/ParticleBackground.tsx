@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 type Particle = {
   x: number;
   y: number;
+  hx: number; // home x
+  hy: number; // home y
   vx: number;
   vy: number;
   size: number;
