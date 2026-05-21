@@ -292,7 +292,7 @@ export default function HeroSection() {
         {/* Background layers */}
         <div className="fyn-bg-texture" />
         <div className="fyn-bg-vignette" />
-        <div className="fyn-bg-grid" />
+        
         <div className="fyn-orb fyn-orb-1" />
         <div className="fyn-orb fyn-orb-2" />
         <div className="fyn-orb fyn-orb-3" />
