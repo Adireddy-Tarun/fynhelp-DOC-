@@ -95,8 +95,7 @@ export default function ParticleBackground() {
 
     let rafId = 0;
     const tick = () => {
-      ctx.fillStyle = "#F4EDDA";
-      ctx.fillRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
       // Update particles
       for (let i = 0; i < particles.length; i++) {
@@ -210,8 +209,10 @@ export default function ParticleBackground() {
         left: 0,
         width: "100%",
         height: "100%",
-        zIndex: -1,
+        zIndex: 50,
         pointerEvents: "none",
+        mixBlendMode: "screen",
+        opacity: 0.55,
       }}
     />
   );
