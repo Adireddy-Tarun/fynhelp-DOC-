@@ -596,6 +596,36 @@ function ChatWidget() {
   );
 }
 
+function TypingPlaceholder() {
+  const phrases = useMemo(() => [
+    "Ask Fynny anything about your business...",
+    "What's my runway this quarter?",
+    "Show me overdue receivables",
+    "Am I GST compliant this month?",
+    "How can I extend my cash runway?",
+  ], []);
+  const [pi, setPi] = useState(0);
+  const [text, setText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  useEffect(() => {
+    const full = phrases[pi];
+    if (!deleting && text === full) {
+      const t = setTimeout(() => setDeleting(true), 1600);
+      return () => clearTimeout(t);
+    }
+    if (deleting && text === "") {
+      setDeleting(false);
+      setPi((pi + 1) % phrases.length);
+      return;
+    }
+    const t = setTimeout(() => {
+      setText(deleting ? full.slice(0, text.length - 1) : full.slice(0, text.length + 1));
+    }, deleting ? 28 : 55);
+    return () => clearTimeout(t);
+  }, [text, deleting, pi, phrases]);
+  return <span className="cf-typed">{text}</span>;
+}
+
 const CF_STYLES = `
 .cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%); border-radius: 32px; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
