@@ -497,7 +497,7 @@ function ChatWidget() {
           )}
 
           {step === "reply" && (
-            <div key={`r-${frame}`} className="cf-row cf-anim-in">
+            <div key={`r-${frame}`} className="cf-row cf-row-fynny cf-anim-in">
               <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
               <div className="cf-bubble cf-bubble-fynny">
                 {f.alert && (
