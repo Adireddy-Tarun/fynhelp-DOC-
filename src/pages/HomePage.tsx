@@ -660,6 +660,76 @@ function Ticker({ items, dark }: { items: string[]; dark?: boolean }) {
   );
 }
 
+function CreditSimulator() {
+  const [currentDays, setCurrentDays] = useState(30);
+  const [newDays, setNewDays] = useState(60);
+  const [revenueL, setRevenueL] = useState(25);
+
+  const currentRunway = 52;
+  const { cashGap, newRunway, bridging, risk } = useMemo(() => {
+    const delta = Math.max(0, newDays - currentDays);
+    const cashGap = -(delta / 30) * revenueL;
+    const daysLost = Math.round(Math.abs(cashGap) * 2.08);
+    const newRunway = Math.max(0, currentRunway - daysLost);
+    const bridging = Math.abs(cashGap) * 0.73;
+    let risk: "LOW" | "MEDIUM" | "HIGH" = "LOW";
+    if (newRunway < 30) risk = "HIGH";
+    else if (newRunway < 60) risk = "MEDIUM";
+    return { cashGap, newRunway, bridging, risk };
+  }, [currentDays, newDays, revenueL]);
+
+  const fmtL = (n: number) => `₹${(Math.round(n * 10) / 10).toFixed(n % 1 === 0 ? 0 : 1)}L`;
+
+  return (
+    <div className="sim-panel">
+      <h3>What happens if I extend credit terms?</h3>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">Current Credit Days</span>
+          <span className="sim-row-value">{currentDays} days</span>
+        </div>
+        <input className="sim-slider" type="range" min={0} max={120} value={currentDays}
+          onChange={(e) => setCurrentDays(+e.target.value)} />
+      </div>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">New Credit Days</span>
+          <span className="sim-row-value">{newDays} days</span>
+        </div>
+        <input className="sim-slider" type="range" min={0} max={120} value={newDays}
+          onChange={(e) => setNewDays(+e.target.value)} />
+      </div>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">Monthly Revenue from Customer</span>
+          <span className="sim-row-value">₹{revenueL}L</span>
+        </div>
+        <input className="sim-slider" type="range" min={1} max={100} value={revenueL}
+          onChange={(e) => setRevenueL(+e.target.value)} />
+      </div>
+
+      <div className="sim-divider">
+        <span className="l">Current Runway</span>
+        <span className="v">{currentRunway} days</span>
+      </div>
+
+      <div className="sim-result">
+        <div className="sim-result-cell"><div className="v">{cashGap === 0 ? "₹0" : `−${fmtL(Math.abs(cashGap))}`}</div><div className="l">Cash Gap Created</div></div>
+        <div className="sim-result-cell"><div className="v">{newRunway} days</div><div className="l">New Runway</div></div>
+        <div className="sim-result-cell"><div className="v gold">{fmtL(bridging)}</div><div className="l">Bridging Needed</div></div>
+        <div className="sim-result-cell"><div className="v">{risk}</div><div className="l">Risk Level</div></div>
+      </div>
+
+      <button className="sim-unlock" onClick={() => window.location.assign("/waitlist")}>Unlock Full Analysis</button>
+    </div>
+  );
+}
+
+
+
 // ===== PAGE =====
 export default function HomePage() {
   const navigate = useNavigate();
