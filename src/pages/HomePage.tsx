@@ -307,7 +307,7 @@ const STYLES = `
   .spm-sim-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.55); margin-bottom: 8px; letter-spacing: 0.06em; }
   .spm-sim-label b { color: #fff; font-weight: 600; }
   .spm-sim-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; position: relative; }
-  .spm-sim-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: linear-gradient(90deg, ${C.red}, ${C.gold}); border-radius: 2px; }
+  .spm-sim-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: linear-gradient(90deg, ${C.red}, #8B6914); border-radius: 2px; }
   .spm-sim-thumb { position: absolute; left: 62%; top: 50%; width: 14px; height: 14px; margin-left: -7px; margin-top: -7px; background: #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(196,30,30,0.45); }
   .spm-sim-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
   .spm-sim-results > div { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px; }
@@ -319,7 +319,7 @@ const STYLES = `
   .spm-match { display: grid; grid-template-columns: 1fr 14px 1fr; gap: 8px; align-items: center; }
   .spm-inv { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 9px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: rgba(255,255,255,0.7); }
   .spm-inv b { display: block; color: #fff; font-size: 12px; margin-bottom: 3px; }
-  .spm-link { color: ${C.gold}; font-size: 16px; text-align: center; }
+  .spm-link { color: #8B6914; font-size: 16px; text-align: center; }
   .spm-match + .spm-match { margin-top: 8px; }
 
   /* mock 5: runway */
