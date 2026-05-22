@@ -488,7 +488,7 @@ function ChatWidget() {
           </div>
 
           {step === "typing" && (
-            <div className="cf-row cf-anim-in">
+            <div className="cf-row cf-row-fynny cf-anim-in">
               <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
               <div className="cf-bubble cf-bubble-fynny cf-typing">
                 <span /><span /><span />
@@ -497,7 +497,7 @@ function ChatWidget() {
           )}
 
           {step === "reply" && (
-            <div key={`r-${frame}`} className="cf-row cf-anim-in">
+            <div key={`r-${frame}`} className="cf-row cf-row-fynny cf-anim-in">
               <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
               <div className="cf-bubble cf-bubble-fynny">
                 {f.alert && (
@@ -561,12 +561,13 @@ const CF_STYLES = `
 @keyframes cf-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
 
 .cf-chat { flex: 1; overflow-y: auto; padding: 32px; background: #fff; display: flex; flex-direction: column; gap: 18px; }
-.cf-row { display: flex; gap: 12px; align-items: flex-start; }
-.cf-row-user { justify-content: flex-end; flex-direction: row-reverse; }
+.cf-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; }
+.cf-row-user { justify-content: flex-start; flex-direction: row; }
+.cf-row-fynny { justify-content: flex-end; flex-direction: row-reverse; margin-left: auto; }
 
-.cf-bubble { padding: 14px 18px; border-radius: 16px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; max-width: 78%; }
-.cf-bubble-user { background: #F0F0F0; }
-.cf-bubble-fynny { background: linear-gradient(135deg, #FDF5F5, #FAEAEA); border: 1px solid rgba(169,56,56,0.12); max-width: 88%; }
+.cf-bubble { padding: 14px 18px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; }
+.cf-bubble-user { background: #F0F0F0; border-radius: 16px 16px 16px 4px; max-width: 85%; }
+.cf-bubble-fynny { background: linear-gradient(135deg, #FDF5F5, #FAEAEA); border: 1px solid rgba(169,56,56,0.12); border-radius: 16px 16px 4px 16px; max-width: 90%; }
 .cf-bubble-fynny b { font-weight: 700; color: #A93838; font-size: 18px; }
 
 .cf-typing { display: inline-flex; gap: 6px; padding: 16px 20px; }
