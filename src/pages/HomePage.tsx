@@ -333,7 +333,7 @@ function Nav() {
         {NAV_LINKS.map(l => <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>)}
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Demo Login</Link>
+        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
         <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
       </div>
     </nav>
