@@ -710,7 +710,7 @@ export default function HomePage() {
           </p>
           <div className="hero-cta fade-up">
             <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
-            <Link to="/demo/login" className="btn-pill btn-outline"><Play size={16} /> Watch Demo</Link>
+            <a href="https://calendly.com/nidhi-fynhelp/30min" target="_blank" rel="noopener noreferrer" className="btn-pill btn-outline"><Calendar size={16} /> Book Demo</a>
           </div>
           <div className="stats-row fade-up">
             {STATS.map(s => (
