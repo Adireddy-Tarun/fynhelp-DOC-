@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Play, Send, Cloud, Lock, Database, ShieldCheck, EyeOff, ArrowUpRight } from "lucide-react";
 
