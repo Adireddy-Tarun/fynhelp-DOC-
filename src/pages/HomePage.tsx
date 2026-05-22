@@ -277,6 +277,49 @@ const STYLES = `
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); will-change: opacity, transform; }
   .reveal.in { opacity: 1; transform: translateY(0); }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ===== GLOBAL RESPONSIVE OVERRIDES ===== */
+  html, body, #root { max-width: 100%; overflow-x: hidden; }
+  .section, .hero, .problem-card, .sim-card, .cta-card, .footer { max-width: 100%; }
+  img, svg, video { max-width: 100%; }
+
+  @media (max-width: 1024px) {
+    .section { padding: 72px 0; }
+    .footer { padding: 40px 28px; margin: 56px 16px 24px; }
+    .footer-bottom { padding: 0 28px; flex-wrap: wrap; gap: 12px; }
+  }
+
+  @media (max-width: 768px) {
+    .fyn-container { padding: 0 18px; }
+    .section { padding: 56px 0; }
+    .section h2 { font-size: clamp(28px, 7.5vw, 42px); }
+    .section .lead { font-size: 15px; padding: 0 8px; }
+    .hero { padding: 110px 0 40px; }
+    .hero h1 { font-size: clamp(40px, 11vw, 64px); line-height: 1.04; }
+    .hero-sub { font-size: 16px; padding: 0 8px; margin-top: 24px; }
+    .hero-cta { gap: 10px; margin-top: 28px; padding: 0 12px; }
+    .hero-cta .btn-red, .hero-cta .btn-outline { padding: 14px 22px; font-size: 14px; }
+    .problem-card { padding: 28px 22px !important; border-radius: 22px; }
+    .problem-card h2 { font-size: clamp(28px, 7vw, 40px); }
+    .sim-card { padding: 28px 22px !important; border-radius: 22px; }
+    .sim-card h2 { font-size: clamp(26px, 6.5vw, 38px); }
+    .cta-card { padding: 36px 22px !important; border-radius: 22px; }
+    .cta-card h2 { font-size: clamp(34px, 9vw, 52px); }
+    .cta-form { grid-template-columns: 1fr; }
+    .footer { padding: 36px 22px; margin: 40px 14px 20px; grid-template-columns: 1fr; gap: 28px; border-radius: 20px; }
+    .footer-bottom { padding: 0 22px; margin-bottom: 28px; }
+    .sec-wrap { margin-top: 36px; }
+  }
+
+  @media (max-width: 480px) {
+    .fyn-container { padding: 0 14px; }
+    .section { padding: 44px 0; }
+    .hero h1 { font-size: clamp(36px, 11vw, 56px); }
+    .hero-cta { flex-direction: column; align-items: stretch; }
+    .hero-cta .btn-red, .hero-cta .btn-outline { width: 100%; justify-content: center; }
+    .problem-card, .sim-card, .cta-card { padding: 24px 18px !important; }
+    .footer { padding: 28px 18px; }
+  }
 `;
 
 // ===== DATA =====
