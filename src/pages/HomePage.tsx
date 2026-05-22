@@ -823,10 +823,6 @@ export default function HomePage() {
         </div>
       </section>
 
-          </div>
-        </div>
-      </section>
-
       {/* SECURITY */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
