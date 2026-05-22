@@ -305,18 +305,26 @@ const TICKER_DARK = [
   "Cut reconciliation from 15 hours to 1 hour/month",
 ];
 
-const INTEGRATIONS = [
-  ["RP", "Razorpay"], ["ZB", "Zoho Books"], ["HD", "HDFC Bank"],
-  ["IC", "ICICI Bank"], ["SB", "SBI"], ["AX", "Axis Bank"],
-  ["KT", "Kotak"], ["TL", "Tally"], ["ST", "Stripe"],
-  ["PU", "PayU"], ["GS", "GST Portal"], ["QB", "QuickBooks"],
+const INTEGRATIONS: [string, string, string][] = [
+  ["RP", "Razorpay", "razorpay.com"],
+  ["ZB", "Zoho Books", "zoho.com"],
+  ["HD", "HDFC Bank", "hdfcbank.com"],
+  ["IC", "ICICI Bank", "icicibank.com"],
+  ["SB", "SBI", "sbi.co.in"],
+  ["AX", "Axis Bank", "axisbank.com"],
+  ["KT", "Kotak", "kotak.com"],
+  ["TL", "Tally", "tallysolutions.com"],
+  ["ST", "Stripe", "stripe.com"],
+  ["PU", "PayU", "payu.in"],
+  ["GS", "GST Portal", "gst.gov.in"],
+  ["QB", "QuickBooks", "intuit.com"],
 ];
 
 const STEPS = [
-  { n: "01", t: "Connect your bank", d: "2 minutes via RBI's Account Aggregator." },
-  { n: "02", t: "Connect accounting", d: "15 minutes — we handle the mapping." },
-  { n: "03", t: "Enter your GSTIN", d: "3 minutes — instant compliance calendar." },
-  { n: "04", t: "Fynny's first brief", d: "Within minutes. Then every morning after." },
+  { n: "01", t: "Connect your bank", d: "2 minutes via RBI's Account Aggregator.", icon: "bank" as const },
+  { n: "02", t: "Connect accounting", d: "15 minutes — we handle the mapping.", icon: "ledger" as const },
+  { n: "03", t: "Enter your GSTIN", d: "3 minutes — instant compliance calendar.", icon: "doc" as const },
+  { n: "04", t: "Fynny's first brief", d: "Within minutes. Then every morning after.", icon: "spark" as const },
 ];
 
 const SIM_CHIPS = ["CREDIT TERMS", "HIRING", "PRICING", "GST REFUND DELAY", "MACHINERY PURCHASE", "WORKING CAPITAL LOAN", "SEASONAL PUSH", "M&A"];
