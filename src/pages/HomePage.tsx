@@ -321,13 +321,6 @@ const NUMS = [
   { v: "4.8★", l: "AVG RATING" },
 ];
 
-// ===== Chat sequence (typed) =====
-const CHAT = {
-  user: "GST status?",
-  label: "GST INTELLIGENCE",
-  reply: <><span className="g">GSTR-1 filed</span> · GSTR-3B due in <b className="a">3 days</b>. ITC reconciliation shows <b>₹18K gap</b> vs 2A. Recommend filing by tomorrow to avoid interest.</>,
-};
-
 // ===== COMPONENTS =====
 function Nav() {
   return (
@@ -347,44 +340,289 @@ function Nav() {
   );
 }
 
-function ChatWidget() {
-  const [phase, setPhase] = useState<"idle" | "user" | "typing" | "reply">("idle");
-  useEffect(() => {
-    const seq = () => {
-      setPhase("user");
-      setTimeout(() => setPhase("typing"), 1200);
-      setTimeout(() => setPhase("reply"), 2400);
-      setTimeout(() => setPhase("idle"), 6000);
-    };
-    seq();
-    const i = setInterval(seq, 7500);
-    return () => clearInterval(i);
-  }, []);
+// ===== ChatWidget (CFO Fynny — production demo) =====
+type Frame = {
+  user: string;
+  reply: React.ReactNode;
+  visual?: React.ReactNode;
+  buttons: string[];
+  alert?: string;
+};
+
+const RupeeIcon = ({ size = 18, color = "#fff" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 4h12M6 9h12M7.5 4c3 0 5.5 2 5.5 5s-2.5 5-5.5 5H6l8 6" />
+  </svg>
+);
+const UserIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+  </svg>
+);
+const PlusIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>);
+const DownloadIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>);
+const PaperclipIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11l-9 9a5 5 0 11-7-7l10-10a3.5 3.5 0 115 5l-9.5 9.5a2 2 0 11-3-3l8-8"/></svg>);
+const SendIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>);
+const AlertIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L1 21h22L12 2z"/><path d="M12 9v5M12 17h.01"/></svg>);
+
+function MiniBars({ values, labels }: { values: number[]; labels: string[] }) {
+  const max = Math.max(...values);
+  const w = values.length >= 8 ? 10 : 12;
   return (
-    <div className="chat-card fade-up">
-      <div className="chat-live"><span className="chat-live-t">LIVE</span></div>
-      <div className="chat-avatar" style={{ position: "absolute", top: 22, left: 22 }} />
-      {(phase === "user" || phase === "typing" || phase === "reply") && (
-        <div className="chat-row-user fade-up"><div className="chat-bubble-user">📄 {CHAT.user}</div></div>
-      )}
-      {phase === "typing" && (
-        <div style={{ position: "relative", height: 40 }}>
-          <div className="chat-typing"><span /><span /><span /></div>
-        </div>
-      )}
-      {phase === "reply" && (
-        <div className="chat-row-bot fade-up" style={{ marginTop: 28 }}>
-          <div className="chat-avatar" style={{ width: 32, height: 32 }} />
-          <div className="chat-bot-content">
-            <div className="chat-bot-label">{CHAT.label}</div>
-            <div className="chat-bot-text">{CHAT.reply}</div>
+    <div className="cf-chart">
+      <div className="cf-chart-bars">
+        {values.map((v, i) => (
+          <div key={i} className="cf-bar-col" style={{ width: w }}>
+            <div className="cf-bar" style={{ height: `${Math.max(8, (v / max) * 80)}px`, animationDelay: `${i * 0.05}s`, width: w }} />
           </div>
-        </div>
-      )}
-      <div className="chat-input-row"><button className="send-fab"><Send size={18} /></button></div>
+        ))}
+      </div>
+      <div className="cf-chart-labels">
+        {labels.map((l, i) => (<span key={i} style={{ width: w + 6 }}>{l}</span>))}
+      </div>
     </div>
   );
 }
+
+function MetricCards({ items }: { items: { label: string; value: string; sub?: string }[] }) {
+  return (
+    <div className="cf-metrics">
+      {items.map((m, i) => (
+        <div key={i} className="cf-metric-card" style={{ animationDelay: `${i * 0.1}s` }}>
+          <div className="cf-metric-label">{m.label}</div>
+          <div className="cf-metric-value">{m.value}</div>
+          {m.sub && <div className="cf-metric-sub">{m.sub}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const FRAMES: Frame[] = [
+  {
+    user: "What's my current runway?",
+    reply: <>At current burn, you have <b>8.4 months</b> runway with net burn of <b>₹2.1L/mo</b> and operating cash of <b>₹17.6L</b>.</>,
+    visual: <MiniBars values={[60, 56, 52, 48, 44, 40, 36, 32]} labels={["M1","M2","M3","M4","M5","M6","M7","M8"]} />,
+    buttons: ["Export Report", "Set Alert", "Run What-If"],
+  },
+  {
+    user: "Do I have any GST issues?",
+    reply: <><b>GSTR-3B</b> filing due in <b>3 days</b>. Available ITC to claim: <b>₹1.8L</b>. Notice risk score: <b>18/100</b> (Healthy).</>,
+    visual: <MetricCards items={[{ label: "GST DUE", value: "₹2.4L", sub: "in 3 days" }, { label: "ITC AVAILABLE", value: "₹1.8L", sub: "ready to claim" }]} />,
+    buttons: ["View Notice", "File Now"],
+  },
+  {
+    user: "How's revenue trending?",
+    reply: <>MRR increased <b>15% MoM</b> to <b>₹18.5L</b>. On track for <b>₹24L</b> this quarter. Top customer segment: Manufacturing (42%).</>,
+    visual: <MiniBars values={[28, 32, 38, 42, 48, 54, 62, 70]} labels={["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov"]} />,
+    buttons: ["Full Report", "Share with CA"],
+  },
+  {
+    user: "What if I hire 2 engineers?",
+    reply: <>Hiring 2 engineers at <b>₹1.2L/mo</b> each drops runway from <b>8.4 → 5.8 months</b>. Recommendation: Wait 45 days for next revenue milestone.</>,
+    visual: <MetricCards items={[{ label: "RUNWAY NOW", value: "8.4 mo", sub: "current burn" }, { label: "AFTER HIRES", value: "5.8 mo", sub: "−2.6 months" }]} />,
+    buttons: ["Run Full Model", "See Options"],
+  },
+  {
+    user: "Any updates I should know?",
+    reply: <>You also have <b>3 pending receivables</b> totaling <b>₹8.4L</b>. 2 are overdue by 15+ days.</>,
+    alert: "VENDOR PAYMENT DUE: ₹3.2L payment to Vendor X due in 2 days. Current balance: ₹17.6L",
+    buttons: ["Mark Paid", "Extend Terms", "Send Reminders"],
+  },
+];
+
+function ChatWidget() {
+  const [frame, setFrame] = useState(0);
+  const [step, setStep] = useState<"user" | "typing" | "reply">("user");
+
+  useEffect(() => {
+    setStep("user");
+    const t1 = setTimeout(() => setStep("typing"), 700);
+    const t2 = setTimeout(() => setStep("reply"), 2200);
+    const t3 = setTimeout(() => setFrame((f) => (f + 1) % FRAMES.length), 6500);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [frame]);
+
+  const f = FRAMES[frame];
+
+  return (
+    <div className="cf-wrap">
+      <style>{CF_STYLES}</style>
+      <div className="cf-bg-terms" aria-hidden>
+        {["MRR","Runway","GST","ITC","₹","Burn Rate","Cash Flow","Receivables","EBITDA","ARR","MRR","Runway","₹","GST"].map((t, i) => (
+          <span key={i} style={{
+            top: `${(i * 37) % 90 + 2}%`,
+            left: `${(i * 53) % 92 + 2}%`,
+            transform: `rotate(${((i * 7) % 11) - 5}deg)`,
+          }}>{t}</span>
+        ))}
+      </div>
+      <svg className="cf-bg-ghost cf-bg-ghost-tr" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
+        <path d="M0,150 Q60,80 120,110 T240,70 T300,90" stroke="#A93838" fill="none" strokeWidth="1" />
+        <path d="M0,170 Q80,140 160,130 T300,110" stroke="#A93838" fill="none" strokeWidth="1" />
+      </svg>
+      <svg className="cf-bg-ghost cf-bg-ghost-bl" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
+        <path d="M0,180 Q70,90 140,130 T280,80" stroke="#A93838" fill="none" strokeWidth="1" />
+        <path d="M0,140 Q90,160 180,100 T300,130" stroke="#A93838" fill="none" strokeWidth="1" />
+      </svg>
+      <div className="cf-glow" aria-hidden />
+
+      <div className="cf-card">
+        {/* Header */}
+        <div className="cf-header">
+          <div className="cf-id">
+            <div className="cf-avatar cf-avatar-fynny cf-avatar-lg"><RupeeIcon size={22} /></div>
+            <div>
+              <div className="cf-name">CFO Fynny</div>
+              <div className="cf-sub">Financial Intelligence</div>
+            </div>
+          </div>
+          <div className="cf-live"><span className="cf-live-dot" /> LIVE</div>
+        </div>
+
+        {/* Chat area */}
+        <div className="cf-chat">
+          <div key={`u-${frame}`} className="cf-row cf-row-user cf-anim-in">
+            <div className="cf-avatar cf-avatar-user"><UserIcon /></div>
+            <div className="cf-bubble cf-bubble-user">{f.user}</div>
+          </div>
+
+          {step === "typing" && (
+            <div className="cf-row cf-anim-in">
+              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-bubble cf-bubble-fynny cf-typing">
+                <span /><span /><span />
+              </div>
+            </div>
+          )}
+
+          {step === "reply" && (
+            <div key={`r-${frame}`} className="cf-row cf-anim-in">
+              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-bubble cf-bubble-fynny">
+                {f.alert && (
+                  <div className="cf-alert">
+                    <AlertIcon />
+                    <span>{f.alert}</span>
+                  </div>
+                )}
+                <div className="cf-reply">{f.reply}</div>
+                {f.visual && <div className="cf-visual">{f.visual}</div>}
+                <div className="cf-actions">
+                  {f.buttons.map((b, i) => (
+                    <button key={b} className="cf-action" style={{ animationDelay: `${0.3 + i * 0.1}s` }}>{b}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div className="cf-input-row">
+          <div className="cf-utils">
+            <button className="cf-util" aria-label="Import"><PlusIcon /></button>
+            <button className="cf-util" aria-label="Export"><DownloadIcon /></button>
+            <button className="cf-util" aria-label="Attach"><PaperclipIcon /></button>
+          </div>
+          <div className="cf-input">Ask Fynny anything about your business...</div>
+          <button className="cf-send" aria-label="Send"><SendIcon /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const CF_STYLES = `
+.cf-wrap { position: relative; max-width: 1100px; margin: 56px auto 0; padding: 40px 20px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+.cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.04); white-space: nowrap; }
+.cf-bg-ghost { position: absolute; width: 50%; height: 60%; opacity: 0.06; pointer-events: none; z-index: 0; }
+.cf-bg-ghost-tr { top: 0; right: 0; }
+.cf-bg-ghost-bl { bottom: 0; left: 0; transform: rotate(180deg); }
+.cf-glow { position: absolute; left: 50%; top: 50%; width: 90%; height: 90%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(169,56,56,0.08) 0%, transparent 65%); filter: blur(60px); z-index: 0; pointer-events: none; }
+
+.cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
+
+.cf-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid rgba(26,16,8,0.06); }
+.cf-id { display: flex; align-items: center; gap: 14px; }
+.cf-name { font-weight: 700; font-size: 18px; color: #1A1008; letter-spacing: -0.01em; line-height: 1.2; }
+.cf-sub { font-weight: 500; font-size: 13px; color: #6B6B6B; margin-top: 2px; }
+
+.cf-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cf-avatar-lg { width: 48px; height: 48px; border-radius: 12px; }
+.cf-avatar-fynny { background: linear-gradient(135deg, #A93838, #C45050); box-shadow: 0 4px 12px rgba(169,56,56,0.25); }
+.cf-avatar-user { background: linear-gradient(135deg, #8A8A8A, #B5B5B5); }
+
+.cf-live { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 100px; background: rgba(16,185,129,0.1); color: #10B981; font-weight: 600; font-size: 13px; letter-spacing: 0.05em; }
+.cf-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; animation: cf-pulse 1.6s infinite; }
+@keyframes cf-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+
+.cf-chat { flex: 1; overflow-y: auto; padding: 32px; background: #fff; display: flex; flex-direction: column; gap: 18px; }
+.cf-row { display: flex; gap: 12px; align-items: flex-start; }
+.cf-row-user { justify-content: flex-end; flex-direction: row-reverse; }
+
+.cf-bubble { padding: 14px 18px; border-radius: 16px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; max-width: 78%; }
+.cf-bubble-user { background: #F0F0F0; }
+.cf-bubble-fynny { background: linear-gradient(135deg, #FDF5F5, #FAEAEA); border: 1px solid rgba(169,56,56,0.12); max-width: 88%; }
+.cf-bubble-fynny b { font-weight: 700; color: #A93838; font-size: 18px; }
+
+.cf-typing { display: inline-flex; gap: 6px; padding: 16px 20px; }
+.cf-typing span { width: 8px; height: 8px; border-radius: 50%; background: #C9A0A0; animation: cf-bounce 1.2s infinite; }
+.cf-typing span:nth-child(2) { animation-delay: 0.15s; }
+.cf-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes cf-bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+.cf-reply { font-size: 16px; line-height: 1.6; }
+.cf-visual { margin-top: 14px; }
+
+.cf-alert { display: flex; align-items: flex-start; gap: 10px; background: linear-gradient(135deg, #A93838, #C45050); color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; line-height: 1.5; margin-bottom: 12px; letter-spacing: 0.01em; }
+.cf-alert svg { flex-shrink: 0; margin-top: 2px; }
+
+.cf-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.cf-action { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #A93838; background: #fff; border: 1.5px solid rgba(169,56,56,0.25); padding: 9px 16px; border-radius: 10px; cursor: pointer; transition: transform 0.2s, background 0.2s, color 0.2s; opacity: 0; animation: cf-slide-up 0.4s forwards; }
+.cf-action:hover { transform: translateY(-2px); background: #A93838; color: #fff; border-color: #A93838; }
+
+.cf-chart { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 16px; }
+.cf-chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+.cf-bar-col { display: flex; align-items: flex-end; height: 100%; }
+.cf-bar { background: linear-gradient(to top, #A93838, #E87C7C); border-radius: 4px 4px 0 0; transform-origin: bottom; transform: scaleY(0); animation: cf-bar-grow 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+@keyframes cf-bar-grow { to { transform: scaleY(1); } }
+.cf-chart-labels { display: flex; gap: 6px; margin-top: 8px; }
+.cf-chart-labels span { font-size: 10px; color: #6B6B6B; text-align: center; font-weight: 500; }
+
+.cf-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cf-metric-card { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 14px 16px; opacity: 0; animation: cf-slide-up 0.5s forwards; }
+.cf-metric-label { font-size: 11px; font-weight: 600; color: #6B6B6B; text-transform: uppercase; letter-spacing: 0.05em; }
+.cf-metric-value { font-size: 20px; font-weight: 700; color: #A93838; margin-top: 6px; line-height: 1.1; }
+.cf-metric-sub { font-size: 13px; font-weight: 500; color: #6B6B6B; margin-top: 4px; }
+
+.cf-input-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(26,16,8,0.06); background: #fff; }
+.cf-utils { display: flex; gap: 6px; }
+.cf-util { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(26,16,8,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+.cf-util:hover { background: #F5F5F3; border-color: rgba(26,16,8,0.18); }
+.cf-input { flex: 1; padding: 14px 20px; border: 1.5px solid rgba(26,16,8,0.1); border-radius: 12px; color: #6B6B6B; font-size: 14px; font-weight: 500; }
+.cf-send { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #A93838, #C45050); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(169,56,56,0.3); }
+.cf-send:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169,56,56,0.4); }
+
+.cf-anim-in { animation: cf-slide-up 0.5s ease-out; }
+@keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+  .cf-card { min-height: 560px; border-radius: 18px; }
+  .cf-header { padding: 18px 20px; }
+  .cf-name { font-size: 16px; }
+  .cf-chat { padding: 20px; gap: 14px; }
+  .cf-bubble { font-size: 14px; max-width: 82%; }
+  .cf-bubble-fynny b { font-size: 16px; }
+  .cf-input-row { padding: 14px 16px; gap: 8px; }
+  .cf-input { font-size: 13px; padding: 12px 14px; }
+  .cf-util { width: 36px; height: 36px; }
+  .cf-send { width: 44px; height: 44px; }
+  .cf-metrics { grid-template-columns: 1fr; }
+}
+`;
 
 function Ticker({ items, dark }: { items: string[]; dark?: boolean }) {
   const loop = [...items, ...items];
