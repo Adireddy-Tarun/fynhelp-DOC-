@@ -914,11 +914,22 @@ export default function HomePage() {
                     <div key={`${ri}-${i}-${n}`} className="int-card">
                       <div className="int-logo">
                         <img
-                          src={`https://logo.clearbit.com/${d}`}
+                          src={`https://icons.duckduckgo.com/ip3/${d}.ico`}
                           alt={`${n} logo`}
                           loading="lazy"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const t = e.currentTarget as HTMLImageElement;
+                            if (!t.dataset.fb1) {
+                              t.dataset.fb1 = "1";
+                              t.src = `https://www.google.com/s2/favicons?sz=128&domain=${d}`;
+                              return;
+                            }
+                            if (!t.dataset.fb2) {
+                              t.dataset.fb2 = "1";
+                              t.src = `https://${d}/favicon.ico`;
+                              return;
+                            }
                             const parent = t.parentElement!;
                             t.remove();
                             const f = document.createElement("div");
