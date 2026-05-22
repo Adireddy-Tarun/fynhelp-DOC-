@@ -1,6 +1,6 @@
-import { useEffect, useState, FormEvent, ReactNode } from "react";
+import { useEffect, useMemo, useState, FormEvent, ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Play, Send, Cloud, Lock, Database, ShieldCheck, EyeOff, ArrowUpRight } from "lucide-react";
+import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco, Search, Database, ArrowUpRight } from "lucide-react";
 
 // ===== PALETTE (matches reference) =====
 const C = {
@@ -157,20 +157,37 @@ const STYLES = `
   .sim-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
   .sim-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: rgba(255,255,255,0.85); }
   .sim-foot { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 28px; font-family: 'JetBrains Mono', monospace; }
-  .sim-panel { background: ${C.card}; border-radius: 18px; padding: 36px; min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
-  .sim-result { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 60px; }
-  .sim-result-cell { text-align: center; }
-  .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; }
-  .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 24px; cursor: pointer; }
+  .sim-panel { background: ${C.card}; border-radius: 18px; padding: 32px; min-height: 380px; display: flex; flex-direction: column; gap: 18px; }
+  .sim-panel h3 { font-size: 18px; font-weight: 700; color: ${C.ink}; margin: 0 0 4px; }
+  .sim-row { display: flex; flex-direction: column; gap: 8px; }
+  .sim-row-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .sim-row-label { font-size: 10.5px; letter-spacing: 0.14em; font-weight: 700; color: ${C.muted}; text-transform: uppercase; }
+  .sim-row-value { font-size: 14px; font-weight: 600; color: ${C.ink}; }
+  .sim-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: #E5DFCB; border-radius: 100px; outline: none; }
+  .sim-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: ${C.red}; cursor: pointer; border: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .sim-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: ${C.red}; cursor: pointer; border: 0; }
+  .sim-divider { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 1px dashed rgba(0,0,0,0.12); }
+  .sim-divider .l { font-size: 10.5px; letter-spacing: 0.14em; font-weight: 700; color: ${C.muted}; text-transform: uppercase; }
+  .sim-divider .v { font-size: 14px; font-weight: 600; color: ${C.ink}; }
+  .sim-result { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .sim-result-cell { background: #fff; border: 1px solid ${C.redSoft}; border-radius: 12px; padding: 18px 10px; text-align: center; }
+  .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; letter-spacing: -0.01em; line-height: 1.05; }
+  .sim-result-cell .v.gold { color: #B8860B; }
+  .sim-result-cell .l { font-size: 10px; letter-spacing: 0.16em; font-weight: 600; color: ${C.muted}; margin-top: 6px; text-transform: uppercase; }
+  .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 8px; cursor: pointer; transition: background .15s; }
+  .sim-unlock:hover { background: ${C.redDark}; }
 
-  /* Security */
-  .sec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
-  @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1100px) { .sec-grid { grid-template-columns: repeat(6, 1fr); } }
-  .sec-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; padding: 22px; }
-  .sec-icon { width: 40px; height: 40px; border-radius: 10px; background: ${C.redTint}; color: ${C.red}; display: flex; align-items: center; justify-content: center; }
-  .sec-label { font-size: 11px; color: ${C.muted}; letter-spacing: 0.12em; font-weight: 600; margin-top: 16px; }
-  .sec-value { font-size: 17px; font-weight: 700; color: ${C.ink}; margin-top: 6px; }
+  /* Security — minimalist grid */
+  .sec-wrap { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; margin-top: 56px; padding: 8px; }
+  .sec-grid { display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .sec-grid { grid-template-columns: repeat(3, 1fr); } }
+  .sec-card { padding: 56px 44px 56px; border-right: 1px solid ${C.border}; border-bottom: 1px solid ${C.border}; background: transparent; text-align: left; min-height: 260px; }
+  @media (min-width: 1000px) { .sec-card:nth-child(3n) { border-right: none; } .sec-card:nth-last-child(-n+3) { border-bottom: none; } }
+  @media (min-width: 700px) and (max-width: 999px) { .sec-card:nth-child(2n) { border-right: none; } }
+  .sec-icon-line { width: 32px; height: 32px; color: ${C.ink}; opacity: 0.85; margin-bottom: 48px; }
+  .sec-label { font-size: 12px; color: ${C.muted}; letter-spacing: 0.22em; font-weight: 600; text-transform: uppercase; }
+  .sec-desc { font-size: 15px; color: ${C.ink}; line-height: 1.55; margin-top: 14px; max-width: 320px; }
 
   /* Testimonials */
   .test-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 56px; }
@@ -282,12 +299,12 @@ const STEPS = [
 const SIM_CHIPS = ["CREDIT TERMS", "HIRING", "PRICING", "GST REFUND DELAY", "MACHINERY PURCHASE", "WORKING CAPITAL LOAN", "SEASONAL PUSH", "M&A"];
 
 const SECURITY = [
-  { Icon: Cloud, l: "INFRASTRUCTURE", v: "AWS Mumbai" },
-  { Icon: Lock, l: "ENCRYPTION", v: "256-bit AES" },
-  { Icon: Database, l: "DATABASE", v: "PostgreSQL" },
-  { Icon: ShieldCheck, l: "COMPLIANCE", v: "Audit Trail" },
-  { Icon: EyeOff, l: "PRIVACY", v: "Zero-Knowledge" },
-  { Icon: Cloud, l: "BACKUP", v: "Daily Automated" },
+  { Icon: ShieldCheck, l: "SOC 2", d: "Actively working toward Type II. Enterprise-grade compliance with DPA standards." },
+  { Icon: Lock, l: "END-TO-END ENCRYPTION", d: "AES-256 at rest, TLS 1.3 in transit. Your data is protected at every step." },
+  { Icon: EyeOff, l: "ZERO DATA RETENTION", d: "Your data never trains models and nothing gets stored after processing." },
+  { Icon: UserIco, l: "ACCESS CONTROLS", d: "Granular, role-based permissions ensure only the right people see what they need." },
+  { Icon: Search, l: "FULL TRACEABILITY", d: "Complete audit trail with every transformation logged. Click any output to trace its source." },
+  { Icon: Database, l: "DATA OWNERSHIP", d: "You decide what happens with your data. We're just the processing layer." },
 ];
 
 const TESTIMONIALS = [
@@ -333,7 +350,7 @@ function Nav() {
         {NAV_LINKS.map(l => <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>)}
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Demo Login</Link>
+        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
         <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
       </div>
     </nav>
@@ -643,6 +660,76 @@ function Ticker({ items, dark }: { items: string[]; dark?: boolean }) {
   );
 }
 
+function CreditSimulator() {
+  const [currentDays, setCurrentDays] = useState(30);
+  const [newDays, setNewDays] = useState(60);
+  const [revenueL, setRevenueL] = useState(25);
+
+  const currentRunway = 52;
+  const { cashGap, newRunway, bridging, risk } = useMemo(() => {
+    const delta = Math.max(0, newDays - currentDays);
+    const cashGap = -(delta / 30) * revenueL;
+    const daysLost = Math.round(Math.abs(cashGap) * 2.08);
+    const newRunway = Math.max(0, currentRunway - daysLost);
+    const bridging = Math.abs(cashGap) * 0.73;
+    let risk: "LOW" | "MEDIUM" | "HIGH" = "LOW";
+    if (newRunway < 30) risk = "HIGH";
+    else if (newRunway < 60) risk = "MEDIUM";
+    return { cashGap, newRunway, bridging, risk };
+  }, [currentDays, newDays, revenueL]);
+
+  const fmtL = (n: number) => `₹${(Math.round(n * 10) / 10).toFixed(n % 1 === 0 ? 0 : 1)}L`;
+
+  return (
+    <div className="sim-panel">
+      <h3>What happens if I extend credit terms?</h3>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">Current Credit Days</span>
+          <span className="sim-row-value">{currentDays} days</span>
+        </div>
+        <input className="sim-slider" type="range" min={0} max={120} value={currentDays}
+          onChange={(e) => setCurrentDays(+e.target.value)} />
+      </div>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">New Credit Days</span>
+          <span className="sim-row-value">{newDays} days</span>
+        </div>
+        <input className="sim-slider" type="range" min={0} max={120} value={newDays}
+          onChange={(e) => setNewDays(+e.target.value)} />
+      </div>
+
+      <div className="sim-row">
+        <div className="sim-row-head">
+          <span className="sim-row-label">Monthly Revenue from Customer</span>
+          <span className="sim-row-value">₹{revenueL}L</span>
+        </div>
+        <input className="sim-slider" type="range" min={1} max={100} value={revenueL}
+          onChange={(e) => setRevenueL(+e.target.value)} />
+      </div>
+
+      <div className="sim-divider">
+        <span className="l">Current Runway</span>
+        <span className="v">{currentRunway} days</span>
+      </div>
+
+      <div className="sim-result">
+        <div className="sim-result-cell"><div className="v">{cashGap === 0 ? "₹0" : `−${fmtL(Math.abs(cashGap))}`}</div><div className="l">Cash Gap Created</div></div>
+        <div className="sim-result-cell"><div className="v">{newRunway} days</div><div className="l">New Runway</div></div>
+        <div className="sim-result-cell"><div className="v gold">{fmtL(bridging)}</div><div className="l">Bridging Needed</div></div>
+        <div className="sim-result-cell"><div className="v">{risk}</div><div className="l">Risk Level</div></div>
+      </div>
+
+      <button className="sim-unlock" onClick={() => window.location.assign("/waitlist")}>Unlock Full Analysis</button>
+    </div>
+  );
+}
+
+
+
 // ===== PAGE =====
 export default function HomePage() {
   const navigate = useNavigate();
@@ -710,7 +797,7 @@ export default function HomePage() {
           </p>
           <div className="hero-cta fade-up">
             <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
-            <Link to="/demo/login" className="btn-pill btn-outline"><Play size={16} /> Watch Demo</Link>
+            <a href="https://calendly.com/nidhi-fynhelp/30min" target="_blank" rel="noopener noreferrer" className="btn-pill btn-outline"><Calendar size={16} /> Book Demo</a>
           </div>
           <div className="stats-row fade-up">
             {STATS.map(s => (
@@ -801,15 +888,7 @@ export default function HomePage() {
               <div className="sim-chips">{SIM_CHIPS.map(c => <span key={c} className="sim-chip">{c}</span>)}</div>
               <div className="sim-foot">Built by our CA team from 500+ SME interviews</div>
             </div>
-            <div className="sim-panel">
-              <div style={{ flex: 1 }} />
-              <div className="sim-result">
-                <div className="sim-result-cell"><div className="v">−₹25L</div></div>
-                <div className="sim-result-cell" />
-                <div className="sim-result-cell"><div className="v">HIGH</div></div>
-              </div>
-              <button className="sim-unlock">Unlock Full Analysis</button>
-            </div>
+            <CreditSimulator />
           </div>
         </div>
       </section>
@@ -817,48 +896,19 @@ export default function HomePage() {
       {/* SECURITY */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">🛡 SECURITY & TRUST</span>
+          <span className="section-eyebrow dot">SECURITY & TRUST</span>
           <h2 className="fyn-h">Enterprise-grade security.<br /><span style={{ color: C.red }}>Zero compromise.</span></h2>
           <p className="lead">Trusted by 1000+ beta users. Your financial data deserves military-grade protection.</p>
-          <div className="sec-grid">
-            {SECURITY.map(({ Icon, l, v }) => (
-              <div key={l} className="sec-card">
-                <div className="sec-icon"><Icon size={20} /></div>
-                <div className="sec-label">{l}</div>
-                <div className="sec-value">{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="section">
-        <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">WHAT BUSINESSES SAY</span>
-          <h2 className="fyn-h">The numbers speak.<br />So do our customers.</h2>
-          <div className="test-grid">
-            {TESTIMONIALS.map(t => (
-              <div key={t.n} className={`test-card ${t.tinted ? "tinted" : ""}`} style={{ textAlign: "left" }}>
-                <div className="test-q">{t.q}</div>
-                <div className="test-author">
-                  <div className="test-avatar">{t.a}</div>
-                  <div>
-                    <div className="test-name">{t.n}</div>
-                    <div className="test-meta">{t.m}</div>
-                  </div>
+          <div className="sec-wrap">
+            <div className="sec-grid">
+              {SECURITY.map(({ Icon, l, d }) => (
+                <div key={l} className="sec-card">
+                  <Icon className="sec-icon-line" strokeWidth={1.4} />
+                  <div className="sec-label">{l}</div>
+                  <div className="sec-desc">{d}</div>
                 </div>
-                <div className="test-tag">{t.tag}</div>
-              </div>
-            ))}
-          </div>
-          <div className="nums-row">
-            {NUMS.map(n => (
-              <div key={n.l} className="num-card">
-                <div className="v">{n.v}</div>
-                <div className="l">{n.l}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
