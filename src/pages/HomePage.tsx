@@ -820,48 +820,19 @@ export default function HomePage() {
       {/* SECURITY */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">🛡 SECURITY & TRUST</span>
+          <span className="section-eyebrow dot">SECURITY & TRUST</span>
           <h2 className="fyn-h">Enterprise-grade security.<br /><span style={{ color: C.red }}>Zero compromise.</span></h2>
           <p className="lead">Trusted by 1000+ beta users. Your financial data deserves military-grade protection.</p>
-          <div className="sec-grid">
-            {SECURITY.map(({ Icon, l, v }) => (
-              <div key={l} className="sec-card">
-                <div className="sec-icon"><Icon size={20} /></div>
-                <div className="sec-label">{l}</div>
-                <div className="sec-value">{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="section">
-        <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">WHAT BUSINESSES SAY</span>
-          <h2 className="fyn-h">The numbers speak.<br />So do our customers.</h2>
-          <div className="test-grid">
-            {TESTIMONIALS.map(t => (
-              <div key={t.n} className={`test-card ${t.tinted ? "tinted" : ""}`} style={{ textAlign: "left" }}>
-                <div className="test-q">{t.q}</div>
-                <div className="test-author">
-                  <div className="test-avatar">{t.a}</div>
-                  <div>
-                    <div className="test-name">{t.n}</div>
-                    <div className="test-meta">{t.m}</div>
-                  </div>
+          <div className="sec-wrap">
+            <div className="sec-grid">
+              {SECURITY.map(({ Icon, l, d }) => (
+                <div key={l} className="sec-card">
+                  <Icon className="sec-icon-line" strokeWidth={1.4} />
+                  <div className="sec-label">{l}</div>
+                  <div className="sec-desc">{d}</div>
                 </div>
-                <div className="test-tag">{t.tag}</div>
-              </div>
-            ))}
-          </div>
-          <div className="nums-row">
-            {NUMS.map(n => (
-              <div key={n.l} className="num-card">
-                <div className="v">{n.v}</div>
-                <div className="l">{n.l}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
