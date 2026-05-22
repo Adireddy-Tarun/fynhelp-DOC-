@@ -537,15 +537,15 @@ function ChatWidget() {
 }
 
 const CF_STYLES = `
-.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; }
+.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%); border-radius: 32px; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 .cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.cf-bg-terms span { position: absolute; font-size: 14px; font-weight: 700; color: rgba(26,16,8,0.09); white-space: nowrap; letter-spacing: 0.02em; }
-.cf-bg-ghost { position: absolute; width: 46%; height: 52%; opacity: 0.18; pointer-events: none; z-index: 0; }
-.cf-bg-ghost-tr { top: 12px; right: 12px; }
-.cf-bg-ghost-bl { bottom: 12px; left: 12px; transform: rotate(180deg); }
+.cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.01); white-space: nowrap; }
+.cf-bg-ghost { position: absolute; width: 400px; height: 300px; max-width: 50%; opacity: 0.02; pointer-events: none; z-index: 0; }
+.cf-bg-ghost-tr { top: 0; right: 0; }
+.cf-bg-ghost-bl { bottom: 0; left: 0; transform: rotate(180deg); }
 .cf-bg-ghost path { stroke: #A93838; }
-.cf-glow { position: absolute; left: 50%; top: 50%; width: 80%; height: 80%; transform: translate(-50%,-50%); background: radial-gradient(ellipse, rgba(169,56,56,0.18) 0%, rgba(169,56,56,0.06) 40%, transparent 70%); filter: blur(80px); z-index: 0; pointer-events: none; }
+.cf-glow { position: absolute; width: 120%; height: 120%; top: -10%; left: -10%; background: radial-gradient(circle, rgba(169,56,56,0.03) 0%, transparent 70%); filter: blur(150px); z-index: 0; pointer-events: none; }
 
 .cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
 
