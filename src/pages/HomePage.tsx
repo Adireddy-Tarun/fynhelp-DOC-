@@ -113,15 +113,38 @@ const STYLES = `
   .section h2.left { text-align: left; }
   .section .lead { text-align: center; color: ${C.muted}; font-size: 17px; margin-top: 16px; }
 
-  /* Integrations grid */
-  .int-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
-  @media (min-width: 700px) { .int-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1000px) { .int-grid { grid-template-columns: repeat(6, 1fr); } }
-  .int-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; padding: 16px; display: flex; align-items: center; gap: 12px; }
-  .int-abbr { width: 38px; height: 38px; border-radius: 50%; background: ${C.ink}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-  .int-name { font-size: 14px; font-weight: 600; color: ${C.ink}; }
-  .int-status { font-size: 11px; color: ${C.green}; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
-  .int-status::before { content:''; width: 5px; height: 5px; border-radius: 50%; background: ${C.green}; }
+  /* Integrations — premium glass marquee */
+  .int-stage { position: relative; margin-top: 64px; padding: 36px 0; border-radius: 28px;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(184,51,58,0.12), transparent 55%),
+      linear-gradient(135deg, rgba(255,255,255,0.55), rgba(244,237,218,0.35));
+    border: 1px solid rgba(255,255,255,0.6); box-shadow: 0 30px 80px -30px rgba(26,16,8,0.25), inset 0 1px 0 rgba(255,255,255,0.7);
+    overflow: hidden; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .int-stage::before, .int-stage::after { content: ''; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 3; pointer-events: none; }
+  .int-stage::before { left: 0; background: linear-gradient(90deg, ${C.bg} 0%, rgba(236,230,210,0) 100%); }
+  .int-stage::after  { right: 0; background: linear-gradient(270deg, ${C.bg} 0%, rgba(236,230,210,0) 100%); }
+  .int-marquee { display: flex; overflow: hidden; padding: 10px 0; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .int-track { display: flex; gap: 18px; flex-shrink: 0; padding-right: 18px; animation: int-slide 38s linear infinite; will-change: transform; }
+  .int-marquee.rev .int-track { animation-direction: reverse; animation-duration: 46s; }
+  .int-marquee:hover .int-track { animation-play-state: paused; }
+  @keyframes int-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .int-card { position: relative; background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
+    border: 1px solid rgba(255,255,255,0.9); border-radius: 16px; padding: 14px 20px 14px 14px; display: flex; align-items: center; gap: 14px;
+    min-width: 220px; backdrop-filter: blur(20px) saturate(140%); -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 8px 24px -12px rgba(26,16,8,0.18), inset 0 1px 0 rgba(255,255,255,0.9);
+    transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease; }
+  .int-card::after { content: ''; position: absolute; inset: 0; border-radius: 16px; padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(184,51,58,0.0) 40%, rgba(184,51,58,0.18));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+  .int-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -14px rgba(184,51,58,0.28), inset 0 1px 0 rgba(255,255,255,0.9); }
+  .int-abbr { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, ${C.ink}, #2a1a10);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(26,16,8,0.35), inset 0 1px 0 rgba(255,255,255,0.15); letter-spacing: 0.04em; }
+  .int-name { font-size: 14px; font-weight: 700; color: ${C.ink}; letter-spacing: -0.01em; }
+  .int-status { font-size: 11px; color: ${C.green}; display: flex; align-items: center; gap: 5px; margin-top: 3px; font-weight: 600; letter-spacing: 0.04em; }
+  .int-status::before { content:''; width: 6px; height: 6px; border-radius: 50%; background: ${C.green}; box-shadow: 0 0 8px ${C.green}; animation: int-pulse 1.8s ease-in-out infinite; }
+  @keyframes int-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
 
   /* Problem */
   .problem-card { background: ${C.card}; border-radius: 24px; padding: 64px; display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid ${C.border}; }
