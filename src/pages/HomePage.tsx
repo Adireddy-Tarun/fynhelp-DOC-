@@ -953,6 +953,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      <Ticker items={TICKER_DARK} dark />
+
+
+
       {/* SECURITY */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
