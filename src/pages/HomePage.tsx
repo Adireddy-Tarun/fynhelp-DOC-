@@ -217,6 +217,11 @@ const STYLES = `
   /* Animations */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: translateY(0);} }
   .fade-up { animation: fadeUp 0.7s ease both; }
+
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); will-change: opacity, transform; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 `;
 
 // ===== DATA =====
@@ -401,6 +406,51 @@ function Ticker({ items, dark }: { items: string[]; dark?: boolean }) {
 export default function HomePage() {
   const navigate = useNavigate();
   const onSubmit = (e: FormEvent) => { e.preventDefault(); navigate("/waitlist"); };
+
+  useEffect(() => {
+    const root = document.querySelector(".fyn-page");
+    if (!root) return;
+    const selector = [
+      ".section .fyn-h",
+      ".section .section-eyebrow",
+      ".section .lead",
+      ".section p",
+      ".section .btn-pill",
+      ".section .stat-card",
+      ".section .int-card",
+      ".section .step-card",
+      ".section .sec-card",
+      ".section .test-card",
+      ".section .num-card",
+      ".section .problem-card",
+      ".section .sim-card",
+      ".section .cta-card",
+      ".section .cta-form",
+      ".section .pill",
+      ".section .sim-chip",
+    ].join(",");
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(selector));
+    targets.forEach((el, i) => {
+      el.classList.add("reveal");
+      // Stagger siblings within same parent
+      const idx = Array.from(el.parentElement?.children || []).indexOf(el);
+      el.style.transitionDelay = `${Math.min(idx, 8) * 80}ms`;
+    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+    );
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
 
   return (
     <div className="fyn-page">
