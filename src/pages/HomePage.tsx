@@ -1160,6 +1160,131 @@ export default function HomePage() {
 
 
 
+      {/* SUPERPOWERS */}
+      <section className="section">
+        <div className="fyn-container">
+          <div className="sp-wrap">
+            <div className="sp-head">
+              <span className="sp-eyebrow">FYNHELP SUPERPOWERS</span>
+              <h2>One platform. <em>Every finance answer.</em></h2>
+              <p>From the first rupee tracked to the boardroom what-if — FynHelp gives Indian SMEs a CFO-grade brain that's always on, always honest, and always in your ledger.</p>
+            </div>
+
+            <div className="sp-grid">
+              {/* 1 — Ask Fynny */}
+              <article className="sp-card">
+                <div className="sp-num">01 · ASK</div>
+                <h3>Ask Fynny anything, in plain English</h3>
+                <p>Conversational CFO trained on your books. Ask in English, Hindi, or Hinglish — get audit-ready answers in seconds, not weeks.</p>
+                <div className="sp-mock">
+                  <div className="sp-mock-bar"><span className="sp-dot red" /><span className="sp-dot" /><span className="sp-dot" /></div>
+                  <div className="spm-chat-u">What's my runway?</div>
+                  <div style={{ display: "block" }}>
+                    <div className="spm-chat-a"><b>4.2 months</b> at ₹2.1L/mo burn. Cut vendor X to extend to <b>5.8 months</b>.</div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 2 — Drill */}
+              <article className="sp-card">
+                <div className="sp-num">02 · TRACE</div>
+                <h3>Drill from any KPI to the exact rupee</h3>
+                <p>Every number on every dashboard links back to the bank line, invoice, or GST entry it came from. Click. See. Done.</p>
+                <div className="sp-mock">
+                  <div className="spm-kpi"><span className="v">₹18.4L</span><span className="l">Q3 Expenses</span></div>
+                  <div className="spm-drill">
+                    <div className="spm-row"><span>SaaS Tools</span><span>₹3.2L</span></div>
+                    <div className="spm-row hi"><span>↳ AWS Mumbai</span><span>₹2.1L</span></div>
+                    <div className="spm-row"><span>Payroll · Aug</span><span>₹8.6L</span></div>
+                    <div className="spm-row"><span>GST Paid · Jul</span><span>₹1.4L</span></div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 3 — Simulate */}
+              <article className="sp-card">
+                <div className="sp-num">03 · SIMULATE</div>
+                <h3>Stress-test decisions before you commit</h3>
+                <p>Hire 3 engineers? Extend credit by 30 days? Move a slider — see the cash gap, runway hit, and risk verdict instantly.</p>
+                <div className="sp-mock">
+                  <div className="spm-sim-label"><span>NEW CREDIT DAYS</span><b>60</b></div>
+                  <div className="spm-sim-track"><div className="spm-sim-fill" /><div className="spm-sim-thumb" /></div>
+                  <div className="spm-sim-results">
+                    <div><div className="k">CASH GAP</div><div className="vred">-₹6.5L</div></div>
+                    <div><div className="k">NEW RUNWAY</div><div className="vgrn">38 days</div></div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 4 — GST reconcile */}
+              <article className="sp-card">
+                <div className="sp-num">04 · RECONCILE</div>
+                <h3>GST & ITC, auto-matched to the paisa</h3>
+                <p>15 hours of monthly reconciliation collapsed to a single review. Mismatches surface with the exact GSTIN and invoice ID.</p>
+                <div className="sp-mock">
+                  <div className="spm-match">
+                    <div className="spm-inv"><b>GSTR-2B</b>INV-4421 · ₹84,200</div>
+                    <div className="spm-link">↔</div>
+                    <div className="spm-inv"><b>Books</b>INV-4421 · ₹84,200</div>
+                  </div>
+                  <div className="spm-match">
+                    <div className="spm-inv"><b>GSTR-2B</b>INV-4515 · ₹12,800</div>
+                    <div className="spm-link" style={{ color: C.red }}>!</div>
+                    <div className="spm-inv" style={{ borderColor: "rgba(196,30,30,0.4)" }}><b>Books</b>Missing · ⚠</div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 5 — Runway live */}
+              <article className="sp-card">
+                <div className="sp-num">05 · MONITOR</div>
+                <h3>Runway, burn & MRR — live, every morning</h3>
+                <p>Bank syncs through RBI's Account Aggregator. Your runway and burn refresh overnight — no spreadsheets, no waiting on the CA.</p>
+                <div className="sp-mock">
+                  <div className="spm-kpi"><span className="v">₹17.6L</span><span className="l">Cash on Hand</span></div>
+                  <div className="spm-spark">
+                    <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="spfade" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#C41E1E" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#C41E1E" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0 40 L25 32 L50 36 L75 22 L100 28 L125 14 L150 20 L175 8 L200 12 L200 60 L0 60 Z" fill="url(#spfade)" />
+                      <path d="M0 40 L25 32 L50 36 L75 22 L100 28 L125 14 L150 20 L175 8 L200 12" fill="none" stroke="#C41E1E" strokeWidth="1.6" />
+                    </svg>
+                  </div>
+                  <div className="spm-runway-pills">
+                    <div className="spm-pill"><div className="k">RUNWAY</div><div className="v">8.4 mo</div></div>
+                    <div className="spm-pill"><div className="k">BURN</div><div className="v red">₹2.1L</div></div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 6 — Collab CA */}
+              <article className="sp-card">
+                <div className="sp-num">06 · COLLABORATE</div>
+                <h3>Loop in your CA without sending a single email</h3>
+                <p>Grant scoped access to your Chartered Accountant. They see the same numbers you do — comments, queries and audits in one place.</p>
+                <div className="sp-mock">
+                  <div className="spm-avatars">
+                    <div className="spm-avatar" style={{ background: "linear-gradient(135deg,#C41E1E,#E0524A)" }}>NK</div>
+                    <div className="spm-avatar" style={{ background: "linear-gradient(135deg,#8B6914,#B89047)" }}>RS</div>
+                    <div className="spm-avatar" style={{ background: "linear-gradient(135deg,#2A2A2A,#555)" }}>PA</div>
+                    <div className="spm-avatar" style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)" }}>+2</div>
+                  </div>
+                  <div className="spm-doc">
+                    <div className="t">Q3 GSTR-3B · Ready for review</div>
+                    <div className="s">SHARED WITH CA · 2 COMMENTS</div>
+                    <div className="lines"><i /><i /><i /></div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SECURITY */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
