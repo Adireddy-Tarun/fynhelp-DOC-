@@ -858,12 +858,28 @@ export default function HomePage() {
           <h2 className="fyn-h">Connect your entire financial stack.</h2>
           <p className="lead">All systems connected. One coherent view of your business.</p>
           <div className="int-stage">
+            <div className="int-glow" aria-hidden />
             {[INTEGRATIONS.slice(0, 6), INTEGRATIONS.slice(6)].map((row, ri) => (
               <div key={ri} className={`int-marquee ${ri === 1 ? "rev" : ""}`}>
                 <div className="int-track">
-                  {[...row, ...row, ...row].map(([a, n], i) => (
+                  {[...row, ...row, ...row].map(([a, n, d], i) => (
                     <div key={`${ri}-${i}-${n}`} className="int-card">
-                      <div className="int-abbr">{a}</div>
+                      <div className="int-logo">
+                        <img
+                          src={`https://logo.clearbit.com/${d}`}
+                          alt={`${n} logo`}
+                          loading="lazy"
+                          onError={(e) => {
+                            const t = e.currentTarget as HTMLImageElement;
+                            const parent = t.parentElement!;
+                            t.remove();
+                            const f = document.createElement("div");
+                            f.className = "fallback";
+                            f.textContent = a;
+                            parent.appendChild(f);
+                          }}
+                        />
+                      </div>
                       <div>
                         <div className="int-name">{n}</div>
                         <div className="int-status">Connected</div>
