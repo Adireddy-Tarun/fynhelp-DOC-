@@ -1,336 +1,430 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Search, TrendingUp, Shield, Briefcase, Users, Target, ArrowRight,
-  DollarSign, BarChart3, PieChart, LineChart, Droplet, AlertCircle,
-  FileCheck, Calculator, Wallet, Activity, Package, FileBarChart,
-  GitBranch, Boxes, Sparkles, ArrowLeft,
-} from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Search, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FynLogo from '@/components/FynLogo';
 
+/* ---------- FYNHELP palette ---------- */
+const C = {
+  ink: '#1A1008',
+  inkSoft: '#2A1C10',
+  beige: '#F4EDDA',
+  beigeWarm: '#FBF6E8',
+  red: '#C41E1E',
+  redDark: '#8B1414',
+  gold: '#8B6914',
+  goldSoft: '#C9A84C',
+  green: '#4A6B3A',
+  line: 'rgba(244,237,218,0.10)',
+  muted: 'rgba(244,237,218,0.55)',
+  beigeMuted: 'rgba(26,16,8,0.60)',
+};
+
+/* ---------- Mock visuals (inline SVG, brand colors) ---------- */
+const M = {
+  Bars: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      <line x1="0" y1="100" x2="220" y2="100" stroke={C.line} strokeWidth="1" />
+      {[60, 75, 45, 90, 55, 80, 35, 70, 50, 85, 40].map((h, i) => (
+        <g key={i}>
+          <rect x={6 + i * 19} y={100 - h} width="12" height={h} rx="2"
+            fill={i % 3 === 0 ? C.red : i % 3 === 1 ? C.goldSoft : 'rgba(244,237,218,0.25)'} />
+        </g>
+      ))}
+    </svg>
+  ),
+  BudgetVActual: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <g key={i}>
+          <rect x={10 + i * 34} y={30 + (i % 2) * 8} width="12" height={70 - (i % 2) * 8} rx="2" fill={C.goldSoft} opacity="0.5" />
+          <rect x={24 + i * 34} y={20 + (i % 3) * 6} width="12" height={80 - (i % 3) * 6} rx="2" fill={C.red} />
+        </g>
+      ))}
+    </svg>
+  ),
+  Line: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      <path d="M0 90 L30 75 L60 80 L90 55 L120 60 L150 35 L180 40 L220 15" stroke={C.red} strokeWidth="2.2" fill="none" />
+      <path d="M0 90 L30 75 L60 80 L90 55 L120 60 L150 35 L180 40 L220 15 L220 110 L0 110 Z" fill="url(#g1)" />
+      <defs>
+        <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={C.red} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={C.red} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
+  Rows: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      {[20, 38, 56, 74, 92].map((y, i) => (
+        <g key={i}>
+          <rect x="6" y={y - 6} width="60" height="10" rx="2" fill="rgba(244,237,218,0.18)" />
+          <rect x="72" y={y - 6} width={50 + i * 18} height="10" rx="2"
+            fill={i === 1 ? C.red : i === 3 ? C.goldSoft : 'rgba(244,237,218,0.35)'} />
+        </g>
+      ))}
+    </svg>
+  ),
+  KpiTiles: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      {['99.2%', '1.2K', '4.5', '97%'].map((t, i) => (
+        <g key={i}>
+          <rect x={6 + i * 53} y="20" width="48" height="70" rx="6" fill="rgba(244,237,218,0.06)" stroke={C.line} />
+          <text x={30 + i * 53} y="58" textAnchor="middle" fill={C.beige} fontFamily="JetBrains Mono, monospace" fontSize="13" fontWeight="700">{t}</text>
+          <rect x={12 + i * 53} y="74" width="36" height="4" rx="2" fill={i === 1 ? C.red : C.goldSoft} opacity="0.7" />
+        </g>
+      ))}
+    </svg>
+  ),
+  HBars: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      {[140, 100, 170, 80, 120].map((w, i) => (
+        <g key={i}>
+          <rect x="6" y={10 + i * 18} width="50" height="10" rx="2" fill="rgba(244,237,218,0.15)" />
+          <rect x="60" y={10 + i * 18} width={w} height="10" rx="2" fill={i === 0 || i === 2 ? C.red : C.goldSoft} opacity={i === 4 ? 0.6 : 1} />
+        </g>
+      ))}
+    </svg>
+  ),
+  Stat: ({ a = '$5.4M', b = '34.2%', c = '847', d = '72' }) => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      {[[a, '#C41E1E'], [b, '#8B6914'], [c, '#C41E1E'], [d, '#8B6914']].map(([t, col], i) => (
+        <g key={i}>
+          <rect x={6 + (i % 2) * 106} y={6 + Math.floor(i / 2) * 52} width="100" height="44" rx="6" fill="rgba(244,237,218,0.06)" stroke={C.line} />
+          <text x={56 + (i % 2) * 106} y={34 + Math.floor(i / 2) * 52} textAnchor="middle" fill={C.beige} fontFamily="Georgia, serif" fontSize="16" fontWeight="700">{t as string}</text>
+        </g>
+      ))}
+    </svg>
+  ),
+  Donut: () => (
+    <svg viewBox="0 0 220 110" width="100%" height="100%">
+      <circle cx="55" cy="55" r="38" fill="none" stroke="rgba(244,237,218,0.15)" strokeWidth="12" />
+      <circle cx="55" cy="55" r="38" fill="none" stroke={C.red} strokeWidth="12" strokeDasharray="170 240" transform="rotate(-90 55 55)" />
+      <text x="55" y="60" textAnchor="middle" fill={C.beige} fontFamily="Georgia,serif" fontSize="16" fontWeight="700">72%</text>
+      {[20, 38, 56, 74].map((y, i) => (
+        <g key={i}>
+          <rect x="115" y={y - 6} width="90" height="8" rx="2" fill={i % 2 ? C.goldSoft : C.red} opacity={0.4 + i * 0.15} />
+        </g>
+      ))}
+    </svg>
+  ),
+};
+
 const USE_CASES = [
-  { id: 1, category: 'finance', title: 'Monthly Financial Close Report', description: 'Generate period-end close reports with automated reconciliation and variance analysis from your ERP exports.', icon: BarChart3, gradient: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDC830 100%)', glowColor: 'rgba(247,147,30,0.4)', route: '/dashboard/reports?template=monthly-close' },
-  { id: 2, category: 'finance', title: 'Budget vs. Actual Analysis', description: 'Compare budgeted figures against actuals across departments with automated variance commentary.', icon: PieChart, gradient: 'linear-gradient(135deg, #F7971E 0%, #FFD200 100%)', glowColor: 'rgba(255,210,0,0.4)', route: '/dashboard/reports?template=budget-vs-actual' },
-  { id: 3, category: 'finance', title: 'Cash Flow Forecast', description: 'Build rolling cash flow forecasts from AR/AP data, bank statements, and revenue projections.', icon: Droplet, gradient: 'linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%)', glowColor: 'rgba(47,128,237,0.4)', route: '/dashboard/cash-flow' },
-  { id: 4, category: 'finance', title: 'P&L Statement Generator', description: 'Auto-generate monthly P&L statements with YoY comparisons and trend analysis.', icon: DollarSign, gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', glowColor: 'rgba(56,239,125,0.4)', route: '/dashboard/reports?template=pnl' },
-  { id: 5, category: 'compliance', title: 'GST Return Preparation', description: 'Auto-generate GSTR-1, GSTR-3B with ITC reconciliation and filing readiness checks.', icon: FileCheck, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', glowColor: 'rgba(118,75,162,0.4)', route: '/dashboard/gst' },
-  { id: 6, category: 'compliance', title: 'Audit Trail Documentation', description: 'Generate complete audit documentation with source traceability for every data point.', icon: GitBranch, gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', glowColor: 'rgba(245,87,108,0.4)', route: '/dashboard/audit-readiness' },
-  { id: 7, category: 'compliance', title: 'TDS Compliance Report', description: 'Automate TDS calculation, deduction tracking, and quarterly return generation.', icon: Calculator, gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', glowColor: 'rgba(0,242,254,0.4)', route: '/dashboard/tds-tax' },
-  { id: 8, category: 'operations', title: 'Weekly Operations Report', description: 'Aggregate operational KPIs from multiple systems into a structured weekly summary.', icon: Activity, gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', glowColor: 'rgba(254,225,64,0.4)', route: '/dashboard/reports?template=weekly-ops' },
-  { id: 9, category: 'operations', title: 'Vendor Performance Report', description: 'Analyze supplier performance, lead times, and inventory levels from procurement data.', icon: Package, gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', glowColor: 'rgba(48,207,208,0.4)', route: '/dashboard/vendors' },
-  { id: 10, category: 'operations', title: 'Inventory Tracking Dashboard', description: 'Monitor stock levels, reorder points, and SKU performance across warehouses.', icon: Boxes, gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', glowColor: 'rgba(254,214,227,0.4)', route: '/dashboard/reports?template=inventory' },
-  { id: 11, category: 'executive', title: 'Board Meeting Deck', description: 'Create quarterly board presentations from financial, product, and growth data sources.', icon: Target, gradient: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)', glowColor: 'rgba(255,8,68,0.4)', route: '/dashboard/reports?template=board-deck' },
-  { id: 12, category: 'executive', title: 'Monthly Investor Update', description: 'Generate polished investor updates with KPIs, burn rate, milestones, and growth metrics.', icon: LineChart, gradient: 'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)', glowColor: 'rgba(255,110,127,0.4)', route: '/dashboard/reports?template=investor-update' },
-  { id: 13, category: 'executive', title: 'Executive KPI Dashboard', description: 'Build comprehensive executive dashboards pulling from finance, sales, and operations.', icon: FileBarChart, gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', glowColor: 'rgba(142,197,252,0.4)', route: '/dashboard/360' },
-  { id: 14, category: 'hr', title: 'Headcount & Attrition Report', description: 'Track headcount changes, attrition rates, and hiring velocity from HRIS data exports.', icon: Users, gradient: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)', glowColor: 'rgba(60,186,146,0.4)', route: '/dashboard/hr' },
-  { id: 15, category: 'hr', title: 'Compensation Benchmarking', description: 'Analyze compensation data against market benchmarks with equity and band distribution.', icon: Wallet, gradient: 'linear-gradient(135deg, #74ebd5 0%, #9face6 100%)', glowColor: 'rgba(159,172,230,0.4)', route: '/dashboard/payroll' },
+  { id: 1, category: 'finance', title: 'MONTHLY FINANCIAL CLOSE REPORT', desc: 'Generate period-end close reports with automated reconciliation and variance analysis from your ERP exports.', mock: <M.Bars /> },
+  { id: 2, category: 'finance', title: 'BUDGET VS. ACTUAL ANALYSIS', desc: 'Compare budgeted figures against actuals across departments with automated variance commentary.', mock: <M.BudgetVActual /> },
+  { id: 3, category: 'finance', title: 'CASH FLOW FORECAST', desc: 'Build rolling cash flow forecasts from AR/AP data, bank statements, and revenue projections.', mock: <M.Line /> },
+  { id: 4, category: 'finance', title: 'P&L STATEMENT GENERATOR', desc: 'Auto-generate monthly P&L statements with YoY comparisons and trend analysis.', mock: <M.Line /> },
+
+  { id: 5, category: 'compliance', title: 'GST RETURN PREPARATION', desc: 'Auto-generate GSTR-1, GSTR-3B with ITC reconciliation and filing readiness checks.', mock: <M.Rows /> },
+  { id: 6, category: 'compliance', title: 'AUDIT TRAIL DOCUMENTATION', desc: 'Generate complete audit documentation with source traceability for every data point.', mock: <M.Rows /> },
+  { id: 7, category: 'compliance', title: 'TDS COMPLIANCE REPORT', desc: 'Automate TDS calculation, deduction tracking, and quarterly return generation.', mock: <M.HBars /> },
+
+  { id: 8, category: 'operations', title: 'WEEKLY OPERATIONS REPORT', desc: 'Aggregate operational KPIs from multiple systems into a structured weekly summary.', mock: <M.KpiTiles /> },
+  { id: 9, category: 'operations', title: 'VENDOR PERFORMANCE REPORT', desc: 'Analyze supplier performance, lead times, and inventory levels from procurement data.', mock: <M.HBars /> },
+  { id: 10, category: 'operations', title: 'INVENTORY TRACKING DASHBOARD', desc: 'Monitor stock levels, reorder points, and SKU performance across warehouses.', mock: <M.Rows /> },
+
+  { id: 11, category: 'executive', title: 'BOARD MEETING DECK', desc: 'Create quarterly board presentations from financial, product, and growth data sources.', mock: <M.Stat /> },
+  { id: 12, category: 'executive', title: 'MONTHLY INVESTOR UPDATE', desc: 'Generate polished investor updates with KPIs, burn rate, milestones, and growth metrics.', mock: <M.Line /> },
+  { id: 13, category: 'executive', title: 'EXECUTIVE KPI DASHBOARD', desc: 'Build comprehensive executive dashboards pulling from finance, sales, and operations.', mock: <M.KpiTiles /> },
+
+  { id: 14, category: 'hr', title: 'HEADCOUNT & ATTRITION REPORT', desc: 'Track headcount changes, attrition rates, and hiring velocity from HRIS data exports.', mock: <M.HBars /> },
+  { id: 15, category: 'hr', title: 'COMPENSATION BENCHMARKING', desc: 'Analyze compensation data against market benchmarks with equity and band distribution.', mock: <M.Donut /> },
 ];
 
 const CATEGORIES = [
-  { id: 'all', label: 'ALL', icon: Target, gradient: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)' },
-  { id: 'finance', label: 'FINANCE', icon: TrendingUp, gradient: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)' },
-  { id: 'compliance', label: 'COMPLIANCE', icon: Shield, gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { id: 'operations', label: 'OPERATIONS', icon: Briefcase, gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-  { id: 'executive', label: 'EXECUTIVE', icon: Users, gradient: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)' },
-  { id: 'hr', label: 'HR & PEOPLE', icon: Users, gradient: 'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)' },
+  { id: 'all', label: 'ALL' },
+  { id: 'finance', label: 'FINANCE' },
+  { id: 'compliance', label: 'COMPLIANCE' },
+  { id: 'operations', label: 'OPERATIONS' },
+  { id: 'executive', label: 'EXECUTIVE' },
+  { id: 'hr', label: 'HR & PEOPLE' },
+];
+
+const CATEGORY_LABEL: Record<string, string> = {
+  finance: 'Finance',
+  compliance: 'Compliance',
+  operations: 'Operations',
+  executive: 'Executive',
+  hr: 'HR & People',
+};
+
+const TYPE_PHRASES = [
+  'Search use cases…',
+  'cash flow forecast',
+  'GST return preparation',
+  'investor update',
+  'board meeting deck',
 ];
 
 export default function UseCasesPage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [placeholder, setPlaceholder] = useState('');
 
-  const filteredCases = USE_CASES.filter((useCase) => {
-    const matchesCategory = activeCategory === 'all' || useCase.category === activeCategory;
-    const q = searchQuery.toLowerCase();
-    const matchesSearch =
-      useCase.title.toLowerCase().includes(q) ||
-      useCase.description.toLowerCase().includes(q);
-    return matchesCategory && matchesSearch;
-  });
+  /* typing placeholder */
+  useEffect(() => {
+    let i = 0, j = 0, deleting = false;
+    const tick = () => {
+      const phrase = TYPE_PHRASES[i];
+      if (!deleting) {
+        j++;
+        setPlaceholder(phrase.slice(0, j));
+        if (j >= phrase.length) { deleting = true; setTimeout(tick, 1400); return; }
+      } else {
+        j--;
+        setPlaceholder(phrase.slice(0, j));
+        if (j <= 0) { deleting = false; i = (i + 1) % TYPE_PHRASES.length; }
+      }
+      setTimeout(tick, deleting ? 35 : 70);
+    };
+    const t = setTimeout(tick, 600);
+    return () => clearTimeout(t);
+  }, []);
 
-  const categoryCount = filteredCases.length;
+  const filtered = useMemo(() => USE_CASES.filter((u) => {
+    const catOk = activeCategory === 'all' || u.category === activeCategory;
+    const q = searchQuery.toLowerCase().trim();
+    const qOk = !q || u.title.toLowerCase().includes(q) || u.desc.toLowerCase().includes(q);
+    return catOk && qOk;
+  }), [activeCategory, searchQuery]);
+
+  const grouped = useMemo(() => {
+    const order = ['finance', 'compliance', 'operations', 'executive', 'hr'];
+    return order
+      .map((cat) => ({ cat, items: filtered.filter((u) => u.category === cat) }))
+      .filter((g) => g.items.length > 0);
+  }, [filtered]);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F4EDDA 0%, #FFF9F0 100%)', position: 'relative', overflow: 'hidden' }}>
-      {/* Top Navigation Bar */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(253,251,247,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(139,105,20,0.15)', padding: '20px 24px' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            <FynLogo size="lg" showTagline={false} />
-          </motion.div>
-          <motion.button whileHover={{ scale: 1.05, x: -4 }} whileTap={{ scale: 0.95 }} onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(139,105,20,0.15)', color: '#1A1008', fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(10px)', boxShadow: '0 2px 8px rgba(139,105,20,0.08)' }}>
-            <ArrowLeft size={18} strokeWidth={2.5} />
-            Back to Home
-          </motion.button>
+    <div style={{ background: C.beige, minHeight: '100vh', color: C.ink, fontFamily: 'Inter, sans-serif' }}>
+      <style>{`
+        .uc-nav-btn:hover { background:${C.ink}; color:${C.beige}; }
+        .uc-pill { transition: all .25s ease; }
+        .uc-pill:hover { transform: translateY(-1px); }
+        .uc-card { transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease; }
+        .uc-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px -20px rgba(196,30,30,0.45); border-color: ${C.red}; }
+        .uc-card:hover .uc-mock { transform: scale(1.04); }
+        .uc-mock { transition: transform .5s ease; }
+        .uc-search-input::placeholder { color: rgba(244,237,218,0.45); }
+        .uc-search-wrap:focus-within { border-color:${C.red}; box-shadow:0 0 0 4px rgba(196,30,30,0.18); }
+        @keyframes ucCaret { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+        .uc-caret { display:inline-block; width:2px; height:1em; background:${C.beige}; margin-left:2px; vertical-align:-2px; animation: ucCaret 1s steps(1) infinite; }
+        .uc-cat-title::before {
+          content:''; display:inline-block; width:8px; height:8px; border-radius:50%;
+          background:${C.red}; margin-right:14px; vertical-align:middle;
+          box-shadow: 0 0 0 4px rgba(196,30,30,0.12);
+        }
+        @media (max-width: 1024px){
+          .uc-hero-h1 { font-size: clamp(40px, 8vw, 64px) !important; }
+        }
+        @media (max-width: 720px){
+          .uc-grid { grid-template-columns: 1fr !important; }
+          .uc-pills { gap: 8px !important; }
+          .uc-pill { padding: 10px 16px !important; font-size: 12px !important; }
+          .uc-nav { padding: 14px 16px !important; }
+          .uc-section { padding-left: 16px !important; padding-right: 16px !important; }
+        }
+      `}</style>
+
+      {/* NAV */}
+      <nav className="uc-nav" style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: 'rgba(244,237,218,0.85)', backdropFilter: 'blur(14px)',
+        borderBottom: `1px solid rgba(26,16,8,0.08)`, padding: '18px 28px',
+      }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <FynLogo size="md" showTagline={false} />
+          </div>
+          <button onClick={() => navigate('/')}
+            className="uc-nav-btn"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 18px', border: `1.5px solid ${C.ink}`, background: 'transparent',
+              color: C.ink, fontWeight: 700, fontSize: 13, letterSpacing: '0.5px',
+              cursor: 'pointer', borderRadius: 0,
+            }}>
+            <ArrowLeft size={16} strokeWidth={2.5} /> BACK
+          </button>
         </div>
       </nav>
 
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        style={{ position: 'absolute', top: '-20%', right: '-10%', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(196,30,30,0.15) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0], opacity: [0.2, 0.4, 0.2] }}
-        transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-        style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: '700px', height: '700px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,105,20,0.15) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }}
-      />
-
-      <section style={{ padding: '80px 24px 60px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <Sparkles size={24} color="#8B6914" />
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', fontWeight: 700, letterSpacing: '2px', color: 'rgba(26,16,8,0.6)', textTransform: 'uppercase' }}>USE CASE LIBRARY</p>
-            <Sparkles size={24} color="#C41E1E" />
+      {/* HERO (dark band, beige type, red accent) */}
+      <section className="uc-section" style={{
+        background: `radial-gradient(1200px 500px at 50% 0%, rgba(196,30,30,0.18), transparent 70%), ${C.ink}`,
+        color: C.beige, padding: '88px 28px 96px', position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+            <Sparkles size={16} color={C.goldSoft} />
+            <span style={{ fontSize: 12, letterSpacing: '3px', color: C.muted, fontWeight: 700 }}>USE CASE LIBRARY</span>
+            <Sparkles size={16} color={C.red} />
           </div>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '64px', fontWeight: 400, color: '#1A1008', marginBottom: '28px', lineHeight: 1.2 }}>
-            {categoryCount} ways teams use <br />
-            <motion.span
-              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-              transition={{ duration: 5, repeat: Infinity }}
-              style={{ fontStyle: 'italic', background: 'linear-gradient(90deg, #C41E1E 0%, #8B6914 50%, #C41E1E 100%)', backgroundSize: '200% 100%', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontSize: '72px', fontWeight: 700 }}
-            >
-              FYNHelp
-            </motion.span>
+          <h1 className="uc-hero-h1" style={{
+            fontFamily: 'Georgia, "Playfair Display", serif',
+            fontSize: 'clamp(48px, 6.4vw, 84px)', lineHeight: 1.04, fontWeight: 400, letterSpacing: '-0.02em',
+            margin: 0, color: C.beige,
+          }}>
+            {USE_CASES.length} ways teams use<br />
+            <em style={{ fontStyle: 'italic', color: C.red, fontWeight: 500 }}>Fynhelp</em>
           </h1>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', color: 'rgba(26,16,8,0.7)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.7, fontWeight: 500 }}>
+          <p style={{
+            marginTop: 26, fontSize: 17, lineHeight: 1.7, color: C.muted, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto',
+          }}>
             Browse real workflows across finance, compliance, operations, and more — all powered by your data.
           </p>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          whileHover={{ scale: 1.02 }}
-          style={{ maxWidth: '700px', margin: '0 auto 48px' }}
-        >
-          <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(139,105,20,0.15)', backgroundImage: 'linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box', border: '2px solid transparent' }}>
-            <Search size={22} color="rgba(26,16,8,0.5)" style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)' }} />
+          {/* Search */}
+          <div className="uc-search-wrap" style={{
+            marginTop: 38, maxWidth: 560, marginLeft: 'auto', marginRight: 'auto',
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'rgba(244,237,218,0.06)', border: `1.5px solid rgba(244,237,218,0.18)`,
+            padding: '14px 18px', borderRadius: 999, transition: 'all .25s',
+          }}>
+            <Search size={18} color={C.muted} />
             <input
-              type="text"
-              placeholder="Search use cases..."
+              className="uc-search-input"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '22px 24px 22px 64px', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#1A1008', fontWeight: 500 }}
+              placeholder={placeholder}
+              style={{
+                flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                color: C.beige, fontSize: 15, fontFamily: 'Inter, sans-serif',
+              }}
             />
+            {searchQuery === '' && <span className="uc-caret" />}
           </div>
-        </motion.div>
-      </section>
 
-      <section style={{ padding: '0 24px 48px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          {CATEGORIES.map((cat, idx) => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.id;
-            return (
-              <motion.button
-                key={cat.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveCategory(cat.id)}
-                style={{
-                  padding: '16px 32px',
-                  borderRadius: '16px',
-                  background: isActive ? cat.gradient : 'rgba(255,255,255,0.95)',
-                  border: `2px solid ${isActive ? 'transparent' : 'rgba(139,105,20,0.15)'}`,
-                  color: isActive ? '#FFF' : 'rgba(26,16,8,0.7)',
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  backdropFilter: 'blur(10px)',
-                  boxShadow: isActive ? '0 8px 24px rgba(0,0,0,0.2)' : '0 2px 8px rgba(139,105,20,0.08)',
-                }}
-              >
-                <Icon size={20} strokeWidth={2.5} />
-                {cat.label}
-              </motion.button>
-            );
-          })}
+          {/* Pills */}
+          <div className="uc-pills" style={{
+            marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center',
+          }}>
+            {CATEGORIES.map((cat) => {
+              const active = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  className="uc-pill"
+                  onClick={() => setActiveCategory(cat.id)}
+                  style={{
+                    padding: '11px 22px',
+                    background: active ? C.beige : 'transparent',
+                    color: active ? C.ink : C.beige,
+                    border: `1.5px solid ${active ? C.beige : 'rgba(244,237,218,0.25)'}`,
+                    fontSize: 12, fontWeight: 700, letterSpacing: '1.5px', cursor: 'pointer',
+                    borderRadius: 4,
+                  }}>
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
-          {categoryCount} USE CASE{categoryCount !== 1 ? 'S' : ''}
-        </p>
       </section>
 
-      <section style={{ padding: '0 24px 80px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory + searchQuery}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '28px' }}
-          >
-            {filteredCases.map((useCase, idx) => (
-              <UseCaseCard3D key={useCase.id} useCase={useCase} delay={idx * 0.05} onClick={() => navigate('/waitlist')} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+      {/* GROUPED RESULTS */}
+      <section className="uc-section" style={{ padding: '72px 28px 40px', maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ fontSize: 11, letterSpacing: '2.5px', color: C.beigeMuted, fontWeight: 700, marginBottom: 32 }}>
+          {filtered.length} USE CASE{filtered.length !== 1 ? 'S' : ''}
+        </div>
 
-        {filteredCases.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', padding: '80px 24px' }}>
-            <AlertCircle size={56} color="rgba(26,16,8,0.3)" style={{ marginBottom: '20px' }} />
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', color: 'rgba(26,16,8,0.5)', fontWeight: 600 }}>
-              No use cases found. Try a different search or category.
-            </p>
-          </motion.div>
+        {grouped.map((group) => (
+          <div key={group.cat} style={{ marginBottom: 72 }}>
+            <h2 className="uc-cat-title" style={{
+              fontFamily: 'Georgia, serif', fontSize: 36, fontWeight: 400, color: C.ink,
+              marginBottom: 26, letterSpacing: '-0.01em',
+            }}>
+              {CATEGORY_LABEL[group.cat]}
+            </h2>
+
+            <div className="uc-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 22,
+            }}>
+              {group.items.map((u, idx) => (
+                <motion.article
+                  key={u.id}
+                  className="uc-card"
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.4, delay: idx * 0.04 }}
+                  onClick={() => navigate('/waitlist')}
+                  style={{
+                    background: C.ink, color: C.beige,
+                    border: `1px solid rgba(244,237,218,0.08)`,
+                    borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column',
+                  }}>
+                  <div style={{
+                    height: 168, padding: 18,
+                    background: `linear-gradient(180deg, rgba(196,30,30,0.06) 0%, rgba(26,16,8,0) 100%)`,
+                    borderBottom: `1px solid rgba(244,237,218,0.06)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div className="uc-mock" style={{ width: '100%', height: '100%' }}>{u.mock}</div>
+                  </div>
+                  <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                    <h3 style={{
+                      fontSize: 13, fontWeight: 800, letterSpacing: '1.2px',
+                      color: C.beige, lineHeight: 1.35, margin: 0,
+                    }}>
+                      {u.title}
+                    </h3>
+                    <p style={{
+                      fontSize: 13.5, color: C.muted, lineHeight: 1.6, margin: 0, flex: 1,
+                    }}>
+                      {u.desc}
+                    </p>
+                    <div style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      fontSize: 11, letterSpacing: '1.5px', fontWeight: 700, color: C.red, marginTop: 6,
+                    }}>
+                      EXPLORE <ArrowRight size={14} strokeWidth={2.5} />
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {filtered.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '80px 24px', color: C.beigeMuted }}>
+            No use cases found. Try a different search or category.
+          </div>
         )}
       </section>
 
-      <section style={{ padding: '100px 24px', background: 'rgba(139,105,20,0.05)', borderTop: '1px solid rgba(139,105,20,0.15)', position: 'relative', overflow: 'hidden' }}>
-        <motion.div
-          animate={{ rotate: [0, 360] }}
-          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-          style={{ position: 'absolute', top: '50%', left: '50%', width: '400px', height: '400px', transform: 'translate(-50%, -50%)', background: 'radial-gradient(circle, rgba(196,30,30,0.1) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }}
-        />
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '52px', fontWeight: 400, color: '#1A1008', marginBottom: '20px' }}>
-              Don't see your use case?
-            </h2>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', color: 'rgba(26,16,8,0.7)', marginBottom: '40px', lineHeight: 1.7, fontWeight: 500 }}>
-              FYNHelp adapts to any data-to-document workflow. <br />
-              Tell us what you're building.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/waitlist')}
-              style={{
-                padding: '20px 52px',
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)',
-                border: 'none',
-                color: '#FFF',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '18px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 12px 40px rgba(139,105,20,0.4)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '12px',
-              }}
-            >
-              TRY NOW FOR FREE
-              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ArrowRight size={22} strokeWidth={3} />
-              </motion.div>
-            </motion.button>
-          </motion.div>
+      {/* CTA */}
+      <section className="uc-section" style={{
+        padding: '88px 28px 120px',
+        background: `linear-gradient(180deg, ${C.beige} 0%, ${C.beigeWarm} 100%)`,
+        borderTop: `1px solid rgba(26,16,8,0.08)`,
+      }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{
+            fontFamily: 'Georgia, serif', fontSize: 'clamp(34px, 4.5vw, 52px)',
+            fontWeight: 400, color: C.ink, margin: 0, letterSpacing: '-0.015em',
+          }}>
+            Don't see your use case?
+          </h2>
+          <p style={{ marginTop: 18, fontSize: 17, color: C.beigeMuted, lineHeight: 1.7 }}>
+            Fynhelp adapts to any data-to-decision workflow.<br />Tell us what you're building.
+          </p>
+          <button onClick={() => navigate('/waitlist')} style={{
+            marginTop: 34, padding: '16px 38px',
+            background: C.red, color: C.beige, border: 'none', cursor: 'pointer',
+            fontWeight: 700, fontSize: 13, letterSpacing: '2px', borderRadius: 4,
+            boxShadow: '0 14px 36px -12px rgba(196,30,30,0.55)',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+          }}>
+            TRY NOW FOR FREE <ArrowRight size={16} strokeWidth={2.5} />
+          </button>
         </div>
       </section>
     </div>
-  );
-}
-
-function UseCaseCard3D({ useCase, delay, onClick }: any) {
-  const Icon = useCase.icon;
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
-      initial={{ opacity: 0, y: 30, rotateX: -15 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ delay, duration: 0.6, ease: 'easeOut' }}
-      whileHover={{ y: -12, rotateX: 5, rotateY: 2, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      style={{
-        position: 'relative',
-        background: 'rgba(255,255,255,0.98)',
-        border: '1px solid rgba(139,105,20,0.12)',
-        borderRadius: '24px',
-        padding: '42px',
-        cursor: 'pointer',
-        transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        backdropFilter: 'blur(20px)',
-        boxShadow: isHovered
-          ? `0 24px 60px ${useCase.glowColor}, 0 12px 24px rgba(0,0,0,0.08)`
-          : '0 8px 24px rgba(139,105,20,0.08)',
-        minHeight: '340px',
-        display: 'flex',
-        flexDirection: 'column',
-        transformStyle: 'preserve-3d',
-        perspective: '1000px',
-      }}
-    >
-      <motion.div
-        animate={{ rotate: isHovered ? [0, 360] : 0 }}
-        transition={{ duration: 3, repeat: isHovered ? Infinity : 0, ease: 'linear' }}
-        style={{
-          position: 'absolute',
-          inset: -2,
-          borderRadius: '24px',
-          background: useCase.gradient,
-          opacity: isHovered ? 0.6 : 0,
-          transition: 'opacity 0.4s',
-          pointerEvents: 'none',
-          filter: 'blur(8px)',
-        }}
-      />
-
-      <motion.div
-        animate={{ rotateY: isHovered ? [0, 360] : 0, scale: isHovered ? 1.1 : 1 }}
-        transition={{ duration: 0.6 }}
-        style={{
-          width: '84px',
-          height: '84px',
-          borderRadius: '20px',
-          background: useCase.gradient,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '26px',
-          flexShrink: 0,
-          boxShadow: isHovered ? `0 16px 40px ${useCase.glowColor}` : '0 8px 24px rgba(0,0,0,0.12)',
-          position: 'relative',
-          zIndex: 1,
-          transformStyle: 'preserve-3d',
-          transform: 'translateZ(20px)',
-        }}
-      >
-        <motion.div animate={{ rotate: isHovered ? 360 : 0 }} transition={{ duration: 0.6 }}>
-          <Icon size={44} color="#FFF" strokeWidth={2.5} />
-        </motion.div>
-      </motion.div>
-
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
-        <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: '22px', fontWeight: 800, color: '#1A1008', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.3 }}>
-          {useCase.title}
-        </h3>
-        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: 'rgba(26,16,8,0.7)', lineHeight: 1.7, marginBottom: '26px', flex: 1, fontWeight: 500 }}>
-          {useCase.description}
-        </p>
-        <motion.div
-          animate={{ x: isHovered ? 8 : 0 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'Inter, sans-serif', fontSize: '15px', fontWeight: 700, background: useCase.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
-        >
-          Learn More
-          <ArrowRight size={20} strokeWidth={3} style={{ color: '#8B6914' }} />
-        </motion.div>
-      </div>
-
-      <motion.div
-        animate={{ scale: isHovered ? 1 : 0, rotate: isHovered ? 0 : 45 }}
-        style={{ position: 'absolute', top: 24, right: 24, width: '10px', height: '10px', borderRadius: '50%', background: useCase.gradient, boxShadow: `0 0 20px ${useCase.glowColor}` }}
-      />
-    </motion.div>
   );
 }
