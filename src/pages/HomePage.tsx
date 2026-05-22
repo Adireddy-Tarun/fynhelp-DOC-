@@ -588,12 +588,42 @@ function ChatWidget() {
             <button className="cf-util" aria-label="Export"><DownloadIcon /></button>
             <button className="cf-util" aria-label="Attach"><PaperclipIcon /></button>
           </div>
-          <div className="cf-input">Ask Fynny anything about your business...</div>
+          <div className="cf-input"><TypingPlaceholder /><span className="cf-caret" /></div>
           <button className="cf-send" aria-label="Send"><SendIcon /></button>
         </div>
       </div>
     </div>
   );
+}
+
+function TypingPlaceholder() {
+  const phrases = useMemo(() => [
+    "Ask Fynny anything about your business...",
+    "What's my runway this quarter?",
+    "Show me overdue receivables",
+    "Am I GST compliant this month?",
+    "How can I extend my cash runway?",
+  ], []);
+  const [pi, setPi] = useState(0);
+  const [text, setText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  useEffect(() => {
+    const full = phrases[pi];
+    if (!deleting && text === full) {
+      const t = setTimeout(() => setDeleting(true), 1600);
+      return () => clearTimeout(t);
+    }
+    if (deleting && text === "") {
+      setDeleting(false);
+      setPi((pi + 1) % phrases.length);
+      return;
+    }
+    const t = setTimeout(() => {
+      setText(deleting ? full.slice(0, text.length - 1) : full.slice(0, text.length + 1));
+    }, deleting ? 28 : 55);
+    return () => clearTimeout(t);
+  }, [text, deleting, pi, phrases]);
+  return <span className="cf-typed">{text}</span>;
 }
 
 const CF_STYLES = `
@@ -667,26 +697,44 @@ const CF_STYLES = `
 .cf-utils { display: flex; gap: 6px; }
 .cf-util { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(26,16,8,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
 .cf-util:hover { background: #F5F5F3; border-color: rgba(26,16,8,0.18); }
-.cf-input { flex: 1; padding: 14px 20px; border: 1.5px solid rgba(26,16,8,0.1); border-radius: 12px; color: #6B6B6B; font-size: 14px; font-weight: 500; }
-.cf-send { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #A93838, #C45050); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(169,56,56,0.3); }
+.cf-input { flex: 1; padding: 14px 20px; border: 1.5px solid rgba(26,16,8,0.1); border-radius: 12px; color: #6B6B6B; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cf-typed { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-caret { display: inline-block; width: 2px; height: 1em; background: #A93838; margin-left: 2px; animation: cf-caret 1s steps(1) infinite; vertical-align: middle; }
+@keyframes cf-caret { 50% { opacity: 0; } }
+.cf-send { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #A93838, #C45050); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(169,56,56,0.3); flex-shrink: 0; }
 .cf-send:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169,56,56,0.4); }
 
 .cf-anim-in { animation: cf-slide-up 0.5s ease-out; }
 @keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
+@media (max-width: 1024px) {
+  .cf-wrap { padding: 70px 32px; }
+  .cf-chat { padding: 26px; }
+}
 @media (max-width: 768px) {
-  .cf-wrap { padding: 50px 16px; }
-  .cf-card { min-height: 560px; border-radius: 18px; }
-  .cf-header { padding: 18px 20px; }
-  .cf-name { font-size: 16px; }
-  .cf-chat { padding: 20px; gap: 14px; }
-  .cf-bubble { font-size: 14px; max-width: 82%; }
+  .cf-wrap { padding: 40px 14px; margin-top: 32px; border-radius: 20px; }
+  .cf-card { min-height: 540px; max-height: none; border-radius: 18px; }
+  .cf-header { padding: 16px 18px; }
+  .cf-name { font-size: 15px; }
+  .cf-sub { font-size: 12px; }
+  .cf-live { padding: 6px 12px; font-size: 11px; }
+  .cf-chat { padding: 18px; gap: 12px; }
+  .cf-bubble { font-size: 14px; max-width: 82%; padding: 12px 14px; }
   .cf-bubble-fynny b { font-size: 16px; }
-  .cf-input-row { padding: 14px 16px; gap: 8px; }
-  .cf-input { font-size: 13px; padding: 12px 14px; }
+  .cf-input-row { padding: 12px 14px; gap: 8px; }
+  .cf-input { font-size: 13px; padding: 11px 14px; }
+  .cf-utils { gap: 4px; }
   .cf-util { width: 36px; height: 36px; }
-  .cf-send { width: 44px; height: 44px; }
+  .cf-send { width: 42px; height: 42px; }
   .cf-metrics { grid-template-columns: 1fr; }
+  .cf-avatar { width: 32px; height: 32px; border-radius: 9px; }
+}
+@media (max-width: 480px) {
+  .cf-wrap { padding: 28px 10px; }
+  .cf-header { padding: 14px 14px; }
+  .cf-chat { padding: 14px; }
+  .cf-utils .cf-util:nth-child(2) { display: none; }
+  .cf-input { padding: 10px 12px; font-size: 12px; }
 }
 `;
 
