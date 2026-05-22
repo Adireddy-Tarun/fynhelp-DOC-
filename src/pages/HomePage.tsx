@@ -818,15 +818,11 @@ export default function HomePage() {
               <div className="sim-chips">{SIM_CHIPS.map(c => <span key={c} className="sim-chip">{c}</span>)}</div>
               <div className="sim-foot">Built by our CA team from 500+ SME interviews</div>
             </div>
-            <div className="sim-panel">
-              <div style={{ flex: 1 }} />
-              <div className="sim-result">
-                <div className="sim-result-cell"><div className="v">−₹25L</div></div>
-                <div className="sim-result-cell" />
-                <div className="sim-result-cell"><div className="v">HIGH</div></div>
-              </div>
-              <button className="sim-unlock">Unlock Full Analysis</button>
-            </div>
+            <CreditSimulator />
+          </div>
+        </div>
+      </section>
+
           </div>
         </div>
       </section>
