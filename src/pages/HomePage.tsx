@@ -449,24 +449,21 @@ function ChatWidget() {
     <div className="cf-wrap">
       <style>{CF_STYLES}</style>
       <div className="cf-bg-terms" aria-hidden>
-        {["MRR","Runway","GST","ITC","₹","Burn Rate","Cash Flow","Receivables","EBITDA","ARR","TDS","P&L","Margin","CAC","LTV","Working Capital","Payables","Net Revenue","DSO","Forecast","Liquidity","NPV"].map((t, i) => (
+        {["MRR","Runway","GST","ITC","₹","Burn Rate","Cash Flow","EBITDA"].map((t, i) => (
           <span key={i} style={{
-            top: `${(i * 41) % 92 + 2}%`,
-            left: `${(i * 67) % 90 + 3}%`,
-            transform: `rotate(${((i * 13) % 21) - 10}deg)`,
-            fontSize: `${11 + (i % 4) * 3}px`,
+            top: `${(i * 41) % 88 + 4}%`,
+            left: `${(i * 67) % 88 + 4}%`,
+            transform: `rotate(${((i * 13) % 11) - 5}deg)`,
           }}>{t}</span>
         ))}
       </div>
-      <svg className="cf-bg-ghost cf-bg-ghost-tr" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
-        <path d="M0,150 Q60,80 120,110 T240,70 T300,90" fill="none" strokeWidth="1.5" />
-        <path d="M0,170 Q80,140 160,130 T300,110" fill="none" strokeWidth="1.5" />
-        <path d="M0,190 Q70,170 140,160 T300,140" fill="none" strokeWidth="1" opacity="0.6" />
+      <svg className="cf-bg-ghost cf-bg-ghost-tr" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden>
+        <path d="M0,150 Q100,100 200,120 T400,100" fill="none" strokeWidth="2" />
+        <path d="M0,200 Q100,150 200,170 T400,150" fill="none" strokeWidth="2" />
       </svg>
-      <svg className="cf-bg-ghost cf-bg-ghost-bl" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
-        <path d="M0,180 Q70,90 140,130 T280,80" fill="none" strokeWidth="1.5" />
-        <path d="M0,140 Q90,160 180,100 T300,130" fill="none" strokeWidth="1.5" />
-        <path d="M0,110 Q90,130 180,80 T300,100" fill="none" strokeWidth="1" opacity="0.6" />
+      <svg className="cf-bg-ghost cf-bg-ghost-bl" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden>
+        <path d="M0,150 Q100,100 200,120 T400,100" fill="none" strokeWidth="2" />
+        <path d="M0,200 Q100,150 200,170 T400,150" fill="none" strokeWidth="2" />
       </svg>
       <div className="cf-glow" aria-hidden />
 
