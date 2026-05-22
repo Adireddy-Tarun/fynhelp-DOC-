@@ -893,7 +893,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Ticker items={TICKER_DARK} dark />
+
 
       {/* PROBLEM */}
       <section className="section">
