@@ -1,10 +1,5 @@
-import Layout from "@/components/Layout";
 import HomePage from "./HomePage";
 
-const Index = () => (
-  <Layout>
-    <HomePage />
-  </Layout>
-);
+const Index = () => <HomePage />;
 
 export default Index;
