@@ -834,13 +834,19 @@ export default function HomePage() {
           <span className="section-eyebrow">✦&nbsp; 12+ LIVE INTEGRATIONS</span>
           <h2 className="fyn-h">Connect your entire financial stack.</h2>
           <p className="lead">All systems connected. One coherent view of your business.</p>
-          <div className="int-grid">
-            {INTEGRATIONS.map(([a, n]) => (
-              <div key={n} className="int-card">
-                <div className="int-abbr">{a}</div>
-                <div>
-                  <div className="int-name">{n}</div>
-                  <div className="int-status">Connected</div>
+          <div className="int-stage">
+            {[INTEGRATIONS.slice(0, 6), INTEGRATIONS.slice(6)].map((row, ri) => (
+              <div key={ri} className={`int-marquee ${ri === 1 ? "rev" : ""}`}>
+                <div className="int-track">
+                  {[...row, ...row, ...row].map(([a, n], i) => (
+                    <div key={`${ri}-${i}-${n}`} className="int-card">
+                      <div className="int-abbr">{a}</div>
+                      <div>
+                        <div className="int-name">{n}</div>
+                        <div className="int-status">Connected</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
