@@ -132,9 +132,9 @@ const STYLES = `
     box-shadow: 0 6px 20px -12px rgba(26,16,8,0.18), inset 0 1px 0 rgba(255,255,255,0.85);
     transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease; }
   .int-card:hover { transform: translateY(-4px); box-shadow: 0 18px 38px -14px rgba(184,51,58,0.25), inset 0 1px 0 rgba(255,255,255,0.95); }
-  .int-logo { width: 38px; height: 38px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  .int-logo { width: 44px; height: 44px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 6px;
     box-shadow: 0 2px 8px rgba(26,16,8,0.10), inset 0 0 0 1px rgba(26,16,8,0.05); overflow: hidden; }
-  .int-logo img { width: 26px; height: 26px; object-fit: contain; display: block; }
+  .int-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .int-logo .fallback { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, ${C.ink}, #2a1a10); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
   .int-name { font-size: 14px; font-weight: 700; color: ${C.ink}; letter-spacing: -0.01em; }
   .int-status { font-size: 11px; color: ${C.green}; display: flex; align-items: center; gap: 5px; margin-top: 3px; font-weight: 600; letter-spacing: 0.04em; }
