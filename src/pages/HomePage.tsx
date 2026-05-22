@@ -534,14 +534,15 @@ function ChatWidget() {
 }
 
 const CF_STYLES = `
-.cf-wrap { position: relative; max-width: 1100px; margin: 56px auto 0; padding: 40px 20px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 .cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.04); white-space: nowrap; }
-.cf-bg-ghost { position: absolute; width: 50%; height: 60%; opacity: 0.06; pointer-events: none; z-index: 0; }
-.cf-bg-ghost-tr { top: 0; right: 0; }
-.cf-bg-ghost-bl { bottom: 0; left: 0; transform: rotate(180deg); }
-.cf-glow { position: absolute; left: 50%; top: 50%; width: 90%; height: 90%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(169,56,56,0.08) 0%, transparent 65%); filter: blur(60px); z-index: 0; pointer-events: none; }
+.cf-bg-terms span { position: absolute; font-size: 14px; font-weight: 700; color: rgba(26,16,8,0.09); white-space: nowrap; letter-spacing: 0.02em; }
+.cf-bg-ghost { position: absolute; width: 46%; height: 52%; opacity: 0.18; pointer-events: none; z-index: 0; }
+.cf-bg-ghost-tr { top: 12px; right: 12px; }
+.cf-bg-ghost-bl { bottom: 12px; left: 12px; transform: rotate(180deg); }
+.cf-bg-ghost path { stroke: #A93838; }
+.cf-glow { position: absolute; left: 50%; top: 50%; width: 80%; height: 80%; transform: translate(-50%,-50%); background: radial-gradient(ellipse, rgba(169,56,56,0.18) 0%, rgba(169,56,56,0.06) 40%, transparent 70%); filter: blur(80px); z-index: 0; pointer-events: none; }
 
 .cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
 
