@@ -282,12 +282,12 @@ const STEPS = [
 const SIM_CHIPS = ["CREDIT TERMS", "HIRING", "PRICING", "GST REFUND DELAY", "MACHINERY PURCHASE", "WORKING CAPITAL LOAN", "SEASONAL PUSH", "M&A"];
 
 const SECURITY = [
-  { Icon: Cloud, l: "INFRASTRUCTURE", v: "AWS Mumbai" },
-  { Icon: Lock, l: "ENCRYPTION", v: "256-bit AES" },
-  { Icon: Database, l: "DATABASE", v: "PostgreSQL" },
-  { Icon: ShieldCheck, l: "COMPLIANCE", v: "Audit Trail" },
-  { Icon: EyeOff, l: "PRIVACY", v: "Zero-Knowledge" },
-  { Icon: Cloud, l: "BACKUP", v: "Daily Automated" },
+  { Icon: ShieldCheck, l: "SOC 2", d: "Actively working toward Type II. Enterprise-grade compliance with DPA standards." },
+  { Icon: Lock, l: "END-TO-END ENCRYPTION", d: "AES-256 at rest, TLS 1.3 in transit. Your data is protected at every step." },
+  { Icon: EyeOff, l: "ZERO DATA RETENTION", d: "Your data never trains models and nothing gets stored after processing." },
+  { Icon: UserIco, l: "ACCESS CONTROLS", d: "Granular, role-based permissions ensure only the right people see what they need." },
+  { Icon: Search, l: "FULL TRACEABILITY", d: "Complete audit trail with every transformation logged. Click any output to trace its source." },
+  { Icon: Database, l: "DATA OWNERSHIP", d: "You decide what happens with your data. We're just the processing layer." },
 ];
 
 const TESTIMONIALS = [
