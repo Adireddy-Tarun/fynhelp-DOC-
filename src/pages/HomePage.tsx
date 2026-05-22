@@ -923,19 +923,27 @@ export default function HomePage() {
         <div className="fyn-container" style={{ textAlign: "center" }}>
           <span className="section-eyebrow">GETTING STARTED</span>
           <h2 className="fyn-h">Your finance team in 4 steps.</h2>
-          <div className="steps-grid">
-            {STEPS.map(s => (
-              <div key={s.n} className="step-card">
-                <ArrowUpRight size={18} className="arrow" />
-                <div className="step-num">{s.n}</div>
-                <div className="step-title">{s.t}</div>
-                <div className="step-desc">{s.d}</div>
-                <div className="step-link">Learn more →</div>
-              </div>
-            ))}
+          <div className="steps-wrap">
+            <div className="steps-line" aria-hidden />
+            <div className="steps-grid">
+              {STEPS.map(s => {
+                const Icon = s.icon === "bank" ? Landmark : s.icon === "ledger" ? BookOpen : s.icon === "doc" ? FileText : Sparkles;
+                return (
+                  <div key={s.n} className="step-card">
+                    <ArrowUpRight size={18} className="arrow" />
+                    <div className="step-icon"><Icon size={26} strokeWidth={1.6} /></div>
+                    <div className="step-num">STEP {s.n}</div>
+                    <div className="step-title">{s.t}</div>
+                    <div className="step-desc">{s.d}</div>
+                    <div className="step-link">Learn more</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
+
 
       {/* SIMULATOR */}
       <section className="section">
