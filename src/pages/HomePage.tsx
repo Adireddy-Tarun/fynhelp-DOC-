@@ -275,6 +275,10 @@ const STYLES = `
   .sp-grid { position: relative; display: grid; grid-template-columns: 1fr; gap: 18px; }
   @media (min-width: 760px) { .sp-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
   @media (min-width: 1100px) { .sp-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; } }
+  .sp-grid.sp-grid-2 { grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .sp-grid.sp-grid-2 { grid-template-columns: repeat(2, 1fr); } }
+  .sp-cta { background: ${C.red} !important; color: #fff !important; padding: 14px 26px; box-shadow: 0 12px 32px -10px rgba(196,30,30,0.6); }
+  .sp-cta:hover { background: ${C.redDark} !important; }
 
   .sp-card { position: relative; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 28px 26px 24px; overflow: hidden; transition: transform 0.45s cubic-bezier(0.22,1,0.36,1), border-color 0.3s, box-shadow 0.45s; }
   .sp-card:hover { transform: translateY(-4px); border-color: rgba(196,30,30,0.4); box-shadow: 0 24px 60px -28px rgba(196,30,30,0.55); }
