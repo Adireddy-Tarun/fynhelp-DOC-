@@ -588,7 +588,7 @@ function ChatWidget() {
             <button className="cf-util" aria-label="Export"><DownloadIcon /></button>
             <button className="cf-util" aria-label="Attach"><PaperclipIcon /></button>
           </div>
-          <div className="cf-input">Ask Fynny anything about your business...</div>
+          <div className="cf-input"><TypingPlaceholder /><span className="cf-caret" /></div>
           <button className="cf-send" aria-label="Send"><SendIcon /></button>
         </div>
       </div>
