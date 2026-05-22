@@ -1,6 +1,6 @@
-import { useEffect, useState, FormEvent, ReactNode } from "react";
+import { useEffect, useMemo, useState, FormEvent, ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Play, Send, Cloud, Lock, Database, ShieldCheck, EyeOff, ArrowUpRight } from "lucide-react";
+import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco, Search, Database, ArrowUpRight } from "lucide-react";
 
 // ===== PALETTE (matches reference) =====
 const C = {
