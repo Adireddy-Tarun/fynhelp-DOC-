@@ -343,8 +343,8 @@ function Nav() {
 // ===== ChatWidget (CFO Fynny — production demo) =====
 type Frame = {
   user: string;
-  reply: React.ReactNode;
-  visual?: React.ReactNode;
+  reply: ReactNode;
+  visual?: ReactNode;
   buttons: string[];
   alert?: string;
 };
