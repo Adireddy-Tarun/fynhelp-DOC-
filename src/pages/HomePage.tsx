@@ -1,451 +1,637 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Play, Send, Cloud, Lock, Database, ShieldCheck, EyeOff, ArrowUpRight } from "lucide-react";
 
-/* ============================================================
-   FYNHelp Landing — exact spec rebuild with scroll animations
-   ============================================================ */
-
-const COLORS = {
-  beige: "#EFE8D8",
-  red: "#A93838",
-  ink: "#1A1008",
-  gray: "#6B6B6B",
-  card: "#F7F4EF",
+// ===== PALETTE (matches reference) =====
+const C = {
+  bg: "#ECE6D2",
+  card: "#FAF7EC",
+  cardSoft: "#F4EFDD",
+  ink: "#111111",
+  inkSoft: "#1A1A1A",
+  body: "#3A3A3A",
+  muted: "#6B6B6B",
+  red: "#B8333A",
+  redDark: "#9E2A30",
+  redSoft: "#F2DCDD",
+  redTint: "#FBEFEF",
+  black: "#0E0E0E",
   green: "#10B981",
+  border: "rgba(0,0,0,0.08)",
 };
 
-/* ---------- Global styles ---------- */
-const GlobalStyles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+// ===== STYLES =====
+const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  .fyn-page { background: ${C.bg}; color: ${C.ink}; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+  .fyn-page * { box-sizing: border-box; }
+  .fyn-h { font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: -0.025em; line-height: 1.02; color: ${C.ink}; }
+  .fyn-container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-    .fyn-page, .fyn-page * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-sizing: border-box; }
-    .fyn-page { background: ${COLORS.beige}; color: ${COLORS.ink}; transition: background-color 0.4s ease; overflow-x: hidden; }
+  /* Nav */
+  .fyn-nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 1180px; z-index: 50;
+    background: ${C.card}; border: 1px solid ${C.border}; border-radius: 100px; padding: 10px 14px 10px 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
+  .fyn-nav-links { display: none; gap: 28px; }
+  @media (min-width: 900px) { .fyn-nav-links { display: flex; } }
+  .fyn-nav a.fyn-nav-link { font-size: 14px; color: ${C.body}; text-decoration: none; font-weight: 500; }
+  .fyn-nav a.fyn-nav-link:hover { color: ${C.ink}; }
+  .fyn-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .fyn-logo-dot { width: 26px; height: 26px; border-radius: 50%; background: ${C.ink}; display: flex; align-items: center; justify-content: center; }
+  .fyn-logo-dot::after { content:''; width:9px; height:9px; border-radius:50%; background: ${C.red}; }
+  .fyn-logo-text { font-weight: 700; font-size: 17px; color: ${C.ink}; }
+  .fyn-logo-text span { color: ${C.red}; }
 
-    /* Reveal base */
-    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); will-change: transform, opacity; }
-    .reveal.in { opacity: 1; transform: translateY(0); }
+  .btn-pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 100px; font-weight: 600; cursor: pointer; transition: all .15s ease; text-decoration: none; }
+  .btn-red { background: ${C.red}; color: #fff; padding: 12px 22px; font-size: 14px; border: none; }
+  .btn-red:hover { background: ${C.redDark}; }
+  .btn-ghost { background: transparent; color: ${C.ink}; padding: 10px 18px; font-size: 14px; border: 1px solid transparent; }
+  .btn-ghost:hover { background: rgba(0,0,0,0.04); }
+  .btn-outline { background: ${C.card}; color: ${C.ink}; padding: 14px 26px; font-size: 15px; border: 1px solid ${C.border}; }
+  .btn-outline:hover { background: #fff; }
+  .btn-dark { background: ${C.black}; color: #fff; padding: 12px 22px; font-size: 14px; border: none; }
+  .btn-dark:hover { background: #222; }
 
-    .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); will-change: transform, opacity; }
-    .reveal-left.in { opacity: 1; transform: translateX(0); }
+  /* Hero */
+  .hero { padding: 140px 0 60px; text-align: center; }
+  .hero h1 { font-size: clamp(56px, 9vw, 116px); font-weight: 900; }
+  .hero .red-line { color: ${C.red}; }
+  .hero-sub { max-width: 720px; margin: 32px auto 0; font-size: 19px; line-height: 1.55; color: ${C.body}; }
+  .hero-sub b { color: ${C.ink}; font-weight: 700; }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; margin-top: 36px; flex-wrap: wrap; }
+  .hero-cta .btn-red { padding: 16px 30px; font-size: 16px; }
+  .hero-cta .btn-outline { padding: 16px 26px; font-size: 16px; }
 
-    .reveal-right { opacity: 0; transform: translateX(40px) scale(0.95); transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); will-change: transform, opacity; }
-    .reveal-right.in { opacity: 1; transform: translateX(0) scale(1); }
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 64px; }
+  @media (min-width: 760px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card { background: ${C.card}; border-radius: 14px; padding: 22px 26px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid ${C.border}; }
+  .stat-card .v { font-size: 36px; font-weight: 800; color: ${C.ink}; letter-spacing: -0.02em; line-height: 1; }
+  .stat-card .l { font-size: 11px; font-weight: 600; color: ${C.muted}; letter-spacing: 0.12em; margin-top: 8px; }
 
-    .reveal-scale { opacity: 0; transform: translateY(40px) scale(0.95); transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94); will-change: transform, opacity; }
-    .reveal-scale.in { opacity: 1; transform: translateY(0) scale(1); }
+  /* Chat */
+  .chat-card { background: ${C.card}; border-radius: 22px; padding: 28px; margin-top: 56px; min-height: 360px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid ${C.border}; position: relative; }
+  .chat-live { position: absolute; top: 22px; right: 22px; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; background: #E8F8EF; }
+  .chat-live::before { content:''; width: 6px; height: 6px; border-radius: 50%; background: ${C.green}; }
+  .chat-live-t { font-size: 11px; color: ${C.green}; font-weight: 600; letter-spacing: 0.06em; }
+  .chat-avatar { width: 42px; height: 42px; border-radius: 50%; background: ${C.red}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .chat-avatar::after { content:''; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+  .chat-row-user { display: flex; justify-content: center; margin: 28px 0 22px; }
+  .chat-bubble-user { background: ${C.red}; color: #fff; padding: 10px 16px; border-radius: 100px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .chat-row-bot { display: flex; gap: 14px; align-items: flex-start; margin-top: 16px; }
+  .chat-bot-content { flex: 1; background: ${C.redTint}; border: 1px solid ${C.redSoft}; border-radius: 14px; padding: 16px 20px; }
+  .chat-bot-label { font-size: 11px; color: ${C.red}; font-weight: 700; letter-spacing: 0.14em; margin-bottom: 6px; }
+  .chat-bot-text { font-size: 14.5px; color: ${C.body}; line-height: 1.55; }
+  .chat-bot-text b { color: ${C.ink}; font-weight: 600; }
+  .chat-bot-text .g { color: ${C.green}; font-weight: 600; }
+  .chat-bot-text .a { color: ${C.red}; font-weight: 600; }
+  .chat-input-row { position: absolute; bottom: 22px; right: 22px; }
+  .chat-typing { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
+  .chat-typing span { width: 5px; height: 5px; border-radius: 50%; background: ${C.green}; animation: blink 1.2s infinite; opacity: 0.4; }
+  .chat-typing span:nth-child(2) { animation-delay: .2s; }
+  .chat-typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+  .send-fab { width: 44px; height: 44px; border-radius: 50%; background: ${C.red}; border: none; display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; }
 
-    .reveal-fade { opacity: 0; transition: opacity 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .reveal-fade.in { opacity: 1; }
+  /* Ticker */
+  .ticker { overflow: hidden; padding: 14px 0; }
+  .ticker-light { background: ${C.cardSoft}; border-top: 1px solid ${C.border}; border-bottom: 1px solid ${C.border}; }
+  .ticker-dark { background: ${C.black}; }
+  .ticker-track { display: inline-flex; white-space: nowrap; animation: scroll 60s linear infinite; }
+  .ticker-light .ticker-track { animation-duration: 50s; }
+  .ticker-item { display: inline-flex; align-items: center; gap: 28px; padding-right: 28px; font-size: 14px; }
+  .ticker-light .ticker-item { color: ${C.body}; }
+  .ticker-dark .ticker-item { color: rgba(255,255,255,0.85); }
+  .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: ${C.red}; }
+  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-    @media (max-width: 767px) {
-      .reveal { transform: translateY(20px); transition-duration: 0.6s; }
-      .reveal-left { transform: translateX(-20px); transition-duration: 0.6s; }
-      .reveal-right { transform: translateX(20px) scale(0.95); transition-duration: 0.6s; }
-      .reveal-scale { transform: translateY(20px) scale(0.95); transition-duration: 0.6s; }
-    }
+  /* Section */
+  .section { padding: 100px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 100px; background: ${C.card}; border: 1px solid ${C.border}; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: ${C.ink}; }
+  .section-eyebrow.dot::before { content:''; width: 7px; height: 7px; border-radius: 50%; background: ${C.red}; }
+  .section h2 { font-size: clamp(40px, 6vw, 72px); font-weight: 800; text-align: center; margin: 20px 0 0; }
+  .section h2.left { text-align: left; }
+  .section .lead { text-align: center; color: ${C.muted}; font-size: 17px; margin-top: 16px; }
 
-    /* Marquee */
-    @keyframes fyn-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .fyn-ticker-track { display: inline-flex; white-space: nowrap; animation: fyn-marquee 40s linear infinite; }
+  /* Integrations grid */
+  .int-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
+  @media (min-width: 700px) { .int-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1000px) { .int-grid { grid-template-columns: repeat(6, 1fr); } }
+  .int-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+  .int-abbr { width: 38px; height: 38px; border-radius: 50%; background: ${C.ink}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .int-name { font-size: 14px; font-weight: 600; color: ${C.ink}; }
+  .int-status { font-size: 11px; color: ${C.green}; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .int-status::before { content:''; width: 5px; height: 5px; border-radius: 50%; background: ${C.green}; }
 
-    /* Float for hero widget */
-    @keyframes fyn-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    .fyn-float { animation: fyn-float 4s ease-in-out infinite; }
+  /* Problem */
+  .problem-card { background: ${C.card}; border-radius: 24px; padding: 64px; display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid ${C.border}; }
+  @media (min-width: 900px) { .problem-card { grid-template-columns: 1fr 1fr; } }
+  .problem-card h2 { font-size: clamp(40px, 5.5vw, 60px); text-align: left; margin: 24px 0 0; line-height: 1.05; }
+  .problem-card h2 .red { color: ${C.red}; }
+  .problem-card p { color: ${C.body}; font-size: 16px; margin-top: 24px; line-height: 1.6; }
+  .problem-stat { background: linear-gradient(135deg, #B8333A, #8E2429); border-radius: 18px; padding: 56px 32px; color: #fff; text-align: center; }
+  .problem-stat .num { font-size: 110px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+  .problem-stat .lbl { font-size: 11px; letter-spacing: 0.14em; margin-top: 10px; opacity: 0.92; font-weight: 600; }
+  .problem-stat .pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 32px; }
+  .problem-stat .pill { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 8px 12px; font-size: 12px; font-weight: 500; }
 
-    /* Typing caret */
-    @keyframes fyn-caret { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
-    .fyn-caret { display: inline-block; width: 4px; background: ${COLORS.red}; margin-left: 4px; animation: fyn-caret 0.8s steps(1) infinite; }
+  /* Steps */
+  .steps-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 16px; margin-top: 56px; }
+  @media (min-width: 700px) { .steps-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .steps-grid { grid-template-columns: repeat(4, 1fr); } }
+  .step-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 16px; padding: 28px; min-height: 200px; position: relative; transition: transform .2s ease; }
+  .step-card:hover { transform: translateY(-3px); }
+  .step-num { font-size: 12px; color: ${C.muted}; font-weight: 600; }
+  .step-card .arrow { position: absolute; top: 24px; right: 24px; color: ${C.muted}; }
+  .step-title { font-size: 20px; font-weight: 700; color: ${C.ink}; margin: 28px 0 12px; }
+  .step-desc { font-size: 14px; color: ${C.muted}; line-height: 1.5; }
+  .step-link { color: ${C.red}; font-size: 13px; font-weight: 600; margin-top: 16px; display: inline-block; }
 
-    /* Highlight bg */
-    .fyn-hl { position: relative; display: inline-block; color: ${COLORS.red}; }
-    .fyn-hl::before { content: ''; position: absolute; left: 0; bottom: 0; top: 0; width: 0; background: rgba(169,56,56,0.2); z-index: -1; transition: width 0.6s cubic-bezier(0.25,0.46,0.45,0.94) 0.3s; }
-    .fyn-hl.in::before { width: 100%; }
+  /* Simulator */
+  .sim-card { background: ${C.black}; border-radius: 24px; padding: 64px; color: #fff; display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+  @media (min-width: 900px) { .sim-card { grid-template-columns: 1fr 1fr; } }
+  .sim-eyebrow { font-size: 11px; letter-spacing: 0.18em; color: rgba(255,255,255,0.6); font-weight: 600; }
+  .sim-card h2 { color: #fff; text-align: left; font-size: clamp(40px, 5vw, 56px); margin-top: 20px; }
+  .sim-card h2 .red { color: ${C.red}; }
+  .sim-card p { color: rgba(255,255,255,0.7); margin-top: 24px; font-size: 15px; line-height: 1.6; }
+  .sim-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+  .sim-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: rgba(255,255,255,0.85); }
+  .sim-foot { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 28px; font-family: 'JetBrains Mono', monospace; }
+  .sim-panel { background: ${C.card}; border-radius: 18px; padding: 36px; min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sim-result { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 60px; }
+  .sim-result-cell { text-align: center; }
+  .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; }
+  .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 24px; cursor: pointer; }
 
-    /* Buttons */
-    .fyn-btn { transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94); cursor: pointer; border: none; font-weight: 600; }
-    .fyn-btn-primary { background: ${COLORS.red}; color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 15px; }
-    .fyn-btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 24px rgba(169,56,56,0.3); }
-    .fyn-btn-ghost { background: transparent; color: ${COLORS.ink}; padding: 14px 28px; border-radius: 10px; font-size: 15px; border: 1.5px solid rgba(26,16,8,0.2); }
-    .fyn-btn-ghost:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 24px rgba(26,16,8,0.08); background: rgba(26,16,8,0.04); }
+  /* Security */
+  .sec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
+  @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1100px) { .sec-grid { grid-template-columns: repeat(6, 1fr); } }
+  .sec-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; padding: 22px; }
+  .sec-icon { width: 40px; height: 40px; border-radius: 10px; background: ${C.redTint}; color: ${C.red}; display: flex; align-items: center; justify-content: center; }
+  .sec-label { font-size: 11px; color: ${C.muted}; letter-spacing: 0.12em; font-weight: 600; margin-top: 16px; }
+  .sec-value { font-size: 17px; font-weight: 700; color: ${C.ink}; margin-top: 6px; }
 
-    /* Cards hover */
-    .fyn-tcard { transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .fyn-tcard:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 40px rgba(26,16,8,0.12); }
-    .fyn-icard { transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .fyn-icard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26,16,8,0.08); }
+  /* Testimonials */
+  .test-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 56px; }
+  @media (min-width: 800px) { .test-grid { grid-template-columns: 1fr 1fr; } }
+  .test-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 18px; padding: 28px; }
+  .test-card.tinted { background: linear-gradient(135deg, ${C.cardSoft}, ${C.redTint}); }
+  .test-q { font-size: 17px; line-height: 1.5; color: ${C.ink}; }
+  .test-author { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+  .test-avatar { width: 38px; height: 38px; border-radius: 50%; background: ${C.ink}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .test-name { font-weight: 700; font-size: 14px; color: ${C.ink}; }
+  .test-meta { font-size: 12px; color: ${C.muted}; margin-top: 2px; }
+  .test-tag { font-size: 12px; color: ${C.red}; font-weight: 600; margin-top: 18px; }
 
-    /* Navbar */
-    .fyn-nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 100; padding: 10px 24px; border-radius: 999px; background: rgba(239,232,216,0.6); backdrop-filter: blur(0); transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94); display: flex; align-items: center; gap: 28px; }
-    .fyn-nav.scrolled { background: rgba(239,232,216,0.95); backdrop-filter: blur(12px); box-shadow: 0 2px 20px rgba(26,16,8,0.06); }
-    .fyn-nav a { color: ${COLORS.ink}; font-size: 14px; font-weight: 500; text-decoration: none; transition: opacity 0.2s; }
-    .fyn-nav a:hover { opacity: 0.7; }
+  .nums-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 32px; }
+  @media (min-width: 800px) { .nums-row { grid-template-columns: repeat(5, 1fr); } }
+  .num-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 18px; padding: 26px; text-align: center; }
+  .num-card .v { font-size: 32px; font-weight: 800; color: ${C.ink}; }
+  .num-card .l { font-size: 10px; letter-spacing: 0.18em; color: ${C.muted}; margin-top: 10px; font-weight: 600; }
 
-    /* Stagger delays via inline style or nth-child */
-    .stagger > .reveal:nth-child(1), .stagger > .reveal-scale:nth-child(1) { transition-delay: 0s; }
-    .stagger > .reveal:nth-child(2), .stagger > .reveal-scale:nth-child(2) { transition-delay: 0.1s; }
-    .stagger > .reveal:nth-child(3), .stagger > .reveal-scale:nth-child(3) { transition-delay: 0.2s; }
-    .stagger > .reveal:nth-child(4), .stagger > .reveal-scale:nth-child(4) { transition-delay: 0.3s; }
-    @media (max-width: 767px) {
-      .stagger > .reveal:nth-child(2) { transition-delay: 0.05s; }
-      .stagger > .reveal:nth-child(3) { transition-delay: 0.1s; }
-      .stagger > .reveal:nth-child(4) { transition-delay: 0.15s; }
-    }
-  `}</style>
-);
+  /* Final CTA */
+  .cta-card { background: ${C.black}; border-radius: 24px; padding: 80px 32px; text-align: center; color: #fff; }
+  .cta-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.18em; color: rgba(255,255,255,0.7); font-weight: 600; }
+  .cta-eyebrow::before { content:''; width: 7px; height: 7px; border-radius: 50%; background: ${C.red}; }
+  .cta-card h2 { color: #fff; margin: 20px 0 0; font-size: clamp(48px, 7vw, 88px); }
+  .cta-card h2 .red { color: ${C.red}; }
+  .cta-card p { color: rgba(255,255,255,0.75); font-size: 17px; margin-top: 20px; max-width: 560px; margin-left: auto; margin-right: auto; }
+  .cta-form { max-width: 560px; margin: 36px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cta-form input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 100px; padding: 14px 22px; color: #fff; font-size: 14px; outline: none; }
+  .cta-form input::placeholder { color: rgba(255,255,255,0.45); }
+  .cta-submit { grid-column: 1 / -1; background: ${C.red}; color: #fff; border: none; border-radius: 100px; padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .cta-submit:hover { background: ${C.redDark}; }
+  .cta-foot { font-size: 11px; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); margin-top: 22px; font-weight: 600; }
 
-/* ---------- Hooks ---------- */
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-fade");
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            obs.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.2 }
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-}
+  /* Footer */
+  .footer { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; padding: 56px 48px; margin: 80px auto 32px; max-width: 1180px; display: grid; grid-template-columns: 1fr; gap: 40px; }
+  @media (min-width: 900px) { .footer { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+  .footer h4 { font-size: 12px; letter-spacing: 0.16em; color: ${C.muted}; font-weight: 700; margin: 0 0 18px; }
+  .footer a, .footer li { color: ${C.ink}; font-size: 14px; text-decoration: none; line-height: 2; display: block; }
+  .footer a:hover { color: ${C.red}; }
+  .footer .desc { color: ${C.muted}; font-size: 14px; line-height: 1.6; max-width: 280px; margin-top: 14px; }
+  .footer .made { font-size: 12px; color: ${C.muted}; margin-top: 18px; }
+  .footer-bottom { max-width: 1180px; margin: 0 auto 40px; padding: 0 48px; display: flex; justify-content: space-between; font-size: 12px; color: ${C.muted}; }
 
-function useNavScroll() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return scrolled;
-}
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: translateY(0);} }
+  .fade-up { animation: fadeUp 0.7s ease both; }
+`;
 
-function useBgTransition() {
-  // Switch body bg via section observers
-  useEffect(() => {
-    const map: Record<string, string> = {
-      "sec-hero": COLORS.beige,
-      "sec-int": COLORS.beige,
-      "sec-problem": COLORS.card,
-      "sec-test": COLORS.beige,
-      "sec-cta": COLORS.beige,
-      "sec-footer": COLORS.card,
-    };
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && map[e.target.id]) {
-            const root = document.querySelector<HTMLElement>(".fyn-page");
-            if (root) root.style.backgroundColor = map[e.target.id];
-          }
-        });
-      },
-      { threshold: 0.4 }
-    );
-    Object.keys(map).forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
-  }, []);
-}
+// ===== DATA =====
+const NAV_LINKS = [
+  { label: "Products", href: "/#products" },
+  { label: "Use Cases", href: "/use-cases" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Security", href: "/security" },
+  { label: "Resources", href: "/resources" },
+  { label: "About", href: "/about" },
+];
 
-/* ---------- Components ---------- */
+const STATS = [
+  { v: "63M+", l: "INDIAN MSMES" },
+  { v: "500+", l: "CA SCENARIOS" },
+  { v: "₹0", l: "CFO COST" },
+  { v: "24/7", l: "AI ALWAYS ON" },
+];
 
+const TICKER_LIGHT = [
+  "Powered by FynHelp Intelligence",
+  "Trained on 500+ CA-verified SME scenarios",
+  "Real-time What-If Scenario Engine",
+  "GST & Tax Intelligence built-in",
+  "Connected to Indian Banks & Accounting",
+];
+
+const TICKER_DARK = [
+  "₹40,000 avg saved/month on missed deductions",
+  "4.2 months avg runway extension",
+  "Real-time cash flow across all bank accounts",
+  "Auto-detect hidden vendor charges (₹2L+/yr)",
+  "Proactive burn alerts prevent cash crises",
+  "GST ITC reconciliation saves ₹1.8L/year",
+  "30% faster month-end close",
+  "Zero GST penalties with deadline tracking",
+  "Predict cash shortfalls 60 days in advance",
+  "Know your runway in 10 seconds, not 10 days",
+  "Never miss a GST deadline with automated alerts",
+  "Track every UPI payment — no lost revenue",
+  "Cut reconciliation from 15 hours to 1 hour/month",
+];
+
+const INTEGRATIONS = [
+  ["RP", "Razorpay"], ["ZB", "Zoho Books"], ["HD", "HDFC Bank"],
+  ["IC", "ICICI Bank"], ["SB", "SBI"], ["AX", "Axis Bank"],
+  ["KT", "Kotak"], ["TL", "Tally"], ["ST", "Stripe"],
+  ["PU", "PayU"], ["GS", "GST Portal"], ["QB", "QuickBooks"],
+];
+
+const STEPS = [
+  { n: "01", t: "Connect your bank", d: "2 minutes via RBI's Account Aggregator." },
+  { n: "02", t: "Connect accounting", d: "15 minutes — we handle the mapping." },
+  { n: "03", t: "Enter your GSTIN", d: "3 minutes — instant compliance calendar." },
+  { n: "04", t: "Fynny's first brief", d: "Within minutes. Then every morning after." },
+];
+
+const SIM_CHIPS = ["CREDIT TERMS", "HIRING", "PRICING", "GST REFUND DELAY", "MACHINERY PURCHASE", "WORKING CAPITAL LOAN", "SEASONAL PUSH", "M&A"];
+
+const SECURITY = [
+  { Icon: Cloud, l: "INFRASTRUCTURE", v: "AWS Mumbai" },
+  { Icon: Lock, l: "ENCRYPTION", v: "256-bit AES" },
+  { Icon: Database, l: "DATABASE", v: "PostgreSQL" },
+  { Icon: ShieldCheck, l: "COMPLIANCE", v: "Audit Trail" },
+  { Icon: EyeOff, l: "PRIVACY", v: "Zero-Knowledge" },
+  { Icon: Cloud, l: "BACKUP", v: "Daily Automated" },
+];
+
+const TESTIMONIALS = [
+  {
+    q: "\"CFO Fynny told me I'd run out of cash in 34 days — five weeks before my CA would have even noticed. I collected from 3 clients that week and avoided a complete shutdown.\"",
+    a: "RM", n: "Rajesh Mehta", m: "Mehta Textile Traders, Surat · ₹18 Cr turnover",
+    tag: "Crisis averted · ₹24L collected · Runway +22 days", tinted: false,
+  },
+  {
+    q: "\"Our GST notice risk was 74 when we joined. Three months of ITC reconciliation brought it to 18. We recovered ₹4.2L in ITC we didn't know we were missing.\"",
+    a: "PS", n: "Priya Sharma", m: "Sharma & Sons Distributors, Pune · ₹12 Cr business",
+    tag: "₹4.2L ITC recovered · Notice risk 74 → 18", tinted: true,
+  },
+  {
+    q: "\"I used to spend 3 hours every Monday trying to understand my finances. Fynny's morning brief is 3 sentences. In Hindi. I know everything in 30 seconds.\"",
+    a: "KS", n: "Karthik Sundaram", m: "KS Engineering Components, Chennai · ₹8 Cr manufacturing",
+    tag: "12 hrs/month saved · CA relationship improved", tinted: false,
+  },
+  {
+    q: "\"Fynhelp flagged that a large corporate buyer was legally obligated to pay me within 45 days under Section 43B(h). I sent the notice. They paid within a week.\"",
+    a: "AF", n: "Anwar Farooqui", m: "Farooqui Garments Export, Tiruppur · Export · 32 employees",
+    tag: "₹6.8L collected · Section 43B(h) exercised", tinted: false,
+  },
+];
+
+const NUMS = [
+  { v: "10,000+", l: "BUSINESSES" },
+  { v: "₹2,400 Cr", l: "MONITORED" },
+  { v: "₹180 Cr", l: "ITC RECOVERED" },
+  { v: "98.7%", l: "ACCURACY" },
+  { v: "4.8★", l: "AVG RATING" },
+];
+
+// ===== Chat sequence (typed) =====
+const CHAT = {
+  user: "GST status?",
+  label: "GST INTELLIGENCE",
+  reply: <><span className="g">GSTR-1 filed</span> · GSTR-3B due in <b className="a">3 days</b>. ITC reconciliation shows <b>₹18K gap</b> vs 2A. Recommend filing by tomorrow to avoid interest.</>,
+};
+
+// ===== COMPONENTS =====
 function Nav() {
-  const scrolled = useNavScroll();
   return (
-    <nav className={`fyn-nav ${scrolled ? "scrolled" : ""}`}>
-      <span style={{ fontWeight: 800, fontSize: 16, color: COLORS.ink }}>FYN<span style={{ color: COLORS.red }}>Help</span></span>
-      <a href="#features">Features</a>
-      <a href="#integrations">Integrations</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#about">About</a>
-      <a href="/waitlist" className="fyn-btn fyn-btn-primary" style={{ padding: "8px 18px", fontSize: 13, color: "#fff" }}>Join Waitlist</a>
+    <nav className="fyn-nav">
+      <Link to="/" className="fyn-logo">
+        <div className="fyn-logo-dot" />
+        <div className="fyn-logo-text">Fyn<span>Help</span></div>
+      </Link>
+      <div className="fyn-nav-links">
+        {NAV_LINKS.map(l => <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>)}
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Demo Login</Link>
+        <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
+      </div>
     </nav>
   );
 }
 
-function TypingHeadline() {
-  const text = "Integrate it.";
-  const [count, setCount] = useState(0);
+function ChatWidget() {
+  const [phase, setPhase] = useState<"idle" | "user" | "typing" | "reply">("idle");
   useEffect(() => {
-    if (count >= text.length) return;
-    const speed = window.innerWidth < 768 ? 80 : 100;
-    const t = setTimeout(() => setCount((c) => c + 1), speed);
-    return () => clearTimeout(t);
-  }, [count]);
-  return (
-    <span style={{ color: COLORS.red, whiteSpace: "nowrap" }}>
-      {text.slice(0, count)}
-      {count < text.length && <span className="fyn-caret">&nbsp;</span>}
-    </span>
-  );
-}
-
-function HeroSection() {
-  const widgetRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (window.innerWidth < 768) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        if (widgetRef.current) {
-          const y = window.scrollY * 0.1;
-          widgetRef.current.style.setProperty("--parallax", `${-y}px`);
-        }
-      });
+    const seq = () => {
+      setPhase("user");
+      setTimeout(() => setPhase("typing"), 1200);
+      setTimeout(() => setPhase("reply"), 2400);
+      setTimeout(() => setPhase("idle"), 6000);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+    seq();
+    const i = setInterval(seq, 7500);
+    return () => clearInterval(i);
   }, []);
-
-  const badges = [
-    { t: "DPDP Act", s: "Compliant" },
-    { t: "ISO 27001", s: "Certified" },
-    { t: "SOC 2", s: "Type II" },
-    { t: "Bank Grade", s: "256-bit AES" },
-  ];
-
   return (
-    <section id="sec-hero" style={{ minHeight: "100vh", padding: "140px 24px 80px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div className="reveal" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 999, background: "rgba(169,56,56,0.08)", border: `1px solid ${COLORS.red}30`, fontSize: 12, fontWeight: 600, color: COLORS.red, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-        <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.green }} />
-        India's Virtual CFO Platform
-      </div>
-
-      <h1 style={{ fontSize: "clamp(40px, 6vw, 72px)", fontWeight: 900, lineHeight: 1.05, textAlign: "center", maxWidth: 980, marginTop: 32, color: COLORS.ink, letterSpacing: "-0.02em" }}>
-        <span className="reveal">Don't just track your data.</span>
-        <br />
-        <TypingHeadline />
-      </h1>
-
-      <p className="reveal" style={{ transitionDelay: "0.3s", fontSize: "clamp(17px, 1.5vw, 20px)", color: COLORS.gray, maxWidth: 720, textAlign: "center", marginTop: 28, lineHeight: 1.55 }}>
-        Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence. Predictive 'What-If' scenarios and instant financial clarity.
-      </p>
-
-      <div className="reveal" style={{ transitionDelay: "0.5s", display: "flex", gap: 12, marginTop: 32, flexWrap: "wrap", justifyContent: "center" }}>
-        <a href="/waitlist" className="fyn-btn fyn-btn-primary">Join the Waitlist →</a>
-        <a href="#demo" className="fyn-btn fyn-btn-ghost">Watch Demo</a>
-      </div>
-
-      {/* Chat widget */}
-      <div ref={widgetRef} className="reveal-scale fyn-float" style={{ transitionDelay: "0.4s", marginTop: 56, width: "100%", maxWidth: 620, transform: "translateY(var(--parallax,0))" }}>
-        <div style={{ background: "#fff", borderRadius: 16, boxShadow: "0 20px 60px rgba(26,16,8,0.15)", overflow: "hidden", border: "1px solid rgba(26,16,8,0.06)" }}>
-          <div style={{ background: "#F3F4F6", padding: "14px 18px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: COLORS.red, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}>F</div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.ink }}>CFO Fynny</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: COLORS.gray }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: COLORS.green }} /> Online
-              </div>
-            </div>
-          </div>
-          <div style={{ padding: 20 }}>
-            <div style={{ fontSize: 13, color: COLORS.gray, marginBottom: 10 }}>💡 Try asking:</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {["What's my current runway?", "When is my next GST deadline?", "Can I afford to hire?", "Should I extend credit?"].map((q) => (
-                <button key={q} className="fyn-btn" style={{ background: "#F3F4F6", padding: "8px 14px", borderRadius: 999, fontSize: 13, color: COLORS.ink, fontWeight: 500 }}>{q}</button>
-              ))}
-            </div>
-            <div style={{ marginTop: 16, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 12, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-              <input placeholder="Ask Fynny anything about your business..." style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: COLORS.ink }} />
-              <button className="fyn-btn" style={{ background: COLORS.red, color: "#fff", width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>→</button>
-            </div>
+    <div className="chat-card fade-up">
+      <div className="chat-live"><span className="chat-live-t">LIVE</span></div>
+      <div className="chat-avatar" style={{ position: "absolute", top: 22, left: 22 }} />
+      {(phase === "user" || phase === "typing" || phase === "reply") && (
+        <div className="chat-row-user fade-up"><div className="chat-bubble-user">📄 {CHAT.user}</div></div>
+      )}
+      {phase === "typing" && (
+        <div style={{ position: "relative", height: 40 }}>
+          <div className="chat-typing"><span /><span /><span /></div>
+        </div>
+      )}
+      {phase === "reply" && (
+        <div className="chat-row-bot fade-up" style={{ marginTop: 28 }}>
+          <div className="chat-avatar" style={{ width: 32, height: 32 }} />
+          <div className="chat-bot-content">
+            <div className="chat-bot-label">{CHAT.label}</div>
+            <div className="chat-bot-text">{CHAT.reply}</div>
           </div>
         </div>
-      </div>
-
-      {/* Trust badges */}
-      <div className="stagger" style={{ marginTop: 56, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, width: "100%", maxWidth: 800 }}>
-        {badges.map((b, i) => (
-          <div key={b.t} className="reveal" style={{ transitionDelay: `${0.7 + i * 0.1}s`, background: COLORS.card, border: "1px solid rgba(26,16,8,0.08)", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
-            <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{b.t}</div>
-            <div style={{ fontSize: 12, color: COLORS.gray, marginTop: 2 }}>{b.s}</div>
-          </div>
-        ))}
-      </div>
-    </section>
+      )}
+      <div className="chat-input-row"><button className="send-fab"><Send size={18} /></button></div>
+    </div>
   );
 }
 
 function Ticker({ items, dark }: { items: string[]; dark?: boolean }) {
-  const content = (
-    <div className="fyn-ticker-track">
-      {[...items, ...items].map((t, i) => (
-        <span key={i} style={{ display: "inline-flex", alignItems: "center", padding: "0 24px", fontSize: 14, fontWeight: 600, color: dark ? "#fff" : COLORS.ink, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-          {t}
-          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: COLORS.red, marginLeft: 24 }} />
-        </span>
-      ))}
+  const loop = [...items, ...items];
+  return (
+    <div className={`ticker ${dark ? "ticker-dark" : "ticker-light"}`}>
+      <div className="ticker-track">
+        {loop.map((t, i) => (
+          <span key={i} className="ticker-item">
+            <span className="ticker-dot" />
+            {t}
+          </span>
+        ))}
+      </div>
     </div>
   );
-  return (
-    <div style={{ background: dark ? COLORS.ink : COLORS.card, padding: "18px 0", overflow: "hidden", borderTop: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(26,16,8,0.08)"}`, borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(26,16,8,0.08)"}` }}>
-      {content}
-    </div>
-  );
 }
 
-function IntegrationsSection() {
-  const integrations = [
-    "Tally", "Zoho Books", "QuickBooks", "Razorpay", "ICICI Bank", "HDFC Bank",
-    "GST Portal", "ClearTax", "Stripe", "PayU", "SBI", "Axis Bank",
-  ];
-  return (
-    <section id="sec-int" style={{ padding: "100px 24px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
-        <div className="reveal" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, background: "rgba(26,16,8,0.06)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: COLORS.ink }}>
-          ⚙️ 12+ LIVE INTEGRATIONS
-        </div>
-        <h2 className="reveal" style={{ transitionDelay: "0.1s", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, marginTop: 20, color: COLORS.ink, letterSpacing: "-0.02em" }}>
-          Connect your entire financial stack.
-        </h2>
-        <p className="reveal" style={{ transitionDelay: "0.2s", fontSize: 18, color: COLORS.gray, marginTop: 14, maxWidth: 640, marginInline: "auto" }}>
-          All systems connected. Real-time sync. Zero manual entry.
-        </p>
-
-        <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
-          {integrations.map((name, i) => (
-            <div key={name} className="reveal fyn-icard" style={{ transitionDelay: `${0.3 + i * 0.08}s`, background: COLORS.card, border: "1px solid rgba(26,16,8,0.08)", borderRadius: 12, padding: "20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontWeight: 600, fontSize: 14, color: COLORS.ink }}>{name}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: COLORS.green, display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.green }} /> Connected
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ProblemSection() {
-  const pills = ["No real-time data", "Excel chaos", "Stale reports", "Gut decisions", "Missed GST", "Cash surprises"];
-  return (
-    <section id="sec-problem" style={{ padding: "100px 24px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div className="reveal" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, background: "rgba(169,56,56,0.1)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: COLORS.red }}>
-          🔴 THE PROBLEM
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 48, marginTop: 32, alignItems: "center" }}>
-          <div>
-            <h2 style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, lineHeight: 1.1, color: COLORS.ink, letterSpacing: "-0.02em" }}>
-              <span className="reveal-left" style={{ transitionDelay: "0.1s", display: "block" }}>India's SMEs make ₹Crore decisions with</span>
-              <span className="reveal-left fyn-hl" style={{ transitionDelay: "0.3s", marginTop: 8 }}>no financial intelligence.</span>
-            </h2>
-            <p className="reveal-left" style={{ transitionDelay: "0.7s", fontSize: 17, color: COLORS.gray, marginTop: 24, lineHeight: 1.6, maxWidth: 520 }}>
-              Manufacturers in Ludhiana, traders in Surat, distributors in Pune — running ₹10Cr+ businesses on Excel sheets and last month's books. Decisions made in the dark cost crores every year.
-            </p>
-          </div>
-
-          <div className="reveal-right" style={{ transitionDelay: "0.1s", background: COLORS.red, color: "#fff", borderRadius: 20, padding: "40px 32px", boxShadow: "0 20px 60px rgba(169,56,56,0.3)" }}>
-            <div style={{ fontSize: 96, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em" }}>98%</div>
-            <p style={{ fontSize: 17, marginTop: 12, opacity: 0.95, lineHeight: 1.5 }}>of Indian SMEs operate without real financial visibility.</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 24 }}>
-              {pills.map((p, i) => (
-                <span key={p} className="reveal" style={{ transitionDelay: `${0.5 + i * 0.05}s`, transitionDuration: "0.6s", padding: "6px 12px", borderRadius: 999, background: "rgba(255,255,255,0.15)", fontSize: 12, fontWeight: 600, border: "1px solid rgba(255,255,255,0.2)" }}>
-                  {p}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TestimonialsSection() {
-  const cards = [
-    { bg: COLORS.card, q: "Fynny told me I'd run out of cash in 34 days — 5 weeks before my CA noticed. Saved my business.", n: "Rajesh Mehta", c: "Mehta Textile Traders, Surat", tag: "₹24L collected · Runway +22 days" },
-    { bg: "#FCE8EA", q: "Recovered ₹4.2L in ITC we didn't know we were missing. Notice risk dropped from 74 to 18.", n: "Priya Sharma", c: "Sharma & Sons, Pune", tag: "₹4.2L ITC recovered" },
-    { bg: COLORS.card, q: "Morning brief is 3 sentences. In Hindi. I know everything in 30 seconds. Game changer.", n: "Karthik Sundaram", c: "KS Engineering, Chennai", tag: "12 hrs/month saved" },
-    { bg: "#fff", q: "The hiring simulator saved us from a ₹15L mistake. Best decision tool we've ever used.", n: "Vandana Kapoor", c: "Kapoor Pharma, Ahmedabad", tag: "₹15L burn avoided" },
-  ];
-  return (
-    <section id="sec-test" style={{ padding: "100px 24px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <h2 className="reveal" style={{ fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 900, color: COLORS.ink, textAlign: "center", letterSpacing: "-0.02em" }}>
-          The numbers speak. So do our customers.
-        </h2>
-        <div style={{ marginTop: 56, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
-          {cards.map((c, i) => (
-            <div key={i} className="reveal-scale fyn-tcard" style={{ transitionDelay: `${i * 0.15}s`, background: c.bg, borderRadius: 20, padding: 32, border: "1px solid rgba(26,16,8,0.06)" }}>
-              <p style={{ fontSize: 17, lineHeight: 1.55, color: COLORS.ink, fontWeight: 500 }}>"{c.q}"</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 24 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: COLORS.ink, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>{c.n.split(" ").map((s) => s[0]).join("")}</div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{c.n}</div>
-                  <div style={{ fontSize: 12, color: COLORS.gray }}>{c.c}</div>
-                </div>
-              </div>
-              <div className="reveal-fade" style={{ transitionDelay: `${i * 0.15 + 0.3}s`, marginTop: 20, display: "inline-block", padding: "6px 12px", borderRadius: 6, background: "rgba(169,56,56,0.1)", color: COLORS.red, fontSize: 12, fontWeight: 600 }}>
-                {c.tag}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FinalCTASection() {
-  return (
-    <section id="sec-cta" style={{ padding: "100px 24px" }}>
-      <div className="reveal-scale" style={{ maxWidth: 980, margin: "0 auto", background: COLORS.ink, borderRadius: 28, padding: "72px 40px", textAlign: "center", color: "#fff", boxShadow: "0 30px 80px rgba(26,16,8,0.25)" }}>
-        <h2 className="reveal" style={{ transitionDelay: "0.2s", fontSize: "clamp(32px, 4.5vw, 56px)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
-          Stop guessing. Start knowing.
-        </h2>
-        <p className="reveal" style={{ transitionDelay: "0.25s", fontSize: 18, opacity: 0.8, marginTop: 16, maxWidth: 520, marginInline: "auto" }}>
-          Join the waitlist. First 100 businesses get 6 months FREE.
-        </p>
-        <a href="/waitlist" className="reveal fyn-btn fyn-btn-primary" style={{ transitionDelay: "0.3s", display: "inline-block", marginTop: 32, padding: "16px 36px", fontSize: 16 }}>
-          Join the Waitlist →
-        </a>
-        <p className="reveal-fade" style={{ transitionDelay: "0.4s", fontSize: 13, opacity: 0.6, marginTop: 16 }}>
-          No credit card required · Launch May 2026
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer id="sec-footer" style={{ background: COLORS.card, padding: "48px 24px", borderTop: "1px solid rgba(26,16,8,0.08)" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 24, alignItems: "center" }}>
-        <span style={{ fontWeight: 800, fontSize: 16, color: COLORS.ink }}>FYN<span style={{ color: COLORS.red }}>Help</span></span>
-        <span style={{ fontSize: 13, color: COLORS.gray }}>© 2026 FYNHelp. India's Virtual CFO Platform.</span>
-      </div>
-    </footer>
-  );
-}
-
-/* ---------- Page ---------- */
+// ===== PAGE =====
 export default function HomePage() {
-  useReveal();
-  useBgTransition();
+  const navigate = useNavigate();
+  const onSubmit = (e: FormEvent) => { e.preventDefault(); navigate("/waitlist"); };
 
   return (
     <div className="fyn-page">
-      <GlobalStyles />
+      <style>{STYLES}</style>
       <Nav />
-      <HeroSection />
-      <Ticker dark items={["Real-time GST tracking", "AI-powered runway forecasts", "Instant ITC reconciliation", "What-if scenario modeling", "Bank-grade security"]} />
-      <IntegrationsSection />
-      <Ticker items={["10,000+ businesses", "₹2,400 Cr monitored", "₹180 Cr ITC recovered", "98.7% accuracy", "4.8★ rated"]} dark />
-      <ProblemSection />
-      <TestimonialsSection />
-      <FinalCTASection />
-      <Footer />
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="fyn-container">
+          <h1 className="fyn-h fade-up">
+            Don't just track your data.<br />
+            <span className="red-line">Interrogate it.</span>
+          </h1>
+          <p className="hero-sub fade-up">
+            Meet <b>CFO Fynny</b> — stop running your business on gut feeling. Start running it on intelligence. Predictive what-if scenarios and instant financial clarity.
+          </p>
+          <div className="hero-cta fade-up">
+            <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
+            <Link to="/demo/login" className="btn-pill btn-outline"><Play size={16} /> Watch Demo</Link>
+          </div>
+          <div className="stats-row fade-up">
+            {STATS.map(s => (
+              <div key={s.l} className="stat-card">
+                <div className="v">{s.v}</div>
+                <div className="l">{s.l}</div>
+              </div>
+            ))}
+          </div>
+          <ChatWidget />
+        </div>
+      </section>
+
+      <Ticker items={TICKER_LIGHT} />
+
+      {/* INTEGRATIONS */}
+      <section className="section">
+        <div className="fyn-container" style={{ textAlign: "center" }}>
+          <span className="section-eyebrow">✦&nbsp; 12+ LIVE INTEGRATIONS</span>
+          <h2 className="fyn-h">Connect your entire financial stack.</h2>
+          <p className="lead">All systems connected. One coherent view of your business.</p>
+          <div className="int-grid">
+            {INTEGRATIONS.map(([a, n]) => (
+              <div key={n} className="int-card">
+                <div className="int-abbr">{a}</div>
+                <div>
+                  <div className="int-name">{n}</div>
+                  <div className="int-status">Connected</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Ticker items={TICKER_DARK} dark />
+
+      {/* PROBLEM */}
+      <section className="section">
+        <div className="fyn-container">
+          <div className="problem-card">
+            <div>
+              <span className="section-eyebrow dot">THE PROBLEM</span>
+              <h2 className="fyn-h">India's SMEs make ₹Crore decisions with <span className="red">no financial intelligence</span>.</h2>
+              <p>Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — all making critical decisions on gut feel and a bank balance check.</p>
+              <Link to="/use-cases" className="btn-pill btn-dark" style={{ marginTop: 32 }}>See how Fynhelp fixes this <ArrowRight size={16} /></Link>
+            </div>
+            <div className="problem-stat">
+              <div className="num">98%</div>
+              <div className="lbl">OF SMES CANNOT AFFORD A CFO</div>
+              <div className="pills">
+                {["Manufacturers", "Traders", "Clinics", "Exporters", "Retailers", "Services"].map(p => (
+                  <div key={p} className="pill">{p}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STEPS */}
+      <section className="section">
+        <div className="fyn-container" style={{ textAlign: "center" }}>
+          <span className="section-eyebrow">GETTING STARTED</span>
+          <h2 className="fyn-h">Your finance team in 4 steps.</h2>
+          <div className="steps-grid">
+            {STEPS.map(s => (
+              <div key={s.n} className="step-card">
+                <ArrowUpRight size={18} className="arrow" />
+                <div className="step-num">{s.n}</div>
+                <div className="step-title">{s.t}</div>
+                <div className="step-desc">{s.d}</div>
+                <div className="step-link">Learn more →</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SIMULATOR */}
+      <section className="section">
+        <div className="fyn-container">
+          <div className="sim-card">
+            <div>
+              <div className="sim-eyebrow">DECISION SIMULATOR</div>
+              <h2 className="fyn-h">Simulate every decision <span className="red">before</span> you make it.</h2>
+              <p>Every major decision has a cash consequence. Extending credit terms. Hiring a senior engineer. Buying a new machine. Fynhelp models any scenario against your live data and shows the exact cash impact.</p>
+              <div className="sim-chips">{SIM_CHIPS.map(c => <span key={c} className="sim-chip">{c}</span>)}</div>
+              <div className="sim-foot">Built by our CA team from 500+ SME interviews</div>
+            </div>
+            <div className="sim-panel">
+              <div style={{ flex: 1 }} />
+              <div className="sim-result">
+                <div className="sim-result-cell"><div className="v">−₹25L</div></div>
+                <div className="sim-result-cell" />
+                <div className="sim-result-cell"><div className="v">HIGH</div></div>
+              </div>
+              <button className="sim-unlock">Unlock Full Analysis</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECURITY */}
+      <section className="section">
+        <div className="fyn-container" style={{ textAlign: "center" }}>
+          <span className="section-eyebrow">🛡 SECURITY & TRUST</span>
+          <h2 className="fyn-h">Enterprise-grade security.<br /><span style={{ color: C.red }}>Zero compromise.</span></h2>
+          <p className="lead">Trusted by 1000+ beta users. Your financial data deserves military-grade protection.</p>
+          <div className="sec-grid">
+            {SECURITY.map(({ Icon, l, v }) => (
+              <div key={l} className="sec-card">
+                <div className="sec-icon"><Icon size={20} /></div>
+                <div className="sec-label">{l}</div>
+                <div className="sec-value">{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="section">
+        <div className="fyn-container" style={{ textAlign: "center" }}>
+          <span className="section-eyebrow">WHAT BUSINESSES SAY</span>
+          <h2 className="fyn-h">The numbers speak.<br />So do our customers.</h2>
+          <div className="test-grid">
+            {TESTIMONIALS.map(t => (
+              <div key={t.n} className={`test-card ${t.tinted ? "tinted" : ""}`} style={{ textAlign: "left" }}>
+                <div className="test-q">{t.q}</div>
+                <div className="test-author">
+                  <div className="test-avatar">{t.a}</div>
+                  <div>
+                    <div className="test-name">{t.n}</div>
+                    <div className="test-meta">{t.m}</div>
+                  </div>
+                </div>
+                <div className="test-tag">{t.tag}</div>
+              </div>
+            ))}
+          </div>
+          <div className="nums-row">
+            {NUMS.map(n => (
+              <div key={n.l} className="num-card">
+                <div className="v">{n.v}</div>
+                <div className="l">{n.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="section" style={{ paddingBottom: 40 }}>
+        <div className="fyn-container">
+          <div className="cta-card">
+            <span className="cta-eyebrow">EARLY ACCESS</span>
+            <h2 className="fyn-h">Talk to your <span className="red">AI CFO</span>.</h2>
+            <p>Be among the first 100 businesses to get 6 months FREE access to CFO Fynny — worth ₹45,000.</p>
+            <form className="cta-form" onSubmit={onSubmit}>
+              <input type="email" placeholder="Work email *" required />
+              <input type="text" placeholder="Company name" />
+              <input type="tel" placeholder="Phone" />
+              <input type="text" placeholder="City" />
+              <button type="submit" className="cta-submit">Join the Waitlist <ArrowRight size={18} /></button>
+            </form>
+            <div className="cta-foot">NO CREDIT CARD · LAUNCH MAY 2026</div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <div className="footer">
+        <div>
+          <div className="fyn-logo">
+            <div className="fyn-logo-dot" />
+            <div className="fyn-logo-text">Fyn<span>Help</span></div>
+          </div>
+          <div className="desc">India's Virtual CFO platform. Built for SMEs, loved by founders.</div>
+          <div className="made">Made in India, for India 🇮🇳</div>
+        </div>
+        <div>
+          <h4>PRODUCT</h4>
+          <Link to="/products/liquidity">Liquidity Intelligence</Link>
+          <Link to="/products/revenue">Revenue Intelligence</Link>
+          <Link to="/products/cost">Cost Intelligence</Link>
+          <Link to="/products/gst">GST & Tax</Link>
+          <Link to="/products/governance">Governance</Link>
+          <Link to="/products/hr">HR & Workforce</Link>
+        </div>
+        <div>
+          <h4>COMPANY</h4>
+          <Link to="/about">About FynHelp</Link>
+          <Link to="/about">Our Mission</Link>
+          <Link to="/about">Founders</Link>
+          <Link to="/blog">Blog</Link>
+          <Link to="/community">Community</Link>
+          <Link to="/about">Contact</Link>
+        </div>
+        <div>
+          <h4>LEGAL</h4>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Refund Policy</a>
+          <a href="#">Cookie Policy</a>
+          <a href="#">DPDP Act</a>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>© 2026 FynHelp Technologies · Bengaluru, Karnataka, India</span>
+        <span>support@fynhelp.com</span>
+      </div>
     </div>
   );
 }
