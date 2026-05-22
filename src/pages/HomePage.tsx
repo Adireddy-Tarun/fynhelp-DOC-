@@ -449,21 +449,24 @@ function ChatWidget() {
     <div className="cf-wrap">
       <style>{CF_STYLES}</style>
       <div className="cf-bg-terms" aria-hidden>
-        {["MRR","Runway","GST","ITC","₹","Burn Rate","Cash Flow","Receivables","EBITDA","ARR","MRR","Runway","₹","GST"].map((t, i) => (
+        {["MRR","Runway","GST","ITC","₹","Burn Rate","Cash Flow","Receivables","EBITDA","ARR","TDS","P&L","Margin","CAC","LTV","Working Capital","Payables","Net Revenue","DSO","Forecast","Liquidity","NPV"].map((t, i) => (
           <span key={i} style={{
-            top: `${(i * 37) % 90 + 2}%`,
-            left: `${(i * 53) % 92 + 2}%`,
-            transform: `rotate(${((i * 7) % 11) - 5}deg)`,
+            top: `${(i * 41) % 92 + 2}%`,
+            left: `${(i * 67) % 90 + 3}%`,
+            transform: `rotate(${((i * 13) % 21) - 10}deg)`,
+            fontSize: `${11 + (i % 4) * 3}px`,
           }}>{t}</span>
         ))}
       </div>
       <svg className="cf-bg-ghost cf-bg-ghost-tr" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
-        <path d="M0,150 Q60,80 120,110 T240,70 T300,90" stroke="#A93838" fill="none" strokeWidth="1" />
-        <path d="M0,170 Q80,140 160,130 T300,110" stroke="#A93838" fill="none" strokeWidth="1" />
+        <path d="M0,150 Q60,80 120,110 T240,70 T300,90" fill="none" strokeWidth="1.5" />
+        <path d="M0,170 Q80,140 160,130 T300,110" fill="none" strokeWidth="1.5" />
+        <path d="M0,190 Q70,170 140,160 T300,140" fill="none" strokeWidth="1" opacity="0.6" />
       </svg>
       <svg className="cf-bg-ghost cf-bg-ghost-bl" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden>
-        <path d="M0,180 Q70,90 140,130 T280,80" stroke="#A93838" fill="none" strokeWidth="1" />
-        <path d="M0,140 Q90,160 180,100 T300,130" stroke="#A93838" fill="none" strokeWidth="1" />
+        <path d="M0,180 Q70,90 140,130 T280,80" fill="none" strokeWidth="1.5" />
+        <path d="M0,140 Q90,160 180,100 T300,130" fill="none" strokeWidth="1.5" />
+        <path d="M0,110 Q90,130 180,80 T300,100" fill="none" strokeWidth="1" opacity="0.6" />
       </svg>
       <div className="cf-glow" aria-hidden />
 
@@ -534,14 +537,15 @@ function ChatWidget() {
 }
 
 const CF_STYLES = `
-.cf-wrap { position: relative; max-width: 1100px; margin: 56px auto 0; padding: 40px 20px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 .cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.04); white-space: nowrap; }
-.cf-bg-ghost { position: absolute; width: 50%; height: 60%; opacity: 0.06; pointer-events: none; z-index: 0; }
-.cf-bg-ghost-tr { top: 0; right: 0; }
-.cf-bg-ghost-bl { bottom: 0; left: 0; transform: rotate(180deg); }
-.cf-glow { position: absolute; left: 50%; top: 50%; width: 90%; height: 90%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(169,56,56,0.08) 0%, transparent 65%); filter: blur(60px); z-index: 0; pointer-events: none; }
+.cf-bg-terms span { position: absolute; font-size: 14px; font-weight: 700; color: rgba(26,16,8,0.09); white-space: nowrap; letter-spacing: 0.02em; }
+.cf-bg-ghost { position: absolute; width: 46%; height: 52%; opacity: 0.18; pointer-events: none; z-index: 0; }
+.cf-bg-ghost-tr { top: 12px; right: 12px; }
+.cf-bg-ghost-bl { bottom: 12px; left: 12px; transform: rotate(180deg); }
+.cf-bg-ghost path { stroke: #A93838; }
+.cf-glow { position: absolute; left: 50%; top: 50%; width: 80%; height: 80%; transform: translate(-50%,-50%); background: radial-gradient(ellipse, rgba(169,56,56,0.18) 0%, rgba(169,56,56,0.06) 40%, transparent 70%); filter: blur(80px); z-index: 0; pointer-events: none; }
 
 .cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
 
@@ -610,6 +614,7 @@ const CF_STYLES = `
 @keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 768px) {
+  .cf-wrap { padding: 50px 16px; }
   .cf-card { min-height: 560px; border-radius: 18px; }
   .cf-header { padding: 18px 20px; }
   .cf-name { font-size: 16px; }
