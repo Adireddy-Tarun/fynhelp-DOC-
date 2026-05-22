@@ -614,6 +614,7 @@ const CF_STYLES = `
 @keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 768px) {
+  .cf-wrap { padding: 50px 16px; }
   .cf-card { min-height: 560px; border-radius: 18px; }
   .cf-header { padding: 18px 20px; }
   .cf-name { font-size: 16px; }
