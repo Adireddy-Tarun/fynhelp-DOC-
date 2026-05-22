@@ -488,7 +488,7 @@ function ChatWidget() {
           </div>
 
           {step === "typing" && (
-            <div className="cf-row cf-anim-in">
+            <div className="cf-row cf-row-fynny cf-anim-in">
               <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
               <div className="cf-bubble cf-bubble-fynny cf-typing">
                 <span /><span /><span />
