@@ -163,14 +163,17 @@ const STYLES = `
   .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; }
   .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 24px; cursor: pointer; }
 
-  /* Security */
-  .sec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 56px; }
-  @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1100px) { .sec-grid { grid-template-columns: repeat(6, 1fr); } }
-  .sec-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; padding: 22px; }
-  .sec-icon { width: 40px; height: 40px; border-radius: 10px; background: ${C.redTint}; color: ${C.red}; display: flex; align-items: center; justify-content: center; }
-  .sec-label { font-size: 11px; color: ${C.muted}; letter-spacing: 0.12em; font-weight: 600; margin-top: 16px; }
-  .sec-value { font-size: 17px; font-weight: 700; color: ${C.ink}; margin-top: 6px; }
+  /* Security — minimalist grid */
+  .sec-wrap { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; margin-top: 56px; padding: 8px; }
+  .sec-grid { display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .sec-grid { grid-template-columns: repeat(3, 1fr); } }
+  .sec-card { padding: 56px 44px 56px; border-right: 1px solid ${C.border}; border-bottom: 1px solid ${C.border}; background: transparent; text-align: left; min-height: 260px; }
+  @media (min-width: 1000px) { .sec-card:nth-child(3n) { border-right: none; } .sec-card:nth-last-child(-n+3) { border-bottom: none; } }
+  @media (min-width: 700px) and (max-width: 999px) { .sec-card:nth-child(2n) { border-right: none; } }
+  .sec-icon-line { width: 32px; height: 32px; color: ${C.ink}; opacity: 0.85; margin-bottom: 48px; }
+  .sec-label { font-size: 12px; color: ${C.muted}; letter-spacing: 0.22em; font-weight: 600; text-transform: uppercase; }
+  .sec-desc { font-size: 15px; color: ${C.ink}; line-height: 1.55; margin-top: 14px; max-width: 320px; }
 
   /* Testimonials */
   .test-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 56px; }
