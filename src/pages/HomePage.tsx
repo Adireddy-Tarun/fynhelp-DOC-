@@ -1093,25 +1093,92 @@ export default function HomePage() {
       {/* PROBLEM */}
       <section className="section">
         <div className="fyn-container">
-          <div className="problem-card">
-            <div>
-              <span className="section-eyebrow dot">THE PROBLEM</span>
-              <h2 className="fyn-h">India's SMEs make ₹Crore decisions with <span className="red">no financial intelligence</span>.</h2>
-              <p>Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — all making critical decisions on gut feel and a bank balance check.</p>
-              <Link to="/use-cases" className="btn-pill btn-dark" style={{ marginTop: 32 }}>See how Fynhelp fixes this <ArrowRight size={16} /></Link>
+          <div className="sp-wrap">
+            <div className="sp-head">
+              <span className="sp-eyebrow">THE PROBLEM</span>
+              <h2>India's SMEs make ₹Crore decisions with <em>no financial intelligence.</em></h2>
+              <p>Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — all running ₹Crore businesses on gut feel, a bank balance check, and a monthly call with the CA.</p>
             </div>
-            <div className="problem-stat">
-              <div className="num">98%</div>
-              <div className="lbl">OF SMES CANNOT AFFORD A CFO</div>
-              <div className="pills">
-                {["Manufacturers", "Traders", "Clinics", "Exporters", "Retailers", "Services"].map(p => (
-                  <div key={p} className="pill">{p}</div>
-                ))}
-              </div>
+
+            <div className="sp-grid sp-grid-2">
+              {/* 1 — Gut feel */}
+              <article className="sp-card">
+                <div className="sp-num">PAIN · 01</div>
+                <h3>"Should I hire?" is answered with a gut feel</h3>
+                <p>No runway model, no scenario math. Founders make ₹50L+ hiring calls staring at the HDFC app — and find out 3 months later it broke their cash flow.</p>
+                <div className="sp-mock">
+                  <div className="sp-mock-bar"><span className="sp-dot red" /><span className="sp-dot" /><span className="sp-dot" /></div>
+                  <div className="spm-kpi"><span className="v" style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.05em" }}>₹??.?L</span><span className="l">RUNWAY · UNKNOWN</span></div>
+                  <div className="spm-drill">
+                    <div className="spm-row" style={{ opacity: 0.5 }}><span>Cash burn this month</span><span>?</span></div>
+                    <div className="spm-row" style={{ opacity: 0.5 }}><span>Receivables overdue</span><span>?</span></div>
+                    <div className="spm-row hi"><span>↳ Gut says: "we'll manage"</span><span>🤞</span></div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 2 — CFO cost */}
+              <article className="sp-card">
+                <div className="sp-num">PAIN · 02</div>
+                <h3>A full-time CFO costs ₹45L+/year</h3>
+                <p>The salary alone rules them out for 98% of Indian SMEs. So the second-most-important seat in the company stays empty — for years.</p>
+                <div className="sp-mock">
+                  <div className="spm-match">
+                    <div className="spm-inv"><b>CFO · Salary</b>Mumbai · Sr.</div>
+                    <div className="spm-link" style={{ color: C.red }}>=</div>
+                    <div className="spm-inv" style={{ borderColor: "rgba(196,30,30,0.4)" }}><b style={{ color: C.red }}>₹45,00,000</b>per year, fixed</div>
+                  </div>
+                  <div className="spm-match">
+                    <div className="spm-inv"><b>+ ESOPs</b>2-4% equity</div>
+                    <div className="spm-link" style={{ color: C.red }}>=</div>
+                    <div className="spm-inv" style={{ borderColor: "rgba(196,30,30,0.4)" }}><b style={{ color: C.red }}>Dilution</b>before PMF</div>
+                  </div>
+                  <div style={{ marginTop: 10, fontSize: 10.5, color: "rgba(255,255,255,0.45)", letterSpacing: "0.1em", textAlign: "center" }}>OUT OF REACH FOR 6.3 CRORE MSMEs</div>
+                </div>
+              </article>
+
+              {/* 3 — Spreadsheets */}
+              <article className="sp-card">
+                <div className="sp-num">PAIN · 03</div>
+                <h3>Month-end is 40 hours of spreadsheets</h3>
+                <p>The CA sends a P&L on the 20th. Receivables live in another sheet. Bank statements in a PDF. Nothing reconciles. Nothing ties out. By the time it's clean, the month is already gone.</p>
+                <div className="sp-mock">
+                  <div className="sp-mock-bar"><span className="sp-dot" /><span className="sp-dot" /><span className="sp-dot" /><span style={{ marginLeft: "auto", fontSize: 10, color: "rgba(255,255,255,0.4)", fontFamily: "'JetBrains Mono', monospace" }}>aug-final-FINAL-v7.xlsx</span></div>
+                  <div className="spm-drill">
+                    <div className="spm-row"><span>A2  Sales · Aug</span><span>₹18,40,000</span></div>
+                    <div className="spm-row hi"><span>A3  =SUMIF(... #REF!)</span><span style={{ color: C.red }}>#ERROR</span></div>
+                    <div className="spm-row"><span>A4  GST Payable</span><span>₹??</span></div>
+                    <div className="spm-row" style={{ opacity: 0.55 }}><span>A5  Receivables</span><span>see sheet 4</span></div>
+                  </div>
+                </div>
+              </article>
+
+              {/* 4 — GST surprise */}
+              <article className="sp-card">
+                <div className="sp-num">PAIN · 04</div>
+                <h3>GST notices arrive without warning</h3>
+                <p>ITC mismatch in GSTR-2B. Late-fee penalty on 3B. ₹2-3L surprises that could've been caught the moment the invoice was booked — but weren't.</p>
+                <div className="sp-mock">
+                  <div className="spm-doc" style={{ background: "rgba(196,30,30,0.08)", border: "1px solid rgba(196,30,30,0.4)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div className="t" style={{ color: C.red }}>⚠ NOTICE · GSTR-2B Mismatch</div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", letterSpacing: "0.1em" }}>DUE 7 DAYS</div>
+                    </div>
+                    <div className="s" style={{ color: "rgba(255,255,255,0.6)" }}>FROM · gst.gov.in · AUG QUARTER</div>
+                    <div style={{ marginTop: 12, fontSize: 11.5, color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>ITC claim of <b style={{ color: "#fff" }}>₹2,84,200</b> does not match supplier filings. Reverse credit and pay penalty within 7 days or face proceedings under section 73.</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 36, position: "relative" }}>
+              <Link to="/use-cases" className="btn-pill btn-red sp-cta">See how FynHelp fixes this <ArrowRight size={16} /></Link>
             </div>
           </div>
         </div>
       </section>
+
+
 
       {/* STEPS */}
       <section className="section">
