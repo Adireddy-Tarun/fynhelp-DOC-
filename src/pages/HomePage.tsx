@@ -157,11 +157,25 @@ const STYLES = `
   .sim-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
   .sim-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: rgba(255,255,255,0.85); }
   .sim-foot { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 28px; font-family: 'JetBrains Mono', monospace; }
-  .sim-panel { background: ${C.card}; border-radius: 18px; padding: 36px; min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
-  .sim-result { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 60px; }
-  .sim-result-cell { text-align: center; }
-  .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; }
-  .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 24px; cursor: pointer; }
+  .sim-panel { background: ${C.card}; border-radius: 18px; padding: 32px; min-height: 380px; display: flex; flex-direction: column; gap: 18px; }
+  .sim-panel h3 { font-size: 18px; font-weight: 700; color: ${C.ink}; margin: 0 0 4px; }
+  .sim-row { display: flex; flex-direction: column; gap: 8px; }
+  .sim-row-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .sim-row-label { font-size: 10.5px; letter-spacing: 0.14em; font-weight: 700; color: ${C.muted}; text-transform: uppercase; }
+  .sim-row-value { font-size: 14px; font-weight: 600; color: ${C.ink}; }
+  .sim-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: #E5DFCB; border-radius: 100px; outline: none; }
+  .sim-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: ${C.red}; cursor: pointer; border: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .sim-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: ${C.red}; cursor: pointer; border: 0; }
+  .sim-divider { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 1px dashed rgba(0,0,0,0.12); }
+  .sim-divider .l { font-size: 10.5px; letter-spacing: 0.14em; font-weight: 700; color: ${C.muted}; text-transform: uppercase; }
+  .sim-divider .v { font-size: 14px; font-weight: 600; color: ${C.ink}; }
+  .sim-result { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .sim-result-cell { background: #fff; border: 1px solid ${C.redSoft}; border-radius: 12px; padding: 18px 10px; text-align: center; }
+  .sim-result-cell .v { font-size: 26px; font-weight: 800; color: ${C.red}; letter-spacing: -0.01em; line-height: 1.05; }
+  .sim-result-cell .v.gold { color: #B8860B; }
+  .sim-result-cell .l { font-size: 10px; letter-spacing: 0.16em; font-weight: 600; color: ${C.muted}; margin-top: 6px; text-transform: uppercase; }
+  .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 8px; cursor: pointer; transition: background .15s; }
+  .sim-unlock:hover { background: ${C.redDark}; }
 
   /* Security — minimalist grid */
   .sec-wrap { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; margin-top: 56px; padding: 8px; }
