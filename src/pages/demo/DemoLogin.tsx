@@ -977,16 +977,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     {[
-                      { label: "Razorpay", status: "LIVE SYNC", color: "#10B981" },
-                      { label: "Zoho Books", status: "CONNECTED", color: "#10B981" },
-                      { label: "CSV Upload", status: "READY", color: "#8B6914" },
+                      { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981" },
+                      { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981" },
+                      { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914" },
                     ].map((src, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
                         <div style={{ width: 5, height: 5, borderRadius: "50%", background: src.color, flexShrink: 0, animation: `blink ${1.8 + i * 0.6}s ease-in-out infinite` }} />
+                        <img src={src.logo} alt={src.label} style={{ height: 11, width: "auto", objectFit: "contain", flexShrink: 0, filter: "brightness(0) invert(0.85)" }} />
                         <span style={{ flex: 1, fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.55)" }}>{src.label}</span>
                         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: src.color }}>{src.status}</span>
                       </div>
                     ))}
+
                   </div>
                 </div>
               </div>
