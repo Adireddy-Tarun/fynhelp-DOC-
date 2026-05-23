@@ -815,8 +815,8 @@ const CF_STYLES = `
 .cf-row-fynny { justify-content: flex-end; flex-direction: row-reverse; margin-left: auto; }
 
 .cf-bubble { padding: 14px 18px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; }
-.cf-bubble-user { background: #F0F0F0; border-radius: 16px 16px 16px 4px; max-width: 85%; }
-.cf-bubble-fynny { background: linear-gradient(135deg, #FDF5F5, #FAEAEA); border: 1px solid rgba(169,56,56,0.12); border-radius: 16px 16px 4px 16px; max-width: 90%; }
+.cf-bubble-user { background: #f6f1e8; border: 1px solid rgba(139,105,20,0.14); border-radius: 16px 16px 16px 4px; max-width: 85%; }
+.cf-bubble-fynny { background: #fef8f8; border: 1px solid rgba(196,30,30,0.12); border-radius: 16px 16px 4px 16px; max-width: 90%; }
 .cf-bubble-fynny b { font-weight: 700; color: #A93838; font-size: 18px; }
 
 .cf-typing { display: inline-flex; gap: 6px; padding: 16px 20px; }
