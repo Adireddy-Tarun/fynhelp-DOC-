@@ -112,13 +112,15 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#1A1008",
+        background: "#100806",
         color: "#F4EDDA",
         position: "relative",
         overflow: "hidden",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}
     >
+      <CircuitLedgerBackground />
+      <div style={{ position: "relative", zIndex: 10 }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
         @keyframes orbPulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.08);opacity:.9} }
