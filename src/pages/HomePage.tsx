@@ -552,10 +552,19 @@ type Frame = {
   alert?: string;
 };
 
-const RupeeIcon = ({ size = 18, color = "#fff" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 4h12M6 9h12M7.5 4c3 0 5.5 2 5.5 5s-2.5 5-5.5 5H6l8 6" />
+const FynnyMark = ({ size = 22 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <rect x="5" y="3" width="2" height="18" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="3" width="14" height="2" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="11" width="9" height="2" rx="0.5" fill="#F4EDDA" />
+    <line x1="14" y1="12" x2="19" y2="5" stroke="#F4EDDA" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="19" cy="5" r="2" fill="#8B6914" />
   </svg>
+);
+const HamburgerBtn = () => (
+  <button className="cf-hamburger" aria-label="Open menu">
+    <span /><span /><span />
+  </button>
 );
 const UserIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -674,7 +683,8 @@ function ChatWidget() {
         {/* Header */}
         <div className="cf-header">
           <div className="cf-id">
-            <div className="cf-avatar cf-avatar-fynny cf-avatar-lg"><RupeeIcon size={22} /></div>
+            <HamburgerBtn />
+            <div className="cf-avatar cf-avatar-fynny cf-avatar-lg"><FynnyMark size={26} /></div>
             <div>
               <div className="cf-name">CFO Fynny</div>
               <div className="cf-sub">Financial Intelligence</div>
@@ -692,7 +702,7 @@ function ChatWidget() {
 
           {step === "typing" && (
             <div className="cf-row cf-row-fynny cf-anim-in">
-              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-avatar cf-avatar-fynny"><FynnyMark size={18} /></div>
               <div className="cf-bubble cf-bubble-fynny cf-typing">
                 <span /><span /><span />
               </div>
@@ -701,7 +711,7 @@ function ChatWidget() {
 
           {step === "reply" && (
             <div key={`r-${frame}`} className="cf-row cf-row-fynny cf-anim-in">
-              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-avatar cf-avatar-fynny"><FynnyMark size={18} /></div>
               <div className="cf-bubble cf-bubble-fynny">
                 {f.alert && (
                   <div className="cf-alert">
@@ -728,8 +738,10 @@ function ChatWidget() {
             <button className="cf-util" aria-label="Export"><DownloadIcon /></button>
             <button className="cf-util" aria-label="Attach"><PaperclipIcon /></button>
           </div>
-          <div className="cf-input"><TypingPlaceholder /><span className="cf-caret" /></div>
-          <button className="cf-send" aria-label="Send"><SendIcon /></button>
+          <div className="cf-input-pill">
+            <div className="cf-input"><TypingPlaceholder /><span className="cf-caret" /></div>
+            <button className="cf-send" aria-label="Send"><SendIcon /></button>
+          </div>
         </div>
       </div>
     </div>
@@ -767,7 +779,13 @@ function TypingPlaceholder() {
 }
 
 const CF_STYLES = `
-.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%); border-radius: 32px; }
+.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%), repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px); border-radius: 32px; }
+.cf-wrap::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px); border-radius: inherit; }
+.cf-hamburger { display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4.5px; width: 32px; height: 32px; padding: 0 7px; border-radius: 8px; background: transparent; border: none; cursor: pointer; transition: background 0.18s; }
+.cf-hamburger:hover { background: rgba(139,105,20,0.12); }
+.cf-hamburger span { display: block; height: 1.5px; background: #1A1008; border-radius: 1px; }
+.cf-hamburger span:nth-child(1), .cf-hamburger span:nth-child(3) { width: 18px; }
+.cf-hamburger span:nth-child(2) { width: 13px; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 .cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.01); white-space: nowrap; }
@@ -777,16 +795,16 @@ const CF_STYLES = `
 .cf-bg-ghost path { stroke: #A93838; }
 .cf-glow { position: absolute; width: 120%; height: 120%; top: -10%; left: -10%; background: radial-gradient(circle, rgba(169,56,56,0.03) 0%, transparent 70%); filter: blur(150px); z-index: 0; pointer-events: none; }
 
-.cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
+.cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; border: 1px solid rgba(26,16,8,0.12); box-shadow: 0 20px 60px rgba(26,16,8,0.12), 0 6px 18px rgba(26,16,8,0.08), 0 1px 3px rgba(26,16,8,0.06); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
 
-.cf-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid rgba(26,16,8,0.06); }
+.cf-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid rgba(26,16,8,0.10); }
 .cf-id { display: flex; align-items: center; gap: 14px; }
 .cf-name { font-weight: 700; font-size: 18px; color: #1A1008; letter-spacing: -0.01em; line-height: 1.2; }
 .cf-sub { font-weight: 500; font-size: 13px; color: #6B6B6B; margin-top: 2px; }
 
 .cf-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .cf-avatar-lg { width: 48px; height: 48px; border-radius: 12px; }
-.cf-avatar-fynny { background: linear-gradient(135deg, #A93838, #C45050); box-shadow: 0 4px 12px rgba(169,56,56,0.25); }
+.cf-avatar-fynny { background: #C41E1E; border-radius: 9px; box-shadow: 0 4px 12px rgba(196,30,30,0.28); }
 .cf-avatar-user { background: linear-gradient(135deg, #8A8A8A, #B5B5B5); }
 
 .cf-live { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 100px; background: rgba(16,185,129,0.1); color: #10B981; font-weight: 600; font-size: 13px; letter-spacing: 0.05em; }
@@ -799,8 +817,8 @@ const CF_STYLES = `
 .cf-row-fynny { justify-content: flex-end; flex-direction: row-reverse; margin-left: auto; }
 
 .cf-bubble { padding: 14px 18px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; }
-.cf-bubble-user { background: #F0F0F0; border-radius: 16px 16px 16px 4px; max-width: 85%; }
-.cf-bubble-fynny { background: linear-gradient(135deg, #FDF5F5, #FAEAEA); border: 1px solid rgba(169,56,56,0.12); border-radius: 16px 16px 4px 16px; max-width: 90%; }
+.cf-bubble-user { background: #f6f1e8; border: 1px solid rgba(139,105,20,0.14); border-radius: 16px 16px 16px 4px; max-width: 85%; }
+.cf-bubble-fynny { background: #fef8f8; border: 1px solid rgba(196,30,30,0.12); border-radius: 16px 16px 4px 16px; max-width: 90%; }
 .cf-bubble-fynny b { font-weight: 700; color: #A93838; font-size: 18px; }
 
 .cf-typing { display: inline-flex; gap: 6px; padding: 16px 20px; }
@@ -819,7 +837,7 @@ const CF_STYLES = `
 .cf-action { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #A93838; background: #fff; border: 1.5px solid rgba(169,56,56,0.25); padding: 9px 16px; border-radius: 10px; cursor: pointer; transition: transform 0.2s, background 0.2s, color 0.2s; opacity: 0; animation: cf-slide-up 0.4s forwards; }
 .cf-action:hover { transform: translateY(-2px); background: #A93838; color: #fff; border-color: #A93838; }
 
-.cf-chart { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 16px; }
+.cf-chart { background: #fff; border: 1px solid rgba(139,105,20,0.10); border-radius: 12px; padding: 16px; }
 .cf-chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
 .cf-bar-col { display: flex; align-items: flex-end; height: 100%; }
 .cf-bar { background: linear-gradient(to top, #A93838, #E87C7C); border-radius: 4px 4px 0 0; transform-origin: bottom; transform: scaleY(0); animation: cf-bar-grow 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
@@ -828,21 +846,22 @@ const CF_STYLES = `
 .cf-chart-labels span { font-size: 10px; color: #6B6B6B; text-align: center; font-weight: 500; }
 
 .cf-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cf-metric-card { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 14px 16px; opacity: 0; animation: cf-slide-up 0.5s forwards; }
+.cf-metric-card { background: #fff; border: 1px solid rgba(139,105,20,0.10); border-radius: 12px; padding: 14px 16px; opacity: 0; animation: cf-slide-up 0.5s forwards; }
 .cf-metric-label { font-size: 11px; font-weight: 600; color: #6B6B6B; text-transform: uppercase; letter-spacing: 0.05em; }
 .cf-metric-value { font-size: 20px; font-weight: 700; color: #A93838; margin-top: 6px; line-height: 1.1; }
 .cf-metric-sub { font-size: 13px; font-weight: 500; color: #6B6B6B; margin-top: 4px; }
 
-.cf-input-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(26,16,8,0.06); background: #fff; }
+.cf-input-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(26,16,8,0.10); background: #fff; }
+.cf-input-pill { flex: 1; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 16px; border-radius: 999px; background: linear-gradient(135deg, rgba(244,237,218,0.55) 0%, rgba(255,255,255,0.9) 40%, rgba(244,237,218,0.4) 100%); border: 1px solid rgba(139,105,20,0.2); box-shadow: inset 0 1px 2px rgba(26,16,8,0.06); min-width: 0; }
 .cf-utils { display: flex; gap: 6px; }
 .cf-util { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(26,16,8,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
 .cf-util:hover { background: #F5F5F3; border-color: rgba(26,16,8,0.18); }
-.cf-input { flex: 1; padding: 14px 20px; border: 1.5px solid rgba(26,16,8,0.1); border-radius: 12px; color: #6B6B6B; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cf-input { flex: 1; padding: 10px 6px; border: none; background: transparent; color: #6B6B6B; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .cf-typed { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cf-caret { display: inline-block; width: 2px; height: 1em; background: #A93838; margin-left: 2px; animation: cf-caret 1s steps(1) infinite; vertical-align: middle; }
 @keyframes cf-caret { 50% { opacity: 0; } }
-.cf-send { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #A93838, #C45050); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(169,56,56,0.3); flex-shrink: 0; }
-.cf-send:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169,56,56,0.4); }
+.cf-send { width: 40px; height: 40px; border-radius: 999px; background: #C41E1E; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(196,30,30,0.3); flex-shrink: 0; }
+.cf-send:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(196,30,30,0.4); }
 
 .cf-anim-in { animation: cf-slide-up 0.5s ease-out; }
 @keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
