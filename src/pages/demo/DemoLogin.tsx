@@ -1284,46 +1284,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             </div>
           )}
 
-          {/* ACCESS */}
-          {activeTab === "access" && !submitted && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div>
-                <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 20, fontWeight: 600, margin: 0 }}>
-                  Internal Access
-                </h2>
-                <p style={{ fontSize: 13, color: "rgba(244,237,218,0.5)", marginTop: 4 }}>
-                  For the FYNHelp team only
-                </p>
-              </div>
-
-              <div>
-                <input
-                  type="password"
-                  className="fyn-input"
-                  placeholder="Enter access password"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(false); }}
-                  onKeyDown={(e) => e.key === "Enter" && handleAccess()}
-                  style={error ? { borderColor: "rgba(239,68,68,0.4)" } : undefined}
-                  autoFocus
-                />
-                {error && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#EF4444", marginTop: 8 }}>
-                    <AlertCircle size={12} /> Incorrect password. Try again.
-                  </div>
-                )}
-              </div>
-
-              <button className="fyn-btn-primary" onClick={handleAccess} disabled={loading || !password}>
-                {loading ? "Verifying..." : <>Access Dashboard <ChevronRight size={16} /></>}
-              </button>
-
-              <div style={{ fontSize: 12, color: "rgba(244,237,218,0.4)", textAlign: "center" }}>
-                Not a team member?{" "}
-                <span className="fyn-link" onClick={() => setActiveTab("waitlist")}>Join the waitlist</span>
-              </div>
-            </div>
-          )}
+          {/* ACCESS tab removed — moved to /admin/internal-access */}
 
           {/* SUCCESS */}
           {submitted && (
