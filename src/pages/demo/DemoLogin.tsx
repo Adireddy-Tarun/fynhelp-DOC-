@@ -1307,9 +1307,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <button
                 className="fyn-back"
                 style={{ marginTop: 22 }}
-                onClick={() => { setSubmitted(false); setActiveTab("access"); }}
+                onClick={() => { setSubmitted(false); setActiveTab("waitlist"); }}
               >
-                <Lock size={12} /> Have internal access?
+                Back to waitlist
               </button>
             </div>
           )}
