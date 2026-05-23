@@ -191,7 +191,9 @@ export default function HeroSection() {
             maxWidth: 600,
             background: "#FAFAF8",
             borderRadius: 16,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+            border: "1px solid rgba(26,16,8,0.12)",
+            boxShadow:
+              "0 20px 60px rgba(0,0,0,0.35), 0 4px 12px rgba(26,16,8,0.08), 0 1px 2px rgba(26,16,8,0.06)",
             overflow: "hidden",
           }}
         >
@@ -201,24 +203,22 @@ export default function HeroSection() {
             style={{
               background: "#F3F4F6",
               padding: "16px 20px",
-              borderBottom: "1px solid #E5E7EB",
+              borderBottom: "1px solid rgba(26,16,8,0.10)",
             }}
           >
             <div className="flex items-center gap-3">
+              <HamburgerBtn />
               <div
                 className="flex items-center justify-center"
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
+                  width: 36,
+                  height: 36,
+                  borderRadius: 9,
                   background: "#C41E1E",
-                  color: "#FFFFFF",
-                  fontFamily: "'Oswald', sans-serif",
-                  fontWeight: 700,
-                  fontSize: 18,
+                  color: "#F4EDDA",
                 }}
               >
-                N
+                <FynnyMark />
               </div>
               <div>
                 <div
