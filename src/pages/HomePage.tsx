@@ -844,7 +844,7 @@ const CF_STYLES = `
 .cf-chart-labels span { font-size: 10px; color: #6B6B6B; text-align: center; font-weight: 500; }
 
 .cf-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cf-metric-card { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 14px 16px; opacity: 0; animation: cf-slide-up 0.5s forwards; }
+.cf-metric-card { background: #fff; border: 1px solid rgba(139,105,20,0.10); border-radius: 12px; padding: 14px 16px; opacity: 0; animation: cf-slide-up 0.5s forwards; }
 .cf-metric-label { font-size: 11px; font-weight: 600; color: #6B6B6B; text-transform: uppercase; letter-spacing: 0.05em; }
 .cf-metric-value { font-size: 20px; font-weight: 700; color: #A93838; margin-top: 6px; line-height: 1.1; }
 .cf-metric-sub { font-size: 13px; font-weight: 500; color: #6B6B6B; margin-top: 4px; }
