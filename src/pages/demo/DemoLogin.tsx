@@ -1175,7 +1175,6 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             {([
               { key: "waitlist" as const, label: "Join Waitlist", icon: <Users size={13} /> },
               { key: "demo" as const, label: "Book Demo", icon: <Calendar size={13} /> },
-              { key: "access" as const, label: "Access", icon: <Lock size={12} /> },
             ]).map((tab) => (
               <button
                 key={tab.key}
