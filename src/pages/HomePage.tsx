@@ -802,7 +802,7 @@ const CF_STYLES = `
 
 .cf-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .cf-avatar-lg { width: 48px; height: 48px; border-radius: 12px; }
-.cf-avatar-fynny { background: linear-gradient(135deg, #A93838, #C45050); box-shadow: 0 4px 12px rgba(169,56,56,0.25); }
+.cf-avatar-fynny { background: #C41E1E; border-radius: 9px; box-shadow: 0 4px 12px rgba(196,30,30,0.28); }
 .cf-avatar-user { background: linear-gradient(135deg, #8A8A8A, #B5B5B5); }
 
 .cf-live { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 100px; background: rgba(16,185,129,0.1); color: #10B981; font-weight: 600; font-size: 13px; letter-spacing: 0.05em; }
