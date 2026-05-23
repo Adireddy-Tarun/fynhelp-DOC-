@@ -1,6 +1,33 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Paperclip, Mic, ArrowRight } from "lucide-react";
+
+const FynnyMark = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <rect x="5" y="3" width="2" height="18" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="3" width="14" height="2" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="11" width="9" height="2" rx="0.5" fill="#F4EDDA" />
+    <line x1="14" y1="12" x2="19" y2="5" stroke="#F4EDDA" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="19" cy="5" r="2" fill="#8B6914" />
+  </svg>
+);
+
+const HamburgerBtn = () => (
+  <button
+    aria-label="Open menu"
+    className="flex flex-col items-start justify-center transition-colors"
+    style={{
+      width: 32, height: 32, borderRadius: 8, gap: 4.5,
+      padding: "0 7px", background: "transparent", border: "none", cursor: "pointer",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(139,105,20,0.12)")}
+    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+  >
+    <span style={{ width: 18, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+    <span style={{ width: 13, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+    <span style={{ width: 18, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+  </button>
+);
 import heroBg from "@/assets/hero-dashboard-bg.jpg";
 
 const SAMPLE_QUESTIONS = [
@@ -66,6 +93,16 @@ export default function HeroSection() {
             "radial-gradient(ellipse at center, rgba(26,16,8,0.45) 0%, rgba(26,16,8,0.85) 100%)",
         }}
       />
+      {/* Subtle crossed diagonal texture (behind card) */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 12px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 12px)",
+        }}
+      />
+
       <div
         aria-hidden
         className="absolute inset-0"
@@ -154,7 +191,9 @@ export default function HeroSection() {
             maxWidth: 600,
             background: "#FAFAF8",
             borderRadius: 16,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+            border: "1px solid rgba(26,16,8,0.12)",
+            boxShadow:
+              "0 20px 60px rgba(0,0,0,0.35), 0 4px 12px rgba(26,16,8,0.08), 0 1px 2px rgba(26,16,8,0.06)",
             overflow: "hidden",
           }}
         >
@@ -164,24 +203,22 @@ export default function HeroSection() {
             style={{
               background: "#F3F4F6",
               padding: "16px 20px",
-              borderBottom: "1px solid #E5E7EB",
+              borderBottom: "1px solid rgba(26,16,8,0.10)",
             }}
           >
             <div className="flex items-center gap-3">
+              <HamburgerBtn />
               <div
                 className="flex items-center justify-center"
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
+                  width: 36,
+                  height: 36,
+                  borderRadius: 9,
                   background: "#C41E1E",
-                  color: "#FFFFFF",
-                  fontFamily: "'Oswald', sans-serif",
-                  fontWeight: 700,
-                  fontSize: 18,
+                  color: "#F4EDDA",
                 }}
               >
-                N
+                <FynnyMark />
               </div>
               <div>
                 <div
@@ -271,14 +308,16 @@ export default function HeroSection() {
             style={{
               padding: "0 20px 20px",
               background: "#FFFFFF",
-              borderTop: "1px solid #F0F0F0",
+              borderTop: "1px solid rgba(26,16,8,0.10)",
             }}
           >
             <div
               className="flex items-center focus-within:!border-[#C41E1E] transition-colors"
               style={{
-                background: "#F9FAFB",
-                border: "1px solid #E5E7EB",
+                background:
+                  "linear-gradient(135deg, rgba(244,237,218,0.55) 0%, rgba(255,255,255,0.9) 40%, rgba(244,237,218,0.4) 100%)",
+                border: "1px solid rgba(139,105,20,0.2)",
+                boxShadow: "inset 0 1px 2px rgba(26,16,8,0.06)",
                 borderRadius: 12,
                 padding: "8px 12px",
                 marginTop: 16,
