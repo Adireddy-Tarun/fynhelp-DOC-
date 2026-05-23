@@ -1160,71 +1160,17 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           border: "1px solid rgba(244,237,218,0.08)", borderRadius: 18,
           padding: 22, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
         }}>
-          {/* Tabs */}
+          {/* DEMO header badge */}
           <div style={{
-            display: "flex", gap: 6, padding: 4,
-            background: "rgba(0,0,0,0.2)", borderRadius: 9, marginBottom: 22,
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "5px 10px", background: "rgba(196,30,30,0.1)",
+            border: "1px solid rgba(196,30,30,0.25)", borderRadius: 100,
+            fontSize: 11, color: "#C41E1E", fontWeight: 600, letterSpacing: "0.06em",
+            marginBottom: 18,
           }}>
-            {([
-              { key: "waitlist" as const, label: "Join Waitlist", icon: <Users size={13} /> },
-              { key: "demo" as const, label: "Book Demo", icon: <Calendar size={13} /> },
-            ]).map((tab) => (
-              <button
-                key={tab.key}
-                className="fyn-tab"
-                onClick={() => { setActiveTab(tab.key); setSubmitted(false); }}
-                style={{
-                  background: activeTab === tab.key ? "rgba(196,30,30,0.12)" : "transparent",
-                  borderColor: activeTab === tab.key ? "rgba(196,30,30,0.25)" : "transparent",
-                  color: activeTab === tab.key ? "#C41E1E" : "rgba(244,237,218,0.4)",
-                  fontWeight: activeTab === tab.key ? 600 : 400,
-                }}
-              >
-                {tab.icon}{tab.label}
-              </button>
-            ))}
+            <Calendar size={12} /> BOOK DEMO
           </div>
 
-          {/* WAITLIST */}
-          {activeTab === "waitlist" && !submitted && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div>
-                <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 20, fontWeight: 600, margin: 0 }}>
-                  Secure Your Free Access
-                </h2>
-                <p style={{ fontSize: 13, color: "rgba(244,237,218,0.5)", marginTop: 4 }}>
-                  First 1,000 founders get 6 months free. No credit card needed.
-                </p>
-              </div>
-
-              <input className="fyn-input" placeholder="Full name" value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <input className="fyn-input" type="email" placeholder="Work email" value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-              <input className="fyn-input" placeholder="Company" value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })} />
-
-              <div style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "10px 12px", background: "rgba(139,105,20,0.08)",
-                border: "1px solid rgba(139,105,20,0.2)", borderRadius: 10,
-              }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#8B6914", animation: "blink 2s ease-in-out infinite" }} />
-                <div style={{ fontSize: 12, color: "rgba(244,237,218,0.7)" }}>
-                  <strong style={{ color: "#F4EDDA" }}>247 founders</strong> on the list
-                  <span style={{ color: "rgba(244,237,218,0.45)" }}> · 753 spots remaining</span>
-                </div>
-              </div>
-
-              <button className="fyn-btn-primary" onClick={handleWaitlistSubmit} disabled={loading}>
-                {loading ? "Joining..." : <>Secure My Spot <ChevronRight size={16} /></>}
-              </button>
-
-              <div style={{ fontSize: 11, color: "rgba(244,237,218,0.4)", textAlign: "center" }}>
-                Next step: book your live demo slot
-              </div>
-            </div>
-          )}
 
           {/* DEMO */}
           {activeTab === "demo" && !submitted && (
@@ -1300,9 +1246,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <button
                 className="fyn-back"
                 style={{ marginTop: 22 }}
-                onClick={() => { setSubmitted(false); setActiveTab("waitlist"); }}
+                onClick={() => { setSubmitted(false); setActiveTab("demo"); }}
               >
-                Back to waitlist
+                Book another demo
               </button>
             </div>
           )}
