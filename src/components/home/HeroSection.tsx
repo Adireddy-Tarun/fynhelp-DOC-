@@ -308,14 +308,16 @@ export default function HeroSection() {
             style={{
               padding: "0 20px 20px",
               background: "#FFFFFF",
-              borderTop: "1px solid #F0F0F0",
+              borderTop: "1px solid rgba(26,16,8,0.10)",
             }}
           >
             <div
               className="flex items-center focus-within:!border-[#C41E1E] transition-colors"
               style={{
-                background: "#F9FAFB",
-                border: "1px solid #E5E7EB",
+                background:
+                  "linear-gradient(135deg, rgba(244,237,218,0.55) 0%, rgba(255,255,255,0.9) 40%, rgba(244,237,218,0.4) 100%)",
+                border: "1px solid rgba(139,105,20,0.2)",
+                boxShadow: "inset 0 1px 2px rgba(26,16,8,0.06)",
                 borderRadius: 12,
                 padding: "8px 12px",
                 marginTop: 16,
