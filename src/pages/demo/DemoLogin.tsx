@@ -9,7 +9,7 @@ import {
 
 const DEMO_PASSWORD = "fynhelp2026";
 
-type Tab = "waitlist" | "demo" | "access";
+type Tab = "waitlist" | "demo";
 
 function DemoGate({ onAccess }: { onAccess: () => void }) {
   const [password, setPassword] = useState("");
