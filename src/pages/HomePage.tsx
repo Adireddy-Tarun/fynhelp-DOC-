@@ -856,7 +856,7 @@ const CF_STYLES = `
 .cf-utils { display: flex; gap: 6px; }
 .cf-util { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(26,16,8,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
 .cf-util:hover { background: #F5F5F3; border-color: rgba(26,16,8,0.18); }
-.cf-input { flex: 1; padding: 14px 20px; border: 1.5px solid rgba(26,16,8,0.1); border-radius: 12px; color: #6B6B6B; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cf-input { flex: 1; padding: 10px 6px; border: none; background: transparent; color: #6B6B6B; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .cf-typed { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cf-caret { display: inline-block; width: 2px; height: 1em; background: #A93838; margin-left: 2px; animation: cf-caret 1s steps(1) infinite; vertical-align: middle; }
 @keyframes cf-caret { 50% { opacity: 0; } }
