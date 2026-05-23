@@ -1,6 +1,33 @@
 import { useState, useRef, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Paperclip, Mic, ArrowRight } from "lucide-react";
+
+const FynnyMark = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <rect x="5" y="3" width="2" height="18" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="3" width="14" height="2" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="11" width="9" height="2" rx="0.5" fill="#F4EDDA" />
+    <line x1="14" y1="12" x2="19" y2="5" stroke="#F4EDDA" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="19" cy="5" r="2" fill="#8B6914" />
+  </svg>
+);
+
+const HamburgerBtn = () => (
+  <button
+    aria-label="Open menu"
+    className="flex flex-col items-start justify-center transition-colors"
+    style={{
+      width: 32, height: 32, borderRadius: 8, gap: 4.5,
+      padding: "0 7px", background: "transparent", border: "none", cursor: "pointer",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(139,105,20,0.12)")}
+    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+  >
+    <span style={{ width: 18, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+    <span style={{ width: 13, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+    <span style={{ width: 18, height: 1.5, background: "#1A1008", borderRadius: 1 }} />
+  </button>
+);
 import heroBg from "@/assets/hero-dashboard-bg.jpg";
 
 const SAMPLE_QUESTIONS = [
