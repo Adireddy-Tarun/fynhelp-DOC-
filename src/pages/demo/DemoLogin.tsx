@@ -843,18 +843,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         position: "relative", zIndex: 5, maxWidth: 480, margin: "0 auto",
         padding: "80px 24px 48px", display: "flex", flexDirection: "column", alignItems: "center",
       }}>
-        {/* Logo */}
-        <div style={fade(0)}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "8px 14px", background: "rgba(196,30,30,0.1)",
-            border: "1px solid rgba(196,30,30,0.25)", borderRadius: 100,
-            fontSize: 12, color: "#C41E1E", fontWeight: 600, letterSpacing: "0.06em",
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C41E1E", animation: "blink 2s ease-in-out infinite" }} />
-            FYNHELP
-          </div>
-        </div>
+        {/* Header logo pill removed per request */}
+
 
         {/* Headline */}
         <div style={{ ...fade(0.1), textAlign: "center", marginTop: 24 }}>
