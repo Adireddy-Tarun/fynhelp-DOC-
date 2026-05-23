@@ -27,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin"] },
   { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin"] },
   { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/internal-access", label: "Internal Access", icon: Lock, roles: ["super_admin","ops_admin"] },
   { divider: true },
   { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst"] },
 ];
