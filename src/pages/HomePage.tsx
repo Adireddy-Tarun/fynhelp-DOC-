@@ -702,7 +702,7 @@ function ChatWidget() {
 
           {step === "typing" && (
             <div className="cf-row cf-row-fynny cf-anim-in">
-              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-avatar cf-avatar-fynny"><FynnyMark size={18} /></div>
               <div className="cf-bubble cf-bubble-fynny cf-typing">
                 <span /><span /><span />
               </div>
@@ -711,7 +711,7 @@ function ChatWidget() {
 
           {step === "reply" && (
             <div key={`r-${frame}`} className="cf-row cf-row-fynny cf-anim-in">
-              <div className="cf-avatar cf-avatar-fynny"><RupeeIcon size={16} /></div>
+              <div className="cf-avatar cf-avatar-fynny"><FynnyMark size={18} /></div>
               <div className="cf-bubble cf-bubble-fynny">
                 {f.alert && (
                   <div className="cf-alert">
