@@ -466,9 +466,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg,rgba(139,105,20,0.4),transparent)" }} />
             </div>
             {[
-              { label: "Razorpay", status: "LIVE SYNC", color: "#10B981", dotColor: "#10B981", delay: "1.8s" },
-              { label: "Zoho Books", status: "CONNECTED", color: "#10B981", dotColor: "#10B981", delay: "2.4s" },
-              { label: "CSV Upload", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
+              { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981", dotColor: "#10B981", delay: "1.8s" },
+              { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981", dotColor: "#10B981", delay: "2.4s" },
+              { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
             ].map((src, i) => (
               <div
                 key={i}
@@ -495,12 +495,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     animation: `blink ${src.delay} ease-in-out infinite`,
                   }}
                 />
+                <img
+                  src={src.logo}
+                  alt={src.label}
+                  style={{ height: 14, width: "auto", objectFit: "contain", flexShrink: 0, filter: "brightness(0) invert(0.85)" }}
+                />
                 <span style={{ flex: 1, fontFamily: "'Instrument Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "rgba(244,237,218,0.7)" }}>
                   {src.label}
                 </span>
                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "8px", color: src.color }}>{src.status}</span>
               </div>
             ))}
+
           </div>
         </div>
       </div>
@@ -843,18 +849,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         position: "relative", zIndex: 5, maxWidth: 480, margin: "0 auto",
         padding: "80px 24px 48px", display: "flex", flexDirection: "column", alignItems: "center",
       }}>
-        {/* Logo */}
-        <div style={fade(0)}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "8px 14px", background: "rgba(196,30,30,0.1)",
-            border: "1px solid rgba(196,30,30,0.25)", borderRadius: 100,
-            fontSize: 12, color: "#C41E1E", fontWeight: 600, letterSpacing: "0.06em",
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C41E1E", animation: "blink 2s ease-in-out infinite" }} />
-            FYNHELP
-          </div>
-        </div>
+        {/* Header logo pill removed per request */}
+
 
         {/* Headline */}
         <div style={{ ...fade(0.1), textAlign: "center", marginTop: 24 }}>
@@ -981,16 +977,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     {[
-                      { label: "Razorpay", status: "LIVE SYNC", color: "#10B981" },
-                      { label: "Zoho Books", status: "CONNECTED", color: "#10B981" },
-                      { label: "CSV Upload", status: "READY", color: "#8B6914" },
+                      { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981" },
+                      { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981" },
+                      { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914" },
                     ].map((src, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
                         <div style={{ width: 5, height: 5, borderRadius: "50%", background: src.color, flexShrink: 0, animation: `blink ${1.8 + i * 0.6}s ease-in-out infinite` }} />
+                        <img src={src.logo} alt={src.label} style={{ height: 11, width: "auto", objectFit: "contain", flexShrink: 0, filter: "brightness(0) invert(0.85)" }} />
                         <span style={{ flex: 1, fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.55)" }}>{src.label}</span>
                         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: src.color }}>{src.status}</span>
                       </div>
                     ))}
+
                   </div>
                 </div>
               </div>
