@@ -683,7 +683,8 @@ function ChatWidget() {
         {/* Header */}
         <div className="cf-header">
           <div className="cf-id">
-            <div className="cf-avatar cf-avatar-fynny cf-avatar-lg"><RupeeIcon size={22} /></div>
+            <HamburgerBtn />
+            <div className="cf-avatar cf-avatar-fynny cf-avatar-lg"><FynnyMark size={26} /></div>
             <div>
               <div className="cf-name">CFO Fynny</div>
               <div className="cf-sub">Financial Intelligence</div>
