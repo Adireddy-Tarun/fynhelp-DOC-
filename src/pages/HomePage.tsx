@@ -860,8 +860,8 @@ const CF_STYLES = `
 .cf-typed { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cf-caret { display: inline-block; width: 2px; height: 1em; background: #A93838; margin-left: 2px; animation: cf-caret 1s steps(1) infinite; vertical-align: middle; }
 @keyframes cf-caret { 50% { opacity: 0; } }
-.cf-send { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #A93838, #C45050); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(169,56,56,0.3); flex-shrink: 0; }
-.cf-send:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169,56,56,0.4); }
+.cf-send { width: 40px; height: 40px; border-radius: 999px; background: #C41E1E; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(196,30,30,0.3); flex-shrink: 0; }
+.cf-send:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(196,30,30,0.4); }
 
 .cf-anim-in { animation: cf-slide-up 0.5s ease-out; }
 @keyframes cf-slide-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
