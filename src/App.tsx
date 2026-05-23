@@ -136,6 +136,7 @@ const App = () => (
               <Route path="communications" element={<AdminCommunicationsPage />} />
               <Route path="feature-flags" element={<AdminFeatureFlagsPage />} />
               <Route path="system-health" element={<AdminSystemHealthPage />} />
+              <Route path="internal-access" element={<AdminInternalAccessPage />} />
             </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
