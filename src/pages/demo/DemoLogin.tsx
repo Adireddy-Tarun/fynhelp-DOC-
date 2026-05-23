@@ -466,9 +466,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg,rgba(139,105,20,0.4),transparent)" }} />
             </div>
             {[
-              { label: "Razorpay", status: "LIVE SYNC", color: "#10B981", dotColor: "#10B981", delay: "1.8s" },
-              { label: "Zoho Books", status: "CONNECTED", color: "#10B981", dotColor: "#10B981", delay: "2.4s" },
-              { label: "CSV Upload", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
+              { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981", dotColor: "#10B981", delay: "1.8s" },
+              { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981", dotColor: "#10B981", delay: "2.4s" },
+              { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
             ].map((src, i) => (
               <div
                 key={i}
@@ -495,12 +495,18 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     animation: `blink ${src.delay} ease-in-out infinite`,
                   }}
                 />
+                <img
+                  src={src.logo}
+                  alt={src.label}
+                  style={{ height: 14, width: "auto", objectFit: "contain", flexShrink: 0, filter: "brightness(0) invert(0.85)" }}
+                />
                 <span style={{ flex: 1, fontFamily: "'Instrument Sans', sans-serif", fontSize: "12px", fontWeight: 500, color: "rgba(244,237,218,0.7)" }}>
                   {src.label}
                 </span>
                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "8px", color: src.color }}>{src.status}</span>
               </div>
             ))}
+
           </div>
         </div>
       </div>
