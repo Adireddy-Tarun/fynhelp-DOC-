@@ -777,7 +777,13 @@ function TypingPlaceholder() {
 }
 
 const CF_STYLES = `
-.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%); border-radius: 32px; }
+.cf-wrap { position: relative; max-width: 1280px; margin: 56px auto 0; padding: 90px 80px; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; isolation: isolate; background: linear-gradient(135deg, #FAFAF8 0%, #F4EDDA 50%, #EFE8D8 100%), repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px); border-radius: 32px; }
+.cf-wrap::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 14px); border-radius: inherit; }
+.cf-hamburger { display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4.5px; width: 32px; height: 32px; padding: 0 7px; border-radius: 8px; background: transparent; border: none; cursor: pointer; transition: background 0.18s; }
+.cf-hamburger:hover { background: rgba(139,105,20,0.12); }
+.cf-hamburger span { display: block; height: 1.5px; background: #1A1008; border-radius: 1px; }
+.cf-hamburger span:nth-child(1), .cf-hamburger span:nth-child(3) { width: 18px; }
+.cf-hamburger span:nth-child(2) { width: 13px; }
 .cf-wrap, .cf-wrap * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
 .cf-bg-terms { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .cf-bg-terms span { position: absolute; font-size: 11px; font-weight: 600; color: rgba(26,16,8,0.01); white-space: nowrap; }
