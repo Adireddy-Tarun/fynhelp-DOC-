@@ -552,10 +552,19 @@ type Frame = {
   alert?: string;
 };
 
-const RupeeIcon = ({ size = 18, color = "#fff" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 4h12M6 9h12M7.5 4c3 0 5.5 2 5.5 5s-2.5 5-5.5 5H6l8 6" />
+const FynnyMark = ({ size = 22 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <rect x="5" y="3" width="2" height="18" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="3" width="14" height="2" rx="0.5" fill="#F4EDDA" />
+    <rect x="5" y="11" width="9" height="2" rx="0.5" fill="#F4EDDA" />
+    <line x1="14" y1="12" x2="19" y2="5" stroke="#F4EDDA" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="19" cy="5" r="2" fill="#8B6914" />
   </svg>
+);
+const HamburgerBtn = () => (
+  <button className="cf-hamburger" aria-label="Open menu">
+    <span /><span /><span />
+  </button>
 );
 const UserIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
