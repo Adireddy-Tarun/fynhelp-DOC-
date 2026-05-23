@@ -849,7 +849,8 @@ const CF_STYLES = `
 .cf-metric-value { font-size: 20px; font-weight: 700; color: #A93838; margin-top: 6px; line-height: 1.1; }
 .cf-metric-sub { font-size: 13px; font-weight: 500; color: #6B6B6B; margin-top: 4px; }
 
-.cf-input-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(26,16,8,0.06); background: #fff; }
+.cf-input-row { display: flex; align-items: center; gap: 12px; padding: 20px 28px; border-top: 1px solid rgba(26,16,8,0.10); background: #fff; }
+.cf-input-pill { flex: 1; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 16px; border-radius: 999px; background: linear-gradient(135deg, rgba(244,237,218,0.55) 0%, rgba(255,255,255,0.9) 40%, rgba(244,237,218,0.4) 100%); border: 1px solid rgba(139,105,20,0.2); box-shadow: inset 0 1px 2px rgba(26,16,8,0.06); min-width: 0; }
 .cf-utils { display: flex; gap: 6px; }
 .cf-util { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid rgba(26,16,8,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
 .cf-util:hover { background: #F5F5F3; border-color: rgba(26,16,8,0.18); }
