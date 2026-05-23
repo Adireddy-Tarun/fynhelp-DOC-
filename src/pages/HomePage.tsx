@@ -811,8 +811,8 @@ const CF_STYLES = `
 .cf-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; animation: cf-pulse 1.6s infinite; }
 @keyframes cf-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
 
-.cf-chat { flex: 1; overflow-y: auto; padding: 32px; background: #fff; display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.cf-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; max-width: 640px; margin: 0 auto; }
+.cf-chat { flex: 1; overflow-y: auto; padding: 32px; background: #fff; display: flex; flex-direction: column; gap: 18px; }
+.cf-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; }
 .cf-row-user { justify-content: flex-end; flex-direction: row-reverse; }
 .cf-row-fynny { justify-content: flex-start; flex-direction: row; }
 
