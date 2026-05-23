@@ -93,6 +93,16 @@ export default function HeroSection() {
             "radial-gradient(ellipse at center, rgba(26,16,8,0.45) 0%, rgba(26,16,8,0.85) 100%)",
         }}
       />
+      {/* Subtle crossed diagonal texture (behind card) */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 12px), repeating-linear-gradient(-45deg, rgba(139,105,20,0.035) 0 1px, transparent 1px 12px)",
+        }}
+      />
+
       <div
         aria-hidden
         className="absolute inset-0"
