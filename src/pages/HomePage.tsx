@@ -813,7 +813,7 @@ const CF_STYLES = `
 
 .cf-chat { flex: 1; overflow-y: auto; padding: 32px; background: #fff; display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .cf-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; max-width: 640px; margin: 0 auto; }
-.cf-row-user { justify-content: flex-start; flex-direction: row; }
+.cf-row-user { justify-content: flex-end; flex-direction: row-reverse; }
 .cf-row-fynny { justify-content: flex-start; flex-direction: row; }
 
 .cf-bubble { padding: 14px 18px; font-size: 16px; font-weight: 500; line-height: 1.6; color: #1A1008; }
