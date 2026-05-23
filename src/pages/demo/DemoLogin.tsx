@@ -1285,7 +1285,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
             </svg>
             <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "15px", letterSpacing: "0.08em", color: "#F4EDDA" }}>
-              Waitlist Member Benefits
+              Early Access Benefits
             </span>
             <div style={{ marginLeft: "auto" }}>
               <div
@@ -1300,7 +1300,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                 }}
               >
                 <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#C41E1E", animation: "blink 2s ease-in-out infinite" }} />
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#C41E1E" }}>753 SPOTS LEFT</span>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#C41E1E" }}>LIMITED SLOTS</span>
               </div>
             </div>
           </div>
