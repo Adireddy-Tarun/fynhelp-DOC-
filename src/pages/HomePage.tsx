@@ -835,7 +835,7 @@ const CF_STYLES = `
 .cf-action { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #A93838; background: #fff; border: 1.5px solid rgba(169,56,56,0.25); padding: 9px 16px; border-radius: 10px; cursor: pointer; transition: transform 0.2s, background 0.2s, color 0.2s; opacity: 0; animation: cf-slide-up 0.4s forwards; }
 .cf-action:hover { transform: translateY(-2px); background: #A93838; color: #fff; border-color: #A93838; }
 
-.cf-chart { background: #fff; border: 1px solid rgba(26,16,8,0.06); border-radius: 12px; padding: 16px; }
+.cf-chart { background: #fff; border: 1px solid rgba(139,105,20,0.10); border-radius: 12px; padding: 16px; }
 .cf-chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
 .cf-bar-col { display: flex; align-items: flex-end; height: 100%; }
 .cf-bar { background: linear-gradient(to top, #A93838, #E87C7C); border-radius: 4px 4px 0 0; transform-origin: bottom; transform: scaleY(0); animation: cf-bar-grow 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
