@@ -9,13 +9,13 @@ import {
 
 const DEMO_PASSWORD = "fynhelp2026";
 
-type Tab = "waitlist" | "demo";
+type Tab = "demo";
 
 function DemoGate({ onAccess }: { onAccess: () => void }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("waitlist");
+  const [activeTab, setActiveTab] = useState<Tab>("demo");
   const [formData, setFormData] = useState({ name: "", email: "", company: "", role: "" });
   const [submitted, setSubmitted] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -75,13 +75,6 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     }
   };
 
-  const handleWaitlistSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.company) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
-    setActiveTab("demo");
-  };
 
   const handleDemoSubmit = async () => {
     if (!formData.name || !formData.email || !formData.company) return;

@@ -1050,7 +1050,7 @@ export default function HomePage() {
           </p>
           <div className="hero-cta fade-up">
             <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
-            <a href="https://calendly.com/nidhi-fynhelp/30min" target="_blank" rel="noopener noreferrer" className="btn-pill btn-outline"><Calendar size={16} /> Book Demo</a>
+            <a href="/demo/login" className="btn-pill btn-outline"><Calendar size={16} /> Book Demo</a>
           </div>
           <ChatWidget />
         </div>
