@@ -6,6 +6,7 @@ import {
   Clock, Zap, BarChart2, PieChart, Activity, IndianRupee,
   Building2, UserCheck, Bell, Target, Mail,
 } from "lucide-react";
+import CircuitLedgerBackground from "@/components/demo/CircuitLedgerBackground";
 
 const DEMO_PASSWORD = "fynhelp2026";
 
