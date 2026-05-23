@@ -875,24 +875,6 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </p>
         </div>
 
-        {/* Stats */}
-        <div style={{ ...fade(0.2), display: "flex", gap: 10, width: "100%", marginTop: 28 }}>
-          {[
-            { icon: <Building2 size={14} color="#8B6914" />, value: "63M+", label: "Indian MSMEs" },
-            { icon: <Target size={14} color="#8B6914" />, value: "5", label: "Intel Modules" },
-            { icon: <Zap size={14} color="#8B6914" />, value: "Free", label: "During Beta" },
-          ].map((s) => (
-            <div key={s.label} style={{
-              flex: 1, background: "rgba(244,237,218,0.03)",
-              border: "1px solid rgba(244,237,218,0.06)", borderRadius: 12,
-              padding: "14px 10px", textAlign: "center",
-            }}>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>{s.icon}</div>
-              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 18, fontWeight: 700, color: "#F4EDDA" }}>{s.value}</div>
-              <div style={{ fontSize: 11, color: "rgba(244,237,218,0.45)", marginTop: 2 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
 
         {/* MOBILE/TABLET PLATFORM STRIP */}
         {(isTablet || isMobile) && (
