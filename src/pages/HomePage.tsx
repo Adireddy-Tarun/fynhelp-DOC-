@@ -526,6 +526,137 @@ const NUMS = [
 ];
 
 // ===== COMPONENTS =====
+function ProductsMenu() {
+  const [open, setOpen] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 767px)");
+    const upd = () => setMobile(m.matches);
+    upd();
+    m.addEventListener("change", upd);
+    return () => m.removeEventListener("change", upd);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, []);
+
+  const handleEnter = () => { if (mobile) return; clearTimeout(closeTimer.current); setOpen(true); };
+  const handleLeave = () => { if (mobile) return; clearTimeout(closeTimer.current); closeTimer.current = setTimeout(() => setOpen(false), 200); };
+
+  const go = (href: string) => { setOpen(false); if (href.startsWith("/#")) { navigate("/"); setTimeout(() => { const el = document.getElementById(href.slice(2)); el?.scrollIntoView({ behavior: "smooth" }); }, 50); } else navigate(href); };
+
+  return (
+    <div ref={wrapRef} className="fyn-products-wrap" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ position: "relative" }}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="fyn-nav-link"
+        style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Sora', 'Inter', sans-serif", fontWeight: 500, fontSize: 14, padding: 0 }}
+      >
+        Products
+        <ChevronDown size={13} style={{ transition: "transform 0.25s", transform: open ? "rotate(180deg)" : "none" }} />
+      </button>
+
+      {open && (
+        <>
+          {mobile && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", zIndex: 999 }} />}
+          <div
+            role="menu"
+            className="fyn-products-panel-anim"
+            style={mobile ? {
+              position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#1A1008",
+              zIndex: 1000, overflowY: "auto", padding: "72px 20px 32px",
+            } : {
+              position: "absolute", top: "calc(100% + 14px)", left: "50%", transform: "translateX(-50%)",
+              width: "min(820px, 92vw)", background: "#1A1008",
+              backgroundImage: "linear-gradient(180deg, #1F0E07 0%, #1A1008 100%)",
+              border: "1px solid rgba(244,237,218,0.08)", borderRadius: 16,
+              boxShadow: "0 24px 64px rgba(0,0,0,0.5)", padding: "22px 24px 24px", zIndex: 1000,
+            }}
+          >
+            {mobile && (
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, width: 40, height: 40, borderRadius: 999, border: "1px solid rgba(244,237,218,0.08)", background: "rgba(244,237,218,0.04)", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <XIcon size={18} />
+              </button>
+            )}
+            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.5, color: "rgba(244,237,218,0.55)", textTransform: "uppercase", marginBottom: 14 }}>
+              Intelligence Suites
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 4 }}>
+              {SUITES.map((s, i) => {
+                const Icon = s.Icon;
+                const isLive = s.status === "live";
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => go(s.href)}
+                    className="fyn-prod-row"
+                    style={{
+                      display: "flex", alignItems: "flex-start", gap: 12, width: "100%",
+                      padding: "10px 12px", borderRadius: 10, background: "transparent",
+                      border: "none", borderLeft: "2px solid transparent", cursor: "pointer",
+                      textAlign: "left", transition: "background 180ms, border-color 180ms",
+                      animation: `fyn-prod-in 200ms ease-out ${i * 0.03}s both`,
+                    }}
+                  >
+                    <div style={{ width: 34, height: 34, flexShrink: 0, borderRadius: 9, background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Icon size={17} color="#F4EDDA" strokeWidth={1.8} />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3, minWidth: 0, flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 13.5, color: "#F4EDDA", lineHeight: 1.25 }}>
+                        <span>{s.name}</span>
+                        {isLive ? (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(8,40,24,0.85)", border: "1px solid rgba(26,158,100,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontSize: 9, fontWeight: 500, color: "rgba(26,158,100,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
+                            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(26,158,100,0.95)", boxShadow: "0 0 5px rgba(26,158,100,0.7)", animation: "fyn-prod-pulse 1.4s ease-in-out infinite" }} />
+                            Live
+                          </span>
+                        ) : (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(139,105,20,0.12)", border: "1px solid rgba(139,105,20,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontSize: 9, fontWeight: 500, color: "rgba(139,105,20,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
+                            <Clock size={9} />
+                            Soon
+                          </span>
+                        )}
+                      </div>
+                      <p style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontWeight: 300, fontSize: 11.5, color: "rgba(244,237,218,0.55)", lineHeight: 1.45 }}>
+                        {s.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <style>{`
+            .fyn-prod-row:hover { background: rgba(244,237,218,0.04) !important; border-left-color: #C41E1E !important; }
+            .fyn-products-panel-anim { animation: fyn-prod-fade 200ms ease-out; }
+            @keyframes fyn-prod-fade { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+            @keyframes fyn-prod-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes fyn-prod-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
+            @media (max-width: 767px) { .fyn-products-panel-anim { animation: fyn-prod-fade-m 220ms ease-out; } @keyframes fyn-prod-fade-m { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } } }
+          `}</style>
+        </>
+      )}
+    </div>
+  );
+}
+
 function Nav() {
   return (
     <nav className="fyn-nav">
@@ -534,7 +665,10 @@ function Nav() {
         <div className="fyn-logo-text">Fyn<span>Help</span></div>
       </Link>
       <div className="fyn-nav-links">
-        {NAV_LINKS.map(l => <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>)}
+        {NAV_LINKS.map(l => l.label === "Products"
+          ? <ProductsMenu key="products" />
+          : <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>
+        )}
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
