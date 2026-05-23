@@ -1424,6 +1424,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           Built for Indian founders · AI-powered · Free during beta
         </div>
       </div>
+      </div>
     </div>
   );
 }
