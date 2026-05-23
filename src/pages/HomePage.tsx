@@ -793,9 +793,9 @@ const CF_STYLES = `
 .cf-bg-ghost path { stroke: #A93838; }
 .cf-glow { position: absolute; width: 120%; height: 120%; top: -10%; left: -10%; background: radial-gradient(circle, rgba(169,56,56,0.03) 0%, transparent 70%); filter: blur(150px); z-index: 0; pointer-events: none; }
 
-.cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(26,16,8,0.12); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
+.cf-card { position: relative; z-index: 1; background: #fff; border-radius: 24px; border: 1px solid rgba(26,16,8,0.12); box-shadow: 0 20px 60px rgba(26,16,8,0.12), 0 6px 18px rgba(26,16,8,0.08), 0 1px 3px rgba(26,16,8,0.06); display: flex; flex-direction: column; min-height: 640px; max-height: 720px; overflow: hidden; }
 
-.cf-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid rgba(26,16,8,0.06); }
+.cf-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 32px; border-bottom: 1px solid rgba(26,16,8,0.10); }
 .cf-id { display: flex; align-items: center; gap: 14px; }
 .cf-name { font-weight: 700; font-size: 18px; color: #1A1008; letter-spacing: -0.01em; line-height: 1.2; }
 .cf-sub { font-weight: 500; font-size: 13px; color: #6B6B6B; margin-top: 2px; }
