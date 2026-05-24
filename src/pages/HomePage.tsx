@@ -1307,6 +1307,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <MobileProductsSection />
+
       <Ticker items={TICKER_LIGHT} />
 
       {/* INTEGRATIONS */}
