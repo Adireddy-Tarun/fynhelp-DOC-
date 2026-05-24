@@ -34,7 +34,7 @@ const STYLES = `
     background: ${C.card}; border: 1px solid ${C.border}; border-radius: 100px; padding: 10px 14px 10px 22px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
   .fyn-nav-links { display: none; gap: 28px; }
-  @media (min-width: 900px) { .fyn-nav-links { display: flex; } }
+  @media (min-width: 769px) { .fyn-nav-links { display: flex; } }
   .fyn-nav a.fyn-nav-link { font-size: 14px; color: ${C.body}; text-decoration: none; font-weight: 500; }
   .fyn-nav a.fyn-nav-link:hover { color: ${C.ink}; }
   .fyn-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
