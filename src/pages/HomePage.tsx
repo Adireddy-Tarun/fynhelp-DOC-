@@ -580,11 +580,8 @@ function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
           {mobile && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", zIndex: 999 }} />}
           <div
             role="menu"
-            className="fyn-products-panel-anim"
-            style={mobile ? {
-              position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#1A1008",
-              zIndex: 1000, overflowY: "auto", padding: "72px 20px 32px",
-            } : {
+            className={mobile ? "fyn-products-sheet" : "fyn-products-panel-anim fyn-products-panel"}
+            style={mobile ? undefined : {
               position: "absolute", top: "calc(100% + 14px)", left: "50%", transform: "translateX(-50%)",
               width: "min(820px, 92vw)", background: "#1A1008",
               backgroundImage: "linear-gradient(180deg, #1F0E07 0%, #1A1008 100%)",
@@ -593,14 +590,17 @@ function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
             }}
           >
             {mobile && (
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close" style={{ position: "absolute", top: 16, right: 16, width: 40, height: 40, borderRadius: 999, border: "1px solid rgba(244,237,218,0.08)", background: "rgba(244,237,218,0.04)", color: "#F4EDDA", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <XIcon size={18} />
-              </button>
+              <>
+                <div aria-hidden style={{ width: 32, height: 4, borderRadius: 999, background: "rgba(244,237,218,0.2)", margin: "12px auto" }} />
+                <button type="button" onClick={() => setOpen(false)} aria-label="Close" style={{ position: "absolute", top: 12, right: 16, width: 36, height: 36, borderRadius: 999, border: "none", background: "transparent", color: "#F4EDDA", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                  <XIcon size={20} />
+                </button>
+              </>
             )}
-            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.5, color: "rgba(244,237,218,0.55)", textTransform: "uppercase", marginBottom: 14 }}>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.5, color: "rgba(244,237,218,0.55)", textTransform: "uppercase", padding: mobile ? "4px 20px 14px" : 0, marginBottom: mobile ? 0 : 14 }}>
               Intelligence Suites
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 4 }}>
+            <div className="fyn-prod-grid" style={{ padding: mobile ? "0 16px 24px" : 0 }}>
               {SUITES.map((s, i) => {
                 const Icon = s.Icon;
                 const isLive = s.status === "live";
@@ -611,10 +611,11 @@ function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
                     onClick={() => go(s.href)}
                     className="fyn-prod-row"
                     style={{
-                      display: "flex", alignItems: "flex-start", gap: 12, width: "100%",
-                      padding: "10px 12px", borderRadius: 10, background: "transparent",
+                      display: "flex", alignItems: "center", gap: 12, width: "100%",
+                      minHeight: mobile ? 56 : undefined,
+                      padding: mobile ? "14px 14px" : "10px 12px", borderRadius: 10, background: "transparent",
                       border: "none", borderLeft: "2px solid transparent", cursor: "pointer",
-                      textAlign: "left", transition: "background 180ms, border-color 180ms",
+                      textAlign: "left", transition: "background 150ms ease, border-color 150ms ease",
                       animation: `fyn-prod-in 200ms ease-out ${i * 0.03}s both`,
                     }}
                   >
@@ -622,39 +623,66 @@ function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
                       <Icon size={17} color="#F4EDDA" strokeWidth={1.8} />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3, minWidth: 0, flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 13.5, color: "#F4EDDA", lineHeight: 1.25 }}>
+                      <div className="fyn-prod-title" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontFamily: "'Sora', sans-serif", fontWeight: 600, color: "#F4EDDA", lineHeight: 1.25 }}>
                         <span>{s.name}</span>
                         {isLive ? (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(8,40,24,0.85)", border: "1px solid rgba(26,158,100,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontSize: 9, fontWeight: 500, color: "rgba(26,158,100,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
+                          <span className="fyn-prod-badge" style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(8,40,24,0.85)", border: "1px solid rgba(26,158,100,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontWeight: 500, color: "rgba(26,158,100,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
                             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(26,158,100,0.95)", boxShadow: "0 0 5px rgba(26,158,100,0.7)", animation: "fyn-prod-pulse 1.4s ease-in-out infinite" }} />
                             Live
                           </span>
                         ) : (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(139,105,20,0.12)", border: "1px solid rgba(139,105,20,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontSize: 9, fontWeight: 500, color: "rgba(139,105,20,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
+                          <span className="fyn-prod-badge" style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(139,105,20,0.12)", border: "1px solid rgba(139,105,20,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontWeight: 500, color: "rgba(139,105,20,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
                             <Clock size={9} />
                             Soon
                           </span>
                         )}
                       </div>
-                      <p style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontWeight: 300, fontSize: 11.5, color: "rgba(244,237,218,0.55)", lineHeight: 1.45 }}>
+                      <p className="fyn-prod-desc" style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontWeight: 300, color: "rgba(244,237,218,0.55)", lineHeight: 1.45 }}>
                         {s.description}
                       </p>
                     </div>
+                    {mobile && (
+                      <span aria-hidden style={{ color: "rgba(244,237,218,0.3)", flexShrink: 0, fontSize: 20, lineHeight: 1 }}>›</span>
+                    )}
                   </button>
                 );
               })}
             </div>
           </div>
           <style>{`
-            .fyn-prod-row:hover { background: rgba(244,237,218,0.04) !important; border-left-color: #C41E1E !important; }
+            .fyn-prod-row:hover { background: rgba(244,237,218,0.05) !important; border-left-color: #C41E1E !important; }
             .fyn-products-panel-anim { animation: fyn-prod-fade 200ms ease-out; }
+            .fyn-prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+            .fyn-prod-title { font-size: 13.5px; }
+            .fyn-prod-desc { font-size: 11.5px; }
+            .fyn-prod-badge { font-size: 9px; }
             @keyframes fyn-prod-fade { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
             @keyframes fyn-prod-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
             @keyframes fyn-prod-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
-            @media (max-width: 767px) { .fyn-products-panel-anim { animation: fyn-prod-fade-m 220ms ease-out; } @keyframes fyn-prod-fade-m { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } } }
+            @media (min-width: 769px) and (max-width: 1024px) {
+              .fyn-products-panel { width: calc(100vw - 40px) !important; max-width: 100% !important; padding: 22px 20px 24px !important; }
+              .fyn-prod-grid { grid-template-columns: 1fr 1fr !important; }
+              .fyn-prod-row { padding: 20px 16px !important; }
+              .fyn-prod-title { font-size: 15px !important; }
+              .fyn-prod-desc { font-size: 12px !important; }
+              .fyn-prod-badge { font-size: 10px !important; }
+            }
+            @media (max-width: 768px) {
+              .fyn-products-sheet {
+                position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
+                background: #1A1008; height: 85vh; overflow-y: auto;
+                border-radius: 16px 16px 0 0; border-top: 1px solid rgba(244,237,218,0.1);
+                animation: fyn-sheet-up 250ms ease-out;
+              }
+              .fyn-prod-grid { grid-template-columns: 1fr !important; gap: 2px !important; }
+              .fyn-prod-title { font-size: 15px !important; }
+              .fyn-prod-desc { font-size: 12px !important; }
+            }
+            @keyframes fyn-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
           `}</style>
         </>
       )}
+
     </div>
   );
 }
