@@ -526,7 +526,7 @@ const NUMS = [
 ];
 
 // ===== COMPONENTS =====
-function ProductsMenu() {
+function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -534,7 +534,7 @@ function ProductsMenu() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const m = window.matchMedia("(max-width: 767px)");
+    const m = window.matchMedia("(max-width: 768px)");
     const upd = () => setMobile(m.matches);
     upd();
     m.addEventListener("change", upd);
@@ -557,7 +557,9 @@ function ProductsMenu() {
   const handleEnter = () => { if (mobile) return; clearTimeout(closeTimer.current); setOpen(true); };
   const handleLeave = () => { if (mobile) return; clearTimeout(closeTimer.current); closeTimer.current = setTimeout(() => setOpen(false), 200); };
 
-  const go = (href: string) => { setOpen(false); if (href.startsWith("/#")) { navigate("/"); setTimeout(() => { const el = document.getElementById(href.slice(2)); el?.scrollIntoView({ behavior: "smooth" }); }, 50); } else navigate(href); };
+  // All product cards route to /waitlist
+  const go = (_href: string) => { setOpen(false); onNavigate?.(); navigate("/waitlist"); };
+
 
   return (
     <div ref={wrapRef} className="fyn-products-wrap" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ position: "relative" }}>
