@@ -688,25 +688,111 @@ function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
 }
 
 function Nav() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDrawerOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+  useEffect(() => {
+    if (drawerOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [drawerOpen]);
+
   return (
-    <nav className="fyn-nav">
-      <Link to="/" className="fyn-logo">
-        <div className="fyn-logo-dot" />
-        <div className="fyn-logo-text">Fyn<span>Help</span></div>
-      </Link>
-      <div className="fyn-nav-links">
-        {NAV_LINKS.map(l => l.label === "Products"
-          ? <ProductsMenu key="products" />
-          : <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>
-        )}
-      </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
-        <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
-      </div>
-    </nav>
+    <>
+      <nav className="fyn-nav">
+        <Link to="/" className="fyn-logo">
+          <div className="fyn-logo-dot" />
+          <div className="fyn-logo-text">Fyn<span>Help</span></div>
+        </Link>
+        <div className="fyn-nav-links">
+          {NAV_LINKS.map(l => l.label === "Products"
+            ? <ProductsMenu key="products" />
+            : <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>
+          )}
+        </div>
+        {/* Desktop CTAs (≥1025px) */}
+        <div className="fyn-nav-cta-desktop" style={{ gap: 8, alignItems: "center" }}>
+          <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
+          <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
+        </div>
+        {/* Tablet CTAs (769-1024px) */}
+        <div className="fyn-nav-cta-tablet" style={{ gap: 8, alignItems: "center" }}>
+          <Link to="/demo/login" style={{ display: "inline-flex", alignItems: "center", border: "1px solid rgba(26,16,8,0.25)", background: "transparent", color: "#1A1008", padding: "8px 16px", fontSize: 13, borderRadius: 20, textDecoration: "none", fontFamily: "'Sora', sans-serif", fontWeight: 600 }}>Try Demo</Link>
+          <Link to="/waitlist" style={{ display: "inline-flex", alignItems: "center", background: "#C41E1E", color: "#F4EDDA", padding: "8px 18px", fontSize: 13, borderRadius: 20, textDecoration: "none", fontFamily: "'Sora', sans-serif", fontWeight: 600 }}>Join Waitlist</Link>
+        </div>
+        {/* Mobile hamburger (≤768px) */}
+        <button
+          type="button"
+          className="fyn-mobile-hamburger"
+          aria-label="Open menu"
+          aria-expanded={drawerOpen}
+          onClick={() => setDrawerOpen(true)}
+        >
+          <span /><span /><span />
+        </button>
+      </nav>
+
+      {drawerOpen && (
+        <>
+          <div onClick={() => setDrawerOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998 }} />
+          <aside className="fyn-mobile-drawer" role="dialog" aria-modal="true">
+            <button type="button" onClick={() => setDrawerOpen(false)} aria-label="Close menu" style={{ position: "absolute", top: 18, right: 18, background: "transparent", border: "none", color: "#F4EDDA", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36 }}>
+              <XIcon size={22} />
+            </button>
+            <div style={{ marginTop: 56, display: "flex", flexDirection: "column" }}>
+              {NAV_LINKS.map(l => (
+                <Link
+                  key={l.label}
+                  to={l.href.startsWith("/#") ? "/" : l.href}
+                  onClick={() => setDrawerOpen(false)}
+                  style={{ display: "block", padding: "16px 0", borderBottom: "1px solid rgba(244,237,218,0.08)", color: "#F4EDDA", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 18, textDecoration: "none" }}
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <Link to="/demo/login" onClick={() => setDrawerOpen(false)} style={{ display: "block", padding: "16px 0", borderBottom: "1px solid rgba(244,237,218,0.08)", color: "#F4EDDA", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 18, textDecoration: "none" }}>
+                Try Demo
+              </Link>
+              <Link to="/waitlist" onClick={() => setDrawerOpen(false)} style={{ display: "block", marginTop: 24, background: "#C41E1E", color: "#F4EDDA", padding: 14, borderRadius: 6, textAlign: "center", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 16, textDecoration: "none" }}>
+                Join Waitlist
+              </Link>
+            </div>
+          </aside>
+        </>
+      )}
+
+      <style>{`
+        .fyn-nav-cta-desktop { display: none; }
+        .fyn-nav-cta-tablet { display: none; }
+        .fyn-mobile-hamburger {
+          display: inline-flex; flex-direction: column; justify-content: center; gap: 4.5px;
+          width: 32px; height: 32px; padding: 0 7px; background: transparent; border: none; cursor: pointer;
+        }
+        .fyn-mobile-hamburger span { display: block; width: 18px; height: 1.5px; background: #1A1008; border-radius: 1px; }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .fyn-nav-cta-tablet { display: inline-flex; }
+          .fyn-mobile-hamburger { display: none; }
+        }
+        @media (min-width: 1025px) {
+          .fyn-nav-cta-desktop { display: inline-flex; }
+          .fyn-mobile-hamburger { display: none; }
+        }
+        .fyn-mobile-drawer {
+          position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px;
+          background: #1A1008; z-index: 999; padding: 32px 24px;
+          animation: fyn-drawer-in 250ms ease-out;
+        }
+        @keyframes fyn-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @media (min-width: 769px) { .fyn-mobile-drawer { display: none; } }
+      `}</style>
+    </>
   );
 }
+
+
 
 // ===== ChatWidget (CFO Fynny — production demo) =====
 type Frame = {
