@@ -28,7 +28,17 @@ const Navbar = () => {
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
+  const resourcesCloseTimer = useRef<ReturnType<typeof setTimeout>>();
   const location = useLocation();
+
+  const openResources = () => {
+    clearTimeout(resourcesCloseTimer.current);
+    setResourcesOpen(true);
+  };
+  const scheduleCloseResources = () => {
+    clearTimeout(resourcesCloseTimer.current);
+    resourcesCloseTimer.current = setTimeout(() => setResourcesOpen(false), 600);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -92,8 +102,8 @@ const Navbar = () => {
             <div
               ref={resourcesRef}
               className="relative py-6"
-              onMouseEnter={() => setResourcesOpen(true)}
-              onMouseLeave={() => setResourcesOpen(false)}
+              onMouseEnter={openResources}
+              onMouseLeave={scheduleCloseResources}
             >
               <button
                 onClick={() => setResourcesOpen((v) => !v)}

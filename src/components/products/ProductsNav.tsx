@@ -37,7 +37,7 @@ export default function ProductsNav({
   };
   const handleLeave = () => {
     clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpen(false), 220);
+    closeTimer.current = setTimeout(() => setOpen(false), 600);
   };
 
   useEffect(() => {
