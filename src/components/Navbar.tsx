@@ -102,8 +102,8 @@ const Navbar = () => {
             <div
               ref={resourcesRef}
               className="relative py-6"
-              onMouseEnter={() => setResourcesOpen(true)}
-              onMouseLeave={() => setResourcesOpen(false)}
+              onMouseEnter={openResources}
+              onMouseLeave={scheduleCloseResources}
             >
               <button
                 onClick={() => setResourcesOpen((v) => !v)}
