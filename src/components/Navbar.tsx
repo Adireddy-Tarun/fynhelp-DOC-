@@ -39,7 +39,6 @@ const Navbar = () => {
     clearTimeout(resourcesCloseTimer.current);
     resourcesCloseTimer.current = setTimeout(() => setResourcesOpen(false), 600);
   };
-  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
