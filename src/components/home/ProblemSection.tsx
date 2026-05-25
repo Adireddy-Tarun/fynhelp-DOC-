@@ -139,12 +139,40 @@ export default function ProblemSection() {
             color: "#FFFFFF",
             fontSize: "clamp(26px, 3vw, 38px)",
             lineHeight: 1.2,
-            marginBottom: 40,
-            maxWidth: 760,
+            marginBottom: 20,
+            maxWidth: 820,
           }}
         >
-          India's SMEs are making ₹Crore decisions with no financial intelligence.
+          Your business is growing. Your financial visibility isn't.
         </h2>
+
+        <p
+          style={{
+            fontFamily: "'Roboto', sans-serif",
+            fontSize: "clamp(15px, 1.2vw, 18px)",
+            lineHeight: 1.7,
+            color: "rgba(255,255,255,0.75)",
+            marginBottom: 16,
+            maxWidth: 820,
+          }}
+        >
+          Cash flow confusion, GST chaos, delayed numbers, payment uncertainty,
+          scattered spreadsheets, and zero forecasting.
+        </p>
+
+        <p
+          style={{
+            fontFamily: "'Roboto', sans-serif",
+            fontSize: "clamp(15px, 1.2vw, 18px)",
+            lineHeight: 1.7,
+            color: "rgba(255,255,255,0.9)",
+            marginBottom: 40,
+            maxWidth: 820,
+          }}
+        >
+          FynHelp gives businesses a real-time AI CFO layer for complete
+          financial clarity and smarter decisions.
+        </p>
 
         {/* Carousel */}
         <div
