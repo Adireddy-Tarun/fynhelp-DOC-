@@ -28,6 +28,17 @@ const Navbar = () => {
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
+  const resourcesCloseTimer = useRef<ReturnType<typeof setTimeout>>();
+  const location = useLocation();
+
+  const openResources = () => {
+    clearTimeout(resourcesCloseTimer.current);
+    setResourcesOpen(true);
+  };
+  const scheduleCloseResources = () => {
+    clearTimeout(resourcesCloseTimer.current);
+    resourcesCloseTimer.current = setTimeout(() => setResourcesOpen(false), 600);
+  };
   const location = useLocation();
 
   useEffect(() => {
