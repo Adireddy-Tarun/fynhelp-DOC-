@@ -86,9 +86,6 @@ export default function HowItWorksSection() {
                       <p className="text-white/55 text-sm leading-relaxed pt-3 border-t border-white/10" style={{ fontFamily: "'Roboto', sans-serif" }}>{s.detail}</p>
                     </div>
 
-                    <button className="text-fyn-red text-xs font-medium mt-2">
-                      {expanded === i ? "Show less" : "Learn more →"}
-                    </button>
                   </div>
                 </div>
               );
