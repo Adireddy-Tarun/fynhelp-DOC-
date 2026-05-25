@@ -1474,7 +1474,7 @@ export default function HomePage() {
                     <div className="step-num">STEP {s.n}</div>
                     <div className="step-title">{s.t}</div>
                     <div className="step-desc">{s.d}</div>
-                    <div className="step-link">Learn more</div>
+                    
                   </div>
                 );
               })}
