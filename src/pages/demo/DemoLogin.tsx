@@ -113,7 +113,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#100806",
+        background: "#1A1008",
         color: "#F4EDDA",
         position: "relative",
         overflow: "hidden",
@@ -170,7 +170,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           transition: background .2s, transform .15s, box-shadow .2s;
         }
         .fyn-btn-primary:hover:not(:disabled) {
-          background: #A01818; transform: translateY(-2px);
+          background: #a51818; transform: translateY(-2px);
           box-shadow: 0 8px 24px rgba(196,30,30,0.3);
         }
         .fyn-btn-primary:disabled { opacity: .35; cursor: not-allowed; }
@@ -270,7 +270,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         <div
           style={{
             width: "210px",
-            background: "#140d04",
+            background: "#1F0E07",
             border: "1px solid rgba(244,237,218,0.07)",
             borderRadius: "18px",
             overflow: "hidden",
@@ -352,7 +352,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                 </div>
               </div>
               <div>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "26px", color: "#10B981" }}>100%</div>
+                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "26px", color: "#C9A84C" }}>100%</div>
                 <div style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "11px", color: "rgba(244,237,218,0.4)", lineHeight: 1.5 }}>
                   Compliance<br />verified
                 </div>
@@ -364,12 +364,12 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     gap: "5px",
                     padding: "3px 9px",
                     borderRadius: "100px",
-                    background: "rgba(16,185,129,0.1)",
-                    border: "1px solid rgba(16,185,129,0.2)",
+                    background: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.2)",
                   }}
                 >
-                  <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#10B981" }}>Secure</span>
+                  <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#C9A84C", animation: "blink 2s ease-in-out infinite" }} />
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#C9A84C" }}>Secure</span>
                 </div>
               </div>
             </div>
@@ -381,7 +381,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             ].map((row, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: i < 2 ? "7px" : 0 }}>
                 <div style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "11px", fontWeight: 500, color: "rgba(244,237,218,0.55)" }}>{row.label}</div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", color: "#10B981" }}>{row.status}</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", color: "#C9A84C" }}>{row.status}</div>
               </div>
             ))}
           </div>
@@ -391,7 +391,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         <div
           style={{
             width: "210px",
-            background: "#140d04",
+            background: "#1F0E07",
             border: "1px solid rgba(244,237,218,0.07)",
             borderRadius: "18px",
             overflow: "hidden",
@@ -466,8 +466,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg,rgba(139,105,20,0.4),transparent)" }} />
             </div>
             {[
-              { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981", dotColor: "#10B981", delay: "1.8s" },
-              { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981", dotColor: "#10B981", delay: "2.4s" },
+              { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#C9A84C", dotColor: "#C9A84C", delay: "1.8s" },
+              { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#C9A84C", dotColor: "#C9A84C", delay: "2.4s" },
               { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
             ].map((src, i) => (
               <div
@@ -532,7 +532,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         <div
           style={{
             width: "218px",
-            background: "#140d04",
+            background: "#1F0E07",
             border: "1px solid rgba(244,237,218,0.07)",
             borderRadius: "18px",
             overflow: "hidden",
@@ -660,7 +660,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         <div
           style={{
             width: "218px",
-            background: "#140d04",
+            background: "#1F0E07",
             border: "1px solid rgba(244,237,218,0.07)",
             borderRadius: "18px",
             overflow: "hidden",
@@ -705,12 +705,12 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   gap: "5px",
                   padding: "3px 8px",
                   borderRadius: "100px",
-                  background: "rgba(16,185,129,0.1)",
-                  border: "1px solid rgba(16,185,129,0.2)",
+                  background: "rgba(201,168,76,0.1)",
+                  border: "1px solid rgba(201,168,76,0.2)",
                 }}
               >
-                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#10B981" }}>ONLINE</span>
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#C9A84C", animation: "blink 2s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: "10px", fontWeight: 600, color: "#C9A84C" }}>ONLINE</span>
               </div>
             </div>
             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "28px", lineHeight: 0.95, color: "#F4EDDA", marginBottom: "12px" }}>
@@ -918,7 +918,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   minWidth: isMobile ? 200 : 220,
                   flexShrink: 0,
                   scrollSnapAlign: "start",
-                  background: "#140d04",
+                  background: "#1F0E07",
                   border: "1px solid rgba(244,237,218,0.07)",
                   borderRadius: 14,
                   overflow: "hidden",
@@ -930,9 +930,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)" }}>
                       Infrastructure
                     </div>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
-                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981", fontWeight: 600 }}>SECURE</span>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#C9A84C", animation: "blink 2s ease-in-out infinite" }} />
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#C9A84C", fontWeight: 600 }}>SECURE</span>
                     </div>
                   </div>
                   <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
@@ -947,7 +947,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     ].map((row, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
                         <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 10.5, color: "rgba(244,237,218,0.5)" }}>{row.label}</span>
-                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981" }}>{row.status}</span>
+                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#C9A84C" }}>{row.status}</span>
                       </div>
                     ))}
                   </div>
@@ -960,7 +960,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   minWidth: isMobile ? 200 : 220,
                   flexShrink: 0,
                   scrollSnapAlign: "start",
-                  background: "#140d04",
+                  background: "#1F0E07",
                   border: "1px solid rgba(244,237,218,0.07)",
                   borderRadius: 14,
                   overflow: "hidden",
@@ -977,8 +977,8 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     {[
-                      { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#10B981" },
-                      { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#10B981" },
+                      { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#C9A84C" },
+                      { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#C9A84C" },
                       { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914" },
                     ].map((src, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
@@ -999,7 +999,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   minWidth: isMobile ? 200 : 220,
                   flexShrink: 0,
                   scrollSnapAlign: "start",
-                  background: "#140d04",
+                  background: "#1F0E07",
                   border: "1px solid rgba(244,237,218,0.07)",
                   borderRadius: 14,
                   overflow: "hidden",
@@ -1060,7 +1060,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   minWidth: isMobile ? 200 : 220,
                   flexShrink: 0,
                   scrollSnapAlign: "start",
-                  background: "#140d04",
+                  background: "#1F0E07",
                   border: "1px solid rgba(244,237,218,0.07)",
                   borderRadius: 14,
                   overflow: "hidden",
@@ -1072,9 +1072,9 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(244,237,218,0.28)" }}>
                       AI CFO
                     </div>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
-                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#10B981", animation: "blink 2s ease-in-out infinite" }} />
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#10B981", fontWeight: 600 }}>ONLINE</span>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 7px", borderRadius: 100, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#C9A84C", animation: "blink 2s ease-in-out infinite" }} />
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: "#C9A84C", fontWeight: 600 }}>ONLINE</span>
                     </div>
                   </div>
                   <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, lineHeight: 0.95, color: "#F4EDDA", marginBottom: 10 }}>
@@ -1213,10 +1213,10 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "16px 8px" }}>
               <div style={{
                 width: 56, height: 56, borderRadius: "50%",
-                background: "rgba(95,191,127,0.12)",
-                border: "1px solid rgba(95,191,127,0.3)",
+                background: "rgba(201,168,76,0.12)",
+                border: "1px solid rgba(201,168,76,0.3)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                marginBottom: 18, color: "#5FBF7F",
+                marginBottom: 18, color: "#C9A84C",
               }}>
                 <CheckCircle size={28} />
               </div>
@@ -1242,7 +1242,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           style={{
             width: "100%",
             marginTop: "20px",
-            background: "#140d04",
+            background: "#1F0E07",
             border: "1px solid rgba(244,237,218,0.07)",
             borderRadius: "18px",
             overflow: "hidden",
@@ -1289,7 +1289,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             {[
-              { val: "6", unit: "MONTHS FREE", desc: "Full platform · No credit card", color: "#10B981" },
+              { val: "6", unit: "MONTHS FREE", desc: "Full platform · No credit card", color: "#C9A84C" },
               { val: "1st", unit: "PRIORITY ACCESS", desc: "Every new feature · Early", color: "#8B6914" },
               { val: "50%", unit: "OFF PRO PLAN", desc: "Locked in · Forever yours", color: "#C41E1E" },
               { val: "10x", unit: "AI USAGE LIMITS", desc: "Enterprise-grade · Included", color: "#8B6914" },
@@ -1387,7 +1387,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
               cursor: "pointer",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "#A01818";
+              (e.currentTarget as HTMLAnchorElement).style.background = "#a51818";
               (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {

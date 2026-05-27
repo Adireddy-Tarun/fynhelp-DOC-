@@ -28,7 +28,7 @@ export default function CircuitLedgerBackground() {
           zIndex: 0,
           pointerEvents: "none",
           background:
-            "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(244,237,218,0.012) 3px, rgba(244,237,218,0.012) 4px), #100806",
+            "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(244,237,218,0.012) 3px, rgba(244,237,218,0.012) 4px), #1A1008",
         }}
       />
 
