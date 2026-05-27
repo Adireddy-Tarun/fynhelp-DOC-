@@ -271,7 +271,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
       style={{
         background: colors.bg.card,
         border: `1px solid ${colors.primary[700]}40`,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Sora', system-ui, sans-serif",
         color: colors.text.primary,
       }}
     >
@@ -288,7 +288,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
 
       <h2
         className="text-2xl font-bold mb-2"
-        style={{ fontFamily: "'Space Grotesk', sans-serif", color: colors.text.primary }}
+        style={{ fontFamily: "'Sora', system-ui, sans-serif", color: colors.text.primary }}
       >
         Upload Transactions
       </h2>
@@ -364,7 +364,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
         <>
           <h3
             className="text-base font-semibold mb-3"
-            style={{ fontFamily: "'Space Grotesk', sans-serif", color: colors.text.primary }}
+            style={{ fontFamily: "'Sora', system-ui, sans-serif", color: colors.text.primary }}
           >
             Map your columns
           </h3>
@@ -402,7 +402,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
           {/* Preview table */}
           <h3
             className="text-base font-semibold mb-3"
-            style={{ fontFamily: "'Space Grotesk', sans-serif", color: colors.text.primary }}
+            style={{ fontFamily: "'Sora', system-ui, sans-serif", color: colors.text.primary }}
           >
             Preview (first 10 rows)
           </h3>
