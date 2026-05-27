@@ -1042,8 +1042,7 @@ export function DemoDashboard() {
   )
 }
 
-  return <FynnyChat data={data} orgId={orgId} answers={answers} />
-}
+
 
 function Shimmer({ className = '' }: { className?: string }) {
   return (
