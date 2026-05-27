@@ -576,95 +576,66 @@ export function CostDashboard({ data }: CostDashboardProps) {
           <RollingText text="Cost Optimization Opportunities" />
         </SectionTitle>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
-          {(optimization.opportunities || []).map((opp: any, idx: number) => {
-            const meta = oppMeta(opp.type, idx)
-            const tone = impactTone(opp.impact)
-            const Icon = meta.icon
+        {(() => {
+          const rows = [
+            { p: 1, name: 'Offshore Opportunities', desc: '4 engineering roles + 2 operations roles eligible', saving: '₹1.9L', impact: 'High', effort: 'Medium', type: 'Hiring' },
+            { p: 2, name: 'Volume Discounts', desc: 'Annual commit on AWS (20% discount), Google Workspace (12% discount)', saving: '₹0.7L', impact: 'Medium', effort: 'Low', type: 'Procurement' },
+            { p: 3, name: 'Vendor Consolidation', desc: 'Bundle AWS + Supabase for 15% volume discount', saving: '₹0.4L', impact: 'Medium', effort: 'Low', type: 'Procurement' },
+            { p: 4, name: 'Over-Provisioned Licenses', desc: '18 unused Salesforce seats, 12 unused Zoom licenses', saving: '₹0.3L', impact: 'Medium', effort: 'Low', type: 'SaaS' },
+            { p: 5, name: 'Duplicate Subscriptions', desc: 'Slack + Microsoft Teams, HubSpot + Salesforce overlap', saving: '₹0.3L', impact: 'High', effort: 'Low', type: 'SaaS' },
+            { p: 6, name: 'Payment Terms', desc: 'Extend Net 30 → Net 60 with AWS, Salesforce (cash flow benefit)', saving: 'Cash flow benefit', impact: 'High', effort: 'Medium', type: 'Finance', cashflow: true },
+          ]
+          const impactBadge = (imp: string) => {
+            const isHigh = imp === 'High'
             return (
-              <Card
-                key={idx}
-                className="p-5 flex flex-col gap-3"
-                style={{
-                  background: colors.bg.secondary,
-                  borderColor: colors.bg.tertiary,
-                }}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center"
-                      style={{ background: `${tone}22` }}
-                    >
-                      <Icon size={18} color={tone} />
-                    </div>
-                    <h4 className="font-semibold text-sm" style={{ color: colors.text.primary }}>
-                      {meta.title}
-                    </h4>
-                  </div>
-                  <Pill tone={tone} label={`${opp.impact || '—'} impact`} />
-                </div>
-
-                <div
-                  className="text-3xl font-bold"
-                  style={{ color: tone, fontFamily: "'SF Mono', monospace" }}
-                >
-                  {opp.type === 'Payment Terms Extension' && opp.savings === 0
-                    ? 'Cash flow benefit'
-                    : fmtL(opp.savings || 0)}
-                </div>
-
-                <p className="text-sm" style={{ color: colors.text.secondary }}>
-                  {opp.description}
-                </p>
-
-                <button
-                  className="self-start mt-1 px-3 py-1.5 rounded-md text-xs font-semibold"
-                  style={{ background: colors.primary[500], color: '#F4EDDA' }}
-                >
-                  Implement
-                </button>
-              </Card>
+              <span style={{
+                fontFamily: 'Sora', fontWeight: 600, fontSize: 9, letterSpacing: '1px', textTransform: 'uppercase',
+                padding: '3px 10px', borderRadius: 20,
+                background: isHigh ? 'rgba(196,30,30,0.12)' : 'rgba(139,105,20,0.12)',
+                border: `1px solid ${isHigh ? 'rgba(196,30,30,0.25)' : 'rgba(139,105,20,0.25)'}`,
+                color: isHigh ? '#C41E1E' : '#8B6914',
+              }}>{imp}</span>
             )
-          })}
-          {(!optimization.opportunities || optimization.opportunities.length === 0) && (
-            <div
-              className="md:col-span-2 lg:col-span-3 py-8 text-center rounded-2xl"
-              style={{ background: colors.bg.secondary, color: colors.text.tertiary }}
-            >
-              No optimization opportunities surfaced.
+          }
+          return (
+            <div className="mt-5">
+              <div style={{ background: '#1F0E07', border: '1px solid rgba(244,237,218,0.07)', borderRadius: 6, width: '100%', overflow: 'hidden' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 100px 110px 90px 110px 110px', background: 'rgba(244,237,218,0.03)', borderBottom: '1px solid rgba(244,237,218,0.08)', padding: '12px 20px', gap: 16 }}>
+                  {['Priority','Opportunity','Saving','Impact','Effort','Type','Action'].map((h, i) => (
+                    <div key={h} style={{ fontFamily: 'Sora', fontWeight: 600, fontSize: 9, letterSpacing: '3px', textTransform: 'uppercase', color: '#8B6914', textAlign: i === 0 ? 'center' : i === 2 || i === 6 ? 'right' : 'left' }}>{h}</div>
+                  ))}
+                </div>
+                {rows.map((r, i) => (
+                  <div key={r.p} className="opp-row" style={{ display: 'grid', gridTemplateColumns: '60px 1fr 100px 110px 90px 110px 110px', padding: '14px 20px', gap: 16, alignItems: 'center', borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(244,237,218,0.05)', transition: 'background 0.15s' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(244,237,218,0.02)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 14, color: '#C41E1E', textAlign: 'center' }}>{r.p}</div>
+                    <div>
+                      <div style={{ fontFamily: 'Sora', fontWeight: 500, fontSize: 13, color: '#F4EDDA' }}>{r.name}</div>
+                      <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 11, color: 'rgba(244,237,218,0.45)', marginTop: 2 }}>{r.desc}</div>
+                    </div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: r.cashflow ? 400 : 700, fontSize: r.cashflow ? 12 : 14, color: r.cashflow ? 'rgba(244,237,218,0.55)' : '#C9A84C', textAlign: 'right' }}>{r.saving}</div>
+                    <div>{impactBadge(r.impact)}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 400, fontSize: 12, color: 'rgba(244,237,218,0.55)' }}>{r.effort}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 400, fontSize: 12, color: 'rgba(244,237,218,0.45)' }}>{r.type}</div>
+                    <div style={{ textAlign: 'right' }}>
+                      <button style={{ background: '#C41E1E', color: '#F4EDDA', fontFamily: 'Sora', fontWeight: 500, fontSize: 12, padding: '6px 14px', borderRadius: 4, border: 'none', cursor: 'pointer' }}>Implement</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.12)', borderRadius: '0 0 6px 6px', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: -1 }}>
+                <div style={{ fontFamily: 'Sora', fontWeight: 600, fontSize: 9, letterSpacing: '3px', textTransform: 'uppercase', color: '#8B6914' }}>Total Identified Saving</div>
+                <div style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 18, color: '#C9A84C' }}>₹3.4L / month</div>
+              </div>
+              <div className="mt-4">
+                <button style={{ background: '#C41E1E', color: '#F4EDDA', fontFamily: 'Sora', fontWeight: 500, fontSize: 13, padding: '10px 20px', borderRadius: 4, border: 'none', cursor: 'pointer' }}>
+                  Generate Cost Optimization Roadmap
+                </button>
+              </div>
             </div>
-          )}
-        </div>
-
-        <Card
-          className="mt-6 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-          style={{
-            background: `linear-gradient(135deg, ${colors.success.main}22, ${colors.primary[500]}22)`,
-            borderColor: `${colors.success.main}55`,
-          }}
-        >
-          <div>
-            <div className="text-xs uppercase tracking-wide" style={{ color: colors.text.secondary }}>
-              Total Identified Savings
-            </div>
-            <div
-              className="text-3xl font-bold mt-1"
-              style={{ color: colors.success.main, fontFamily: "'SF Mono', monospace" }}
-            >
-              {fmtL(optimization.totalSavings || 0)}
-            </div>
-            <div className="text-sm mt-1" style={{ color: colors.text.secondary }}>
-              Extends runway by{' '}
-              <span style={{ color: colors.text.primary, fontWeight: 600 }}>
-                {(optimization.runwayExtension || 0).toFixed(1)} months
-              </span>
-            </div>
-          </div>
-          <GalaxyButton variant="primary">
-            <RollingText text="Generate Cost Optimization Roadmap" />
-          </GalaxyButton>
-        </Card>
+          )
+        })()}
       </section>
 
       {/* SECTION 7: EFFICIENCY TRENDS */}
