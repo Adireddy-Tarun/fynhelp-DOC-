@@ -268,7 +268,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
                     className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
                     style={{
                       background: active ? color : 'transparent',
-                      color: active ? '#fff' : colors.text.secondary,
+                      color: active ? '#F4EDDA' : colors.text.secondary,
                       border: `1px solid ${active ? color : colors.bg.tertiary}`,
                     }}
                   >

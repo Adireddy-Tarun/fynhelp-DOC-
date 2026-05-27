@@ -352,7 +352,7 @@ export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardPr
                     className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
                     style={{
                       background: active ? colors.primary[500] : 'transparent',
-                      color: active ? '#fff' : colors.text.secondary,
+                      color: active ? '#F4EDDA' : colors.text.secondary,
                       border: `1px solid ${active ? colors.primary[500] : colors.bg.tertiary}`,
                     }}
                   >
