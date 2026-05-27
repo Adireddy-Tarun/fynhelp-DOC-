@@ -17,6 +17,9 @@ import {
   Shield,
 } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { LedgerStrip, LedgerMetric } from '@/components/demo/_design/primitives'
+import { C } from '@/components/demo/_design/tokens'
+
 
 interface LiquidityDashboardProps {
   data: any
