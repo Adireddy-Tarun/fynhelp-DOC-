@@ -840,214 +840,196 @@ export function DemoDashboard() {
     return <DashboardSkeleton businessName={businessName} fileName={fileName} />
   }
 
+  const renderActive = () => {
+    switch (activeModule) {
+      case 'liquidity':  return <LiquidityDashboard data={insightsData} />
+      case 'revenue':    return <RevenueDashboard data={insightsData} timeRange={timeRange} />
+      case 'cost':       return <CostDashboard data={insightsData} />
+      case 'gst':        return <GSTDashboard data={insightsData} />
+      case 'governance': return <GovernanceDashboard data={insightsData} />
+      case 'investor':   return <InvestorDashboard data={insightsData} />
+      case 'fynny':      return <FynnyChat data={insightsData} orgId={orgId} answers={answers} />
+      default: return null
+    }
+  }
+
+  const showBriefing = activeModule !== 'fynny' && activeModule !== 'investor'
+  const showAction   = activeModule !== 'fynny' && activeModule !== 'investor'
+
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: "linear-gradient(135deg, #1A1008 0%, #1F0E07 100%)" }}
-    >
-      {/* Top Nav */}
-      <nav className="border-b border-white/10 bg-[#1A1008]/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1
-                className="text-4xl font-bold mb-2"
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  letterSpacing: '-0.02em',
-                  color: '#F4EDDA',
-                  lineHeight: 1.1,
-                }}
-              >
-                {businessName}
-              </h1>
-              <p
-                className="text-sm"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#8B6914' }}
-              >
-                Data: {fileName}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div
-                className="flex items-center gap-1 p-1 rounded-xl"
-                style={{
-                  background: '#2A1209',
-                  border: '1px solid rgba(139,105,20, 0.25)',
-                }}
-              >
-                {(['12m', '24m', 'all'] as TimeRange[]).map((r) => {
-                  const active = timeRange === r
-                  return (
-                    <button
-                      key={r}
-                      onClick={() => setTimeRange(r)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                      style={{
-                        background: active ? '#C9A84C' : 'transparent',
-                        color: active ? '#1A1008' : '#F4EDDA',
-                        fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                      }}
-                      aria-pressed={active}
-                    >
-                      {r === '12m' ? '12 Months' : r === '24m' ? '24 Months' : 'All Time'}
-                    </button>
-                  )
-                })}
-              </div>
-              {availableOrgs.length > 1 && (
-                <select
-                  value={orgId ?? ''}
-                  onChange={(e) => switchOrg(e.target.value)}
-                  className="px-3 py-2 rounded-xl text-sm font-semibold focus:outline-none"
-                  style={{
-                    background: '#2A1209',
-                    color: '#F4EDDA',
-                    border: '1px solid rgba(139,105,20, 0.4)',
-                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                    maxWidth: 220,
-                  }}
-                  aria-label="Switch demo organization"
-                >
-                  {availableOrgs.map((o) => (
-                    <option key={o.demo_org_id} value={o.demo_org_id}>
-                      {o.name || o.business_name || o.demo_org_id}
-                    </option>
-                  ))}
-                </select>
-              )}
-              <button
-                onClick={() => setShowUpload(true)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
-                style={{
-                  background: '#C9A84C',
-                  color: '#1A1008',
-                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                  border: '1px solid #C9A84C',
-                }}
-              >
-                <Upload size={16} />
-                Upload Data
-              </button>
-              {!zohoConnected ? (
-                <button
-                  onClick={connectZoho}
-                  className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
-                  style={{
-                    background: 'transparent',
-                    color: '#F4EDDA',
-                    fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                    border: '1px solid rgba(139,105,20, 0.5)',
-                  }}
-                >
-                  <Link2 size={16} />
-                  Connect Zoho Books
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={syncZoho}
-                    disabled={zohoSyncing}
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors disabled:opacity-60"
-                    style={{
-                      background: '#8B6914',
-                      color: '#F4EDDA',
-                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                      border: '1px solid #8B6914',
-                    }}
-                  >
-                    {zohoSyncing ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Syncing…
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw size={16} />
-                        Sync Zoho Data
-                      </>
-                    )}
-                  </button>
-                  <div
-                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
-                    style={{
-                      background: 'rgba(201,168,76, 0.12)',
-                      color: '#C9A84C',
-                      border: '1px solid rgba(201,168,76, 0.3)',
-                      fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                    }}
-                  >
-                    <CheckCircle2 size={14} />
-                    <span className="w-1.5 h-1.5 bg-[#C9A84C] rounded-full animate-pulse" />
-                    Zoho Connected
-                  </div>
-                </>
-              )}
-              <button
-                onClick={() => {
-                  if (confirm('Exit demo? All data will be cleared.')) {
-                    sessionStorage.clear()
-                    window.location.href = '/demo/login'
-                  }
-                }}
-                className="px-6 py-3 rounded-xl font-semibold transition-colors"
-                style={{
-                  background: '#2A1209',
-                  color: '#F4EDDA',
-                  fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                  border: '1px solid rgba(139,105,20, 0.25)',
-                }}
-              >
-                Exit Demo
-              </button>
-            </div>
+    <div style={{ minHeight: '100vh', background: C.ink, color: C.beige, fontFamily: FONT }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
+        .fyn-page-bg {
+          background:
+            repeating-linear-gradient(45deg, transparent 0, transparent 32px, rgba(139,105,20,0.015) 32px, rgba(139,105,20,0.015) 33px),
+            ${C.ink};
+        }
+        @keyframes fyn-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .fyn-ticker:hover .fyn-ticker-track { animation-play-state: paused; }
+        .fyn-tabs::-webkit-scrollbar { display: none; }
+      `}</style>
+
+      {/* HEADER */}
+      <header
+        style={{
+          position: 'sticky', top: 0, zIndex: 100,
+          height: 64, background: C.ink, borderBottom: `1px solid ${A.beige08}`,
+          display: 'flex', alignItems: 'center', padding: '0 24px', gap: 24,
+        }}
+      >
+        <div style={{ flexShrink: 0, minWidth: 0 }}>
+          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 18, color: C.beige, letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+            {businessName}
           </div>
+          <div style={{ fontFamily: FONT, fontWeight: 300, fontSize: 10, color: A.beige30, letterSpacing: 1, marginTop: 2 }}>
+            Data: {fileName}
+          </div>
+        </div>
+
+        <div
+          className="fyn-ticker"
+          style={{
+            flex: 1, overflow: 'hidden', height: 28, position: 'relative',
+            maskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',
+            WebkitMaskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',
+          }}
+        >
+          <div
+            className="fyn-ticker-track"
+            style={{
+              display: 'inline-flex', whiteSpace: 'nowrap',
+              animation: 'fyn-marquee 30s linear infinite',
+              fontFamily: FONT, fontWeight: 500, fontSize: 11, color: C.red,
+              alignItems: 'center', height: '100%',
+            }}
+          >
+            {[...TICKER_ALERTS, ...TICKER_ALERTS, ...TICKER_ALERTS].map((t, i) => (
+              <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 40, paddingRight: 40 }}>
+                {t}
+                <span style={{ color: A.beige20 }}>·</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 4 }}>
+            {(['12m','24m','all'] as TimeRange[]).map((r) => (
+              <Pill key={r} active={timeRange === r} onClick={() => setTimeRange(r)}>
+                {r === '12m' ? '12M' : r === '24m' ? '24M' : 'All'}
+              </Pill>
+            ))}
+          </div>
+          {availableOrgs.length > 1 && (
+            <select
+              value={orgId ?? ''}
+              onChange={(e) => switchOrg(e.target.value)}
+              style={{
+                background: 'transparent', color: A.beige65,
+                border: `1px solid ${A.beige15}`, borderRadius: 4,
+                padding: '6px 10px', fontSize: 11, fontFamily: FONT, fontWeight: 500,
+                maxWidth: 160,
+              }}
+            >
+              {availableOrgs.map(o => (
+                <option key={o.demo_org_id} value={o.demo_org_id} style={{ background: C.inkCard }}>
+                  {o.name || o.business_name || o.demo_org_id}
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={() => setShowUpload(true)}
+            style={{
+              background: C.gold, color: C.beige, border: 'none', borderRadius: 4,
+              padding: '7px 16px', fontFamily: FONT, fontWeight: 500, fontSize: 12, cursor: 'pointer',
+            }}
+          >
+            Upload Data
+          </button>
+          {!zohoConnected ? (
+            <SecondaryBtn onClick={connectZoho}>Connect Zoho Books</SecondaryBtn>
+          ) : (
+            <>
+              <SecondaryBtn onClick={syncZoho}>{zohoSyncing ? 'Syncing…' : 'Sync Zoho'}</SecondaryBtn>
+              <Badge variant="online">Online</Badge>
+            </>
+          )}
+          <button
+            onClick={() => {
+              if (confirm('Exit demo? All data will be cleared.')) {
+                sessionStorage.clear()
+                window.location.href = '/demo/login'
+              }
+            }}
+            style={{
+              background: 'transparent', color: A.red80,
+              border: `1px solid ${A.red30}`, borderRadius: 4,
+              padding: '7px 16px', fontFamily: FONT, fontWeight: 500, fontSize: 12, cursor: 'pointer',
+            }}
+          >
+            Exit Demo
+          </button>
+        </div>
+      </header>
+
+      {/* TAB BAR */}
+      <nav
+        style={{
+          position: 'sticky', top: 64, zIndex: 99,
+          height: 48, background: C.ink, borderBottom: `1px solid ${A.beige07}`,
+        }}
+      >
+        <div className="fyn-tabs" style={{ display: 'flex', overflowX: 'auto', height: '100%', padding: '0 24px' }}>
+          {MODULES.map(m => {
+            const Icon = m.icon
+            const active = activeModule === m.id
+            return (
+              <button
+                key={m.id}
+                onClick={() => setActiveModule(m.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '0 20px', height: '100%', flexShrink: 0,
+                  background: 'transparent', border: 'none',
+                  borderBottom: active ? `2px solid ${C.red}` : '2px solid transparent',
+                  color: active ? C.beige : A.beige42,
+                  fontFamily: FONT, fontWeight: active ? 600 : 500, fontSize: 12,
+                  cursor: 'pointer', whiteSpace: 'nowrap',
+                  transition: 'color 0.15s ease, background 0.15s ease',
+                }}
+                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = A.beige72; e.currentTarget.style.background = A.beige03; } }}
+                onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = A.beige42; e.currentTarget.style.background = 'transparent'; } }}
+              >
+                <Icon size={14} color={active ? C.red : A.beige35} />
+                <span>{m.name}</span>
+              </button>
+            )
+          })}
         </div>
       </nav>
 
-      {/* Module Tabs */}
-      <div className="border-b border-white/10 sticky top-[89px] z-40" style={{ background: "#1A1008CC" }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-1 overflow-x-auto">
-            {MODULES.map((module) => {
-              const Icon = module.icon
-              const isActive = activeModule === module.id
-              return (
-                <button
-                  key={module.id}
-                  onClick={() => setActiveModule(module.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap font-inter font-semibold ${
-                    isActive ? "text-white" : "text-white/60 hover:text-white/80"
-                  }`}
-                  style={{ borderColor: isActive ? "#C9A84C" : "transparent" }}
-                >
-                  <Icon size={20} style={{ color: isActive ? "#C9A84C" : undefined }} />
-                  <span>{module.name}</span>
-                </button>
-              )
-            })}
-          </div>
+      {/* CONTENT */}
+      <main className="fyn-page-bg" style={{ minHeight: 'calc(100vh - 112px)' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '28px clamp(16px, 3vw, 32px)' }}>
+          {showBriefing && VERDICTS[activeModule] && <CFOBriefing verdict={VERDICTS[activeModule]} />}
+          {renderActive()}
+          {showAction && ACTIONS[activeModule] && <RecommendedAction action={ACTIONS[activeModule]} />}
         </div>
-      </div>
+      </main>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
-        {activeModule === 'liquidity' && <LiquidityDashboard data={insightsData} />}
-        {activeModule === 'revenue' && <RevenueModule data={insightsData} timeRange={timeRange} />}
-        {activeModule === 'cost' && <CostModule data={insightsData} />}
-        {activeModule === 'gst' && <GSTModule data={insightsData} />}
-        {activeModule === 'governance' && <GovernanceDashboard data={insightsData} />}
-        {activeModule === 'fynny' && <FynnyModule answers={answers} orgId={orgId} data={insightsData} />}
-      </div>
-
-      {/* Upload modal */}
       {showUpload && (
         <div
-          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-6"
-          style={{ background: 'rgba(26,16,8, 0.85)', backdropFilter: 'blur(6px)' }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+            overflow: 'auto', padding: 24,
+            background: 'rgba(26,16,8,0.85)', backdropFilter: 'blur(6px)',
+          }}
           onClick={() => setShowUpload(false)}
         >
-          <div className="w-full max-w-4xl my-12" onClick={(e) => e.stopPropagation()}>
+          <div style={{ width: '100%', maxWidth: 960, marginTop: 48 }} onClick={(e) => e.stopPropagation()}>
             <TransactionUpload
               organizationId={orgId ?? ''}
               onClose={() => setShowUpload(false)}
@@ -1060,19 +1042,6 @@ export function DemoDashboard() {
   )
 }
 
-function RevenueModule({ data, timeRange }: { data: any; timeRange: TimeRange }) {
-  return <RevenueDashboard data={data} timeRange={timeRange} />
-}
-
-function CostModule({ data }: { data: any }) {
-  return <CostDashboard data={data} />
-}
-
-function GSTModule({ data }: { data: any }) {
-  return <GSTDashboard data={data} />
-}
-
-function FynnyModule({ answers, orgId, data }: { answers: string[]; orgId: string | null; data: any }) {
   return <FynnyChat data={data} orgId={orgId} answers={answers} />
 }
 
