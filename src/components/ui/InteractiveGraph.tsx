@@ -164,17 +164,18 @@ export function InteractiveGraph({
             >
               <div
                 style={{
-                  background: '#fff',
+                  background: '#2A1209',
+                  border: '1px solid rgba(244,237,218,0.10)',
                   borderRadius: 8,
                   padding: '8px 12px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.2)',
                   fontFamily: "'DM Sans', sans-serif",
                   minWidth: 80,
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: 11, color: colors.text.tertiary, fontWeight: 500 }}>{item.label}</div>
-                <div style={{ fontSize: 14, color: colors.bg.primary, fontWeight: 700, fontFamily: "'SF Mono', monospace" }}>
+                <div style={{ fontSize: 11, color: 'rgba(244,237,218,0.55)', fontWeight: 500 }}>{item.label}</div>
+                <div style={{ fontSize: 14, color: '#F4EDDA', fontWeight: 700, fontFamily: "'SF Mono', monospace" }}>
                   {formatValue(item.value)}
                 </div>
               </div>
@@ -187,8 +188,9 @@ export function InteractiveGraph({
                   transform: 'translateX(-50%) rotate(45deg)',
                   width: 10,
                   height: 10,
-                  background: '#fff',
-                  boxShadow: '2px 2px 4px rgba(0,0,0,0.08)',
+                  background: '#2A1209',
+                  borderRight: '1px solid rgba(244,237,218,0.10)',
+                  borderBottom: '1px solid rgba(244,237,218,0.10)',
                 }}
               />
             </motion.div>

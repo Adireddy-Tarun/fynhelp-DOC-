@@ -145,7 +145,7 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
               className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: colors.danger.main }}
             >
-              <AlertTriangle size={24} color="#fff" />
+              <AlertTriangle size={24} color="#F4EDDA" />
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold" style={{ color: colors.text.primary }}>
