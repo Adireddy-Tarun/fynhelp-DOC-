@@ -173,29 +173,48 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
         <SectionTitle icon={FileText}>
           <RollingText text="Compliance Status" />
         </SectionTitle>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-          <FilingCard
-            label="GSTR-1"
-            sub="Outward supplies"
-            status={compliance.gstr1?.status}
-            dueDate={compliance.gstr1?.dueDate}
-            extra={compliance.gstr1?.lastFiled ? `Last filed: ${fmtDate(compliance.gstr1.lastFiled)}` : compliance.gstr1?.period}
-          />
-          <FilingCard
-            label="GSTR-3B"
-            sub="Monthly summary"
-            status={compliance.gstr3b?.status}
-            dueDate={compliance.gstr3b?.dueDate}
-            extra={compliance.gstr3b?.netTaxPaid != null ? `Net tax: ${fmtL(compliance.gstr3b.netTaxPaid)}` : compliance.gstr3b?.period}
-          />
-          <FilingCard
-            label="GSTR-9"
-            sub="Annual return"
-            status={compliance.gstr9?.status}
-            dueDate={compliance.gstr9?.dueDate}
-            extra={compliance.gstr9?.fyear}
-          />
-        </div>
+        {(() => {
+          const rows = [
+            { ret: 'GSTR-1', desc: 'Outward supplies', status: 'Filed', due: '11 Jul 2025', dueUrgent: false, lastFiled: '09 Jul 2023', netTax: '—', netTaxUrgent: false, accent: false },
+            { ret: 'GSTR-3B', desc: 'Monthly summary', status: 'Pending', due: '20 Jul 2025', dueUrgent: true, lastFiled: '—', netTax: '₹1.84L', netTaxUrgent: true, accent: true },
+            { ret: 'GSTR-9', desc: 'Annual return', status: 'Not Due', due: '31 Dec 2025', dueUrgent: false, lastFiled: 'FY 2024-25', netTax: '—', netTaxUrgent: false, accent: false },
+          ]
+          const statusBadge = (s: string) => {
+            const cfg = s === 'Filed'
+              ? { bg: 'rgba(139,105,20,0.12)', bd: 'rgba(139,105,20,0.25)', fg: '#8B6914' }
+              : s === 'Pending'
+              ? { bg: 'rgba(196,30,30,0.12)', bd: 'rgba(196,30,30,0.25)', fg: '#C41E1E' }
+              : { bg: 'rgba(244,237,218,0.05)', bd: 'rgba(244,237,218,0.12)', fg: 'rgba(244,237,218,0.45)' }
+            return <span style={{ fontFamily: 'Sora', fontWeight: 600, fontSize: 9, letterSpacing: '1px', textTransform: 'uppercase', padding: '3px 10px', borderRadius: 20, background: cfg.bg, border: `1px solid ${cfg.bd}`, color: cfg.fg }}>{s}</span>
+          }
+          return (
+            <div className="mt-5">
+              <div style={{ background: '#1F0E07', border: '1px solid rgba(244,237,218,0.07)', borderRadius: 6, width: '100%', overflow: 'hidden' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 110px 130px 130px 110px', background: 'rgba(244,237,218,0.03)', borderBottom: '1px solid rgba(244,237,218,0.08)', padding: '12px 20px', gap: 16 }}>
+                  {['Return','Description','Status','Due Date','Last Filed','Net Tax'].map((h, i) => (
+                    <div key={h} style={{ fontFamily: 'Sora', fontWeight: 600, fontSize: 9, letterSpacing: '3px', textTransform: 'uppercase', color: '#8B6914', textAlign: i === 5 ? 'right' : 'left' }}>{h}</div>
+                  ))}
+                </div>
+                {rows.map((r, i) => (
+                  <div key={r.ret} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 110px 130px 130px 110px', padding: '14px 20px', gap: 16, alignItems: 'center', borderBottom: i === rows.length - 1 ? 'none' : '1px solid rgba(244,237,218,0.05)', borderLeft: r.accent ? '2px solid rgba(196,30,30,0.5)' : '2px solid transparent', transition: 'background 0.15s' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(244,237,218,0.02)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 13, color: '#F4EDDA' }}>{r.ret}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 12, color: 'rgba(244,237,218,0.45)' }}>{r.desc}</div>
+                    <div>{statusBadge(r.status)}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: r.dueUrgent ? 700 : 400, fontSize: 12, color: r.dueUrgent ? '#C41E1E' : 'rgba(244,237,218,0.65)' }}>{r.due}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 12, color: r.lastFiled === '—' ? 'rgba(244,237,218,0.30)' : 'rgba(244,237,218,0.40)' }}>{r.lastFiled}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: r.netTaxUrgent ? 600 : 300, fontSize: r.netTaxUrgent ? 13 : 12, color: r.netTaxUrgent ? '#C41E1E' : 'rgba(244,237,218,0.30)', textAlign: 'right' }}>{r.netTax}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: 'rgba(196,30,30,0.06)', border: '1px solid rgba(196,30,30,0.12)', borderRadius: '0 0 6px 6px', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: -1 }}>
+                <div style={{ fontFamily: 'Sora', fontWeight: 500, fontSize: 12, color: '#C41E1E' }}>⚠ GSTR-3B filing due in 10 days — Net tax payable ₹1.84L</div>
+                <button style={{ background: '#C41E1E', color: '#F4EDDA', fontFamily: 'Sora', fontWeight: 500, fontSize: 12, padding: '6px 16px', borderRadius: 4, border: 'none', cursor: 'pointer' }}>File Now →</button>
+              </div>
+            </div>
+          )
+        })()}
       </section>
 
       {/* SECTION 2: ITC RECONCILIATION */}
