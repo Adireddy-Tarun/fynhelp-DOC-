@@ -204,8 +204,8 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
           <RollingText text="ITC Reconciliation" />
         </SectionTitle>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
         <div className="mt-5">
+
           <LedgerStrip>
             <LedgerMetric
               label="Total ITC Available"
