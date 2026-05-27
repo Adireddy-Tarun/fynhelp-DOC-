@@ -20,6 +20,9 @@ import {
   Zap,
 } from 'lucide-react'
 import { colors } from '@/lib/design-system'
+import { LedgerStrip, LedgerMetric } from '@/components/demo/_design/primitives'
+import { C } from '@/components/demo/_design/tokens'
+
 
 interface RevenueDashboardProps {
   data: any
@@ -207,60 +210,51 @@ export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardPr
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-          <CFOCard
-            title="NRR"
-            value={m.nrr || 0}
-            suffix="%"
-            icon={TrendingUp}
-            status={nrrStatus}
-            subtitle="Net revenue retention"
-          />
-          <CFOCard
-            title="GRR"
-            value={m.grr || 0}
-            suffix="%"
-            icon={Activity}
-            status={(m.grr || 0) >= 90 ? 'good' : (m.grr || 0) >= 80 ? 'warning' : 'danger'}
-            subtitle="Gross revenue retention"
-          />
-          <CFOCard
-            title="Magic Number"
-            value={m.magicNumber || 0}
-            icon={Zap}
-            status={(m.magicNumber || 0) >= 1 ? 'good' : (m.magicNumber || 0) >= 0.5 ? 'warning' : 'danger'}
-            subtitle="Net new ARR ÷ S&M"
-          />
-          <CFOCard
-            title="Rule of 40"
-            value={m.ruleOf40 || 0}
-            suffix=""
-            icon={Target}
-            status={ruleStatus}
-            subtitle="Growth% + EBITDA%"
-          />
+        <div className="mt-4">
+          <LedgerStrip>
+            <LedgerMetric
+              label="NRR"
+              value={`${(m.nrr || 0).toFixed(0)}%`}
+              context="Net revenue retention"
+              valueColor={nrrStatus === 'good' ? C.goldL : nrrStatus === 'danger' ? C.red : C.beige}
+            />
+            <LedgerMetric
+              label="GRR"
+              value={`${(m.grr || 0).toFixed(0)}%`}
+              context="Gross revenue retention"
+              valueColor={(m.grr || 0) >= 90 ? C.goldL : (m.grr || 0) < 80 ? C.red : C.beige}
+            />
+            <LedgerMetric
+              label="Magic Number"
+              value={(m.magicNumber || 0).toFixed(2)}
+              context="Net new ARR ÷ S&M"
+              valueColor={(m.magicNumber || 0) >= 1 ? C.goldL : (m.magicNumber || 0) < 0.5 ? C.red : C.beige}
+            />
+            <LedgerMetric
+              label="Rule of 40"
+              value={(m.ruleOf40 || 0).toFixed(2)}
+              context="Growth% + EBITDA%"
+              valueColor={ruleStatus === 'good' ? C.goldL : ruleStatus === 'danger' ? C.red : C.beige}
+            />
+          </LedgerStrip>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <CFOCard
-            title="Avg Deal Size"
-            value={(m.avgDealSize || 0) / 1000}
-            prefix="₹"
-            suffix="K"
-            icon={Briefcase}
-            status="neutral"
-            subtitle="Per closed deal"
-          />
-          <CFOCard
-            title="Total Revenue (Period)"
-            value={(m.totalRevenue || 0) / 100000}
-            prefix="₹"
-            suffix="L"
-            icon={IndianRupee}
-            status="good"
-            subtitle="Cumulative this period"
-          />
+        <div className="mt-4">
+          <LedgerStrip>
+            <LedgerMetric
+              label="Avg Deal Size"
+              value={`₹${((m.avgDealSize || 0) / 1000).toFixed(0)}K`}
+              context="Per closed deal"
+            />
+            <LedgerMetric
+              label="Total Revenue (Period)"
+              value={`₹${((m.totalRevenue || 0) / 100000).toFixed(1)}L`}
+              context="Cumulative this period"
+              valueColor={C.goldL}
+            />
+          </LedgerStrip>
         </div>
+
       </section>
 
       {/* SECTION 3: REVENUE TREND */}

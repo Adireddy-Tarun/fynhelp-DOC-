@@ -197,38 +197,58 @@ export function FynnyChat({ data }: FynnyChatProps) {
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-6 py-5 border-b"
+        className="flex items-center justify-between"
         style={{
-          borderColor: `${colors.primary[500]}30`,
-          background: `linear-gradient(135deg, ${colors.primary[700]} 0%, ${colors.primary[900]} 100%)`,
+          background: '#1F0E07',
+          borderBottom: '1px solid rgba(244,237,218,0.08)',
+          padding: '16px 20px',
         }}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center" style={{ gap: 12 }}>
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center"
             style={{
-              background: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
-              boxShadow: `0 8px 24px ${colors.accent[500]}40`,
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              background: '#C41E1E',
+              border: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: "'Sora', system-ui, sans-serif",
+              fontWeight: 800,
+              fontSize: 18,
+              color: '#F4EDDA',
             }}
           >
-            <Sparkles size={22} color="#F4EDDA" />
+            F
           </div>
-          <div>
-            <h3 className="font-serif font-bold text-xl" style={{ color: colors.text.primary }}>
+          <div className="flex flex-col" style={{ gap: 2 }}>
+            <div style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 700, fontSize: 15, color: '#F4EDDA', letterSpacing: '-0.2px' }}>
               FYNNY
-            </h3>
-            <p className="text-xs" style={{ color: colors.text.secondary }}>
+            </div>
+            <div style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 300, fontSize: 11, color: 'rgba(244,237,218,0.45)' }}>
               Your AI Chief Financial Officer
-            </p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(15,120,70,0.12)',
+            border: '1px solid rgba(15,120,70,0.25)',
+            borderRadius: 20,
+            padding: '4px 10px',
+          }}
+        >
           <span
-            className="w-2 h-2 rounded-full animate-pulse"
-            style={{ background: colors.success.main }}
+            className="animate-pulse"
+            style={{ width: 6, height: 6, borderRadius: '50%', background: '#1a9e67' }}
           />
-          <span className="text-xs font-semibold" style={{ color: colors.text.secondary }}>
-            Online
+          <span style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: 1, color: '#1a9e67' }}>
+            ONLINE
           </span>
         </div>
       </div>
@@ -238,7 +258,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
         <div className="px-6 pt-5">
           <p
             className="text-xs uppercase tracking-wider mb-3 font-semibold"
-            style={{ color: colors.text.tertiary }}
+            style={{ color: 'rgba(244,237,218,0.45)', fontFamily: "'Sora', system-ui, sans-serif", letterSpacing: 3, fontSize: 9 }}
           >
             Quick Actions
           </p>
@@ -252,18 +272,18 @@ export function FynnyChat({ data }: FynnyChatProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.08 }}
-                  whileHover={{ scale: 1.04, y: -3 }}
+                  whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.97 }}
-                  className="p-4 rounded-xl flex flex-col items-center gap-2 text-center"
+                  className="p-4 flex flex-col items-center gap-2 text-center"
                   style={{
-                    background: colors.bg.tertiary,
-                    border: `1px solid ${colors.primary[500]}30`,
+                    background: 'rgba(244,237,218,0.03)',
+                    border: '1px solid rgba(244,237,218,0.07)',
+                    borderRadius: 6,
                   }}
                 >
-                  <Icon size={20} color={colors.accent[500]} />
+                  <Icon size={20} color="rgba(244,237,218,0.40)" />
                   <span
-                    className="text-xs font-semibold"
-                    style={{ color: colors.text.primary }}
+                    style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(244,237,218,0.55)' }}
                   >
                     {action.label}
                   </span>
@@ -273,6 +293,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
           </div>
         </div>
       )}
+
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
