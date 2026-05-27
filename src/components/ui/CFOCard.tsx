@@ -82,7 +82,7 @@ export function CFOCard({
         className="relative rounded-2xl border overflow-hidden"
         style={{
           background: "#1F0E07",
-          borderColor: "rgba(255,255,255,0.08)",
+          borderColor: "rgba(244,237,218,0.08)",
         }}
       >
         {/* Inner gradient overlay */}
@@ -91,7 +91,7 @@ export function CFOCard({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 100%)",
+              "linear-gradient(135deg, rgba(244,237,218,0.10) 0%, transparent 100%)",
           }}
         />
         {/* Animated accent glow */}
