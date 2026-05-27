@@ -211,7 +211,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
               boxShadow: `0 8px 24px ${colors.accent[500]}40`,
             }}
           >
-            <Sparkles size={22} color="#fff" />
+            <Sparkles size={22} color="#F4EDDA" />
           </div>
           <div>
             <h3 className="font-serif font-bold text-xl" style={{ color: colors.text.primary }}>
@@ -294,7 +294,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
                     background: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
                   }}
                 >
-                  <Bot size={18} color="#fff" />
+                  <Bot size={18} color="#F4EDDA" />
                 </div>
               )}
 
@@ -384,7 +384,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
                 background: `linear-gradient(135deg, ${colors.accent[500]} 0%, ${colors.accent[700]} 100%)`,
               }}
             >
-              <Bot size={18} color="#fff" />
+              <Bot size={18} color="#F4EDDA" />
             </div>
             <div
               className="px-5 py-3 rounded-2xl flex items-center gap-1.5"
@@ -454,7 +454,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
               animate={{ opacity: [0.4, 0.9, 0.4], scale: [1, 1.25, 1] }}
               transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <Send size={20} color="#fff" className="relative z-10" />
+            <Send size={20} color="#F4EDDA" className="relative z-10" />
           </motion.button>
         </div>
 

@@ -761,7 +761,7 @@ export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardPr
                       <td className="py-3 px-3 text-right">
                         <button
                           className="px-3 py-1.5 rounded-md text-xs font-semibold"
-                          style={{ background: colors.primary[500], color: '#fff' }}
+                          style={{ background: colors.primary[500], color: '#F4EDDA' }}
                         >
                           Retain
                         </button>

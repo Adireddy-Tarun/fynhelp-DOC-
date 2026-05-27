@@ -142,7 +142,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
               className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: colors.warning.main }}
             >
-              <AlertTriangle size={24} color="#fff" />
+              <AlertTriangle size={24} color="#F4EDDA" />
             </div>
             <div>
               <h2 className="text-2xl font-bold" style={{ color: colors.text.primary }}>
@@ -320,7 +320,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
                     <td className="py-3 px-3 text-right">
                       <button
                         className="px-3 py-1.5 rounded-md text-xs font-semibold"
-                        style={{ background: colors.primary[500], color: '#fff' }}
+                        style={{ background: colors.primary[500], color: '#F4EDDA' }}
                       >
                         Review
                       </button>
@@ -620,7 +620,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
 
                 <button
                   className="self-start mt-1 px-3 py-1.5 rounded-md text-xs font-semibold"
-                  style={{ background: colors.primary[500], color: '#fff' }}
+                  style={{ background: colors.primary[500], color: '#F4EDDA' }}
                 >
                   Implement
                 </button>
