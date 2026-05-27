@@ -282,38 +282,26 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-            {scenarios.map(({ key, label, color }) => {
-              const value = liq.burnRunway?.[`scenario${key.charAt(0).toUpperCase() + key.slice(1)}`] || 0
-              const isActive = selectedScenario === key
-              return (
-                <motion.div
-                  key={key}
-                  animate={{ scale: isActive ? 1.02 : 1, opacity: isActive ? 1 : 0.7 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl p-5"
-                  style={{
-                    background: colors.bg.tertiary,
-                    border: `1px solid ${isActive ? color : 'transparent'}`,
-                    boxShadow: isActive ? `0 0 24px ${color}55` : 'none',
-                  }}
-                >
-                  <div className="text-xs uppercase tracking-wide" style={{ color: colors.text.secondary }}>
-                    {label}
-                  </div>
-                  <div
-                    className="text-4xl font-bold mt-2"
-                    style={{ color, fontFamily: "'SF Mono', monospace" }}
-                  >
-                    {Number(value).toFixed(1)}
-                  </div>
-                  <div className="text-sm mt-1" style={{ color: colors.text.tertiary }}>
-                    months runway
-                  </div>
-                </motion.div>
-              )
-            })}
+          <div className="mt-5">
+            <LedgerStrip>
+              {scenarios.map(({ key, label }) => {
+                const value = liq.burnRunway?.[`scenario${key.charAt(0).toUpperCase() + key.slice(1)}`] || 0
+                const isActive = selectedScenario === key
+                const tone = key === 'worst' ? C.red : key === 'best' ? C.goldL : C.beige
+                return (
+                  <LedgerMetric
+                    key={key}
+                    label={label}
+                    value={`${Number(value).toFixed(1)}`}
+                    context="months runway"
+                    valueColor={tone}
+                    statusColor={isActive ? C.goldL : undefined}
+                  />
+                )
+              })}
+            </LedgerStrip>
           </div>
+
 
           <div className="mt-6 flex justify-end">
             <GalaxyButton variant="primary">
