@@ -34,48 +34,49 @@ export const typography = {
 } as const;
 
 // ─── Colors ──────────────────────────────────────────────────────────
+// FynHelp brand palette only — no navy, indigo, teal, or purple.
 export const colors = {
-  // Primary: Deep Navy (Trust, Banking, Authority)
+  // Primary: Brand Red (FynHelp accent / CTAs / alerts)
   primary: {
-    50: "#E8EAF6",
-    100: "#C5CAE9",
-    300: "#7986CB",
-    500: "#3949AB", // Main brand color
-    600: "#3344AA",
-    700: "#283593",
-    900: "#1A237E",
+    50:  "#F9DCDC",
+    100: "#F2B5B5",
+    300: "#E06A6A",
+    500: "#C41E1E", // Main brand color
+    600: "#a51818",
+    700: "#8a1414",
+    900: "#5a0d0d",
   },
 
-  // Accent: Rich Gold (Premium, Value, CFO-level)
+  // Accent: Brand Gold (labels, borders, subtle highlights)
   accent: {
-    50: "#FFF8E1",
-    300: "#FFD54F",
-    500: "#FFA726", // Main accent
-    600: "#FB8C00",
-    700: "#F57C00",
-    900: "#E65100",
+    50:  "#F5E9C8",
+    300: "#C9A84C",
+    500: "#8B6914", // Main accent
+    600: "#735611",
+    700: "#5b440d",
+    900: "#3a2b08",
   },
 
-  // Status colors
-  success: { light: "#34D399", main: "#059669", dark: "#047857" },
-  warning: { light: "#FBBF24", main: "#D97706", dark: "#B45309" },
-  danger:  { light: "#F87171", main: "#DC2626", dark: "#B91C1C" },
-  info:    { light: "#38BDF8", main: "#0284C7", dark: "#0369A1" },
+  // Status colors — kept on brand. No green/blue.
+  success: { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
+  warning: { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
+  danger:  { light: "#E06A6A", main: "#C41E1E", dark: "#8a1414" },
+  info:    { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
 
-  // Backgrounds
+  // Backgrounds — warm dark ink hierarchy
   bg: {
-    primary:   "#0A0E27",
-    secondary: "#1A1F3A",
-    tertiary:  "#252B4A",
-    card:      "#1E2642",
+    primary:   "#1A1008",
+    secondary: "#1F0E07",
+    tertiary:  "#2A1209",
+    card:      "#1F0E07",
   },
 
-  // Text hierarchy
+  // Text hierarchy — beige on ink
   text: {
-    primary:   "#F8FAFC",
-    secondary: "#CBD5E1",
-    tertiary:  "#64748B",
-    muted:     "#475569",
+    primary:   "#F4EDDA",
+    secondary: "rgba(244,237,218,0.55)",
+    tertiary:  "rgba(244,237,218,0.40)",
+    muted:     "rgba(244,237,218,0.30)",
   },
 } as const;
 

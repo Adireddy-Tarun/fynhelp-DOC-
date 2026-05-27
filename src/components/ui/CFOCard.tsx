@@ -54,7 +54,7 @@ export function CFOCard({
         transformStyle: "preserve-3d",
         perspective: 1000,
         boxShadow:
-          "0 8px 32px rgba(57, 73, 171, 0.15), 0 4px 16px rgba(0, 0, 0, 0.4)",
+          "0 8px 32px rgba(196,30,30, 0.15), 0 4px 16px rgba(0, 0, 0, 0.4)",
         borderRadius: 16,
       }}
       className="relative group"
@@ -81,7 +81,7 @@ export function CFOCard({
       <div
         className="relative rounded-2xl border overflow-hidden"
         style={{
-          background: "#1E2642",
+          background: "#1F0E07",
           borderColor: "rgba(255,255,255,0.08)",
         }}
       >
@@ -99,7 +99,7 @@ export function CFOCard({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle at 30% 0%, rgba(57,73,171,0.20), transparent 60%), radial-gradient(circle at 80% 100%, rgba(255,167,38,0.10), transparent 60%)",
+              "radial-gradient(circle at 30% 0%, rgba(196,30,30,0.20), transparent 60%), radial-gradient(circle at 80% 100%, rgba(201,168,76,0.10), transparent 60%)",
           }}
           {...pulseGlow}
         />
@@ -123,8 +123,8 @@ export function CFOCard({
               transition={{ duration: 0.6 }}
               className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
               style={{
-                background: "linear-gradient(135deg, #3949AB 0%, #283593 100%)",
-                color: "#F8FAFC",
+                background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                color: "#F4EDDA",
               }}
             >
               <Icon size={18} />
@@ -195,7 +195,7 @@ export function CFOCard({
             className="h-full w-full"
             style={{
               background:
-                "linear-gradient(90deg, transparent, #FFA726, transparent)",
+                "linear-gradient(90deg, transparent, #C9A84C, transparent)",
             }}
             {...shimmer}
           />
