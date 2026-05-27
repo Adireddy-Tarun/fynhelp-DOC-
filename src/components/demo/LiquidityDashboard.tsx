@@ -501,7 +501,7 @@ function SectionTitle({ icon: Icon, children }: { icon: any; children: React.Rea
       >
         <Icon size={18} />
       </div>
-      <h2 className="text-2xl font-bold" style={{ color: colors.text.primary, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <h2 className="text-2xl font-bold" style={{ color: colors.text.primary, fontFamily: "'Sora', system-ui, sans-serif" }}>
         {children}
       </h2>
     </div>
