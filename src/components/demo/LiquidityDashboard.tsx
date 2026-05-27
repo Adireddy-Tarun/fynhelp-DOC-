@@ -237,23 +237,23 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <CFOCard
-            title="Zero Cash Date"
-            value={liq.burnRunway?.zeroCashDate || '—'}
-            icon={Calendar}
-            status={isRunwayCritical ? 'danger' : 'warning'}
-            subtitle="Projected date cash hits zero"
-            animated={false}
-          />
-          <CFOCard
-            title="Burn Multiple"
-            value={liq.burnRunway?.burnMultiple || 0}
-            icon={Zap}
-            status={(liq.burnRunway?.burnMultiple || 0) < 1.5 ? 'good' : 'warning'}
-            subtitle="Net burn ÷ net new ARR"
-          />
+        <div className="mt-4">
+          <LedgerStrip>
+            <LedgerMetric
+              label="Zero Cash Date"
+              value={liq.burnRunway?.zeroCashDate || '—'}
+              context="Projected date cash hits zero"
+              statusColor={isRunwayCritical ? C.red : C.goldL}
+            />
+            <LedgerMetric
+              label="Burn Multiple"
+              value={(liq.burnRunway?.burnMultiple || 0).toFixed(2)}
+              context="Net burn ÷ net new ARR"
+              valueColor={(liq.burnRunway?.burnMultiple || 0) < 1.5 ? C.goldL : C.red}
+            />
+          </LedgerStrip>
         </div>
+
 
         {/* SCENARIO PLANNING */}
         <div className="mt-8 rounded-2xl p-6" style={{ background: colors.bg.secondary, border: `1px solid ${colors.bg.tertiary}` }}>
