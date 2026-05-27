@@ -170,7 +170,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           transition: background .2s, transform .15s, box-shadow .2s;
         }
         .fyn-btn-primary:hover:not(:disabled) {
-          background: #a51818; transform: translateY(-2px);
+          background: rgba(196,30,30,0.85); transform: translateY(-2px);
           box-shadow: 0 8px 24px rgba(196,30,30,0.3);
         }
         .fyn-btn-primary:disabled { opacity: .35; cursor: not-allowed; }
