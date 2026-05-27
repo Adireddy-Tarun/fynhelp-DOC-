@@ -106,30 +106,21 @@ export function CFOCard({
 
         {/* Content */}
         <div className="relative z-10" style={{ padding: 32 }}>
-          {/* Header with icon */}
+          {/* Header (icon circle intentionally removed per brand spec) */}
           <div className="flex items-center justify-between mb-5">
             <span
               className="text-xs font-semibold uppercase"
               style={{
-                color: colors.text.secondary,
+                color: "#8B6914",
                 fontFamily: typography.heading.fontFamily,
-                letterSpacing: "0.06em",
+                letterSpacing: "0.18em",
+                fontSize: 9,
               }}
             >
               {title}
             </span>
-            <motion.div
-              whileHover={{ rotate: 360, scale: 1.15 }}
-              transition={{ duration: 0.6 }}
-              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
-                color: "#F4EDDA",
-              }}
-            >
-              <Icon size={18} />
-            </motion.div>
           </div>
+
 
           {/* Value with count-up */}
           <div className="mb-2">
