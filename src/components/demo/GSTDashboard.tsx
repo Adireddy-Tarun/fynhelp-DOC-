@@ -205,42 +205,34 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
         </SectionTitle>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
-          <CFOCard
-            title="Total ITC Available"
-            value={(itc.totalAvailable || 0) / 100000}
-            prefix="₹"
-            suffix="L"
-            icon={IndianRupee}
-            status="neutral"
-            subtitle="From GSTR-2A"
-          />
-          <CFOCard
-            title="ITC Claimed"
-            value={(itc.claimed || 0) / 100000}
-            prefix="₹"
-            suffix="L"
-            icon={CheckCircle}
-            status={STATUS_GOOD}
-            subtitle="In GSTR-3B"
-          />
-          <CFOCard
-            title="ITC Gap"
-            value={itcGapPct}
-            suffix="%"
-            icon={AlertCircle}
-            status={itcGapStatus}
-            subtitle={`Gap: ${fmtL(itc.gap || 0)}`}
-          />
-          <CFOCard
-            title="Blocked ITC"
-            value={(itc.ineligible || 0) / 100000}
-            prefix="₹"
-            suffix="L"
-            icon={XCircle}
-            status={STATUS_DANGER}
-            subtitle="Ineligible credit"
-          />
+        <div className="mt-5">
+          <LedgerStrip>
+            <LedgerMetric
+              label="Total ITC Available"
+              value={`₹${((itc.totalAvailable || 0) / 100000).toFixed(1)}L`}
+              context="From GSTR-2A"
+            />
+            <LedgerMetric
+              label="ITC Claimed"
+              value={`₹${((itc.claimed || 0) / 100000).toFixed(1)}L`}
+              context="In GSTR-3B"
+              valueColor={C.goldL}
+            />
+            <LedgerMetric
+              label="ITC Gap"
+              value={`${itcGapPct.toFixed(1)}%`}
+              context={`Gap: ₹${((itc.gap || 0) / 100000).toFixed(1)}L`}
+              valueColor={itcGapStatus === 'danger' ? C.red : itcGapStatus === 'warning' ? C.beige : C.goldL}
+            />
+            <LedgerMetric
+              label="Blocked ITC"
+              value={`₹${((itc.ineligible || 0) / 100000).toFixed(1)}L`}
+              context="Ineligible credit"
+              valueColor={C.red}
+            />
+          </LedgerStrip>
         </div>
+
 
         <Card
           className="mt-5 overflow-hidden"
