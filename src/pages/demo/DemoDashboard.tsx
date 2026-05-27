@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-// Demo access guards temporarily disabled — re-enable when design review complete
-import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Upload, Link2, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { Droplet, TrendingUp, DollarSign, FileText, Bot, ShieldCheck, Briefcase } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { LiquidityDashboard } from '@/components/demo/LiquidityDashboard'
 import { FynnyChat } from '@/components/demo/FynnyChat'
@@ -9,15 +8,42 @@ import { RevenueDashboard } from '@/components/demo/RevenueDashboard'
 import { CostDashboard } from '@/components/demo/CostDashboard'
 import { GSTDashboard } from '@/components/demo/GSTDashboard'
 import { GovernanceDashboard } from '@/components/demo/GovernanceDashboard'
+import { InvestorDashboard } from '@/components/demo/InvestorDashboard'
 import { TransactionUpload } from '@/components/demo/TransactionUpload'
+import { C, A, T, FONT } from '@/components/demo/_design/tokens'
+import { CFOBriefing, RecommendedAction, Pill, PrimaryBtn, SecondaryBtn, Badge } from '@/components/demo/_design/primitives'
 
 const MODULES = [
-  { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#C41E1E' },
-  { id: 'revenue', name: 'Revenue', icon: TrendingUp, color: '#C9A84C' },
-  { id: 'cost', name: 'Cost', icon: DollarSign, color: '#C9A84C' },
-  { id: 'gst', name: 'GST & Tax', icon: FileText, color: '#C41E1E' },
-  { id: 'governance', name: 'Governance', icon: ShieldCheck, color: '#C41E1E' },
-  { id: 'fynny', name: 'Ask Fynny', icon: Bot, color: '#C41E1E' },
+  { id: 'liquidity',  name: 'Liquidity',     icon: Droplet },
+  { id: 'revenue',    name: 'Revenue',       icon: TrendingUp },
+  { id: 'cost',       name: 'Cost',          icon: DollarSign },
+  { id: 'gst',        name: 'GST & Tax',     icon: FileText },
+  { id: 'governance', name: 'Governance',    icon: ShieldCheck },
+  { id: 'investor',   name: 'Investor View', icon: Briefcase },
+  { id: 'fynny',      name: 'Ask Fynny',     icon: Bot },
+]
+
+// Per-module CFO verdicts
+const VERDICTS: Record<string, React.ReactNode> = {
+  liquidity: (<>Your cash conversion cycle is <strong style={{color:C.beige,fontWeight:600}}>35 days</strong> — 13 days slower than sector median of 22 days. This ties up <strong style={{color:C.beige,fontWeight:600}}>₹18.4L</strong> in unnecessary working capital annually. Acme Corp, TechStart Ltd, and Global Inc account for <strong style={{color:C.beige,fontWeight:600}}>78%</strong> of overdue receivables. Call them this week.</>),
+  revenue: (<>MRR is <strong style={{color:C.beige,fontWeight:600}}>₹14.2L</strong> growing at <strong style={{color:C.beige,fontWeight:600}}>8.3% MoM</strong> and <strong style={{color:C.beige,fontWeight:600}}>127.4% YoY</strong> — faster than 94% of Indian B2B SaaS at your stage. At this trajectory you cross <strong style={{color:C.beige,fontWeight:600}}>₹5Cr ARR</strong> in 8 months. Immediate risk: TechStart Solutions shows <strong style={{color:C.beige,fontWeight:600}}>72% churn probability</strong> — their renewal is in 6 weeks.</>),
+  cost: (<>AWS spend of <strong style={{color:C.beige,fontWeight:600}}>₹125K</strong> is 34% above median for companies at your revenue stage. Reserved instances would cost <strong style={{color:C.beige,fontWeight:600}}>₹82K</strong> — saving <strong style={{color:C.beige,fontWeight:600}}>₹43K/month</strong>. Vendor concentration at <strong style={{color:C.beige,fontWeight:600}}>32.4%</strong> from top 3 vendors is above the 25% safe threshold.</>),
+  gst: (<>Compliance score <strong style={{color:C.beige,fontWeight:600}}>28/100</strong> is in the safe zone — scores above 50 trigger audit selection. However <strong style={{color:C.beige,fontWeight:600}}>₹0.96L</strong> penalty exposure requires resolution within 7 days before escalation under Section 73. ITC reversal of <strong style={{color:C.beige,fontWeight:600}}>₹0.10L</strong> needed because your supplier has not filed their return.</>),
+  governance: (<>No critical governance flags this month. <strong style={{color:C.beige,fontWeight:600}}>3 ROC filings</strong> due in the next 60 days. MSME compliance score: <strong style={{color:C.beige,fontWeight:600}}>94/100</strong>.</>),
+}
+
+const ACTIONS: Record<string, string> = {
+  liquidity: "Call Acme Corp (₹145K, 42 days overdue) and TechStart Ltd (₹98K, 35 days overdue) before Friday. Together they represent 78% of your overdue balance.",
+  revenue:   "Contact TechStart Solutions this week — 72% churn probability, renewal in 6 weeks. Schedule a QBR and address their export feature request before they evaluate alternatives.",
+  cost:      "Move AWS infrastructure to reserved instances this month — estimated saving ₹43K/month or ₹5.16L annually. Requires 1-year commitment. At current runway this pays back in month 1.",
+  gst:       "Resolve ₹0.96L penalty exposure this week — contact your CA to file the amended return before 27 July. After 7 days this escalates to Section 73 proceedings. Also chase your ITC supplier to file their GSTR-1 to protect ₹0.24L in credit.",
+  governance:"File Annual Return (MGT-7) due in 38 days. Your CS has been notified. Estimated time: 2 hours. No penalties if filed before due date.",
+}
+
+const TICKER_ALERTS = [
+  "⚠ GST filing due in 3 days",
+  "⚠ Receivables ₹3.72L overdue 60+ days",
+  "⚠ Burn multiple above Series A threshold — 2.4x",
 ]
 
 interface OrgOption {
