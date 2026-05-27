@@ -102,9 +102,9 @@ export function DemoOnboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+    <div className="min-h-screen bg-gradient-to-b from-[#2A1209] to-[#1A1008]">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur">
+      <div className="border-b border-white/10 bg-[#2A1209]/80 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-georgia font-bold text-white">
             FynHelp Demo
@@ -118,7 +118,7 @@ export function DemoOnboarding() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-gradient-to-br from-[#C41E1E] to-[#E85D5D] rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#C41E1E] to-[#C41E1E] rounded-full flex items-center justify-center mx-auto mb-6">
             <Bot size={40} className="text-white" />
           </div>
           <h2 className="text-4xl font-georgia font-bold text-white mb-3">
@@ -137,7 +137,7 @@ export function DemoOnboarding() {
             >
               <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
                 msg.role === 'fynny'
-                  ? 'bg-gradient-to-br from-[#C41E1E] to-[#E85D5D]'
+                  ? 'bg-gradient-to-br from-[#C41E1E] to-[#C41E1E]'
                   : 'bg-white/10'
               }`}>
                 {msg.role === 'fynny' ? (
@@ -186,7 +186,7 @@ export function DemoOnboarding() {
           </div>
           <div className="h-2 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#C41E1E] to-[#E85D5D] transition-all duration-500"
+              className="h-full bg-gradient-to-r from-[#C41E1E] to-[#C41E1E] transition-all duration-500"
               style={{ width: `${(step / QUESTIONS.length) * 100}%` }}
             />
           </div>

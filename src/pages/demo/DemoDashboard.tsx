@@ -12,11 +12,11 @@ import { GovernanceDashboard } from '@/components/demo/GovernanceDashboard'
 import { TransactionUpload } from '@/components/demo/TransactionUpload'
 
 const MODULES = [
-  { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#3B82F6' },
-  { id: 'revenue', name: 'Revenue', icon: TrendingUp, color: '#10B981' },
-  { id: 'cost', name: 'Cost', icon: DollarSign, color: '#F59E0B' },
-  { id: 'gst', name: 'GST & Tax', icon: FileText, color: '#8B5CF6' },
-  { id: 'governance', name: 'Governance', icon: ShieldCheck, color: '#0EA5E9' },
+  { id: 'liquidity', name: 'Liquidity', icon: Droplet, color: '#C41E1E' },
+  { id: 'revenue', name: 'Revenue', icon: TrendingUp, color: '#C9A84C' },
+  { id: 'cost', name: 'Cost', icon: DollarSign, color: '#C9A84C' },
+  { id: 'gst', name: 'GST & Tax', icon: FileText, color: '#C41E1E' },
+  { id: 'governance', name: 'Governance', icon: ShieldCheck, color: '#C41E1E' },
   { id: 'fynny', name: 'Ask Fynny', icon: Bot, color: '#C41E1E' },
 ]
 
@@ -817,10 +817,10 @@ export function DemoDashboard() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "linear-gradient(135deg, #0A0E27 0%, #1A1F3A 100%)" }}
+      style={{ background: "linear-gradient(135deg, #1A1008 0%, #1F0E07 100%)" }}
     >
       {/* Top Nav */}
-      <nav className="border-b border-white/10 bg-[#0A0E27]/80 backdrop-blur sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#1A1008]/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -829,7 +829,7 @@ export function DemoDashboard() {
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   letterSpacing: '-0.02em',
-                  color: '#F8FAFC',
+                  color: '#F4EDDA',
                   lineHeight: 1.1,
                 }}
               >
@@ -837,7 +837,7 @@ export function DemoDashboard() {
               </h1>
               <p
                 className="text-sm"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#64748B' }}
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#8B6914' }}
               >
                 Data: {fileName}
               </p>
@@ -846,8 +846,8 @@ export function DemoDashboard() {
               <div
                 className="flex items-center gap-1 p-1 rounded-xl"
                 style={{
-                  background: '#252B48',
-                  border: '1px solid rgba(57, 73, 171, 0.25)',
+                  background: '#2A1209',
+                  border: '1px solid rgba(139,105,20, 0.25)',
                 }}
               >
                 {(['12m', '24m', 'all'] as TimeRange[]).map((r) => {
@@ -858,8 +858,8 @@ export function DemoDashboard() {
                       onClick={() => setTimeRange(r)}
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
                       style={{
-                        background: active ? '#FFA726' : 'transparent',
-                        color: active ? '#0A0E27' : '#F8FAFC',
+                        background: active ? '#C9A84C' : 'transparent',
+                        color: active ? '#1A1008' : '#F4EDDA',
                         fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
                       }}
                       aria-pressed={active}
@@ -875,9 +875,9 @@ export function DemoDashboard() {
                   onChange={(e) => switchOrg(e.target.value)}
                   className="px-3 py-2 rounded-xl text-sm font-semibold focus:outline-none"
                   style={{
-                    background: '#252B48',
-                    color: '#F8FAFC',
-                    border: '1px solid rgba(57, 73, 171, 0.4)',
+                    background: '#2A1209',
+                    color: '#F4EDDA',
+                    border: '1px solid rgba(139,105,20, 0.4)',
                     fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
                     maxWidth: 220,
                   }}
@@ -894,10 +894,10 @@ export function DemoDashboard() {
                 onClick={() => setShowUpload(true)}
                 className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
                 style={{
-                  background: '#FFA726',
-                  color: '#0A0E27',
+                  background: '#C9A84C',
+                  color: '#1A1008',
                   fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                  border: '1px solid #FFA726',
+                  border: '1px solid #C9A84C',
                 }}
               >
                 <Upload size={16} />
@@ -909,9 +909,9 @@ export function DemoDashboard() {
                   className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors"
                   style={{
                     background: 'transparent',
-                    color: '#F8FAFC',
+                    color: '#F4EDDA',
                     fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                    border: '1px solid rgba(57, 73, 171, 0.5)',
+                    border: '1px solid rgba(139,105,20, 0.5)',
                   }}
                 >
                   <Link2 size={16} />
@@ -924,10 +924,10 @@ export function DemoDashboard() {
                     disabled={zohoSyncing}
                     className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-colors disabled:opacity-60"
                     style={{
-                      background: '#3949AB',
-                      color: '#F8FAFC',
+                      background: '#8B6914',
+                      color: '#F4EDDA',
                       fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                      border: '1px solid #3949AB',
+                      border: '1px solid #8B6914',
                     }}
                   >
                     {zohoSyncing ? (
@@ -945,14 +945,14 @@ export function DemoDashboard() {
                   <div
                     className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold"
                     style={{
-                      background: 'rgba(16, 185, 129, 0.12)',
-                      color: '#34D399',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      background: 'rgba(201,168,76, 0.12)',
+                      color: '#C9A84C',
+                      border: '1px solid rgba(201,168,76, 0.3)',
                       fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
                     }}
                   >
                     <CheckCircle2 size={14} />
-                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                    <span className="w-1.5 h-1.5 bg-[#C9A84C] rounded-full animate-pulse" />
                     Zoho Connected
                   </div>
                 </>
@@ -966,10 +966,10 @@ export function DemoDashboard() {
                 }}
                 className="px-6 py-3 rounded-xl font-semibold transition-colors"
                 style={{
-                  background: '#252B48',
-                  color: '#F8FAFC',
+                  background: '#2A1209',
+                  color: '#F4EDDA',
                   fontFamily: "'Plus Jakarta Sans Variable', sans-serif",
-                  border: '1px solid rgba(57, 73, 171, 0.25)',
+                  border: '1px solid rgba(139,105,20, 0.25)',
                 }}
               >
                 Exit Demo
@@ -980,7 +980,7 @@ export function DemoDashboard() {
       </nav>
 
       {/* Module Tabs */}
-      <div className="border-b border-white/10 sticky top-[89px] z-40" style={{ background: "#0A0E27CC" }}>
+      <div className="border-b border-white/10 sticky top-[89px] z-40" style={{ background: "#1A1008CC" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto">
             {MODULES.map((module) => {
@@ -993,9 +993,9 @@ export function DemoDashboard() {
                   className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-all whitespace-nowrap font-inter font-semibold ${
                     isActive ? "text-white" : "text-white/60 hover:text-white/80"
                   }`}
-                  style={{ borderColor: isActive ? "#FFA726" : "transparent" }}
+                  style={{ borderColor: isActive ? "#C9A84C" : "transparent" }}
                 >
-                  <Icon size={20} style={{ color: isActive ? "#FFA726" : undefined }} />
+                  <Icon size={20} style={{ color: isActive ? "#C9A84C" : undefined }} />
                   <span>{module.name}</span>
                 </button>
               )
@@ -1018,7 +1018,7 @@ export function DemoDashboard() {
       {showUpload && (
         <div
           className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto p-6"
-          style={{ background: 'rgba(10, 14, 39, 0.85)', backdropFilter: 'blur(6px)' }}
+          style={{ background: 'rgba(26,16,8, 0.85)', backdropFilter: 'blur(6px)' }}
           onClick={() => setShowUpload(false)}
         >
           <div className="w-full max-w-4xl my-12" onClick={(e) => e.stopPropagation()}>
@@ -1068,9 +1068,9 @@ function DashboardSkeleton({
   fileName: string
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+    <div className="min-h-screen bg-gradient-to-b from-[#2A1209] to-[#1A1008]">
       {/* Top Nav (real, so no flash) */}
-      <nav className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#2A1209]/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -1085,7 +1085,7 @@ function DashboardSkeleton({
       </nav>
 
       {/* Module tab placeholders */}
-      <div className="border-b border-white/10 bg-[#1a1412]/50 sticky top-[73px] z-40">
+      <div className="border-b border-white/10 bg-[#2A1209]/50 sticky top-[73px] z-40">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-6 py-4">
             {Array.from({ length: 5 }).map((_, i) => (

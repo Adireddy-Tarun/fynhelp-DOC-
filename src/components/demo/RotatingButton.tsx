@@ -26,7 +26,7 @@ export const RotatingButton = ({ children, onClick, className = "" }: RotatingBu
         transformStyle: "preserve-3d",
         perspective: 1000,
       }}
-      className={`relative px-8 py-4 bg-gradient-to-br from-[#3949AB] to-[#283593] text-white font-semibold rounded-xl shadow-2xl ${className}`}
+      className={`relative px-8 py-4 bg-gradient-to-br from-[#8B6914] to-[#8B6914] text-white font-semibold rounded-xl shadow-2xl ${className}`}
     >
       {/* Inner glow layer */}
       <motion.div

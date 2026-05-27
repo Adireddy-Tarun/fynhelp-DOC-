@@ -74,9 +74,9 @@ export function DemoUpload() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a1412] to-[#0a0a0a]">
+    <div className="min-h-screen bg-gradient-to-b from-[#2A1209] to-[#1A1008]">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#1a1412]/80 backdrop-blur">
+      <div className="border-b border-white/10 bg-[#2A1209]/80 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-georgia font-bold text-white">FynHelp Demo</h1>
           <button

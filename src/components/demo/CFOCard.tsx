@@ -21,10 +21,10 @@ const TrendIcon = ({ status }: { status: CFOCardStatus }) => {
 export const CFOCard = ({ title, value, icon, trend, status }: CFOCardProps) => {
   const statusColor =
     status === "good"
-      ? "text-[#059669]"
+      ? "text-[#C9A84C]"
       : status === "warning"
-      ? "text-[#D97706]"
-      : "text-[#DC2626]";
+      ? "text-[#C9A84C]"
+      : "text-[#C41E1E]";
 
   return (
     <motion.div
@@ -41,10 +41,10 @@ export const CFOCard = ({ title, value, icon, trend, status }: CFOCardProps) => 
       className="relative group"
     >
       {/* Main card */}
-      <div className="relative bg-gradient-to-br from-[#1A1F3A] to-[#252B48] rounded-2xl border border-white/10 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#1F0E07] to-[#2A1209] rounded-2xl border border-white/10 overflow-hidden">
         {/* Animated gradient overlay */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-[#3949AB]/20 via-transparent to-[#FFA726]/10 pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-br from-[#8B6914]/20 via-transparent to-[#C9A84C]/10 pointer-events-none"
           animate={{
             opacity: [0.3, 0.6, 0.3],
             scale: [1, 1.1, 1],
@@ -56,13 +56,13 @@ export const CFOCard = ({ title, value, icon, trend, status }: CFOCardProps) => 
         <div className="relative z-10 p-6" style={{ transform: "translateZ(20px)" }}>
           {/* Header with icon */}
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[#CBD5E1] text-xs font-semibold uppercase tracking-wider">
+            <span className="text-[#F4EDDA] text-xs font-semibold uppercase tracking-wider">
               {title}
             </span>
             <motion.div
               whileHover={{ rotate: 360, scale: 1.2 }}
               transition={{ duration: 0.6 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3949AB] to-[#283593] flex items-center justify-center text-white"
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B6914] to-[#8B6914] flex items-center justify-center text-white"
               style={{ transform: "translateZ(10px)" }}
             >
               {icon}
@@ -89,7 +89,7 @@ export const CFOCard = ({ title, value, icon, trend, status }: CFOCardProps) => 
 
         {/* Bottom accent line */}
         <motion.div
-          className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3949AB] via-[#FFA726] to-[#3949AB]"
+          className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8B6914] via-[#C9A84C] to-[#8B6914]"
           animate={{ x: ["-100%", "100%"] }}
           transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
         />
@@ -97,7 +97,7 @@ export const CFOCard = ({ title, value, icon, trend, status }: CFOCardProps) => 
 
       {/* Shadow layer */}
       <div
-        className="absolute inset-0 bg-[#3949AB]/20 rounded-2xl blur-2xl -z-10 group-hover:bg-[#3949AB]/40 transition-all"
+        className="absolute inset-0 bg-[#8B6914]/20 rounded-2xl blur-2xl -z-10 group-hover:bg-[#8B6914]/40 transition-all"
         style={{ transform: "translateZ(-20px)" }}
       />
     </motion.div>
