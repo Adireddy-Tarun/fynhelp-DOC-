@@ -27,6 +27,7 @@ import AdminWaitlistPage from "./pages/admin/AdminWaitlistPage.tsx";
 import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
+import WaitlistPopup from "./components/WaitlistPopup";
 
 import PricingPage from "./pages/PricingPage.tsx";
 import PublicSecurityPage from "./pages/SecurityPage.tsx";
