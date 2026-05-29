@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const COMPANY_TYPES = [
@@ -41,6 +41,8 @@ export interface WaitlistFormProps {
   /** Visual theme of the form (light backgrounds vs. dark/red backgrounds). */
   theme?: "light" | "dark";
   className?: string;
+  /** Called when the form is submitted successfully. */
+  onSuccess?: () => void;
 }
 
 export default function WaitlistForm({
@@ -48,9 +50,11 @@ export default function WaitlistForm({
   inline = false,
   theme = "light",
   className = "",
+  onSuccess,
 }: WaitlistFormProps) {
   const [formData, setFormData] = useState<FormData>(initial);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(
     null,
   );
@@ -77,13 +81,9 @@ export default function WaitlistForm({
       });
 
       if (!error && (body?.success ?? true)) {
-        setMessage({
-          type: "success",
-          text: body?.already_exists
-            ? "✅ You're already on the waitlist. We'll be in touch soon."
-            : "✅ Successfully joined! Check your email for confirmation.",
-        });
+        setSubmitted(true);
         setFormData(initial);
+        onSuccess?.();
       } else {
         setMessage({
           type: "error",
@@ -126,6 +126,32 @@ export default function WaitlistForm({
   const errorCls = isDark
     ? "text-sm font-medium text-center text-white bg-black/20 py-2.5 px-3 rounded-lg"
     : "text-red-600 text-sm mt-2 text-center";
+
+  if (submitted) {
+    return (
+      <div className={`text-center py-6 md:py-10 ${className}`}>
+        <div className="mx-auto mb-5 w-16 h-16 md:w-20 md:h-20 rounded-full bg-fyn-red/10 border border-fyn-red/20 flex items-center justify-center">
+          <Check className="w-7 h-7 md:w-9 md:h-9 text-fyn-red" strokeWidth={2.5} />
+        </div>
+        <h3
+          className="text-fyn-ink leading-[1.1] text-[26px] md:text-[32px] mb-3"
+          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}
+        >
+          You're on the list
+        </h3>
+        <p className="text-fyn-ink/65 text-sm md:text-[15px] max-w-md mx-auto mb-6 leading-relaxed">
+          We review applications on a rolling basis. Expect an email from our team within{" "}
+          <span className="text-fyn-ink font-semibold">24–48 hours</span> with your early-access credentials and next steps.
+        </p>
+        <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-fyn-beige-dark border border-fyn-ink/8">
+          <Mail className="w-4 h-4 text-fyn-gold flex-shrink-0" />
+          <span className="text-fyn-ink/70 text-sm" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+            Check your inbox — and your spam folder
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
