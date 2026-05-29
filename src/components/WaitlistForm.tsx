@@ -79,18 +79,24 @@ export default function WaitlistForm({
     setMessage(null);
 
     try {
-      const { data: body, error } = await supabase.functions.invoke("waitlist-signup", {
-        body: { ...formData, email },
+      const response = await fetch(EXTERNAL_WAITLIST_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${EXTERNAL_ANON_KEY}`,
+        },
+        body: JSON.stringify({ ...formData, email }),
       });
+      const body = await response.json().catch(() => ({} as any));
 
-      if (!error && (body?.success ?? true)) {
+      if (response.ok && (body?.success ?? true)) {
         setSubmitted(true);
         setFormData(initial);
         onSuccess?.();
       } else {
         setMessage({
           type: "error",
-          text: error?.message || body?.error || "Something went wrong. Please try again.",
+          text: body?.error || "Something went wrong. Please try again.",
         });
       }
     } catch {
