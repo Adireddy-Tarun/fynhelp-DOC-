@@ -127,6 +127,32 @@ export default function WaitlistForm({
     ? "text-sm font-medium text-center text-white bg-black/20 py-2.5 px-3 rounded-lg"
     : "text-red-600 text-sm mt-2 text-center";
 
+  if (submitted) {
+    return (
+      <div className={`text-center py-6 md:py-10 ${className}`}>
+        <div className="mx-auto mb-5 w-16 h-16 md:w-20 md:h-20 rounded-full bg-fyn-red/10 border border-fyn-red/20 flex items-center justify-center">
+          <Check className="w-7 h-7 md:w-9 md:h-9 text-fyn-red" strokeWidth={2.5} />
+        </div>
+        <h3
+          className="text-fyn-ink leading-[1.1] text-[26px] md:text-[32px] mb-3"
+          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}
+        >
+          You're on the list
+        </h3>
+        <p className="text-fyn-ink/65 text-sm md:text-[15px] max-w-md mx-auto mb-6 leading-relaxed">
+          We review applications on a rolling basis. Expect an email from our team within{" "}
+          <span className="text-fyn-ink font-semibold">24–48 hours</span> with your early-access credentials and next steps.
+        </p>
+        <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-fyn-beige-dark border border-fyn-ink/8">
+          <Mail className="w-4 h-4 text-fyn-gold flex-shrink-0" />
+          <span className="text-fyn-ink/70 text-sm" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+            Check your inbox — and your spam folder
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
       <div className={isSimple ? "space-y-4" : "grid grid-cols-1 md:grid-cols-2 gap-4"}>
