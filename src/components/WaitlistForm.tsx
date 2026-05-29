@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const COMPANY_TYPES = [
