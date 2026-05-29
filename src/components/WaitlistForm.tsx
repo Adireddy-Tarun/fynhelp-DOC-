@@ -41,6 +41,8 @@ export interface WaitlistFormProps {
   /** Visual theme of the form (light backgrounds vs. dark/red backgrounds). */
   theme?: "light" | "dark";
   className?: string;
+  /** Called when the form is submitted successfully. */
+  onSuccess?: () => void;
 }
 
 export default function WaitlistForm({
@@ -48,9 +50,11 @@ export default function WaitlistForm({
   inline = false,
   theme = "light",
   className = "",
+  onSuccess,
 }: WaitlistFormProps) {
   const [formData, setFormData] = useState<FormData>(initial);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(
     null,
   );
