@@ -1,6 +1,9 @@
 import { useState, FormEvent } from "react";
 import { Loader2, Check, Mail } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+const EXTERNAL_WAITLIST_URL =
+  "https://wiknwxniwqvsxgyzqqxu.supabase.co/functions/v1/waitlist-signup";
+const EXTERNAL_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa253eG5pd3F2c3hneXpxcXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzc1MTksImV4cCI6MjA5MTgxMzUxOX0.MVIp_hMUZsiMQ-LFulVdYaFkGonNk5WwdcHYWsx__qY";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",
@@ -76,18 +79,24 @@ export default function WaitlistForm({
     setMessage(null);
 
     try {
-      const { data: body, error } = await supabase.functions.invoke("waitlist-signup", {
-        body: { ...formData, email },
+      const response = await fetch(EXTERNAL_WAITLIST_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${EXTERNAL_ANON_KEY}`,
+        },
+        body: JSON.stringify({ ...formData, email }),
       });
+      const body = await response.json().catch(() => ({} as any));
 
-      if (!error && (body?.success ?? true)) {
+      if (response.ok && (body?.success ?? true)) {
         setSubmitted(true);
         setFormData(initial);
         onSuccess?.();
       } else {
         setMessage({
           type: "error",
-          text: error?.message || body?.error || "Something went wrong. Please try again.",
+          text: body?.error || "Something went wrong. Please try again.",
         });
       }
     } catch {
