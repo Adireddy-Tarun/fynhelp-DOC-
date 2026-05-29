@@ -106,7 +106,11 @@ export default function WaitlistPopup() {
         </div>
 
         <div className="px-5 pb-7 md:px-10 md:pb-9">
-          <WaitlistForm variant="detailed" theme="light" />
+          <WaitlistForm
+            variant="detailed"
+            theme="light"
+            onSuccess={() => setCanClose(true)}
+          />
         </div>
       </div>
     </div>
