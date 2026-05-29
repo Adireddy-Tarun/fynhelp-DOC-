@@ -81,13 +81,9 @@ export default function WaitlistForm({
       });
 
       if (!error && (body?.success ?? true)) {
-        setMessage({
-          type: "success",
-          text: body?.already_exists
-            ? "✅ You're already on the waitlist. We'll be in touch soon."
-            : "✅ Successfully joined! Check your email for confirmation.",
-        });
+        setSubmitted(true);
         setFormData(initial);
+        onSuccess?.();
       } else {
         setMessage({
           type: "error",
