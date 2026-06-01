@@ -1,60 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- Homepage -->
   <url>
     <loc>https://fynhelp.com/</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>daily</changefreq>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- About Page -->
   <url>
-    <loc>https://fynhelp.com/about</loc>
-    <lastmod>2026-05-14</lastmod>
+    <loc>https://fynhelp.com/features</loc>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Security Page -->
-  <url>
-    <loc>https://fynhelp.com/security</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Pricing Page -->
   <url>
     <loc>https://fynhelp.com/pricing</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
-
-  <!-- Waitlist Page -->
   <url>
-    <loc>https://fynhelp.com/waitlist</loc>
-    <lastmod>2026-05-14</lastmod>
+    <loc>https://fynhelp.com/blog</loc>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
-
-  <!-- Contact Page -->
+  <url>
+    <loc>https://fynhelp.com/about</loc>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
   <url>
     <loc>https://fynhelp.com/contact</loc>
-    <lastmod>2026-05-14</lastmod>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fynhelp.com/login</loc>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fynhelp.com/signup</loc>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
-  <!-- Blog -->
-  <url>
-    <loc>https://fynhelp.com/blog</loc>
-    <lastmod>2026-05-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
 </urlset>
