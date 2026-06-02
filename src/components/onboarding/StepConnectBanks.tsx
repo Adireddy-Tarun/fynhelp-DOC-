@@ -70,11 +70,11 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
       </h1>
       <p className="mb-8 text-sm text-secondary-foreground">
         Connect all your business bank accounts at once. FynHelp aggregates them into one unified cash view.
-        Uses RBI's Account Aggregator — your login credentials are never shared with us.
+        Uses RBI's Account Aggregator, your login credentials are never shared with us.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
-        {/* LEFT — Bank Selection */}
+        {/* LEFT, Bank Selection */}
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3 text-secondary-foreground">
             Select your banks
@@ -192,7 +192,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
           )}
         </div>
 
-        {/* RIGHT — Connected banks panel */}
+        {/* RIGHT, Connected banks panel */}
         <div className="lg:sticky lg:top-32 self-start">
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-[15px] font-semibold" style={{ color: "hsl(var(--fyn-ink))" }}>Connected accounts</h3>
@@ -260,7 +260,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
         <div>
           {!showSkipWarning ? (
             <button onClick={() => setShowSkipWarning(true)} className="text-[13px] hover:underline text-secondary-foreground">
-              Skip for now — I'll connect banks later
+              Skip for now, I'll connect banks later
             </button>
           ) : (
             <div className="text-xs max-w-sm" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>

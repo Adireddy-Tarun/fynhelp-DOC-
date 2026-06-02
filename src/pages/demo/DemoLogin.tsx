@@ -867,7 +867,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             marginTop: 14, fontSize: 15, color: "rgba(244,237,218,0.55)",
             lineHeight: 1.5, maxWidth: 380, marginInline: "auto",
           }}>
-            Built for Indian founders who need real financial intelligence — not another spreadsheet.
+            Built for Indian founders who need real financial intelligence, not another spreadsheet.
           </p>
         </div>
 
@@ -1206,7 +1206,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             </div>
           )}
 
-          {/* ACCESS tab removed — moved to /admin/internal-access */}
+          {/* ACCESS tab removed, moved to /admin/internal-access */}
 
           {/* SUCCESS */}
           {submitted && (

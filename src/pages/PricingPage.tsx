@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 /* ================================================================
-   FYNHelp Pricing Page — brand palette only
+   FYNHelp Pricing Page, brand palette only
    Ink #1A1008 | Red #C41E1E | Beige #F4EDDA | Gold #8B6914
    Fonts: Oswald, Raleway, Roboto, DM Sans
 ================================================================ */
@@ -34,7 +34,7 @@ const plans: Plan[] = [
     name: "Starter",
     price: "FREE",
     priceSuffix: "for 6 months",
-    subline: "Then ₹30,000/year — Waitlist only",
+    subline: "Then ₹30,000/year, Waitlist only",
     features: [
       "8 AI CFO queries per month",
       "Real-time cash flow tracking",
@@ -199,7 +199,7 @@ export default function PricingPage() {
 
   return (
     <Layout>
-      {/* Local styles — sparkles, gradient bg, accents */}
+      {/* Local styles, sparkles, gradient bg, accents */}
       <style>{`
         .fyn-bg-anim {
           background: linear-gradient(145deg, #F4EDDA 0%, #E8DCC4 30%, #F4EDDA 60%, #D4C4A8 100%);
@@ -457,7 +457,7 @@ export default function PricingPage() {
             >
               6-months free
             </span>{" "}
-            today — no credit card required.
+            today, no credit card required.
           </motion.p>
 
           <motion.form
@@ -1110,7 +1110,7 @@ function EngagementPopup() {
         </button>
 
         <div className="fyn-popup-grid">
-          {/* LEFT — text + form */}
+          {/* LEFT, text + form */}
           <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <h2
               id="fyn-popup-title"
@@ -1139,7 +1139,7 @@ function EngagementPopup() {
                 marginBottom: 12,
               }}
             >
-              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Fynny</strong> — real founders, not sales reps. Honest advice on what'll work for your business.
+              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Fynny</strong>, real founders, not sales reps. Honest advice on what'll work for your business.
             </p>
             <p
               style={{
@@ -1242,7 +1242,7 @@ function EngagementPopup() {
             )}
           </div>
 
-          {/* RIGHT — stats panel */}
+          {/* RIGHT, stats panel */}
           <div
             className="fyn-popup-right"
             style={{

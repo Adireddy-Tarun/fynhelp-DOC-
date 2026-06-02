@@ -170,7 +170,7 @@ function Hero() {
           }}
           className="text-[19px] md:text-[25px]"
         >
-          Every SME deserves CFO-level clarity — without CFO-level cost
+          Every SME deserves CFO-level clarity, without CFO-level cost
         </motion.p>
 
         <div
@@ -609,7 +609,7 @@ function StorySection() {
   const events = [
     { year: "2023", icon: Sparkles, color: "rgba(16,185,129,0.9)", title: "Started Dark Capital", desc: "Launched a luxury sugar-free chocolate brand with big dreams and optimism. Revenue growing, customers loving the product." },
     { year: "2024", icon: AlertTriangle, color: "rgba(245,158,11,0.9)", title: "Hidden Payables Discovered", desc: "Realized we had zero visibility into our true cash position. Hidden vendor payables, delayed payments, no real-time tracking." },
-    { year: "2024", icon: TimerOff, color: "#EF4444", title: "14 Days from Bankruptcy", desc: "Discovered we were 14 days away from running out of cash — not 60 days out when we could have acted. No CFO. No warning system. Just sudden crisis." },
+    { year: "2024", icon: TimerOff, color: "#EF4444", title: "14 Days from Bankruptcy", desc: "Discovered we were 14 days away from running out of cash, not 60 days out when we could have acted. No CFO. No warning system. Just sudden crisis." },
     { year: "2025", icon: XCircle, color: "rgba(239,68,68,0.7)", title: "Shut Down Dark Capital", desc: "Made the painful decision to close the business. The product was great. The execution was solid. But we flew blind financially." },
     { year: "2025", icon: Lightbulb, color: TERRACOTTA, title: "Built FynHelp", desc: "We decided to build what we wish we'd had. An AI CFO that gives every Indian SME the financial intelligence to prevent what happened to us." },
   ];
@@ -715,7 +715,7 @@ function StorySection() {
           "We're building what we wish we'd had. No founder should discover their crisis 14 days too late."
         </p>
         <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, marginTop: 16 }} className="text-[16px] md:text-[18px]">
-          — Tarun & Nidhi, Co-founders
+         , Tarun & Nidhi, Co-founders
         </p>
       </motion.div>
     </section>

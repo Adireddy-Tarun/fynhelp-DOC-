@@ -24,7 +24,7 @@ const FynLogo = ({ variant = "dark", showTagline = true, className = "", iconOnl
     <div className={`inline-flex items-center ${className}`}>
       <img
         src={src}
-        alt="FynHelp — Find Your Numbers"
+        alt="FynHelp, Find Your Numbers"
         style={{
           height,
           width: "auto",

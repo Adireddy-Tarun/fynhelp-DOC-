@@ -13,13 +13,13 @@ import { FYN } from "./widgets/Shared";
 interface Props {
   /** Render a mobile-only trigger row inside the mobile drawer */
   variant?: "desktop" | "mobile";
-  /** Mobile drawer open state — used to render the floating icon panel only when relevant */
+  /** Mobile drawer open state, used to render the floating icon panel only when relevant */
   mobileMenuOpen?: boolean;
   onCloseMobileMenu?: () => void;
 }
 
 /**
- * ProductsNav — orchestrates the Products dropdown trigger, dropdown UI,
+ * ProductsNav, orchestrates the Products dropdown trigger, dropdown UI,
  * mobile floating icon panel, and the per-product widget modal.
  */
 export default function ProductsNav({
@@ -70,7 +70,7 @@ export default function ProductsNav({
     const b = BUSINESS_TYPES[idx];
     if (!b) return;
     openProduct({
-      name: `${b.name} — Built for you`,
+      name: `${b.name}, Built for you`,
       description: `See how FYNHelp tailors financial intelligence for ${b.name.toLowerCase()} businesses.`,
       widget: b.widget,
       href: "/dashboard/cockpit",

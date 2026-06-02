@@ -144,24 +144,24 @@ export default function CADashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <MetricCard
           label="Active Clients"
-          value={clientsLoading ? "—" : String(metrics.activeClients)}
+          value={clientsLoading ? "-" : String(metrics.activeClients)}
           sub={`↑ ${Math.min(3, metrics.activeClients)} new this month`}
         />
         <MetricCard
           label="Filings Due This Week"
-          value={clientsLoading ? "—" : String(metrics.filingsThisWeek)}
+          value={clientsLoading ? "-" : String(metrics.filingsThisWeek)}
           valueColor={metrics.filingsThisWeek > 20 ? COLORS.red : metrics.filingsThisWeek > 10 ? COLORS.amber : "#fff"}
           sub={`GSTR-3B: ${metrics.gstr3b}, GSTR-1: ${metrics.gstr1}`}
         />
         <MetricCard
           label="Critical Alerts"
-          value={clientsLoading ? "—" : String(metrics.criticalAlerts)}
+          value={clientsLoading ? "-" : String(metrics.criticalAlerts)}
           valueColor={metrics.criticalAlerts > 0 ? COLORS.amber : "#fff"}
           sub={<button onClick={() => navigate("/ca/notifications")} className="hover:underline">View all →</button>}
         />
         <MetricCard
           label="Total ITC at Risk"
-          value={clientsLoading ? "—" : `₹${metrics.itcAtRisk.toFixed(1)}L`}
+          value={clientsLoading ? "-" : `₹${metrics.itcAtRisk.toFixed(1)}L`}
           valueColor={COLORS.amber}
           sub={`Across ${metrics.itcRiskClients} client${metrics.itcRiskClients === 1 ? "" : "s"}`}
         />
@@ -296,7 +296,7 @@ export default function CADashboardPage() {
                           {alertCount}
                         </span>
                       ) : (
-                        <span style={{ color: "rgba(26,16,8,0.35)", fontSize: "13px" }}>—</span>
+                        <span style={{ color: "rgba(26,16,8,0.35)", fontSize: "13px" }}>-</span>
                       )}
                     </td>
                     <td className="px-3 py-3.5">

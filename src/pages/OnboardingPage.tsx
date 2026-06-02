@@ -463,9 +463,9 @@ const OnboardingPage = () => {
                 >
                   <div className="grid grid-cols-3 gap-4 mb-4">
                     {[
-                      { label: "Cash Runway", value: "— days", sub: "Awaiting bank data" },
-                      { label: "Bank Balance", value: "—", sub: "Connect to see" },
-                      { label: "GST Notice Risk", value: "—", sub: "Enter GSTIN to score" },
+                      { label: "Cash Runway", value: "- days", sub: "Awaiting bank data" },
+                      { label: "Bank Balance", value: "-", sub: "Connect to see" },
+                      { label: "GST Notice Risk", value: "-", sub: "Enter GSTIN to score" },
                     ].map((m) => (
                       <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
                         <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>

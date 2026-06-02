@@ -61,7 +61,7 @@ export default function ProductEcosystemSection() {
             marginBottom: 0,
           }}
         >
-          Every module feeds CFO Fynny. CFO Fynny connects everything. You get one coherent answer — not 6 separate dashboards.
+          Every module feeds CFO Fynny. CFO Fynny connects everything. You get one coherent answer, not 6 separate dashboards.
         </p>
       </div>
 

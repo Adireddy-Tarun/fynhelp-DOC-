@@ -116,7 +116,7 @@ export default function NidhiWidget() {
         </div>
       </WidgetShell>
 
-      <ImpactStat stat="Get CFO-grade answers in seconds, 24/7" source="CFO Fynny — live now" />
+      <ImpactStat stat="Get CFO-grade answers in seconds, 24/7" source="CFO Fynny, live now" />
     </div>
   );
 }

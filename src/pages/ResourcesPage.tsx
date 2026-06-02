@@ -82,25 +82,25 @@ const ARTICLES: ArticleItem[] = [
   { id: "a3", title: "How we cut DSO from 67 days to 41 in 90 days", excerpt: "A founder's playbook for tightening receivables without alienating your best customers.", views: "890", date: "Apr 22, 2026" },
   { id: "a4", title: "GST 2.0: What the new rate rationalisation means for you", excerpt: "The biggest GST overhaul in 5 years is here. Here's a clear breakdown for SME owners.", views: "3.1K", date: "Apr 15, 2026" },
   { id: "a5", title: "The compliance calendar every Indian SME should run", excerpt: "20+ filings, 12 months, 1 dashboard. The complete deadline map for FY 2026-27.", views: "1.8K", date: "Apr 8, 2026" },
-  { id: "a6", title: "Why your CA shouldn't also be your CFO", excerpt: "Compliance and strategy are two different jobs. Here's why founders confuse them — and what it costs.", views: "1.4K", date: "Apr 1, 2026" },
+  { id: "a6", title: "Why your CA shouldn't also be your CFO", excerpt: "Compliance and strategy are two different jobs. Here's why founders confuse them, and what it costs.", views: "1.4K", date: "Apr 1, 2026" },
 ];
 
 const GLOSSARY: GlossaryItem[] = [
-  { id: "g-arr", term: "ARR", short: "Annual Recurring Revenue.", full: "Annual Recurring Revenue — the predictable subscription or contract revenue your business expects to earn over a 12-month period. ARR = MRR × 12." },
+  { id: "g-arr", term: "ARR", short: "Annual Recurring Revenue.", full: "Annual Recurring Revenue, the predictable subscription or contract revenue your business expects to earn over a 12-month period. ARR = MRR × 12." },
   { id: "g-burn", term: "Burn Rate", short: "Monthly cash spend rate.", full: "The speed at which your business spends its cash reserves. Net burn = cash out − cash in. Tracked monthly to project runway." },
-  { id: "g-cac", term: "CAC", short: "Customer Acquisition Cost.", full: "Customer Acquisition Cost — total sales and marketing spend divided by the number of new customers acquired in the same period." },
+  { id: "g-cac", term: "CAC", short: "Customer Acquisition Cost.", full: "Customer Acquisition Cost, total sales and marketing spend divided by the number of new customers acquired in the same period." },
   { id: "g-churn", term: "Churn", short: "Customer or revenue loss rate.", full: "The rate at which customers stop doing business with you, expressed as a percentage of your base per month or year. Revenue churn weights customers by their billing." },
-  { id: "g-dso", term: "DSO", short: "Days Sales Outstanding.", full: "Days Sales Outstanding — the average number of days it takes to collect payment after a sale. Indian SME average is around 42 days." },
-  { id: "g-ebitda", term: "EBITDA", short: "Earnings before interest, tax, depreciation, amortization.", full: "Earnings Before Interest, Taxes, Depreciation and Amortization — a proxy for operating cash profitability that strips out financing and accounting effects." },
+  { id: "g-dso", term: "DSO", short: "Days Sales Outstanding.", full: "Days Sales Outstanding, the average number of days it takes to collect payment after a sale. Indian SME average is around 42 days." },
+  { id: "g-ebitda", term: "EBITDA", short: "Earnings before interest, tax, depreciation, amortization.", full: "Earnings Before Interest, Taxes, Depreciation and Amortization, a proxy for operating cash profitability that strips out financing and accounting effects." },
   { id: "g-grossmargin", term: "Gross Margin", short: "Revenue minus cost of goods sold.", full: "Revenue minus the direct cost of producing what you sold, expressed as a percentage of revenue. A core measure of unit economics." },
   { id: "g-gstr1", term: "GSTR-1", short: "GST outward supply return.", full: "Monthly or quarterly return that lists every outward supply (sale) made by a registered taxpayer. Drives the buyer's GSTR-2B." },
-  { id: "g-itc", term: "ITC", short: "Input Tax Credit (GST).", full: "Input Tax Credit — GST paid on business purchases that you can offset against the GST you owe on sales, subject to GSTR-2B matching." },
-  { id: "g-ltv", term: "LTV", short: "Lifetime Value of customer.", full: "Lifetime Value — the total gross profit you expect from a customer over the entire relationship. LTV/CAC > 3 is a healthy benchmark." },
-  { id: "g-mrr", term: "MRR", short: "Monthly Recurring Revenue.", full: "Monthly Recurring Revenue — the predictable revenue your business earns every month from active subscriptions or contracts." },
-  { id: "g-nps", term: "NPS", short: "Net Promoter Score.", full: "Net Promoter Score — a customer satisfaction metric on a 0–10 scale. Promoters (9–10) minus Detractors (0–6), expressed as a percentage." },
-  { id: "g-pl", term: "P&L", short: "Profit & Loss statement.", full: "Profit & Loss statement — a summary of revenue, costs and expenses over a period, ending with net profit or loss." },
+  { id: "g-itc", term: "ITC", short: "Input Tax Credit (GST).", full: "Input Tax Credit, GST paid on business purchases that you can offset against the GST you owe on sales, subject to GSTR-2B matching." },
+  { id: "g-ltv", term: "LTV", short: "Lifetime Value of customer.", full: "Lifetime Value, the total gross profit you expect from a customer over the entire relationship. LTV/CAC > 3 is a healthy benchmark." },
+  { id: "g-mrr", term: "MRR", short: "Monthly Recurring Revenue.", full: "Monthly Recurring Revenue, the predictable revenue your business earns every month from active subscriptions or contracts." },
+  { id: "g-nps", term: "NPS", short: "Net Promoter Score.", full: "Net Promoter Score, a customer satisfaction metric on a 0–10 scale. Promoters (9–10) minus Detractors (0–6), expressed as a percentage." },
+  { id: "g-pl", term: "P&L", short: "Profit & Loss statement.", full: "Profit & Loss statement, a summary of revenue, costs and expenses over a period, ending with net profit or loss." },
   { id: "g-runway", term: "Runway", short: "Months until cash depletes.", full: "The number of months your business can operate at its current net burn before running out of cash. Runway = cash on hand ÷ monthly net burn." },
-  { id: "g-wc", term: "Working Capital", short: "Current assets minus current liabilities.", full: "Current assets minus current liabilities — the short-term liquidity cushion your business operates with day to day." },
+  { id: "g-wc", term: "Working Capital", short: "Current assets minus current liabilities.", full: "Current assets minus current liabilities, the short-term liquidity cushion your business operates with day to day." },
 ];
 
 const COMMUNITY: CommunityItem[] = [
@@ -775,7 +775,7 @@ const ResourcesPage = () => {
         }}
       >
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          {/* GETTING STARTED — vertical learning path */}
+          {/* GETTING STARTED, vertical learning path */}
           {activeTab === "getting-started" && (
             <>
               {filteredVideos.length === 0 ? (
@@ -822,7 +822,7 @@ const ResourcesPage = () => {
             </>
           )}
 
-          {/* TEMPLATES — grid */}
+          {/* TEMPLATES, grid */}
           {activeTab === "templates" && (
             <>
               {filteredTemplates.length === 0 ? (
@@ -846,7 +846,7 @@ const ResourcesPage = () => {
             </>
           )}
 
-          {/* GLOSSARY — alphabetical list */}
+          {/* GLOSSARY, alphabetical list */}
           {activeTab === "glossary" && (
             <>
               {filteredGlossary.length === 0 ? (
@@ -863,7 +863,7 @@ const ResourcesPage = () => {
             </>
           )}
 
-          {/* BLOG — 2 column grid */}
+          {/* BLOG, 2 column grid */}
           {activeTab === "blog" && (
             <>
               {filteredArticles.length === 0 ? (
@@ -887,7 +887,7 @@ const ResourcesPage = () => {
             </>
           )}
 
-          {/* COMMUNITY — list (newest first; already ordered) */}
+          {/* COMMUNITY, list (newest first; already ordered) */}
           {activeTab === "community" && (
             <>
               {filteredCommunity.length === 0 ? (

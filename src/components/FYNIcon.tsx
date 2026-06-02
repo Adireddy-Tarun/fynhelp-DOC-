@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * FYNIcon — custom SVG icon system for FynHelp.
+ * FYNIcon, custom SVG icon system for FynHelp.
  * Indian SME-themed designs using brand palette:
  *   --fyn-ink #1A1008, --fyn-red #C41E1E, --fyn-gold #8B6914, --fyn-beige #F4EDDA
  *
@@ -105,7 +105,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
   let svg: React.ReactElement;
 
   switch (name) {
-    // 1. GETTING STARTED — open book + stairs + sprout + sparkle
+    // 1. GETTING STARTED, open book + stairs + sprout + sparkle
     case "getting-started":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +145,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 2. TEMPLATES & DOWNLOADS — document with folded corner + rows + download
+    // 2. TEMPLATES & DOWNLOADS, document with folded corner + rows + download
     case "templates":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -185,7 +185,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 3. GLOSSARY — closed book with A-Z and magnifier
+    // 3. GLOSSARY, closed book with A-Z and magnifier
     case "glossary":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -236,7 +236,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 4. BLOG — newspaper + pen + NEW badge
+    // 4. BLOG, newspaper + pen + NEW badge
     case "blog":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -283,7 +283,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 5. COMMUNITY — overlapping circles + handshake + dotted ring
+    // 5. COMMUNITY, overlapping circles + handshake + dotted ring
     case "community":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -292,7 +292,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
           <circle cx="11" cy="18" r="5.5" fill={RED} opacity="0.75" stroke={INK} strokeWidth="1.2" />
           <circle cx="21" cy="18" r="5.5" fill={RED} opacity="0.75" stroke={INK} strokeWidth="1.2" />
           <circle cx="16" cy="13" r="5.5" fill={`url(#${gGold})`} stroke={INK} strokeWidth="1.4" />
-          {/* handshake — two angled segments meeting */}
+          {/* handshake, two angled segments meeting */}
           <path
             d="M13 16 L16 13.5 L19 16"
             stroke={INK}
@@ -305,7 +305,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 6. VIDEO — screen with play + record dot
+    // 6. VIDEO, screen with play + record dot
     case "video":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -326,7 +326,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 7. ARTICLE — small document with text + folded corner
+    // 7. ARTICLE, small document with text + folded corner
     case "article":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -347,7 +347,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 8. TEMPLATE — 3x3 spreadsheet grid + bar chart in middle
+    // 8. TEMPLATE, 3x3 spreadsheet grid + bar chart in middle
     case "template":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -368,7 +368,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 9. DISCUSSION — chat bubble + reply + dots
+    // 9. DISCUSSION, chat bubble + reply + dots
     case "discussion":
       svg = (
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -395,7 +395,7 @@ const FYNIcon: React.FC<Props> = ({ name, size = 32, className, title, animated 
       );
       break;
 
-    // 10. CALLBACK — vintage rotary phone
+    // 10. CALLBACK, vintage rotary phone
     case "callback":
       svg = (
         <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -276,7 +276,7 @@ export default function CAItcReconPage() {
               <div>
                 <div className="text-[16px] font-semibold">{selectedClient?.business_name}</div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[13px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>{selectedClient?.gstin || "—"}</span>
+                  <span className="text-[13px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>{selectedClient?.gstin || "-"}</span>
                   <button onClick={() => copyText(selectedClient?.gstin || "")} className="opacity-60 hover:opacity-100"><Copy size={12} /></button>
                   <button onClick={() => { setSelectedId(null); setLines([]); }} className="text-[13px] font-medium ml-2" style={{ color: COLORS.red }}>Change Client</button>
                 </div>
@@ -349,7 +349,7 @@ export default function CAItcReconPage() {
                           <td className="py-3"><input type="checkbox" checked={selected.has(l.id)} onChange={() => toggleSelect(l.id)} /></td>
                           <td className="py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{l.invoice_date}</td>
                           <td className="py-3 text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>
-                            <div className="flex items-center gap-1.5">{l.vendor_gstin || "—"}{l.vendor_gstin && <button onClick={() => copyText(l.vendor_gstin!)} className="opacity-50 hover:opacity-100"><Copy size={11} /></button>}</div>
+                            <div className="flex items-center gap-1.5">{l.vendor_gstin || "-"}{l.vendor_gstin && <button onClick={() => copyText(l.vendor_gstin!)} className="opacity-50 hover:opacity-100"><Copy size={11} /></button>}</div>
                           </td>
                           <td className="py-3 font-medium">
                             <div className="flex items-center gap-1.5">{l.vendor_name}{l.risk_flag === "high" && <AlertTriangle size={13} style={{ color: COLORS.amber }} />}</div>
@@ -368,8 +368,8 @@ export default function CAItcReconPage() {
                           <tr style={{ background: "#FAF7F0" }}>
                             <td colSpan={10} className="p-4">
                               <div className="grid grid-cols-2 gap-4">
-                                <DetailPanel title="Our Books" data={{ "Invoice Date": l.invoice_date, "Vendor GSTIN": l.vendor_gstin || "—", "Invoice No": l.invoice_no, "Taxable Value": formatIndianCurrency(l.itc_claimed * 5), "CGST": formatIndianCurrency(l.itc_claimed / 2), "SGST": formatIndianCurrency(l.itc_claimed / 2), "Total ITC": formatIndianCurrency(l.itc_claimed) }} />
-                                <DetailPanel title="GSTR-2A" data={{ "Invoice Date": l.invoice_date, "Vendor GSTIN": l.vendor_gstin || "—", "Invoice No": l.invoice_no, "Taxable Value": formatIndianCurrency((l.itc_claimed - l.diff) * 5), "CGST": formatIndianCurrency((l.itc_claimed - l.diff) / 2), "SGST": formatIndianCurrency((l.itc_claimed - l.diff) / 2), "Total ITC": formatIndianCurrency(l.itc_claimed - l.diff) }} highlight={l.diff > 0} />
+                                <DetailPanel title="Our Books" data={{ "Invoice Date": l.invoice_date, "Vendor GSTIN": l.vendor_gstin || "-", "Invoice No": l.invoice_no, "Taxable Value": formatIndianCurrency(l.itc_claimed * 5), "CGST": formatIndianCurrency(l.itc_claimed / 2), "SGST": formatIndianCurrency(l.itc_claimed / 2), "Total ITC": formatIndianCurrency(l.itc_claimed) }} />
+                                <DetailPanel title="GSTR-2A" data={{ "Invoice Date": l.invoice_date, "Vendor GSTIN": l.vendor_gstin || "-", "Invoice No": l.invoice_no, "Taxable Value": formatIndianCurrency((l.itc_claimed - l.diff) * 5), "CGST": formatIndianCurrency((l.itc_claimed - l.diff) / 2), "SGST": formatIndianCurrency((l.itc_claimed - l.diff) / 2), "Total ITC": formatIndianCurrency(l.itc_claimed - l.diff) }} highlight={l.diff > 0} />
                               </div>
                               <textarea placeholder="Add notes for this invoice..." className="w-full mt-3 p-2 rounded text-sm bg-white" rows={2} style={{ border: `1px solid ${COLORS.caBorder}` }} />
                             </td>

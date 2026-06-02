@@ -115,14 +115,14 @@ const SimulatorPage = () => {
             {simulations.map((sim: any) => {
               const paramKeys = sim.parameters
                 ? Object.keys(sim.parameters).slice(0, 3).join(", ")
-                : "—";
+                : "-";
               return (
                 <TableRow key={sim.id}>
                   <TableCell className="font-medium capitalize">
-                    {sim.scenario_type || "—"}
+                    {sim.scenario_type || "-"}
                   </TableCell>
                   <TableCell className="text-fyn-ink/70 text-sm">
-                    {paramKeys || "—"}
+                    {paramKeys || "-"}
                   </TableCell>
                   <TableCell>
                     {new Date(sim.created_at).toLocaleDateString("en-IN", {

@@ -161,7 +161,7 @@ function AdminTeamTab() {
       const p = profMap.get(r.user_id);
       return {
         user_id: r.user_id,
-        name: p?.display_name || p?.full_name || "—",
+        name: p?.display_name || p?.full_name || "-",
         email: "",
         role: r.role,
       };

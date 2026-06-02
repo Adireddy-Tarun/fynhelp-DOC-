@@ -42,7 +42,7 @@ const DEMO = {
     { type: "payable", desc: "Vendor payment scheduled to Tata Power", amount: -18_000, time: "3 days ago" },
   ],
   insight:
-    "Burn rate increased 8% this month, driven primarily by payroll and SaaS subscriptions. Review vendor costs in Cost Intelligence — three vendors account for 42% of discretionary spend.",
+    "Burn rate increased 8% this month, driven primarily by payroll and SaaS subscriptions. Review vendor costs in Cost Intelligence, three vendors account for 42% of discretionary spend.",
 };
 
 // ── Module catalogue (mapped to existing /dashboard routes) ──
@@ -364,7 +364,7 @@ const CockpitPage = () => {
       <div className="min-h-full bg-background text-foreground">
       {/* Header: title + demo toggle */}
       <div className="flex items-start justify-between gap-fyn-md mb-fyn-lg flex-wrap">
-        <FynPageTitle sub={`Welcome back${profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""} — here's your business at a glance.`}>
+        <FynPageTitle sub={`Welcome back${profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}, here's your business at a glance.`}>
           Cockpit
         </FynPageTitle>
         <div className="flex items-center gap-fyn-sm">
@@ -427,16 +427,16 @@ const CockpitPage = () => {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-fyn-md mb-fyn-lg"
       >
         <StatCard icon={Droplet} label="Cash Position" accent="ink"
-          value={hasData ? formatINR(view.cash) : "—"}
+          value={hasData ? formatINR(view.cash) : "-"}
           trend={view.cashTrend} trendLabel={view.cashTrend !== undefined ? `+${view.cashTrend}% this month` : undefined} />
         <StatCard icon={TrendingUp} label="Runway" accent="green"
-          value={hasData && view.runway > 0 ? `${view.runway.toFixed(0)} days` : "—"} />
+          value={hasData && view.runway > 0 ? `${view.runway.toFixed(0)} days` : "-"} />
         <StatCard icon={DollarSign} label="Monthly Burn" accent="red"
-          value={hasData && view.burn > 0 ? formatINR(Math.round(view.burn)) : "—"}
+          value={hasData && view.burn > 0 ? formatINR(Math.round(view.burn)) : "-"}
           trend={view.burnTrend !== undefined ? -view.burnTrend : undefined}
           trendLabel={view.burnTrend !== undefined ? `+${view.burnTrend}% this month` : undefined} />
         <StatCard icon={FileText} label="Receivables Overdue" accent="gold"
-          value={hasData ? formatINR(view.receivables) : "—"} />
+          value={hasData ? formatINR(view.receivables) : "-"} />
       </motion.div>
 
       {/* Cash flow chart */}

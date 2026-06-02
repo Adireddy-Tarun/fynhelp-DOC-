@@ -140,7 +140,7 @@ export default function ParticleBackground() {
         p.vx += (p.hx - p.x) * SPRING;
         p.vy += (p.hy - p.y) * SPRING;
 
-        // Mouse repulsion — smooth eased displacement (water ripple)
+        // Mouse repulsion, smooth eased displacement (water ripple)
         if (mouse.active) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;

@@ -61,7 +61,7 @@ function csvEscape(v: unknown) {
   return s;
 }
 
-// Escape value for use inside a PostgREST .or() filter — commas, parens, quotes break the parser.
+// Escape value for use inside a PostgREST .or() filter, commas, parens, quotes break the parser.
 function escOrValue(v: string) {
   return v.replace(/[(),]/g, " ").replace(/"/g, '""').trim();
 }
@@ -163,7 +163,7 @@ export default function AdminWaitlistPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Stats — fire 5 head-only count queries in parallel; refire on filter changes? Keep stats global (unfiltered) so they stay meaningful.
+  // Stats, fire 5 head-only count queries in parallel; refire on filter changes? Keep stats global (unfiltered) so they stay meaningful.
   const loadStats = useCallback(async () => {
     const now = new Date();
     const startOfDay = new Date(now); startOfDay.setHours(0,0,0,0);
@@ -204,7 +204,7 @@ export default function AdminWaitlistPage() {
 
   useEffect(() => { loadStats(); loadDistincts(); }, [loadStats, loadDistincts]);
 
-  // Realtime — refresh current page + stats on any change
+  // Realtime, refresh current page + stats on any change
   const reloadAllRef = useRef<() => void>(() => {});
   reloadAllRef.current = () => { load(); loadStats(); loadDistincts(); };
   useEffect(() => {
@@ -516,14 +516,14 @@ export default function AdminWaitlistPage() {
                       <Td>
                         <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleRow(r.id)} aria-label={`Select ${r.email}`} />
                       </Td>
-                      <Td><span style={{ color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{r.email ?? "—"}</span></Td>
-                      <Td>{r.name ?? "—"}</Td>
-                      <Td>{r.company_name ?? "—"}</Td>
-                      <Td>{r.phone ?? "—"}</Td>
-                      <Td>{r.company_type ?? "—"}</Td>
-                      <Td>{r.company_size ?? "—"}</Td>
-                      <Td>{r.location ?? "—"}</Td>
-                      <Td><span style={{ fontFamily: "JetBrains Mono, monospace", color: "#8B6914", fontWeight: 600 }}>{r.position != null ? `#${r.position}` : "—"}</span></Td>
+                      <Td><span style={{ color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{r.email ?? "-"}</span></Td>
+                      <Td>{r.name ?? "-"}</Td>
+                      <Td>{r.company_name ?? "-"}</Td>
+                      <Td>{r.phone ?? "-"}</Td>
+                      <Td>{r.company_type ?? "-"}</Td>
+                      <Td>{r.company_size ?? "-"}</Td>
+                      <Td>{r.location ?? "-"}</Td>
+                      <Td><span style={{ fontFamily: "JetBrains Mono, monospace", color: "#8B6914", fontWeight: 600 }}>{r.position != null ? `#${r.position}` : "-"}</span></Td>
                       <Td>{convertedBadge(r.is_converted)}</Td>
                       <Td><span style={{ color: "hsl(var(--fyn-ink) / 0.7)", whiteSpace: "nowrap" }}>{fmtDate(r.created_at)}</span></Td>
                       <Td>
@@ -683,7 +683,7 @@ function AuthStatusBanner({
     detail = "RLS requires an authenticated session to read the waitlist. Sign in via /admin/login, then return to this page.";
   } else if (!isAdmin) {
     tone = "warn"; Icon = ShieldAlert;
-    title = `Signed in as ${user.email ?? user.id} — no admin role`;
+    title = `Signed in as ${user.email ?? user.id}, no admin role`;
     detail = `Roles: ${roles.length ? roles.join(", ") : "(none)"}. The "Authenticated can read waitlist" policy still allows reads, but admin-only update/delete will fail.`;
   } else if (error) {
     tone = "bad"; Icon = ShieldX;
@@ -691,7 +691,7 @@ function AuthStatusBanner({
     detail = error;
   } else if (!loading && rowCount === 0) {
     tone = "warn"; Icon = ShieldAlert;
-    title = `Authorized as ${user.email ?? user.id} (${roles.join(", ") || "admin"}) — but the table is empty`;
+    title = `Authorized as ${user.email ?? user.id} (${roles.join(", ") || "admin"}), but the table is empty`;
     detail = "The query succeeded with 0 rows. Click \"Test signup\" to insert a row and confirm the live pipeline end-to-end.";
   } else {
     tone = "ok"; Icon = ShieldCheck;

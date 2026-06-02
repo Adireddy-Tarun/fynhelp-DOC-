@@ -189,7 +189,7 @@ const VendorsPage = () => {
                     <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>
                       {v.lastPayment
                         ? new Date(v.lastPayment).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-                        : "—"}
+                        : "-"}
                     </td>
                   </tr>
                 ))}

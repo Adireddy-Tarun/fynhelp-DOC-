@@ -300,22 +300,22 @@ export function CostDashboard({ data }: CostDashboardProps) {
                       {fmtK(v.monthlySpend || 0)}
                     </td>
                     <td className="py-3 px-3" style={{ color: colors.text.secondary }}>
-                      {v.category || '—'}
+                      {v.category || '-'}
                     </td>
                     <td
                       className="py-3 px-3"
                       style={{ color: colors.text.secondary, fontFamily: "'SF Mono', monospace" }}
                     >
-                      {v.contractEnd || '—'}
+                      {v.contractEnd || '-'}
                     </td>
                     <td className="py-3 px-3" style={{ color: colors.text.secondary }}>
-                      {v.paymentTerms || '—'}
+                      {v.paymentTerms || '-'}
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <Pill tone={renewalTone(v.renewalStatus)} label={v.renewalStatus || '—'} />
+                      <Pill tone={renewalTone(v.renewalStatus)} label={v.renewalStatus || '-'} />
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <Pill tone={riskTone(v.riskLevel)} label={v.riskLevel || '—'} />
+                      <Pill tone={riskTone(v.riskLevel)} label={v.riskLevel || '-'} />
                     </td>
                     <td className="py-3 px-3 text-right">
                       <button
@@ -401,7 +401,7 @@ export function CostDashboard({ data }: CostDashboardProps) {
           />
           <CFOCard
             title="Fixed : Variable"
-            value={breakdown.fixedVariableRatio || '—'}
+            value={breakdown.fixedVariableRatio || '-'}
             icon={Percent}
             status="neutral"
             subtitle="Cost structure ratio"
@@ -806,7 +806,7 @@ function TrendCard({
           className="text-xs font-semibold"
           style={{ color: deltaTone, fontFamily: "'SF Mono', monospace" }}
         >
-          {delta > 0 ? '▲' : delta < 0 ? '▼' : '—'} {formatter(Math.abs(delta))}
+          {delta > 0 ? '▲' : delta < 0 ? '▼' : '-'} {formatter(Math.abs(delta))}
         </span>
       </div>
       <div

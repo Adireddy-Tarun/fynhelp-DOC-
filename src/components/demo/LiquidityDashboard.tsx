@@ -241,7 +241,7 @@ export function LiquidityDashboard({ data }: LiquidityDashboardProps) {
           <LedgerStrip>
             <LedgerMetric
               label="Zero Cash Date"
-              value={liq.burnRunway?.zeroCashDate || '—'}
+              value={liq.burnRunway?.zeroCashDate || '-'}
               context="Projected date cash hits zero"
               statusColor={isRunwayCritical ? C.red : C.goldL}
             />
@@ -528,7 +528,7 @@ function RiskBadge({ risk }: { risk: string }) {
       className="inline-block px-2 py-1 rounded-md text-xs font-semibold"
       style={{ background: `${tone}22`, color: tone, border: `1px solid ${tone}55` }}
     >
-      {risk || '—'}
+      {risk || '-'}
     </span>
   )
 }

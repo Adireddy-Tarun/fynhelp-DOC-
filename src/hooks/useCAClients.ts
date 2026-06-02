@@ -18,7 +18,7 @@ export interface CAClientRow {
   gstin: string | null;
 }
 
-const fmtTurnover = (range: string | null) => range || "—";
+const fmtTurnover = (range: string | null) => range || "-";
 const turnoverToHealth = (range: string | null) => {
   // BACKEND: replace with real health score from analytics
   if (!range) return 60;
@@ -72,7 +72,7 @@ export function useCAClients() {
         if (!cancelled) { setClients([]); setLoading(false); }
         return;
       }
-      // Step 2: get businesses (RLS may filter — relies on additional policy)
+      // Step 2: get businesses (RLS may filter, relies on additional policy)
       const { data: biz, error: e2 } = await supabase
         .from("businesses")
         .select("id, business_name, industry, turnover_range, plan, gstin")
@@ -90,12 +90,12 @@ export function useCAClients() {
           id: a.id,
           business_id: a.business_id,
           name: b?.business_name ?? "Pending access",
-          industry: b?.industry ?? "—",
+          industry: b?.industry ?? "-",
           turnover: fmtTurnover(b?.turnover_range ?? null),
           health: turnoverToHealth(b?.turnover_range ?? null),
           cash: planToCash(b?.plan ?? null),
           filing: Math.floor(Math.random() * 14) + 1, // BACKEND: join compliance_events
-          itc: "₹—", // BACKEND: join gst_itc_lines
+          itc: "₹-", // BACKEND: join gst_itc_lines
           report: reportLabel(a.granted_at),
           notes: a.notes,
           granted_at: a.granted_at,

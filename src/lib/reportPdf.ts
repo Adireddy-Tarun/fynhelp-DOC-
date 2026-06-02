@@ -18,7 +18,7 @@ const formatDate = (d?: string | null) =>
         month: "short",
         year: "numeric",
       })
-    : "—";
+    : "-";
 
 interface ReportLike {
   id?: string;
@@ -72,7 +72,7 @@ export function downloadReportPdf(
   // - "Fyn" ink + "Help" red serif wordmark
   // - Gold "FIND YOUR NUMBERS" tagline
   const drawLogo = (originX: number, originY: number) => {
-    const iconSize = 36; // pt — proportional to header band
+    const iconSize = 36; // pt, proportional to header band
     const scale = iconSize / 48; // SVG viewBox is 48x48
     const sx = (n: number) => originX + n * scale;
     const sy = (n: number) => originY + n * scale;
@@ -231,7 +231,7 @@ export function downloadReportPdf(
     y += 18;
   }
 
-  // Body — paragraph-aware pagination
+  // Body, paragraph-aware pagination
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.setTextColor(...inkColor);

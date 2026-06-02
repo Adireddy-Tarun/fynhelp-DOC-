@@ -144,7 +144,7 @@ export default function AdminCommunicationsPage() {
               <tbody>
                 {activity.map((row) => {
                   const meta = PLATFORM_META[row.platform];
-                  const recipients = row.details?.sent ?? row.details?.total ?? "—";
+                  const recipients = row.details?.sent ?? row.details?.total ?? "-";
                   return (
                     <tr key={row.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                       <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{new Date(row.created_at).toLocaleString("en-IN")}</td>
@@ -167,7 +167,7 @@ export default function AdminCommunicationsPage() {
         )}
       </Card>
 
-      {/* Scheduled — empty state, not yet implemented */}
+      {/* Scheduled, empty state, not yet implemented */}
       <Card>
         <h2 className="mb-4" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>
           Scheduled Posts

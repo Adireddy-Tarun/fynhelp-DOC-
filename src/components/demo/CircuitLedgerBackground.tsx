@@ -1,6 +1,6 @@
 /**
  * Circuit Ledger animated background for the FYNHelp demo page.
- * Purely decorative — fixed, full viewport, pointer-events: none.
+ * Purely decorative, fixed, full viewport, pointer-events: none.
  * Brand colors only: #1A1008, #C41E1E, #F4EDDA, #8B6914.
  */
 export default function CircuitLedgerBackground() {
@@ -94,19 +94,19 @@ export default function CircuitLedgerBackground() {
         {goldNode(1260, 480, 0.3)}
         {goldNode(1000, 560, 0.3)}
 
-        {/* Particle 1 — red, main rail */}
+        {/* Particle 1, red, main rail */}
         <circle r={3} fill="rgba(196,30,30,0.9)" filter="url(#circuitGlow)">
           <animateMotion dur="4s" repeatCount="indefinite" path="M 0,370 L 440,370 L 720,370 L 1000,370 L 1440,370" />
           <animate attributeName="opacity" values="0;1;1;1;0" dur="4s" repeatCount="indefinite" />
         </circle>
 
-        {/* Particle 2 — gold, left branch */}
+        {/* Particle 2, gold, left branch */}
         <circle r={2.5} fill="rgba(139,105,20,0.9)" filter="url(#circuitGlow)">
           <animateMotion dur="6s" repeatCount="indefinite" path="M 0,180 L 180,180 L 180,370 L 440,370" />
           <animate attributeName="opacity" values="0;0;1;1;1;0" dur="6s" repeatCount="indefinite" />
         </circle>
 
-        {/* Particle 3 — gold, right branch */}
+        {/* Particle 3, gold, right branch */}
         <circle r={2.5} fill="rgba(139,105,20,0.80)" filter="url(#circuitGlow)">
           <animateMotion dur="5s" begin="2s" repeatCount="indefinite" path="M 1440,260 L 1260,260 L 1260,370 L 1000,370" />
           <animate attributeName="opacity" values="0;1;1;1;0" dur="5s" begin="2s" repeatCount="indefinite" />

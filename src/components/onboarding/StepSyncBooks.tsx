@@ -5,29 +5,29 @@ import FloatingSelectionCounter from "./FloatingSelectionCounter";
 const SOFTWARE = [
   {
     id: "tally", name: "Tally Prime", initial: "T", color: "#E0341A",
-    sub: "ODBC agent — syncs every 2 hours automatically",
+    sub: "ODBC agent, syncs every 2 hours automatically",
     badge: "Most used in India", badgeBg: "hsl(var(--fyn-gold-light))", badgeColor: "hsl(var(--fyn-gold))",
   },
   {
     id: "zoho", name: "Zoho Books", initial: "Z", color: "#E61F25",
-    sub: "OAuth — connects instantly",
+    sub: "OAuth, connects instantly",
   },
   {
     id: "quickbooks", name: "QuickBooks India", initial: "QB", color: "#2CA01C",
-    sub: "OAuth — connects instantly",
+    sub: "OAuth, connects instantly",
   },
   {
     id: "busy", name: "Busy Accounting", initial: "B", color: "#1565C0",
-    sub: "CSV export — manual upload",
+    sub: "CSV export, manual upload",
     badge: "CSV import", badgeBg: "hsl(var(--fyn-info-bg))", badgeColor: "hsl(var(--fyn-info))",
   },
   {
     id: "marg", name: "Marg ERP", initial: "M", color: "#0D47A1",
-    sub: "ODBC connector — same as Tally",
+    sub: "ODBC connector, same as Tally",
   },
   {
     id: "csv", name: "Excel or CSV upload", initial: "XL", color: "#217346",
-    sub: "Universal — works with any software",
+    sub: "Universal, works with any software",
     badge: "Universal", badgeBg: "hsl(var(--fyn-success-bg))", badgeColor: "hsl(var(--fyn-success))",
   },
 ];
@@ -73,7 +73,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
-        {/* LEFT — Software Selection */}
+        {/* LEFT, Software Selection */}
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.12em] mb-3 text-secondary-foreground">
             Your accounting software
@@ -166,7 +166,7 @@ const StepSyncBooks = ({ selectedSoftware, setSelectedSoftware, onContinue, onBa
           </div>
         </div>
 
-        {/* RIGHT — Sync status panel */}
+        {/* RIGHT, Sync status panel */}
         <div className="lg:sticky lg:top-32 self-start">
           <h3 className="text-[15px] font-semibold mb-1" style={{ color: "hsl(var(--fyn-ink))" }}>Syncing from</h3>
           <p className="text-xs mb-4 text-accent">

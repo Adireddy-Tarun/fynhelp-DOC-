@@ -34,7 +34,7 @@ export const typography = {
 } as const;
 
 // ─── Colors ──────────────────────────────────────────────────────────
-// FynHelp brand palette only — no navy, indigo, teal, or purple.
+// FynHelp brand palette only, no navy, indigo, teal, or purple.
 export const colors = {
   // Primary: Brand Red (FynHelp accent / CTAs / alerts)
   primary: {
@@ -57,13 +57,13 @@ export const colors = {
     900: "#3a2b08",
   },
 
-  // Status colors — kept on brand. No green/blue.
+  // Status colors, kept on brand. No green/blue.
   success: { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
   warning: { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
   danger:  { light: "#E06A6A", main: "#C41E1E", dark: "#8a1414" },
   info:    { light: "#C9A84C", main: "#8B6914", dark: "#5b440d" },
 
-  // Backgrounds — warm dark ink hierarchy
+  // Backgrounds, warm dark ink hierarchy
   bg: {
     primary:   "#1A1008",
     secondary: "#1F0E07",
@@ -71,7 +71,7 @@ export const colors = {
     card:      "#1F0E07",
   },
 
-  // Text hierarchy — beige on ink
+  // Text hierarchy, beige on ink
   text: {
     primary:   "#F4EDDA",
     secondary: "rgba(244,237,218,0.55)",

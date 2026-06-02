@@ -136,7 +136,7 @@ export const SCENARIOS: Scenario[] = [
         metrics: [
           { label: "Monthly Cash Impact", value: monthlyImpact >= 0 ? `−${inr(monthlyImpact)}` : `+${inr(Math.abs(monthlyImpact))}`, tone },
           { label: "Runway Impact", value: `${newRunway} days (Δ${runwayDelta})`, tone },
-          { label: "Break-even Period", value: breakEven < 999 ? `${breakEven} months` : "—", tone: breakEven < 12 ? "good" : breakEven < 24 ? "warn" : "bad" },
+          { label: "Break-even Period", value: breakEven < 999 ? `${breakEven} months` : "-", tone: breakEven < 12 ? "good" : breakEven < 24 ? "warn" : "bad" },
           { label: "Total Year 1 Cost", value: inr(year1), tone: "warn" },
         ],
         recs: [
@@ -247,7 +247,7 @@ export const SCENARIOS: Scenario[] = [
       return {
         metrics: [
           { label: "Monthly EMI", value: inr(emi), tone: "bad" },
-          { label: "Payback Period", value: payback < 999 ? `${payback} months` : "—", tone: payback < 18 ? "good" : payback < 36 ? "warn" : "bad" },
+          { label: "Payback Period", value: payback < 999 ? `${payback} months` : "-", tone: payback < 18 ? "good" : payback < 36 ? "warn" : "bad" },
           { label: "Net Cash Year 1", value: `${year1Net >= 0 ? "+" : "−"}${inr(Math.abs(year1Net))}`, tone: year1Net >= 0 ? "good" : "warn" },
           { label: "ROI (annualised)", value: fmtPct(roi), tone: roi > 25 ? "good" : roi > 10 ? "warn" : "bad" },
         ],

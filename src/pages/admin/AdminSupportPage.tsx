@@ -151,13 +151,13 @@ export default function AdminSupportPage() {
               {!loading && rows.map((t) => {
                 const p = PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE.low;
                 const s = STATUS_STYLE[t.status] ?? STATUS_STYLE.open;
-                const company = (t.business_id && bizMap.get(t.business_id)) || "—";
+                const company = (t.business_id && bizMap.get(t.business_id)) || "-";
                 return (
                   <tr key={t.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                     <td className="py-3 px-2 font-mono whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{t.ticket_number}</td>
                     <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))" }}>{t.subject}</td>
                     <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{company}</td>
-                    <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{CATEGORY_LABEL[t.category ?? ""] ?? "—"}</td>
+                    <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{CATEGORY_LABEL[t.category ?? ""] ?? "-"}</td>
                     <td className="py-3 px-2">
                       <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: p.bg, color: p.color }} className={p.pulse ? "animate-pulse" : ""}>{p.label}</span>
                     </td>

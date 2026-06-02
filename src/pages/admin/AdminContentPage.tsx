@@ -112,10 +112,10 @@ export default function AdminContentPage() {
               return (
                 <tr key={p.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
                   <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))", fontWeight: 500 }}>{p.title}</td>
-                  <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{p.category ?? "—"}</td>
+                  <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{p.category ?? "-"}</td>
                   <td className="py-3 px-2"><span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: s.bg, color: s.color }}>{s.label}</span></td>
                   <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.6)" }}>
-                    {p.published_at ? new Date(p.published_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : "—"}
+                    {p.published_at ? new Date(p.published_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : "-"}
                   </td>
                   <td className="py-3 px-2" style={{ fontFamily: "JetBrains Mono, monospace", color: "hsl(var(--fyn-ink))" }}>{(p.views ?? 0).toLocaleString("en-IN")}</td>
                   <td className="py-3 px-2">

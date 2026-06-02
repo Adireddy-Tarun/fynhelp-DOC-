@@ -238,7 +238,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
           return {
             business_id: businessId,
             date: toDate(pick(r, ["Date", "Transaction Date"])),
-            description: pick(r, ["Description", "Narration", "Particulars"]) || "—",
+            description: pick(r, ["Description", "Narration", "Particulars"]) || "-",
             counterparty: pick(r, ["Counterparty", "Payee", "Vendor", "Customer"]) || null,
             amount,
             direction,
@@ -467,7 +467,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const cancelDuplicate = () => {
     setDupMatch(null);
     setPending(null);
-    toast.info("Upload cancelled — no duplicate data inserted");
+    toast.info("Upload cancelled, no duplicate data inserted");
   };
 
   return (
@@ -603,7 +603,7 @@ const TYPE_LABEL: Record<ImportType, string> = {
 };
 
 const formatBytes = (b: number) => {
-  if (!b) return "—";
+  if (!b) return "-";
   if (b < 1024) return `${b} B`;
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
   return `${(b / (1024 * 1024)).toFixed(2)} MB`;

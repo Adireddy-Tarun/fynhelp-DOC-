@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
  *   - business_id, if set, must equal get_user_business_id()
  *   - ca_firm_id,  if set, must equal get_user_ca_firm_id()
  *
- * This function NEVER throws — audit logging must not break realtime handlers.
+ * This function NEVER throws, audit logging must not break realtime handlers.
  * Failures are logged to console.warn only.
  */
 export type RealtimeAuditEvent = {
@@ -28,7 +28,7 @@ export async function logRealtimeEvent(evt: RealtimeAuditEvent): Promise<void> {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return; // anon clients cannot insert per RLS — skip silently.
+    if (!user) return; // anon clients cannot insert per RLS, skip silently.
 
     const payload = {
       emitted_by: user.id,

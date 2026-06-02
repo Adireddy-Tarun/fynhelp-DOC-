@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 /* ============================================================
-   FynHelp — Business Profile
+   FynHelp, Business Profile
    Inter only · static UI · backend stubbed
    ============================================================ */
 
@@ -159,7 +159,7 @@ const BusinessProfilePage = () => {
           padding: "14px 20px", margin: "24px 0 32px",
         }}>
           <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 14, color: "#92400E", marginBottom: 8 }}>
-            Profile {completion}% complete — add your MSME number and registered address to unlock all features
+            Profile {completion}% complete, add your MSME number and registered address to unlock all features
           </p>
           <div style={{ height: 6, background: "#FEF3C7", borderRadius: 3, overflow: "hidden" }}>
             <div style={{ width: `${completion}%`, height: "100%", background: "#F59E0B" }} />

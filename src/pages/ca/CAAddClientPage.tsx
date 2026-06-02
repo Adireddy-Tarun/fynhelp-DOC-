@@ -144,7 +144,7 @@ export default function CAAddClientPage() {
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Hi — I'm your CA at Mehta & Associates, requesting view access to manage your GST filings."
+              placeholder="Hi, I'm your CA at Mehta & Associates, requesting view access to manage your GST filings."
               rows={3}
               className="w-full p-3 rounded text-sm mb-4"
               style={{ border: `1px solid ${COLORS.caBorder}` }}

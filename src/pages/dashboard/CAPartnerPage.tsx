@@ -10,7 +10,7 @@ const useIsCAFirm = () => {
   return new URLSearchParams(window.location.search).get("ca") === "1";
 };
 
-// BACKEND: ca_clients table — JOIN businesses for each client
+// BACKEND: ca_clients table, JOIN businesses for each client
 const clients = [
   { name: "Mehta Textile Traders", industry: "Textile", turnover: "₹8.4Cr", health: 78, cash: "Safe", filing: 5, itc: "₹2.1L" },
   { name: "Patel Exports", industry: "Export", turnover: "₹14.2Cr", health: 42, cash: "Critical", filing: 2, itc: "₹4.8L" },
@@ -138,11 +138,11 @@ export default function CAPartnerPage() {
 
         {/* Deadlines */}
         <Card>
-          <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Upcoming filings — all clients</h2>
+          <h2 style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#1A1008", marginBottom: 16 }}>Upcoming filings, all clients</h2>
           <div className="space-y-4">
             {deadlines.map((d) => (
               <div key={d.date}>
-                <p style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 13, color: "#1A1008" }}>{d.date} — {d.filing}</p>
+                <p style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 13, color: "#1A1008" }}>{d.date}, {d.filing}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {d.clients.map((cn) => (
                     <span key={cn} className="px-2.5 py-1 rounded-full text-xs" style={{ background: "#F4EDDA", color: "rgba(26,16,8,0.75)" }}>{cn}</span>

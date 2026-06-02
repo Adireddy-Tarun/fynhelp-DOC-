@@ -347,7 +347,7 @@ export default function CAClientsPage() {
                     </td>
                     <td className="px-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2 group/g">
-                        <span className="text-[13px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>{c.gstin || "—"}</span>
+                        <span className="text-[13px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>{c.gstin || "-"}</span>
                         {c.gstin && (
                           <button onClick={() => copyGSTIN(c.gstin)} className="opacity-0 group-hover/g:opacity-100 transition-opacity">
                             <Copy size={12} style={{ color: "rgba(26,16,8,0.55)" }} />
@@ -366,7 +366,7 @@ export default function CAClientsPage() {
                     </td>
                     <td className="px-3">
                       {d.criticalAlerts === 0 ? (
-                        <span style={{ color: "rgba(26,16,8,0.25)" }}>—</span>
+                        <span style={{ color: "rgba(26,16,8,0.25)" }}>-</span>
                       ) : (
                         <span className="inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[12px] font-semibold text-white"
                           style={{ background: COLORS.red }}>

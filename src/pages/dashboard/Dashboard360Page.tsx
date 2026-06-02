@@ -123,7 +123,7 @@ const Dashboard360Page = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h2 className="text-fyn-ink text-lg font-sans">360 Dashboard — Complete Business Health View</h2>
+        <h2 className="text-fyn-ink text-lg font-sans">360 Dashboard, Complete Business Health View</h2>
         <p className="font-sans" style={{ color: "rgba(26,16,8,0.50)", fontSize: 14, marginTop: 4 }}>Every metric. Every module. One view. Last updated 12 min ago.</p>
         <div className="flex gap-4 mt-3">
           {[

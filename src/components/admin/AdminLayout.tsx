@@ -38,7 +38,7 @@ const ROLE_LABEL: Record<AdminRole, string> = {
 };
 
 export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
-  // Auth temporarily disabled — admin portal is in design phase.
+  // Auth temporarily disabled, admin portal is in design phase.
   return <>{children ?? <Outlet />}</>;
 }
 
@@ -83,7 +83,7 @@ export default function AdminLayout() {
     return () => window.removeEventListener("keydown", onEsc);
   }, [sidebarOpen, isDesktop]);
 
-  // Auth disabled during design — show all items EXCEPT super_admin-only ones.
+  // Auth disabled during design, show all items EXCEPT super_admin-only ones.
   const visible = NAV_ITEMS.filter((i) => {
     if ("divider" in i && i.divider) return true;
     const it = i as Extract<NavItem, { to: string }>;

@@ -109,7 +109,7 @@ export default function NotifyMeModal({ open, initialModuleId, onClose }: Props)
             >
               {comingSoon.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.name} — {s.quarter}
+                  {s.name}, {s.quarter}
                 </option>
               ))}
             </select>

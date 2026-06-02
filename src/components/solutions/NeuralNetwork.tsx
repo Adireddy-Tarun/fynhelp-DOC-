@@ -202,7 +202,7 @@ const CHILD_ICONS: Record<string, LucideIcon> = {
   "Industry Benchmarks": BarChart3, "Growth Readiness": Rocket, "Competitive Position": Trophy, "Expansion Map": Map,
 };
 
-/** Inter-module relationships (intelligent web) — by id pairs */
+/** Inter-module relationships (intelligent web), by id pairs */
 const RELATIONSHIPS: [string, string][] = [
   ["liquidity", "revenue"],
   ["liquidity", "cost"],
@@ -250,7 +250,7 @@ export default function NeuralNetwork() {
   const active = pinned ?? hovered;
   const isMobile = bp === "mobile";
 
-  /* ----- Responsive layout (mathematical) — recomputes on resize via vw ----- */
+  /* ----- Responsive layout (mathematical), recomputes on resize via vw ----- */
   useEffect(() => {
     const update = () => setVw(window.innerWidth);
     update();
@@ -554,7 +554,7 @@ export default function NeuralNetwork() {
         })}
       </svg>
 
-      {/* ============ Center node — CFO Fynny ============ */}
+      {/* ============ Center node, CFO Fynny ============ */}
       <div
         className="absolute flex flex-col items-center center-node"
         style={{
@@ -576,7 +576,7 @@ export default function NeuralNetwork() {
         }}
         role="button"
         tabIndex={0}
-        aria-label="CFO Fynny — Central Intelligence. Click to get started."
+        aria-label="CFO Fynny, Central Intelligence. Click to get started."
       >
         <div
           className="rounded-full flex items-center justify-center"
@@ -930,7 +930,7 @@ export default function NeuralNetwork() {
                       margin: 0,
                     }}
                   >
-                    {n.name} metric — part of {n.shortLabel}.
+                    {n.name} metric, part of {n.shortLabel}.
                   </p>
                 </div>
               )}
@@ -955,7 +955,7 @@ export default function NeuralNetwork() {
         />
       )}
 
-      {/* ============ Info card — desktop/tablet beside cluster ============ */}
+      {/* ============ Info card, desktop/tablet beside cluster ============ */}
       {activeNode && pinned && !isMobile && (() => {
         const pos = cardPos(activeNode);
         return (

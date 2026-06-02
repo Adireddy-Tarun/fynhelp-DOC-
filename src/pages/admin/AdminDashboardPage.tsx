@@ -181,7 +181,7 @@ export default function AdminDashboardPage() {
   }, []);
 
   const fmtVal = (v: number | null, fmt: (n: number) => string) =>
-    d.loading ? "…" : v === null ? "—" : fmt(v);
+    d.loading ? "…" : v === null ? "-" : fmt(v);
 
   return (
     <div>

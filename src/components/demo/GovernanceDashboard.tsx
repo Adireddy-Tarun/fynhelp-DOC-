@@ -42,7 +42,7 @@ const fmtPct = (n: number) => `${(n || 0).toFixed(1)}%`
 const fmtSignedPct = (n: number) => `${n > 0 ? '+' : ''}${(n || 0).toFixed(1)}%`
 
 function fmtDate(d?: string) {
-  if (!d) return '—'
+  if (!d) return '-'
   try {
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
   } catch {
@@ -355,7 +355,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
                         {fmtSignedPct(v)}
                       </td>
                       <td className="px-4 py-3 text-right" style={{ color: colors.text.secondary, fontFamily: "'SF Mono', monospace" }}>
-                        {s.unreconciled != null ? fmtL(s.unreconciled) : '—'}
+                        {s.unreconciled != null ? fmtL(s.unreconciled) : '-'}
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -713,7 +713,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
             suffix=" mo ago"
             icon={Clock}
             status={lastAuditStatus}
-            subtitle={audit.lastInternalAudit ? fmtDate(audit.lastInternalAudit) : '—'}
+            subtitle={audit.lastInternalAudit ? fmtDate(audit.lastInternalAudit) : '-'}
           />
           <CFOCard
             title="Open Audit Findings"

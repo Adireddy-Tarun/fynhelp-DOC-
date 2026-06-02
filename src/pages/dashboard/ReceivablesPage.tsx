@@ -207,10 +207,10 @@ const ReceivablesPage = () => {
               return (
                 <TableRow key={item.id}>
                   <TableCell className="font-mono text-xs">
-                    {item.invoice_number || "—"}
+                    {item.invoice_number || "-"}
                   </TableCell>
                   <TableCell className="font-semibold">
-                    {item.customer_name || "—"}
+                    {item.customer_name || "-"}
                   </TableCell>
                   <TableCell className="text-right fyn-metric">
                     ₹{(Number(item.amount) || 0).toLocaleString("en-IN")}
@@ -225,7 +225,7 @@ const ReceivablesPage = () => {
                           month: "short",
                           year: "numeric",
                         })
-                      : "—"}
+                      : "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusBadge.variant}>

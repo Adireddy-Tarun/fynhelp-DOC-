@@ -390,7 +390,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
                     color: colors.text.primary,
                   }}
                 >
-                  <option value="">— Not mapped —</option>
+                  <option value="">- Not mapped -</option>
                   {columns.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}

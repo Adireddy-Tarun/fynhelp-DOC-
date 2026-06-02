@@ -119,9 +119,9 @@ export default function AdminUserDetailPage() {
 
           <div className="mt-6 space-y-3">
             <Field icon={<Mail size={14} />} label="User ID" value={profile.user_id.slice(0, 12) + "…"} />
-            <Field icon={<Phone size={14} />} label="Mobile" value={profile.mobile ?? "—"} />
-            <Field icon={<Building2 size={14} />} label="Business" value={business?.business_name ?? "—"} />
-            <Field icon={<Shield size={14} />} label="Plan" value={business?.plan ?? "—"} />
+            <Field icon={<Phone size={14} />} label="Mobile" value={profile.mobile ?? "-"} />
+            <Field icon={<Building2 size={14} />} label="Business" value={business?.business_name ?? "-"} />
+            <Field icon={<Shield size={14} />} label="Plan" value={business?.plan ?? "-"} />
             <Field icon={<Calendar size={14} />} label="Joined" value={new Date(profile.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} />
           </div>
 
@@ -235,11 +235,11 @@ function SubscriptionTab({ business }: { business: Business | null }) {
   if (!business) return <PlaceholderTab text="No business linked to this user yet." />;
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <KV label="Plan" value={business.plan ?? "—"} />
-      <KV label="Status" value={business.subscription_status ?? "—"} />
-      <KV label="Industry" value={business.industry ?? "—"} />
-      <KV label="State" value={business.state ?? "—"} />
-      <KV label="GSTIN" value={business.gstin ?? "—"} />
+      <KV label="Plan" value={business.plan ?? "-"} />
+      <KV label="Status" value={business.subscription_status ?? "-"} />
+      <KV label="Industry" value={business.industry ?? "-"} />
+      <KV label="State" value={business.state ?? "-"} />
+      <KV label="GSTIN" value={business.gstin ?? "-"} />
       <KV label="Business ID" value={business.id.slice(0, 8) + "…"} />
     </div>
   );

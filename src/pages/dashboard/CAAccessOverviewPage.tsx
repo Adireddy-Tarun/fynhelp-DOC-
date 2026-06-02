@@ -34,7 +34,7 @@ const accessLabel: Record<string, string> = {
 };
 
 const formatDate = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-";
 
 export default function CAAccessOverviewPage() {
   const [businessId, setBusinessId] = useState<string | null>(null);

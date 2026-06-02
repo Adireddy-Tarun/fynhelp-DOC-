@@ -156,7 +156,7 @@
     --sidebar-border: 40 52% 91% / 0.08;
     --sidebar-ring: 0 73% 44%;
 
-    /* Fyn brand tokens — dark mode overrides
+    /* Fyn brand tokens, dark mode overrides
        Invert ink/beige so dashboard surfaces (which use fyn-* tokens
        by design-system rule) adapt with the theme. Brand red/gold stay. */
     --fyn-ink: 40 52% 91%;

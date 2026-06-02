@@ -84,7 +84,7 @@ const SECTIONS_BY_TEMPLATE: Record<TemplateId, { id: string; label: string; defa
 const periodLabel = (p?: string | null, ps?: string | null, pe?: string | null) => {
   if (p) return p;
   if (ps && pe) return `${new Date(ps).toLocaleDateString("en-IN", { month: "short" })} - ${new Date(pe).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}`;
-  return "—";
+  return "-";
 };
 
 const fmtDateTime = (s: string) =>
@@ -151,7 +151,7 @@ export default function CAReportsPage() {
       const { data: bz } = await supabase.from("businesses").select("id, business_name").in("id", ids);
       nameMap = Object.fromEntries((bz || []).map((b: any) => [b.id, b.business_name]));
     }
-    setReports(reportRows.map(r => ({ ...r, business: r.business_id ? { business_name: nameMap[r.business_id] || "—" } : null })));
+    setReports(reportRows.map(r => ({ ...r, business: r.business_id ? { business_name: nameMap[r.business_id] || "-" } : null })));
     setSchedules((sch.data || []) as ScheduleRow[]);
     setClients(((acc.data || []) as any[]).map(a => ({ business_id: a.business_id, business_name: a.businesses?.business_name || "Unknown" })));
     setLoading(false);
@@ -253,11 +253,11 @@ export default function CAReportsPage() {
                             <div className="text-[13px] font-medium">{r.report_name || m.name}</div>
                           </div>
                         </td>
-                        <td className="py-3 pr-4 text-[13px]">{r.business?.business_name || (r.business_id ? "—" : <em style={{ color: "rgba(26,16,8,0.55)" }}>Portfolio-wide</em>)}</td>
+                        <td className="py-3 pr-4 text-[13px]">{r.business?.business_name || (r.business_id ? "-" : <em style={{ color: "rgba(26,16,8,0.55)" }}>Portfolio-wide</em>)}</td>
                         <td className="py-3 pr-4 text-[13px]">{periodLabel(r.period, r.period_start, r.period_end)}</td>
                         <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{fmtDateTime(r.created_at)}</td>
                         <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>
-                          {r.generated_by_user_id === user?.id ? "You" : "—"}
+                          {r.generated_by_user_id === user?.id ? "You" : "-"}
                         </td>
                         <td className="py-3 pr-4">
                           {r.status === "generating" ? (
@@ -342,7 +342,7 @@ export default function CAReportsPage() {
                         <td className="py-3 pr-4 text-[13px] capitalize">{s.frequency}{s.day_of_month ? ` (day ${s.day_of_month})` : ""}</td>
                         <td className="py-3 pr-4 text-[13px]">{s.scope === "all" ? "All clients" : `${clientCount} clients`}</td>
                         <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{s.last_generated_at ? fmtDateTime(s.last_generated_at) : "Never"}</td>
-                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{s.next_generation_at ? fmtDateTime(s.next_generation_at) : "—"}</td>
+                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{s.next_generation_at ? fmtDateTime(s.next_generation_at) : "-"}</td>
                         <td className="py-3 pr-4">
                           <ScheduleToggle schedule={s} onChange={loadAll} />
                         </td>

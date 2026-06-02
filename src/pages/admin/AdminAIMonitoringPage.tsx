@@ -124,7 +124,7 @@ export default function AdminAIMonitoringPage() {
         <Metric label="Total AI Queries (30d)" value={loading ? "…" : metrics.queries.toLocaleString("en-IN")} icon={<MessageCircle size={22} color="#8B6914" />} />
         <Metric label="Active AI Users" value={loading ? "…" : String(metrics.users)} icon={<Users size={22} color="#8B6914" />} />
         <Metric label="Total AI Cost (USD)" value={loading ? "…" : `$${metrics.cost.toFixed(2)}`} icon={<DollarSign size={22} color="#8B6914" />} />
-        <Metric label="Avg Response Time" value={loading ? "…" : metrics.avgMs ? `${(metrics.avgMs / 1000).toFixed(1)}s` : "—"} icon={<Clock size={22} color="#8B6914" />} />
+        <Metric label="Avg Response Time" value={loading ? "…" : metrics.avgMs ? `${(metrics.avgMs / 1000).toFixed(1)}s` : "-"} icon={<Clock size={22} color="#8B6914" />} />
       </div>
 
       <Card style={{ marginTop: 32, padding: 32, height: 400 }}>
@@ -245,10 +245,10 @@ export default function AdminAIMonitoringPage() {
                 {recentErrors.map((l, i) => (
                   <tr key={l.id} style={{ borderTop: "1px solid rgba(26,16,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
                     <td style={td}>{new Date(l.created_at).toLocaleString("en-IN")}</td>
-                    <td style={{ ...td, fontFamily: "JetBrains Mono, monospace" }}>{l.user_id ? l.user_id.slice(0, 8) + "…" : "—"}</td>
+                    <td style={{ ...td, fontFamily: "JetBrains Mono, monospace" }}>{l.user_id ? l.user_id.slice(0, 8) + "…" : "-"}</td>
                     <td style={td}>{l.status}</td>
-                    <td style={td}>{l.error_message ?? "—"}</td>
-                    <td style={td}>{l.response_time_ms ? `${(l.response_time_ms / 1000).toFixed(1)}s` : "—"}</td>
+                    <td style={td}>{l.error_message ?? "-"}</td>
+                    <td style={td}>{l.response_time_ms ? `${(l.response_time_ms / 1000).toFixed(1)}s` : "-"}</td>
                   </tr>
                 ))}
               </tbody>

@@ -101,7 +101,7 @@ export default function WaitlistStatsWidget() {
                     color: "hsl(var(--fyn-ink))",
                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>
-                    {s.company_name || s.name || s.email || "—"}
+                    {s.company_name || s.name || s.email || "-"}
                   </div>
                   <div style={{
                     fontFamily: "Roboto, sans-serif", fontSize: 11,

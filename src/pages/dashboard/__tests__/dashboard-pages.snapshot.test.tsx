@@ -3,7 +3,7 @@
  *
  * Strategy: full pages depend on Supabase, React Query, Auth context, and the
  * Router. Rather than snapshot the entire page (huge + brittle), we mount each
- * page with mocked dependencies and snapshot the *rendered output* — which
+ * page with mocked dependencies and snapshot the *rendered output*, which
  * exercises the shared primitives (FynCard/FynTable/FynBadge/FynButton) and the
  * Bloomberg-style spacing & typography classes used at the page level.
  *
@@ -81,19 +81,19 @@ const renderPage = (ui: ReactNode) => {
 beforeEach(() => {
   fromMock.mockReset();
   // Default: every table returns empty so pages render their empty/disconnected
-  // states — these are the most stable snapshots and exercise the shared
+  // states, these are the most stable snapshots and exercise the shared
   // primitives without needing realistic fixtures.
   fromMock.mockImplementation(() => makeQuery([]));
 });
 
-describe("Dashboard page snapshots — shared-primitive layout regression", () => {
+describe("Dashboard page snapshots, shared-primitive layout regression", () => {
   it("AuditReadinessPage: scorecard, area bars, accordion, vault use brand tokens", async () => {
     const { default: AuditReadinessPage } = await import("../AuditReadinessPage");
     const { container } = renderPage(<AuditReadinessPage />);
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  // TDSTaxPage was merged into GSTPage as the "TDS Filings" tab — snapshot retired.
+  // TDSTaxPage was merged into GSTPage as the "TDS Filings" tab, snapshot retired.
 
   it("CompliancePage (empty state): FynEmpty + FynCard troubleshooting use brand tokens", async () => {
     // profiles → business_id (so queries enable); businesses.gstin → null;

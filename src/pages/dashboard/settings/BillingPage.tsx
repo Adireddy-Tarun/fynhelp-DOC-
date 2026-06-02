@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Star, CreditCard, Shield, X } from "lucide-react";
 
 /* ============================================================
-   FynHelp — Billing (combined)
+   FynHelp, Billing (combined)
    Inter only · backend stubbed
    Replaces: Plan, Payments, Billing History
    ============================================================ */
@@ -87,7 +87,7 @@ const BillingPage = () => {
             <ul style={{ marginTop: 12, padding: 0, listStyle: "none" }}>
               {[
                 "All 50+ intelligence modules unlocked",
-                "CFO Fynny AI CFO — full access",
+                "CFO Fynny AI CFO, full access",
                 "Priority support",
                 "30% permanent discount when paid plans launch",
                 "Early access to new features before public release",
@@ -118,7 +118,7 @@ const BillingPage = () => {
 
       {/* SECTION 2: UPCOMING PLANS */}
       <div style={CARD}>
-        <SectionTitle title="What's coming" sub="Paid plans launch soon. As a founding member you pay 30% less — permanently." />
+        <SectionTitle title="What's coming" sub="Paid plans launch soon. As a founding member you pay 30% less, permanently." />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 20 }}>
           {PLANS.map((p) => (
             <div key={p.name} style={{
@@ -222,7 +222,7 @@ const BillingPage = () => {
           padding: "16px 20px", marginBottom: 20,
         }}>
           <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 14, color: "#92400E" }}>
-            No invoices yet — Early Access is completely free
+            No invoices yet, Early Access is completely free
           </p>
           <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "#92400E", marginTop: 4 }}>
             Your invoices will appear here when paid plans launch. We will email you before your first charge.
