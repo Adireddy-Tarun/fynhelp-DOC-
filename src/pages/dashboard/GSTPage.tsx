@@ -410,11 +410,11 @@ const GSTPage = () => {
                       <td className="py-3 text-fyn-ink font-medium">{f.return_type}</td>
                       <td className="py-3 text-fyn-ink/70">{f.filing_period}</td>
                       <td className="py-3 text-fyn-ink/70 fyn-metric">{fmtDate(f.due_date)}</td>
-                      <td className="py-3 text-right fyn-metric">{f.taxable_sales ? formatINR(Number(f.taxable_sales)) : "—"}</td>
-                      <td className="py-3 text-right fyn-metric">{f.tax_payable ? formatINR(Number(f.tax_payable)) : "—"}</td>
-                      <td className="py-3 text-right fyn-metric">{f.input_tax_credit ? formatINR(Number(f.input_tax_credit)) : "—"}</td>
+                      <td className="py-3 text-right fyn-metric">{f.taxable_sales ? formatINR(Number(f.taxable_sales)) : "-"}</td>
+                      <td className="py-3 text-right fyn-metric">{f.tax_payable ? formatINR(Number(f.tax_payable)) : "-"}</td>
+                      <td className="py-3 text-right fyn-metric">{f.input_tax_credit ? formatINR(Number(f.input_tax_credit)) : "-"}</td>
                       <td className="py-3 text-center"><StatusBadge status={f.status} due={f.due_date} /></td>
-                      <td className="py-3 text-fyn-ink/70 fyn-metric">{f.arn_number || "—"}</td>
+                      <td className="py-3 text-fyn-ink/70 fyn-metric">{f.arn_number || "-"}</td>
                     </tr>
                   );
                 })}
@@ -492,7 +492,7 @@ const GSTPage = () => {
                       <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deducted || 0))}</td>
                       <td className="py-3 text-right fyn-metric">{formatINR(Number(f.total_tds_deposited || 0))}</td>
                       <td className="py-3 text-center"><StatusBadge status={f.status} due={f.due_date} /></td>
-                      <td className="py-3 text-fyn-ink/70 fyn-metric">{f.acknowledgement_number || "—"}</td>
+                      <td className="py-3 text-fyn-ink/70 fyn-metric">{f.acknowledgement_number || "-"}</td>
                     </tr>
                   );
                 })}
@@ -624,7 +624,7 @@ const GSTPage = () => {
           />
           <Metric
             label="NEXT DEADLINE"
-            value={taxData.upcoming_deadlines[0] ? fmtDate(taxData.upcoming_deadlines[0].due_date) : "—"}
+            value={taxData.upcoming_deadlines[0] ? fmtDate(taxData.upcoming_deadlines[0].due_date) : "-"}
             sub={taxData.upcoming_deadlines[0] ? `${taxData.upcoming_deadlines[0].type} · ${taxData.upcoming_deadlines[0].filing_type}` : "No upcoming filings"}
           />
           <Metric

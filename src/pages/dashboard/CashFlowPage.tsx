@@ -163,7 +163,7 @@ const CashFlowPage = () => {
 
   return (
     <DashboardLayout>
-      {/* TOP METRICS — current month real data */}
+      {/* TOP METRICS, current month real data */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Inflow (This Month)</p>
@@ -184,7 +184,7 @@ const CashFlowPage = () => {
       {/* CHART */}
       <div className="rounded-lg p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fyn-ink font-sans" style={{ fontSize: 15, fontWeight: 600 }}>Monthly Cash Flow — Last 12 Months</h3>
+          <h3 className="text-fyn-ink font-sans" style={{ fontSize: 15, fontWeight: 600 }}>Monthly Cash Flow, Last 12 Months</h3>
           <div className="flex gap-1">
             {periods.map((p) => (
               <button
@@ -289,13 +289,13 @@ const CashFlowPage = () => {
                       style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
                     >
                       <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{dateLabel}</td>
-                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.description || "—"}</td>
+                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.description || "-"}</td>
                       <td className="py-3">
                         {t.category ? (
                           <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: "#F1F5F9", color: "#475569" }}>{t.category}</span>
-                        ) : <span style={{ fontSize: 12, color: "rgba(26,16,8,0.30)" }}>—</span>}
+                        ) : <span style={{ fontSize: 12, color: "rgba(26,16,8,0.30)" }}>-</span>}
                       </td>
-                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.counterparty || "—"}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.counterparty || "-"}</td>
                       <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: isIn ? "#16A34A" : "#DC2626" }}>
                         {isIn ? "+" : "-"}{formatINR(Number(t.amount))}
                       </td>

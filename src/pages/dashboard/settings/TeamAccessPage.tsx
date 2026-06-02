@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Users, ChevronDown, FileCheck } from "lucide-react";
 
 /* ============================================================
-   FynHelp — Team & Access
+   FynHelp, Team & Access
    Inter only · backend stubbed
    ============================================================ */
 
@@ -151,7 +151,7 @@ const TeamAccessPage = () => {
               )}
             </div>
             <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(26,16,8,0.60)" }}>
-              {m.isOwner ? "Full access" : ROLE_DESCRIPTIONS[m.role] || "—"}
+              {m.isOwner ? "Full access" : ROLE_DESCRIPTIONS[m.role] || "-"}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: m.status === "active" ? "#16A34A" : "#F59E0B" }} />

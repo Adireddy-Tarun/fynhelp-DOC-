@@ -113,7 +113,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           }}
         />
 
-        {/* Header — logo + toggle always visible, stacked when collapsed */}
+        {/* Header, logo + toggle always visible, stacked when collapsed */}
         <div
           className="flex flex-col items-center gap-3 px-4 py-5"
           style={{

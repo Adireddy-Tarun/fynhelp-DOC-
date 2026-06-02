@@ -90,7 +90,7 @@ export default function SimulatorWidget() {
         </div>
       </WidgetShell>
 
-      <ImpactStat stat="Test any decision before you spend a rupee" source="Live in beta — Q4 2026" />
+      <ImpactStat stat="Test any decision before you spend a rupee" source="Live in beta, Q4 2026" />
     </div>
   );
 }

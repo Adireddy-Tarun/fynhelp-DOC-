@@ -2,7 +2,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const testimonials = [
   {
-    quote: "CFO Fynny told me I'd run out of cash in 34 days — 5 weeks before my CA would have even noticed. I collected from 3 clients that week and avoided what would have been a complete shutdown.",
+    quote: "CFO Fynny told me I'd run out of cash in 34 days, 5 weeks before my CA would have even noticed. I collected from 3 clients that week and avoided what would have been a complete shutdown.",
     initials: "RM", name: "Rajesh Mehta", company: "Mehta Textile Traders, Surat", size: "₹18 Crore turnover business",
     impact: "Crisis averted · ₹24L collected · Runway +22 days", impactBg: "bg-fyn-success-bg", impactText: "text-fyn-success",
   },

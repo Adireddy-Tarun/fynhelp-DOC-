@@ -99,7 +99,7 @@ export function RevenueDashboard({ data, timeRange = '12m' }: RevenueDashboardPr
 
   const breakdownRows: Array<{ name: string; revenue: number; percent: number }> =
     (breakdown[breakdownTab] || []).map((r: any) => ({
-      name: r.name || r.segment || r.channel || '—',
+      name: r.name || r.segment || r.channel || '-',
       revenue: r.revenue || 0,
       percent: r.percent || 0,
     }))

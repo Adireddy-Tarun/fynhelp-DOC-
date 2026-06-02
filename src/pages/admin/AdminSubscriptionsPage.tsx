@@ -189,14 +189,14 @@ export default function AdminSubscriptionsPage() {
                   <td style={td}><PlanBadge plan={k} /></td>
                   <td style={td}>{v.count}</td>
                   <td style={td}>{fmtINR(v.mrr)}</td>
-                  <td style={td}>{v.count ? fmtINR(Math.round(v.mrr / v.count)) : "—"}</td>
+                  <td style={td}>{v.count ? fmtINR(Math.round(v.mrr / v.count)) : "-"}</td>
                 </tr>
               ))}
               <tr style={{ borderTop:"2px solid rgba(139,105,20,0.3)", background:"rgba(244,237,218,0.5)" }}>
                 <td style={{...td, fontWeight:700}}>TOTAL</td>
                 <td style={{...td, fontWeight:700}}>{subs.length}</td>
                 <td style={{...td, fontWeight:700}}>{fmtINR(Object.values(planDist).reduce((a,v)=>a+v.mrr,0))}</td>
-                <td style={td}>—</td>
+                <td style={td}>-</td>
               </tr>
             </tbody>
           </table>
@@ -245,13 +245,13 @@ export default function AdminSubscriptionsPage() {
                   background: i%2 ? "rgba(244,237,218,0.3)" : "#fff",
                   borderBottom: "1px solid rgba(26,16,8,0.06)",
                 }}>
-                  <td style={td}>{s.user_id ? s.user_id.slice(0,8) : "—"}</td>
-                  <td style={td}>{s.business_id ? s.business_id.slice(0,8) : "—"}</td>
+                  <td style={td}>{s.user_id ? s.user_id.slice(0,8) : "-"}</td>
+                  <td style={td}>{s.business_id ? s.business_id.slice(0,8) : "-"}</td>
                   <td style={td}><PlanBadge plan={s.plan_type} /></td>
                   <td style={td}><StatusBadge status={s.status} /></td>
                   <td style={{ ...td, textAlign:"right", fontFamily:"JetBrains Mono, monospace" }}>{fmtINR(Number(s.mrr))}</td>
                   <td style={td}>{s.billing_cycle}</td>
-                  <td style={td}>{s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" }) : "—"}</td>
+                  <td style={td}>{s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" }) : "-"}</td>
                   <td style={td}>{new Date(s.started_at).toLocaleDateString("en-IN",{ day:"2-digit", month:"short" })}</td>
                   <td style={td}>
                     <ActionsMenu
@@ -350,13 +350,13 @@ function ChangePlanModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
   const [reason, setReason] = useState("");
   return (
     <ModalShell title="Change Plan" onClose={onClose}>
-      <Field label="Current Plan" value={`${sub.plan_type} — ${fmtINR(Number(sub.mrr))} / ${sub.billing_cycle}`} />
+      <Field label="Current Plan" value={`${sub.plan_type}, ${fmtINR(Number(sub.mrr))} / ${sub.billing_cycle}`} />
       <label style={lbl}>New Plan</label>
       <select value={newPlan} onChange={(e)=>setNewPlan(e.target.value)} style={{ ...selectStyle, width:"100%" }}>
-        <option value="free_trial">Free Trial — ₹0</option>
-        <option value="starter">Starter — ₹2,500</option>
-        <option value="pro">Pro — ₹7,500</option>
-        <option value="enterprise">Enterprise — ₹15,000</option>
+        <option value="free_trial">Free Trial, ₹0</option>
+        <option value="starter">Starter, ₹2,500</option>
+        <option value="pro">Pro, ₹7,500</option>
+        <option value="enterprise">Enterprise, ₹15,000</option>
       </select>
       <label style={lbl}>Effective Date</label>
       <div className="flex gap-4" style={{ fontFamily:"Roboto, sans-serif", fontSize:14 }}>

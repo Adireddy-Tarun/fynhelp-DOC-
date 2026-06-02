@@ -9,7 +9,7 @@ export type AdminAuditPayload = {
 
 /**
  * Records an admin action into admin_audit_logs in the external Supabase
- * project (where admin users live). Never throws — failures are logged only.
+ * project (where admin users live). Never throws, failures are logged only.
  */
 export async function logAdminAction(p: AdminAuditPayload): Promise<void> {
   try {

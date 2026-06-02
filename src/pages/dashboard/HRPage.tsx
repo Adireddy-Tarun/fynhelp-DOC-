@@ -166,11 +166,11 @@ const HRPage = () => {
                 {employees.map((e, i) => (
                   <tr key={e.id} className={`border-b border-fyn-ink-10 last:border-0 ${i % 2 === 0 ? "bg-[#FAF7F0]" : "bg-card"}`}>
                     <td className="py-3 text-fyn-ink font-medium">{e.name}</td>
-                    <td className="py-3 text-fyn-ink/70">{e.email || "—"}</td>
-                    <td className="py-3 text-fyn-ink/70">{e.department || "—"}</td>
-                    <td className="py-3 text-fyn-ink/70">{e.designation || "—"}</td>
-                    <td className="py-3 text-right fyn-metric">{e.salary_monthly ? formatINR(Number(e.salary_monthly)) : "—"}</td>
-                    <td className="py-3 text-right fyn-metric">{e.ctc_annual ? formatINR(Number(e.ctc_annual)) : "—"}</td>
+                    <td className="py-3 text-fyn-ink/70">{e.email || "-"}</td>
+                    <td className="py-3 text-fyn-ink/70">{e.department || "-"}</td>
+                    <td className="py-3 text-fyn-ink/70">{e.designation || "-"}</td>
+                    <td className="py-3 text-right fyn-metric">{e.salary_monthly ? formatINR(Number(e.salary_monthly)) : "-"}</td>
+                    <td className="py-3 text-right fyn-metric">{e.ctc_annual ? formatINR(Number(e.ctc_annual)) : "-"}</td>
                     <td className="py-3 text-center">
                       <span className={`text-[11px] px-2 py-0.5 rounded ${getStatusClass(e.status)}`}>
                         {e.status}
@@ -179,7 +179,7 @@ const HRPage = () => {
                     <td className="py-3 text-fyn-ink/70 fyn-metric">
                       {e.date_of_joining
                         ? new Date(e.date_of_joining).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-                        : "—"}
+                        : "-"}
                     </td>
                   </tr>
                 ))}

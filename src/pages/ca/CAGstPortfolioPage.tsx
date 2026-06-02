@@ -42,12 +42,12 @@ const formatINRCompact = (n: number): string => {
 const daysFromNow = (d: string) => Math.floor((new Date(d).getTime() - Date.now()) / 86400000);
 
 const monthYear = (d: string | null) => {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleDateString("en-IN", { month: "short", year: "numeric" });
 };
 
 const daysAgo = (d: string | null) => {
-  if (!d) return "—";
+  if (!d) return "-";
   const n = Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
   return n === 0 ? "today" : n === 1 ? "1 day ago" : `${n} days ago`;
 };
@@ -383,7 +383,7 @@ export default function CAGstPortfolioPage() {
                       </td>
                       <td className="py-3 group">
                         <div className="flex items-center gap-1.5 text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>
-                          <span>{r.gstin || "—"}</span>
+                          <span>{r.gstin || "-"}</span>
                           {r.gstin && (
                             <button onClick={(e) => { e.stopPropagation(); copyGstin(r.gstin!); }} className="opacity-0 group-hover:opacity-100">
                               <Copy size={12} />
@@ -412,7 +412,7 @@ export default function CAGstPortfolioPage() {
                             <div>{monthYear(r.last_filed.date)}</div>
                             <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.45)" }}>{daysAgo(r.last_filed.date)}</div>
                           </>
-                        ) : <span style={{ color: "rgba(26,16,8,0.35)" }}>—</span>}
+                        ) : <span style={{ color: "rgba(26,16,8,0.35)" }}>-</span>}
                       </td>
                       <td className="py-3 text-[13px]">
                         {r.next_due ? (
@@ -613,8 +613,8 @@ function ReconModal({ clients, onClose, caFirmId }: { clients: ClientRow[]; onCl
       const mm = c.mismatches || Math.floor(Math.random() * 4);
       mismatchTotal += mm;
       const line = mm > 0
-        ? `⚠ ${c.business_name} — ${mm} mismatch${mm > 1 ? "es" : ""} found`
-        : `✓ ${c.business_name} — clean`;
+        ? `⚠ ${c.business_name}, ${mm} mismatch${mm > 1 ? "es" : ""} found`
+        : `✓ ${c.business_name}, clean`;
       setLogs((prev) => [...prev, line]);
       setProgress(Math.round(((i + 1) / list.length) * 100));
 

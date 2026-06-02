@@ -38,7 +38,7 @@ const SLIDES: Slide[] = [
     headline: "42% of Indian SMEs cite cash flow as their #1 challenge.",
     statValue: "14 days",
     statLabel: "Average time before a cash crisis is discovered",
-    body: "Most owners discover a crisis 14 days before it happens — not 60 days when something can still be done about it.",
+    body: "Most owners discover a crisis 14 days before it happens, not 60 days when something can still be done about it.",
   },
   {
     id: "leak",
@@ -53,8 +53,8 @@ const SLIDES: Slide[] = [
     Icon: BarChart2,
     headline: "50% of Indian businesses fail within 5 years.",
     statValue: "50%",
-    statLabel: "Fail within 5 years — mostly from cash & compliance surprises",
-    body: "Most failures are not caused by bad products or poor sales — they are caused by cash flow mismanagement and compliance shocks.",
+    statLabel: "Fail within 5 years, mostly from cash & compliance surprises",
+    body: "Most failures are not caused by bad products or poor sales, they are caused by cash flow mismanagement and compliance shocks.",
   },
   {
     id: "blind",
@@ -62,7 +62,7 @@ const SLIDES: Slide[] = [
     headline: "98% of Indian SMEs operate financially blind.",
     statValue: "98%",
     statLabel: "Of SMEs cannot afford a CFO",
-    body: "Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — all making critical decisions on gut feel and a bank balance check.",
+    body: "Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur, all making critical decisions on gut feel and a bank balance check.",
   },
 ];
 

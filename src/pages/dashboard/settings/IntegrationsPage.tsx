@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Upload, Shield, Users } from "lucide-react";
 
 /* ============================================================
-   FynHelp — Integrations
+   FynHelp, Integrations
    Inter only · backend stubbed with // BACKEND NEEDED comments
    ============================================================ */
 
@@ -189,7 +189,7 @@ const IntegrationsPage = () => {
                   <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "#1A1008" }}>{req}</span>
                 </label>
               ))}
-              {/* BACKEND: Supabase Storage signed URL — GET /api/resources/tally-agent-download */}
+              {/* BACKEND: Supabase Storage signed URL, GET /api/resources/tally-agent-download */}
               <button style={{
                 width: "100%", marginTop: 12, padding: "10px 14px",
                 background: "#FFFFFF", border: "1px solid #D4C9A8", borderRadius: 6,

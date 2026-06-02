@@ -47,7 +47,7 @@ export default function TestSecureImportPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        setResult({ status: "error", payload: null, error: "Not signed in — please log in first." });
+        setResult({ status: "error", payload: null, error: "Not signed in, please log in first." });
         setLoading(false);
         return;
       }

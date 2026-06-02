@@ -126,7 +126,7 @@ export default function AdminSystemHealthPage() {
                 <div>
                   <div style={{ color: "hsl(var(--fyn-ink) / 0.5)" }}>Response</div>
                   <div style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600, fontFamily: "JetBrains Mono, monospace" }}>
-                    {s.responseMs != null ? `${s.responseMs}ms` : "—"}
+                    {s.responseMs != null ? `${s.responseMs}ms` : "-"}
                   </div>
                 </div>
                 <div>
@@ -144,7 +144,7 @@ export default function AdminSystemHealthPage() {
         })}
       </div>
 
-      {/* Response time history — no historical store yet */}
+      {/* Response time history, no historical store yet */}
       <Card className="mb-6">
         <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
           Response Time History
@@ -156,7 +156,7 @@ export default function AdminSystemHealthPage() {
         />
       </Card>
 
-      {/* Error log — no error log table yet */}
+      {/* Error log, no error log table yet */}
       <Card className="mb-6">
         <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
           Recent Errors
@@ -168,7 +168,7 @@ export default function AdminSystemHealthPage() {
         />
       </Card>
 
-      {/* 30-day uptime — no uptime history yet */}
+      {/* 30-day uptime, no uptime history yet */}
       <Card>
         <h2 className="mb-2" style={{ fontFamily: "Oswald, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
           30-Day Uptime

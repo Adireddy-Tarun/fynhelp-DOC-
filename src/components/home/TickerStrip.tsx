@@ -2,9 +2,9 @@ export default function TickerStrip() {
   const items = [
     "Know your runway in 10 seconds, not 10 days",
     "Never miss a GST deadline again with automated alerts",
-    "Track every UPI payment — no more lost revenue",
+    "Track every UPI payment, no more lost revenue",
     "Reduce manual reconciliation from 15 hours to 1 hour per month",
-    "Get investor-ready dashboards instantly — no CFO needed",
+    "Get investor-ready dashboards instantly, no CFO needed",
     "₹40,000 average savings per month on missed tax deductions",
     "4.2 months average runway extension after cost optimization",
     "Real-time cash flow visibility across all bank accounts",

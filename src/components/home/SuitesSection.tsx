@@ -321,7 +321,7 @@ const CaWidget: React.FC = () => (
 
 const SUITES: Suite[] = [
   { id: "liquidity", name: "Liquidity Intelligence", short: "Liquidity", Icon: Droplets, modules: 6,
-    desc: "Real-time cash position, burn rate, runway forecast, and working capital — every morning before you ask.",
+    desc: "Real-time cash position, burn rate, runway forecast, and working capital, every morning before you ask.",
     status: "live", href: "/products#liquidity", accent: "#C41E1E", Widget: LiquidityWidget },
   { id: "revenue", name: "Revenue Intelligence", short: "Revenue", Icon: TrendingUp, modules: 8,
     desc: "Know which customers will pay, who won't, and what to do before a ₹10L receivable becomes a write-off.",
@@ -345,10 +345,10 @@ const SUITES: Suite[] = [
     desc: "Know where you stand in your industry, what you qualify for, and when you're ready to grow.",
     status: "dev", href: "/products#market", accent: "#DC6B19", Widget: MarketWidget },
   { id: "banking", name: "Banking & Fintech Intelligence", short: "Banking", Icon: Building2, modules: 6,
-    desc: "All your bank accounts, UPI transactions, and loan options — unified and intelligently analyzed.",
+    desc: "All your bank accounts, UPI transactions, and loan options, unified and intelligently analyzed.",
     status: "dev", href: "/products#banking", accent: "#1A4A8B", Widget: BankingWidget },
   { id: "ca-partner", name: "CA & Partner Ecosystem", short: "CA Partner", Icon: Briefcase, modules: 4,
-    desc: "For CA firms managing 50+ SME clients — a white-label intelligence platform that makes you indispensable.",
+    desc: "For CA firms managing 50+ SME clients, a white-label intelligence platform that makes you indispensable.",
     status: "dev", href: "/products#ca-partner", accent: "#8B6914", Widget: CaWidget },
 ];
 
@@ -436,7 +436,7 @@ export default function SuitesSection() {
               boxShadow: "0 20px 60px -20px rgba(26,16,8,0.18)",
             }}
           >
-            {/* Layered background — accent gradient + faux dashboard pattern */}
+            {/* Layered background, accent gradient + faux dashboard pattern */}
             <div
               className="absolute inset-0"
               style={{

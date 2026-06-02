@@ -1,4 +1,4 @@
-// External Supabase client — points at the user's main Supabase project
+// External Supabase client, points at the user's main Supabase project
 // (project ref: wiknwxniwqvsxgyzqqxu), separate from the Lovable Cloud
 // backend used by `./client`.
 //

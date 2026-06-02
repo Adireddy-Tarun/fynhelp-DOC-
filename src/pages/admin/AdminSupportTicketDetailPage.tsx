@@ -161,7 +161,7 @@ export default function AdminSupportTicketDetailPage() {
               </span>
               <div>
                 <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{businessName || "Direct user"}</div>
-                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.6)" }}>{ticket.user_id?.slice(0, 8) ?? "—"}…</div>
+                <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.6)" }}>{ticket.user_id?.slice(0, 8) ?? "-"}…</div>
               </div>
             </div>
 

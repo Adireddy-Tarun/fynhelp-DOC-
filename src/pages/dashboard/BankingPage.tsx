@@ -129,9 +129,9 @@ const BankingPage = () => {
             {bankAccounts.map((acc: any) => (
               <TableRow key={acc.id}>
                 <TableCell className="font-medium">
-                  {acc.bank_name || "—"}
+                  {acc.bank_name || "-"}
                 </TableCell>
-                <TableCell>{acc.account_number || "—"}</TableCell>
+                <TableCell>{acc.account_number || "-"}</TableCell>
                 <TableCell>
                   {acc.last_sync
                     ? new Date(acc.last_sync).toLocaleDateString("en-IN", {
@@ -139,7 +139,7 @@ const BankingPage = () => {
                         month: "short",
                         year: "numeric",
                       })
-                    : "—"}
+                    : "-"}
                 </TableCell>
                 <TableCell className="text-right fyn-metric">
                   ₹{(Number(acc.balance) || 0).toLocaleString("en-IN")}
@@ -176,11 +176,11 @@ const BankingPage = () => {
                           month: "short",
                           year: "numeric",
                         })
-                      : "—"}
+                      : "-"}
                   </TableCell>
-                  <TableCell>{txn.description || txn.counterparty || "—"}</TableCell>
+                  <TableCell>{txn.description || txn.counterparty || "-"}</TableCell>
                   <TableCell className="capitalize">
-                    {txn.direction || "—"}
+                    {txn.direction || "-"}
                   </TableCell>
                   <TableCell
                     className="text-right fyn-metric"

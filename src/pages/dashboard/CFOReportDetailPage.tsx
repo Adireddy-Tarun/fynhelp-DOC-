@@ -22,7 +22,7 @@ const formatDate = (d?: string | null) =>
         month: "short",
         year: "numeric",
       })
-    : "—";
+    : "-";
 
 const CFOReportDetailPage = () => {
   const navigate = useNavigate();

@@ -34,7 +34,7 @@ const longDesc: Record<string, string> = {
   governance:
     "Stay compliant across every regulator. Real-time risk scoring, audit trails, and proactive alerts.",
   hr:
-    "Headcount ROI, payroll analytics, and attrition signals — built for growing Indian teams.",
+    "Headcount ROI, payroll analytics, and attrition signals, built for growing Indian teams.",
   simulator:
     "Model any business decision in seconds. Adjust hires, prices, or spend and see the runway impact instantly.",
   market:
@@ -58,7 +58,7 @@ export const NIDHI_ITEM = {
   shortLabel: "Fynny",
   description: "Conversational financial intelligence, available 24/7",
   longDescription:
-    "Ask Fynny anything about your business — burn rate, runway, vendor cuts, hiring decisions. She replies instantly with actionable advice grounded in your real data.",
+    "Ask Fynny anything about your business, burn rate, runway, vendor cuts, hiring decisions. She replies instantly with actionable advice grounded in your real data.",
   status: "live" as const,
   quarter: "Live" as const,
   href: "/dashboard/nidhi",
@@ -90,7 +90,7 @@ export const PLATFORM_FEATURES = [
     name: "CA Partner Program",
     description: "White label for accountants",
     longDescription:
-      "Manage your entire client portfolio from one dashboard. Compliance, GST, and reports — co-branded.",
+      "Manage your entire client portfolio from one dashboard. Compliance, GST, and reports, co-branded.",
     status: "coming_soon" as const,
     widget: "generic" as WidgetKey,
     href: "/#product-ecosystem",

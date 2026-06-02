@@ -220,9 +220,9 @@ const PayablesPage = () => {
                       }}
                     >
                       <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{p.vendor_name}</td>
-                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{p.invoice_number || "—"}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{p.invoice_number || "-"}</td>
                       <td className="py-3" style={{ fontSize: 13, color: overdue ? "#C41E1E" : "rgba(26,16,8,0.60)", fontWeight: overdue ? 600 : 400 }}>
-                        {p.due_date ? new Date(p.due_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                        {p.due_date ? new Date(p.due_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}
                       </td>
                       <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, color: "rgba(26,16,8,0.80)" }}>
                         {formatINR(Number(p.amount || 0))}

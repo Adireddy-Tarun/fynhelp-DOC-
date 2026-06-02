@@ -306,7 +306,7 @@ export default function CAPortfolioHealthPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <KpiCard
           label="Total Active Clients"
-          value={loading ? "—" : `${stats.total}`}
+          value={loading ? "-" : `${stats.total}`}
           trend={`+ ${Math.max(1, Math.floor(stats.total / 8))} new this quarter`}
           trendUp
           icon={<Users size={18} style={{ color: COLORS.blue }} />}
@@ -314,7 +314,7 @@ export default function CAPortfolioHealthPage() {
         />
         <KpiCard
           label="Portfolio Health Score"
-          value={loading ? "—" : `${stats.avgHealth}/100`}
+          value={loading ? "-" : `${stats.avgHealth}/100`}
           valueColor={stats.avgHealth > 80 ? COLORS.green : stats.avgHealth >= 60 ? COLORS.amber : COLORS.red}
           trend={`+ 3 points vs last month`}
           trendUp
@@ -323,7 +323,7 @@ export default function CAPortfolioHealthPage() {
         />
         <KpiCard
           label="Total Revenue (Annualized)"
-          value={loading ? "—" : fmtCr(stats.totalRevenue)}
+          value={loading ? "-" : fmtCr(stats.totalRevenue)}
           trend="+ 12% vs last year"
           trendUp
           icon={<TrendingUp size={18} style={{ color: COLORS.green }} />}
@@ -331,7 +331,7 @@ export default function CAPortfolioHealthPage() {
         />
         <KpiCard
           label="Active Critical Alerts"
-          value={loading ? "—" : `${stats.critAlerts}`}
+          value={loading ? "-" : `${stats.critAlerts}`}
           valueColor={stats.critAlerts > 0 ? COLORS.red : COLORS.green}
           trend="↓ 8 resolved this week"
           trendUp
@@ -383,7 +383,7 @@ export default function CAPortfolioHealthPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
                 <XAxis dataKey="m" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} />
                 <YAxis tickFormatter={(v) => `₹${(v / 1e7).toFixed(1)}Cr`} tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} />
-                <Tooltip formatter={(v: any) => v ? formatINR(Number(v)) : "—"} />
+                <Tooltip formatter={(v: any) => v ? formatINR(Number(v)) : "-"} />
                 <Legend />
                 <Line type="monotone" dataKey="actual" name="Actual" stroke={COLORS.green} strokeWidth={2.5} dot={false} />
                 <Line type="monotone" dataKey="projected" name="Projected" stroke="rgba(26,16,8,0.40)" strokeDasharray="4 4" strokeWidth={2} dot={false} />
@@ -554,7 +554,7 @@ export default function CAPortfolioHealthPage() {
           <Insight
             cat="Growth" tone="green" icon={<TrendingUp size={16} />}
             text="Portfolio revenue grew 15% QoQ, primarily driven by Electronics sector clients"
-            sub={`Top industry: ${industryStats[0]?.name || "—"} with ${fmtCr(industryStats[0]?.revenue || 0)} revenue`}
+            sub={`Top industry: ${industryStats[0]?.name || "-"} with ${fmtCr(industryStats[0]?.revenue || 0)} revenue`}
             action="View breakdown"
             onClick={() => navigate("/ca/revenue")}
           />
@@ -724,7 +724,7 @@ function Stat({ label, value, valueColor = COLORS.ink }: { label: string; value:
 function Empty({ small, text }: { small?: boolean; text?: string }) {
   return (
     <div className={`flex items-center justify-center text-[13px] ${small ? "py-6" : "py-10"}`} style={{ color: "rgba(26,16,8,0.50)" }}>
-      {text || "No data yet — add clients to see analytics"}
+      {text || "No data yet, add clients to see analytics"}
     </div>
   );
 }

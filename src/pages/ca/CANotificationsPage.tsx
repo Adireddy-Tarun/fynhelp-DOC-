@@ -62,7 +62,7 @@ const sevColor = (s: string | null) =>
 
 // Time-ago formatter
 function timeAgo(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const d = new Date(iso);
   const now = new Date();
   const diff = (now.getTime() - d.getTime()) / 1000;

@@ -5,7 +5,7 @@ import { Eye, EyeOff, Check } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
 
 const FEATURES = [
-  "Portfolio dashboard — 50+ clients at a glance",
+  "Portfolio dashboard, 50+ clients at a glance",
   "Bulk GST filing across clients",
   "ITC reconciliation engine",
   "Client alerts & notifications",

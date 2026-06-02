@@ -44,9 +44,9 @@ const NotificationsPage = () => {
   };
 
   const groupLabels: Record<string, { label: string; color: string }> = {
-    critical: { label: "CRITICAL — Always on", color: "#C41E1E" },
-    warning: { label: "WARNING — On by default", color: "#8B5A00" },
-    info: { label: "INFORMATIONAL — Off by default", color: "#1A4A8B" },
+    critical: { label: "CRITICAL, Always on", color: "#C41E1E" },
+    warning: { label: "WARNING, On by default", color: "#8B5A00" },
+    info: { label: "INFORMATIONAL, Off by default", color: "#1A4A8B" },
     brief: { label: "NIDHI DAILY BRIEF", color: "#8B6914" },
   };
 

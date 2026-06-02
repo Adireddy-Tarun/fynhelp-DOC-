@@ -115,7 +115,7 @@ const STYLES = `
   .section h2.left { text-align: left; }
   .section .lead { text-align: center; color: ${C.muted}; font-size: 17px; margin-top: 16px; }
 
-  /* Integrations — seamless glass marquee (no box) */
+  /* Integrations, seamless glass marquee (no box) */
   .int-stage { position: relative; margin: 64px -24px 0; padding: 8px 0; overflow: hidden; isolation: isolate; }
   .int-stage::before, .int-stage::after { content: ''; position: absolute; top: 0; bottom: 0; width: 180px; z-index: 3; pointer-events: none; }
   .int-stage::before { left: 0; background: linear-gradient(90deg, ${C.bg} 0%, rgba(236,230,210,0) 100%); }
@@ -156,7 +156,7 @@ const STYLES = `
   .problem-stat .pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 32px; }
   .problem-stat .pill { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 8px 12px; font-size: 12px; font-weight: 500; }
 
-  /* Steps — connected timeline */
+  /* Steps, connected timeline */
   .steps-wrap { position: relative; margin-top: 72px; }
   .steps-line { position: absolute; left: 8%; right: 8%; top: 52px; height: 2px; pointer-events: none; z-index: 0;
     background-image: linear-gradient(90deg, ${C.red} 50%, transparent 50%); background-size: 10px 2px; background-repeat: repeat-x;
@@ -217,7 +217,7 @@ const STYLES = `
   .sim-unlock { background: ${C.red}; color: #fff; border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 600; margin-top: 8px; cursor: pointer; transition: background .15s; }
   .sim-unlock:hover { background: ${C.redDark}; }
 
-  /* Security — minimalist grid */
+  /* Security, minimalist grid */
   .sec-wrap { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; margin-top: 56px; padding: 8px; }
   .sec-grid { display: grid; grid-template-columns: 1fr; }
   @media (min-width: 700px) { .sec-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -458,7 +458,7 @@ const TICKER_DARK = [
   "Predict cash shortfalls 60 days in advance",
   "Know your runway in 10 seconds, not 10 days",
   "Never miss a GST deadline with automated alerts",
-  "Track every UPI payment — no lost revenue",
+  "Track every UPI payment, no lost revenue",
   "Cut reconciliation from 15 hours to 1 hour/month",
 ];
 
@@ -479,8 +479,8 @@ const INTEGRATIONS: [string, string, string][] = [
 
 const STEPS = [
   { n: "01", t: "Connect your bank", d: "2 minutes via RBI's Account Aggregator.", icon: "bank" as const },
-  { n: "02", t: "Connect accounting", d: "15 minutes — we handle the mapping.", icon: "ledger" as const },
-  { n: "03", t: "Enter your GSTIN", d: "3 minutes — instant compliance calendar.", icon: "doc" as const },
+  { n: "02", t: "Connect accounting", d: "15 minutes, we handle the mapping.", icon: "ledger" as const },
+  { n: "03", t: "Enter your GSTIN", d: "3 minutes, instant compliance calendar.", icon: "doc" as const },
   { n: "04", t: "Fynny's first brief", d: "Within minutes. Then every morning after.", icon: "spark" as const },
 ];
 
@@ -497,7 +497,7 @@ const SECURITY = [
 
 const TESTIMONIALS = [
   {
-    q: "\"CFO Fynny told me I'd run out of cash in 34 days — five weeks before my CA would have even noticed. I collected from 3 clients that week and avoided a complete shutdown.\"",
+    q: "\"CFO Fynny told me I'd run out of cash in 34 days, five weeks before my CA would have even noticed. I collected from 3 clients that week and avoided a complete shutdown.\"",
     a: "RM", n: "Rajesh Mehta", m: "Mehta Textile Traders, Surat · ₹18 Cr turnover",
     tag: "Crisis averted · ₹24L collected · Runway +22 days", tinted: false,
   },
@@ -795,7 +795,7 @@ function Nav() {
 
 
 
-// ===== ChatWidget (CFO Fynny — production demo) =====
+// ===== ChatWidget (CFO Fynny, production demo) =====
 type Frame = {
   user: string;
   reply: ReactNode;
@@ -1298,7 +1298,7 @@ export default function HomePage() {
             <span className="red-line">Interrogate it.</span>
           </h1>
           <p className="hero-sub fade-up">
-            Meet <b>CFO Fynny</b> — stop running your business on gut feeling. Start running it on intelligence. Predictive what-if scenarios and instant financial clarity.
+            Meet <b>CFO Fynny</b>, stop running your business on gut feeling. Start running it on intelligence. Predictive what-if scenarios and instant financial clarity.
           </p>
           <div className="hero-cta fade-up">
             <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
@@ -1374,15 +1374,15 @@ export default function HomePage() {
             <div className="sp-head">
               <span className="sp-eyebrow">THE PROBLEM</span>
               <h2>India's SMEs make ₹Crore decisions with <em>no financial intelligence.</em></h2>
-              <p>Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur — all running ₹Crore businesses on gut feel, a bank balance check, and a monthly call with the CA.</p>
+              <p>Manufacturers in Ludhiana, traders in Surat, clinics in Chennai, exporters in Tiruppur, all running ₹Crore businesses on gut feel, a bank balance check, and a monthly call with the CA.</p>
             </div>
 
             <div className="sp-grid sp-grid-2">
-              {/* 1 — Gut feel */}
+              {/* 1, Gut feel */}
               <article className="sp-card">
                 <div className="sp-num">PAIN · 01</div>
                 <h3>"Should I hire?" is answered with a gut feel</h3>
-                <p>No runway model, no scenario math. Founders make ₹50L+ hiring calls staring at the HDFC app — and find out 3 months later it broke their cash flow.</p>
+                <p>No runway model, no scenario math. Founders make ₹50L+ hiring calls staring at the HDFC app, and find out 3 months later it broke their cash flow.</p>
                 <div className="sp-mock">
                   <div className="sp-mock-bar"><span className="sp-dot red" /><span className="sp-dot" /><span className="sp-dot" /></div>
                   <div className="spm-kpi"><span className="v" style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.05em" }}>₹??.?L</span><span className="l">RUNWAY · UNKNOWN</span></div>
@@ -1394,11 +1394,11 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 2 — CFO cost */}
+              {/* 2, CFO cost */}
               <article className="sp-card">
                 <div className="sp-num">PAIN · 02</div>
                 <h3>A full-time CFO costs ₹45L+/year</h3>
-                <p>The salary alone rules them out for 98% of Indian SMEs. So the second-most-important seat in the company stays empty — for years.</p>
+                <p>The salary alone rules them out for 98% of Indian SMEs. So the second-most-important seat in the company stays empty, for years.</p>
                 <div className="sp-mock">
                   <div className="spm-match">
                     <div className="spm-inv"><b>CFO · Salary</b>Mumbai · Sr.</div>
@@ -1414,7 +1414,7 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 3 — Spreadsheets */}
+              {/* 3, Spreadsheets */}
               <article className="sp-card">
                 <div className="sp-num">PAIN · 03</div>
                 <h3>Month-end is 40 hours of spreadsheets</h3>
@@ -1430,11 +1430,11 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 4 — GST surprise */}
+              {/* 4, GST surprise */}
               <article className="sp-card">
                 <div className="sp-num">PAIN · 04</div>
                 <h3>GST notices arrive without warning</h3>
-                <p>ITC mismatch in GSTR-2B. Late-fee penalty on 3B. ₹2-3L surprises that could've been caught the moment the invoice was booked — but weren't.</p>
+                <p>ITC mismatch in GSTR-2B. Late-fee penalty on 3B. ₹2-3L surprises that could've been caught the moment the invoice was booked, but weren't.</p>
                 <div className="sp-mock">
                   <div className="spm-doc" style={{ background: "rgba(196,30,30,0.08)", border: "1px solid rgba(196,30,30,0.4)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1511,15 +1511,15 @@ export default function HomePage() {
             <div className="sp-head">
               <span className="sp-eyebrow">FYNHELP SUPERPOWERS</span>
               <h2>One platform. <em>Every finance answer.</em></h2>
-              <p>From the first rupee tracked to the boardroom what-if — FynHelp gives Indian SMEs a CFO-grade brain that's always on, always honest, and always in your ledger.</p>
+              <p>From the first rupee tracked to the boardroom what-if, FynHelp gives Indian SMEs a CFO-grade brain that's always on, always honest, and always in your ledger.</p>
             </div>
 
             <div className="sp-grid">
-              {/* 1 — Ask Fynny */}
+              {/* 1, Ask Fynny */}
               <article className="sp-card">
                 <div className="sp-num">01 · ASK</div>
                 <h3>Ask Fynny anything, in plain English</h3>
-                <p>Conversational CFO trained on your books. Ask in English, Hindi, or Hinglish — get audit-ready answers in seconds, not weeks.</p>
+                <p>Conversational CFO trained on your books. Ask in English, Hindi, or Hinglish, get audit-ready answers in seconds, not weeks.</p>
                 <div className="sp-mock">
                   <div className="sp-mock-bar"><span className="sp-dot red" /><span className="sp-dot" /><span className="sp-dot" /></div>
                   <div className="spm-chat-u">What's my runway?</div>
@@ -1529,7 +1529,7 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 2 — Drill */}
+              {/* 2, Drill */}
               <article className="sp-card">
                 <div className="sp-num">02 · TRACE</div>
                 <h3>Drill from any KPI to the exact rupee</h3>
@@ -1545,11 +1545,11 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 3 — Simulate */}
+              {/* 3, Simulate */}
               <article className="sp-card">
                 <div className="sp-num">03 · SIMULATE</div>
                 <h3>Stress-test decisions before you commit</h3>
-                <p>Hire 3 engineers? Extend credit by 30 days? Move a slider — see the cash gap, runway hit, and risk verdict instantly.</p>
+                <p>Hire 3 engineers? Extend credit by 30 days? Move a slider, see the cash gap, runway hit, and risk verdict instantly.</p>
                 <div className="sp-mock">
                   <div className="spm-sim-label"><span>NEW CREDIT DAYS</span><b>60</b></div>
                   <div className="spm-sim-track"><div className="spm-sim-fill" /><div className="spm-sim-thumb" /></div>
@@ -1560,7 +1560,7 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 4 — GST reconcile */}
+              {/* 4, GST reconcile */}
               <article className="sp-card">
                 <div className="sp-num">04 · RECONCILE</div>
                 <h3>GST & ITC, auto-matched to the paisa</h3>
@@ -1579,11 +1579,11 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 5 — Runway live */}
+              {/* 5, Runway live */}
               <article className="sp-card">
                 <div className="sp-num">05 · MONITOR</div>
-                <h3>Runway, burn & MRR — live, every morning</h3>
-                <p>Bank syncs through RBI's Account Aggregator. Your runway and burn refresh overnight — no spreadsheets, no waiting on the CA.</p>
+                <h3>Runway, burn & MRR, live, every morning</h3>
+                <p>Bank syncs through RBI's Account Aggregator. Your runway and burn refresh overnight, no spreadsheets, no waiting on the CA.</p>
                 <div className="sp-mock">
                   <div className="spm-kpi"><span className="v">₹17.6L</span><span className="l">Cash on Hand</span></div>
                   <div className="spm-spark">
@@ -1605,11 +1605,11 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* 6 — Collab CA */}
+              {/* 6, Collab CA */}
               <article className="sp-card">
                 <div className="sp-num">06 · COLLABORATE</div>
                 <h3>Loop in your CA without sending a single email</h3>
-                <p>Grant scoped access to your Chartered Accountant. They see the same numbers you do — comments, queries and audits in one place.</p>
+                <p>Grant scoped access to your Chartered Accountant. They see the same numbers you do, comments, queries and audits in one place.</p>
                 <div className="sp-mock">
                   <div className="spm-avatars">
                     <div className="spm-avatar" style={{ background: "linear-gradient(135deg,#C41E1E,#E0524A)" }}>NK</div>
@@ -1655,7 +1655,7 @@ export default function HomePage() {
           <div className="cta-card">
             <span className="cta-eyebrow">EARLY ACCESS</span>
             <h2 className="fyn-h">Talk to your <span className="red">AI CFO</span>.</h2>
-            <p>Be among the first 100 businesses to get 6 months FREE access to CFO Fynny — worth ₹45,000.</p>
+            <p>Be among the first 100 businesses to get 6 months FREE access to CFO Fynny, worth ₹45,000.</p>
             <form className="cta-form" onSubmit={onSubmit}>
               <input type="email" placeholder="Work email *" required />
               <input type="text" placeholder="Company name" />

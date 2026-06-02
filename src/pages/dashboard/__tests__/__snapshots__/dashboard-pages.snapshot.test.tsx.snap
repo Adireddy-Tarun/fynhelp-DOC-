@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Dashboard page snapshots — shared-primitive layout regression > AuditReadinessPage: scorecard, area bars, accordion, vault use brand tokens 1`] = `
+exports[`Dashboard page snapshots, shared-primitive layout regression > AuditReadinessPage: scorecard, area bars, accordion, vault use brand tokens 1`] = `
 <div
   data-testid="dashboard-layout-mock"
 >
@@ -20,7 +20,7 @@ exports[`Dashboard page snapshots — shared-primitive layout regression > Audit
     <p
       class="text-white/40 text-base"
     >
-      /100 — Moderate Risk
+      /100, Moderate Risk
     </p>
     <p
       class="text-white/50 text-sm mt-2"
@@ -579,7 +579,7 @@ exports[`Dashboard page snapshots — shared-primitive layout regression > Audit
 </div>
 `;
 
-exports[`Dashboard page snapshots — shared-primitive layout regression > CompliancePage (empty state): FynEmpty + FynCard troubleshooting use brand tokens 1`] = `
+exports[`Dashboard page snapshots, shared-primitive layout regression > CompliancePage (empty state): FynEmpty + FynCard troubleshooting use brand tokens 1`] = `
 <div
   data-testid="dashboard-layout-mock"
 >
@@ -724,7 +724,7 @@ exports[`Dashboard page snapshots — shared-primitive layout regression > Compl
 </div>
 `;
 
-exports[`Dashboard page snapshots — shared-primitive layout regression > TDSTaxPage (empty state): disconnected banner + 'YOU\\'LL NEED' checklist 1`] = `
+exports[`Dashboard page snapshots, shared-primitive layout regression > TDSTaxPage (empty state): disconnected banner + 'YOU\\'LL NEED' checklist 1`] = `
 <div
   data-testid="dashboard-layout-mock"
 >

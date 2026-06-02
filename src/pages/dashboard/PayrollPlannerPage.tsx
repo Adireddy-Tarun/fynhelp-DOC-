@@ -78,7 +78,7 @@ const PayrollPlannerPage = () => {
         <div className="bg-fyn-ink rounded-lg p-5">
           <p className="text-white/40 text-[13px] fyn-label">CURRENT MONTH PAYROLL</p>
           <p className="text-white text-[28px] font-bold mt-1 font-sans">{formatINR(totalPayroll)}</p>
-          <p className="text-white/40 text-[11px] mt-1">{currentMonth?.month || "—"}</p>
+          <p className="text-white/40 text-[11px] mt-1">{currentMonth?.month || "-"}</p>
         </div>
         <div className="bg-fyn-ink rounded-lg p-5">
           <p className="text-white/40 text-[13px] fyn-label">EMPLOYEE COUNT</p>

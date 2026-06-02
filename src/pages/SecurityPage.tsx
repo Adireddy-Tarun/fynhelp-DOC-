@@ -76,7 +76,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
             <br /><br />
             <strong>Account Data (Required):</strong> Full name, email, phone, company name, industry, business registration details, and onboarding preferences.
             <br /><br />
-            <strong>Financial System Connections (Optional, User-Initiated):</strong> OAuth tokens for Razorpay, Zoho Books, or Account Aggregator banks; transaction metadata (dates, amounts, categories — not full narratives stored permanently); invoice and payment records cached temporarily for analysis, then discarded.
+            <strong>Financial System Connections (Optional, User-Initiated):</strong> OAuth tokens for Razorpay, Zoho Books, or Account Aggregator banks; transaction metadata (dates, amounts, categories, not full narratives stored permanently); invoice and payment records cached temporarily for analysis, then discarded.
             <br /><br />
             <strong>Usage Analytics (Non-Personal):</strong> Feature usage statistics, performance metrics, anonymized error logs.
             <br /><br />
@@ -110,7 +110,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
           <Section title="5. AI & Machine Learning">
             <strong>Fynny (AI CFO):</strong> Analyzes your financial data in real-time; results are returned to you, not stored in AI training datasets. We do <em>not</em> use your proprietary financial data to train or improve our models. Fynny learns from anonymized, aggregated industry benchmarks.
             <br /><br />
-            <strong>Anonymization:</strong> Any aggregated data used for product improvement strips all identifiers — no company names, transaction details, or sensitive figures.
+            <strong>Anonymization:</strong> Any aggregated data used for product improvement strips all identifiers, no company names, transaction details, or sensitive figures.
           </Section>
 
           <Section title="6. Data Retention & Deletion">
@@ -171,7 +171,7 @@ const SecurityPage = () => {
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Security | FYNHelp — Enterprise-Grade Financial Data Protection";
+    document.title = "Security | FYNHelp, Enterprise-Grade Financial Data Protection";
     const meta = document.querySelector('meta[name="description"]') || (() => {
       const m = document.createElement("meta");
       m.setAttribute("name", "description");
@@ -491,12 +491,12 @@ const SecurityPage = () => {
               },
               {
                 icon: <Lock size={32} color="#FFFFFF" />,
-                title: "Your Data is Yours — And Only Yours",
+                title: "Your Data is Yours, And Only Yours",
                 bullets: [
                   ["No AI Training on Your Data", "Your proprietary financial information is never used to train our AI models. Fynny learns from general benchmarks, not your books."],
                   ["No Third-Party Sharing", "We don't sell, rent, lease, or share your financial data with advertisers, brokers, or anyone outside your organization. Period."],
                   ["Complete Data Portability", "Export everything anytime in CSV, Excel, or JSON. No vendor lock-in, no export fees, no delays."],
-                  ["Client-Controlled Lifecycle", "We store only contact details and onboarding metadata. Your actual financial data stays in Razorpay, Zoho, your bank — you control retention."],
+                  ["Client-Controlled Lifecycle", "We store only contact details and onboarding metadata. Your actual financial data stays in Razorpay, Zoho, your bank, you control retention."],
                 ],
               },
             ].map((card, i) => (
@@ -571,7 +571,7 @@ const SecurityPage = () => {
                 padding: "10px 24px", borderRadius: 20, marginTop: 16,
               }}
             >
-              ⚙️ Integration in Progress — Available Q2 2026
+              ⚙️ Integration in Progress, Available Q2 2026
             </span>
           </motion.div>
 
@@ -581,10 +581,10 @@ const SecurityPage = () => {
                 icon: <KeyRound size={48} color={GOLD} strokeWidth={1.5} />,
                 title: "Secure Authentication (OAuth 2.0)",
                 bullets: [
-                  "One-click secure login via OAuth 2.0 — the same protocol used by Google, Microsoft, and your bank.",
+                  "One-click secure login via OAuth 2.0, the same protocol used by Google, Microsoft, and your bank.",
                   "We never ask for or store your Razorpay, Zoho, or banking credentials.",
                   "Time-limited access tokens that expire automatically and require periodic re-auth.",
-                  "Entire flow over TLS 1.3 — eavesdropping or MITM attacks are cryptographically impossible.",
+                  "Entire flow over TLS 1.3, eavesdropping or MITM attacks are cryptographically impossible.",
                 ],
               },
               {
@@ -594,7 +594,7 @@ const SecurityPage = () => {
                   "We only observe, never modify. We cannot transfer funds, delete invoices, or alter source data.",
                   "All financial actions stay in your original systems. FYNHelp observes and analyzes; you execute.",
                   "Disconnect anytime from Razorpay, Zoho, or bank settings. Access ends instantly.",
-                  "Scoped permissions — only the minimum data needed. No personal messages, employee data, or unrelated systems.",
+                  "Scoped permissions, only the minimum data needed. No personal messages, employee data, or unrelated systems.",
                 ],
               },
               {
@@ -603,7 +603,7 @@ const SecurityPage = () => {
                 bullets: [
                   "Real-time data sync over TLS 1.3 with perfect forward secrecy.",
                   "Tokens expire every 24-72 hours and refresh with your consent. No stale access.",
-                  "Anomaly detection — unusual access patterns trigger instant email + SMS alerts.",
+                  "Anomaly detection, unusual access patterns trigger instant email + SMS alerts.",
                   "Automatic disconnection on suspicious activity, with notification within minutes.",
                 ],
               },
@@ -729,8 +729,8 @@ const SecurityPage = () => {
                 {[
                   ["Designed by founders who've managed real businesses.", "FYNHelp was born from running a D2C chocolate brand (Dark Capital) that nearly failed due to poor financial visibility. We built the tool we desperately needed."],
                   ["Engineered with production-grade security from day one.", "Enterprise infrastructure (the same backbone trusted by Mozilla and 1Password), PostgreSQL Row Level Security, and defense-in-depth strategies."],
-                  ["Tested with realistic data in secure sandbox environments.", "Beta testing uses realistic transaction volumes, invoice patterns, and GST scenarios — not toy data. Every decision validated against real SME use cases."],
-                  ["Continuously improved based on feedback from security-conscious users.", "Every concern raised — MFA preferences, data export formats — is logged, prioritized, and addressed. Security is our foundation, not a feature."],
+                  ["Tested with realistic data in secure sandbox environments.", "Beta testing uses realistic transaction volumes, invoice patterns, and GST scenarios, not toy data. Every decision validated against real SME use cases."],
+                  ["Continuously improved based on feedback from security-conscious users.", "Every concern raised, MFA preferences, data export formats, is logged, prioritized, and addressed. Security is our foundation, not a feature."],
                 ].map(([title, desc], i) => (
                   <div key={i} className="flex items-start gap-4">
                     <div className="flex-shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: `linear-gradient(135deg, ${RED} 0%, ${GOLD} 100%)`, marginTop: 2 }}>

@@ -1,5 +1,5 @@
 /**
- * FYNHelp demo dashboard — locked brand tokens.
+ * FYNHelp demo dashboard, locked brand tokens.
  * Only these hex values + opacity variants are allowed anywhere
  * under src/components/demo/* and src/pages/demo/*.
  */
@@ -13,7 +13,7 @@ export const C = {
   beige:      "#F4EDDA",
   gold:       "#8B6914",
   goldL:      "#C9A84C",
-  // status green — reserved for "Online" + positive compliance only
+  // status green, reserved for "Online" + positive compliance only
   green:      "#1a9e67",
   greenBg:    "rgba(15,120,70,0.12)",
   greenBorder:"rgba(15,120,70,0.25)",

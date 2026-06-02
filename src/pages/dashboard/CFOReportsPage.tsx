@@ -233,7 +233,7 @@ const CFOReportsPage = () => {
                 typeof report.content === "string"
                   ? report.content.slice(0, 120) +
                     (report.content.length > 120 ? "…" : "")
-                  : "—";
+                  : "-";
               return (
                 <TableRow key={report.id}>
                   <TableCell className="font-medium">
@@ -243,7 +243,7 @@ const CFOReportsPage = () => {
                           month: "short",
                           year: "numeric",
                         })
-                      : "—"}
+                      : "-"}
                   </TableCell>
                   <TableCell className="text-fyn-ink/70 text-sm max-w-md">
                     {preview}

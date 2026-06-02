@@ -17,7 +17,7 @@ type Carousel = {
 
 const CAROUSELS: Carousel[] = [
   {
-    label: "Banking — Via RBI Account Aggregator",
+    label: "Banking, Via RBI Account Aggregator",
     speed: 40,
     items: [
       { name: "HDFC Bank", color: "#004C8F" },

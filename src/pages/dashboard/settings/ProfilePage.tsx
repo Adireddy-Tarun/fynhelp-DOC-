@@ -57,7 +57,7 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
-  // Loading skeleton while auth resolves — prevents flash of redirect
+  // Loading skeleton while auth resolves, prevents flash of redirect
   if (loading) {
     return (
       <div className="p-6">

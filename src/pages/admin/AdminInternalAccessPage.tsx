@@ -5,7 +5,7 @@ import { Lock, AlertCircle, ChevronRight, CheckCircle } from "lucide-react";
 const DEMO_PASSWORD = "fynhelp2026";
 
 /**
- * Internal Access — moved from /demo/login (previously the "Access" tab).
+ * Internal Access, moved from /demo/login (previously the "Access" tab).
  * Grants the team access to the demo dashboard by setting the
  * `demo_access` session flag, then redirects to /demo/dashboard.
  */

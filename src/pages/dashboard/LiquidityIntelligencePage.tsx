@@ -160,7 +160,7 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
   const cf = data.cash_flow || {};
   const runwayDays = num(data.runway?.days);
   const runwayMonths = runwayDays / 30;
-  // Tier badge: Safe (>6mo) / Watch (3-6mo) / Critical (<3mo) — ported from RunwayPage
+  // Tier badge: Safe (>6mo) / Watch (3-6mo) / Critical (<3mo), ported from RunwayPage
   const runwayTone = runwayMonths > 6 ? "success" : runwayMonths >= 3 ? "warning" : "danger";
   const runwayLabel = runwayMonths > 6 ? "Safe" : runwayMonths >= 3 ? "Watch" : "Critical";
   const crisisDate = runwayDays > 0 && runwayDays < 3650

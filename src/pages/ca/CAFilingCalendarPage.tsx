@@ -187,7 +187,7 @@ export default function CAFilingCalendarPage() {
         const d = parseISO(f.due_date);
         const days = daysBetween(new Date(), d);
         return [
-          f.businesses?.business_name || "—",
+          f.businesses?.business_name || "-",
           f.filing_type,
           f.filing_name,
           fmtDate(d),
@@ -476,7 +476,7 @@ function WeekGrid({ cursor, byDate, onCardClick }: { cursor: Date; byDate: Map<s
                       className="block w-full text-left bg-white rounded-md p-2 hover:bg-[#F8F6F1]"
                       style={{ borderLeft: `4px solid ${meta.bar}`, border: `1px solid ${COLORS.divider}` }}>
                       <div className="text-[12px] font-semibold" style={{ color: COLORS.ink }}>{f.filing_type}</div>
-                      <div className="text-[11px] truncate" style={{ color: "rgba(26,16,8,0.65)" }}>{f.businesses?.business_name || "—"}</div>
+                      <div className="text-[11px] truncate" style={{ color: "rgba(26,16,8,0.65)" }}>{f.businesses?.business_name || "-"}</div>
                       <div className="mt-1">
                         <Chip tone={f.status === "filed" ? "green" : overdue ? "red" : "amber"}>
                           {f.status === "filed" ? "Filed" : overdue ? "Overdue" : "Pending"}
@@ -485,7 +485,7 @@ function WeekGrid({ cursor, byDate, onCardClick }: { cursor: Date; byDate: Map<s
                     </button>
                   );
                 })}
-                {items.length === 0 && <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.40)" }}>—</div>}
+                {items.length === 0 && <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.40)" }}>-</div>}
               </div>
             </div>
           );
@@ -528,7 +528,7 @@ function ListView({ filings, onMarkFiled, onViewClient }: {
                 </td>
                 <td className="px-4">
                   <button onClick={() => onViewClient(f.business_id)} className="text-[14px] font-medium hover:underline" style={{ color: COLORS.ink }}>
-                    {f.businesses?.business_name || "—"}
+                    {f.businesses?.business_name || "-"}
                   </button>
                 </td>
                 <td className="px-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{fmtDate(d)}</td>
@@ -536,7 +536,7 @@ function ListView({ filings, onMarkFiled, onViewClient }: {
                   <Chip tone={isFiled ? "green" : overdue ? "red" : "amber"}>{isFiled ? "Filed" : overdue ? "Overdue" : "Pending"}</Chip>
                 </td>
                 <td className="px-4 text-[14px] font-semibold tabular-nums" style={{ color: isFiled ? "rgba(26,16,8,0.40)" : daysColor }}>
-                  {isFiled ? "—" : days < 0 ? `${days}d` : `${days}d`}
+                  {isFiled ? "-" : days < 0 ? `${days}d` : `${days}d`}
                 </td>
                 <td className="px-4"><Chip tone={priorityTone as any}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</Chip></td>
                 <td className="px-4 relative">
@@ -567,7 +567,7 @@ function DayFilingsModal({ date, filings, onClose, onView, onMarkFiled }: {
       <div className="bg-white rounded-xl max-w-[600px] w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="p-6 flex items-start justify-between" style={{ borderBottom: `1px solid ${COLORS.divider}` }}>
           <div>
-            <h3 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>Filings Due — {fmtDate(date)}</h3>
+            <h3 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>Filings Due, {fmtDate(date)}</h3>
             <div className="text-[14px]" style={{ color: "rgba(26,16,8,0.65)" }}>{filings.length} filing{filings.length !== 1 ? "s" : ""}</div>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-[#F0EBD8]"><X size={18} /></button>
@@ -579,7 +579,7 @@ function DayFilingsModal({ date, filings, onClose, onView, onMarkFiled }: {
                 <Chip tone={typeMeta(f.filing_type).tone}>{f.filing_type}</Chip>
                 <Chip tone={f.status === "filed" ? "green" : "amber"}>{f.status === "filed" ? "Filed" : "Pending"}</Chip>
               </div>
-              <div className="text-[14px] font-semibold" style={{ color: COLORS.ink }}>{f.businesses?.business_name || "—"}</div>
+              <div className="text-[14px] font-semibold" style={{ color: COLORS.ink }}>{f.businesses?.business_name || "-"}</div>
               <div className="text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{f.filing_name}</div>
               <div className="flex items-center gap-2 mt-3">
                 {f.status !== "filed" && <PrimaryBtn size="sm" onClick={() => onMarkFiled(f)}>Mark Filed →</PrimaryBtn>}

@@ -155,7 +155,7 @@ export default function WaitlistForm({
         <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-fyn-beige-dark border border-fyn-ink/8">
           <Mail className="w-4 h-4 text-fyn-gold flex-shrink-0" />
           <span className="text-fyn-ink/70 text-sm" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-            Check your inbox — and your spam folder
+            Check your inbox, and your spam folder
           </span>
         </div>
       </div>

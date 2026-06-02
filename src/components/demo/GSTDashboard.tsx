@@ -86,7 +86,7 @@ function riskTone(level: string) {
 }
 
 function fmtDate(d: string) {
-  if (!d) return '—'
+  if (!d) return '-'
   try {
     return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
   } catch {
@@ -175,9 +175,9 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
         </SectionTitle>
         {(() => {
           const rows = [
-            { ret: 'GSTR-1', desc: 'Outward supplies', status: 'Filed', due: '11 Jul 2025', dueUrgent: false, lastFiled: '09 Jul 2023', netTax: '—', netTaxUrgent: false, accent: false },
-            { ret: 'GSTR-3B', desc: 'Monthly summary', status: 'Pending', due: '20 Jul 2025', dueUrgent: true, lastFiled: '—', netTax: '₹1.84L', netTaxUrgent: true, accent: true },
-            { ret: 'GSTR-9', desc: 'Annual return', status: 'Not Due', due: '31 Dec 2025', dueUrgent: false, lastFiled: 'FY 2024-25', netTax: '—', netTaxUrgent: false, accent: false },
+            { ret: 'GSTR-1', desc: 'Outward supplies', status: 'Filed', due: '11 Jul 2025', dueUrgent: false, lastFiled: '09 Jul 2023', netTax: '-', netTaxUrgent: false, accent: false },
+            { ret: 'GSTR-3B', desc: 'Monthly summary', status: 'Pending', due: '20 Jul 2025', dueUrgent: true, lastFiled: '-', netTax: '₹1.84L', netTaxUrgent: true, accent: true },
+            { ret: 'GSTR-9', desc: 'Annual return', status: 'Not Due', due: '31 Dec 2025', dueUrgent: false, lastFiled: 'FY 2024-25', netTax: '-', netTaxUrgent: false, accent: false },
           ]
           const statusBadge = (s: string) => {
             const cfg = s === 'Filed'
@@ -203,13 +203,13 @@ export function GSTDashboard({ data }: GSTDashboardProps) {
                     <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 12, color: 'rgba(244,237,218,0.45)' }}>{r.desc}</div>
                     <div>{statusBadge(r.status)}</div>
                     <div style={{ fontFamily: 'Sora', fontWeight: r.dueUrgent ? 700 : 400, fontSize: 12, color: r.dueUrgent ? '#C41E1E' : 'rgba(244,237,218,0.65)' }}>{r.due}</div>
-                    <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 12, color: r.lastFiled === '—' ? 'rgba(244,237,218,0.30)' : 'rgba(244,237,218,0.40)' }}>{r.lastFiled}</div>
+                    <div style={{ fontFamily: 'Sora', fontWeight: 300, fontSize: 12, color: r.lastFiled === '-' ? 'rgba(244,237,218,0.30)' : 'rgba(244,237,218,0.40)' }}>{r.lastFiled}</div>
                     <div style={{ fontFamily: 'Sora', fontWeight: r.netTaxUrgent ? 600 : 300, fontSize: r.netTaxUrgent ? 13 : 12, color: r.netTaxUrgent ? '#C41E1E' : 'rgba(244,237,218,0.30)', textAlign: 'right' }}>{r.netTax}</div>
                   </div>
                 ))}
               </div>
               <div style={{ background: 'rgba(196,30,30,0.06)', border: '1px solid rgba(196,30,30,0.12)', borderRadius: '0 0 6px 6px', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: -1 }}>
-                <div style={{ fontFamily: 'Sora', fontWeight: 500, fontSize: 12, color: '#C41E1E' }}>⚠ GSTR-3B filing due in 10 days — Net tax payable ₹1.84L</div>
+                <div style={{ fontFamily: 'Sora', fontWeight: 500, fontSize: 12, color: '#C41E1E' }}>⚠ GSTR-3B filing due in 10 days, Net tax payable ₹1.84L</div>
                 <button style={{ background: '#C41E1E', color: '#F4EDDA', fontFamily: 'Sora', fontWeight: 500, fontSize: 12, padding: '6px 16px', borderRadius: 4, border: 'none', cursor: 'pointer' }}>File Now →</button>
               </div>
             </div>
@@ -799,7 +799,7 @@ function FilingCard({
           <Icon size={18} />
         </div>
       </div>
-      <Pill tone={tone} label={status || '—'} />
+      <Pill tone={tone} label={status || '-'} />
       <div className="mt-3 text-xs" style={{ color: colors.text.secondary }}>
         Due: <span style={{ color: colors.text.primary, fontFamily: "'SF Mono', monospace" }}>{fmtDate(dueDate || '')}</span>
       </div>

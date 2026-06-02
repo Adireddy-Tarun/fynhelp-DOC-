@@ -274,7 +274,7 @@ export default function UseCasesPage() {
           <p style={{
             marginTop: 26, fontSize: 17, lineHeight: 1.7, color: C.muted, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto',
           }}>
-            Browse real workflows across finance, compliance, operations, and more — all powered by your data.
+            Browse real workflows across finance, compliance, operations, and more, all powered by your data.
           </p>
 
           {/* Search */}

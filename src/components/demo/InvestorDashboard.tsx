@@ -1,5 +1,5 @@
 /**
- * FYNHelp Investor View — new module.
+ * FYNHelp Investor View, new module.
  * Composes only brand primitives. No external deps beyond design tokens.
  */
 import { Check, AlertTriangle, Circle } from "lucide-react";
@@ -20,7 +20,7 @@ export function InvestorDashboard({ data: _data }: { data: any }) {
           <>
             At current growth you can justify <strong style={{ color: C.beige, fontWeight: 600 }}>₹8.5Cr–₹12.2Cr</strong> valuation on a 5x–7x ARR multiple.
             The one number that will raise questions in any Series A conversation is your burn multiple of{" "}
-            <strong style={{ color: C.beige, fontWeight: 600 }}>2.4x</strong> — above the 1.5x benchmark.
+            <strong style={{ color: C.beige, fontWeight: 600 }}>2.4x</strong>, above the 1.5x benchmark.
             Fixing this is the highest-leverage action before your next raise.
           </>
         }
@@ -46,9 +46,9 @@ export function InvestorDashboard({ data: _data }: { data: any }) {
           </div>
         </div>
         {[
-          ["LTV:CAC 7.0x — Excellent", "Burn Multiple 2.4x — Above Series A threshold"],
-          ["NRR 108% — Expansion happening", "DSO 42 days — Cash tied in receivables"],
-          ["Gross Margin 68.4% — Fundable", "GST penalty ₹0.96L — Resolve before raise"],
+          ["LTV:CAC 7.0x, Excellent", "Burn Multiple 2.4x, Above Series A threshold"],
+          ["NRR 108%, Expansion happening", "DSO 42 days, Cash tied in receivables"],
+          ["Gross Margin 68.4%, Fundable", "GST penalty ₹0.96L, Resolve before raise"],
           ["ARR growing 127% YoY", "Working capital tight vs. next payroll"],
         ].map(([good, bad], i, arr) => (
           <div
@@ -93,7 +93,7 @@ export function InvestorDashboard({ data: _data }: { data: any }) {
             lineHeight: 1.05,
           }}
         >
-          ₹8.5Cr — ₹12.2Cr
+          ₹8.5Cr, ₹12.2Cr
         </div>
         <div style={{ ...T.sub, marginTop: 12, color: A.beige50 }}>
           Based on 5x–7x ARR multiple for B2B SaaS at 127% YoY growth
@@ -125,12 +125,12 @@ export function InvestorDashboard({ data: _data }: { data: any }) {
       <SectionHeader>Series A Readiness Checklist</SectionHeader>
       <div style={{ ...SURF.card, overflow: "hidden" }}>
         {[
-          { icon: "ok",   text: "MRR above ₹10L",          status: "Done — ₹14.2L",                color: C.goldL },
-          { icon: "ok",   text: "NRR above 100%",          status: "Done — 108%",                  color: C.goldL },
-          { icon: "ok",   text: "Gross Margin above 60%",  status: "Done — 68.4%",                 color: C.goldL },
-          { icon: "ok",   text: "18 months runway",        status: "Done — 24 months",             color: C.goldL },
-          { icon: "warn", text: "Burn Multiple below 1.5x",status: "Action needed — 2.4x",         color: C.red   },
-          { icon: "warn", text: "Clean GST compliance",    status: "Action needed — ₹0.96L exposure", color: C.red },
+          { icon: "ok",   text: "MRR above ₹10L",          status: "Done, ₹14.2L",                color: C.goldL },
+          { icon: "ok",   text: "NRR above 100%",          status: "Done, 108%",                  color: C.goldL },
+          { icon: "ok",   text: "Gross Margin above 60%",  status: "Done, 68.4%",                 color: C.goldL },
+          { icon: "ok",   text: "18 months runway",        status: "Done, 24 months",             color: C.goldL },
+          { icon: "warn", text: "Burn Multiple below 1.5x",status: "Action needed, 2.4x",         color: C.red   },
+          { icon: "warn", text: "Clean GST compliance",    status: "Action needed, ₹0.96L exposure", color: C.red },
           { icon: "todo", text: "Audited financials",      status: "Not yet verified",             color: A.beige30 },
         ].map((row, i, arr) => {
           const bg =

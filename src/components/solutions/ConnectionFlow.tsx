@@ -209,7 +209,7 @@ function Card({ card, delayMs, slideFrom }: { card: FlowCard; delayMs: number; s
     <button
       type="button"
       tabIndex={0}
-      aria-label={`${card.label} — ${card.sub}`}
+      aria-label={`${card.label}, ${card.sub}`}
       className="cf-card"
       style={{
         width: 140,
@@ -456,7 +456,7 @@ function DesktopLayout({ inView }: { inView: boolean }) {
         })}
       </svg>
 
-      {/* Column 1 — Connect */}
+      {/* Column 1, Connect */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 1 }}>
         <ColHeading text="Connect" />
         <div style={{ display: "flex", flexDirection: "column", gap: GAP_Y }}>
@@ -468,7 +468,7 @@ function DesktopLayout({ inView }: { inView: boolean }) {
 
       <div /> {/* spacer */}
 
-      {/* Column 2 — Analyze */}
+      {/* Column 2, Analyze */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, minHeight: SECTION_H }}>
         <ColHeading text="Analyze" />
         <CenterBrain size={BRAIN} inView={inView} />
@@ -476,7 +476,7 @@ function DesktopLayout({ inView }: { inView: boolean }) {
 
       <div /> {/* spacer */}
 
-      {/* Column 3 — Act */}
+      {/* Column 3, Act */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 1 }}>
         <ColHeading text="Act" />
         <div style={{ display: "flex", flexDirection: "column", gap: GAP_Y }}>

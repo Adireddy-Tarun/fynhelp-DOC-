@@ -206,7 +206,7 @@ const CompliancePage = () => {
           label: "Filed late",
           color: "#8B5A00",
           rule: "filed AND filed_date missing",
-          detail: "Marked filed but the filed date is missing — counted as late.",
+          detail: "Marked filed but the filed date is missing, counted as late.",
         };
       }
       const diff = daysBetween(f.filed_date, due);
@@ -694,7 +694,7 @@ const CompliancePage = () => {
                     return `<tr>
                       <td>${escapeHtml(f._src)}</td>
                       <td>${escapeHtml(f.due_date)}</td>
-                      <td>${escapeHtml(f.filed_date ?? "—")}</td>
+                      <td>${escapeHtml(f.filed_date ?? "-")}</td>
                       <td>${escapeHtml(f.status)}</td>
                       <td><span class="lbl" style="background:${exp.color}1A;color:${exp.color}">${escapeHtml(exp.label)}</span></td>
                       <td><code>${escapeHtml(exp.rule)}</code></td>
@@ -702,7 +702,7 @@ const CompliancePage = () => {
                     </tr>`;
                   }).join("");
                   const html = `<!doctype html><html><head><meta charset="utf-8" />
-                    <title>Compliance reasons — ${escapeHtml(bucketLabel[breakdownFilter])} — ${today}</title>
+                    <title>Compliance reasons, ${escapeHtml(bucketLabel[breakdownFilter])}, ${today}</title>
                     <style>
                       body { font-family: Inter, system-ui, -apple-system, sans-serif; color: #1A1008; padding: 24px; }
                       h1 { font-family: Georgia, serif; font-size: 20px; margin: 0 0 4px; }
@@ -714,7 +714,7 @@ const CompliancePage = () => {
                       .lbl { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
                       @media print { body { padding: 12mm; } }
                     </style></head><body>
-                    <h1>Compliance — ${escapeHtml(bucketLabel[breakdownFilter])} reasons</h1>
+                    <h1>Compliance, ${escapeHtml(bucketLabel[breakdownFilter])} reasons</h1>
                     <p class="meta">${rows.length} filing${rows.length === 1 ? "" : "s"} · Period ${escapeHtml(fromStr)} to ${escapeHtml(toStr)} · Generated ${today}</p>
                     <table>
                       <thead><tr>
@@ -868,7 +868,7 @@ const CompliancePage = () => {
                               </FynTD>
                               <FynTD className="text-fyn-ink font-medium">{f._src}</FynTD>
                               <FynTD>{f.due_date}</FynTD>
-                              <FynTD>{f.filed_date || "—"}</FynTD>
+                              <FynTD>{f.filed_date || "-"}</FynTD>
                               <FynTD>{f.status}</FynTD>
                             </FynTR>
                             {expanded && (() => {
@@ -946,7 +946,7 @@ const CompliancePage = () => {
                     ).length === 0 && (() => {
                       const empty: Record<string, { title: string; body: string; emoji: string }> = {
                         "on-time": { emoji: "🎯", title: "No on-time filings in this range", body: "Nothing was filed on or before its due date for the selected period." },
-                        late: { emoji: "✅", title: "No late filings — nice work", body: "Every filed return for this period went out on time." },
+                        late: { emoji: "✅", title: "No late filings, nice work", body: "Every filed return for this period went out on time." },
                         overdue: { emoji: "🎉", title: "No overdue filings", body: "All past-due returns have been filed. You're caught up." },
                         pending: { emoji: "📭", title: "No upcoming pending filings", body: "Nothing is due later in the selected window." },
                         unknown: { emoji: "✨", title: "No rows missing a due date", body: "Every filing in this period has a valid due date on record." },
@@ -984,7 +984,7 @@ const CompliancePage = () => {
       {!isLoading && totalFilings > 0 && (
         <FynCard className="mt-fyn-md">
           <FynLabel className="mb-fyn-md">
-            ON-TIME FILING RATE — LAST 3 MONTHS
+            ON-TIME FILING RATE, LAST 3 MONTHS
           </FynLabel>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>

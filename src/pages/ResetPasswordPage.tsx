@@ -24,7 +24,7 @@ interface LinkFailureInfo {
   code?: string;
   /** Human-readable description from Supabase, decoded. */
   description?: string;
-  /** Where the failure was detected — useful for logging/analytics. */
+  /** Where the failure was detected, useful for logging/analytics. */
   source: "url" | "supabase";
 }
 
@@ -334,7 +334,7 @@ const ResetPasswordPage = () => {
     const type = queryParams.get("type");
 
     const tryRecover = async () => {
-      // 3a) PKCE flow: ?code=... — exchange for a session.
+      // 3a) PKCE flow: ?code=..., exchange for a session.
       if (code) {
         const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
         if (exErr) {
@@ -626,7 +626,7 @@ const ResetPasswordPage = () => {
                       {strength.label}
                     </span>
                     {isCommonWeak && (
-                      <span className="text-fyn-red"> — this is a commonly used password.</span>
+                      <span className="text-fyn-red">, this is a commonly used password.</span>
                     )}
                   </p>
                 </div>

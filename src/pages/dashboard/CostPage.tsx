@@ -519,7 +519,7 @@ function CategoryChart({
             formatter={(v: number, _n, p: any) => {
               const pct = p.payload.percentage != null ? ` (${num(p.payload.percentage).toFixed(1)}%)` : "";
               const extra = tooltipExtra ? tooltipExtra(p) : "";
-              return [`${formatINR(v)}${pct}${extra ? ` — ${extra}` : ""}`, "Spend"];
+              return [`${formatINR(v)}${pct}${extra ? `, ${extra}` : ""}`, "Spend"];
             }}
           />
           <Bar dataKey="amount" fill={color} radius={[0, 4, 4, 0]}

@@ -3,7 +3,7 @@ import Layout from "@/components/Layout";
 
 const categories = [
   "Cash Flow & Liquidity", "GST & Tax Questions", "Tally Integration Help",
-  "CFO Fynny — Tips & Tricks", "Industry Discussions", "Success Stories", "Feature Requests",
+  "CFO Fynny, Tips & Tricks", "Industry Discussions", "Success Stories", "Feature Requests",
 ];
 
 const threads = [
@@ -13,12 +13,12 @@ const threads = [
     tag: "GST & Tax", replies: 28,
   },
   {
-    title: "Best time of day to chase overdue payments — what's working?",
+    title: "Best time of day to chase overdue payments, what's working?",
     preview: "Various members share: Tuesday 10AM calls work best in manufacturing, WhatsApp on Saturday mornings works for traders, formal emails followed by calls for corporate buyers...",
     tag: "Collections", replies: 41,
   },
   {
-    title: "Tally ODBC sync not reflecting weekend entries — SOLVED",
+    title: "Tally ODBC sync not reflecting weekend entries, SOLVED",
     preview: "Issue: entries made Saturday/Sunday not appearing in FynHelp dashboard. Root cause: Tally agent scheduled for weekday sync only. Fix: change agent sync schedule to include weekends. Step-by-step in replies...",
     tag: "Technical Help", replies: 15,
   },
@@ -50,7 +50,7 @@ const CommunityPage = () => {
       {/* Goals bar */}
       <section className="bg-fyn-red py-8">
         <div className="fyn-container text-center">
-          <p className="text-white/70 text-sm mb-4">Our target community size — these are our goals for the first year.</p>
+          <p className="text-white/70 text-sm mb-4">Our target community size, these are our goals for the first year.</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { v: "5,000", l: "Members by Dec 2026" },
@@ -69,8 +69,8 @@ const CommunityPage = () => {
 
       <section className="bg-fyn-beige fyn-section">
         <div className="fyn-container">
-          {/* Community Forum — Coming Soon */}
-          <h2 className="text-3xl text-fyn-ink mb-4">Community Forum — Coming April 2026</h2>
+          {/* Community Forum, Coming Soon */}
+          <h2 className="text-3xl text-fyn-ink mb-4">Community Forum, Coming April 2026</h2>
           <p className="text-fyn-ink/60 text-base mb-6">Discussion categories being prepared:</p>
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((c) => (
@@ -99,7 +99,7 @@ const CommunityPage = () => {
 
           {/* Example threads */}
           <h2 className="text-3xl text-fyn-ink mb-2">Preview: What the Community Will Look Like</h2>
-          <p className="fyn-caption text-[11px] italic mb-6 text-[#6b4400]">Example discussions — the kind of conversations happening when you join:</p>
+          <p className="fyn-caption text-[11px] italic mb-6 text-[#6b4400]">Example discussions, the kind of conversations happening when you join:</p>
           <div className="space-y-4 mb-16">
             {threads.map((t) => (
               <div key={t.title} className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
@@ -116,11 +116,11 @@ const CommunityPage = () => {
 
           {/* Expert Office Hours */}
           <h2 className="text-3xl text-fyn-ink mb-2">Expert Office Hours</h2>
-          <p className="text-fyn-ink/60 text-base mb-6">Starting May 2026 — register for early access:</p>
+          <p className="text-fyn-ink/60 text-base mb-6">Starting May 2026, register for early access:</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
               <h3 className="font-serif text-lg text-fyn-ink mb-2">FynHelp CFO Office Hours</h3>
-              <p className="text-fyn-ink/60 text-sm mb-2">Every Tuesday, 4PM IST — Adireddy Tarun answers your financial intelligence questions live. Any FynHelp module, any business problem.</p>
+              <p className="text-fyn-ink/60 text-sm mb-2">Every Tuesday, 4PM IST, Adireddy Tarun answers your financial intelligence questions live. Any FynHelp module, any business problem.</p>
               <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Tuesday, 6 May 2026, 4:00 PM IST</p>
               {event1Submitted ? (
                 <p className="text-fyn-success text-sm">Registered! We'll send you the link. ✓</p>
@@ -135,7 +135,7 @@ const CommunityPage = () => {
             </div>
             <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
               <h3 className="font-serif text-lg text-fyn-ink mb-2">GST & Compliance Clinic</h3>
-              <p className="text-fyn-ink/60 text-sm mb-2">Every Thursday, 11AM IST — Our CA partner network answers your GST, TDS, and compliance questions.</p>
+              <p className="text-fyn-ink/60 text-sm mb-2">Every Thursday, 11AM IST, Our CA partner network answers your GST, TDS, and compliance questions.</p>
               <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Thursday, 8 May 2026, 11:00 AM IST</p>
               {event2Submitted ? (
                 <p className="text-fyn-success text-sm">Registered! We'll send you the link. ✓</p>

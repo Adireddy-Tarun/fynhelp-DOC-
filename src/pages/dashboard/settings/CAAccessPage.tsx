@@ -189,7 +189,7 @@ export default function CAAccessPage() {
                 <div>
                   <div className="font-semibold text-sm" style={{ color: "#1A1008" }}>{firm?.firm_name ?? "CA firm"}</div>
                   <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.60)" }}>
-                    {accessLabel[a.access_level] ?? a.access_level} · since {a.granted_at ? new Date(a.granted_at).toLocaleDateString() : "—"}
+                    {accessLabel[a.access_level] ?? a.access_level} · since {a.granted_at ? new Date(a.granted_at).toLocaleDateString() : "-"}
                   </div>
                 </div>
                 <button

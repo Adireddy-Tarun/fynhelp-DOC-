@@ -174,7 +174,7 @@ export default function HeroSection() {
             marginTop: 32,
           }}
         >
-          Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
+          Meet CFO Fynny, stop running your business on gut feeling. Start running it on intelligence.
           <br /><br />
           <span style={{ fontSize: "clamp(16px, 1.5vw, 20px)" }}>
             While other tools build board decks, Fynny provides the strategy. Upload any model or connect your stack to get predictive 'What-If' scenarios and instant financial clarity.

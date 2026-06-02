@@ -129,7 +129,7 @@ export default function CAClientDetailPage() {
         ca_firm_id: caFirm.id,
         business_id: businessId,
         action_type: "client_view",
-        description: `Viewed ${biz.data?.business_name || "client"} — ${tab} tab`,
+        description: `Viewed ${biz.data?.business_name || "client"}, ${tab} tab`,
       });
     })();
 
@@ -254,9 +254,9 @@ export default function CAClientDetailPage() {
         {/* Quick metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
           <QuickMetric label="Cash Balance" value={formatIndianCurrency(bankBalance)} sub={`${bankCount} account${bankCount === 1 ? "" : "s"}`} />
-          <QuickMetric label="Runway" value={`${runwayDays > 365 ? "—" : runwayDays} days`} valueColor={runwayColor} />
+          <QuickMetric label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays} days`} valueColor={runwayColor} />
           <QuickMetric label="Critical Alerts" value={String(mismatchCount + filingsDue7d)} valueColor={(mismatchCount + filingsDue7d) > 0 ? COLORS.redSoft : "#FFFFFF"} />
-          <QuickMetric label="Next Filing" value={nextFiling?.filing_name || "—"} sub={nextFiling ? formatIndianDate(nextFiling.due_date) : ""} />
+          <QuickMetric label="Next Filing" value={nextFiling?.filing_name || "-"} sub={nextFiling ? formatIndianDate(nextFiling.due_date) : ""} />
         </div>
       </div>
 
@@ -287,13 +287,13 @@ export default function CAClientDetailPage() {
                 <h3 className="text-[15px] font-semibold mb-4">Financial Summary</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <Stat label="Cash Balance" value={formatIndianCurrency(bankBalance)} />
-                  <Stat label="Runway" value={`${runwayDays > 365 ? "—" : runwayDays} d`} color={runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red} />
+                  <Stat label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays} d`} color={runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red} />
                   <Stat label="Daily Burn" value={formatIndianCurrency(burnRate)} />
                 </div>
               </Card>
 
               <Card>
-                <h3 className="text-[15px] font-semibold mb-3">Cash Flow — last 30 days</h3>
+                <h3 className="text-[15px] font-semibold mb-3">Cash Flow, last 30 days</h3>
                 {cashSeries.length === 0 ? (
                   <EmptyHint text="No transactions yet for this client." />
                 ) : (
@@ -354,7 +354,7 @@ export default function CAClientDetailPage() {
                 <div className="space-y-2 text-sm">
                   <ItcRow label="ITC Safe" value={formatIndianCurrency(itcSafe)} bg="#DCFCE7" color="#166534" />
                   <ItcRow label="ITC At Risk" value={formatIndianCurrency(itcAtRisk)} bg="#FEE2E2" color="#991B1B" />
-                  <ItcRow label="Notice Risk Score" value={`${risk?.score ?? "—"}/100`} bg="#FEF3C7" color="#92400E" />
+                  <ItcRow label="Notice Risk Score" value={`${risk?.score ?? "-"}/100`} bg="#FEF3C7" color="#92400E" />
                 </div>
               </Card>
 
@@ -379,7 +379,7 @@ export default function CAClientDetailPage() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <MetricCard label="Cash Balance" value={formatIndianCurrency(bankBalance)} sub={`${bankCount} accounts`} />
-              <MetricCard label="Runway" value={`${runwayDays > 365 ? "—" : runwayDays}d`} valueColor={runwayColor} sub={runwayDays < 30 ? "Critical" : runwayDays < 90 ? "Watch" : "Healthy"} />
+              <MetricCard label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays}d`} valueColor={runwayColor} sub={runwayDays < 30 ? "Critical" : runwayDays < 90 ? "Watch" : "Healthy"} />
               <MetricCard label="Daily Burn" value={formatIndianCurrency(burnRate)} sub="Avg last 30d" />
               <MetricCard label="Tx (90d)" value={String(txs.length)} sub="Bank transactions" />
             </div>
@@ -403,8 +403,8 @@ export default function CAClientDetailPage() {
                 headers={["Date", "Counterparty", "Category", "Direction", "Amount"]}
                 rows={txs.slice(0, 20).map(t => [
                   formatIndianDate(t.date),
-                  t.counterparty || "—",
-                  t.category || "—",
+                  t.counterparty || "-",
+                  t.category || "-",
                   <Chip key="dir" tone={t.direction === "in" ? "green" : "red"}>{t.direction}</Chip>,
                   formatIndianCurrency(Number(t.amount)),
                 ])}
@@ -419,7 +419,7 @@ export default function CAClientDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <MetricCard label="ITC Safe" value={formatIndianCurrency(itcSafe)} valueColor={COLORS.greenSoft} />
               <MetricCard label="ITC At Risk" value={formatIndianCurrency(itcAtRisk)} valueColor={COLORS.redSoft} />
-              <MetricCard label="Notice Risk" value={`${risk?.score ?? "—"}/100`} valueColor={COLORS.amberSoft} />
+              <MetricCard label="Notice Risk" value={`${risk?.score ?? "-"}/100`} valueColor={COLORS.amberSoft} />
               <MetricCard label="Pending Filings" value={String(upcomingFilings.filter(f => f.filing_type?.toLowerCase().includes("gst")).length)} />
             </div>
             <Card>
@@ -435,7 +435,7 @@ export default function CAClientDetailPage() {
                 headers={["Period", "Vendor GSTIN", "Safe", "At Risk", "Mismatches", "Status"]}
                 rows={itcLines.map(l => [
                   l.period,
-                  <span key="g" className="font-mono text-[12px]">{l.vendor_gstin || "—"}</span>,
+                  <span key="g" className="font-mono text-[12px]">{l.vendor_gstin || "-"}</span>,
                   formatIndianCurrency(Number(l.itc_safe || 0)),
                   <span key="r" style={{ color: Number(l.itc_at_risk) > 0 ? COLORS.red : "inherit", fontWeight: Number(l.itc_at_risk) > 0 ? 600 : 400 }}>
                     {formatIndianCurrency(Number(l.itc_at_risk || 0))}
@@ -493,11 +493,11 @@ export default function CAClientDetailPage() {
                   const overdue = r.due_date && new Date(r.due_date) < new Date();
                   return [
                     r.customer_name,
-                    r.invoice_number || "—",
-                    <span key="d" style={{ color: overdue ? COLORS.red : "inherit" }}>{r.due_date ? formatIndianDate(r.due_date) : "—"}</span>,
+                    r.invoice_number || "-",
+                    <span key="d" style={{ color: overdue ? COLORS.red : "inherit" }}>{r.due_date ? formatIndianDate(r.due_date) : "-"}</span>,
                     formatIndianCurrency(Number(r.amount)),
                     formatIndianCurrency(Number(r.outstanding || r.amount)),
-                    <Chip key="r" tone={Number(r.risk_score) > 70 ? "red" : Number(r.risk_score) > 40 ? "amber" : "green"}>{r.risk_score ?? "—"}</Chip>,
+                    <Chip key="r" tone={Number(r.risk_score) > 70 ? "red" : Number(r.risk_score) > 40 ? "amber" : "green"}>{r.risk_score ?? "-"}</Chip>,
                     <GhostLink key="a">Chase →</GhostLink>,
                   ];
                 })}
@@ -520,8 +520,8 @@ export default function CAClientDetailPage() {
                 headers={["Vendor", "Bill", "Due", "Amount", "Outstanding", "Status", "Actions"]}
                 rows={payables.map(p => [
                   p.vendor_name,
-                  p.invoice_number || "—",
-                  p.due_date ? formatIndianDate(p.due_date) : "—",
+                  p.invoice_number || "-",
+                  p.due_date ? formatIndianDate(p.due_date) : "-",
                   formatIndianCurrency(Number(p.amount)),
                   formatIndianCurrency(Number(p.outstanding || p.amount)),
                   <Chip key="s" tone={p.status === "paid" ? "green" : "amber"}>{p.status || "pending"}</Chip>,
@@ -536,10 +536,10 @@ export default function CAClientDetailPage() {
         {tab === "HR & Payroll" && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard label="Headcount" value={String(latestPayroll?.headcount ?? "—")} />
-              <MetricCard label="Monthly Payroll" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.total_payroll || 0)) : "—"} />
-              <MetricCard label="PF Due" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.pf_due || 0)) : "—"} />
-              <MetricCard label="Next Payroll" value={latestPayroll?.next_payroll_date ? formatIndianDate(latestPayroll.next_payroll_date) : "—"} />
+              <MetricCard label="Headcount" value={String(latestPayroll?.headcount ?? "-")} />
+              <MetricCard label="Monthly Payroll" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.total_payroll || 0)) : "-"} />
+              <MetricCard label="PF Due" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.pf_due || 0)) : "-"} />
+              <MetricCard label="Next Payroll" value={latestPayroll?.next_payroll_date ? formatIndianDate(latestPayroll.next_payroll_date) : "-"} />
             </div>
             <Card>
               <h3 className="text-[15px] font-semibold mb-3">Payroll history</h3>
@@ -547,7 +547,7 @@ export default function CAClientDetailPage() {
                 headers={["Month", "Headcount", "Total Payroll", "PF Due", "ESIC Due"]}
                 rows={payroll.map(p => [
                   formatIndianDate(p.month),
-                  p.headcount ?? "—",
+                  p.headcount ?? "-",
                   formatIndianCurrency(Number(p.total_payroll || 0)),
                   formatIndianCurrency(Number(p.pf_due || 0)),
                   formatIndianCurrency(Number(p.esic_due || 0)),
@@ -582,7 +582,7 @@ export default function CAClientDetailPage() {
               rows={activities.map(a => [
                 <span key="t" className="text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.60)" }}>{new Date(a.created_at).toLocaleString("en-IN")}</span>,
                 <Chip key="a" tone={actionTone(a.action_type)}>{a.action_type}</Chip>,
-                a.description || "—",
+                a.description || "-",
               ])}
               empty="No activity yet."
             />
@@ -653,7 +653,7 @@ function buildTopIssues({ runwayDays, itcAtRisk, overdueReceivables, mismatchCou
   const issues: { title: string; body: string; color: string; tab: string }[] = [];
   if (runwayDays < 30) issues.push({ title: "Critical runway", body: `Cash will last only ${runwayDays} days at current burn.`, color: COLORS.red, tab: "Cash & Liquidity" });
   if (itcAtRisk > 0) issues.push({ title: "ITC at risk", body: `${formatIndianCurrency(itcAtRisk)} of ITC flagged across ${mismatchCount} mismatches.`, color: COLORS.red, tab: "GST & ITC" });
-  if (overdueReceivables > 0) issues.push({ title: "Overdue receivables", body: `${formatIndianCurrency(overdueReceivables)} past due — chase customers.`, color: COLORS.amber, tab: "Receivables" });
+  if (overdueReceivables > 0) issues.push({ title: "Overdue receivables", body: `${formatIndianCurrency(overdueReceivables)} past due, chase customers.`, color: COLORS.amber, tab: "Receivables" });
   if (nextFiling) {
     const days = Math.ceil((new Date(nextFiling.due_date).getTime() - Date.now()) / 86400000);
     if (days <= 7) issues.push({ title: `${nextFiling.filing_name} due soon`, body: `Due in ${days} days (${formatIndianDate(nextFiling.due_date)}).`, color: days < 3 ? COLORS.red : COLORS.amber, tab: "Compliance" });

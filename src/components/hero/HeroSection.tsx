@@ -75,7 +75,7 @@ const CONVERSATIONS = [
     reply: (
       <>
         Moving Infra-X to{" "}
-        <strong style={{ color: "#F4EDDA" }}>60-day terms</strong> frees ₹80K working capital — covering 67 days of new hire cost. Vendor risk score:{" "}
+        <strong style={{ color: "#F4EDDA" }}>60-day terms</strong> frees ₹80K working capital, covering 67 days of new hire cost. Vendor risk score:{" "}
         <strong style={{ color: "#10B981" }}>LOW</strong>. Recommend negotiating now.
       </>
     ),
@@ -312,7 +312,7 @@ export default function HeroSection() {
             </h1>
 
             <div className="fyn-red-highlight" style={{ marginTop: 22 }}>
-              Meet CFO Fynny — stop running your business on gut feeling. Start running it on intelligence.
+              Meet CFO Fynny, stop running your business on gut feeling. Start running it on intelligence.
             </div>
 
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 16, lineHeight: 1.65, color: "rgba(244,237,218,0.65)", margin: "16px 0 0", maxWidth: 560 }}>

@@ -140,7 +140,7 @@ export default function RevenueIntelligencePage() {
           <FynEmpty
             icon={<LineChartIcon className="h-7 w-7" />}
             title="No revenue data yet"
-            description="Connect Razorpay or Stripe to track subscriptions automatically — or upload subscription data via CSV."
+            description="Connect Razorpay or Stripe to track subscriptions automatically, or upload subscription data via CSV."
             action={
               <Link to="/dashboard/data-import">
                 <FynButton>Upload data</FynButton>

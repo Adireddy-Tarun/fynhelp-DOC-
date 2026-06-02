@@ -22,7 +22,7 @@ const PLAN_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
   starter:    { bg: "rgba(59,130,246,0.12)", fg: "#3B82F6", label: "Starter" },
   pro:        { bg: "rgba(16,185,129,0.12)", fg: "#0F7B4F", label: "Pro" },
   enterprise: { bg: "rgba(120,53,15,0.12)",  fg: "#78350F", label: "Enterprise" },
-  none:       { bg: "rgba(26,16,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "—" },
+  none:       { bg: "rgba(26,16,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "-" },
 };
 
 type ProfileRow = {
@@ -98,8 +98,8 @@ export default function AdminUsersPage() {
       return {
         user_id: p.user_id,
         name: p.display_name || p.full_name || "Unnamed user",
-        mobile: p.mobile || p.whatsapp_phone || "—",
-        company: p.business_id ? (bizMap.get(p.business_id) ?? "—") : "—",
+        mobile: p.mobile || p.whatsapp_phone || "-",
+        company: p.business_id ? (bizMap.get(p.business_id) ?? "-") : "-",
         plan: sub?.plan_type ?? "none",
         status: sub?.status ?? "none",
         mrr: Number(sub?.mrr ?? 0),
@@ -261,7 +261,7 @@ export default function AdminUsersPage() {
                     <td style={cell} onClick={go}><Badge {...statusStyle} /></td>
                     <td style={cell} onClick={go}>
                       <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 13, fontWeight: 600, color: r.mrr > 0 ? "#8B6914" : "hsl(var(--fyn-ink) / 0.4)" }}>
-                        {r.mrr > 0 ? fmtINR(r.mrr) : "—"}
+                        {r.mrr > 0 ? fmtINR(r.mrr) : "-"}
                       </span>
                     </td>
                     <td style={cell} onClick={go}>

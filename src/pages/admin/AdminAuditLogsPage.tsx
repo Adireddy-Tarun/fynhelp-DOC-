@@ -154,8 +154,8 @@ export default function AdminAuditLogsPage() {
                         {l.action}
                       </span>
                     </td>
-                    <td style={cell}>{l.target_type ? `${l.target_type}${l.target_id ? ` · ${l.target_id.slice(0, 8)}…` : ""}` : "—"}</td>
-                    <td style={cell}>{l.ip_address ?? "—"}</td>
+                    <td style={cell}>{l.target_type ? `${l.target_type}${l.target_id ? ` · ${l.target_id.slice(0, 8)}…` : ""}` : "-"}</td>
+                    <td style={cell}>{l.ip_address ?? "-"}</td>
                     <td style={cell}>
                       <button onClick={(e) => { e.stopPropagation(); setOpen(l); }}
                         style={{ color: "#8B6914", background: "transparent", border: "none", fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
@@ -197,9 +197,9 @@ export default function AdminAuditLogsPage() {
             <div className="p-6 space-y-3">
               <DetailRow label="Action" value={open.action} />
               <DetailRow label="Admin User" value={open.admin_user_id} />
-              <DetailRow label="Target" value={open.target_type ? `${open.target_type} · ${open.target_id ?? "—"}` : "—"} />
-              <DetailRow label="IP Address" value={open.ip_address ?? "—"} />
-              <DetailRow label="User Agent" value={open.user_agent ?? "—"} />
+              <DetailRow label="Target" value={open.target_type ? `${open.target_type} · ${open.target_id ?? "-"}` : "-"} />
+              <DetailRow label="IP Address" value={open.ip_address ?? "-"} />
+              <DetailRow label="User Agent" value={open.user_agent ?? "-"} />
               <div>
                 <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.55)", marginBottom: 6 }}>
                   Details

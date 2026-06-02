@@ -49,7 +49,7 @@ export default function FynnyChatPage() {
       id: "1",
       role: "assistant",
       content:
-        "Hi! I'm **Fynny**, your AI CFO. I have live access to your bank balances, transactions, subscriptions, payables, receivables, and GST filings.\n\nAsk me anything — *\"What's my runway?\"*, *\"Who hasn't paid?\"*, *\"What's my MRR?\"*",
+        "Hi! I'm **Fynny**, your AI CFO. I have live access to your bank balances, transactions, subscriptions, payables, receivables, and GST filings.\n\nAsk me anything, *\"What's my runway?\"*, *\"Who hasn't paid?\"*, *\"What's my MRR?\"*",
       timestamp: new Date(),
     }]);
   }, []);

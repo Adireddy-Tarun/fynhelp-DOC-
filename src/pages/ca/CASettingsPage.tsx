@@ -657,7 +657,7 @@ function ThresholdField({ label, value, onChange }: { label: string; value: numb
 /* ================= BILLING ================= */
 function BillingTab({ caFirm }: { caFirm: any }) {
   const [showCancel, setShowCancel] = useState(false);
-  const planName = caFirm?.plan_type === "ca_partner" ? "CA Partner — Professional" : "CA Partner";
+  const planName = caFirm?.plan_type === "ca_partner" ? "CA Partner, Professional" : "CA Partner";
   const invoices = useMemo(() => {
     const out: { date: string; amount: string; status: "Paid" | "Pending" }[] = [];
     const now = new Date();

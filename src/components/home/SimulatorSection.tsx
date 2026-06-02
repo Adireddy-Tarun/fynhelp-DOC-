@@ -37,7 +37,7 @@ export default function SimulatorSection() {
   const [activeIdx, setActiveIdx] = useState(0);
   const scenario = SCENARIOS[activeIdx];
 
-  // Per-scenario input state (keyed by scenario id) — preserves values when switching
+  // Per-scenario input state (keyed by scenario id), preserves values when switching
   const [stateMap, setStateMap] = useState<Record<string, Record<string, number | string>>>(() => {
     const m: Record<string, Record<string, number | string>> = {};
     SCENARIOS.forEach((sc) => {
@@ -78,7 +78,7 @@ export default function SimulatorSection() {
     <section className="bg-fyn-beige py-24" ref={ref}>
       <div className="fyn-container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Left — Copy + Scenario tabs */}
+          {/* Left, Copy + Scenario tabs */}
           <div className="reveal-left">
             <span className="fyn-caption text-fyn-gold block mb-4 text-base">Decision Simulator</span>
             <h2
@@ -128,7 +128,7 @@ export default function SimulatorSection() {
             </button>
           </div>
 
-          {/* Right — Calculator */}
+          {/* Right, Calculator */}
           <div className="bg-fyn-beige-card border border-fyn-ink/10 rounded-xl p-6 md:p-7 reveal-right">
             <h3
               className="text-xl text-fyn-ink mb-6"
