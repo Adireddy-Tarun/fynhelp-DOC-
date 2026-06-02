@@ -1,4 +1,5 @@
-import logoSrc from "@/assets/fynhelp-logo.png";
+import logoLight from "@/assets/fynhelp-logo.png";
+import logoDarkAsset from "@/assets/fynhelp-logo-dark.png.asset.json";
 
 interface FynLogoProps {
   variant?: "dark" | "light";
@@ -17,10 +18,12 @@ const FynLogo = ({ variant = "dark", showTagline = true, className = "", iconOnl
       ? (size === "sm" ? 40 : size === "lg" ? 72 : 56)
       : (size === "sm" ? 28 : size === "lg" ? 48 : 36);
 
+  const src = variant === "light" ? logoLight : logoDarkAsset.url;
+
   return (
     <div className={`inline-flex items-center ${className}`}>
       <img
-        src={logoSrc}
+        src={src}
         alt="FynHelp — Find Your Numbers"
         style={{
           height,
