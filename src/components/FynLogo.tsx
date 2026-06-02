@@ -18,7 +18,8 @@ const FynLogo = ({ variant = "dark", showTagline = true, className = "", iconOnl
       ? (size === "sm" ? 40 : size === "lg" ? 72 : 56)
       : (size === "sm" ? 28 : size === "lg" ? 48 : 36);
 
-  const src = variant === "light" ? logoLight : logoDarkAsset.url;
+  const src = logoDarkAsset.url;
+  void logoLight;
 
   return (
     <div className={`inline-flex items-center ${className}`}>
