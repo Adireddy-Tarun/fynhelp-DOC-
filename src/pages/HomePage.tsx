@@ -1309,6 +1309,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <AIRecommendedSection />
+
       <MobileProductsSection />
 
       <Ticker items={TICKER_LIGHT} />
