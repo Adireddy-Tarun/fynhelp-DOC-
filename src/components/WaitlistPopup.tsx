@@ -25,7 +25,7 @@ export default function WaitlistPopup() {
   useEffect(() => {
     if (!open) return;
     setCanClose(false);
-    const t = window.setTimeout(() => setCanClose(true), 60000);
+    const t = window.setTimeout(() => setCanClose(true), 10000);
     return () => window.clearTimeout(t);
   }, [open]);
 
