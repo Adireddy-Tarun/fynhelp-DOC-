@@ -1,227 +1,132 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+  ListPageShell, FilterChips, Pagination, useDebounced,
+  FynSearchInput, FynSelect,
+} from "@/components/dashboard/ListPageShell";
+import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
+import DetailDrawer, { useDrawer } from "@/components/dashboard/DetailDrawer";
+import { useCustomers, useInvoices } from "@/hooks/dashboard/useDashboardData";
+import { formatINR } from "@/lib/indian-format";
 import { Users } from "lucide-react";
 
-type CustomerAgg = {
-  name: string;
-  totalBilled: number;
-  totalOutstanding: number;
-  invoiceCount: number;
-  lastInvoiceDate: string | null;
-};
+const PAGE_SIZE = 10;
 
-const CustomersPage = () => {
-  const navigate = useNavigate();
-  const [businessId, setBusinessId] = useState<string | null>(null);
+export default function CustomersPage() {
+  const { data: customers, isLoading, error } = useCustomers();
+  const { data: invoices } = useInvoices();
+  const { open } = useDrawer();
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(params.get("q") || "");
+  const [filter, setFilter] = useState(params.get("filter") || "all");
+  const [sort, setSort] = useState(params.get("sort") || "name");
+  const [page, setPage] = useState(1);
+  const debounced = useDebounced(search);
 
-  useEffect(() => {
-    const fetchBusiness = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("business_id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data?.business_id) setBusinessId(data.business_id);
-    };
-    fetchBusiness();
-  }, []);
+  const overdueCustomerIds = useMemo(
+    () => new Set((invoices || []).filter((i) => i.status === "overdue").map((i) => i.customer_id).filter(Boolean) as string[]),
+    [invoices],
+  );
 
-  const { data: receivables, isLoading } = useQuery({
-    queryKey: ["receivables-customers", businessId],
-    queryFn: async () => {
-      if (!businessId) return [];
-      const { data } = await supabase
-        .from("receivables")
-        .select("*")
-        .eq("business_id", businessId);
-      return data || [];
-    },
-    enabled: !!businessId,
-  });
-
-  const customersMap = receivables?.reduce((acc, r) => {
-    const customerName = r.customer_name || "Unknown Customer";
-    if (!acc[customerName]) {
-      acc[customerName] = {
-        name: customerName,
-        totalBilled: 0,
-        totalOutstanding: 0,
-        invoiceCount: 0,
-        lastInvoiceDate: r.invoice_date ?? null,
-      };
+  const filtered = useMemo(() => {
+    let list = customers || [];
+    if (filter === "active") list = list.filter((c) => c.is_active);
+    if (filter === "inactive") list = list.filter((c) => !c.is_active);
+    if (filter === "overdue") list = list.filter((c) => overdueCustomerIds.has(c.id));
+    if (debounced) {
+      const q = debounced.toLowerCase();
+      list = list.filter((c) => c.customer_name.toLowerCase().includes(q));
     }
-    acc[customerName].totalBilled += Number(r.amount) || 0;
-    acc[customerName].totalOutstanding += Number(r.outstanding) || 0;
-    acc[customerName].invoiceCount += 1;
-
-    if (r.invoice_date) {
-      const currentDate = new Date(r.invoice_date);
-      const lastDate = acc[customerName].lastInvoiceDate
-        ? new Date(acc[customerName].lastInvoiceDate as string)
-        : null;
-      if (!lastDate || currentDate > lastDate) {
-        acc[customerName].lastInvoiceDate = r.invoice_date;
+    list = [...list].sort((a, b) => {
+      switch (sort) {
+        case "revenue":
+        case "outstanding":
+          return Number(b.total_receivable) - Number(a.total_receivable);
+        case "terms":
+          return (b.payment_terms_days || 0) - (a.payment_terms_days || 0);
+        default:
+          return a.customer_name.localeCompare(b.customer_name);
       }
-    }
+    });
+    return list;
+  }, [customers, filter, debounced, sort, overdueCustomerIds]);
 
-    return acc;
-  }, {} as Record<string, CustomerAgg>);
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const customers = Object.values(customersMap || {}).sort(
-    (a, b) => b.totalOutstanding - a.totalOutstanding,
-  );
-
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
-  const activeCustomers = customers.filter(
-    (c) => c.lastInvoiceDate && new Date(c.lastInvoiceDate) >= ninetyDaysAgo,
-  );
-  const totalOutstanding = customers.reduce(
-    (sum, c) => sum + c.totalOutstanding,
-    0,
-  );
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-lg" />
-          ))}
-        </div>
-        <Skeleton className="h-96 rounded-lg" />
-      </DashboardLayout>
-    );
-  }
-
-  if (!customers || customers.length === 0) {
-    return (
-      <DashboardLayout>
-        <Card className="p-12 text-center bg-fyn-beige-dark border-fyn-ink-10">
-          <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 rounded-full bg-fyn-beige flex items-center justify-center">
-              <Users className="w-7 h-7 text-fyn-ink/50" />
-            </div>
-          </div>
-          <h3 className="font-serif text-xl text-fyn-ink mb-2">
-            No Customer Data
-          </h3>
-          <p className="text-sm text-fyn-ink/60 mb-6 max-w-md mx-auto">
-            Upload invoices to see customer analytics
-          </p>
-          <button
-            onClick={() => navigate("/dashboard/data-import")}
-            className="inline-flex items-center gap-2 transition-colors hover:opacity-90"
-            style={{
-              background: "#C41E1E",
-              color: "#FFFFFF",
-              padding: "10px 20px",
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 500,
-            }}
-          >
-            Upload Data →
-          </button>
-        </Card>
-      </DashboardLayout>
-    );
-  }
+  if (isLoading) return <DashboardLayout><FynLoading rows={4} /></DashboardLayout>;
+  if (error) return <DashboardLayout><FynEmpty icon={<Users size={28} />} title="Couldn't load customers" description={(error as Error).message} /></DashboardLayout>;
 
   return (
     <DashboardLayout>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <Card className="p-5 bg-fyn-beige-card border-fyn-ink-10">
-          <p className="text-[13px] fyn-label text-secondary-foreground">
-            Total Customers
-          </p>
-          <p className="text-fyn-ink text-[28px] font-bold mt-1 font-sans">
-            {customers.length}
-          </p>
-        </Card>
-
-        <Card className="p-5 bg-fyn-beige-card border-fyn-ink-10">
-          <p className="text-[13px] fyn-label text-secondary-foreground">
-            Active Customers
-          </p>
-          <p className="text-fyn-ink text-[28px] font-bold mt-1 font-sans">
-            {activeCustomers.length}
-          </p>
-          <p className="text-xs text-fyn-ink/60 mt-1">
-            Billed in last 90 days
-          </p>
-        </Card>
-
-        <Card className="p-5 bg-fyn-beige-card border-fyn-ink-10">
-          <p className="text-[13px] fyn-label text-secondary-foreground">
-            Total Outstanding
-          </p>
-          <p className="text-fyn-ink text-[28px] font-bold mt-1 font-sans">
-            ₹{totalOutstanding.toLocaleString("en-IN")}
-          </p>
-        </Card>
-      </div>
-
-      <Card className="bg-fyn-beige-dark border-fyn-ink-10">
-        <div className="p-5 border-b border-fyn-ink-10">
-          <h3 className="font-serif text-lg text-fyn-ink">Customer List</h3>
+      <ListPageShell
+        title="Customers"
+        count={filtered.length}
+        controls={
+          <>
+            <div className="flex-1 min-w-[220px]">
+              <FynSearchInput value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search by name…" />
+            </div>
+            <FilterChips
+              value={filter}
+              onChange={(v) => { setFilter(v); setPage(1); }}
+              options={[
+                { value: "all", label: "All" },
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+                { value: "overdue", label: "Overdue" },
+              ]}
+            />
+            <FynSelect value={sort} onChange={(e) => setSort(e.target.value)} className="w-auto">
+              <option value="name">Sort: Name</option>
+              <option value="revenue">Sort: Receivable</option>
+              <option value="terms">Sort: Payment Days</option>
+            </FynSelect>
+          </>
+        }
+      >
+        {paged.length === 0 ? (
+          <div className="p-fyn-xl text-center text-fyn-ink-45">No matching customers.</div>
+        ) : (
+          <FynTable>
+            <thead className="bg-fyn-ink-02">
+              <tr className="border-b border-fyn-ink-10">
+                <FynTH>Customer</FynTH>
+                <FynTH>City</FynTH>
+                <FynTH>Category</FynTH>
+                <FynTH align="right">Total Receivable</FynTH>
+                <FynTH>Status</FynTH>
+                <FynTH align="right">Actions</FynTH>
+              </tr>
+            </thead>
+            <tbody>
+              {paged.map((c) => (
+                <FynTR key={c.id} className="cursor-pointer" onClick={() => open("customer", c.id)}>
+                  <FynTD>
+                    <div className="text-fyn-ink font-medium">{c.customer_name}</div>
+                    <div className="text-fyn-tiny text-fyn-ink-45">{c.contact_person || "—"}</div>
+                  </FynTD>
+                  <FynTD>{[c.city, c.state].filter(Boolean).join(", ") || "—"}</FynTD>
+                  <FynTD>{c.customer_category || "—"}</FynTD>
+                  <FynTD align="right" mono>{formatINR(Number(c.total_receivable))}</FynTD>
+                  <FynTD>
+                    <FynBadge tone={c.is_active ? "success" : "danger"}>
+                      {c.is_active ? "Active" : "Inactive"}
+                    </FynBadge>
+                  </FynTD>
+                  <FynTD align="right">
+                    <FynButton variant="ghost" onClick={(e) => { e.stopPropagation(); open("customer", c.id); }}>View →</FynButton>
+                  </FynTD>
+                </FynTR>
+              ))}
+            </tbody>
+          </FynTable>
+        )}
+        <div className="p-fyn-md">
+          <Pagination page={page} pageSize={PAGE_SIZE} total={filtered.length} onPage={setPage} />
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer Name</TableHead>
-              <TableHead className="text-right">Total Billed</TableHead>
-              <TableHead className="text-right">Outstanding</TableHead>
-              <TableHead className="text-right">Invoices</TableHead>
-              <TableHead>Last Invoice</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customers.map((customer) => (
-              <TableRow key={customer.name}>
-                <TableCell className="font-semibold">{customer.name}</TableCell>
-                <TableCell className="text-right fyn-metric">
-                  ₹{customer.totalBilled.toLocaleString("en-IN")}
-                </TableCell>
-                <TableCell className="text-right fyn-metric font-semibold">
-                  ₹{customer.totalOutstanding.toLocaleString("en-IN")}
-                </TableCell>
-                <TableCell className="text-right">
-                  {customer.invoiceCount}
-                </TableCell>
-                <TableCell className="text-xs">
-                  {customer.lastInvoiceDate
-                    ? new Date(customer.lastInvoiceDate).toLocaleDateString(
-                        "en-IN",
-                        { day: "2-digit", month: "short", year: "numeric" },
-                      )
-                    : "-"}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      </ListPageShell>
+      <DetailDrawer />
     </DashboardLayout>
   );
-};
-
-export default CustomersPage;
+}
