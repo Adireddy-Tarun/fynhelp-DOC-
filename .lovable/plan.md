@@ -1,117 +1,71 @@
-## Goal
-Replace hardcoded numbers in the `/dashboard/*` cockpit with live Lovable Cloud queries, and add drill-down list views + detail drawers for Customers, Vendors, Invoices, Expenses, Employees.
+# Plan: Demo dashboard (/demo/*) → mirror to /dashboard/*
 
-## 1. Database (single migration)
+Build the public **demo** experience first end-to-end. Once it looks and behaves correctly, copy the same components/queries into the authenticated **real** dashboard and swap the data source.
 
-Create 8 new tables in the `public` schema, alongside existing ones (existing `employees`, `gst_filings`, `receivables`, `payables` are left untouched). All scoped to `business_id`, with the brief's exact column names.
+## Phase 1 — Database (one migration)
 
-New tables: `customers`, `vendors`, `invoices`, `expenses`, `bank_transactions`, `employees_demo`, `gst_filings_demo`, `clients`.
+Reuse the 8 tables already created in the prior turn (`customers`, `vendors`, `invoices`, `expenses`, `bank_transactions`, `employees_demo`, `gst_filings_demo`, `clients`). One new migration to:
 
-Each table:
-- `id uuid pk`, `business_id uuid not null`, `created_at`, `updated_at`
-- GRANTs to `authenticated` (SELECT/INSERT/UPDATE/DELETE) and `service_role` (ALL)
-- RLS enabled with policy `business_id = public.get_user_business_id()` (helper already exists)
-- FKs: `invoices.customer_id → customers.id`, `expenses.vendor_id → vendors.id`
-- `updated_at` trigger using existing `public.update_updated_at_column()`
+1. Add a `is_demo boolean default false` column to each of those 8 tables (lets the same tables back both demo and real dashboards).
+2. Add RLS policy: `SELECT` allowed to role `anon` and `authenticated` **when `is_demo = true`**. Existing business-scoped policies stay for non-demo rows.
+3. Keep all existing GRANTs; add `GRANT SELECT ... TO anon` on the 8 tables (policy still gates per-row).
+4. Designate one fixed demo `business_id` constant: `4b30494f-4c30-4a74-a6bb-6bf56493a97d` (already used by prior seed).
 
-Status enums use `text` with CHECK constraints matching the brief (e.g. invoice status one of `draft|sent|partially_paid|paid|overdue|cancelled`).
+## Phase 2 — Seed demo data
 
-## 2. Seed data
+Mark every prior-seeded row `is_demo = true`. Re-seed to match the exact spec (counts and named entities):
 
-After migration approval, insert deterministic synthetic rows for `business_id = 4b30494f-4c30-4a74-a6bb-6bf56493a97d`:
-- 20 customers (Indian SME names, mixed cities, categories Enterprise/SMB/Startup)
-- 20 vendors (SaaS, Logistics, Office, Marketing categories)
-- 40 invoices spread over last 6 months; ~30% paid, 20% sent, 25% overdue, 15% partially_paid, 10% draft
-- 36 expenses across 8 categories, 60% Paid / 40% Pending
-- 40 bank_transactions ending today with running `balance`
-- 10 employees across 4 departments
-- 11 gst_filings (GSTR-1, GSTR-3B) over last 6 months
-- 20 clients (CA-firm style records)
+- 20 customers (Acme Corp Surat, TechStart Ltd Bangalore, Beta Labs Hyderabad, MedPlus Chennai, NovaBuild Ahmedabad, FreshKart Bangalore, + 14 more) with GSTIN, contact, city, state, payment_terms_days, customer_category, total_receivable.
+- 20 vendors (AWS, GCP, Razorpay, Zoho, WeWork India, Airtel Business, Swiggy Corporate, Freshworks, HubSpot, Notion, Figma, Keka HR, Tata Communications, IndiGo Corporate, Stripe India, + 5 more).
+- 40 invoices INV-2025-0001..0040: 14 overdue, 4 sent, 22 paid; amounts ₹35K–₹320K; 18% GST math-consistent (subtotal/tax/total/paid/outstanding).
+- 36 expenses across Infrastructure / Office / Salaries / SaaS / Marketing / Travel / Telecom / Legal with the exact named line items and amounts in the brief; mix Paid/Pending.
+- 40 bank_transactions with running balance, credit/debit, category, reconciled flag.
+- 10 employees: Tarun Kumar CTO ₹0, Nidhi Siddhapura CMO ₹0, Arjun Menon ₹1.25L, Deepika Iyer ₹95K, Rohit Saxena ₹85K, Sneha Kulkarni ₹75K, Mohammed Faizan ₹65K, Pooja Sharma ₹55K, Karthik Raman ₹1.05L, Ananya Bose ₹60K.
+- 11 gst_filings: GSTR-1 + GSTR-3B for Mar/Apr/May 2025 (mix Filed/Pending), GSTR-9 FY 2024-25 Not Due.
 
-Amounts in INR, totals math-consistent (subtotal+tax=total; paid+outstanding=total).
+## Phase 3 — Demo dashboard at `/demo/*` (public, read-only)
 
-## 3. Data layer
+New top-level public section under `src/pages/demo/`, mounted in `App.tsx` outside the auth guard.
 
-`src/hooks/dashboard/` — typed React Query hooks, one per query in the brief:
-- `useLiquidityMetrics` (gross burn, net burn, runway, cash balance)
-- `useOverdueInvoices`, `useUpcomingPayments`
-- `useRevenueTrend`, `useTopCustomers`
-- `useExpensesByCategory`, `useVendorSpend`, `usePersonnelCosts`
-- `useGstFilings`, `useItcSummary`
-- List-page hooks: `useCustomers`, `useVendors`, `useInvoices`, `useExpenses`, `useEmployees` (with search/filter/sort/pagination params)
-- Detail hooks: `useCustomerDetail(id)`, `useVendorDetail(id)`, `useInvoiceDetail(id)`, `useExpenseDetail(id)`
+Routes:
+- `/demo` — Cockpit (mirrors `CockpitPage` layout: Liquidity / Revenue / Cost / GST tabs, clickable cards)
+- `/demo/customers`, `/demo/vendors`, `/demo/invoices`, `/demo/expenses`, `/demo/employees`, `/demo/gst`
 
-All currency formatting via existing `formatINR` in `src/lib/indian-format.ts`.
+Shared building blocks (new):
+- `src/hooks/demo/useDemoData.ts` — typed React Query hooks. All queries hardcode `business_id = DEMO_BUSINESS_ID` and `is_demo = true`. Mirrors the existing `useDashboardData.ts` API surface 1:1.
+- `src/components/demo/DemoLayout.tsx` — dark theme shell with a top "Demo mode — read-only. Sign up to use your own data →" banner and the existing sidebar/nav styling (no auth widgets).
+- Reuse `ListPageShell`, `DetailDrawer`, and the `detail/*` components already built; pass a `readOnly` prop that hides edit/add/delete actions.
 
-## 4. Cockpit rewrite
+Behaviour:
+- Public access, no login required.
+- All cards clickable → list views; rows clickable → detail drawer (`?drawer=…&id=…`).
+- Search debounced 300ms, filters, sorting, pagination 10/page.
+- Headers show counts: `Customers (20)`, etc.
+- INR formatting via existing `formatINR`.
+- Any write attempt is hidden in UI; backend RLS has no INSERT/UPDATE/DELETE policy for anon as defence-in-depth.
 
-Replace hardcoded values in:
-- `src/pages/dashboard/LiquidityIntelligencePage.tsx`
-- `src/pages/dashboard/RevenueIntelligencePage.tsx`
-- `src/pages/dashboard/CostPage.tsx`
-- `src/pages/dashboard/GSTPage.tsx`
-- `src/pages/dashboard/CockpitPage.tsx` (top KPI strip)
+## Phase 4 — Mirror into real `/dashboard/*`
 
-Each card gets:
-- Loading skeleton, error fallback, empty state
-- `cursor-pointer`, hover lift+glow per brief, small `→` arrow at 30% opacity top-right
-- `onClick` navigating to its list route or opening the relevant drawer
-- "View all →" link added under section headers (overdue invoices, top customers, vendor spend, etc.)
+Once `/demo/*` is verified:
+1. Create `src/hooks/dashboard/useRealData.ts` with the same hook signatures as `useDemoData`, but scoping by `business_id = profile.business_id` and `is_demo = false` and using `useAuth`.
+2. Build (or update) the parallel real pages under `src/pages/dashboard/`: same components from Phase 3, swapped data hook, `readOnly={false}`, edit/add/delete actions enabled (CRUD wired to the same tables).
+3. Routes already exist (`/dashboard`, `/dashboard/customers`, …) — replace any leftover hardcoded panels with the mirrored components.
+4. Auth gate stays as-is; redirect unauthenticated users to `/auth`.
 
-## 5. New list pages
+## Phase 5 — Verification
 
-Routes registered in `src/App.tsx`:
-- `/dashboard/customers` (rewrite existing `CustomersPage.tsx` to use `customers` table)
-- `/dashboard/vendors` (rewrite existing `VendorsPage.tsx`)
-- `/dashboard/invoices` (new)
-- `/dashboard/expenses` (new)
-- `/dashboard/employees` (new — distinct from existing `/dashboard/hr`)
+- `psql` row counts for all 8 demo tables = spec counts, all `is_demo = true`.
+- Anonymous load of `/demo` → cockpit numbers populate; tab through Liquidity/Revenue/Cost/GST; click each card → correct list view; click row → correct drawer.
+- `/demo/customers` etc.: search, filter, sort, pagination, count header all work.
+- Logged-in `/dashboard/*` shows the same UI against the user's own (non-demo) rows; CRUD round-trips.
+- Console + network: zero errors on either surface.
 
-Shared `ListPageShell` component built on `FynCard` / `FynTable` / `FynBadge` primitives:
-- Header: `"<Entity> (count)"`, breadcrumb `Dashboard > <Entity>`, "← Back to Cockpit" link
-- Debounced search (300ms), filter chips, sort dropdown, 10-per-page pagination
-- Row click opens corresponding detail drawer (uses URL search param `?id=…` so links are shareable)
-- Status badges with brand-aligned colors (paid=green, overdue=red, sent=amber, draft=neutral, partial=orange, cancelled=muted)
-- Responsive: horizontal scroll on mobile
+## Out of scope
 
-## 6. Detail drawer
+- Auth/onboarding changes, sidebar/nav redesign, PDF/email exports, real bank/GST integrations, marketing copy on `/demo`, the existing `receivables` / `payables` / `employees` / `gst_filings` legacy tables (untouched).
 
-New `src/components/dashboard/DetailDrawer.tsx` built on existing shadcn `Sheet` (right side, 500px desktop / full-width mobile, ESC + backdrop close). Four content components:
-- `CustomerDetail` — header, 3 metric cards (revenue/outstanding/avg payment days), invoice history table, actions (Send Reminder, View All Invoices→filtered list)
-- `VendorDetail` — header, metrics (total spend/outstanding/avg monthly), expense history, actions
-- `InvoiceDetail` — header, dates, days overdue, amount breakdown, payment info, actions (Send Reminder, Mark Paid, Download PDF placeholder)
-- `ExpenseDetail` — header, category path, vendor, amount, status, actions (Mark Paid, Download Receipt placeholder)
+## Technical notes
 
-Drawer open state driven by `?drawer=customer&id=…` so cockpit cards and list rows both deep-link in.
-
-## 7. Drill-down wiring
-
-- Liquidity: Gross Burn → `/dashboard/expenses?range=30d`; Runway card → runway breakdown drawer; overdue rows → InvoiceDetail; Send Reminder → CustomerDetail; payments → ExpenseDetail; Optimize Schedule → `/dashboard/expenses?status=Pending`
-- Revenue: MRR → `/dashboard/invoices?status=paid&range=30d`; top-customer row → CustomerDetail
-- Cost: OPEX → `/dashboard/expenses`; vendor row → VendorDetail; personnel → `/dashboard/employees`
-- GST: filing row → filing detail drawer; ITC row → ITC detail drawer
-
-## 8. Verification
-
-After implementation:
-- `psql` row counts on the 8 new tables
-- Open each cockpit tab → confirm numbers render and skeletons resolve
-- Click each card variant → confirm correct route/drawer
-- Read console + network for query errors
-
-## Out of scope (will not change)
-- Auth flow, sidebar, settings pages
-- Existing `receivables`/`payables`/`employees`/`gst_filings` tables and the pages bound to them (CA portal, HR page, etc.)
-- Real PDF download / real reminder email
-
----
-
-### Technical notes
-
-Filter encoding: list pages read filters from URL params (`?status=overdue&q=acme&sort=amount&page=2`) so cockpit links are deterministic and shareable.
-
-Query keys: `['dash', '<entity>', businessId, params]` so React Query cache buckets per filter combo. Stale time 60s for list/detail, 30s for cockpit aggregates.
-
-`business_id` resolution: pull once via `useAuth` → `profile.business_id`, fall back to the seeded demo business id when developing without a profile so screenshots still render.
-
-Aggregations done client-side over the small seeded dataset (no RPC needed). If volumes grow, swap individual hooks for SQL views in a follow-up.
+- Demo business id constant lives in `src/lib/demo.ts` and is imported by demo hooks only.
+- `is_demo` lets us keep one schema/codebase; the only difference between `/demo` and `/dashboard` is the hook (`useDemoData` vs `useRealData`) and the `readOnly` prop.
+- RLS on the 8 tables: `USING (is_demo = true)` for anon SELECT; existing `business_id = get_user_business_id()` policies remain for authenticated full access.
