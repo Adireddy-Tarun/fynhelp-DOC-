@@ -391,6 +391,11 @@ const CockpitPage = () => {
         </div>
       </div>
 
+      {/* Live data panel — wired to seeded customers/invoices/expenses/etc. */}
+      <div className="mb-fyn-lg">
+        <LiveCockpitPanel />
+      </div>
+
       {/* Onboarding banner */}
       {!onboardingDone && !demoMode && (
         <motion.div
