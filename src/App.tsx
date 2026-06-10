@@ -80,6 +80,9 @@ import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
+import InvoicesListPage from "./pages/dashboard/InvoicesListPage.tsx";
+import ExpensesListPage from "./pages/dashboard/ExpensesListPage.tsx";
+import EmployeesListPage from "./pages/dashboard/EmployeesListPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
@@ -177,6 +180,9 @@ const App = () => (
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
             <Route path="/dashboard/customers" element={<CustomersPage />} />
+            <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
+            <Route path="/dashboard/expenses" element={<ExpensesListPage />} />
+            <Route path="/dashboard/employees" element={<EmployeesListPage />} />
             <Route path="/dashboard/cost" element={<CostPage />} />
             <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />

@@ -17,6 +17,7 @@ import { logRealtimeEvent } from "@/lib/realtimeAudit";
 import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
+import LiveCockpitPanel from "@/components/dashboard/LiveCockpitPanel";
 
 const REFETCH_MS = 30000;
 
@@ -388,6 +389,11 @@ const CockpitPage = () => {
           </button>
           {demoMode && <FynBadge tone="warning">DEMO</FynBadge>}
         </div>
+      </div>
+
+      {/* Live data panel — wired to seeded customers/invoices/expenses/etc. */}
+      <div className="mb-fyn-lg">
+        <LiveCockpitPanel />
       </div>
 
       {/* Onboarding banner */}
