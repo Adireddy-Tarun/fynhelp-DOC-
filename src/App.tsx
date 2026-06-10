@@ -88,6 +88,7 @@ import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoDashboard from "./pages/demo/DemoDashboard.tsx";
+import DemoModeBanner from "./components/demo/DemoModeBanner";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
@@ -158,6 +159,15 @@ const App = () => (
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
             <Route path="/demo/dashboard" element={<DemoDashboard />} />
+            {/* Public read-only demo of the real dashboard, backed by seeded data */}
+            <Route path="/demo" element={<Navigate to="/demo/cockpit" replace />} />
+            <Route path="/demo/cockpit"   element={<DemoModeBanner><CockpitPage /></DemoModeBanner>} />
+            <Route path="/demo/customers" element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
+            <Route path="/demo/vendors"   element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
+            <Route path="/demo/invoices"  element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
+            <Route path="/demo/expenses"  element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
+            <Route path="/demo/employees" element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
+            <Route path="/demo/gst"       element={<DemoModeBanner><GSTPage /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard/cockpit" element={<CockpitPage />} />
