@@ -17,6 +17,7 @@ import { logRealtimeEvent } from "@/lib/realtimeAudit";
 import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
+import LiveCockpitPanel from "@/components/dashboard/LiveCockpitPanel";
 
 const REFETCH_MS = 30000;
 
