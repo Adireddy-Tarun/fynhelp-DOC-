@@ -180,6 +180,9 @@ const App = () => (
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
             <Route path="/dashboard/customers" element={<CustomersPage />} />
+            <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
+            <Route path="/dashboard/expenses" element={<ExpensesListPage />} />
+            <Route path="/dashboard/employees" element={<EmployeesListPage />} />
             <Route path="/dashboard/cost" element={<CostPage />} />
             <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
