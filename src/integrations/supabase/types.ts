@@ -258,6 +258,48 @@ export type Database = {
           },
         ]
       }
+      bank_transactions: {
+        Row: {
+          amount: number
+          balance: number
+          business_id: string
+          category: string | null
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          reconciled: boolean
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          balance: number
+          business_id: string
+          category?: string | null
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          reconciled?: boolean
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          balance?: number
+          business_id?: string
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          reconciled?: boolean
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -845,6 +887,60 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          avg_payment_days: number | null
+          business_id: string
+          city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          credit_risk: string | null
+          gstin: string | null
+          id: string
+          industry: string | null
+          name: string
+          outstanding_amount: number
+          state: string | null
+          total_revenue: number
+          updated_at: string
+        }
+        Insert: {
+          avg_payment_days?: number | null
+          business_id: string
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          credit_risk?: string | null
+          gstin?: string | null
+          id?: string
+          industry?: string | null
+          name: string
+          outstanding_amount?: number
+          state?: string | null
+          total_revenue?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_payment_days?: number | null
+          business_id?: string
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          credit_risk?: string | null
+          gstin?: string | null
+          id?: string
+          industry?: string | null
+          name?: string
+          outstanding_amount?: number
+          state?: string | null
+          total_revenue?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       compliance_events: {
         Row: {
           business_id: string
@@ -934,6 +1030,60 @@ export type Database = {
           status?: string
           upload_type?: string
           uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          business_id: string
+          city: string | null
+          contact_person: string | null
+          created_at: string
+          customer_category: string | null
+          customer_name: string
+          email: string | null
+          gstin: string | null
+          id: string
+          is_active: boolean
+          payment_terms_days: number | null
+          phone: string | null
+          state: string | null
+          total_receivable: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          customer_category?: string | null
+          customer_name: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          payment_terms_days?: number | null
+          phone?: string | null
+          state?: string | null
+          total_receivable?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          customer_category?: string | null
+          customer_name?: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          payment_terms_days?: number | null
+          phone?: string | null
+          state?: string | null
+          total_receivable?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1135,6 +1285,104 @@ export type Database = {
         }
         Relationships: []
       }
+      employees_demo: {
+        Row: {
+          business_id: string
+          cost_to_company: number
+          created_at: string
+          department: string | null
+          designation: string | null
+          id: string
+          joining_date: string | null
+          name: string
+          salary: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          cost_to_company?: number
+          created_at?: string
+          department?: string | null
+          designation?: string | null
+          id?: string
+          joining_date?: string | null
+          name: string
+          salary?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          cost_to_company?: number
+          created_at?: string
+          department?: string | null
+          designation?: string | null
+          id?: string
+          joining_date?: string | null
+          name?: string
+          salary?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          business_id: string
+          category: string | null
+          created_at: string
+          date: string
+          description: string | null
+          due_date: string | null
+          id: string
+          payment_method: string | null
+          payment_status: string
+          subcategory: string | null
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          amount?: number
+          business_id: string
+          category?: string | null
+          created_at?: string
+          date: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          payment_method?: string | null
+          payment_status?: string
+          subcategory?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          category?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          payment_method?: string | null
+          payment_status?: string
+          subcategory?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feature_flags: {
         Row: {
           created_at: string
@@ -1224,6 +1472,51 @@ export type Database = {
           status?: string
           tax_payable?: number | null
           taxable_sales?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gst_filings_demo: {
+        Row: {
+          business_id: string
+          created_at: string
+          due_date: string | null
+          filed_date: string | null
+          filing_type: string
+          id: string
+          itc_claimed: number
+          net_payable: number
+          period: string
+          status: string
+          tax_liability: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          due_date?: string | null
+          filed_date?: string | null
+          filing_type: string
+          id?: string
+          itc_claimed?: number
+          net_payable?: number
+          period: string
+          status?: string
+          tax_liability?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          due_date?: string | null
+          filed_date?: string | null
+          filing_type?: string
+          id?: string
+          itc_claimed?: number
+          net_payable?: number
+          period?: string
+          status?: string
+          tax_liability?: number
           updated_at?: string
         }
         Relationships: []
@@ -1375,6 +1668,68 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      invoices: {
+        Row: {
+          business_id: string
+          created_at: string
+          customer_id: string | null
+          due_date: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          outstanding_amount: number
+          paid_amount: number
+          payment_date: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          customer_id?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          outstanding_amount?: number
+          paid_amount?: number
+          payment_date?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          customer_id?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          outstanding_amount?: number
+          paid_amount?: number
+          payment_date?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       liquidity_metrics: {
         Row: {
@@ -2417,6 +2772,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vendors: {
+        Row: {
+          business_id: string
+          city: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          gstin: string | null
+          id: string
+          is_active: boolean
+          payment_terms_days: number | null
+          phone: string | null
+          total_outstanding: number
+          updated_at: string
+          vendor_category: string | null
+          vendor_name: string
+        }
+        Insert: {
+          business_id: string
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          payment_terms_days?: number | null
+          phone?: string | null
+          total_outstanding?: number
+          updated_at?: string
+          vendor_category?: string | null
+          vendor_name: string
+        }
+        Update: {
+          business_id?: string
+          city?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          payment_terms_days?: number | null
+          phone?: string | null
+          total_outstanding?: number
+          updated_at?: string
+          vendor_category?: string | null
+          vendor_name?: string
+        }
+        Relationships: []
       }
       waitlist: {
         Row: {
