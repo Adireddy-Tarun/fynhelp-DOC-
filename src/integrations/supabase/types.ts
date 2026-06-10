@@ -268,6 +268,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          is_demo: boolean
           reconciled: boolean
           type: string
           updated_at: string
@@ -281,6 +282,7 @@ export type Database = {
           date: string
           description?: string | null
           id?: string
+          is_demo?: boolean
           reconciled?: boolean
           type: string
           updated_at?: string
@@ -294,6 +296,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          is_demo?: boolean
           reconciled?: boolean
           type?: string
           updated_at?: string
@@ -899,6 +902,7 @@ export type Database = {
           gstin: string | null
           id: string
           industry: string | null
+          is_demo: boolean
           name: string
           outstanding_amount: number
           state: string | null
@@ -916,6 +920,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           industry?: string | null
+          is_demo?: boolean
           name: string
           outstanding_amount?: number
           state?: string | null
@@ -933,6 +938,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           industry?: string | null
+          is_demo?: boolean
           name?: string
           outstanding_amount?: number
           state?: string | null
@@ -1045,6 +1051,7 @@ export type Database = {
           gstin: string | null
           id: string
           is_active: boolean
+          is_demo: boolean
           payment_terms_days: number | null
           phone: string | null
           state: string | null
@@ -1062,6 +1069,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           payment_terms_days?: number | null
           phone?: string | null
           state?: string | null
@@ -1079,6 +1087,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           payment_terms_days?: number | null
           phone?: string | null
           state?: string | null
@@ -1293,6 +1302,7 @@ export type Database = {
           department: string | null
           designation: string | null
           id: string
+          is_demo: boolean
           joining_date: string | null
           name: string
           salary: number
@@ -1306,6 +1316,7 @@ export type Database = {
           department?: string | null
           designation?: string | null
           id?: string
+          is_demo?: boolean
           joining_date?: string | null
           name: string
           salary?: number
@@ -1319,6 +1330,7 @@ export type Database = {
           department?: string | null
           designation?: string | null
           id?: string
+          is_demo?: boolean
           joining_date?: string | null
           name?: string
           salary?: number
@@ -1337,6 +1349,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          is_demo: boolean
           payment_method: string | null
           payment_status: string
           subcategory: string | null
@@ -1352,6 +1365,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           payment_method?: string | null
           payment_status?: string
           subcategory?: string | null
@@ -1367,6 +1381,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          is_demo?: boolean
           payment_method?: string | null
           payment_status?: string
           subcategory?: string | null
@@ -1484,6 +1499,7 @@ export type Database = {
           filed_date: string | null
           filing_type: string
           id: string
+          is_demo: boolean
           itc_claimed: number
           net_payable: number
           period: string
@@ -1498,6 +1514,7 @@ export type Database = {
           filed_date?: string | null
           filing_type: string
           id?: string
+          is_demo?: boolean
           itc_claimed?: number
           net_payable?: number
           period: string
@@ -1512,6 +1529,7 @@ export type Database = {
           filed_date?: string | null
           filing_type?: string
           id?: string
+          is_demo?: boolean
           itc_claimed?: number
           net_payable?: number
           period?: string
@@ -1678,6 +1696,7 @@ export type Database = {
           id: string
           invoice_date: string
           invoice_number: string
+          is_demo: boolean
           outstanding_amount: number
           paid_amount: number
           payment_date: string | null
@@ -1695,6 +1714,7 @@ export type Database = {
           id?: string
           invoice_date: string
           invoice_number: string
+          is_demo?: boolean
           outstanding_amount?: number
           paid_amount?: number
           payment_date?: string | null
@@ -1712,6 +1732,7 @@ export type Database = {
           id?: string
           invoice_date?: string
           invoice_number?: string
+          is_demo?: boolean
           outstanding_amount?: number
           paid_amount?: number
           payment_date?: string | null
@@ -2783,6 +2804,7 @@ export type Database = {
           gstin: string | null
           id: string
           is_active: boolean
+          is_demo: boolean
           payment_terms_days: number | null
           phone: string | null
           total_outstanding: number
@@ -2799,6 +2821,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           payment_terms_days?: number | null
           phone?: string | null
           total_outstanding?: number
@@ -2815,6 +2838,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           is_active?: boolean
+          is_demo?: boolean
           payment_terms_days?: number | null
           phone?: string | null
           total_outstanding?: number
