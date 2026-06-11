@@ -77,27 +77,34 @@
     --chart-4: 216 66% 33%;
     --chart-5: 300 60% 26%;
 
-    /* Shadcn tokens (LIGHT MODE) */
-    --background: 40 52% 91%;
-    --foreground: 24 53% 7%;
-    --card: 36 50% 96%;
+    /* Shadcn tokens — BEIGE intelligence theme (spec: bg #EFE8D8 / card #FFFFFF / red #A93838) */
+    --background: 40 38% 89%;            /* #EFE8D8 */
+    --foreground: 24 53% 7%;             /* #1A1008 */
+    --card: 0 0% 100%;                   /* #FFFFFF */
     --card-foreground: 24 53% 7%;
-    --popover: 40 52% 91%;
+    --popover: 0 0% 100%;
     --popover-foreground: 24 53% 7%;
-    --primary: 0 73% 44%;
+    --primary: 0 50% 44%;                /* #A93838 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 42% 86%;
+    --secondary: 40 38% 84%;
     --secondary-foreground: 24 53% 7%;
-    --muted: 40 42% 86%;
-    --muted-foreground: 24 53% 7% / 0.6;
-    --accent: 38 74% 31%;
+    --muted: 40 38% 92%;
+    --muted-foreground: 0 0% 42%;        /* #6B6B6B */
+    --accent: 38 74% 31%;                /* #8B6914 gold */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 73% 44%;
+    --destructive: 0 50% 44%;
     --destructive-foreground: 0 0% 100%;
     --border: 24 53% 7% / 0.08;
     --input: 24 53% 7% / 0.08;
-    --ring: 0 73% 44%;
+    --ring: 0 50% 44%;
     --radius: 0.5rem;
+
+    /* Override fyn-beige-card to pure white so FynCard primitive renders on white surface */
+    --fyn-beige: 40 38% 89%;
+    --fyn-beige-card: 0 0% 100%;
+    --fyn-red: 0 50% 44%;
+    --fyn-red-mid: 0 50% 44%;
+    --fyn-red-dark: 0 50% 36%;
 
     --sidebar-background: 24 53% 7%;
     --sidebar-foreground: 40 52% 91%;
