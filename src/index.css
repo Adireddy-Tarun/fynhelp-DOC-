@@ -892,3 +892,111 @@ a:focus-visible,
 .font-serif {
   letter-spacing: -0.02em;
 }
+
+/* ── FYN intelligence: alive micro-animations ───────────────── */
+
+/* Subtle noise texture on beige page background for "premium paper" feel */
+body {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0.015 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-repeat: repeat;
+}
+
+/* Card hover lift */
+.fyn-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  will-change: transform;
+}
+.fyn-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(26, 16, 8, 0.1) !important;
+  border-color: rgba(169, 56, 56, 0.15) !important;
+}
+
+/* Stagger entrance for child cards */
+@keyframes fyn-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fyn-card-enter {
+  animation: fyn-card-in 0.4s ease-out both;
+}
+.fyn-stagger > * { animation: fyn-card-in 0.4s ease-out both; }
+.fyn-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.fyn-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.fyn-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.fyn-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.fyn-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.fyn-stagger > *:nth-child(6) { animation-delay: 400ms; }
+.fyn-stagger > *:nth-child(7) { animation-delay: 480ms; }
+.fyn-stagger > *:nth-child(8) { animation-delay: 560ms; }
+.fyn-stagger > *:nth-child(9) { animation-delay: 640ms; }
+.fyn-stagger > *:nth-child(n+10) { animation-delay: 720ms; }
+
+/* KPI cards inside a grid also stagger by position */
+.grid > .fyn-card-enter:nth-child(1) { animation-delay: 0ms; }
+.grid > .fyn-card-enter:nth-child(2) { animation-delay: 80ms; }
+.grid > .fyn-card-enter:nth-child(3) { animation-delay: 160ms; }
+.grid > .fyn-card-enter:nth-child(4) { animation-delay: 240ms; }
+.grid > .fyn-card-enter:nth-child(5) { animation-delay: 320ms; }
+.grid > .fyn-card-enter:nth-child(6) { animation-delay: 400ms; }
+
+/* Health glow pulses (border-side shadow loops) */
+@keyframes fyn-glow-green {
+  0%, 100% { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 12px -3px rgba(16,185,129,0.05); }
+  50%      { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 16px -3px rgba(16,185,129,0.18); }
+}
+@keyframes fyn-glow-gold {
+  0%, 100% { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 12px -3px rgba(212,175,55,0.05); }
+  50%      { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 16px -3px rgba(212,175,55,0.20); }
+}
+@keyframes fyn-glow-red {
+  0%, 100% { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 12px -3px rgba(169,56,56,0.06); }
+  50%      { box-shadow: 0 2px 8px rgba(26,16,8,0.06), -3px 0 18px -3px rgba(169,56,56,0.24); }
+}
+.fyn-pulse-green { animation: fyn-glow-green 3s ease-in-out infinite; }
+.fyn-pulse-gold  { animation: fyn-glow-gold 2.5s ease-in-out infinite; }
+.fyn-pulse-red   { animation: fyn-glow-red 2s ease-in-out infinite; }
+
+/* Breathing status labels (opacity heartbeat) */
+@keyframes fyn-breath-soft  { 0%,100%{ opacity: 0.72; } 50%{ opacity: 1; } }
+.fyn-breath-green { animation: fyn-breath-soft 3s ease-in-out infinite; }
+.fyn-breath-gold  { animation: fyn-breath-soft 2.5s ease-in-out infinite; }
+.fyn-breath-red   { animation: fyn-breath-soft 2s   ease-in-out infinite; }
+
+/* Trend arrow micro-bounce */
+@keyframes fyn-arrow-up   { 0%{ transform: translateY(0); } 40%{ transform: translateY(-4px); } 100%{ transform: translateY(0); } }
+@keyframes fyn-arrow-down { 0%{ transform: translateY(0); } 40%{ transform: translateY(4px); }  100%{ transform: translateY(0); } }
+.fyn-trend-up   .fyn-arrow { display: inline-block; animation: fyn-arrow-up 0.5s cubic-bezier(.34,1.56,.64,1) 1; }
+.fyn-trend-down .fyn-arrow { display: inline-block; animation: fyn-arrow-down 0.5s cubic-bezier(.34,1.56,.64,1) 1; }
+
+/* Live refresh icon: slow rotation */
+@keyframes fyn-slow-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+.fyn-slow-spin { animation: fyn-slow-spin 8s linear infinite; transform-origin: center; }
+
+/* Table row hover (slide-right) */
+.fyn-row {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+.fyn-row:hover {
+  background: rgba(169, 56, 56, 0.03);
+  transform: translateX(4px);
+}
+
+/* Alert ticker — bg pulse when critical, blinking dot */
+@keyframes fyn-alert-bg { 0%,100%{ background-color: rgba(169,56,56,0.03); } 50%{ background-color: rgba(169,56,56,0.08); } }
+.fyn-alert-critical { animation: fyn-alert-bg 2s ease-in-out infinite; }
+@keyframes fyn-dot-blink { 0%,100%{ opacity: 0.4; } 50%{ opacity: 1; } }
+.fyn-dot-blink { animation: fyn-dot-blink 1.5s ease-in-out infinite; }
+
+@media (max-width: 768px) {
+  .fyn-card-enter, .fyn-stagger > * { animation-duration: 0.28s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fyn-card-enter, .fyn-stagger > *, .fyn-pulse-green, .fyn-pulse-gold, .fyn-pulse-red,
+  .fyn-breath-green, .fyn-breath-gold, .fyn-breath-red, .fyn-slow-spin, .fyn-trend-up .fyn-arrow,
+  .fyn-trend-down .fyn-arrow, .fyn-alert-critical, .fyn-dot-blink {
+    animation: none !important;
+  }
+  .fyn-card-hover { transition: none; }
+}

@@ -13,7 +13,7 @@ import GovernanceTab from "./tabs/GovernanceTab";
 import HrTab from "./tabs/HrTab";
 import InvestorTab from "./tabs/InvestorTab";
 import AskFynnyTab from "./tabs/AskFynnyTab";
-import { IntelPage, ModeBanner, ACCENT } from "./_primitives";
+import { IntelPage, ModeBanner, ACCENT, LiveTimestamp } from "./_primitives";
 
 const TABS = [
   { id: "liquidity",  label: "Liquidity",   icon: Droplets,    Comp: LiquidityTab },
@@ -36,28 +36,35 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
     <IntelPage>
       <ModeBanner />
 
-      <nav className="flex items-center gap-1 bg-white rounded-lg p-1 overflow-x-auto" style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
-        {TABS.map((t) => {
-          const Icon = t.icon;
-          const isActive = active === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => setActive(t.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
-                isActive ? "text-white" : "text-[#6B6B6B] hover:text-fyn-ink hover:bg-[rgba(26,16,8,0.04)]",
-              )}
-              style={isActive ? { background: ACCENT.red } : undefined}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {t.label}
-            </button>
-          );
-        })}
-      </nav>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <nav className="flex items-center gap-1 bg-white rounded-lg p-1 overflow-x-auto" style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const isActive = active === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActive(t.id)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
+                  isActive ? "text-white" : "text-[#6B6B6B] hover:text-fyn-ink hover:bg-[rgba(26,16,8,0.04)]",
+                )}
+                style={isActive ? { background: ACCENT.red } : undefined}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {t.label}
+              </button>
+            );
+          })}
+        </nav>
+        <LiveTimestamp />
+      </div>
 
-      <Active />
+      <div key={active}>
+        <Active />
+      </div>
+
     </IntelPage>
   );
 }
+
