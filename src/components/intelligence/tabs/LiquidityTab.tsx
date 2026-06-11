@@ -88,35 +88,43 @@ export default function LiquidityTab() {
     return { cashBalance, operating, restricted, grossBurn, netBurn, runwayMonths, revenue30, dso, dpo, ccc, quickRatio, currentRatio, workingCapital, aging, overdue, payments, weekly };
   }, [bank, invoices, expenses, customers, vendors]);
 
-  const isEmpty = !invL && !bankL && !expL && (invoices?.length ?? 0) === 0;
+  const isEmpty = !invL && !bankL && !expL && (invoices?.length ?? 0) === 0 && (expenses?.length ?? 0) === 0 && (bank?.length ?? 0) === 0;
+  const isLive = mode === "live";
+  const liveEmpty = isLive && isEmpty;
+  const fmtMonths = (n: number) => (Number.isFinite(n) ? `${n.toFixed(1)} mo` : EMPTY);
+  const fmtDays = (n: number) => (Number.isFinite(n) ? `${n.toFixed(0)}d` : EMPTY);
+  const burnTone = liveEmpty ? "neutral" : m.netBurn > 0 && m.netBurn / Math.max(1, m.cashBalance) > 0.2 ? "critical" : m.netBurn > 0 ? "warning" : "healthy";
+  const runwayTone = liveEmpty || !Number.isFinite(m.runwayMonths) ? "neutral" : m.runwayMonths < 6 ? "critical" : m.runwayMonths < 12 ? "warning" : "healthy";
   const zeroDate = useMemo(() => {
-    if (m.netBurn <= 0 || m.cashBalance <= 0) return null;
+    if (!Number.isFinite(m.runwayMonths) || m.netBurn <= 0 || m.cashBalance <= 0) return null;
     const days = (m.cashBalance / m.netBurn) * 30;
     const d = new Date();
     d.setDate(d.getDate() + Math.round(days));
     return d.toISOString().slice(0, 10);
   }, [m]);
+  const hasCriticalAlert = !liveEmpty && (m.aging.d61_90 + m.aging.d90) > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 fyn-stagger">
       {/* Alert ticker */}
-      <div className="bg-white rounded-md px-4 py-2 flex items-center gap-3 overflow-hidden" style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+      <div className={`bg-white rounded-md px-4 py-2 flex items-center gap-3 overflow-hidden ${hasCriticalAlert ? "fyn-alert-critical" : ""}`} style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+        {hasCriticalAlert && <span className="w-1.5 h-1.5 rounded-full fyn-dot-blink flex-shrink-0" style={{ background: ACCENT.red }} />}
         <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT.red }} />
         <div className="flex gap-8 text-xs text-fyn-ink animate-[ticker-scroll_30s_linear_infinite] whitespace-nowrap">
           <span>GST filing due in 3 days</span>
           <span>•</span>
           <span>Receivables {fmtCompact(m.aging.d61_90 + m.aging.d90)} overdue 60+ days</span>
           <span>•</span>
-          <span>Burn multiple {m.revenue30 > 0 ? (m.netBurn / m.revenue30).toFixed(2) : "—"}x</span>
+          <span>Burn multiple {m.revenue30 > 0 ? (m.netBurn / m.revenue30).toFixed(2) : EMPTY}x</span>
         </div>
       </div>
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Cash Balance" value={fmtCompact(m.cashBalance)} sub={`Operating ${fmtCompact(m.operating)}`} />
-        <KPI label="Runway" value={`${m.runwayMonths.toFixed(1)} mo`} sub={zeroDate ? `Zero by ${zeroDate}` : "—"} deltaTone={m.runwayMonths < 6 ? "down" : "up"} delta={m.runwayMonths < 6 ? "Low" : "Healthy"} />
-        <KPI label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} />
-        <KPI label="Working Capital" value={fmtCompact(m.workingCapital)} sub={`Quick Ratio ${m.quickRatio.toFixed(2)}`} />
+        <KPI label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
+        <KPI label="Runway" value={fmtMonths(m.runwayMonths)} isEmpty={liveEmpty || !Number.isFinite(m.runwayMonths)} emptySub={liveEmpty ? "Upload data to calculate" : "Profitable — no burn"} sub={zeroDate ? `Zero by ${zeroDate}` : undefined} deltaTone={Number.isFinite(m.runwayMonths) && m.runwayMonths < 6 ? "down" : "up"} delta={Number.isFinite(m.runwayMonths) ? (m.runwayMonths < 6 ? "Low" : "Healthy") : undefined} tone={runwayTone} />
+        <KPI label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
+        <KPI label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
 
       {/* Cash position + CCC */}
@@ -124,20 +132,20 @@ export default function LiquidityTab() {
         <IntelCard title="Cash Conversion Cycle" sub="DSO + DIO − DPO">
           <div className="space-y-3">
             <div>
-              <p className="font-mono text-3xl text-fyn-ink font-semibold">{m.ccc.toFixed(0)} <span className="text-sm text-[#6B6B6B] font-sans">days</span></p>
+              <p className="font-mono text-3xl text-fyn-ink font-semibold">{Number.isFinite(m.ccc) ? m.ccc.toFixed(0) : EMPTY} <span className="text-sm text-[#6B6B6B] font-sans">days</span></p>
             </div>
             <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(26,16,8,0.08)]">
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DSO</p><p className="font-mono text-base text-fyn-ink">{m.dso.toFixed(0)}d</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DSO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dso)}</p></div>
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">12d</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DPO</p><p className="font-mono text-base text-fyn-ink">{m.dpo.toFixed(0)}d</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DPO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dpo)}</p></div>
             </div>
           </div>
         </IntelCard>
 
         <IntelCard title="Liquidity Ratios">
           <div className="space-y-3">
-            <Row label="Quick Ratio" value={m.quickRatio.toFixed(2)} />
-            <Row label="Current Ratio" value={m.currentRatio.toFixed(2)} />
+            <Row label="Quick Ratio" value={Number.isFinite(m.quickRatio) ? m.quickRatio.toFixed(2) : EMPTY} />
+            <Row label="Current Ratio" value={Number.isFinite(m.currentRatio) ? m.currentRatio.toFixed(2) : EMPTY} />
             <Row label="Cash Balance" value={fmtCompact(m.cashBalance)} />
             <Row label="Restricted Cash" value={fmtCompact(m.restricted)} />
           </div>
@@ -146,18 +154,19 @@ export default function LiquidityTab() {
         <IntelCard title="Scenario Planning" sub="Runway under different revenue scenarios">
           <div className="space-y-2">
             {[
-              { label: "Best Case (+20%)", months: m.runwayMonths * 1.35, tone: "green" as const },
-              { label: "Base Case", months: m.runwayMonths, tone: "gold" as const },
-              { label: "Worst Case (−20%)", months: m.runwayMonths * 0.68, tone: "red" as const },
+              { label: "Best Case (+20%)", months: m.runwayMonths * 1.35 },
+              { label: "Base Case", months: m.runwayMonths },
+              { label: "Worst Case (−20%)", months: m.runwayMonths * 0.68 },
             ].map((s) => (
               <div key={s.label} className="flex items-center justify-between text-sm">
                 <span className="text-fyn-ink">{s.label}</span>
-                <span className="font-mono text-fyn-ink font-semibold">{s.months.toFixed(1)} mo</span>
+                <span className="font-mono text-fyn-ink font-semibold">{fmtMonths(s.months)}</span>
               </div>
             ))}
             <button className="w-full mt-3 text-xs font-medium py-2 rounded-md text-white" style={{ background: ACCENT.red }}>Model Custom Scenario</button>
           </div>
         </IntelCard>
+
       </div>
 
       {/* 13-week forecast */}
