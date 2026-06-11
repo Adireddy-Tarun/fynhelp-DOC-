@@ -207,12 +207,15 @@ export default function LiquidityTab() {
                     <span className="text-fyn-ink">{row.label}</span>
                     <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(row.value)}</span>
                   </div>
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: row.tone === "green" ? ACCENT.green : row.tone === "gold" ? ACCENT.gold : row.tone === "amber" ? ACCENT.amber : ACCENT.red }} />
-                  </div>
+                  <AnimatedBar
+                    pct={pct}
+                    delay={i * 100}
+                    color={row.tone === "green" ? ACCENT.green : row.tone === "gold" ? ACCENT.gold : row.tone === "amber" ? ACCENT.amber : ACCENT.red}
+                  />
                 </div>
               );
             })}
+
           </div>
         </IntelCard>
 
