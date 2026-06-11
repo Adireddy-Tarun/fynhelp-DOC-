@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useInvoices, useCustomers } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients } from "../_primitives";
+import { useInvoices, useCustomers, useMode } from "../DataSource";
+import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+
 
 export default function RevenueTab() {
   const { data: invoices, isLoading } = useInvoices();
