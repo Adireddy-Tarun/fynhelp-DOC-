@@ -2986,6 +2986,15 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_latest_demo_insight: {
+        Args: { p_org_id: string }
+        Returns: {
+          created_at: string
+          data: Json
+          id: string
+          org_id: string
+        }[]
+      }
       get_user_business_id: { Args: never; Returns: string }
       get_user_ca_firm_id: { Args: never; Returns: string }
       has_role: {

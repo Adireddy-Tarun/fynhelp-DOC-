@@ -767,14 +767,10 @@ export function DemoDashboard() {
     const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
     const fetchInsights = async (organizationId: string) => {
-      // 1. Try cache
-      const { data: cached } = await supabase
-        .from('demo_insights')
-        .select('*')
-        .eq('org_id', organizationId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
+      // 1. Try cache via SECURITY DEFINER RPC scoped to this demo org id
+      const { data: cachedRows } = await (supabase as any)
+        .rpc('get_latest_demo_insight', { p_org_id: organizationId })
+      const cached = Array.isArray(cachedRows) ? cachedRows[0] as { data: any; created_at: string } | undefined : null
 
       // 2. Fresh cache hit (<24h)
       if (cached?.data) {
