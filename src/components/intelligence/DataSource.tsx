@@ -53,7 +53,7 @@ function useScopedTable<T>(table: string, opts?: { order?: string; ascending?: b
 export type Customer = { id: string; customer_name: string; total_receivable: number; payment_terms_days: number | null; city: string | null; credit_limit?: number; gstin?: string };
 export type Vendor = { id: string; vendor_name: string; total_outstanding: number; category?: string; gstin?: string; city: string | null };
 export type Invoice = { id: string; customer_id: string | null; invoice_number: string; invoice_date: string; due_date: string | null; total_amount: number; paid_amount: number; outstanding_amount: number; status: string; payment_date: string | null; subtotal: number; tax_amount: number };
-export type Expense = { id: string; vendor_id: string | null; amount: number; date: string; category: string | null; subcategory: string | null; description: string | null; payment_status: string };
+export type Expense = { id: string; vendor_id: string | null; amount: number; date: string; due_date: string | null; category: string | null; subcategory: string | null; description: string | null; payment_status: string };
 export type BankTxn = { id: string; date: string; amount: number; type: "credit" | "debit"; balance: number; category: string | null; description: string | null };
 export type EmployeeDemo = { id: string; name: string; department: string | null; designation: string | null; salary: number; cost_to_company: number; joining_date: string | null; status: string };
 export type GstFiling = { id: string; filing_type: string; period: string; due_date: string | null; filed_date: string | null; status: string; tax_liability: number; itc_claimed: number; net_payable: number };
