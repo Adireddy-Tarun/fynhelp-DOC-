@@ -89,6 +89,8 @@ import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoDashboard from "./pages/demo/DemoDashboard.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
+import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
+import DashboardLayout from "./components/DashboardLayout.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
@@ -159,33 +161,44 @@ const App = () => (
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
             <Route path="/demo/dashboard" element={<DemoDashboard />} />
-            {/* Public read-only demo of the real dashboard, backed by seeded data */}
-            <Route path="/demo" element={<Navigate to="/demo/cockpit" replace />} />
-            <Route path="/demo/cockpit"   element={<DemoModeBanner><CockpitPage /></DemoModeBanner>} />
-            <Route path="/demo/customers" element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
-            <Route path="/demo/vendors"   element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
-            <Route path="/demo/invoices"  element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
-            <Route path="/demo/expenses"  element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
-            <Route path="/demo/employees" element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
-            <Route path="/demo/gst"       element={<DemoModeBanner><GSTPage /></DemoModeBanner>} />
+            {/* Public demo — fully-loaded intelligence dashboard, beige theme */}
+            <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
+            <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
+            <Route path="/demo/liquidity"  element={<IntelligencePage mode="demo" tab="liquidity" />} />
+            <Route path="/demo/revenue"    element={<IntelligencePage mode="demo" tab="revenue" />} />
+            <Route path="/demo/cost"       element={<IntelligencePage mode="demo" tab="cost" />} />
+            <Route path="/demo/gst"        element={<IntelligencePage mode="demo" tab="gst" />} />
+            <Route path="/demo/governance" element={<IntelligencePage mode="demo" tab="governance" />} />
+            <Route path="/demo/hr"         element={<IntelligencePage mode="demo" tab="hr" />} />
+            <Route path="/demo/investor"   element={<IntelligencePage mode="demo" tab="investor" />} />
+            <Route path="/demo/fynny"      element={<IntelligencePage mode="demo" tab="fynny" />} />
+            <Route path="/demo/customers"  element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
+            <Route path="/demo/vendors"    element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
+            <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
+            <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
+            <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="/dashboard/cockpit" element={<CockpitPage />} />
+            {/* Real dashboard — same beige intelligence tabs with live data */}
+            <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
             <Route path="/dashboard/360" element={<Dashboard360Page />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
-            <Route path="/dashboard/liquidity" element={<LiquidityIntelligencePage />} />
-            <Route path="/dashboard/revenue-intelligence" element={<RevenueIntelligencePage />} />
+            <Route path="/dashboard/liquidity"            element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
+            <Route path="/dashboard/revenue-intelligence" element={<DashboardLayout><IntelligencePage mode="live" tab="revenue" /></DashboardLayout>} />
+            <Route path="/dashboard/cost"                 element={<DashboardLayout><IntelligencePage mode="live" tab="cost" /></DashboardLayout>} />
+            <Route path="/dashboard/gst"                  element={<DashboardLayout><IntelligencePage mode="live" tab="gst" /></DashboardLayout>} />
+            <Route path="/dashboard/compliance"           element={<DashboardLayout><IntelligencePage mode="live" tab="governance" /></DashboardLayout>} />
+            <Route path="/dashboard/hr"                   element={<DashboardLayout><IntelligencePage mode="live" tab="hr" /></DashboardLayout>} />
+            <Route path="/dashboard/investor"             element={<DashboardLayout><IntelligencePage mode="live" tab="investor" /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<SimulatorPage />} />
-            <Route path="/dashboard/gst" element={<GSTPage />} />
             <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
-            <Route path="/dashboard/hr" element={<HRPage />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
-            <Route path="/dashboard/nidhi" element={<FynnyChatPage />} />
-            <Route path="/dashboard/nidhi-chat" element={<FynnyChatPage />} />
-            <Route path="/dashboard/fynny-chat" element={<FynnyChatPage />} />
+            <Route path="/dashboard/nidhi"      element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
+            <Route path="/dashboard/nidhi-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
+            <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/reports" element={<CFOReportsPage />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
@@ -193,8 +206,6 @@ const App = () => (
             <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
             <Route path="/dashboard/expenses" element={<ExpensesListPage />} />
             <Route path="/dashboard/employees" element={<EmployeesListPage />} />
-            <Route path="/dashboard/cost" element={<CostPage />} />
-            <Route path="/dashboard/compliance" element={<CompliancePage />} />
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
             <Route path="/dashboard/working-capital" element={<Navigate to="/dashboard/liquidity" replace />} />
