@@ -64,55 +64,53 @@ export function downloadReportPdf(
   const statusLabel = report.delivered ? "Delivered" : "Ready";
 
   // ---------- Reusable chrome ----------
-  // Renders the FynHelp logo SVG (icon + wordmark + tagline) using jsPDF
-  // vector primitives. Mirrors src/components/FynLogo.tsx exactly:
-  // - 48x48 rounded beige square with ink border
-  // - Three ascending ink bars
-  // - Red trend line with red dot
+  // Renders the FynHelp logo (icon + wordmark + tagline) using jsPDF
+  // vector primitives. Mirrors src/components/FynLogo.tsx (24x24 viewBox):
+  // - White rounded square with ink border
+  // - Three horizontal ink bars (ascending widths)
+  // - Red diagonal trend line with red end dot
+  // - Red underline accent
   // - "Fyn" ink + "Help" red serif wordmark
-  // - Gold "FIND YOUR NUMBERS" tagline
   const drawLogo = (originX: number, originY: number) => {
-    const iconSize = 36; // pt, proportional to header band
-    const scale = iconSize / 48; // SVG viewBox is 48x48
+    const iconSize = 32; // pt
+    const scale = iconSize / 24; // SVG viewBox is 24x24
     const sx = (n: number) => originX + n * scale;
     const sy = (n: number) => originY + n * scale;
 
-    // Rounded square background (beige with ink border)
-    doc.setFillColor(...BRAND.beige);
+    // Rounded square (white fill, ink border)
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(...BRAND.ink);
+    doc.setLineWidth(1.5 * scale);
+    doc.roundedRect(sx(1), sy(1), 22 * scale, 22 * scale, 2 * scale, 2 * scale, "FD");
+
+    // Three horizontal ink bars (ascending), round caps
     doc.setDrawColor(...BRAND.ink);
     doc.setLineWidth(2 * scale);
-    doc.roundedRect(
-      sx(1),
-      sy(1),
-      46 * scale,
-      46 * scale,
-      4 * scale,
-      4 * scale,
-      "FD"
-    );
-
-    // Three ascending ink bars (rx=1)
-    doc.setFillColor(...BRAND.ink);
-    doc.roundedRect(sx(8), sy(32), 12 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
-    doc.roundedRect(sx(8), sy(25), 20 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
-    doc.roundedRect(sx(8), sy(18), 28 * scale, 4 * scale, 1 * scale, 1 * scale, "F");
-
-    // Red trend line, round caps
-    doc.setDrawColor(...BRAND.red);
-    doc.setLineWidth(2 * scale);
     doc.setLineCap("round");
-    doc.line(sx(14), sy(36), sx(36), sy(12));
+    doc.line(sx(4), sy(17), sx(10), sy(17));
+    doc.line(sx(4), sy(13), sx(12), sy(13));
+    doc.line(sx(4), sy(9), sx(8), sy(9));
 
-    // Red end dot (r=4)
+    // Red diagonal trend line
+    doc.setDrawColor(...BRAND.red);
+    doc.setLineWidth(1.5 * scale);
+    doc.line(sx(8), sy(14), sx(18), sy(6));
+
+    // Red end dot
     doc.setFillColor(...BRAND.red);
-    doc.circle(sx(36), sy(12), 4 * scale, "F");
+    doc.circle(sx(18), sy(6), 2 * scale, "F");
+
+    // Red underline accent
+    doc.setDrawColor(...BRAND.red);
+    doc.setLineWidth(1.5 * scale);
+    doc.line(sx(8), sy(21), sx(16), sy(21));
     doc.setLineCap("butt");
 
     // Wordmark "Fyn" (ink) + "Help" (red), serif
-    const wordmarkX = originX + iconSize + 10;
-    const wordmarkBaseline = originY + iconSize * 0.62;
+    const wordmarkX = originX + iconSize + 8;
+    const wordmarkBaseline = originY + iconSize * 0.66;
     doc.setFont("times", "bold");
-    doc.setFontSize(22);
+    doc.setFontSize(20);
     doc.setTextColor(...BRAND.ink);
     doc.text("Fyn", wordmarkX, wordmarkBaseline);
     const fynWidth = doc.getTextWidth("Fyn");
@@ -124,7 +122,7 @@ export function downloadReportPdf(
     doc.setFontSize(7);
     doc.setTextColor(...BRAND.gold);
     doc.setCharSpace(1.2);
-    doc.text("FIND YOUR NUMBERS", wordmarkX, wordmarkBaseline + 11);
+    doc.text("FIND YOUR NUMBERS", wordmarkX, wordmarkBaseline + 10);
     doc.setCharSpace(0);
   };
 
