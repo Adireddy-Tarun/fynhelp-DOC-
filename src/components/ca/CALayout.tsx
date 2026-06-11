@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate, Outlet, Navigate } from "react-router-dom";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import FynLogo from "@/components/FynLogo";
 import {
   Home, Grid3x3, Bell, Calendar, FileText, Calculator, Shield,
   CheckCircle2, BarChart3, Layers, Activity, IndianRupee,
