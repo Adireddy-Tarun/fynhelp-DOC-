@@ -198,9 +198,10 @@ export default function LiquidityTab() {
               { label: "31-60 days", value: m.aging.d31_60, tone: "gold" as const },
               { label: "61-90 days", value: m.aging.d61_90, tone: "amber" as const },
               { label: "90+ days", value: m.aging.d90, tone: "red" as const },
-            ].map((row) => {
+            ].map((row, i) => {
               const total = m.aging.current + m.aging.d31_60 + m.aging.d61_90 + m.aging.d90 || 1;
               const pct = (row.value / total) * 100;
+
               return (
                 <div key={row.label} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
