@@ -88,8 +88,8 @@ export default function CALayout() {
       <aside className="w-[260px] flex-shrink-0 fixed inset-y-0 left-0 flex flex-col z-40" style={{ background: "#1A1008" }}>
         {/* Top: logo */}
         <div className="px-5 py-4 h-16 flex flex-col justify-center">
-          <div className="text-white font-bold text-lg tracking-tight">FynHelp</div>
-          <div className="text-[10px] font-medium uppercase tracking-[0.12em]" style={{ color: "#8B6914" }}>
+          <FynLogo variant="light" size="md" />
+          <div className="text-[10px] font-medium uppercase tracking-[0.12em] mt-1" style={{ color: "#8B6914" }}>
             CA Partner Portal
           </div>
         </div>
