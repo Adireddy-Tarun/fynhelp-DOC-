@@ -30,8 +30,10 @@ export default function LiquidityTab() {
     const c30 = new Date(now.getTime() - 30 * 86400000);
     const grossBurn = exp.filter((e) => new Date(e.date) >= c30).reduce((s, e) => s + Number(e.amount), 0);
     const revenue30 = inv.filter((i) => i.status === "paid" && i.payment_date && new Date(i.payment_date) >= c30).reduce((s, i) => s + Number(i.paid_amount), 0);
-    const netBurn = Math.max(0, grossBurn - revenue30);
-    const runwayMonths = netBurn > 0 ? cashBalance / netBurn : 99;
+    // Net burn = total expenses − total paid invoices (last 30 days). Can be negative if profitable.
+    const netBurn = grossBurn - revenue30;
+    const runwayMonths = netBurn > 0 && cashBalance > 0 ? cashBalance / netBurn : NaN;
+
 
     // AR aging
     const aging = { current: 0, d31_60: 0, d61_90: 0, d90: 0 };
