@@ -226,7 +226,7 @@ export default function LiquidityTab() {
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5">
                         <p className="text-fyn-ink font-medium text-xs">{r.customer_name}</p>
                         <p className="text-[11px] text-[#6B6B6B]">{r.invoice_number}</p>
@@ -264,7 +264,7 @@ export default function LiquidityTab() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
                     <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.vendor_name}</td>
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.category ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(r.amount)}</td>

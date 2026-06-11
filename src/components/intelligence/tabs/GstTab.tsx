@@ -52,7 +52,7 @@ export default function GstTab() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
                     <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.filing_type}</td>
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.period}</td>
                     <td className="py-2.5"><Badge tone={statusTone(r.status)}>{r.status}</Badge></td>
