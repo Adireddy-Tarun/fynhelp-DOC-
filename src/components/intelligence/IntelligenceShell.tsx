@@ -60,9 +60,10 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
         <LiveTimestamp />
       </div>
 
-      <div key={active} className="fyn-stagger space-y-6">
+      <div key={active}>
         <Active />
       </div>
+
     </IntelPage>
   );
 }
