@@ -143,17 +143,18 @@ export default function RevenueTab() {
         </div>
       }>
         <div className="space-y-3">
-          {m.breakdown.map((row) => (
+          {m.breakdown.length === 0 ? (
+            <p className="text-sm text-[#9B9B9B] text-center py-6">{EMPTY} <span className="ml-2">Upload data to calculate</span></p>
+          ) : m.breakdown.map((row, i) => (
             <div key={row.label}>
               <div className="flex items-center justify-between text-sm mb-1">
                 <span className="text-fyn-ink">{row.label}</span>
                 <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(row.value)} <span className="text-[#6B6B6B] text-xs">({row.pct}%)</span></span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${row.pct * 3}%`, background: `linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})` }} />
-              </div>
+              <AnimatedBar pct={row.pct * 3} delay={i * 100} height={8} color={`linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})`} />
             </div>
           ))}
+
         </div>
       </IntelCard>
 
