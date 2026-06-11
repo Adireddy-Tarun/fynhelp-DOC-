@@ -67,14 +67,15 @@ export default function LiquidityTab() {
     const recv = inv.reduce((s, i) => s + Number(i.outstanding_amount), 0);
     const pay = exp.filter((e) => e.payment_status !== "Paid").reduce((s, e) => s + Number(e.amount), 0);
     const cogs90 = exp.filter((e) => new Date(e.date) >= c90).reduce((s, e) => s + Number(e.amount), 0);
-    const dso = sales90 > 0 ? (recv / sales90) * 90 : 0;
-    const dpo = cogs90 > 0 ? (pay / cogs90) * 90 : 0;
+    const dso = sales90 > 0 ? (recv / sales90) * 90 : NaN;
+    const dpo = cogs90 > 0 ? (pay / cogs90) * 90 : NaN;
     const dio = 12; // proxy
-    const ccc = dso + dio - dpo;
+    const ccc = Number.isFinite(dso) && Number.isFinite(dpo) ? dso + dio - dpo : NaN;
 
-    const quickRatio = pay > 0 ? (cashBalance + recv) / pay : 0;
-    const currentRatio = pay > 0 ? (cashBalance + recv) / pay : 0;
+    const quickRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
+    const currentRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
     const workingCapital = cashBalance + recv - pay;
+
 
     // 13-week forecast
     const weekly: { week: string; inflow: number; outflow: number; net: number }[] = [];
