@@ -1658,6 +1658,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <FAQSection />
+
       {/* FINAL CTA */}
       <section className="section" style={{ paddingBottom: 40 }}>
         <div className="fyn-container">
