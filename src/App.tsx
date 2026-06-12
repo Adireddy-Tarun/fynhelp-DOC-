@@ -43,7 +43,6 @@ import WaitlistPage from "./pages/WaitlistPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
-import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
 
 import LiquidityIntelligencePage from "./pages/dashboard/LiquidityIntelligencePage.tsx";
@@ -87,7 +86,6 @@ import NotFound from "./pages/NotFound.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
-import DemoDashboard from "./pages/demo/DemoDashboard.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
 import DashboardLayout from "./components/DashboardLayout.tsx";
@@ -160,7 +158,7 @@ const App = () => (
             <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
-            <Route path="/demo/dashboard" element={<DemoDashboard />} />
+            <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
             {/* Public demo — fully-loaded intelligence dashboard, beige theme */}
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
@@ -181,7 +179,7 @@ const App = () => (
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Real dashboard — same beige intelligence tabs with live data */}
             <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
-            <Route path="/dashboard/360" element={<Dashboard360Page />} />
+            <Route path="/dashboard/360" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/liquidity"            element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
@@ -215,7 +213,7 @@ const App = () => (
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
-            <Route path="/admin/resources" element={<AdminResourcesPage />} />
+            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />
