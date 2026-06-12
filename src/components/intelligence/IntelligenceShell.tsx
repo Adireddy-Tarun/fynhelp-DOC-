@@ -61,7 +61,10 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
             );
           })}
         </nav>
-        <LiveTimestamp />
+        <div className="flex items-center gap-3">
+          <LiveTimestamp />
+          <HeaderToolbar />
+        </div>
       </div>
 
       <div key={active}>
