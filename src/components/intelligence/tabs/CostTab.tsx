@@ -102,13 +102,13 @@ export default function CostTab() {
 
       {/* Vendor analysis */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <IntelCard title="Top Vendors by Spend" action={<Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge>}>
+        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/demo/vendors" /></div>}>
           <WithData data={m.vendorSpend.slice(0, 6)} cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((v) => (
-                    <tr key={v.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                    <tr key={v.id} onClick={() => openDrawer("vendor", v.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2 text-xs text-fyn-ink font-medium">{v.name}</td>
                       <td className="py-2 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(v.total)}</td>
                     </tr>
