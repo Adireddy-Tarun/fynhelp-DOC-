@@ -213,7 +213,7 @@ const App = () => (
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
-            <Route path="/admin/resources" element={<AdminResourcesPage />} />
+            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={null} />
               <Route path="profile" element={<ProfilePage />} />
