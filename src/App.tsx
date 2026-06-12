@@ -86,7 +86,6 @@ import NotFound from "./pages/NotFound.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
-import DemoDashboard from "./pages/demo/DemoDashboard.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
 import DashboardLayout from "./components/DashboardLayout.tsx";
