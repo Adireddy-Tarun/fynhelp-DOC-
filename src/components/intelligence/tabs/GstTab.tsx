@@ -122,6 +122,10 @@ export default function GstTab() {
           </tbody>
         </table>
       </IntelCard>
+
+      <EwayBillSection />
+      <HsnMasterSection />
+      <TaxPlanningSection />
     </div>
   );
 }
