@@ -226,13 +226,13 @@ export default function LiquidityTab() {
           </div>
         </IntelCard>
 
-        <IntelCard title="Overdue Invoices" sub="Action required" action={<Badge tone="red">{m.overdue.length} overdue</Badge>}>
+        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/demo/invoices?status=overdue" /></div>}>
           <WithData data={m.overdue} emptyTitle="No overdue invoices" emptyDescription="All receivables on track." cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} onClick={() => openDrawer("invoice", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5">
                         <p className="text-fyn-ink font-medium text-xs">{r.customer_name}</p>
                         <p className="text-[11px] text-[#6B6B6B]">{r.invoice_number}</p>
@@ -242,9 +242,7 @@ export default function LiquidityTab() {
                         <Badge tone={r.daysOver > 60 ? "red" : "amber"}>{r.daysOver}d overdue</Badge>
                       </td>
                       <td className="py-2.5 pl-3 text-right">
-                        <button className="inline-flex items-center gap-1 text-[11px] font-medium text-white px-2 py-1 rounded" style={{ background: ACCENT.red }}>
-                          <Phone className="w-3 h-3" /> Remind
-                        </button>
+                        <RemindButton customerName={r.customer_name} />
                       </td>
                     </tr>
                   ))}
