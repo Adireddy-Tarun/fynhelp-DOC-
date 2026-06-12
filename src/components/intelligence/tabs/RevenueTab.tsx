@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useInvoices, useCustomers, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+import { CustomerAcquisitionSection, CohortRetentionSection, SalesPipelineSection, RevenueBreakdownSection, DeferredRevenueSection } from "./sections/NewSections";
 
 
 export default function RevenueTab() {
@@ -232,6 +233,13 @@ export default function RevenueTab() {
           </div>
         </IntelCard>
       </div>
+
+      {/* ── New wired sections ─────────────────────────────── */}
+      <CustomerAcquisitionSection />
+      <CohortRetentionSection />
+      <SalesPipelineSection />
+      <RevenueBreakdownSection active={breakdownBy} setActive={setBreakdownBy} />
+      <DeferredRevenueSection />
     </div>
   );
 }

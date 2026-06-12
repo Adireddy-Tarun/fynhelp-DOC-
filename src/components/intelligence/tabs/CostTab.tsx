@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { AlertTriangle } from "lucide-react";
+import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
@@ -171,6 +172,9 @@ export default function CostTab() {
           <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Vendor consolidation: 3 stationary vendors → 1, save ₹8K/mo</span></li>
         </ul>
       </IntelCard>
+
+      <SubscriptionAuditSection />
+      <ContractRenewalsSection />
     </div>
   );
 }

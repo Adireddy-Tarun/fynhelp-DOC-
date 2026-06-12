@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useEmployees, useInvoices } from "../DataSource";
 import { IntelCard, KPI, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
+import { EsopSection, HiringPipelineSection, CompBenchmarksSection } from "./sections/NewSections";
 
 export default function HrTab() {
   const { data: emps, isLoading } = useEmployees();
@@ -98,6 +99,10 @@ export default function HrTab() {
           )}
         </WithData>
       </IntelCard>
+
+      <EsopSection />
+      <HiringPipelineSection />
+      <CompBenchmarksSection />
     </div>
   );
 }
