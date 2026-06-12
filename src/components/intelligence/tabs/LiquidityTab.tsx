@@ -127,10 +127,10 @@ export default function LiquidityTab() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
+        <KPI href="/demo/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
         <KPI label="Runway" value={fmtMonths(m.runwayMonths)} isEmpty={liveEmpty || !Number.isFinite(m.runwayMonths)} emptySub={liveEmpty ? "Upload data to calculate" : "Profitable — no burn"} sub={zeroDate ? `Zero by ${zeroDate}` : undefined} deltaTone={Number.isFinite(m.runwayMonths) && m.runwayMonths < 6 ? "down" : "up"} delta={Number.isFinite(m.runwayMonths) ? (m.runwayMonths < 6 ? "Low" : "Healthy") : undefined} tone={runwayTone} />
-        <KPI label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
-        <KPI label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
+        <KPI href="/demo/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
+        <KPI href="/demo/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
 
       {/* Cash position + CCC */}
