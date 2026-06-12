@@ -33,6 +33,7 @@ export type TabId = typeof TABS[number]["id"];
 export default function IntelligenceShell({ initialTab = "liquidity" }: { initialTab?: TabId }) {
   const [active, setActive] = useState<TabId>(initialTab);
   const Active = TABS.find((t) => t.id === active)?.Comp ?? LiquidityTab;
+  const mode = useMode();
 
   return (
     <IntelPage>
@@ -66,6 +67,20 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
         <Active />
       </div>
 
+      {mode === "demo" && (
+        <footer
+          className="mt-10 pt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs"
+          style={{ borderTop: "1px solid rgba(26,16,8,0.08)", color: "#6B6B6B" }}
+        >
+          <span>Exploring the FynHelp demo. No sign-in needed.</span>
+          <Link to="/demo/login" className="hover:text-fyn-ink transition-colors underline-offset-4 hover:underline">
+            Preview Login Flow →
+          </Link>
+          <Link to="/demo/onboarding" className="hover:text-fyn-ink transition-colors underline-offset-4 hover:underline">
+            Preview Onboarding →
+          </Link>
+        </footer>
+      )}
     </IntelPage>
   );
 }
