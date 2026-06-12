@@ -105,21 +105,23 @@ export default function GstTab() {
               <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
               <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">GST</th>
               <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
+              <th className="py-2"></th>
             </tr>
           </thead>
           <tbody>
             {[
-              { gstin: "27AABCU9603R1ZX", inv: "PUR-2025-441", val: 124000, gst: 22320, status: "Matched" as const, tone: "green" as const },
-              { gstin: "07AAACI1681G1ZP", inv: "PUR-2025-442", val: 87500, gst: 15750, status: "Mismatch" as const, tone: "amber" as const },
-              { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const },
-              { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const },
+              { gstin: "27AABCU9603R1ZX", inv: "PUR-2025-441", val: 124000, gst: 22320, status: "Matched" as const, tone: "green" as const, reconcilable: false },
+              { gstin: "07AAACI1681G1ZP", inv: "PUR-2025-442", val: 87500, gst: 15750, status: "Mismatch" as const, tone: "amber" as const, reconcilable: true },
+              { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const, reconcilable: true },
+              { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const, reconcilable: false },
             ].map((r) => (
-              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                 <td className="py-2.5 font-mono text-xs text-fyn-ink">{r.gstin}</td>
                 <td className="py-2.5 text-xs text-[#6B6B6B]">{r.inv}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.val)}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.gst)}</td>
                 <td className="py-2.5 pl-3"><Badge tone={r.tone}>{r.status}</Badge></td>
+                <td className="py-2.5 text-right">{r.reconcilable && <ReconcileButton label={r.gstin} />}</td>
               </tr>
             ))}
           </tbody>
@@ -129,6 +131,8 @@ export default function GstTab() {
       <EwayBillSection />
       <HsnMasterSection />
       <TaxPlanningSection />
+
+      <GstFilingDialog open={!!filingOpen} onOpenChange={(v) => !v && setFilingOpen(null)} period={filingOpen ?? undefined} />
     </div>
   );
 }
