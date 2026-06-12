@@ -63,7 +63,7 @@ export const useCustomers = () => useScopedTable<Customer>("customers", { order:
 export const useVendors = () => useScopedTable<Vendor>("vendors", { order: "vendor_name", ascending: true });
 export const useInvoices = () => useScopedTable<Invoice>("invoices", { order: "invoice_date" });
 export const useExpenses = () => useScopedTable<Expense>("expenses", { order: "date" });
-export const useBankTxns = () => useScopedTable<BankTxn>("date", { order: "date" });
+export const useBankTxns = () => useScopedTable<BankTxn>("bank_transactions", { order: "date" });
 export const useEmployees = () => useScopedTable<EmployeeDemo>("employees_demo", { order: "department", ascending: true });
 export const useGstFilings = () => useScopedTable<GstFiling>("gst_filings_demo", { order: "due_date" });
 
