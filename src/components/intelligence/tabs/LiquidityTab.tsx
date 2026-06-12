@@ -105,6 +105,11 @@ export default function LiquidityTab() {
   }, [m]);
   const hasCriticalAlert = !liveEmpty && (m.aging.d61_90 + m.aging.d90) > 0;
 
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [optimizeOpen, setOptimizeOpen] = useState(false);
+  const [priorityDismissed, setPriorityDismissed] = useState(false);
+  const openDrawer = useOpenDrawer();
+
   return (
     <div className="space-y-6 fyn-stagger">
       {/* Alert ticker */}
