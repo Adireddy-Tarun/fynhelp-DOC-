@@ -127,7 +127,7 @@ export default function CostTab() {
             </div>
           </div>
           <div className="space-y-2">
-            <button className="w-full text-xs font-medium py-2 rounded-md text-white" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
+            <button onClick={() => setSpendOpen(true)} className="w-full text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
             <div className="grid grid-cols-3 gap-2 text-[11px] text-[#6B6B6B] text-center">
               <span>Approval Workflow</span>
               <span>Centralize Procurement</span>
