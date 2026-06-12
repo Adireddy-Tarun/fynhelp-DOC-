@@ -88,6 +88,10 @@ export default function GovernanceTab() {
           </ResponsiveContainer>
         </div>
       </IntelCard>
+
+      <BalanceSheetSection />
+      <RiskRegisterSection />
+      <InsuranceSection />
     </div>
   );
 }
