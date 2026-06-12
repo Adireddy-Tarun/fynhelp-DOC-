@@ -63,12 +63,15 @@ export default function CostTab() {
     return { totalOpex, cogs, grossMargin, ebitda, ebitdaMargin, byCategory, vendorSpend, concentration, personnelTotal, personnelPct, avgCost, revenuePerEmp, byDept, burnMultiple };
   }, [expenses, vendors, invoices, emps]);
 
+  const [spendOpen, setSpendOpen] = useState(false);
+  const openDrawer = useOpenDrawer();
+
   return (
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Total OPEX" value={fmtCompact(m.totalOpex)} />
-        <KPI label="COGS" value={fmtCompact(m.cogs)} />
+        <KPI href="/demo/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
+        <KPI href="/demo/expenses" label="COGS" value={fmtCompact(m.cogs)} />
         <KPI label="Gross Margin" value={fmtPct(m.grossMargin, 0)} deltaTone={m.grossMargin >= 30 ? "up" : "down"} delta={m.grossMargin >= 30 ? "Healthy" : "Below 30%"} />
         <KPI label="EBITDA" value={fmtCompact(m.ebitda)} sub={`${fmtPct(m.ebitdaMargin, 1)} margin`} />
       </div>
