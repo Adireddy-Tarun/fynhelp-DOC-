@@ -99,6 +99,10 @@ export default function HrTab() {
           )}
         </WithData>
       </IntelCard>
+
+      <EsopSection />
+      <HiringPipelineSection />
+      <CompBenchmarksSection />
     </div>
   );
 }
