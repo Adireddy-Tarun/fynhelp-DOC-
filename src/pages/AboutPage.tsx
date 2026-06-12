@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   Lock,
   MapPin,
@@ -1025,6 +1026,14 @@ function FinalCTA() {
 export default function AboutPage() {
   return (
     <Layout>
+      <Helmet>
+        <title>About FynHelp — Built by Founders, for Founders</title>
+        <meta name="description" content="FynHelp was born from the failure of Dark Capital. Two founders who lost a business to financial blindness are now building India's AI CFO platform." />
+        <link rel="canonical" href="https://fynhelp.com/about" />
+        <meta property="og:title" content="About FynHelp — Built by Founders, for Founders" />
+        <meta property="og:description" content="FynHelp was born from the failure of Dark Capital. Two founders building India's AI CFO platform." />
+        <meta property="og:url" content="https://fynhelp.com/about" />
+      </Helmet>
       <style>{`
         .about-hero { isolation: isolate; }
         .about-particle {

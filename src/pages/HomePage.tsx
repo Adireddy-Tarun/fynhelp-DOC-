@@ -5,6 +5,7 @@ import { SUITES } from "@/data/suiteStatus";
 import MobileProductsSection from "@/components/home/MobileProductsSection";
 import AIRecommendedSection from "@/components/AIRecommendedSection";
 import FAQSection from "@/components/home/FAQSection";
+import { Helmet } from "react-helmet-async";
 
 // ===== PALETTE (matches reference) =====
 const C = {
@@ -1289,6 +1290,9 @@ export default function HomePage() {
 
   return (
     <div className="fyn-page">
+      <Helmet>
+        <link rel="canonical" href="https://fynhelp.com/" />
+      </Helmet>
       <style>{STYLES}</style>
       <Nav />
 
