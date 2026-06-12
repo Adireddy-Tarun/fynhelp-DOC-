@@ -27,6 +27,8 @@ export default function GstTab() {
     return "amber" as const;
   };
 
+  const [filingOpen, setFilingOpen] = useState<string | null>(null);
+
   return (
     <div className="space-y-6">
       {/* KPIs */}
