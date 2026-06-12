@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco,
 import { SUITES } from "@/data/suiteStatus";
 import MobileProductsSection from "@/components/home/MobileProductsSection";
 import AIRecommendedSection from "@/components/AIRecommendedSection";
+import FAQSection from "@/components/home/FAQSection";
 
 // ===== PALETTE (matches reference) =====
 const C = {
@@ -1303,7 +1304,15 @@ export default function HomePage() {
           </p>
           <div className="hero-cta fade-up">
             <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
-            <a href="/demo/login" className="btn-pill btn-outline"><Calendar size={16} /> Book Demo</a>
+            <Link to="/demo/liquidity" className="btn-pill btn-outline"><Calendar size={16} /> Watch Demo</Link>
+          </div>
+          <div className="stats-row fade-up">
+            {STATS.map((s) => (
+              <div key={s.l} className="stat-card">
+                <div className="v">{s.v}</div>
+                <div className="l">{s.l}</div>
+              </div>
+            ))}
           </div>
           <ChatWidget />
         </div>
@@ -1312,8 +1321,6 @@ export default function HomePage() {
       <AIRecommendedSection />
 
       <MobileProductsSection />
-
-      <Ticker items={TICKER_LIGHT} />
 
       {/* INTEGRATIONS */}
       <section className="section">
@@ -1651,6 +1658,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <FAQSection />
 
       {/* FINAL CTA */}
       <section className="section" style={{ paddingBottom: 40 }}>
