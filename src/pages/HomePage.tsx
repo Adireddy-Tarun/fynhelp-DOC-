@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco,
 import { SUITES } from "@/data/suiteStatus";
 import MobileProductsSection from "@/components/home/MobileProductsSection";
 import AIRecommendedSection from "@/components/AIRecommendedSection";
+import FAQSection from "@/components/home/FAQSection";
 
 // ===== PALETTE (matches reference) =====
 const C = {
