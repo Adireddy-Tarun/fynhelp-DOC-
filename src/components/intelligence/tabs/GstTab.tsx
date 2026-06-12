@@ -63,7 +63,7 @@ export default function GstTab() {
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.due_date?.slice(0, 10) ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(r.net_payable)}</td>
                     <td className="py-2.5 text-right">
-                      {/pending/i.test(r.status) && <button className="text-[11px] font-medium px-2 py-1 rounded text-white" style={{ background: ACCENT.red }}>File Now</button>}
+                      {/pending/i.test(r.status) && <button onClick={() => setFilingOpen(r.period)} className="text-[11px] font-medium px-2 py-1 rounded text-white hover:opacity-90" style={{ background: ACCENT.red }}>File Now →</button>}
                     </td>
                   </tr>
                 ))}
