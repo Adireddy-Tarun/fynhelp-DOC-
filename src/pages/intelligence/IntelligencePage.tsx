@@ -5,6 +5,7 @@
  */
 import IntelligenceShell, { TabId } from "@/components/intelligence/IntelligenceShell";
 import { IntelligenceProvider, IntelligenceMode } from "@/components/intelligence/DataSource";
+import DetailDrawer from "@/components/dashboard/DetailDrawer";
 
 interface Props {
   mode: IntelligenceMode;
@@ -16,6 +17,7 @@ export default function IntelligencePage({ mode, tab = "liquidity" }: Props) {
     <IntelligenceProvider mode={mode}>
       <div className="min-h-screen bg-fyn-beige">
         <IntelligenceShell initialTab={tab} />
+        <DetailDrawer />
       </div>
     </IntelligenceProvider>
   );
