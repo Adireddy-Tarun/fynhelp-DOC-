@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
