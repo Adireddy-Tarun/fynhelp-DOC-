@@ -135,65 +135,6 @@ export default function RevenueTab() {
         </WithData>
       </IntelCard>
 
-      {/* Breakdown */}
-      <IntelCard title="Revenue Breakdown" action={
-        <div className="flex gap-1 text-xs bg-slate-100 rounded-md p-0.5">
-          {(["product", "segment", "channel"] as const).map((b) => (
-            <button key={b} onClick={() => setBreakdownBy(b)} className={`px-2.5 py-1 rounded ${breakdownBy === b ? "bg-white text-fyn-ink font-medium shadow-sm" : "text-[#6B6B6B]"}`}>By {b}</button>
-          ))}
-        </div>
-      }>
-        <div className="space-y-3">
-          {m.breakdown.length === 0 ? (
-            <p className="text-sm text-[#9B9B9B] text-center py-6">{EMPTY} <span className="ml-2">Upload data to calculate</span></p>
-          ) : m.breakdown.map((row, i) => (
-            <div key={row.label}>
-              <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-fyn-ink">{row.label}</span>
-                <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(row.value)} <span className="text-[#6B6B6B] text-xs">({row.pct}%)</span></span>
-              </div>
-              <AnimatedBar pct={row.pct * 3} delay={i * 100} height={8} color={`linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})`} />
-            </div>
-          ))}
-
-        </div>
-      </IntelCard>
-
-      {/* Cohort heatmap */}
-      <IntelCard title="Cohort Retention" sub="% retained each month after acquisition">
-        <div className="overflow-x-auto">
-          <table className="text-xs">
-            <thead>
-              <tr>
-                <th className="text-left text-[10px] uppercase text-[#6B6B6B] font-medium pr-3 py-1">Cohort</th>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <th key={i} className="text-center text-[10px] uppercase text-[#6B6B6B] font-medium px-2 py-1">M{i}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((cohort, i) => (
-                <tr key={cohort}>
-                  <td className="text-fyn-ink py-1 pr-3 font-medium">{cohort} 2025</td>
-                  {Array.from({ length: 6 }).map((_, j) => {
-                    if (j > 5 - i) return <td key={j} />;
-                    const v = Math.max(40, 100 - j * 8 - Math.random() * 10);
-                    const intensity = v / 100;
-                    const bg = v >= 80 ? `rgba(16,185,129,${intensity})` : v >= 60 ? `rgba(212,175,55,${intensity})` : `rgba(169,56,56,${intensity})`;
-                    return (
-                      <td key={j} className="px-1 py-0.5">
-                        <div className="w-12 h-7 rounded text-center text-[11px] font-mono font-semibold flex items-center justify-center text-white" style={{ background: bg }}>
-                          {v.toFixed(0)}%
-                        </div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </IntelCard>
 
       {/* Pipeline + health */}
       <div className="grid lg:grid-cols-2 gap-4">

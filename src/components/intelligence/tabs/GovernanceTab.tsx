@@ -1,20 +1,23 @@
 import { useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useInvoices, useExpenses } from "../DataSource";
-import { IntelCard, KPI, Badge, fmtCompact, ACCENT, CHART, ChartGradients } from "../_primitives";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { useInvoices, useExpenses, useBalanceSheet } from "../DataSource";
+import { IntelCard, KPI, Badge, fmtCompact, ACCENT, CHART, ChartGradients, WithData } from "../_primitives";
 import { BalanceSheetSection, RiskRegisterSection, InsuranceSection } from "./sections/NewSections";
 
 export default function GovernanceTab() {
   const { data: invoices } = useInvoices();
   const { data: expenses } = useExpenses();
+  const { data: snapshots } = useBalanceSheet();
 
   const trend = useMemo(() => {
-    const months = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-    return months.map((m, i) => {
-      const base = 100000 + i * 8000;
-      return { month: m, actual: base + Math.random() * 20000, budget: base * 1.1 };
-    });
-  }, []);
+    return (snapshots ?? []).slice().sort((a: any, b: any) => a.snapshot_date.localeCompare(b.snapshot_date)).map((s: any) => ({
+      month: new Date(s.snapshot_date).toLocaleString("en", { month: "short" }),
+      Assets: Number(s.total_assets),
+      Liabilities: Number(s.total_liabilities),
+      Equity: Number(s.total_equity),
+    }));
+  }, [snapshots]);
+
 
   const riskScore = 28;
   const fxExposure = 425000;
@@ -73,21 +76,28 @@ export default function GovernanceTab() {
         </IntelCard>
       </div>
 
-      <IntelCard title="Budget vs Actual" sub="Monthly variance over last 12 months">
-        <div style={{ height: 260 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={trend} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-              <ChartGradients />
-              <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" stroke={CHART.axis} fontSize={11} tickLine={false} axisLine={false} />
-              <YAxis stroke={CHART.axis} fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtCompact} />
-              <Tooltip contentStyle={{ background: CHART.tooltipBg, border: `1px solid ${CHART.tooltipBorder}`, borderRadius: 6, fontSize: 12 }} formatter={(v: number) => fmtCompact(v)} />
-              <Bar dataKey="budget" fill={`url(#${CHART.goldGrad.id})`} radius={[3, 3, 0, 0]} />
-              <Bar dataKey="actual" fill={`url(#${CHART.redGrad.id})`} radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      <IntelCard title="Balance Sheet Trend" sub="Assets, Liabilities & Equity — last 3 snapshots">
+        <WithData data={trend} emptyTitle="No snapshots yet" emptyDescription="Balance sheet snapshots will appear here." cta={null}>
+          {(d) => (
+            <div style={{ height: 260 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={d} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
+                  <ChartGradients />
+                  <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" stroke={CHART.axis} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke={CHART.axis} fontSize={11} tickLine={false} axisLine={false} tickFormatter={fmtCompact} />
+                  <Tooltip contentStyle={{ background: CHART.tooltipBg, border: `1px solid ${CHART.tooltipBorder}`, borderRadius: 6, fontSize: 12 }} formatter={(v: number) => fmtCompact(v)} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="Assets" fill={ACCENT.green} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="Liabilities" fill={ACCENT.red} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="Equity" fill={ACCENT.gold} radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </WithData>
       </IntelCard>
+
 
       <BalanceSheetSection />
       <RiskRegisterSection />
