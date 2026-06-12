@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useInvoices, useExpenses } from "../DataSource";
 import { IntelCard, KPI, Badge, fmtCompact, ACCENT, CHART, ChartGradients } from "../_primitives";
+import { BalanceSheetSection, RiskRegisterSection, InsuranceSection } from "./sections/NewSections";
 
 export default function GovernanceTab() {
   const { data: invoices } = useInvoices();
