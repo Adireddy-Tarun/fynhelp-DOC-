@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Layout from "@/components/Layout";
 
 const blogs = [
@@ -14,6 +15,14 @@ const blogs = [
 
 const BlogPage = () => (
   <Layout>
+    <Helmet>
+      <title>FynHelp Blog — Financial Intelligence for Indian SMEs</title>
+      <meta name="description" content="Tips, guides, and insights on cash flow management, GST compliance, and financial intelligence for Indian startups and SMEs." />
+      <link rel="canonical" href="https://fynhelp.com/blog" />
+      <meta property="og:title" content="FynHelp Blog — Financial Intelligence for Indian SMEs" />
+      <meta property="og:description" content="Insights on cash flow, GST compliance, and finance for Indian SMEs." />
+      <meta property="og:url" content="https://fynhelp.com/blog" />
+    </Helmet>
     <section className="bg-fyn-ink py-16">
       <div className="fyn-container text-center">
         <h1 className="text-3xl md:text-[48px] leading-tight text-white mb-4">The FynHelp Journal</h1>
