@@ -179,6 +179,8 @@ export default function CostTab() {
 
       <SubscriptionAuditSection />
       <ContractRenewalsSection />
+
+      <SpendControlsDialog open={spendOpen} onOpenChange={setSpendOpen} />
     </div>
   );
 }
