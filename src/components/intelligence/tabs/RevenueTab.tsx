@@ -117,7 +117,7 @@ export default function RevenueTab() {
 
 
       {/* Trend chart */}
-      <IntelCard title="Revenue Trend" sub="Last 12 months">
+      <IntelCard title="Revenue Trend" sub="Last 12 months" action={<GenerateReportButton label="Export" />}>
         <WithData data={m.trend} isLoading={isLoading}>
           {(d) => (
             <div style={{ height: 260 }}>
