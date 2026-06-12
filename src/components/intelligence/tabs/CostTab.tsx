@@ -172,6 +172,9 @@ export default function CostTab() {
           <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Vendor consolidation: 3 stationary vendors → 1, save ₹8K/mo</span></li>
         </ul>
       </IntelCard>
+
+      <SubscriptionAuditSection />
+      <ContractRenewalsSection />
     </div>
   );
 }
