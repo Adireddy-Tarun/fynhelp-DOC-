@@ -74,7 +74,7 @@ export default function HrTab() {
         </IntelCard>
       </div>
 
-      <IntelCard title="Personnel Table">
+      <IntelCard title="Personnel Table" action={<ViewAllLink to="/demo/employees" />}>
         <WithData data={m.active} isLoading={isLoading}>
           {(rows) => (
             <div className="overflow-x-auto">
@@ -91,7 +91,7 @@ export default function HrTab() {
                 </thead>
                 <tbody>
                   {rows.map((e) => (
-                    <tr key={e.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                    <tr key={e.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{e.name}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.department ?? "—"}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.designation ?? "—"}</td>
@@ -110,6 +110,8 @@ export default function HrTab() {
       <EsopSection />
       <HiringPipelineSection />
       <CompBenchmarksSection />
+
+      <HrmsDialog open={hrmsOpen} onOpenChange={setHrmsOpen} />
     </div>
   );
 }
