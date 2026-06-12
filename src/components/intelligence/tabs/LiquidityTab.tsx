@@ -169,7 +169,7 @@ export default function LiquidityTab() {
                 <span className="font-mono text-fyn-ink font-semibold">{fmtMonths(s.months)}</span>
               </div>
             ))}
-            <button className="w-full mt-3 text-xs font-medium py-2 rounded-md text-white" style={{ background: ACCENT.red }}>Model Custom Scenario</button>
+            <button onClick={() => setScenarioOpen(true)} className="w-full mt-3 text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Model Custom Scenario</button>
           </div>
         </IntelCard>
 
