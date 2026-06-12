@@ -254,7 +254,7 @@ export default function LiquidityTab() {
       </div>
 
       {/* Payments due */}
-      <IntelCard title="Major Payments Due (next 30 days)" action={<button className="text-xs font-medium px-3 py-1.5 rounded text-white" style={{ background: ACCENT.red }}>Optimize Schedule</button>}>
+      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/demo/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
         <WithData data={m.payments} emptyTitle="No pending payments" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">
@@ -268,7 +268,7 @@ export default function LiquidityTab() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                  <tr key={r.id} onClick={() => openDrawer("expense", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                     <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.vendor_name}</td>
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.category ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(r.amount)}</td>
