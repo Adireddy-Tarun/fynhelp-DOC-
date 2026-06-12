@@ -158,7 +158,7 @@ const App = () => (
             <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
-            <Route path="/demo/dashboard" element={<DemoDashboard />} />
+            <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
             {/* Public demo — fully-loaded intelligence dashboard, beige theme */}
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
