@@ -230,9 +230,15 @@ export default function RevenueTab() {
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Expansion</p><p className="font-mono text-sm text-fyn-ink font-semibold">31%</p></div>
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Renewal</p><p className="font-mono text-sm text-fyn-ink font-semibold">27%</p></div>
             </div>
-          </div>
         </IntelCard>
       </div>
+
+      {/* ── New wired sections ─────────────────────────────── */}
+      <CustomerAcquisitionSection />
+      <CohortRetentionSection />
+      <SalesPipelineSection />
+      <RevenueBreakdownSection active={breakdownBy} setActive={setBreakdownBy} />
+      <DeferredRevenueSection />
     </div>
   );
 }
