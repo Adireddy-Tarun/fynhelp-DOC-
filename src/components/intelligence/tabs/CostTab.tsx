@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { AlertTriangle } from "lucide-react";
+import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
