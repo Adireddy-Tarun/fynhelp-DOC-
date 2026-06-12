@@ -3,6 +3,7 @@
  * Used by /demo/* and /dashboard/* via IntelligenceProvider mode.
  */
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Droplets, TrendingUp, DollarSign, FileText, ShieldCheck, Users, Briefcase, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LiquidityTab from "./tabs/LiquidityTab";
@@ -14,6 +15,7 @@ import HrTab from "./tabs/HrTab";
 import InvestorTab from "./tabs/InvestorTab";
 import AskFynnyTab from "./tabs/AskFynnyTab";
 import { IntelPage, ModeBanner, ACCENT, LiveTimestamp } from "./_primitives";
+import { useMode } from "./DataSource";
 
 const TABS = [
   { id: "liquidity",  label: "Liquidity",   icon: Droplets,    Comp: LiquidityTab },
