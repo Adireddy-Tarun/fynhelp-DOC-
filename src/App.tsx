@@ -179,7 +179,7 @@ const App = () => (
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Real dashboard — same beige intelligence tabs with live data */}
             <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
-            <Route path="/dashboard/360" element={<Dashboard360Page />} />
+            <Route path="/dashboard/360" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/liquidity"            element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
