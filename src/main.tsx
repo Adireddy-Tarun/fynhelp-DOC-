@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/typography.css";
@@ -17,4 +18,8 @@ import "@fontsource/space-grotesk/700.css";
 document.documentElement.classList.remove("dark");
 document.documentElement.classList.add("light");
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>
+);
