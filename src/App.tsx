@@ -43,7 +43,6 @@ import WaitlistPage from "./pages/WaitlistPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
-import Dashboard360Page from "./pages/dashboard/Dashboard360Page.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
 
 import LiquidityIntelligencePage from "./pages/dashboard/LiquidityIntelligencePage.tsx";
