@@ -24,8 +24,14 @@ export default function HrTab() {
     return { total, payroll, ctc, avgSalary, revPerEmp, byDept, active };
   }, [emps, invoices]);
 
+  const [hrmsOpen, setHrmsOpen] = useState(false);
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <button onClick={() => setHrmsOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Connect HRMS</button>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Total Employees" value={m.total} sub="Active headcount" />
         <KPI label="Monthly Payroll" value={fmtCompact(m.payroll)} />
