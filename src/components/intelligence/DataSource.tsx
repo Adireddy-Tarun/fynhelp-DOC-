@@ -63,9 +63,27 @@ export const useCustomers = () => useScopedTable<Customer>("customers", { order:
 export const useVendors = () => useScopedTable<Vendor>("vendors", { order: "vendor_name", ascending: true });
 export const useInvoices = () => useScopedTable<Invoice>("invoices", { order: "invoice_date" });
 export const useExpenses = () => useScopedTable<Expense>("expenses", { order: "date" });
-export const useBankTxns = () => useScopedTable<BankTxn>("bank_transactions", { order: "date" });
+export const useBankTxns = () => useScopedTable<BankTxn>("date", { order: "date" });
 export const useEmployees = () => useScopedTable<EmployeeDemo>("employees_demo", { order: "department", ascending: true });
 export const useGstFilings = () => useScopedTable<GstFiling>("gst_filings_demo", { order: "due_date" });
+
+/* ── New intelligence tables ────────────────────────────── */
+export const useCAC = () => useScopedTable<any>("customer_acquisition_costs", { order: "period_start", ascending: true });
+export const useCohorts = () => useScopedTable<any>("cohort_data", { order: "cohort_month", ascending: true });
+export const useSalesPipeline = () => useScopedTable<any>("sales_pipeline", { order: "deal_value" });
+export const useRevenueBreakdowns = () => useScopedTable<any>("revenue_breakdowns", { order: "revenue_amount" });
+export const useDeferredRevenue = () => useScopedTable<any>("deferred_revenue", { order: "deferred_balance" });
+export const useSubscriptionAudit = () => useScopedTable<any>("subscription_audit", { order: "potential_savings" });
+export const useContractRenewals = () => useScopedTable<any>("contract_renewals", { order: "end_date", ascending: true });
+export const useEwayBills = () => useScopedTable<any>("eway_bills", { order: "document_date" });
+export const useHsnMaster = () => useScopedTable<any>("hsn_master", { order: "usage_count" });
+export const useTaxPlanning = () => useScopedTable<any>("tax_planning", { order: "financial_year" });
+export const useBalanceSheet = () => useScopedTable<any>("balance_sheet_snapshots", { order: "snapshot_date" });
+export const useRiskRegister = () => useScopedTable<any>("risk_register", { order: "risk_score" });
+export const useInsurancePolicies = () => useScopedTable<any>("insurance_policies", { order: "coverage_amount" });
+export const useEsopGrants = () => useScopedTable<any>("esop_grants", { order: "total_options" });
+export const useHiringPipeline = () => useScopedTable<any>("hiring_pipeline", { order: "priority", ascending: true });
+export const useCompBenchmarks = () => useScopedTable<any>("compensation_benchmarks", { order: "percentile_position", ascending: true });
 
 export function useHasAnyData(): boolean {
   const c = useCustomers().data?.length ?? 0;
