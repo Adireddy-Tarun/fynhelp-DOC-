@@ -37,8 +37,20 @@ const ROLE_LABEL: Record<AdminRole, string> = {
   support_agent: "Support Agent", analyst: "Analyst", user: "User",
 };
 
-export function AdminProtected({ children }: { children?: ReactNode; allowed?: AdminRole[] }) {
-  // Auth temporarily disabled, admin portal is in design phase.
+export function AdminProtected({ children, allowed }: { children?: ReactNode; allowed?: AdminRole[] }) {
+  const { user, loading, isAdmin, hasRole } = useAdminAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F0EBE0" }}>
+        <div className="text-sm" style={{ color: "#1A1008" }}>Checking access…</div>
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/admin/login" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard/liquidity" replace />;
+  if (allowed && allowed.length && !hasRole(...allowed)) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
   return <>{children ?? <Outlet />}</>;
 }
 
