@@ -282,8 +282,8 @@ export default function LiquidityTab() {
       </IntelCard>
 
       {/* Priority action */}
-      {m.overdue.length > 0 && (
-        <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3" style={{ background: "rgba(169,56,56,0.08)", border: "1px solid rgba(169,56,56,0.2)" }}>
+      {m.overdue.length > 0 && !priorityDismissed && (
+        <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 transition-opacity duration-300" style={{ background: "rgba(169,56,56,0.08)", border: "1px solid rgba(169,56,56,0.2)" }}>
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: ACCENT.red }} />
             <div>
@@ -293,9 +293,12 @@ export default function LiquidityTab() {
               </p>
             </div>
           </div>
-          <button className="text-xs font-medium px-3 py-1.5 rounded text-white whitespace-nowrap" style={{ background: ACCENT.red }}>Mark Done</button>
+          <MarkDoneButton onDone={() => setPriorityDismissed(true)} />
         </div>
       )}
+
+      <ScenarioPlannerDialog open={scenarioOpen} onOpenChange={setScenarioOpen} baseRunwayMonths={m.runwayMonths} baseBurn={m.netBurn} baseRevenue={m.revenue30} />
+      <OptimizeScheduleDialog open={optimizeOpen} onOpenChange={setOptimizeOpen} />
     </div>
   );
 }
