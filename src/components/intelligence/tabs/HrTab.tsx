@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useEmployees, useInvoices } from "../DataSource";
 import { IntelCard, KPI, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EsopSection, HiringPipelineSection, CompBenchmarksSection } from "./sections/NewSections";
+import { HrmsDialog, ViewAllLink } from "../actions";
 
 export default function HrTab() {
   const { data: emps, isLoading } = useEmployees();
@@ -23,8 +24,14 @@ export default function HrTab() {
     return { total, payroll, ctc, avgSalary, revPerEmp, byDept, active };
   }, [emps, invoices]);
 
+  const [hrmsOpen, setHrmsOpen] = useState(false);
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <button onClick={() => setHrmsOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Connect HRMS</button>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Total Employees" value={m.total} sub="Active headcount" />
         <KPI label="Monthly Payroll" value={fmtCompact(m.payroll)} />
@@ -67,7 +74,7 @@ export default function HrTab() {
         </IntelCard>
       </div>
 
-      <IntelCard title="Personnel Table">
+      <IntelCard title="Personnel Table" action={<ViewAllLink to="/demo/employees" />}>
         <WithData data={m.active} isLoading={isLoading}>
           {(rows) => (
             <div className="overflow-x-auto">
@@ -84,7 +91,7 @@ export default function HrTab() {
                 </thead>
                 <tbody>
                   {rows.map((e) => (
-                    <tr key={e.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                    <tr key={e.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{e.name}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.department ?? "—"}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.designation ?? "—"}</td>
@@ -103,6 +110,8 @@ export default function HrTab() {
       <EsopSection />
       <HiringPipelineSection />
       <CompBenchmarksSection />
+
+      <HrmsDialog open={hrmsOpen} onOpenChange={setHrmsOpen} />
     </div>
   );
 }

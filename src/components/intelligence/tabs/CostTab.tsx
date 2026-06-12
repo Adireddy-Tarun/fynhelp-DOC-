@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { AlertTriangle } from "lucide-react";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
+import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
 
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
@@ -62,12 +63,15 @@ export default function CostTab() {
     return { totalOpex, cogs, grossMargin, ebitda, ebitdaMargin, byCategory, vendorSpend, concentration, personnelTotal, personnelPct, avgCost, revenuePerEmp, byDept, burnMultiple };
   }, [expenses, vendors, invoices, emps]);
 
+  const [spendOpen, setSpendOpen] = useState(false);
+  const openDrawer = useOpenDrawer();
+
   return (
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Total OPEX" value={fmtCompact(m.totalOpex)} />
-        <KPI label="COGS" value={fmtCompact(m.cogs)} />
+        <KPI href="/demo/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
+        <KPI href="/demo/expenses" label="COGS" value={fmtCompact(m.cogs)} />
         <KPI label="Gross Margin" value={fmtPct(m.grossMargin, 0)} deltaTone={m.grossMargin >= 30 ? "up" : "down"} delta={m.grossMargin >= 30 ? "Healthy" : "Below 30%"} />
         <KPI label="EBITDA" value={fmtCompact(m.ebitda)} sub={`${fmtPct(m.ebitdaMargin, 1)} margin`} />
       </div>
@@ -98,13 +102,13 @@ export default function CostTab() {
 
       {/* Vendor analysis */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <IntelCard title="Top Vendors by Spend" action={<Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge>}>
+        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/demo/vendors" /></div>}>
           <WithData data={m.vendorSpend.slice(0, 6)} cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((v) => (
-                    <tr key={v.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+                    <tr key={v.id} onClick={() => openDrawer("vendor", v.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2 text-xs text-fyn-ink font-medium">{v.name}</td>
                       <td className="py-2 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(v.total)}</td>
                     </tr>
@@ -123,7 +127,7 @@ export default function CostTab() {
             </div>
           </div>
           <div className="space-y-2">
-            <button className="w-full text-xs font-medium py-2 rounded-md text-white" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
+            <button onClick={() => setSpendOpen(true)} className="w-full text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
             <div className="grid grid-cols-3 gap-2 text-[11px] text-[#6B6B6B] text-center">
               <span>Approval Workflow</span>
               <span>Centralize Procurement</span>
@@ -175,6 +179,8 @@ export default function CostTab() {
 
       <SubscriptionAuditSection />
       <ContractRenewalsSection />
+
+      <SpendControlsDialog open={spendOpen} onOpenChange={setSpendOpen} />
     </div>
   );
 }

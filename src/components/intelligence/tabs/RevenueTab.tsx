@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useInvoices, useCustomers, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
 import { CustomerAcquisitionSection, CohortRetentionSection, SalesPipelineSection, RevenueBreakdownSection, DeferredRevenueSection } from "./sections/NewSections";
+import { GenerateReportButton, ViewAllLink } from "../actions";
 
 
 export default function RevenueTab() {
@@ -111,12 +112,12 @@ export default function RevenueTab() {
         <KPI label="ARPA" count={Number.isFinite(m.arpa) ? m.arpa : 0} format={fmtCompact} isEmpty={!Number.isFinite(m.arpa)} />
         <KPI label="LTV" count={Number.isFinite(m.ltv) ? m.ltv : 0} format={fmtCompact} isEmpty={!Number.isFinite(m.ltv)} />
         <KPI label="Rule of 40" value={Number.isFinite(m.rule) ? m.rule.toFixed(0) : EMPTY} isEmpty={!Number.isFinite(m.rule)} deltaTone={Number.isFinite(m.rule) && m.rule >= 40 ? "up" : "down"} delta={Number.isFinite(m.rule) ? (m.rule >= 40 ? "Pass" : "Below") : undefined} tone={!Number.isFinite(m.rule) ? "neutral" : m.rule >= 40 ? "healthy" : "warning"} />
-        <KPI label="Total Revenue" count={m.totalRevenue} format={fmtCompact} isEmpty={liveEmpty && m.totalRevenue === 0} delta={Number.isFinite(m.mom) ? `${m.mom >= 0 ? "+" : ""}${m.mom.toFixed(1)}% MoM` : undefined} deltaTone={Number.isFinite(m.mom) && m.mom >= 0 ? "up" : "down"} />
+        <KPI href="/demo/invoices?status=paid" label="Total Revenue" count={m.totalRevenue} format={fmtCompact} isEmpty={liveEmpty && m.totalRevenue === 0} delta={Number.isFinite(m.mom) ? `${m.mom >= 0 ? "+" : ""}${m.mom.toFixed(1)}% MoM` : undefined} deltaTone={Number.isFinite(m.mom) && m.mom >= 0 ? "up" : "down"} />
       </div>
 
 
       {/* Trend chart */}
-      <IntelCard title="Revenue Trend" sub="Last 12 months">
+      <IntelCard title="Revenue Trend" sub="Last 12 months" action={<GenerateReportButton label="Export" />}>
         <WithData data={m.trend} isLoading={isLoading}>
           {(d) => (
             <div style={{ height: 260 }}>

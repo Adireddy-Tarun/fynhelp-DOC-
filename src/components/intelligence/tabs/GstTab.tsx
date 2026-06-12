@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useGstFilings, useExpenses, useInvoices } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EwayBillSection, HsnMasterSection, TaxPlanningSection } from "./sections/NewSections";
+import { GstFilingDialog, ReconcileButton } from "../actions";
 
 export default function GstTab() {
   const { data: filings, isLoading } = useGstFilings();
@@ -25,6 +26,8 @@ export default function GstTab() {
     if (/not due/i.test(status)) return "gray" as const;
     return "amber" as const;
   };
+
+  const [filingOpen, setFilingOpen] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -60,7 +63,7 @@ export default function GstTab() {
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.due_date?.slice(0, 10) ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(r.net_payable)}</td>
                     <td className="py-2.5 text-right">
-                      {/pending/i.test(r.status) && <button className="text-[11px] font-medium px-2 py-1 rounded text-white" style={{ background: ACCENT.red }}>File Now</button>}
+                      {/pending/i.test(r.status) && <button onClick={() => setFilingOpen(r.period)} className="text-[11px] font-medium px-2 py-1 rounded text-white hover:opacity-90" style={{ background: ACCENT.red }}>File Now →</button>}
                     </td>
                   </tr>
                 ))}
@@ -102,21 +105,23 @@ export default function GstTab() {
               <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
               <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">GST</th>
               <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
+              <th className="py-2"></th>
             </tr>
           </thead>
           <tbody>
             {[
-              { gstin: "27AABCU9603R1ZX", inv: "PUR-2025-441", val: 124000, gst: 22320, status: "Matched" as const, tone: "green" as const },
-              { gstin: "07AAACI1681G1ZP", inv: "PUR-2025-442", val: 87500, gst: 15750, status: "Mismatch" as const, tone: "amber" as const },
-              { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const },
-              { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const },
+              { gstin: "27AABCU9603R1ZX", inv: "PUR-2025-441", val: 124000, gst: 22320, status: "Matched" as const, tone: "green" as const, reconcilable: false },
+              { gstin: "07AAACI1681G1ZP", inv: "PUR-2025-442", val: 87500, gst: 15750, status: "Mismatch" as const, tone: "amber" as const, reconcilable: true },
+              { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const, reconcilable: true },
+              { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const, reconcilable: false },
             ].map((r) => (
-              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0">
+              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                 <td className="py-2.5 font-mono text-xs text-fyn-ink">{r.gstin}</td>
                 <td className="py-2.5 text-xs text-[#6B6B6B]">{r.inv}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.val)}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.gst)}</td>
                 <td className="py-2.5 pl-3"><Badge tone={r.tone}>{r.status}</Badge></td>
+                <td className="py-2.5 text-right">{r.reconcilable && <ReconcileButton label={r.gstin} />}</td>
               </tr>
             ))}
           </tbody>
@@ -126,6 +131,8 @@ export default function GstTab() {
       <EwayBillSection />
       <HsnMasterSection />
       <TaxPlanningSection />
+
+      <GstFilingDialog open={!!filingOpen} onOpenChange={(v) => !v && setFilingOpen(null)} period={filingOpen ?? undefined} />
     </div>
   );
 }

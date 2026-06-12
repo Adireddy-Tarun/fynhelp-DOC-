@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { AlertTriangle, Phone } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+import { RemindButton, MarkDoneButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
 
 
 function daysBetween(a: string, b: string) {
@@ -104,6 +105,11 @@ export default function LiquidityTab() {
   }, [m]);
   const hasCriticalAlert = !liveEmpty && (m.aging.d61_90 + m.aging.d90) > 0;
 
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [optimizeOpen, setOptimizeOpen] = useState(false);
+  const [priorityDismissed, setPriorityDismissed] = useState(false);
+  const openDrawer = useOpenDrawer();
+
   return (
     <div className="space-y-6 fyn-stagger">
       {/* Alert ticker */}
@@ -121,10 +127,10 @@ export default function LiquidityTab() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
+        <KPI href="/demo/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
         <KPI label="Runway" value={fmtMonths(m.runwayMonths)} isEmpty={liveEmpty || !Number.isFinite(m.runwayMonths)} emptySub={liveEmpty ? "Upload data to calculate" : "Profitable — no burn"} sub={zeroDate ? `Zero by ${zeroDate}` : undefined} deltaTone={Number.isFinite(m.runwayMonths) && m.runwayMonths < 6 ? "down" : "up"} delta={Number.isFinite(m.runwayMonths) ? (m.runwayMonths < 6 ? "Low" : "Healthy") : undefined} tone={runwayTone} />
-        <KPI label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
-        <KPI label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
+        <KPI href="/demo/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
+        <KPI href="/demo/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
 
       {/* Cash position + CCC */}
@@ -163,7 +169,7 @@ export default function LiquidityTab() {
                 <span className="font-mono text-fyn-ink font-semibold">{fmtMonths(s.months)}</span>
               </div>
             ))}
-            <button className="w-full mt-3 text-xs font-medium py-2 rounded-md text-white" style={{ background: ACCENT.red }}>Model Custom Scenario</button>
+            <button onClick={() => setScenarioOpen(true)} className="w-full mt-3 text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Model Custom Scenario</button>
           </div>
         </IntelCard>
 
@@ -220,13 +226,13 @@ export default function LiquidityTab() {
           </div>
         </IntelCard>
 
-        <IntelCard title="Overdue Invoices" sub="Action required" action={<Badge tone="red">{m.overdue.length} overdue</Badge>}>
+        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/demo/invoices?status=overdue" /></div>}>
           <WithData data={m.overdue} emptyTitle="No overdue invoices" emptyDescription="All receivables on track." cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} onClick={() => openDrawer("invoice", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5">
                         <p className="text-fyn-ink font-medium text-xs">{r.customer_name}</p>
                         <p className="text-[11px] text-[#6B6B6B]">{r.invoice_number}</p>
@@ -236,9 +242,7 @@ export default function LiquidityTab() {
                         <Badge tone={r.daysOver > 60 ? "red" : "amber"}>{r.daysOver}d overdue</Badge>
                       </td>
                       <td className="py-2.5 pl-3 text-right">
-                        <button className="inline-flex items-center gap-1 text-[11px] font-medium text-white px-2 py-1 rounded" style={{ background: ACCENT.red }}>
-                          <Phone className="w-3 h-3" /> Remind
-                        </button>
+                        <RemindButton customerName={r.customer_name} />
                       </td>
                     </tr>
                   ))}
@@ -250,7 +254,7 @@ export default function LiquidityTab() {
       </div>
 
       {/* Payments due */}
-      <IntelCard title="Major Payments Due (next 30 days)" action={<button className="text-xs font-medium px-3 py-1.5 rounded text-white" style={{ background: ACCENT.red }}>Optimize Schedule</button>}>
+      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/demo/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
         <WithData data={m.payments} emptyTitle="No pending payments" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">
@@ -264,7 +268,7 @@ export default function LiquidityTab() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                  <tr key={r.id} onClick={() => openDrawer("expense", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                     <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.vendor_name}</td>
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.category ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(r.amount)}</td>
@@ -278,8 +282,8 @@ export default function LiquidityTab() {
       </IntelCard>
 
       {/* Priority action */}
-      {m.overdue.length > 0 && (
-        <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3" style={{ background: "rgba(169,56,56,0.08)", border: "1px solid rgba(169,56,56,0.2)" }}>
+      {m.overdue.length > 0 && !priorityDismissed && (
+        <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 transition-opacity duration-300" style={{ background: "rgba(169,56,56,0.08)", border: "1px solid rgba(169,56,56,0.2)" }}>
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: ACCENT.red }} />
             <div>
@@ -289,9 +293,12 @@ export default function LiquidityTab() {
               </p>
             </div>
           </div>
-          <button className="text-xs font-medium px-3 py-1.5 rounded text-white whitespace-nowrap" style={{ background: ACCENT.red }}>Mark Done</button>
+          <MarkDoneButton onDone={() => setPriorityDismissed(true)} />
         </div>
       )}
+
+      <ScenarioPlannerDialog open={scenarioOpen} onOpenChange={setScenarioOpen} baseRunwayMonths={m.runwayMonths} baseBurn={m.netBurn} baseRevenue={m.revenue30} />
+      <OptimizeScheduleDialog open={optimizeOpen} onOpenChange={setOptimizeOpen} />
     </div>
   );
 }
