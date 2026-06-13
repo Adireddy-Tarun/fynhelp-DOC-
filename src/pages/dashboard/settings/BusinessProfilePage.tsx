@@ -1,293 +1,127 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
-/* ============================================================
-   FynHelp, Business Profile
-   Inter only · static UI · backend stubbed
-   ============================================================ */
+const RED = "#A93838"; const BORDER = "#E0D9C8";
 
-const PAGE_WRAP: React.CSSProperties = {
-  maxWidth: 900, margin: "0 auto", padding: "40px 48px", fontFamily: "'Inter', sans-serif",
-};
+const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in" style={{ borderColor: BORDER }}>
+    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
+    <div className="mt-4 space-y-4">{children}</div>
+  </div>
+);
 
-const CARD: React.CSSProperties = {
-  background: "#FFFFFF", border: "1px solid #D4C9A8", borderRadius: 10, padding: 28, marginBottom: 24,
-};
-
-const LABEL: React.CSSProperties = {
-  fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 13, color: "#1A1008",
-  marginBottom: 6, display: "block",
-};
-
-const HELPER: React.CSSProperties = {
-  fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
-  color: "rgba(26,16,8,0.50)", marginTop: 6,
-};
-
-const inputStyle = (focused: boolean): React.CSSProperties => ({
-  width: "100%", height: 42, padding: "0 12px",
-  background: "#FFFFFF",
-  border: focused ? "1.5px solid #C41E1E" : "1px solid #D4C9A8",
-  borderRadius: 6, outline: "none",
-  boxShadow: focused ? "0 0 0 3px rgba(196,30,30,0.08)" : "none",
-  fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 14, color: "#1A1008",
-  transition: "border-color 150ms, box-shadow 150ms",
-});
-
-const Section = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => (
-  <div style={CARD}>
-    <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 16, color: "#1A1008", marginBottom: 4 }}>{title}</h2>
-    {sub && <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(26,16,8,0.55)", marginBottom: 24 }}>{sub}</p>}
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label className="block text-[13px] font-medium mb-1.5" style={{ color: "#1A1008" }}>{label}</label>
     {children}
   </div>
 );
 
-const Field = ({ label, helper, children }: { label: string; helper?: string; children: React.ReactNode }) => (
-  <div style={{ marginBottom: 18 }}>
-    <label style={LABEL}>{label}</label>
-    {children}
-    {helper && <p style={HELPER}>{helper}</p>}
-  </div>
+const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+const selCls = inpCls;
+
+const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi"];
+const INDUSTRIES = ["Technology","D2C","Manufacturing","Retail","Healthcare","Education","Logistics","F&B","Real Estate","Services","Other"];
+
+const Save = ({ onClick }: { onClick: () => void }) => (
+  <button onClick={onClick} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Save</button>
 );
-
-const TextInput = ({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) => {
-  const [focused, setFocused] = useState(false);
-  return (
-    <input
-      value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-      onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-      style={inputStyle(focused)}
-    />
-  );
-};
-
-const Select = ({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) => {
-  const [focused, setFocused] = useState(false);
-  return (
-    <div style={{ position: "relative" }}>
-      <select
-        value={value} onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-        style={{ ...inputStyle(focused), appearance: "none", paddingRight: 36, cursor: "pointer" }}
-      >
-        <option value="" disabled>Select…</option>
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
-      <ChevronDown size={16} style={{ position: "absolute", right: 12, top: 13, color: "rgba(26,16,8,0.40)", pointerEvents: "none" }} />
-    </div>
-  );
-};
-
-const PillGroup = ({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) => (
-  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-    {options.map((opt) => {
-      const active = value === opt;
-      return (
-        <button
-          key={opt} onClick={() => onChange(opt)}
-          style={{
-            padding: "9px 16px", borderRadius: 6,
-            background: active ? "#C41E1E" : "rgba(26,16,8,0.05)",
-            color: active ? "#FFFFFF" : "#1A1008",
-            border: active ? "1px solid #C41E1E" : "1px solid transparent",
-            fontFamily: "'Inter', sans-serif", fontWeight: active ? 600 : 500, fontSize: 13,
-            cursor: "pointer", transition: "all 150ms",
-          }}
-          onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = "#FDF2F1"; e.currentTarget.style.border = "1px solid #C41E1E"; } }}
-          onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = "rgba(26,16,8,0.05)"; e.currentTarget.style.border = "1px solid transparent"; } }}
-        >
-          {opt}
-        </button>
-      );
-    })}
-  </div>
-);
-
-const STATES = [
-  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana",
-  "Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur",
-  "Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana",
-  "Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
-  "Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Delhi",
-  "Jammu and Kashmir","Ladakh","Lakshadweep","Puducherry",
-];
 
 const BusinessProfilePage = () => {
-  // BACKEND: load from `businesses` row by get_user_business_id()
-  const [businessName, setBusinessName] = useState("Mehta Textile Traders");
-  const [entityType, setEntityType] = useState("Private Limited Company");
-  const [gstin, setGstin] = useState("27AABCM1234F1Z5");
-  const [pan, setPan] = useState("AABCM1234F");
-  const [industry, setIndustry] = useState("Textile & Apparel");
-  const [turnover, setTurnover] = useState("₹5-25 Cr");
-  const [stateReg, setStateReg] = useState("Maharashtra");
-  const [employees, setEmployees] = useState("16-50");
-  const [fyStart, setFyStart] = useState("April (Indian FY)");
-  const [msme, setMsme] = useState("");
+  const [name, setName] = useState("FynHelp Demo Pvt Ltd");
+  const [industry, setIndustry] = useState("Technology");
+  const [desc, setDesc] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [pan, setPan] = useState("");
+  const [gstin, setGstin] = useState("");
   const [cin, setCin] = useState("");
-  const [iec, setIec] = useState("");
-  const [addr1, setAddr1] = useState("Plot 12, MIDC Industrial Area");
-  const [addr2, setAddr2] = useState("Phase II");
-  const [city, setCity] = useState("Mumbai");
-  const [addrState, setAddrState] = useState("Maharashtra");
-  const [pin, setPin] = useState("400093");
+  const [msme, setMsme] = useState("");
+  const [addr, setAddr] = useState({ street: "", city: "", state: "Karnataka", pincode: "" });
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [fyStart, setFyStart] = useState("April");
+  const [gstType, setGstType] = useState("regular");
+  const [bank, setBank] = useState({ name: "", account: "", ifsc: "" });
 
-  const showCin = ["Private Limited Company", "Limited Liability Partnership", "One Person Company", "Public Limited Company"].includes(entityType);
-  const showIec = industry === "Export & Import";
-
-  // BACKEND: compute from non-null fields in businesses table
-  const completion = 80;
-
-  const entityNote =
-    entityType === "Private Limited Company" || entityType === "Public Limited Company" || entityType === "One Person Company"
-      ? "ROC, MCA, and board meeting compliance will be tracked"
-      : entityType === "Sole Proprietorship"
-      ? "No ROC obligations. GST and IT only."
-      : "Filing obligations vary by entity type";
+  const savePan = () => {
+    if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) return toast.error("Invalid PAN format");
+    if (gstin && gstin.length !== 15) return toast.error("GSTIN must be 15 characters");
+    toast.success("Legal details saved");
+  };
 
   return (
-    <div style={PAGE_WRAP}>
-      <h1 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 28, color: "#1A1008" }}>Business Profile</h1>
-      <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 15, color: "rgba(26,16,8,0.60)", marginTop: 6 }}>
-        Your business details are used by CFO Fynny to personalise every insight, compliance calendar, and alert.
-      </p>
+    <div className="max-w-3xl">
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Business Profile</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Company identity, legal, address and financial settings.</p>
 
-      {/* Completion banner */}
-      {completion < 100 && (
-        <div style={{
-          background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: 8,
-          padding: "14px 20px", margin: "24px 0 32px",
-        }}>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 14, color: "#92400E", marginBottom: 8 }}>
-            Profile {completion}% complete, add your MSME number and registered address to unlock all features
-          </p>
-          <div style={{ height: 6, background: "#FEF3C7", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{ width: `${completion}%`, height: "100%", background: "#F59E0B" }} />
-          </div>
+      <Card title="Company Identity">
+        <div className="border-2 border-dashed rounded-md p-6 text-center text-[12px]" style={{ borderColor: BORDER, color: "rgba(26,16,8,0.5)" }}>
+          Drag & drop logo here, or click to upload
         </div>
-      )}
-
-      {/* SECTION 1: Identity */}
-      <Section title="Business Identity" sub="Your legal name and registration details.">
-        <Field label="Business Name *">
-          {/* BACKEND: businesses.business_name */}
-          <TextInput value={businessName} onChange={setBusinessName} />
+        <Field label="Company name"><input value={name} onChange={(e) => setName(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+        <Field label="Industry type">
+          <select value={industry} onChange={(e) => setIndustry(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+            {INDUSTRIES.map((i) => <option key={i}>{i}</option>)}
+          </select>
         </Field>
+        <Field label="Company description"><textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={2} className={inpCls + " h-auto py-2"} style={{ borderColor: BORDER }} /></Field>
+        <Save onClick={() => toast.success("Company identity saved")} />
+      </Card>
 
-        <Field label="Legal Entity Type *" helper={entityNote}>
-          {/* BACKEND: businesses.business_type */}
-          <Select value={entityType} onChange={setEntityType}
-            options={["Sole Proprietorship", "Partnership Firm", "Private Limited Company", "Limited Liability Partnership", "One Person Company", "Public Limited Company"]} />
-        </Field>
-
-        <Field label="GSTIN" helper="Your GSTIN unlocks automatic filing calendars, ITC reconciliation, and vendor compliance checks.">
-          <div style={{ position: "relative" }}>
-            {/* BACKEND: businesses.gstin · GET /api/gstn/verify?gstin=X */}
-            <TextInput value={gstin} onChange={(v) => setGstin(v.toUpperCase().slice(0, 15))} placeholder="22AAAAA0000A1Z5" />
-            {gstin.length === 15 && (
-              <span style={{
-                position: "absolute", right: 10, top: 10,
-                background: "#F0FDF4", color: "#166534", border: "1px solid #A7F3D0",
-                borderRadius: 100, padding: "3px 10px",
-                fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 11,
-              }}>Verified ✓</span>
-            )}
+      <Card title="Legal & Registration">
+        <Field label="Legal name (full registered name)"><input value={legalName} onChange={(e) => setLegalName(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+        <Field label="PAN number"><input value={pan} onChange={(e) => setPan(e.target.value.toUpperCase())} maxLength={10} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
+        <Field label="GSTIN">
+          <div className="flex gap-2">
+            <input value={gstin} onChange={(e) => setGstin(e.target.value.toUpperCase())} maxLength={15} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} />
+            <button onClick={() => toast.success("GSTIN verified")} className="px-4 rounded-md border text-[13px] font-medium" style={{ color: RED, borderColor: RED }}>Verify</button>
           </div>
         </Field>
+        <Field label="CIN (optional)"><input value={cin} onChange={(e) => setCin(e.target.value.toUpperCase())} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
+        <Field label="MSME registration number (optional)"><input value={msme} onChange={(e) => setMsme(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+        <Save onClick={savePan} />
+      </Card>
 
-        <Field label="PAN Number" helper="Required for advance tax computation">
-          {/* BACKEND: businesses.pan (column not yet present) */}
-          <TextInput value={pan} onChange={(v) => setPan(v.toUpperCase().slice(0, 10))} placeholder="ABCDE1234F" />
-        </Field>
-      </Section>
-
-      {/* SECTION 2: Business Details */}
-      <Section title="Business Details">
-        <Field label="Industry Vertical *" helper={industry ? `CFO Fynny will use ${industry} benchmarks for your gross margin, DSO, and working capital analysis.` : undefined}>
-          {/* BACKEND: businesses.industry */}
-          <Select value={industry} onChange={setIndustry}
-            options={["Textile & Apparel", "Manufacturing", "IT & Services", "Healthcare & Clinics", "Real Estate & Construction", "Trading & Distribution", "Export & Import", "Food & Beverage", "Retail", "Agriculture", "Education", "Logistics", "Pharma", "Other"]} />
-        </Field>
-
-        <Field label="Annual Turnover Range *">
-          {/* BACKEND: businesses.turnover_range */}
-          <PillGroup value={turnover} onChange={setTurnover}
-            options={["Under ₹1 Cr", "₹1-5 Cr", "₹5-25 Cr", "₹25-100 Cr", "₹100-200 Cr", "Above ₹200 Cr"]} />
-        </Field>
-
-        <Field label="State of GST Registration *">
-          {/* BACKEND: businesses.state */}
-          <Select value={stateReg} onChange={setStateReg} options={STATES} />
-        </Field>
-
-        <Field label="Number of Employees" helper="Used for PF, ESIC, and labour law compliance alerts">
-          {/* BACKEND: businesses.employee_count */}
-          <Select value={employees} onChange={setEmployees} options={["1-5", "6-15", "16-50", "51-200", "201-500", "500+"]} />
-        </Field>
-
-        <Field label="Financial Year Start">
-          {/* BACKEND: businesses.financial_year_start (column not yet present) */}
-          <PillGroup value={fyStart} onChange={setFyStart} options={["April (Indian FY)", "January (Calendar Year)"]} />
-        </Field>
-      </Section>
-
-      {/* SECTION 3: Registrations */}
-      <Section title="Registrations & Certifications">
-        <Field label="MSME Udyam Registration" helper="Enables MSME payment rights enforcement (Section 43B(h)) and unlocks CGTMSE loan benefits">
-          {/* BACKEND: businesses.msme_udyam */}
-          <TextInput value={msme} onChange={setMsme} placeholder="UDYAM-XX-00-0000000" />
-          {!msme && (
-            <div style={{
-              marginTop: 10, background: "#FFFBEB", border: "1px solid #FCD34D",
-              borderRadius: 6, padding: "10px 14px",
-              fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "#92400E",
-            }}>
-              No MSME number? Register free at udyamregistration.gov.in →
-            </div>
-          )}
-        </Field>
-
-        {showCin && (
-          <Field label="CIN (Company Identification Number)" helper="Required for ROC filing alerts and MCA compliance tracking">
-            {/* BACKEND: businesses.cin (column not yet present) */}
-            <TextInput value={cin} onChange={(v) => setCin(v.toUpperCase().slice(0, 21))} placeholder="U17110MH2015PTC123456" />
+      <Card title="Address & Contact">
+        <Field label="Street"><input value={addr.street} onChange={(e) => setAddr({ ...addr, street: e.target.value })} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="City"><input value={addr.city} onChange={(e) => setAddr({ ...addr, city: e.target.value })} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+          <Field label="State">
+            <select value={addr.state} onChange={(e) => setAddr({ ...addr, state: e.target.value })} className={selCls} style={{ borderColor: BORDER }}>
+              {STATES.map((s) => <option key={s}>{s}</option>)}
+            </select>
           </Field>
-        )}
-
-        {showIec && (
-          <Field label="Import Export Code (IEC)">
-            {/* BACKEND: businesses.iec (column not yet present) */}
-            <TextInput value={iec} onChange={(v) => setIec(v.slice(0, 10))} placeholder="0123456789" />
-          </Field>
-        )}
-      </Section>
-
-      {/* SECTION 4: Address */}
-      <Section title="Registered Address" sub="Used for compliance correspondence and state-specific regulations.">
-        {/* BACKEND: businesses.address_json (column not yet present) */}
-        <Field label="Registered Address Line 1"><TextInput value={addr1} onChange={setAddr1} /></Field>
-        <Field label="Address Line 2"><TextInput value={addr2} onChange={setAddr2} /></Field>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-          <Field label="City"><TextInput value={city} onChange={setCity} /></Field>
-          <Field label="State"><Select value={addrState} onChange={setAddrState} options={STATES} /></Field>
-          <Field label="PIN Code"><TextInput value={pin} onChange={(v) => setPin(v.replace(/\D/g, "").slice(0, 6))} /></Field>
+          <Field label="Pincode"><input value={addr.pincode} onChange={(e) => setAddr({ ...addr, pincode: e.target.value })} maxLength={6} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+          <Field label="Business email"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+          <Field label="Business phone"><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+          <Field label="Website URL"><input value={website} onChange={(e) => setWebsite(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
         </div>
-      </Section>
+        <Save onClick={() => toast.success("Address saved")} />
+      </Card>
 
-      {/* SAVE ROW */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 32 }}>
-        <button style={{
-          height: 42, padding: "0 20px", borderRadius: 6,
-          background: "transparent", border: "1px solid #D4C9A8", color: "#1A1008",
-          fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer",
-        }}>Discard</button>
-        {/* BACKEND: PATCH /api/businesses {all form fields} */}
-        <button style={{
-          height: 42, padding: "0 20px", borderRadius: 6,
-          background: "#C41E1E", border: "none", color: "#FFFFFF",
-          fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer",
-        }}>Save changes</button>
-      </div>
+      <Card title="Financial Settings">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Financial year start">
+            <select value={fyStart} onChange={(e) => setFyStart(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+              <option>April</option><option>January</option><option>July</option>
+            </select>
+          </Field>
+          <Field label="Base currency"><input disabled value="INR ₹" className={inpCls} style={{ borderColor: BORDER, background: "#FAF7F0" }} /></Field>
+          <Field label="GST registration type">
+            <select value={gstType} onChange={(e) => setGstType(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+              <option value="regular">Regular</option><option value="composition">Composition</option><option value="unregistered">Unregistered</option>
+            </select>
+          </Field>
+        </div>
+        <p className="text-[12px] font-semibold mt-2" style={{ color: "rgba(26,16,8,0.6)" }}>Business bank account</p>
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Bank name"><input value={bank.name} onChange={(e) => setBank({ ...bank, name: e.target.value })} className={inpCls} style={{ borderColor: BORDER }} /></Field>
+          <Field label="Account number"><input value={bank.account} onChange={(e) => setBank({ ...bank, account: e.target.value })} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
+          <Field label="IFSC"><input value={bank.ifsc} onChange={(e) => setBank({ ...bank, ifsc: e.target.value.toUpperCase() })} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
+        </div>
+        <Save onClick={() => toast.success("Financial settings saved")} />
+      </Card>
     </div>
   );
 };

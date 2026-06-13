@@ -1,142 +1,141 @@
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
-interface AlertRow {
-  category: string;
-  description: string;
-  group: "critical" | "warning" | "info" | "brief";
-  whatsapp: boolean;
-  email: boolean;
-  inApp: boolean;
-  locked?: boolean;
-}
+const RED = "#A93838"; const BORDER = "#E0D9C8";
 
-const defaultAlerts: AlertRow[] = [
-  { category: "Cash below threshold", description: "When cash drops below your limit", group: "critical", whatsapp: true, email: true, inApp: true, locked: true },
-  { category: "Payroll cash risk", description: "10 days before if cash may be tight", group: "critical", whatsapp: true, email: true, inApp: true, locked: true },
-  { category: "ITC mismatch", description: "When 2B mismatches found on 14th", group: "warning", whatsapp: true, email: true, inApp: true },
-  { category: "Overdue receivables", description: "When customer 30/60/90 days overdue", group: "warning", whatsapp: true, email: true, inApp: true },
-  { category: "Filing deadline", description: "14/7/3/0 days before each filing", group: "warning", whatsapp: true, email: true, inApp: true },
-  { category: "Vendor GST risk", description: "When vendor compliance drops below 60", group: "warning", whatsapp: true, email: true, inApp: true },
-  { category: "Monthly CFO report", description: "Auto-generated on 1st of month", group: "info", whatsapp: false, email: false, inApp: true },
-  { category: "CBIC notifications", description: "New circulars relevant to you", group: "info", whatsapp: false, email: false, inApp: true },
-  { category: "Product updates", description: "New FynHelp features", group: "info", whatsapp: false, email: false, inApp: false },
-  { category: "Morning brief", description: "Daily 8AM financial summary", group: "brief", whatsapp: true, email: true, inApp: true },
-];
+const Card = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => (
+  <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in" style={{ borderColor: BORDER }}>
+    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
+    {sub && <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>}
+    <div className="mt-4 space-y-4">{children}</div>
+  </div>
+);
 
-const Toggle = ({ on, onChange, disabled }: { on: boolean; onChange: () => void; disabled?: boolean }) => (
-  <button onClick={disabled ? undefined : onChange}
-    className="w-10 h-[22px] rounded-full relative transition-all duration-250"
-    style={{ background: on ? "#C41E1E" : "#E0D9C8", opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>
-    <div className="w-4 h-4 rounded-full bg-card shadow absolute top-[3px] transition-all duration-250"
-      style={{ left: on ? 21 : 3 }} />
-  </button>
+const selCls = "h-9 px-3 rounded-md border bg-card text-[13px] focus:outline-none";
+const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none";
+
+const Row = ({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) => (
+  <div className="flex items-start justify-between gap-4 py-2">
+    <div className="flex-1">
+      <p className="text-[13px] font-medium" style={{ color: "#1A1008" }}>{label}</p>
+      {sub && <p className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>{sub}</p>}
+    </div>
+    <div className="flex items-center gap-2">{children}</div>
+  </div>
+);
+
+const Save = ({ onClick, label = "Save" }: { onClick: () => void; label?: string }) => (
+  <button onClick={onClick} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>{label}</button>
 );
 
 const NotificationsPage = () => {
-  const { toast } = useToast();
-  const [alerts, setAlerts] = useState(defaultAlerts);
-  const [channels, setChannels] = useState({ whatsapp: true, email: true });
-  const [briefTime, setBriefTime] = useState("8:00 AM");
-
-  const toggleAlert = (idx: number, channel: "whatsapp" | "email" | "inApp") => {
-    setAlerts(prev => prev.map((a, i) => i === idx ? { ...a, [channel]: !a[channel] } : a));
-  };
-
-  const groupLabels: Record<string, { label: string; color: string }> = {
-    critical: { label: "CRITICAL, Always on", color: "#C41E1E" },
-    warning: { label: "WARNING, On by default", color: "#8B5A00" },
-    info: { label: "INFORMATIONAL, Off by default", color: "#1A4A8B" },
-    brief: { label: "NIDHI DAILY BRIEF", color: "#8B6914" },
-  };
+  const [dailyOn, setDailyOn] = useState(true);
+  const [briefTime, setBriefTime] = useState("8 AM");
+  const [briefVia, setBriefVia] = useState<"email" | "whatsapp" | "both">("email");
+  const [runway, setRunway] = useState("3");
+  const [burn, setBurn] = useState("15");
+  const [overdue, setOverdue] = useState("14");
+  const [cashBal, setCashBal] = useState("500000");
+  const [comp, setComp] = useState({
+    gstr3b: { on: true, days: "3" }, gstr1: { on: true, days: "3" },
+    tds: { on: true, days: "5" }, adv: { on: true, days: "7" },
+  });
+  const [mod, setMod] = useState({ liquidity: true, revenue: true, cost: true, gst: true, hr: true, payment: true });
+  const [emailOn, setEmailOn] = useState(true);
+  const [waOn, setWaOn] = useState(false);
+  const [digest, setDigest] = useState(true);
 
   return (
     <div className="max-w-3xl">
       <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Notifications</h2>
-      <p className="text-[14px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Choose how and when CFO Fynny contacts you.</p>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Choose how and when CFO Fynny contacts you.</p>
 
-      {/* Channels */}
-      <div className="mb-8">
-        <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>How CFO Fynny reaches you</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { label: "WhatsApp", key: "whatsapp" as const, status: channels.whatsapp, sub: "+91-XXXXXXXXXX" },
-            { label: "Email", key: "email" as const, status: channels.email, sub: "Connected" },
-            { label: "In-App", key: null, status: true, sub: "Always on" },
-          ].map(ch => (
-            <div key={ch.label} className="bg-card border rounded-lg p-4" style={{ borderColor: "#E0D9C8" }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[14px] font-medium" style={{ color: "#1A1008" }}>{ch.label}</span>
-                <Toggle on={ch.status} onChange={() => ch.key && setChannels(c => ({ ...c, [ch.key!]: !c[ch.key!] }))} disabled={!ch.key} />
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: ch.status ? "#16A34A" : "#E0D9C8" }} />
-                <span className="text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>{ch.sub}</span>
-              </div>
-              {ch.key && !ch.status && (
-                <p className="text-[12px] mt-2 px-2 py-1 rounded" style={{ background: "#FEF3E2", color: "#8B5A00" }}>
-                  You'll miss daily briefs and urgent alerts
-                </p>
-              )}
-              {!ch.key && <p className="text-[11px] mt-1" style={{ color: "rgba(26,16,8,0.40)" }}>(Required for core functionality)</p>}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Alert types */}
-      <h3 className="font-semibold text-[15px] mb-4" style={{ color: "#1A1008" }}>What CFO Fynny alerts you about</h3>
-      <div className="bg-card border rounded-lg overflow-hidden" style={{ borderColor: "#E0D9C8" }}>
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-0 text-[12px] font-semibold px-4 py-2" style={{ background: "#FAF7F0", color: "rgba(26,16,8,0.50)" }}>
-          <span>Alert</span>
-          <span className="w-16 text-center">WhatsApp</span>
-          <span className="w-16 text-center">Email</span>
-          <span className="w-16 text-center">In-App</span>
-        </div>
-        {(["critical", "warning", "info", "brief"] as const).map(group => (
-          <div key={group}>
-            <div className="px-4 py-2 border-t" style={{ borderColor: "#E0D9C8" }}>
-              <span className="text-[10px] font-semibold tracking-widest" style={{ color: groupLabels[group].color }}>{groupLabels[group].label}</span>
-            </div>
-            {alerts.filter(a => a.group === group).map((alert, idx) => {
-              const realIdx = alerts.findIndex(a => a === alert);
-              return (
-                <div key={alert.category} className="grid grid-cols-[1fr_auto_auto_auto] gap-0 items-center px-4 py-3 border-t" style={{ borderColor: "#E0D9C8" }}>
-                  <div>
-                    <p className="font-medium font-sans text-sm" style={{ color: "#1A1008" }}>{alert.category}</p>
-                    <p className="text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>{alert.description}</p>
-                  </div>
-                  <div className="w-16 flex justify-center">
-                    {alert.locked ? <span className="text-[11px]" style={{ color: "#16A34A" }}>✓</span> :
-                      <Toggle on={alert.whatsapp} onChange={() => toggleAlert(realIdx, "whatsapp")} />}
-                  </div>
-                  <div className="w-16 flex justify-center">
-                    {alert.locked ? <span className="text-[11px]" style={{ color: "#16A34A" }}>✓</span> :
-                      <Toggle on={alert.email} onChange={() => toggleAlert(realIdx, "email")} />}
-                  </div>
-                  <div className="w-16 flex justify-center">
-                    <span className="text-[11px]" style={{ color: "#16A34A" }}>✓</span>
-                  </div>
-                </div>
-              );
-            })}
+      <Card title="Daily Brief" sub="Fynny sends a 3-sentence financial summary every morning">
+        <Row label="Send daily financial brief"><Switch checked={dailyOn} onCheckedChange={setDailyOn} /></Row>
+        <Row label="Send at">
+          <select value={briefTime} onChange={(e) => setBriefTime(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+            {["6 AM", "7 AM", "8 AM", "9 AM"].map((t) => <option key={t}>{t}</option>)}
+          </select>
+        </Row>
+        <Row label="Via">
+          <div className="inline-flex rounded-md overflow-hidden border" style={{ borderColor: BORDER }}>
+            {(["email", "whatsapp", "both"] as const).map((v) => (
+              <button key={v} onClick={() => setBriefVia(v)} className="px-3 py-1.5 text-[12px] capitalize"
+                style={{ background: briefVia === v ? RED : "transparent", color: briefVia === v ? "#fff" : "#1A1008" }}>{v}</button>
+            ))}
           </div>
+        </Row>
+      </Card>
+
+      <Card title="Alert Thresholds">
+        <Row label="Alert me when runway drops below">
+          <select value={runway} onChange={(e) => setRunway(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+            <option value="1">1 month</option><option value="2">2 months</option><option value="3">3 months</option><option value="6">6 months</option>
+          </select>
+        </Row>
+        <Row label="Alert me when burn rate increases by">
+          <select value={burn} onChange={(e) => setBurn(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+            {["10", "15", "20", "25"].map((v) => <option key={v} value={v}>{v}%</option>)}
+          </select>
+        </Row>
+        <Row label="Alert me when invoice is overdue by">
+          <select value={overdue} onChange={(e) => setOverdue(e.target.value)} className={selCls} style={{ borderColor: BORDER }}>
+            {["7", "14", "30"].map((v) => <option key={v} value={v}>{v} days</option>)}
+          </select>
+        </Row>
+        <Row label="Alert me when cash balance drops below">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px]" style={{ color: "rgba(26,16,8,0.5)" }}>₹</span>
+            <input value={cashBal} onChange={(e) => setCashBal(e.target.value)} className="h-9 pl-7 pr-3 w-40 rounded-md border bg-card text-[13px]" style={{ borderColor: BORDER }} />
+          </div>
+        </Row>
+        <Save onClick={() => toast.success("Thresholds saved")} label="Save Thresholds" />
+      </Card>
+
+      <Card title="GST & Compliance Reminders">
+        {([
+          ["gstr3b", "GSTR-3B reminder"], ["gstr1", "GSTR-1 reminder"],
+          ["tds", "TDS filing reminder"], ["adv", "Advance tax reminder"],
+        ] as const).map(([k, lbl]) => (
+          <Row key={k} label={lbl}>
+            <Switch checked={comp[k].on} onCheckedChange={(v) => setComp((c) => ({ ...c, [k]: { ...c[k], on: v } }))} />
+            <select value={comp[k].days} onChange={(e) => setComp((c) => ({ ...c, [k]: { ...c[k], days: e.target.value } }))}
+              className={selCls} style={{ borderColor: BORDER }} disabled={!comp[k].on}>
+              {["1", "3", "5", "7"].map((d) => <option key={d} value={d}>{d} days before</option>)}
+            </select>
+          </Row>
         ))}
-      </div>
+        <Save onClick={() => toast.success("Reminders saved")} />
+      </Card>
 
-      {/* Brief time */}
-      <div className="mt-4 flex items-center gap-3">
-        <span className="text-[13px]" style={{ color: "#1A1008" }}>Send brief at</span>
-        <select value={briefTime} onChange={e => setBriefTime(e.target.value)}
-          className="px-3 py-1.5 border rounded-lg text-[13px]" style={{ borderColor: "#E0D9C8", color: "#1A1008" }}>
-          {["6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM"].map(t => <option key={t}>{t}</option>)}
-        </select>
-        <span className="text-[12px]" style={{ color: "rgba(26,16,8,0.40)" }}>IST</span>
-      </div>
+      <Card title="Per-Module Notifications">
+        {([
+          ["liquidity", "Liquidity alerts", "runway, burn"],
+          ["revenue", "Revenue alerts", "churn, MRR drop"],
+          ["cost", "Cost alerts", "maverick spend, anomalies"],
+          ["gst", "GST alerts", "filing, ITC mismatch"],
+          ["hr", "HR alerts", "payroll due, attrition risk"],
+          ["payment", "Payment reminders", "vendor due, customer overdue"],
+        ] as const).map(([k, lbl, sub]) => (
+          <Row key={k} label={lbl} sub={sub}>
+            <Switch checked={mod[k]} onCheckedChange={(v) => setMod((m) => ({ ...m, [k]: v }))} />
+          </Row>
+        ))}
+      </Card>
 
-      <button onClick={() => toast({ title: "Notification preferences saved" })}
-        className="mt-6 px-6 py-3 rounded-lg text-sm font-semibold text-white"
-        style={{ background: "#C41E1E" }}>Save notification preferences</button>
+      <Card title="Notification Channels">
+        <Row label="Email notifications" sub="tarun@fynhelp.com  ·  Change">
+          <Switch checked={emailOn} onCheckedChange={setEmailOn} />
+        </Row>
+        <Row label="WhatsApp notifications" sub={waOn ? "+91 98765 43210" : "WhatsApp not connected yet"}>
+          {!waOn && <button onClick={() => { setWaOn(true); toast.success("WhatsApp connected"); }} className="text-[12px] px-3 py-1 rounded border font-medium" style={{ color: RED, borderColor: RED }}>Connect</button>}
+          <Switch checked={waOn} onCheckedChange={setWaOn} />
+        </Row>
+        <Row label="Weekly digest" sub="Every Monday at 9 AM — summary of the week">
+          <Switch checked={digest} onCheckedChange={setDigest} />
+        </Row>
+      </Card>
     </div>
   );
 };
