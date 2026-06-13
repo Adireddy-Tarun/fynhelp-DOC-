@@ -218,10 +218,13 @@ const App = () => (
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
-              <Route index element={null} />
-              <Route path="profile" element={<ProfilePage />} />
+              <Route index element={<Navigate to="/dashboard/settings/personal" replace />} />
+              <Route path="personal" element={<ProfilePage />} />
+              <Route path="profile" element={<Navigate to="/dashboard/settings/personal" replace />} />
               <Route path="security" element={<SecurityPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="language" element={<LanguagePage />} />
+              <Route path="preferences" element={<Navigate to="/dashboard/settings/language" replace />} />
               <Route path="billing" element={<BillingPage />} />
               <Route path="integrations" element={<IntegrationsPage />} />
               <Route path="business" element={<BusinessProfilePage />} />
