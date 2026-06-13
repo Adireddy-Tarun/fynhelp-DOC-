@@ -7,10 +7,10 @@ const settingsNav = [
   {
     title: "ACCOUNT",
     items: [
-      { label: "Personal Information", icon: User, href: "/dashboard/settings/profile" },
+      { label: "Personal Information", icon: User, href: "/dashboard/settings/personal" },
       { label: "Security & Password", icon: Lock, href: "/dashboard/settings/security" },
       { label: "Notifications", icon: Bell, href: "/dashboard/settings/notifications" },
-      { label: "Language & Region", icon: Globe, href: "/dashboard/settings/preferences" },
+      { label: "Language & Region", icon: Globe, href: "/dashboard/settings/language" },
     ],
   },
   {
