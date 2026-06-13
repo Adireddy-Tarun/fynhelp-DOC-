@@ -462,7 +462,7 @@ export function BankingComingSoon() {
                 className="relative rounded-xl bg-white p-5"
                 style={{ border: "0.5px solid rgba(26,16,8,0.08)" }}
               >
-                <div className="text-sm font-medium mb-4" style={{ color: INK }}>Bank Accounts</div>
+                <div className="mb-4" style={{ fontSize: 14, fontWeight: 600, color: INK }}>Bank Accounts</div>
                 <div className="space-y-3">
                   {[
                     { name: "HDFC Bank", balance: "₹12.4L balance", action: "Connected", connected: true },
@@ -476,20 +476,23 @@ export function BankingComingSoon() {
                     >
                       <div className="flex items-center gap-2">
                         {b.connected && <span className="block w-2 h-2 rounded-full" style={{ background: "#10B981" }} />}
-                        <span className="text-sm" style={{ color: INK }}>{b.name}</span>
-                        {b.balance && <span className="text-xs" style={{ color: "#6B6B6B" }}> · {b.balance}</span>}
+                        <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{b.name}</span>
+                        {b.balance && (
+                          <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>
+                            {" · "}{b.balance}
+                          </span>
+                        )}
                       </div>
                       <span
-                        className="text-xs"
-                        style={{ color: b.connected ? "#10B981" : RED }}
+                        style={{ fontSize: 12, fontWeight: 600, color: b.connected ? "#0E8F66" : RED }}
                       >
                         {b.action}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="pt-3 mt-3 border-t text-xs" style={{ borderColor: "rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
-                  Total cash position: <span style={{ color: INK, fontWeight: 600 }}>₹12.4L</span>
+                <div className="pt-3 mt-3 border-t" style={{ fontSize: 12, fontWeight: 500, borderColor: "rgba(26,16,8,0.06)", color: "#4A4540" }}>
+                  Total cash position: <span style={{ fontSize: 20, fontWeight: 700, color: INK }}>₹12.4L</span>
                 </div>
 
                 {/* overlay */}
@@ -498,8 +501,8 @@ export function BankingComingSoon() {
                   style={{ background: "rgba(239,232,216,0.55)", backdropFilter: "blur(1px)" }}
                 >
                   <span
-                    className="text-xs uppercase tracking-wider px-3 py-1.5 rounded-full"
-                    style={{ background: INK, color: "#fff", letterSpacing: "0.1em" }}
+                    className="uppercase px-3 py-1.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, background: INK, color: "#fff", letterSpacing: "0.08em" }}
                   >
                     Coming Q3 2026
                   </span>
