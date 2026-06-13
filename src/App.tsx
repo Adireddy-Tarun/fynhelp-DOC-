@@ -221,7 +221,7 @@ const App = () => (
             <Route path="/dashboard/banking" element={<BankingComingSoon />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
-            <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
+            <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
