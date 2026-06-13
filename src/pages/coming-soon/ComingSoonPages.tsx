@@ -44,10 +44,12 @@ function PreviewBadge() {
   return (
     <span
       title="This is a preview of what you'll see when the module launches"
-      className="absolute top-2 right-2 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+      className="absolute top-2 right-2 uppercase px-1.5 py-0.5 rounded-full"
       style={{
-        background: "rgba(26,16,8,0.06)",
-        color: "rgba(26,16,8,0.55)",
+        fontSize: 10,
+        fontWeight: 600,
+        background: "rgba(26,16,8,0.08)",
+        color: "rgba(26,16,8,0.65)",
         letterSpacing: "0.08em",
       }}
     >
