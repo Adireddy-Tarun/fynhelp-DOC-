@@ -184,6 +184,10 @@ const App = () => (
             <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
             <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
             <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
+            <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Real dashboard — same beige intelligence tabs with live data */}
