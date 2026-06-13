@@ -2148,7 +2148,7 @@ export type Database = {
       }
       integrations: {
         Row: {
-          access_token: string
+          access_token: string | null
           created_at: string | null
           expires_at: string | null
           id: string
@@ -2156,10 +2156,11 @@ export type Database = {
           organization_id: string
           provider: string
           refresh_token: string | null
+          status: string
           updated_at: string | null
         }
         Insert: {
-          access_token: string
+          access_token?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
@@ -2167,10 +2168,11 @@ export type Database = {
           organization_id: string
           provider: string
           refresh_token?: string | null
+          status?: string
           updated_at?: string | null
         }
         Update: {
-          access_token?: string
+          access_token?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
@@ -2178,6 +2180,7 @@ export type Database = {
           organization_id?: string
           provider?: string
           refresh_token?: string | null
+          status?: string
           updated_at?: string | null
         }
         Relationships: []
