@@ -415,8 +415,8 @@ export function BankingComingSoon() {
                   <Landmark size={20} color="#fff" />
                 </div>
                 <div>
-                  <h1 style={{ fontSize: 18, fontWeight: 500, color: INK }}>Banking Intelligence</h1>
-                  <p className="text-xs" style={{ color: "#6B6B6B" }}>
+                  <h1 style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: "-0.02em" }}>Banking Intelligence</h1>
+                  <p style={{ fontSize: 13, color: "#4A4540", lineHeight: 1.7 }}>
                     Multi-bank aggregation via RBI Account Aggregator
                   </p>
                 </div>
@@ -424,10 +424,12 @@ export function BankingComingSoon() {
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span style={{ fontSize: 32, fontWeight: 500, color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <span style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     60%
                   </span>
-                  <span className="text-xs" style={{ color: "#9A9A9A" }}>build complete</span>
+                  <span className="uppercase" style={{ fontSize: 11, fontWeight: 500, color: "#5C5550", letterSpacing: "0.04em" }}>
+                    build complete
+                  </span>
                 </div>
                 <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(26,16,8,0.08)" }}>
                   <div className="h-full rounded-full" style={{ width: "60%", background: RED }} />
@@ -446,8 +448,8 @@ export function BankingComingSoon() {
                         border: m.status === "upcoming" ? "1px solid #C9C2B0" : "none",
                       }}
                     />
-                    <span className="text-sm flex-1" style={{ color: INK }}>{m.text}</span>
-                    <span className="text-xs" style={{ color: "#9A9A9A" }}>{m.date}</span>
+                    <span className="flex-1" style={{ fontSize: 12, fontWeight: 500, color: INK }}>{m.text}</span>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: m.status === "upcoming" ? "#9E9E9E" : GOLD }}>{m.date}</span>
                   </li>
                 ))}
               </ul>
