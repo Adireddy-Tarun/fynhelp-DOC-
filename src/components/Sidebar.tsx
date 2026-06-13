@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Droplets, TrendingUp, DollarSign,
-  FileText, Shield, Users, Brain, BarChart3, Landmark, Building2,
+  FileText, Shield, Users, Brain, BarChart3, BarChart, Landmark, Building2,
   ArrowLeftRight, FileBarChart, Plug, Building, Settings,
   X, ChevronLeft, ChevronRight, Lock,
 } from "lucide-react";
@@ -27,7 +27,6 @@ const menuSections: Section[] = [
     title: "OVERVIEW",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/cockpit" },
-      { icon: MessageSquare, label: "CFO Fynny", path: "/dashboard/nidhi" },
     ],
   },
   {
@@ -37,10 +36,12 @@ const menuSections: Section[] = [
       { icon: TrendingUp, label: "Revenue", path: "/dashboard/revenue-intelligence" },
       { icon: DollarSign, label: "Cost", path: "/dashboard/cost" },
       { icon: FileText, label: "GST & Tax", path: "/dashboard/gst" },
-      { icon: Shield, label: "Governance", path: "/dashboard/compliance", soon: true },
-      { icon: Users, label: "HR & Workforce", path: "/dashboard/hr", soon: true },
-      { icon: Brain, label: "Decision Simulator", path: "/dashboard/simulator" },
-      { icon: BarChart3, label: "Market & Growth", path: "/dashboard/market-growth", soon: true },
+      { icon: Shield, label: "Governance", path: "/dashboard/compliance" },
+      { icon: Users, label: "HR & Workforce", path: "/dashboard/hr" },
+      { icon: BarChart3, label: "Investor", path: "/dashboard/investor" },
+      { icon: MessageSquare, label: "Ask Fynny", path: "/dashboard/nidhi" },
+      { icon: Brain, label: "Decision Simulator", path: "/dashboard/simulator", soon: true },
+      { icon: BarChart, label: "Market & Growth", path: "/dashboard/market-growth", soon: true },
       { icon: Landmark, label: "Banking", path: "/dashboard/banking", soon: true },
       { icon: Building2, label: "CA Partner", path: "/dashboard/ca-partner", soon: true },
     ],
