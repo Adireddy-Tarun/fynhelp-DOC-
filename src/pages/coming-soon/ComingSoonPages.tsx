@@ -172,8 +172,8 @@ export function DecisionSimulatorComingSoon() {
               {["Hiring impact", "Pricing scenarios", "Credit term simulator", "Loan impact"].map((c) => (
                 <span
                   key={c}
-                  className="text-xs px-3 py-1.5 rounded-full bg-white"
-                  style={{ border: `0.5px solid ${RED}33`, color: INK }}
+                  className="px-3 py-1.5 rounded-full bg-white"
+                  style={{ fontSize: 11, fontWeight: 500, color: "#3D3530", border: `0.5px solid ${RED}33` }}
                 >
                   {c}
                 </span>
@@ -182,7 +182,7 @@ export function DecisionSimulatorComingSoon() {
 
             <div key="cta" className="flex flex-col items-center mt-8 gap-2">
               <NotifyButton moduleId="simulator" />
-              <p className="text-[11px]" style={{ color: "#9A9A9A" }}>
+              <p style={{ fontSize: 11, color: "#6B6B6B" }}>
                 We'll email you as soon as this module launches.
               </p>
             </div>,
