@@ -198,7 +198,7 @@ const App = () => (
             <Route path="/dashboard/nidhi"      element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/nidhi-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
-            <Route path="/dashboard/reports" element={<CFOReportsPage />} />
+            <Route path="/dashboard/reports" element={<ReportsPage mode="live" />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
             <Route path="/dashboard/customers" element={<CustomersPage />} />
