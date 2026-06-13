@@ -44,10 +44,12 @@ function PreviewBadge() {
   return (
     <span
       title="This is a preview of what you'll see when the module launches"
-      className="absolute top-2 right-2 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+      className="absolute top-2 right-2 uppercase px-1.5 py-0.5 rounded-full"
       style={{
-        background: "rgba(26,16,8,0.06)",
-        color: "rgba(26,16,8,0.55)",
+        fontSize: 10,
+        fontWeight: 600,
+        background: "rgba(26,16,8,0.08)",
+        color: "rgba(26,16,8,0.65)",
         letterSpacing: "0.08em",
       }}
     >
@@ -73,13 +75,16 @@ function NotifyButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center justify-center text-sm font-medium rounded-lg transition-opacity hover:opacity-90 ${
+        className={`inline-flex items-center justify-center rounded-lg transition-opacity hover:opacity-90 ${
           fullWidth ? "w-full" : ""
         }`}
         style={{
           background: variant === "red" ? RED : INK,
           color: "#fff",
-          padding: "10px 24px",
+          padding: "11px 26px",
+          fontSize: 13,
+          fontWeight: 600,
+          letterSpacing: "0.01em",
         }}
       >
         {label}
@@ -138,24 +143,26 @@ export function DecisionSimulatorComingSoon() {
                 <Brain size={24} color={RED} />
               </div>
               <span
-                className="inline-block mb-4 text-[9px] uppercase font-medium"
+                className="inline-block mb-4 uppercase"
                 style={{
+                  fontSize: 10,
+                  fontWeight: 600,
                   background: RED,
                   color: "#fff",
-                  padding: "3px 10px",
+                  padding: "4px 11px",
                   borderRadius: 20,
-                  letterSpacing: "0.1em",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Coming soon
               </span>
               <h1
                 className="mb-3"
-                style={{ fontSize: 22, fontWeight: 500, color: INK, fontFamily: "Playfair Display, Georgia, serif" }}
+                style={{ fontSize: 24, fontWeight: 700, color: INK, fontFamily: "Playfair Display, Georgia, serif", letterSpacing: "-0.02em" }}
               >
                 Decision Simulator
               </h1>
-              <p className="text-sm leading-relaxed mx-auto" style={{ color: "#6B6B6B", maxWidth: 360 }}>
+              <p className="mx-auto" style={{ color: "#4A4540", fontSize: 13, lineHeight: 1.7, maxWidth: 360 }}>
                 Model the financial impact of any decision before you commit. Hiring, pricing, credit
                 terms — see the numbers before you move.
               </p>
@@ -165,8 +172,8 @@ export function DecisionSimulatorComingSoon() {
               {["Hiring impact", "Pricing scenarios", "Credit term simulator", "Loan impact"].map((c) => (
                 <span
                   key={c}
-                  className="text-xs px-3 py-1.5 rounded-full bg-white"
-                  style={{ border: `0.5px solid ${RED}33`, color: INK }}
+                  className="px-3 py-1.5 rounded-full bg-white"
+                  style={{ fontSize: 11, fontWeight: 500, color: "#3D3530", border: `0.5px solid ${RED}33` }}
                 >
                   {c}
                 </span>
@@ -175,7 +182,7 @@ export function DecisionSimulatorComingSoon() {
 
             <div key="cta" className="flex flex-col items-center mt-8 gap-2">
               <NotifyButton moduleId="simulator" />
-              <p className="text-[11px]" style={{ color: "#9A9A9A" }}>
+              <p style={{ fontSize: 11, color: "#6B6B6B" }}>
                 We'll email you as soon as this module launches.
               </p>
             </div>,
@@ -210,19 +217,19 @@ export function DecisionSimulatorComingSoon() {
                 <div
                   key={p.title}
                   className="relative rounded-xl bg-white p-4"
-                  style={{ opacity: 0.6, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.85, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="text-[11px] uppercase tracking-wider mb-2" style={{ color: "#9A9A9A" }}>
+                  <div className="uppercase mb-2" style={{ fontSize: 10, fontWeight: 600, color: "#5C5550", letterSpacing: "0.08em" }}>
                     {p.label}
                   </div>
-                  <div className="text-sm font-medium mb-3" style={{ color: INK }}>
+                  <div className="mb-3" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
                     {p.title}
                   </div>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: "#6B6B6B" }}>
-                    <span style={{ fontFamily: "ui-monospace, monospace" }}>{p.before}</span>
+                  <div className="flex items-center gap-2" style={{ fontSize: 13, color: "#4A4540" }}>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, fontWeight: 700, color: INK }}>{p.before}</span>
                     {p.arrow}
-                    <span style={{ fontFamily: "ui-monospace, monospace", color: p.color, fontWeight: 600 }}>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, fontWeight: 700, color: p.color }}>
                       {p.after}
                     </span>
                   </div>
@@ -252,25 +259,27 @@ export function MarketGrowthComingSoon() {
               style={{ background: INK }}
             >
               <span
-                className="inline-block mb-4 text-[10px] uppercase font-medium px-2.5 py-1 rounded-full"
+                className="inline-block mb-4 uppercase px-2.5 py-1 rounded-full"
                 style={{
+                  fontSize: 10,
+                  fontWeight: 600,
                   background: "rgba(169,56,56,0.18)",
-                  color: "#E08585",
-                  border: "1px solid rgba(169,56,56,0.35)",
-                  letterSpacing: "0.1em",
+                  color: "#F5A8A8",
+                  border: "1px solid rgba(169,56,56,0.45)",
+                  letterSpacing: "0.08em",
                 }}
               >
                 In development
               </span>
               <h1
                 className="mb-3"
-                style={{ fontSize: 24, fontWeight: 500, color: "#fff", fontFamily: "Playfair Display, Georgia, serif" }}
+                style={{ fontSize: 24, fontWeight: 700, color: "#fff", fontFamily: "Playfair Display, Georgia, serif", letterSpacing: "-0.02em" }}
               >
                 Market & Growth Intelligence
               </h1>
               <p
-                className="text-sm mx-auto mb-5"
-                style={{ color: "rgba(255,255,255,0.45)", maxWidth: 520 }}
+                className="mx-auto mb-5"
+                style={{ color: "rgba(255,255,255,0.78)", maxWidth: 520, fontSize: 13, lineHeight: 1.7 }}
               >
                 See how your numbers compare to your industry. Get a fundraise-ready score before
                 you talk to investors.
@@ -279,11 +288,13 @@ export function MarketGrowthComingSoon() {
                 {["Industry benchmarks", "Credit rating predictor", "Fundraise readiness score"].map((t) => (
                   <span
                     key={t}
-                    className="text-[10px] px-2.5 py-1 rounded-full"
+                    className="px-2.5 py-1 rounded-full"
                     style={{
-                      background: "rgba(255,255,255,0.04)",
-                      color: "rgba(255,255,255,0.7)",
-                      border: "1px solid rgba(255,255,255,0.12)",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      background: "rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.82)",
+                      border: "1px solid rgba(255,255,255,0.16)",
                     }}
                   >
                     {t}
@@ -301,21 +312,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 1 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <BarChart3 size={14} color={RED} /> Revenue Growth
                   </div>
-                  <div className="text-3xl font-medium mb-1" style={{ color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <div className="mb-1" style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     42%
                   </div>
-                  <div className="text-[11px] mb-2" style={{ color: "#9A9A9A" }}>
+                  <div className="mb-2" style={{ fontSize: 11, color: "#6B6B6B" }}>
                     Industry median: 28%
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: "#10B98120", color: "#10B981" }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: "#10B98120", color: "#0E8F66" }}
                   >
                     Above median
                   </span>
@@ -324,21 +335,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 2 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <Shield size={14} color={RED} /> Business Credit Score
                   </div>
-                  <div className="text-3xl font-medium mb-2" style={{ color: INK, fontFamily: "ui-monospace, monospace" }}>
-                    720<span className="text-sm" style={{ color: "#9A9A9A" }}> / 900</span>
+                  <div className="mb-2" style={{ fontSize: 28, fontWeight: 700, color: INK, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
+                    720<span style={{ fontSize: 14, fontWeight: 500, color: "#6B6B6B" }}> / 900</span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: "#EFE8D8" }}>
                     <div className="h-full" style={{ width: "80%", background: GOLD }} />
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: `${GOLD}20`, color: GOLD }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: `${GOLD}20`, color: GOLD }}
                   >
                     Good
                   </span>
@@ -347,21 +358,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 3 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <Rocket size={14} color={RED} /> Series A Readiness
                   </div>
-                  <div className="text-3xl font-medium mb-2" style={{ color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <div className="mb-2" style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     67%
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: "#EFE8D8" }}>
                     <div className="h-full" style={{ width: "67%", background: RED }} />
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: `${GOLD}20`, color: GOLD }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: `${GOLD}20`, color: GOLD }}
                   >
                     Getting there
                   </span>
@@ -404,8 +415,8 @@ export function BankingComingSoon() {
                   <Landmark size={20} color="#fff" />
                 </div>
                 <div>
-                  <h1 style={{ fontSize: 18, fontWeight: 500, color: INK }}>Banking Intelligence</h1>
-                  <p className="text-xs" style={{ color: "#6B6B6B" }}>
+                  <h1 style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: "-0.02em" }}>Banking Intelligence</h1>
+                  <p style={{ fontSize: 13, color: "#4A4540", lineHeight: 1.7 }}>
                     Multi-bank aggregation via RBI Account Aggregator
                   </p>
                 </div>
@@ -413,10 +424,12 @@ export function BankingComingSoon() {
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span style={{ fontSize: 32, fontWeight: 500, color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <span style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     60%
                   </span>
-                  <span className="text-xs" style={{ color: "#9A9A9A" }}>build complete</span>
+                  <span className="uppercase" style={{ fontSize: 11, fontWeight: 500, color: "#5C5550", letterSpacing: "0.04em" }}>
+                    build complete
+                  </span>
                 </div>
                 <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(26,16,8,0.08)" }}>
                   <div className="h-full rounded-full" style={{ width: "60%", background: RED }} />
@@ -435,8 +448,8 @@ export function BankingComingSoon() {
                         border: m.status === "upcoming" ? "1px solid #C9C2B0" : "none",
                       }}
                     />
-                    <span className="text-sm flex-1" style={{ color: INK }}>{m.text}</span>
-                    <span className="text-xs" style={{ color: "#9A9A9A" }}>{m.date}</span>
+                    <span className="flex-1" style={{ fontSize: 12, fontWeight: 500, color: INK }}>{m.text}</span>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: m.status === "upcoming" ? "#9E9E9E" : GOLD }}>{m.date}</span>
                   </li>
                 ))}
               </ul>
@@ -449,7 +462,7 @@ export function BankingComingSoon() {
                 className="relative rounded-xl bg-white p-5"
                 style={{ border: "0.5px solid rgba(26,16,8,0.08)" }}
               >
-                <div className="text-sm font-medium mb-4" style={{ color: INK }}>Bank Accounts</div>
+                <div className="mb-4" style={{ fontSize: 14, fontWeight: 600, color: INK }}>Bank Accounts</div>
                 <div className="space-y-3">
                   {[
                     { name: "HDFC Bank", balance: "₹12.4L balance", action: "Connected", connected: true },
@@ -463,20 +476,23 @@ export function BankingComingSoon() {
                     >
                       <div className="flex items-center gap-2">
                         {b.connected && <span className="block w-2 h-2 rounded-full" style={{ background: "#10B981" }} />}
-                        <span className="text-sm" style={{ color: INK }}>{b.name}</span>
-                        {b.balance && <span className="text-xs" style={{ color: "#6B6B6B" }}> · {b.balance}</span>}
+                        <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{b.name}</span>
+                        {b.balance && (
+                          <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>
+                            {" · "}{b.balance}
+                          </span>
+                        )}
                       </div>
                       <span
-                        className="text-xs"
-                        style={{ color: b.connected ? "#10B981" : RED }}
+                        style={{ fontSize: 12, fontWeight: 600, color: b.connected ? "#0E8F66" : RED }}
                       >
                         {b.action}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="pt-3 mt-3 border-t text-xs" style={{ borderColor: "rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
-                  Total cash position: <span style={{ color: INK, fontWeight: 600 }}>₹12.4L</span>
+                <div className="pt-3 mt-3 border-t" style={{ fontSize: 12, fontWeight: 500, borderColor: "rgba(26,16,8,0.06)", color: "#4A4540" }}>
+                  Total cash position: <span style={{ fontSize: 20, fontWeight: 700, color: INK }}>₹12.4L</span>
                 </div>
 
                 {/* overlay */}
@@ -485,8 +501,8 @@ export function BankingComingSoon() {
                   style={{ background: "rgba(239,232,216,0.55)", backdropFilter: "blur(1px)" }}
                 >
                   <span
-                    className="text-xs uppercase tracking-wider px-3 py-1.5 rounded-full"
-                    style={{ background: INK, color: "#fff", letterSpacing: "0.1em" }}
+                    className="uppercase px-3 py-1.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, background: INK, color: "#fff", letterSpacing: "0.08em" }}
                   >
                     Coming Q3 2026
                   </span>
@@ -523,8 +539,8 @@ export function CAPartnerComingSoon() {
               style={{ border: "0.5px solid rgba(26,16,8,0.08)", boxShadow: "0 6px 24px rgba(26,16,8,0.04)" }}
             >
               <span
-                className="absolute top-5 right-5 text-[10px] uppercase font-medium px-2.5 py-1 rounded-full"
-                style={{ background: `${GOLD}20`, color: GOLD, letterSpacing: "0.1em" }}
+                className="absolute top-5 right-5 uppercase px-2.5 py-1 rounded-full"
+                style={{ fontSize: 10, fontWeight: 600, background: `${GOLD}22`, color: GOLD, letterSpacing: "0.08em" }}
               >
                 Launching Q3 2026
               </span>
@@ -536,10 +552,10 @@ export function CAPartnerComingSoon() {
                 <Building2 size={20} color={RED} />
               </div>
 
-              <h1 className="mb-2" style={{ fontSize: 18, fontWeight: 500, color: INK }}>
+              <h1 className="mb-2" style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: "-0.02em" }}>
                 CA Partner Ecosystem
               </h1>
-              <p className="text-[13px] leading-relaxed mb-6" style={{ color: "#6B6B6B" }}>
+              <p className="mb-6" style={{ fontSize: 13, lineHeight: 1.7, color: "#4A4540" }}>
                 A white-label CFO dashboard for chartered accountants managing 30+ clients — with
                 built-in referral commissions.
               </p>
@@ -552,8 +568,8 @@ export function CAPartnerComingSoon() {
                     style={{ background: BEIGE }}
                   >
                     <f.Icon size={16} color={RED} className="mb-2" />
-                    <div className="text-sm font-medium mb-0.5" style={{ color: INK }}>{f.title}</div>
-                    <div className="text-[10px] leading-snug" style={{ color: "#6B6B6B" }}>{f.desc}</div>
+                    <div className="mb-1" style={{ fontSize: 13, fontWeight: 600, color: INK }}>{f.title}</div>
+                    <div style={{ fontSize: 11, lineHeight: 1.5, color: "#5C5550" }}>{f.desc}</div>
                   </div>
                 ))}
               </div>
@@ -562,14 +578,14 @@ export function CAPartnerComingSoon() {
                 className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5"
                 style={{ borderTop: "1px solid rgba(26,16,8,0.08)" }}
               >
-                <span className="text-sm" style={{ color: INK }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#3D3530" }}>
                   Are you a CA? Join the early access program.
                 </span>
                 <NotifyButton moduleId="ca-partner" label="Join early access" variant="red" />
               </div>
             </div>,
 
-            <p key="proof" className="text-xs text-center mt-4" style={{ color: "#9A9A9A" }}>
+            <p key="proof" className="text-center mt-4" style={{ fontSize: 12, fontWeight: 500, color: "#5C5550" }}>
               Join 40+ CAs already on the early access list
             </p>,
           ]}
