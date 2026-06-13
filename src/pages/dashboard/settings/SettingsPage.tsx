@@ -1,7 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import GlobalBackBar from "@/components/GlobalBackBar";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase } from "lucide-react";
+import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase, ChevronRight } from "lucide-react";
 
 const settingsNav = [
   {
@@ -110,15 +109,29 @@ const SettingsLayout = () => {
   const location = useLocation();
   const isRoot = location.pathname === "/dashboard/settings";
 
+  const currentItem = settingsNav
+    .flatMap((g) => g.items)
+    .find((i) => i.href === location.pathname);
+  const currentLabel = currentItem?.label ?? "Overview";
+
   return (
     <DashboardLayout>
-      <GlobalBackBar />
       <div className="mb-6">
-        <h1 className="font-serif text-4xl font-bold py-[15px] pt-[100px]" style={{ color: "#1A1008" }}>Settings</h1>
+        <nav className="flex items-center gap-1.5 text-[12px] mb-2" style={{ color: "rgba(26,16,8,0.55)" }}>
+          <Link to="/dashboard/settings" className="hover:underline" style={{ color: "#8B6914" }}>Settings</Link>
+          {!isRoot && (
+            <>
+              <ChevronRight size={12} />
+              <span style={{ color: "rgba(26,16,8,0.75)" }}>{currentLabel}</span>
+            </>
+          )}
+        </nav>
+        <h1 className="font-serif text-4xl font-bold" style={{ color: "#1A1008" }}>Settings</h1>
         <p className="text-sm mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
           Manage your account, business profile, and subscription.
         </p>
       </div>
+
 
       <div className="flex gap-0 min-h-[calc(100vh-240px)]">
         {/* Settings sidebar nav */}
