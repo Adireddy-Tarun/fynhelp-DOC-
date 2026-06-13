@@ -132,11 +132,6 @@ const SettingsLayout = () => {
         </p>
       </div>
 
-      <div className="flex gap-0 min-h-[calc(100vh-240px)]">
-        {/* Settings sidebar nav */}
-        <aside className="hidden lg:block w-[220px] flex-shrink-0 bg-card border-r sticky top-[80px] self-start" style={{ borderColor: "#E0D9C8" }}>
-
-      </div>
 
       <div className="flex gap-0 min-h-[calc(100vh-240px)]">
         {/* Settings sidebar nav */}
