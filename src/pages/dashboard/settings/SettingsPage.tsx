@@ -1,7 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import GlobalBackBar from "@/components/GlobalBackBar";
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase } from "lucide-react";
+import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase, ChevronRight } from "lucide-react";
 
 const settingsNav = [
   {
