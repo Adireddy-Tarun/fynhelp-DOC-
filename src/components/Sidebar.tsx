@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Droplets, TrendingUp, DollarSign,
-  FileText, Shield, Users, Brain, BarChart3, Landmark, Building2,
+  FileText, Shield, Users, Brain, BarChart3, BarChart, Landmark, Building2,
   ArrowLeftRight, FileBarChart, Plug, Building, Settings,
   X, ChevronLeft, ChevronRight, Lock,
 } from "lucide-react";
