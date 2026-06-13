@@ -171,6 +171,7 @@ const App = () => (
             <Route path="/demo/hr"         element={<IntelligencePage mode="demo" tab="hr" />} />
             <Route path="/demo/investor"   element={<IntelligencePage mode="demo" tab="investor" />} />
             <Route path="/demo/fynny"      element={<IntelligencePage mode="demo" tab="fynny" />} />
+            <Route path="/demo/reports"    element={<ReportsPage mode="demo" />} />
             <Route path="/demo/customers"  element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
             <Route path="/demo/vendors"    element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
             <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
