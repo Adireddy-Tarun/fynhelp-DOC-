@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Droplets, TrendingUp, DollarSign, FileText, ShieldCheck, Users, Briefcase, Bot } from "lucide-react";
+import { Droplets, TrendingUp, DollarSign, FileText, Shield, Users, BarChart3, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LiquidityTab from "./tabs/LiquidityTab";
 import RevenueTab from "./tabs/RevenueTab";
@@ -19,14 +19,15 @@ import { useMode } from "./DataSource";
 import { HeaderToolbar } from "./actions";
 
 const TABS = [
-  { id: "liquidity",  label: "Liquidity",   icon: Droplets,    Comp: LiquidityTab },
-  { id: "revenue",    label: "Revenue",     icon: TrendingUp,  Comp: RevenueTab },
-  { id: "cost",       label: "Cost",        icon: DollarSign,  Comp: CostTab },
-  { id: "gst",        label: "GST & Tax",   icon: FileText,    Comp: GstTab },
-  { id: "governance", label: "Governance",  icon: ShieldCheck, Comp: GovernanceTab },
-  { id: "hr",         label: "HR",          icon: Users,       Comp: HrTab },
-  { id: "investor",   label: "Investor",    icon: Briefcase,   Comp: InvestorTab },
-  { id: "fynny",      label: "Ask Fynny",   icon: Bot,         Comp: AskFynnyTab },
+  { id: "liquidity",  label: "Liquidity",      icon: Droplets,       Comp: LiquidityTab },
+  { id: "revenue",    label: "Revenue",        icon: TrendingUp,     Comp: RevenueTab },
+  { id: "cost",       label: "Cost",           icon: DollarSign,     Comp: CostTab },
+  { id: "gst",        label: "GST & Tax",      icon: FileText,       Comp: GstTab },
+  { id: "governance", label: "Governance",     icon: Shield,         Comp: GovernanceTab },
+  { id: "hr",         label: "HR & Workforce", icon: Users,          Comp: HrTab },
+  { id: "investor",   label: "Investor",       icon: BarChart3,      Comp: InvestorTab },
+  { id: "fynny",      label: "Ask Fynny",      icon: MessageSquare,  Comp: AskFynnyTab },
+
 ] as const;
 
 export type TabId = typeof TABS[number]["id"];
