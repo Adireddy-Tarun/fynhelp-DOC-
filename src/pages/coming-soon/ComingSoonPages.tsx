@@ -217,19 +217,19 @@ export function DecisionSimulatorComingSoon() {
                 <div
                   key={p.title}
                   className="relative rounded-xl bg-white p-4"
-                  style={{ opacity: 0.6, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.85, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="text-[11px] uppercase tracking-wider mb-2" style={{ color: "#9A9A9A" }}>
+                  <div className="uppercase mb-2" style={{ fontSize: 10, fontWeight: 600, color: "#5C5550", letterSpacing: "0.08em" }}>
                     {p.label}
                   </div>
-                  <div className="text-sm font-medium mb-3" style={{ color: INK }}>
+                  <div className="mb-3" style={{ fontSize: 14, fontWeight: 600, color: INK }}>
                     {p.title}
                   </div>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: "#6B6B6B" }}>
-                    <span style={{ fontFamily: "ui-monospace, monospace" }}>{p.before}</span>
+                  <div className="flex items-center gap-2" style={{ fontSize: 13, color: "#4A4540" }}>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, fontWeight: 700, color: INK }}>{p.before}</span>
                     {p.arrow}
-                    <span style={{ fontFamily: "ui-monospace, monospace", color: p.color, fontWeight: 600 }}>
+                    <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, fontWeight: 700, color: p.color }}>
                       {p.after}
                     </span>
                   </div>
