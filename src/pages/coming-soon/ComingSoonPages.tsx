@@ -143,24 +143,26 @@ export function DecisionSimulatorComingSoon() {
                 <Brain size={24} color={RED} />
               </div>
               <span
-                className="inline-block mb-4 text-[9px] uppercase font-medium"
+                className="inline-block mb-4 uppercase"
                 style={{
+                  fontSize: 10,
+                  fontWeight: 600,
                   background: RED,
                   color: "#fff",
-                  padding: "3px 10px",
+                  padding: "4px 11px",
                   borderRadius: 20,
-                  letterSpacing: "0.1em",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Coming soon
               </span>
               <h1
                 className="mb-3"
-                style={{ fontSize: 22, fontWeight: 500, color: INK, fontFamily: "Playfair Display, Georgia, serif" }}
+                style={{ fontSize: 24, fontWeight: 700, color: INK, fontFamily: "Playfair Display, Georgia, serif", letterSpacing: "-0.02em" }}
               >
                 Decision Simulator
               </h1>
-              <p className="text-sm leading-relaxed mx-auto" style={{ color: "#6B6B6B", maxWidth: 360 }}>
+              <p className="mx-auto" style={{ color: "#4A4540", fontSize: 13, lineHeight: 1.7, maxWidth: 360 }}>
                 Model the financial impact of any decision before you commit. Hiring, pricing, credit
                 terms — see the numbers before you move.
               </p>
