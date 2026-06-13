@@ -90,6 +90,12 @@ import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
+import {
+  DecisionSimulatorComingSoon,
+  MarketGrowthComingSoon,
+  BankingComingSoon,
+  CAPartnerComingSoon,
+} from "./pages/coming-soon/ComingSoonPages.tsx";
 import DashboardLayout from "./components/DashboardLayout.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
