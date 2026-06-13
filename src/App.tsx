@@ -79,6 +79,8 @@ import IntegrationsPage from "./pages/dashboard/settings/IntegrationsPage.tsx";
 import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.tsx";
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
+import LanguagePage from "./pages/dashboard/settings/LanguagePage.tsx";
+import { Navigate } from "react-router-dom";
 import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import InvoicesListPage from "./pages/dashboard/InvoicesListPage.tsx";
 import ExpensesListPage from "./pages/dashboard/ExpensesListPage.tsx";
