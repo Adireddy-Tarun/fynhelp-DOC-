@@ -217,8 +217,8 @@ const App = () => (
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
             <Route path="/dashboard/working-capital" element={<Navigate to="/dashboard/liquidity" replace />} />
-            <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
-            <Route path="/dashboard/banking" element={<BankingPage />} />
+            <Route path="/dashboard/market-growth" element={<MarketGrowthComingSoon />} />
+            <Route path="/dashboard/banking" element={<BankingComingSoon />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
