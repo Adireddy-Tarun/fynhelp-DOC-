@@ -88,7 +88,7 @@ const GhostBtn = ({ children, onClick, color = "rgba(26,16,8,0.50)" }: { childre
 /* ---------- Logo box ---------- */
 type LogoSpec =
   | { kind: "img"; slug: string; color: string; alt: string }
-  | { kind: "icon"; Icon: ComponentType<{ size?: number; color?: string }>; color: string };
+  | { kind: "icon"; Icon: LucideIcon; color: string };
 
 const LogoBox = ({ logo }: { logo: LogoSpec }) => (
   <div style={{
