@@ -312,21 +312,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 1 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <BarChart3 size={14} color={RED} /> Revenue Growth
                   </div>
-                  <div className="text-3xl font-medium mb-1" style={{ color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <div className="mb-1" style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     42%
                   </div>
-                  <div className="text-[11px] mb-2" style={{ color: "#9A9A9A" }}>
+                  <div className="mb-2" style={{ fontSize: 11, color: "#6B6B6B" }}>
                     Industry median: 28%
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: "#10B98120", color: "#10B981" }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: "#10B98120", color: "#0E8F66" }}
                   >
                     Above median
                   </span>
@@ -335,21 +335,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 2 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <Shield size={14} color={RED} /> Business Credit Score
                   </div>
-                  <div className="text-3xl font-medium mb-2" style={{ color: INK, fontFamily: "ui-monospace, monospace" }}>
-                    720<span className="text-sm" style={{ color: "#9A9A9A" }}> / 900</span>
+                  <div className="mb-2" style={{ fontSize: 28, fontWeight: 700, color: INK, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
+                    720<span style={{ fontSize: 14, fontWeight: 500, color: "#6B6B6B" }}> / 900</span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: "#EFE8D8" }}>
                     <div className="h-full" style={{ width: "80%", background: GOLD }} />
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: `${GOLD}20`, color: GOLD }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: `${GOLD}20`, color: GOLD }}
                   >
                     Good
                   </span>
@@ -358,21 +358,21 @@ export function MarketGrowthComingSoon() {
                 {/* Card 3 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.7, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
                 >
                   <PreviewBadge />
-                  <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: "#6B6B6B" }}>
+                  <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <Rocket size={14} color={RED} /> Series A Readiness
                   </div>
-                  <div className="text-3xl font-medium mb-2" style={{ color: RED, fontFamily: "ui-monospace, monospace" }}>
+                  <div className="mb-2" style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     67%
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: "#EFE8D8" }}>
                     <div className="h-full" style={{ width: "67%", background: RED }} />
                   </div>
                   <span
-                    className="inline-block text-[10px] px-2 py-0.5 rounded-full"
-                    style={{ background: `${GOLD}20`, color: GOLD }}
+                    className="inline-block uppercase px-2 py-0.5 rounded-full"
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: `${GOLD}20`, color: GOLD }}
                   >
                     Getting there
                   </span>
