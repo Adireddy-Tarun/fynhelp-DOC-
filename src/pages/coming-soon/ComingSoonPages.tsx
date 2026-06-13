@@ -75,13 +75,16 @@ function NotifyButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center justify-center text-sm font-medium rounded-lg transition-opacity hover:opacity-90 ${
+        className={`inline-flex items-center justify-center rounded-lg transition-opacity hover:opacity-90 ${
           fullWidth ? "w-full" : ""
         }`}
         style={{
           background: variant === "red" ? RED : INK,
           color: "#fff",
-          padding: "10px 24px",
+          padding: "11px 26px",
+          fontSize: 13,
+          fontWeight: 600,
+          letterSpacing: "0.01em",
         }}
       >
         {label}
