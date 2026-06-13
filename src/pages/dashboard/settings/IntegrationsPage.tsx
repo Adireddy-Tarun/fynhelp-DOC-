@@ -1,8 +1,10 @@
-import { useState, ComponentType } from "react";
+import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   Upload, Landmark, CreditCard, FileSpreadsheet, Users, FileText, Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+
 
 /* ============================================================
    FynHelp · Integrations
