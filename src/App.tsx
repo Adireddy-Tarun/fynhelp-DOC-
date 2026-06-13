@@ -49,7 +49,6 @@ import LiquidityIntelligencePage from "./pages/dashboard/LiquidityIntelligencePa
 import RevenueIntelligencePage from "./pages/dashboard/RevenueIntelligencePage.tsx";
 import ReceivablesPage from "./pages/dashboard/ReceivablesPage.tsx";
 import PayablesPage from "./pages/dashboard/PayablesPage.tsx";
-import SimulatorPage from "./pages/dashboard/SimulatorPage.tsx";
 import GSTPage from "./pages/dashboard/GSTPage.tsx";
 import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
@@ -64,11 +63,8 @@ import CompliancePage from "./pages/dashboard/CompliancePage.tsx";
 import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
 import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
 
-import MarketGrowthPage from "./pages/dashboard/MarketGrowthPage.tsx";
-import BankingPage from "./pages/dashboard/BankingPage.tsx";
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
 import TestSecureImportPage from "./pages/dashboard/TestSecureImportPage.tsx";
-import CAPartnerPage from "./pages/dashboard/CAPartnerPage.tsx";
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
@@ -90,6 +86,12 @@ import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
+import {
+  DecisionSimulatorComingSoon,
+  MarketGrowthComingSoon,
+  BankingComingSoon,
+  CAPartnerComingSoon,
+} from "./pages/coming-soon/ComingSoonPages.tsx";
 import DashboardLayout from "./components/DashboardLayout.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
@@ -178,6 +180,10 @@ const App = () => (
             <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
             <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
             <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
+            <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
+            <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             {/* Real dashboard — same beige intelligence tabs with live data */}
@@ -194,7 +200,8 @@ const App = () => (
             <Route path="/dashboard/investor"             element={<DashboardLayout><IntelligencePage mode="live" tab="investor" /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
-            <Route path="/dashboard/simulator" element={<SimulatorPage />} />
+            <Route path="/dashboard/simulator" element={<DecisionSimulatorComingSoon />} />
+            <Route path="/dashboard/decision-simulator" element={<DecisionSimulatorComingSoon />} />
             <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/nidhi"      element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
@@ -210,11 +217,11 @@ const App = () => (
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
             <Route path="/dashboard/working-capital" element={<Navigate to="/dashboard/liquidity" replace />} />
-            <Route path="/dashboard/market-growth" element={<MarketGrowthPage />} />
-            <Route path="/dashboard/banking" element={<BankingPage />} />
+            <Route path="/dashboard/market-growth" element={<MarketGrowthComingSoon />} />
+            <Route path="/dashboard/banking" element={<BankingComingSoon />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
-            <Route path="/dashboard/ca-partner" element={<CAPartnerPage />} />
+            <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
