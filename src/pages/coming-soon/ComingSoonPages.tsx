@@ -259,25 +259,27 @@ export function MarketGrowthComingSoon() {
               style={{ background: INK }}
             >
               <span
-                className="inline-block mb-4 text-[10px] uppercase font-medium px-2.5 py-1 rounded-full"
+                className="inline-block mb-4 uppercase px-2.5 py-1 rounded-full"
                 style={{
+                  fontSize: 10,
+                  fontWeight: 600,
                   background: "rgba(169,56,56,0.18)",
-                  color: "#E08585",
-                  border: "1px solid rgba(169,56,56,0.35)",
-                  letterSpacing: "0.1em",
+                  color: "#F5A8A8",
+                  border: "1px solid rgba(169,56,56,0.45)",
+                  letterSpacing: "0.08em",
                 }}
               >
                 In development
               </span>
               <h1
                 className="mb-3"
-                style={{ fontSize: 24, fontWeight: 500, color: "#fff", fontFamily: "Playfair Display, Georgia, serif" }}
+                style={{ fontSize: 24, fontWeight: 700, color: "#fff", fontFamily: "Playfair Display, Georgia, serif", letterSpacing: "-0.02em" }}
               >
                 Market & Growth Intelligence
               </h1>
               <p
-                className="text-sm mx-auto mb-5"
-                style={{ color: "rgba(255,255,255,0.45)", maxWidth: 520 }}
+                className="mx-auto mb-5"
+                style={{ color: "rgba(255,255,255,0.78)", maxWidth: 520, fontSize: 13, lineHeight: 1.7 }}
               >
                 See how your numbers compare to your industry. Get a fundraise-ready score before
                 you talk to investors.
@@ -286,11 +288,13 @@ export function MarketGrowthComingSoon() {
                 {["Industry benchmarks", "Credit rating predictor", "Fundraise readiness score"].map((t) => (
                   <span
                     key={t}
-                    className="text-[10px] px-2.5 py-1 rounded-full"
+                    className="px-2.5 py-1 rounded-full"
                     style={{
-                      background: "rgba(255,255,255,0.04)",
-                      color: "rgba(255,255,255,0.7)",
-                      border: "1px solid rgba(255,255,255,0.12)",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      background: "rgba(255,255,255,0.06)",
+                      color: "rgba(255,255,255,0.82)",
+                      border: "1px solid rgba(255,255,255,0.16)",
                     }}
                   >
                     {t}
