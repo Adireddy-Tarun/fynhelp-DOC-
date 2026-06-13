@@ -55,6 +55,7 @@ import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
+import ReportsPage from "./pages/intelligence/ReportsPage.tsx";
 import CFOReportDetailPage from "./pages/dashboard/CFOReportDetailPage.tsx";
 import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
 import CustomersPage from "./pages/dashboard/CustomersPage.tsx";
@@ -170,6 +171,7 @@ const App = () => (
             <Route path="/demo/hr"         element={<IntelligencePage mode="demo" tab="hr" />} />
             <Route path="/demo/investor"   element={<IntelligencePage mode="demo" tab="investor" />} />
             <Route path="/demo/fynny"      element={<IntelligencePage mode="demo" tab="fynny" />} />
+            <Route path="/demo/reports"    element={<ReportsPage mode="demo" />} />
             <Route path="/demo/customers"  element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
             <Route path="/demo/vendors"    element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
             <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
@@ -197,7 +199,7 @@ const App = () => (
             <Route path="/dashboard/nidhi"      element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/nidhi-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
-            <Route path="/dashboard/reports" element={<CFOReportsPage />} />
+            <Route path="/dashboard/reports" element={<ReportsPage mode="live" />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
             <Route path="/dashboard/customers" element={<CustomersPage />} />

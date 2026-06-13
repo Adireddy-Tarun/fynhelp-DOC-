@@ -1770,6 +1770,51 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_reports: {
+        Row: {
+          business_id: string
+          created_at: string
+          file_size: number | null
+          file_url: string | null
+          generated_at: string
+          generated_by: string | null
+          id: string
+          parameters: Json
+          report_name: string
+          report_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          file_size?: number | null
+          file_url?: string | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          parameters?: Json
+          report_name: string
+          report_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          file_size?: number | null
+          file_url?: string | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          parameters?: Json
+          report_name?: string
+          report_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gst_filings: {
         Row: {
           acknowledgement_number: string | null
