@@ -539,8 +539,8 @@ export function CAPartnerComingSoon() {
               style={{ border: "0.5px solid rgba(26,16,8,0.08)", boxShadow: "0 6px 24px rgba(26,16,8,0.04)" }}
             >
               <span
-                className="absolute top-5 right-5 text-[10px] uppercase font-medium px-2.5 py-1 rounded-full"
-                style={{ background: `${GOLD}20`, color: GOLD, letterSpacing: "0.1em" }}
+                className="absolute top-5 right-5 uppercase px-2.5 py-1 rounded-full"
+                style={{ fontSize: 10, fontWeight: 600, background: `${GOLD}22`, color: GOLD, letterSpacing: "0.08em" }}
               >
                 Launching Q3 2026
               </span>
@@ -552,10 +552,10 @@ export function CAPartnerComingSoon() {
                 <Building2 size={20} color={RED} />
               </div>
 
-              <h1 className="mb-2" style={{ fontSize: 18, fontWeight: 500, color: INK }}>
+              <h1 className="mb-2" style={{ fontSize: 22, fontWeight: 700, color: INK, letterSpacing: "-0.02em" }}>
                 CA Partner Ecosystem
               </h1>
-              <p className="text-[13px] leading-relaxed mb-6" style={{ color: "#6B6B6B" }}>
+              <p className="mb-6" style={{ fontSize: 13, lineHeight: 1.7, color: "#4A4540" }}>
                 A white-label CFO dashboard for chartered accountants managing 30+ clients — with
                 built-in referral commissions.
               </p>
@@ -568,8 +568,8 @@ export function CAPartnerComingSoon() {
                     style={{ background: BEIGE }}
                   >
                     <f.Icon size={16} color={RED} className="mb-2" />
-                    <div className="text-sm font-medium mb-0.5" style={{ color: INK }}>{f.title}</div>
-                    <div className="text-[10px] leading-snug" style={{ color: "#6B6B6B" }}>{f.desc}</div>
+                    <div className="mb-1" style={{ fontSize: 13, fontWeight: 600, color: INK }}>{f.title}</div>
+                    <div style={{ fontSize: 11, lineHeight: 1.5, color: "#5C5550" }}>{f.desc}</div>
                   </div>
                 ))}
               </div>
@@ -578,14 +578,14 @@ export function CAPartnerComingSoon() {
                 className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5"
                 style={{ borderTop: "1px solid rgba(26,16,8,0.08)" }}
               >
-                <span className="text-sm" style={{ color: INK }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#3D3530" }}>
                   Are you a CA? Join the early access program.
                 </span>
                 <NotifyButton moduleId="ca-partner" label="Join early access" variant="red" />
               </div>
             </div>,
 
-            <p key="proof" className="text-xs text-center mt-4" style={{ color: "#9A9A9A" }}>
+            <p key="proof" className="text-center mt-4" style={{ fontSize: 12, fontWeight: 500, color: "#5C5550" }}>
               Join 40+ CAs already on the early access list
             </p>,
           ]}
