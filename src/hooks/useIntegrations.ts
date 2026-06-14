@@ -38,7 +38,6 @@ export function useIntegrations() {
         organization_id: orgId,
         provider: args.provider,
         status: "active",
-        access_token: "",
         metadata: { ...(args.metadata ?? {}), connected_at: new Date().toISOString() },
       };
       const { error } = await supabase
