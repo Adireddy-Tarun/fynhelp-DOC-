@@ -15,6 +15,7 @@ import {
 type ReportDef = {
   type: string;
   name: string;
+  dbName: string;
   Icon: typeof TrendingUp;
   description: string;
   buttonLabel?: string;
@@ -28,52 +29,61 @@ const CATEGORIES: Category[] = [
   {
     title: "Financial Reports",
     reports: [
-      { type: "profit_loss",   name: "Profit & Loss",       Icon: TrendingUp,    description: "Monthly revenue, expenses and net profit breakdown" },
-      { type: "cash_flow",     name: "Cash Flow",           Icon: Droplets,      description: "Cash inflows, outflows and 13-week forecast" },
-      { type: "burn_rate",     name: "Burn Rate",           Icon: Flame,         description: "Monthly burn trend, runway projection and scenarios" },
-      { type: "gst_summary",   name: "GST Summary",         Icon: FileText,      description: "GSTR filing status, ITC reconciliation and net payable" },
-      { type: "receivables",   name: "Receivables",         Icon: ArrowLeftRight,description: "Outstanding invoices, aging analysis and overdue customers" },
-      { type: "vendor_spend",  name: "Vendor Spend",        Icon: IndianRupee,   description: "Top vendor analysis, category breakdown and optimization" },
-      { type: "employee_cost", name: "Employee Cost",       Icon: Users,         description: "Payroll summary, department costs and CTC breakdown" },
-      { type: "board_pack",    name: "Investor Board Pack", Icon: BarChart3,     description: "Investor-ready KPIs: MRR, ARR, burn, runway, NRR" },
+      { type: "profit_loss",   name: "Profit & Loss",       dbName: "Profit & Loss Statement",     Icon: TrendingUp,    description: "Monthly revenue, expenses and net profit breakdown" },
+      { type: "cash_flow",     name: "Cash Flow",           dbName: "Cash Flow Report",            Icon: Droplets,      description: "Cash inflows, outflows and 13-week forecast" },
+      { type: "burn_rate",     name: "Burn Rate",           dbName: "Burn Rate Report",            Icon: Flame,         description: "Monthly burn trend, runway projection and scenarios" },
+      { type: "gst_summary",   name: "GST Summary",         dbName: "GST Summary Report",          Icon: FileText,      description: "GSTR filing status, ITC reconciliation and net payable" },
+      { type: "receivables",   name: "Receivables",         dbName: "Accounts Receivable Report", Icon: ArrowLeftRight, description: "Outstanding invoices, aging analysis and overdue customers" },
+      { type: "vendor_spend",  name: "Vendor Spend",        dbName: "Vendor Spend Report",         Icon: IndianRupee,   description: "Top vendor analysis, category breakdown and optimization" },
+      { type: "employee_cost", name: "Employee Cost",       dbName: "Employee Cost Report",        Icon: Users,         description: "Payroll summary, department costs and CTC breakdown" },
+      { type: "board_pack",    name: "Investor Board Pack", dbName: "Investor Board Pack",         Icon: BarChart3,     description: "Investor-ready KPIs: MRR, ARR, burn, runway, NRR" },
     ],
   },
   {
     title: "Statutory & Tax Reports",
     reports: [
-      { type: "gstr1",              name: "GSTR-1 Report",              Icon: FileText,       description: "Outward supplies statement in GST portal upload format (JSON + Excel)", buttonLabel: "Generate GSTR-1",       badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "gstr3b",             name: "GSTR-3B Report",             Icon: FileText,       description: "Monthly GST return with ITC reconciliation in govt prescribed format",      buttonLabel: "Generate GSTR-3B",      badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "gstr9",              name: "GSTR-9 Annual Return",       Icon: FileText,       description: "Annual GST return consolidating all monthly filings for the FY",            buttonLabel: "Generate GSTR-9",       badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "tds_return",         name: "TDS Return (26Q/24Q)",       Icon: Receipt,        description: "Quarterly TDS return for contractor payments (26Q) and salary (24Q)",       buttonLabel: "Generate TDS Return",   badge: "govt",      formats: ["excel","pdf","csv"] },
-      { type: "form26as",           name: "Form 26AS Reconciliation",   Icon: ArrowLeftRight, description: "Tax credit statement matching TDS deducted vs deposited vs 26AS",           buttonLabel: "Generate Report" },
-      { type: "advance_tax",        name: "Advance Tax Computation",    Icon: Calculator,     description: "Quarterly advance tax liability with Section 234B/234C interest calculator",  buttonLabel: "Generate Report" },
-      { type: "balance_sheet_sch3", name: "Balance Sheet (Schedule III)",Icon: Building,      description: "Balance sheet in Companies Act 2013 Schedule III format for statutory filing", buttonLabel: "Generate Balance Sheet", badge: "companies", formats: ["excel","pdf","csv"] },
-      { type: "pnl_sch3",           name: "P&L Statement (Schedule III)",Icon: TrendingUp,    description: "Profit & Loss in Companies Act 2013 format with revenue from operations, EBITDA", buttonLabel: "Generate P&L",        badge: "companies", formats: ["excel","pdf","csv"] },
-      { type: "mis_report",         name: "MIS Report",                 Icon: FileBarChart,   description: "Monthly Management Information System summary — all key metrics in one page", buttonLabel: "Generate MIS" },
+      { type: "gstr1",              name: "GSTR-1 Report",              dbName: "GSTR-1 — Outward Supplies",  Icon: FileText,       description: "Outward supplies statement in GST portal upload format (JSON + Excel)", buttonLabel: "Generate GSTR-1",       badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "gstr3b",             name: "GSTR-3B Report",             dbName: "GSTR-3B — Monthly Return",   Icon: FileText,       description: "Monthly GST return with ITC reconciliation in govt prescribed format",      buttonLabel: "Generate GSTR-3B",      badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "gstr9",              name: "GSTR-9 Annual Return",       dbName: "GSTR-9 — Annual Return",     Icon: FileText,       description: "Annual GST return consolidating all monthly filings for the FY",            buttonLabel: "Generate GSTR-9",       badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "tds_return",         name: "TDS Return (26Q/24Q)",       dbName: "TDS Return (26Q/24Q)",       Icon: Receipt,        description: "Quarterly TDS return for contractor payments (26Q) and salary (24Q)",       buttonLabel: "Generate TDS Return",   badge: "govt",      formats: ["pdf","excel"] },
+      { type: "form26as",           name: "Form 26AS Reconciliation",   dbName: "Form 26AS Reconciliation",   Icon: ArrowLeftRight, description: "Tax credit statement matching TDS deducted vs deposited vs 26AS",           buttonLabel: "Generate Report" },
+      { type: "advance_tax",        name: "Advance Tax Computation",    dbName: "Advance Tax Computation",    Icon: Calculator,     description: "Quarterly advance tax liability with Section 234B/234C interest calculator",  buttonLabel: "Generate Report" },
+      { type: "balance_sheet_sch3", name: "Balance Sheet (Schedule III)",dbName: "Balance Sheet (Schedule III)",Icon: Building,     description: "Balance sheet in Companies Act 2013 Schedule III format for statutory filing", buttonLabel: "Generate Balance Sheet", badge: "companies", formats: ["pdf","excel"] },
+      { type: "pnl_sch3",           name: "P&L Statement (Schedule III)",dbName: "P&L Statement (Schedule III)",Icon: TrendingUp,   description: "Profit & Loss in Companies Act 2013 format with revenue from operations, EBITDA", buttonLabel: "Generate P&L",        badge: "companies", formats: ["pdf","excel"] },
+      { type: "mis_report",         name: "MIS Report",                 dbName: "MIS Report",                 Icon: FileBarChart,   description: "Monthly Management Information System summary — all key metrics in one page", buttonLabel: "Generate MIS" },
     ],
   },
   {
     title: "Operational Reports",
     reports: [
-      { type: "payroll_register",   name: "Payroll Register",           Icon: Users,          description: "Salary register with gross, deductions (PF/ESI/TDS), net pay per employee", buttonLabel: "Generate Payroll Register", badge: "govt", formats: ["excel","pdf","csv"] },
-      { type: "epf_esic",           name: "EPF/ESIC Challan Report",    Icon: Shield,         description: "Monthly PF and ESI contribution register for portal filing",                buttonLabel: "Generate Challan",          badge: "govt", formats: ["excel","pdf","csv"] },
-      { type: "vendor_payment",     name: "Vendor Payment Report",      Icon: ArrowLeftRight, description: "All vendor payments due, overdue, and paid this month with ageing",         buttonLabel: "Generate Report" },
-      { type: "customer_statement", name: "Customer Statement",         Icon: User,           description: "Individual customer ledger with all invoices, payments and outstanding balance", buttonLabel: "Generate Statement" },
-      { type: "sales_register",     name: "Sales Register",             Icon: FileText,       description: "Invoice-wise outward sales with GST breakup (CGST/SGST/IGST) — CA ready",    buttonLabel: "Generate Sales Register" },
-      { type: "purchase_register",  name: "Purchase Register",          Icon: ShoppingCart,   description: "Bill-wise inward purchases with ITC breakup — matches GSTR-2A format",       buttonLabel: "Generate Purchase Register" },
-      { type: "budget_vs_actual",   name: "Budget vs Actual",           Icon: BarChart3,      description: "Department-wise budget vs actual variance report for board review",          buttonLabel: "Generate Report" },
+      { type: "payroll_register",   name: "Payroll Register",           dbName: "Payroll Register",           Icon: Users,          description: "Salary register with gross, deductions (PF/ESI/TDS), net pay per employee", buttonLabel: "Generate Payroll Register", badge: "govt", formats: ["pdf","excel"] },
+      { type: "epf_esic",           name: "EPF/ESIC Challan Report",    dbName: "EPF/ESIC Challan Report",    Icon: Shield,         description: "Monthly PF and ESI contribution register for portal filing",                buttonLabel: "Generate Challan",          badge: "govt", formats: ["pdf","excel"] },
+      { type: "vendor_payment",     name: "Vendor Payment Report",      dbName: "Vendor Payment Report",      Icon: ArrowLeftRight, description: "All vendor payments due, overdue, and paid this month with ageing",         buttonLabel: "Generate Report" },
+      { type: "customer_statement", name: "Customer Statement",         dbName: "Customer Statement",         Icon: User,           description: "Individual customer ledger with all invoices, payments and outstanding balance", buttonLabel: "Generate Statement" },
+      { type: "sales_register",     name: "Sales Register",             dbName: "Sales Register",             Icon: FileText,       description: "Invoice-wise outward sales with GST breakup (CGST/SGST/IGST) — CA ready",    buttonLabel: "Generate Sales Register",   badge: "govt", formats: ["pdf","excel"] },
+      { type: "purchase_register",  name: "Purchase Register",          dbName: "Purchase Register",          Icon: ShoppingCart,   description: "Bill-wise inward purchases with ITC breakup — matches GSTR-2A format",       buttonLabel: "Generate Purchase Register",badge: "govt", formats: ["pdf","excel"] },
+      { type: "budget_vs_actual",   name: "Budget vs Actual",           dbName: "Budget vs Actual",           Icon: BarChart3,      description: "Department-wise budget vs actual variance report for board review",          buttonLabel: "Generate Report" },
     ],
   },
   {
     title: "Investor & Board Reports",
     reports: [
-      { type: "investor_update",  name: "Investor Update Pack",        Icon: Rocket,       description: "Monthly investor update — MRR, burn, runway, NRR, wins, risks, asks",       buttonLabel: "Generate Investor Update" },
-      { type: "unit_economics",   name: "Unit Economics Report",       Icon: PieChart,     description: "Full unit economics — CAC by channel, LTV, payback period, cohort analysis", buttonLabel: "Generate Report" },
-      { type: "dpiit_report",     name: "Startup India / DPIIT Report",Icon: Target,       description: "DPIIT recognition compliance report + startup metrics for grant applications", buttonLabel: "Generate Report" },
-      { type: "working_capital",  name: "Working Capital Report",      Icon: FileBarChart, description: "CCC analysis — DSO, DIO, DPO trends with working capital optimization plan", buttonLabel: "Generate Report" },
+      { type: "investor_update",  name: "Investor Update Pack",        dbName: "Investor Update Pack",        Icon: Rocket,       description: "Monthly investor update — MRR, burn, runway, NRR, wins, risks, asks",       buttonLabel: "Generate Investor Update" },
+      { type: "unit_economics",   name: "Unit Economics Report",       dbName: "Unit Economics Report",       Icon: PieChart,     description: "Full unit economics — CAC by channel, LTV, payback period, cohort analysis", buttonLabel: "Generate Report" },
+      { type: "dpiit_report",     name: "Startup India / DPIIT Report",dbName: "Startup India / DPIIT Report",Icon: Target,       description: "DPIIT recognition compliance report + startup metrics for grant applications", buttonLabel: "Generate Report" },
+      { type: "working_capital",  name: "Working Capital Report",      dbName: "Working Capital Report",      Icon: FileBarChart, description: "CCC analysis — DSO, DIO, DPO trends with working capital optimization plan", buttonLabel: "Generate Report" },
     ],
   },
 ];
+
+const MONTHLY_TYPES = new Set(["gstr1","gstr3b","payroll_register","sales_register","purchase_register"]);
+const FORMAT_BADGE_COLORS: Record<string, { bg: string; fg: string }> = {
+  pdf:   { bg: "rgba(169,56,56,0.08)", fg: "#A93838" },
+  excel: { bg: "rgba(16,185,129,0.10)", fg: "#0B7A52" },
+  json:  { bg: "rgba(139,105,20,0.10)", fg: "#8B6914" },
+  csv:   { bg: "rgba(26,16,8,0.06)",    fg: "#1A1008" },
+};
+
 
 const GOLD_BG = "#FAEEDA";
 const GOLD_FG = "#633806";
