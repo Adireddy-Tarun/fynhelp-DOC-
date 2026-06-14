@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AlertTriangle } from "lucide-react";
 import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
-import { RemindButton, MarkDoneButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import { RemindButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
 import SettlementsSection from "../sections/SettlementsSection";
 import FxExposureSection from "../sections/FxExposureSection";
 import UnbilledWipSection from "../sections/UnbilledWipSection";
@@ -111,7 +111,7 @@ export default function LiquidityTab() {
 
   const [scenarioOpen, setScenarioOpen] = useState(false);
   const [optimizeOpen, setOptimizeOpen] = useState(false);
-  const [priorityDismissed, setPriorityDismissed] = useState(false);
+  
   const openDrawer = useOpenDrawer();
 
   return (
