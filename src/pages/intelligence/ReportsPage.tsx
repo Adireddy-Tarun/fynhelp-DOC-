@@ -314,26 +314,54 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
   const [downloading, setDownloading] = useState<string | null>(null);
   const [modalReport, setModalReport] = useState<ReportDef | null>(null);
 
-  const runGenerate = async (r: ReportDef, params?: Record<string, any>) => {
+function ReportsContent({ mode }: { mode: IntelligenceMode }) {
+  const { businessId: liveBiz, profile, user } = useAuth() as any;
+  const businessId = mode === "demo" ? DEMO_BIZ : liveBiz;
+  const userName =
+    mode === "demo"
+      ? "Tarun"
+      : profile?.full_name || user?.email || "User";
+  const { data: reports = [], isLoading } = useGeneratedReports(businessId);
+  const generate = useGenerateReport(businessId);
+  const [pending, setPending] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const [modalReport, setModalReport] = useState<ReportDef | null>(null);
+
+  const runGenerate = async (
+    r: ReportDef,
+    params?: { format?: string; fy?: string; month?: string },
+  ) => {
     if (!businessId) {
       toast.error("Please sign in to generate reports");
       return;
     }
+    const format = params?.format ?? "pdf";
+    const fy = params?.fy ?? "FY 2025-26";
+    const month = params?.month;
+    // Build full report name with period for govt-format reports
+    const reportName = r.badge
+      ? `${r.dbName}${month ? ` — ${month} ${fy}` : ` — ${fy}`}`
+      : r.dbName;
+    const parameters: Record<string, unknown> = { format, period: fy };
+    if (month) parameters.month = month;
+
     setPending(r.type);
+    const tId = toast.loading(`Generating ${reportName} as ${format.toUpperCase()}...`);
     try {
       await generate.mutateAsync({
         report_type: r.type,
-        report_name: r.name,
+        report_name: reportName,
         generated_by: userName,
-        ...(params ? { parameters: params } : {}),
-      } as any);
-      toast.success(`${r.name} generated successfully`);
+        parameters,
+      });
+      toast.success("Ready — downloading", { id: tId });
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to generate report");
+      toast.error(e?.message ?? "Failed to generate report", { id: tId });
     } finally {
       setPending(null);
     }
   };
+
 
   const handleClick = (r: ReportDef) => {
     if (r.badge) {
