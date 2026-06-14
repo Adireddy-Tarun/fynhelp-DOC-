@@ -1,141 +1,83 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
-import ProfileCompletionBadge from "@/components/ProfileCompletionBadge";
+import GlobalHeader from "@/components/layout/GlobalHeader";
 
-import { Search, Bell, Menu } from "lucide-react";
-
-const PAGE_TITLES: Record<string, string> = {
-  "/dashboard/cockpit": "CFO Fynny Cockpit",
-  "/dashboard/nidhi": "Talk to CFO Fynny",
-  "/dashboard/liquidity": "Liquidity",
-  "/dashboard/cash-flow": "Revenue",
-  "/dashboard/cost": "Cost",
-  "/dashboard/gst": "GST & Tax",
-  "/dashboard/compliance": "Governance",
-  "/dashboard/hr": "HR & Workforce",
-  "/dashboard/simulator": "Decision Simulator",
-  "/dashboard/market-growth": "Market & Growth",
-  "/dashboard/banking": "Banking",
-  "/dashboard/ca-partner": "CA Partner",
-  "/dashboard/data-import": "Transactions",
-  "/dashboard/reports": "CFO Reports",
-  "/dashboard/settings/integrations": "Integrations",
-  "/dashboard/settings/business": "Business Profile",
-  "/dashboard/settings/profile": "Profile",
-};
+const STORAGE_KEY = "fynhelp_sidebar_open";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { profile } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" ? window.innerWidth >= 1024 : true);
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
 
   useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
+    const onResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+      setIsMobile(window.innerWidth < 768);
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("sidebar-collapsed");
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved !== null) {
-      try {
-        setCollapsed(JSON.parse(saved));
-      } catch {
-        // ignore
-      }
+      setSidebarOpen(saved === "true");
+    } else if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setSidebarOpen(false);
     }
   }, []);
 
-  const onCollapsedChange = (next: boolean) => {
-    setCollapsed(next);
-    localStorage.setItem("sidebar-collapsed", JSON.stringify(next));
+  const handleToggleSidebar = () => {
+    setSidebarOpen((v) => {
+      const next = !v;
+      localStorage.setItem(STORAGE_KEY, String(next));
+      return next;
+    });
   };
 
-  const isCockpit = location.pathname === "/dashboard/cockpit";
-  const pageTitle = PAGE_TITLES[location.pathname] || "Dashboard";
+  const collapsed = !sidebarOpen;
   const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
-      <Sidebar
-        isOpen={drawerOpen}
-        onToggle={() => setDrawerOpen((v) => !v)}
-        collapsed={collapsed}
-        onCollapsedChange={onCollapsedChange}
-      />
+      {!isMobile && (
+        <Sidebar
+          isOpen={drawerOpen}
+          onToggle={() => setDrawerOpen((v) => !v)}
+          collapsed={collapsed}
+          onCollapsedChange={(next) => {
+            setSidebarOpen(!next);
+            localStorage.setItem(STORAGE_KEY, String(!next));
+          }}
+        />
+      )}
+      {isMobile && drawerOpen && (
+        <Sidebar
+          isOpen={drawerOpen}
+          onToggle={() => setDrawerOpen(false)}
+          collapsed={false}
+          onCollapsedChange={() => {}}
+        />
+      )}
 
       <div
-        className="flex-1 flex flex-col min-h-screen transition-[margin] duration-300"
-        style={{ marginLeft: isDesktop ? sidebarWidth : 0 }}
+        className="flex-1 flex flex-col min-h-screen transition-[margin] duration-200"
+        style={{ marginLeft: isMobile ? 0 : (isDesktop ? sidebarWidth : 0) }}
       >
-        <header className="h-16 border-b border-border bg-background flex items-center px-4 lg:px-6 sticky top-0 z-30">
-          <button
-            className="lg:hidden mr-3 text-fyn-ink"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={20} />
-          </button>
+        <GlobalHeader
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={handleToggleSidebar}
+          onOpenMobileDrawer={() => setDrawerOpen(true)}
+        />
 
-          <div className="flex items-center gap-3">
-            {!isCockpit && (
-              <button
-                onClick={() => navigate("/dashboard/cockpit")}
-                className="text-[#8B6914] text-[13px] hover:underline flex items-center gap-1"
-              >
-                ← Back to Cockpit
-              </button>
-            )}
-            <h1 className="text-lg font-sans text-secondary-foreground">{pageTitle}</h1>
-          </div>
-
-          <div className="ml-auto flex items-center gap-4">
-            <div
-              className="hidden md:flex items-center border border-border rounded-lg px-3 py-1.5 gap-2 w-64 bg-card"
-            >
-              <Search size={14} className="text-fyn-ink/30" />
-              <input
-                placeholder="Search customers, invoices..."
-                className="bg-transparent text-[13px] text-fyn-ink outline-none flex-1"
-                aria-label="Search"
-              />
-              <span className="text-fyn-ink/20 text-xs">⌘K</span>
-            </div>
-            <span
-              className="hidden md:inline text-[12px] px-2 py-1 rounded fyn-metric"
-              style={{ background: "#FEF3E2", color: "#8B5A00" }}
-            >
-              GSTR-3B in 8 days
-            </span>
-            <button className="relative text-fyn-ink/60 hover:text-fyn-ink" aria-label="Notifications">
-              <Bell size={18} />
-              <span
-                className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center"
-                style={{ background: "#C41E1E" }}
-              >
-                3
-              </span>
-            </button>
-            
-            <ProfileCompletionBadge />
-            <Link
-              to="/dashboard/settings/profile"
-              aria-label="Open profile"
-              title="Profile"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold transition-transform hover:scale-105"
-              style={{ background: "#C41E1E" }}
-            >
-              {profile?.full_name?.[0] || "U"}
-            </Link>
-          </div>
-        </header>
-
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto bg-background" style={{ minHeight: "calc(100vh - 64px)" }}>
+        <main
+          className="flex-1 p-4 lg:p-6 overflow-y-auto bg-background"
+          style={{ minHeight: "calc(100vh - 46px)" }}
+          key={location.pathname}
+        >
           {children}
         </main>
       </div>
