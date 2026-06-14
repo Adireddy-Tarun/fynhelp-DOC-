@@ -266,8 +266,10 @@ function GenerateModal({
               Financial Year
             </div>
             <select value={fy} onChange={(e) => setFy(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(26,16,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
+              <option>FY 2026-27</option>
               <option>FY 2025-26</option>
               <option>FY 2024-25</option>
+
             </select>
           </div>
           {needsMonth && (
