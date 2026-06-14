@@ -3,6 +3,9 @@ import { useGstFilings, useExpenses, useInvoices } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EwayBillSection, HsnMasterSection, TaxPlanningSection } from "./sections/NewSections";
 import { GstFilingDialog, ReconcileButton } from "../actions";
+import TdsIntelligenceSection from "../sections/TdsIntelligenceSection";
+import AdvanceTaxSection from "../sections/AdvanceTaxSection";
+import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection";
 
 export default function GstTab() {
   const { data: filings, isLoading } = useGstFilings();
@@ -128,9 +131,12 @@ export default function GstTab() {
         </table>
       </IntelCard>
 
+      <TdsIntelligenceSection />
       <EwayBillSection />
+      <AdvanceTaxSection />
       <HsnMasterSection />
       <TaxPlanningSection />
+      <RegulatoryComplianceSection />
 
       <GstFilingDialog open={!!filingOpen} onOpenChange={(v) => !v && setFilingOpen(null)} period={filingOpen ?? undefined} />
     </div>

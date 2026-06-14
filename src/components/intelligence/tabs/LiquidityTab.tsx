@@ -3,7 +3,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AlertTriangle } from "lucide-react";
 import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
-import { RemindButton, MarkDoneButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import { RemindButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import SettlementsSection from "../sections/SettlementsSection";
+import FxExposureSection from "../sections/FxExposureSection";
+import UnbilledWipSection from "../sections/UnbilledWipSection";
+import ActionItemsSection from "../sections/ActionItemsSection";
 
 
 function daysBetween(a: string, b: string) {
@@ -107,7 +111,7 @@ export default function LiquidityTab() {
 
   const [scenarioOpen, setScenarioOpen] = useState(false);
   const [optimizeOpen, setOptimizeOpen] = useState(false);
-  const [priorityDismissed, setPriorityDismissed] = useState(false);
+  
   const openDrawer = useOpenDrawer();
 
   return (
@@ -132,6 +136,9 @@ export default function LiquidityTab() {
         <KPI href="/demo/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
         <KPI href="/demo/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
+
+      <SettlementsSection />
+
 
       {/* Cash position + CCC */}
       <div className="grid lg:grid-cols-3 gap-4">
@@ -174,6 +181,9 @@ export default function LiquidityTab() {
         </IntelCard>
 
       </div>
+
+      <FxExposureSection />
+
 
       {/* 13-week forecast */}
       <IntelCard title="13-Week Cash Forecast" sub="Net cash flow per week">
@@ -253,6 +263,9 @@ export default function LiquidityTab() {
         </IntelCard>
       </div>
 
+      <UnbilledWipSection />
+
+
       {/* Payments due */}
       <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/demo/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
         <WithData data={m.payments} emptyTitle="No pending payments" cta={null}>
@@ -282,20 +295,7 @@ export default function LiquidityTab() {
       </IntelCard>
 
       {/* Priority action */}
-      {m.overdue.length > 0 && !priorityDismissed && (
-        <div className="rounded-lg px-4 py-3 flex items-center justify-between gap-3 transition-opacity duration-300" style={{ background: "rgba(169,56,56,0.08)", border: "1px solid rgba(169,56,56,0.2)" }}>
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: ACCENT.red }} />
-            <div>
-              <p className="text-xs font-semibold text-fyn-ink">Priority action</p>
-              <p className="text-xs text-fyn-ink mt-0.5">
-                Call <strong>{m.overdue[0].customer_name}</strong> ({fmtCompact(m.overdue[0].outstanding_amount)}, {m.overdue[0].daysOver} days overdue) before Friday.
-              </p>
-            </div>
-          </div>
-          <MarkDoneButton onDone={() => setPriorityDismissed(true)} />
-        </div>
-      )}
+      <ActionItemsSection />
 
       <ScenarioPlannerDialog open={scenarioOpen} onOpenChange={setScenarioOpen} baseRunwayMonths={m.runwayMonths} baseBurn={m.netBurn} baseRevenue={m.revenue30} />
       <OptimizeScheduleDialog open={optimizeOpen} onOpenChange={setOptimizeOpen} />
