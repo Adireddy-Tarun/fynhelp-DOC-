@@ -4,6 +4,9 @@ import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../
 import { AlertTriangle } from "lucide-react";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
+import ProjectEconomicsSection from "../sections/ProjectEconomicsSection";
+import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
 
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
@@ -168,6 +171,11 @@ export default function CostTab() {
           )}
         </WithData>
       </IntelCard>
+
+      <PeopleEfficiencySection />
+      <ProjectEconomicsSection />
+      <SupportIntelligenceSection />
+
 
       <IntelCard title="Cost Optimization Opportunities">
         <ul className="space-y-2 text-sm">

@@ -4,6 +4,9 @@ import { useInvoices, useCustomers, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
 import { CustomerAcquisitionSection, CohortRetentionSection, SalesPipelineSection, RevenueBreakdownSection, DeferredRevenueSection } from "./sections/NewSections";
 import { GenerateReportButton, ViewAllLink } from "../actions";
+import RevenueQualitySection from "../sections/RevenueQualitySection";
+import ConversionFunnelSection from "../sections/ConversionFunnelSection";
+import RevenueAlertsSection from "../sections/RevenueAlertsSection";
 
 
 export default function RevenueTab() {
@@ -115,6 +118,9 @@ export default function RevenueTab() {
         <KPI href="/demo/invoices?status=paid" label="Total Revenue" count={m.totalRevenue} format={fmtCompact} isEmpty={liveEmpty && m.totalRevenue === 0} delta={Number.isFinite(m.mom) ? `${m.mom >= 0 ? "+" : ""}${m.mom.toFixed(1)}% MoM` : undefined} deltaTone={Number.isFinite(m.mom) && m.mom >= 0 ? "up" : "down"} />
       </div>
 
+      <RevenueQualitySection />
+
+
 
       {/* Trend chart */}
       <IntelCard title="Revenue Trend" sub="Last 12 months" action={<GenerateReportButton label="Export" />}>
@@ -178,10 +184,12 @@ export default function RevenueTab() {
 
       {/* ── New wired sections ─────────────────────────────── */}
       <CustomerAcquisitionSection />
+      <ConversionFunnelSection />
       <CohortRetentionSection />
       <SalesPipelineSection />
       <RevenueBreakdownSection active={breakdownBy} setActive={setBreakdownBy} />
       <DeferredRevenueSection />
+      <RevenueAlertsSection />
     </div>
   );
 }
