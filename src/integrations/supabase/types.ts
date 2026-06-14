@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_items: {
+        Row: {
+          business_id: string
+          category: string
+          created_at: string
+          due_date: string | null
+          id: string
+          is_demo: boolean
+          priority: string
+          status: string
+          title: string
+        }
+        Insert: {
+          business_id: string
+          category: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_demo?: boolean
+          priority?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          business_id?: string
+          category?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_demo?: boolean
+          priority?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -47,6 +83,48 @@ export type Database = {
           target_id?: string | null
           target_type?: string | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      advance_tax_schedule: {
+        Row: {
+          amount_due: number
+          business_id: string
+          created_at: string
+          cumulative_pct: number
+          due_date: string
+          financial_year: string
+          id: string
+          instalment_number: number
+          is_demo: boolean
+          section_80iac_exempt: boolean
+          status: string
+        }
+        Insert: {
+          amount_due?: number
+          business_id: string
+          created_at?: string
+          cumulative_pct?: number
+          due_date: string
+          financial_year?: string
+          id?: string
+          instalment_number: number
+          is_demo?: boolean
+          section_80iac_exempt?: boolean
+          status?: string
+        }
+        Update: {
+          amount_due?: number
+          business_id?: string
+          created_at?: string
+          cumulative_pct?: number
+          due_date?: string
+          financial_year?: string
+          id?: string
+          instalment_number?: number
+          is_demo?: boolean
+          section_80iac_exempt?: boolean
+          status?: string
         }
         Relationships: []
       }
@@ -1165,6 +1243,60 @@ export type Database = {
         }
         Relationships: []
       }
+      conversion_funnel: {
+        Row: {
+          activated: number
+          activation_rate: number
+          avg_days_to_convert: number
+          best_channel: string | null
+          business_id: string
+          converted_to_paid: number
+          created_at: string
+          id: string
+          is_demo: boolean
+          leads_total: number
+          period_start: string
+          retained_90d: number
+          trial_to_paid_rate: number
+          trials_started: number
+          worst_channel: string | null
+        }
+        Insert: {
+          activated?: number
+          activation_rate?: number
+          avg_days_to_convert?: number
+          best_channel?: string | null
+          business_id: string
+          converted_to_paid?: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          leads_total?: number
+          period_start: string
+          retained_90d?: number
+          trial_to_paid_rate?: number
+          trials_started?: number
+          worst_channel?: string | null
+        }
+        Update: {
+          activated?: number
+          activation_rate?: number
+          avg_days_to_convert?: number
+          best_channel?: string | null
+          business_id?: string
+          converted_to_paid?: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          leads_total?: number
+          period_start?: string
+          retained_90d?: number
+          trial_to_paid_rate?: number
+          trials_started?: number
+          worst_channel?: string | null
+        }
+        Relationships: []
+      }
       csv_uploads: {
         Row: {
           business_id: string
@@ -1767,6 +1899,45 @@ export type Database = {
           rollout_percentage?: number
           target_segment?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      fx_exposure: {
+        Row: {
+          business_id: string
+          created_at: string
+          currency: string
+          exchange_rate: number
+          exposure_type: string
+          hedged: boolean
+          id: string
+          is_demo: boolean
+          monthly_amount_inr: number
+          vendor_or_client: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          currency?: string
+          exchange_rate?: number
+          exposure_type: string
+          hedged?: boolean
+          id?: string
+          is_demo?: boolean
+          monthly_amount_inr?: number
+          vendor_or_client?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          currency?: string
+          exchange_rate?: number
+          exposure_type?: string
+          hedged?: boolean
+          id?: string
+          is_demo?: boolean
+          monthly_amount_inr?: number
+          vendor_or_client?: string | null
         }
         Relationships: []
       }
@@ -2409,6 +2580,39 @@ export type Database = {
           },
         ]
       }
+      payment_settlements: {
+        Row: {
+          amount: number
+          business_id: string
+          created_at: string
+          expected_date: string | null
+          gateway: string
+          id: string
+          is_demo: boolean
+          status: string
+        }
+        Insert: {
+          amount?: number
+          business_id: string
+          created_at?: string
+          expected_date?: string | null
+          gateway: string
+          id?: string
+          is_demo?: boolean
+          status?: string
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          created_at?: string
+          expected_date?: string | null
+          gateway?: string
+          id?: string
+          is_demo?: boolean
+          status?: string
+        }
+        Relationships: []
+      }
       payroll_records: {
         Row: {
           business_id: string
@@ -2501,6 +2705,45 @@ export type Database = {
         }
         Relationships: []
       }
+      people_efficiency: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          is_demo: boolean
+          overtime_cost: number
+          overtime_hours: number
+          period_start: string
+          revenue_per_billable_hour: number
+          training_spend: number
+          utilisation_rate: number
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          overtime_cost?: number
+          overtime_hours?: number
+          period_start: string
+          revenue_per_billable_hour?: number
+          training_spend?: number
+          utilisation_rate?: number
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          overtime_cost?: number
+          overtime_hours?: number
+          period_start?: string
+          revenue_per_billable_hour?: number
+          training_spend?: number
+          utilisation_rate?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2556,6 +2799,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      projects: {
+        Row: {
+          actual_cost: number
+          business_id: string
+          client_name: string | null
+          created_at: string
+          end_date: string | null
+          gross_margin_pct: number
+          id: string
+          is_demo: boolean
+          notes: string | null
+          project_name: string
+          quoted_amount: number
+          start_date: string | null
+          status: string
+        }
+        Insert: {
+          actual_cost?: number
+          business_id: string
+          client_name?: string | null
+          created_at?: string
+          end_date?: string | null
+          gross_margin_pct?: number
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          project_name: string
+          quoted_amount?: number
+          start_date?: string | null
+          status?: string
+        }
+        Update: {
+          actual_cost?: number
+          business_id?: string
+          client_name?: string | null
+          created_at?: string
+          end_date?: string | null
+          gross_margin_pct?: number
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          project_name?: string
+          quoted_amount?: number
+          start_date?: string | null
+          status?: string
+        }
+        Relationships: []
       }
       realtime_event_log: {
         Row: {
@@ -2690,6 +2981,39 @@ export type Database = {
           },
         ]
       }
+      regulatory_compliance: {
+        Row: {
+          business_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          is_demo: boolean
+          notes: string | null
+          requirement_name: string
+          status: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          requirement_name: string
+          status?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_demo?: boolean
+          notes?: string | null
+          requirement_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           created_at: string
@@ -2732,6 +3056,45 @@ export type Database = {
           sort_order?: number
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      revenue_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_demo: boolean
+          recommended_action: string | null
+          severity: string
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_demo?: boolean
+          recommended_action?: string | null
+          severity?: string
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_demo?: boolean
+          recommended_action?: string | null
+          severity?: string
+          title?: string
         }
         Relationships: []
       }
@@ -2786,6 +3149,54 @@ export type Database = {
           id?: string
           is_demo?: boolean
           revenue_amount?: number
+        }
+        Relationships: []
+      }
+      revenue_quality: {
+        Row: {
+          bookings_total: number
+          business_id: string
+          created_at: string
+          id: string
+          is_demo: boolean
+          onetime_pct: number
+          period_start: string
+          project_pct: number
+          recurring_pct: number
+          recurring_revenue: number
+          revenue_at_risk: number
+          top3_client_pct: number
+          total_revenue: number
+        }
+        Insert: {
+          bookings_total?: number
+          business_id: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          onetime_pct?: number
+          period_start: string
+          project_pct?: number
+          recurring_pct?: number
+          recurring_revenue?: number
+          revenue_at_risk?: number
+          top3_client_pct?: number
+          total_revenue?: number
+        }
+        Update: {
+          bookings_total?: number
+          business_id?: string
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          onetime_pct?: number
+          period_start?: string
+          project_pct?: number
+          recurring_pct?: number
+          recurring_revenue?: number
+          revenue_at_risk?: number
+          top3_client_pct?: number
+          total_revenue?: number
         }
         Relationships: []
       }
@@ -3162,6 +3573,42 @@ export type Database = {
         }
         Relationships: []
       }
+      support_intelligence: {
+        Row: {
+          avg_resolution_hours: number
+          business_id: string
+          cost_per_ticket: number
+          created_at: string
+          id: string
+          is_demo: boolean
+          period_start: string
+          satisfaction_score: number
+          total_tickets: number
+        }
+        Insert: {
+          avg_resolution_hours?: number
+          business_id: string
+          cost_per_ticket?: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          period_start: string
+          satisfaction_score?: number
+          total_tickets?: number
+        }
+        Update: {
+          avg_resolution_hours?: number
+          business_id?: string
+          cost_per_ticket?: number
+          created_at?: string
+          id?: string
+          is_demo?: boolean
+          period_start?: string
+          satisfaction_score?: number
+          total_tickets?: number
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           assigned_to: string | null
@@ -3330,6 +3777,54 @@ export type Database = {
           total_tds_deducted?: number | null
           total_tds_deposited?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tds_intelligence: {
+        Row: {
+          amount_deducted: number
+          amount_deposited: number
+          business_id: string
+          created_at: string
+          description: string | null
+          financial_year: string
+          id: string
+          is_demo: boolean
+          matched_26as: boolean
+          rate: number
+          return_filed: boolean
+          section_code: string
+          status: string
+        }
+        Insert: {
+          amount_deducted?: number
+          amount_deposited?: number
+          business_id: string
+          created_at?: string
+          description?: string | null
+          financial_year: string
+          id?: string
+          is_demo?: boolean
+          matched_26as?: boolean
+          rate?: number
+          return_filed?: boolean
+          section_code: string
+          status?: string
+        }
+        Update: {
+          amount_deducted?: number
+          amount_deposited?: number
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          financial_year?: string
+          id?: string
+          is_demo?: boolean
+          matched_26as?: boolean
+          rate?: number
+          return_filed?: boolean
+          section_code?: string
+          status?: string
         }
         Relationships: []
       }
