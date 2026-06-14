@@ -85,6 +85,20 @@ export const useEsopGrants = () => useScopedTable<any>("esop_grants", { order: "
 export const useHiringPipeline = () => useScopedTable<any>("hiring_pipeline", { order: "priority", ascending: true });
 export const useCompBenchmarks = () => useScopedTable<any>("compensation_benchmarks", { order: "percentile_position", ascending: true });
 
+/* ── Extra section tables (settlements, fx, action items, etc.) ── */
+export const usePaymentSettlements   = () => useScopedTable<any>("payment_settlements",   { order: "created_at" });
+export const useFxExposure           = () => useScopedTable<any>("fx_exposure",           { order: "monthly_amount_inr" });
+export const useActionItems          = () => useScopedTable<any>("action_items",          { order: "due_date", ascending: true });
+export const useRevenueQuality       = () => useScopedTable<any>("revenue_quality",       { order: "period_start" });
+export const useConversionFunnel     = () => useScopedTable<any>("conversion_funnel",     { order: "period_start" });
+export const useRevenueAlerts        = () => useScopedTable<any>("revenue_alerts",        { order: "created_at" });
+export const usePeopleEfficiency     = () => useScopedTable<any>("people_efficiency",     { order: "period_start" });
+export const useProjectsList         = () => useScopedTable<any>("projects",              { order: "gross_margin_pct" });
+export const useSupportIntelligence  = () => useScopedTable<any>("support_intelligence",  { order: "period_start" });
+export const useTdsIntelligence      = () => useScopedTable<any>("tds_intelligence",      { order: "section_code", ascending: true });
+export const useAdvanceTaxSchedule   = () => useScopedTable<any>("advance_tax_schedule",  { order: "instalment_number", ascending: true });
+export const useRegulatoryCompliance = () => useScopedTable<any>("regulatory_compliance", { order: "due_date", ascending: true });
+
 export function useHasAnyData(): boolean {
   const c = useCustomers().data?.length ?? 0;
   const i = useInvoices().data?.length ?? 0;
