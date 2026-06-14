@@ -200,13 +200,15 @@ function GenerateModal({
   onClose: () => void;
   onGenerate: (params: { format: string; fy: string; month?: string }) => Promise<void>;
 }) {
-  const formats = report.formats ?? ["excel","pdf","csv"];
-  const [format, setFormat] = useState<string>(formats[0]);
+  const formats = report.formats ?? ["pdf","excel"];
+  const [format, setFormat] = useState<string>(formats.includes("pdf" as any) ? "pdf" : formats[0]);
   const [fy, setFy] = useState("FY 2025-26");
-  const [month, setMonth] = useState("Apr");
+  const now = new Date();
+  const prevMonth = MONTHS[(now.getMonth() + 11) % 12 < 12 ? (now.getMonth() + 11) % 12 : 0];
+  const [month, setMonth] = useState(prevMonth);
   const [busy, setBusy] = useState(false);
 
-  const needsMonth = /gstr1|gstr3b|tds_return|payroll_register|epf_esic|mis_report/.test(report.type);
+  const needsMonth = MONTHLY_TYPES.has(report.type);
 
   const submit = async () => {
     setBusy(true);
@@ -214,6 +216,7 @@ function GenerateModal({
     setBusy(false);
     onClose();
   };
+
 
   return (
     <div
