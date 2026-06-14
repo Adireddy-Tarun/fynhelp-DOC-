@@ -4,10 +4,11 @@ import {
   LayoutDashboard, MessageSquare, Droplets, TrendingUp, DollarSign,
   FileText, Shield, Users, Brain, BarChart3, BarChart, Landmark, Building2,
   ArrowLeftRight, FileBarChart, Plug, Building, Settings,
-  X, ChevronLeft, ChevronRight, Lock,
+  X, ChevronLeft, ChevronRight, ChevronUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import FynLogo from "@/components/FynLogo";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ interface SidebarProps {
 }
 
 export const SIDEBAR_WIDTH_EXPANDED = 180;
-export const SIDEBAR_WIDTH_COLLAPSED = 44;
+export const SIDEBAR_WIDTH_COLLAPSED = 56;
 
 type Item = { icon: any; label: string; path: string; soon?: boolean };
 type Section = { title: string; items: Item[] };
@@ -63,13 +64,33 @@ const menuSections: Section[] = [
   },
 ];
 
-const INACTIVE = "#6B6B6B";
 const ACTIVE = "#A93838";
 const INK = "#1A1008";
+const INACTIVE_ICON = "#9E9E9E";
+const INACTIVE_TEXT = "#6B6B6B";
+
+const Divider = ({ collapsed }: { collapsed: boolean }) => (
+  <div
+    style={{
+      height: "0.5px",
+      background: "rgba(26,16,8,0.05)",
+      margin: collapsed ? "6px 10px" : "4px 14px",
+    }}
+  />
+);
+
+function getInitials(name?: string | null, email?: string | null) {
+  const src = (name || email || "").trim();
+  if (!src) return "T";
+  const parts = src.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return src.slice(0, 1).toUpperCase();
+}
 
 export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile, user } = useAuth();
   const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" ? window.innerWidth >= 1024 : true);
 
   useEffect(() => {
@@ -81,6 +102,12 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
   const isActive = (path: string) => location.pathname === path;
   const width = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
   const visible = isDesktop || isOpen;
+
+  const fullName = profile?.full_name || (user?.email ? user.email.split("@")[0] : "Tarun");
+  const role = profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : "Owner";
+  const initials = getInitials(profile?.full_name, user?.email);
+
+  const handleUserClick = () => navigate("/dashboard/settings/profile");
 
   return (
     <>
@@ -97,7 +124,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
       <motion.aside
         initial={false}
         animate={{ width, x: visible ? 0 : -width }}
-        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
         className="fixed top-0 left-0 h-full z-50 flex flex-col bg-white"
         style={{
           overflowY: "auto",
@@ -108,85 +135,208 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
         }}
       >
         {/* Logo */}
-        <div
-          className="flex items-center justify-between"
-          style={{
-            padding: collapsed ? "20px 12px" : "24px",
-            minHeight: 72,
-          }}
-        >
-          <button
-            onClick={() => navigate("/dashboard/cockpit")}
-            style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
-            aria-label="Go to dashboard"
+        {collapsed ? (
+          <div
+            style={{
+              padding: "12px 0",
+              display: "flex",
+              justifyContent: "center",
+              borderBottom: "0.5px solid rgba(26,16,8,0.06)",
+              marginBottom: 6,
+            }}
           >
-            <FynLogo variant="dark" showTagline={false} iconOnly={collapsed} />
-          </button>
-
-          {!collapsed && (
             <button
-              onClick={() => onCollapsedChange(true)}
-              className="hidden lg:flex items-center justify-center rounded-md transition-colors"
-              style={{
-                width: 28, height: 28, background: "transparent", border: "none", cursor: "pointer",
-                color: INACTIVE,
-              }}
-              aria-label="Collapse sidebar"
+              onClick={() => navigate("/dashboard/cockpit")}
+              style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+              aria-label="Go to dashboard"
             >
-              <ChevronLeft size={18} strokeWidth={1.75} />
+              <FynLogo variant="dark" showTagline={false} iconOnly />
             </button>
-          )}
+          </div>
+        ) : (
+          <>
+            <div
+              className="flex items-center justify-between"
+              style={{ padding: "20px 16px 8px", minHeight: 60 }}
+            >
+              <button
+                onClick={() => navigate("/dashboard/cockpit")}
+                style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+                aria-label="Go to dashboard"
+              >
+                <FynLogo variant="dark" showTagline={false} iconOnly={false} />
+              </button>
 
-          <button
-            onClick={onToggle}
-            className="lg:hidden"
-            style={{ background: "transparent", border: "none", cursor: "pointer", color: INACTIVE }}
-            aria-label="Close menu"
-          >
-            <X size={20} strokeWidth={1.75} />
-          </button>
-        </div>
+              <button
+                onClick={() => onCollapsedChange(true)}
+                className="hidden lg:flex items-center justify-center rounded-md"
+                style={{
+                  width: 24, height: 24, background: "transparent", border: "none", cursor: "pointer",
+                  color: INACTIVE_ICON,
+                }}
+                aria-label="Collapse sidebar"
+              >
+                <ChevronLeft size={16} strokeWidth={1.75} />
+              </button>
+
+              <button
+                onClick={onToggle}
+                className="lg:hidden"
+                style={{ background: "transparent", border: "none", cursor: "pointer", color: INACTIVE_ICON }}
+                aria-label="Close menu"
+              >
+                <X size={18} strokeWidth={1.75} />
+              </button>
+            </div>
+
+            {/* Plan badge */}
+            <div
+              style={{
+                background: "#EFE8D8",
+                borderRadius: 6,
+                padding: "5px 10px",
+                margin: "8px 12px 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span style={{ fontSize: 10, fontWeight: 500, color: INK }}>Early Access</span>
+              <span
+                style={{
+                  background: "#FAEEDA",
+                  color: "#633806",
+                  fontSize: 8,
+                  fontWeight: 500,
+                  padding: "2px 6px",
+                  borderRadius: 20,
+                }}
+              >
+                Free
+              </span>
+            </div>
+          </>
+        )}
 
         {collapsed && (
           <button
             onClick={() => onCollapsedChange(false)}
-            className="hidden lg:flex items-center justify-center mx-auto rounded-md transition-colors"
+            className="hidden lg:flex items-center justify-center mx-auto rounded-md"
             style={{
               width: 28, height: 28, background: "transparent", border: "none", cursor: "pointer",
-              color: INACTIVE, marginBottom: 8,
+              color: INACTIVE_ICON, marginBottom: 4,
             }}
             aria-label="Expand sidebar"
           >
-            <ChevronRight size={18} strokeWidth={1.75} />
+            <ChevronRight size={16} strokeWidth={1.75} />
           </button>
         )}
 
         <nav
           className="flex-1"
-          style={{ padding: collapsed ? "8px 10px" : "8px 12px" }}
+          style={{ padding: collapsed ? "4px 0" : "4px 8px" }}
         >
           {menuSections.map((section, sectionIdx) => (
-            <div key={sectionIdx} style={{ marginTop: sectionIdx === 0 ? 0 : 24 }}>
+            <div key={sectionIdx}>
+              {sectionIdx > 0 && <Divider collapsed={collapsed} />}
+
               {!collapsed && (
                 <p
                   style={{
-                    fontSize: 11,
-                    fontWeight: 600,
+                    fontSize: 10,
+                    fontWeight: 500,
                     letterSpacing: "0.08em",
                     color: ACTIVE,
-                    marginBottom: 8,
-                    padding: "0 12px",
                     textTransform: "uppercase",
+                    padding: "10px 12px 4px",
+                    margin: 0,
                   }}
                 >
                   {section.title}
                 </p>
               )}
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   const active = isActive(item.path);
+
+                  if (collapsed) {
+                    return (
+                      <div
+                        key={item.path}
+                        className="relative group"
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <button
+                          onClick={() => {
+                            navigate(item.path);
+                            if (!isDesktop) onToggle();
+                          }}
+                          style={{
+                            width: 40,
+                            height: 34,
+                            borderRadius: 8,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            margin: "2px auto",
+                            cursor: "pointer",
+                            background: active ? "rgba(169,56,56,0.10)" : "transparent",
+                            border: "none",
+                            position: "relative",
+                            color: active ? ACTIVE : INACTIVE_ICON,
+                            transition: "background 0.15s ease, color 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!active) e.currentTarget.style.background = "rgba(26,16,8,0.04)";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!active) e.currentTarget.style.background = "transparent";
+                          }}
+                          aria-current={active ? "page" : undefined}
+                          aria-label={item.label}
+                        >
+                          <Icon size={18} strokeWidth={1.75} style={{ color: "currentColor" }} />
+                          {item.soon && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: 4,
+                                right: 6,
+                                width: 5,
+                                height: 5,
+                                borderRadius: "50%",
+                                background: ACTIVE,
+                              }}
+                            />
+                          )}
+                        </button>
+
+                        <div
+                          className="absolute opacity-0 group-hover:opacity-100 pointer-events-none"
+                          style={{
+                            left: "calc(100% + 8px)",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            background: INK,
+                            color: "#fff",
+                            fontSize: 10,
+                            fontWeight: 400,
+                            padding: "5px 10px",
+                            borderRadius: 7,
+                            whiteSpace: "nowrap",
+                            zIndex: 100,
+                            transition: "opacity 120ms ease",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                          }}
+                        >
+                          {item.label}
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <button
                       key={item.path}
@@ -194,108 +344,74 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         navigate(item.path);
                         if (!isDesktop) onToggle();
                       }}
-                      className="relative group"
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 12,
-                        background: active ? "rgba(169,56,56,0.08)" : "transparent",
-                        border: "none",
+                        gap: 8,
+                        background: active ? "rgba(169,56,56,0.07)" : "transparent",
+                        borderLeft: active ? `2px solid ${ACTIVE}` : "2px solid transparent",
+                        borderTop: "none",
+                        borderRight: "none",
+                        borderBottom: "none",
                         cursor: "pointer",
-                        borderRadius: 10,
-                        padding: collapsed ? "10px" : "8px 12px",
-                        position: "relative",
+                        borderRadius: active ? "0 8px 8px 0" : 8,
+                        padding: "7px 10px",
                         width: "100%",
-                        height: 44,
-                        justifyContent: collapsed ? "center" : "flex-start",
-                        color: active ? ACTIVE : INACTIVE,
+                        height: 34,
+                        color: active ? INK : INACTIVE_TEXT,
                         fontFamily: "inherit",
-                        fontSize: 14,
-                        fontWeight: active ? 600 : 500,
-                        transition: "background 0.2s ease, color 0.2s ease",
+                        fontSize: 12,
+                        fontWeight: active ? 500 : 400,
+                        transition: "background 0.15s ease, color 0.15s ease",
                       }}
                       onMouseEnter={(e) => {
-                        if (!active) {
-                          e.currentTarget.style.background = "rgba(169,56,56,0.04)";
-                          e.currentTarget.style.color = INK;
-                        }
+                        if (!active) e.currentTarget.style.background = "rgba(26,16,8,0.03)";
                       }}
                       onMouseLeave={(e) => {
-                        if (!active) {
-                          e.currentTarget.style.background = "transparent";
-                          e.currentTarget.style.color = INACTIVE;
-                        }
+                        if (!active) e.currentTarget.style.background = "transparent";
                       }}
                       aria-current={active ? "page" : undefined}
                     >
-                      {active && (
+                      <span
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 7,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          background: active ? "rgba(169,56,56,0.12)" : "transparent",
+                          color: active ? ACTIVE : INACTIVE_ICON,
+                        }}
+                      >
+                        <Icon size={16} strokeWidth={1.75} style={{ color: "currentColor" }} />
+                      </span>
+
+                      <span
+                        style={{
+                          flex: 1,
+                          textAlign: "left",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          color: "currentColor",
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                      {item.soon && (
                         <span
                           style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 6,
-                            bottom: 6,
-                            width: 3,
-                            background: ACTIVE,
-                            borderRadius: "0 2px 2px 0",
-                          }}
-                        />
-                      )}
-
-                      <Icon size={20} strokeWidth={1.75} style={{ flexShrink: 0, color: "currentColor" }} />
-
-                      {!collapsed && (
-                        <>
-                          <span
-                            style={{
-                              flex: 1,
-                              textAlign: "left",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              color: "currentColor",
-                            }}
-                          >
-                            {item.label}
-                          </span>
-                          {item.soon && (
-                            <span
-                              style={{
-                                fontSize: 10,
-                                fontStyle: "italic",
-                                color: "#9B9B9B",
-                                fontWeight: 400,
-                                flexShrink: 0,
-                              }}
-                            >
-                              Soon
-                            </span>
-                          )}
-                        </>
-                      )}
-
-                      {collapsed && item.soon && (
-                        <Lock
-                          size={10}
-                          strokeWidth={2}
-                          style={{ position: "absolute", top: 8, right: 8, opacity: 0.3, color: INACTIVE }}
-                        />
-                      )}
-
-                      {collapsed && (
-                        <div
-                          className="absolute left-full ml-2 px-2.5 py-1.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50"
-                          style={{
-                            background: INK,
-                            color: "#FFFFFF",
-                            fontSize: 12,
-                            fontWeight: 500,
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                            fontSize: 9,
+                            fontStyle: "italic",
+                            color: "#9B9B9B",
+                            fontWeight: 400,
+                            flexShrink: 0,
                           }}
                         >
-                          {item.label}
-                          {item.soon && <span style={{ marginLeft: 6, opacity: 0.6, fontStyle: "italic" }}>Soon</span>}
-                        </div>
+                          Soon
+                        </span>
                       )}
                     </button>
                   );
@@ -305,22 +421,103 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           ))}
         </nav>
 
+        {/* User profile bottom */}
         <div
           style={{
-            padding: collapsed ? "16px 8px" : "16px 24px",
-            borderTop: "1px solid rgba(26,16,8,0.06)",
+            marginTop: "auto",
+            borderTop: "0.5px solid rgba(26,16,8,0.06)",
+            padding: collapsed ? "10px 0" : "10px 8px",
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <p
-            style={{
-              fontSize: 11,
-              color: "#9B9B9B",
-              textAlign: collapsed ? "center" : "left",
-              fontWeight: 400,
-            }}
-          >
-            {collapsed ? "©" : "FYNHelp © 2026"}
-          </p>
+          {collapsed ? (
+            <button
+              onClick={handleUserClick}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: ACTIVE,
+                color: "#fff",
+                fontSize: 11,
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                border: "none",
+              }}
+              aria-label="Open user menu"
+            >
+              {initials}
+            </button>
+          ) : (
+            <button
+              onClick={handleUserClick}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 8px",
+                borderRadius: 8,
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                transition: "background 0.15s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,16,8,0.03)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              aria-label="Open user menu"
+            >
+              <span
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 7,
+                  background: ACTIVE,
+                  color: "#fff",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {initials}
+              </span>
+              <span style={{ flex: 1, textAlign: "left", overflow: "hidden" }}>
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: INK,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {fullName}
+                </span>
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: 9,
+                    color: "#9E9E9E",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {role} · Admin
+                </span>
+              </span>
+              <ChevronUp size={13} strokeWidth={1.75} style={{ color: "#9E9E9E", flexShrink: 0 }} />
+            </button>
+          )}
         </div>
       </motion.aside>
     </>
