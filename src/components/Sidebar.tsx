@@ -16,8 +16,8 @@ interface SidebarProps {
   onCollapsedChange: (next: boolean) => void;
 }
 
-export const SIDEBAR_WIDTH_EXPANDED = 240;
-export const SIDEBAR_WIDTH_COLLAPSED = 72;
+export const SIDEBAR_WIDTH_EXPANDED = 180;
+export const SIDEBAR_WIDTH_COLLAPSED = 44;
 
 type Item = { icon: any; label: string; path: string; soon?: boolean };
 type Section = { title: string; items: Item[] };
