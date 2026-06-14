@@ -191,7 +191,7 @@ const FORMAT_LABELS: Record<string, string> = {
   csv:   "CSV — For accounting software import",
 };
 
-const MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function GenerateModal({
   report, onClose, onGenerate,
