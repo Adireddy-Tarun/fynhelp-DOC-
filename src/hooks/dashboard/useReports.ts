@@ -16,7 +16,7 @@ export type GeneratedReport = {
 
 export function useGeneratedReports(businessId: string | null) {
   return useQuery({
-    queryKey: ["reports", businessId],
+    queryKey: ["reports", "generated", businessId],
     queryFn: async (): Promise<GeneratedReport[]> => {
       if (!businessId) return [];
       const { data, error } = await (supabase as any)
@@ -24,10 +24,11 @@ export function useGeneratedReports(businessId: string | null) {
         .select("*")
         .eq("business_id", businessId)
         .order("generated_at", { ascending: false })
-        .limit(10);
+        .limit(20);
       if (error) throw error;
       return (data as GeneratedReport[]) || [];
     },
+    staleTime: 30_000,
     enabled: !!businessId,
   });
 }
@@ -35,7 +36,12 @@ export function useGeneratedReports(businessId: string | null) {
 export function useGenerateReport(businessId: string | null) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (args: { report_type: string; report_name: string; generated_by: string }) => {
+    mutationFn: async (args: {
+      report_type: string;
+      report_name: string;
+      generated_by: string;
+      parameters?: Record<string, unknown>;
+    }) => {
       if (!businessId) throw new Error("No business selected");
       const { data, error } = await (supabase as any)
         .from("generated_reports")
@@ -45,6 +51,7 @@ export function useGenerateReport(businessId: string | null) {
           report_name: args.report_name,
           generated_by: args.generated_by,
           status: "generating",
+          parameters: args.parameters ?? {},
         })
         .select()
         .single();
@@ -62,7 +69,7 @@ export function useGenerateReport(businessId: string | null) {
       return newRow;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["reports", businessId] });
+      qc.invalidateQueries({ queryKey: ["reports", "generated", businessId] });
     },
   });
 }

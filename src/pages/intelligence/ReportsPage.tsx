@@ -15,6 +15,7 @@ import {
 type ReportDef = {
   type: string;
   name: string;
+  dbName: string;
   Icon: typeof TrendingUp;
   description: string;
   buttonLabel?: string;
@@ -28,52 +29,61 @@ const CATEGORIES: Category[] = [
   {
     title: "Financial Reports",
     reports: [
-      { type: "profit_loss",   name: "Profit & Loss",       Icon: TrendingUp,    description: "Monthly revenue, expenses and net profit breakdown" },
-      { type: "cash_flow",     name: "Cash Flow",           Icon: Droplets,      description: "Cash inflows, outflows and 13-week forecast" },
-      { type: "burn_rate",     name: "Burn Rate",           Icon: Flame,         description: "Monthly burn trend, runway projection and scenarios" },
-      { type: "gst_summary",   name: "GST Summary",         Icon: FileText,      description: "GSTR filing status, ITC reconciliation and net payable" },
-      { type: "receivables",   name: "Receivables",         Icon: ArrowLeftRight,description: "Outstanding invoices, aging analysis and overdue customers" },
-      { type: "vendor_spend",  name: "Vendor Spend",        Icon: IndianRupee,   description: "Top vendor analysis, category breakdown and optimization" },
-      { type: "employee_cost", name: "Employee Cost",       Icon: Users,         description: "Payroll summary, department costs and CTC breakdown" },
-      { type: "board_pack",    name: "Investor Board Pack", Icon: BarChart3,     description: "Investor-ready KPIs: MRR, ARR, burn, runway, NRR" },
+      { type: "profit_loss",   name: "Profit & Loss",       dbName: "Profit & Loss Statement",     Icon: TrendingUp,    description: "Monthly revenue, expenses and net profit breakdown" },
+      { type: "cash_flow",     name: "Cash Flow",           dbName: "Cash Flow Report",            Icon: Droplets,      description: "Cash inflows, outflows and 13-week forecast" },
+      { type: "burn_rate",     name: "Burn Rate",           dbName: "Burn Rate Report",            Icon: Flame,         description: "Monthly burn trend, runway projection and scenarios" },
+      { type: "gst_summary",   name: "GST Summary",         dbName: "GST Summary Report",          Icon: FileText,      description: "GSTR filing status, ITC reconciliation and net payable" },
+      { type: "receivables",   name: "Receivables",         dbName: "Accounts Receivable Report", Icon: ArrowLeftRight, description: "Outstanding invoices, aging analysis and overdue customers" },
+      { type: "vendor_spend",  name: "Vendor Spend",        dbName: "Vendor Spend Report",         Icon: IndianRupee,   description: "Top vendor analysis, category breakdown and optimization" },
+      { type: "employee_cost", name: "Employee Cost",       dbName: "Employee Cost Report",        Icon: Users,         description: "Payroll summary, department costs and CTC breakdown" },
+      { type: "board_pack",    name: "Investor Board Pack", dbName: "Investor Board Pack",         Icon: BarChart3,     description: "Investor-ready KPIs: MRR, ARR, burn, runway, NRR" },
     ],
   },
   {
     title: "Statutory & Tax Reports",
     reports: [
-      { type: "gstr1",              name: "GSTR-1 Report",              Icon: FileText,       description: "Outward supplies statement in GST portal upload format (JSON + Excel)", buttonLabel: "Generate GSTR-1",       badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "gstr3b",             name: "GSTR-3B Report",             Icon: FileText,       description: "Monthly GST return with ITC reconciliation in govt prescribed format",      buttonLabel: "Generate GSTR-3B",      badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "gstr9",              name: "GSTR-9 Annual Return",       Icon: FileText,       description: "Annual GST return consolidating all monthly filings for the FY",            buttonLabel: "Generate GSTR-9",       badge: "govt",      formats: ["excel","pdf","json","csv"] },
-      { type: "tds_return",         name: "TDS Return (26Q/24Q)",       Icon: Receipt,        description: "Quarterly TDS return for contractor payments (26Q) and salary (24Q)",       buttonLabel: "Generate TDS Return",   badge: "govt",      formats: ["excel","pdf","csv"] },
-      { type: "form26as",           name: "Form 26AS Reconciliation",   Icon: ArrowLeftRight, description: "Tax credit statement matching TDS deducted vs deposited vs 26AS",           buttonLabel: "Generate Report" },
-      { type: "advance_tax",        name: "Advance Tax Computation",    Icon: Calculator,     description: "Quarterly advance tax liability with Section 234B/234C interest calculator",  buttonLabel: "Generate Report" },
-      { type: "balance_sheet_sch3", name: "Balance Sheet (Schedule III)",Icon: Building,      description: "Balance sheet in Companies Act 2013 Schedule III format for statutory filing", buttonLabel: "Generate Balance Sheet", badge: "companies", formats: ["excel","pdf","csv"] },
-      { type: "pnl_sch3",           name: "P&L Statement (Schedule III)",Icon: TrendingUp,    description: "Profit & Loss in Companies Act 2013 format with revenue from operations, EBITDA", buttonLabel: "Generate P&L",        badge: "companies", formats: ["excel","pdf","csv"] },
-      { type: "mis_report",         name: "MIS Report",                 Icon: FileBarChart,   description: "Monthly Management Information System summary — all key metrics in one page", buttonLabel: "Generate MIS" },
+      { type: "gstr1",              name: "GSTR-1 Report",              dbName: "GSTR-1 — Outward Supplies",  Icon: FileText,       description: "Outward supplies statement in GST portal upload format (JSON + Excel)", buttonLabel: "Generate GSTR-1",       badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "gstr3b",             name: "GSTR-3B Report",             dbName: "GSTR-3B — Monthly Return",   Icon: FileText,       description: "Monthly GST return with ITC reconciliation in govt prescribed format",      buttonLabel: "Generate GSTR-3B",      badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "gstr9",              name: "GSTR-9 Annual Return",       dbName: "GSTR-9 — Annual Return",     Icon: FileText,       description: "Annual GST return consolidating all monthly filings for the FY",            buttonLabel: "Generate GSTR-9",       badge: "govt",      formats: ["pdf","excel","json","csv"] },
+      { type: "tds_return",         name: "TDS Return (26Q/24Q)",       dbName: "TDS Return (26Q/24Q)",       Icon: Receipt,        description: "Quarterly TDS return for contractor payments (26Q) and salary (24Q)",       buttonLabel: "Generate TDS Return",   badge: "govt",      formats: ["pdf","excel"] },
+      { type: "form26as",           name: "Form 26AS Reconciliation",   dbName: "Form 26AS Reconciliation",   Icon: ArrowLeftRight, description: "Tax credit statement matching TDS deducted vs deposited vs 26AS",           buttonLabel: "Generate Report" },
+      { type: "advance_tax",        name: "Advance Tax Computation",    dbName: "Advance Tax Computation",    Icon: Calculator,     description: "Quarterly advance tax liability with Section 234B/234C interest calculator",  buttonLabel: "Generate Report" },
+      { type: "balance_sheet_sch3", name: "Balance Sheet (Schedule III)",dbName: "Balance Sheet (Schedule III)",Icon: Building,     description: "Balance sheet in Companies Act 2013 Schedule III format for statutory filing", buttonLabel: "Generate Balance Sheet", badge: "companies", formats: ["pdf","excel"] },
+      { type: "pnl_sch3",           name: "P&L Statement (Schedule III)",dbName: "P&L Statement (Schedule III)",Icon: TrendingUp,   description: "Profit & Loss in Companies Act 2013 format with revenue from operations, EBITDA", buttonLabel: "Generate P&L",        badge: "companies", formats: ["pdf","excel"] },
+      { type: "mis_report",         name: "MIS Report",                 dbName: "MIS Report",                 Icon: FileBarChart,   description: "Monthly Management Information System summary — all key metrics in one page", buttonLabel: "Generate MIS" },
     ],
   },
   {
     title: "Operational Reports",
     reports: [
-      { type: "payroll_register",   name: "Payroll Register",           Icon: Users,          description: "Salary register with gross, deductions (PF/ESI/TDS), net pay per employee", buttonLabel: "Generate Payroll Register", badge: "govt", formats: ["excel","pdf","csv"] },
-      { type: "epf_esic",           name: "EPF/ESIC Challan Report",    Icon: Shield,         description: "Monthly PF and ESI contribution register for portal filing",                buttonLabel: "Generate Challan",          badge: "govt", formats: ["excel","pdf","csv"] },
-      { type: "vendor_payment",     name: "Vendor Payment Report",      Icon: ArrowLeftRight, description: "All vendor payments due, overdue, and paid this month with ageing",         buttonLabel: "Generate Report" },
-      { type: "customer_statement", name: "Customer Statement",         Icon: User,           description: "Individual customer ledger with all invoices, payments and outstanding balance", buttonLabel: "Generate Statement" },
-      { type: "sales_register",     name: "Sales Register",             Icon: FileText,       description: "Invoice-wise outward sales with GST breakup (CGST/SGST/IGST) — CA ready",    buttonLabel: "Generate Sales Register" },
-      { type: "purchase_register",  name: "Purchase Register",          Icon: ShoppingCart,   description: "Bill-wise inward purchases with ITC breakup — matches GSTR-2A format",       buttonLabel: "Generate Purchase Register" },
-      { type: "budget_vs_actual",   name: "Budget vs Actual",           Icon: BarChart3,      description: "Department-wise budget vs actual variance report for board review",          buttonLabel: "Generate Report" },
+      { type: "payroll_register",   name: "Payroll Register",           dbName: "Payroll Register",           Icon: Users,          description: "Salary register with gross, deductions (PF/ESI/TDS), net pay per employee", buttonLabel: "Generate Payroll Register", badge: "govt", formats: ["pdf","excel"] },
+      { type: "epf_esic",           name: "EPF/ESIC Challan Report",    dbName: "EPF/ESIC Challan Report",    Icon: Shield,         description: "Monthly PF and ESI contribution register for portal filing",                buttonLabel: "Generate Challan",          badge: "govt", formats: ["pdf","excel"] },
+      { type: "vendor_payment",     name: "Vendor Payment Report",      dbName: "Vendor Payment Report",      Icon: ArrowLeftRight, description: "All vendor payments due, overdue, and paid this month with ageing",         buttonLabel: "Generate Report" },
+      { type: "customer_statement", name: "Customer Statement",         dbName: "Customer Statement",         Icon: User,           description: "Individual customer ledger with all invoices, payments and outstanding balance", buttonLabel: "Generate Statement" },
+      { type: "sales_register",     name: "Sales Register",             dbName: "Sales Register",             Icon: FileText,       description: "Invoice-wise outward sales with GST breakup (CGST/SGST/IGST) — CA ready",    buttonLabel: "Generate Sales Register",   badge: "govt", formats: ["pdf","excel"] },
+      { type: "purchase_register",  name: "Purchase Register",          dbName: "Purchase Register",          Icon: ShoppingCart,   description: "Bill-wise inward purchases with ITC breakup — matches GSTR-2A format",       buttonLabel: "Generate Purchase Register",badge: "govt", formats: ["pdf","excel"] },
+      { type: "budget_vs_actual",   name: "Budget vs Actual",           dbName: "Budget vs Actual",           Icon: BarChart3,      description: "Department-wise budget vs actual variance report for board review",          buttonLabel: "Generate Report" },
     ],
   },
   {
     title: "Investor & Board Reports",
     reports: [
-      { type: "investor_update",  name: "Investor Update Pack",        Icon: Rocket,       description: "Monthly investor update — MRR, burn, runway, NRR, wins, risks, asks",       buttonLabel: "Generate Investor Update" },
-      { type: "unit_economics",   name: "Unit Economics Report",       Icon: PieChart,     description: "Full unit economics — CAC by channel, LTV, payback period, cohort analysis", buttonLabel: "Generate Report" },
-      { type: "dpiit_report",     name: "Startup India / DPIIT Report",Icon: Target,       description: "DPIIT recognition compliance report + startup metrics for grant applications", buttonLabel: "Generate Report" },
-      { type: "working_capital",  name: "Working Capital Report",      Icon: FileBarChart, description: "CCC analysis — DSO, DIO, DPO trends with working capital optimization plan", buttonLabel: "Generate Report" },
+      { type: "investor_update",  name: "Investor Update Pack",        dbName: "Investor Update Pack",        Icon: Rocket,       description: "Monthly investor update — MRR, burn, runway, NRR, wins, risks, asks",       buttonLabel: "Generate Investor Update" },
+      { type: "unit_economics",   name: "Unit Economics Report",       dbName: "Unit Economics Report",       Icon: PieChart,     description: "Full unit economics — CAC by channel, LTV, payback period, cohort analysis", buttonLabel: "Generate Report" },
+      { type: "dpiit_report",     name: "Startup India / DPIIT Report",dbName: "Startup India / DPIIT Report",Icon: Target,       description: "DPIIT recognition compliance report + startup metrics for grant applications", buttonLabel: "Generate Report" },
+      { type: "working_capital",  name: "Working Capital Report",      dbName: "Working Capital Report",      Icon: FileBarChart, description: "CCC analysis — DSO, DIO, DPO trends with working capital optimization plan", buttonLabel: "Generate Report" },
     ],
   },
 ];
+
+const MONTHLY_TYPES = new Set(["gstr1","gstr3b","payroll_register","sales_register","purchase_register"]);
+const FORMAT_BADGE_COLORS: Record<string, { bg: string; fg: string }> = {
+  pdf:   { bg: "rgba(169,56,56,0.08)", fg: "#A93838" },
+  excel: { bg: "rgba(16,185,129,0.10)", fg: "#0B7A52" },
+  json:  { bg: "rgba(139,105,20,0.10)", fg: "#8B6914" },
+  csv:   { bg: "rgba(26,16,8,0.06)",    fg: "#1A1008" },
+};
+
 
 const GOLD_BG = "#FAEEDA";
 const GOLD_FG = "#633806";
@@ -181,7 +191,7 @@ const FORMAT_LABELS: Record<string, string> = {
   csv:   "CSV — For accounting software import",
 };
 
-const MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function GenerateModal({
   report, onClose, onGenerate,
@@ -190,13 +200,17 @@ function GenerateModal({
   onClose: () => void;
   onGenerate: (params: { format: string; fy: string; month?: string }) => Promise<void>;
 }) {
-  const formats = report.formats ?? ["excel","pdf","csv"];
-  const [format, setFormat] = useState<string>(formats[0]);
+  const formats = report.formats ?? ["pdf","excel"];
+  const [format, setFormat] = useState<string>(formats.includes("pdf" as any) ? "pdf" : formats[0]);
   const [fy, setFy] = useState("FY 2025-26");
-  const [month, setMonth] = useState("Apr");
+  const CAL = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const now = new Date();
+  const prevMonth = CAL[(now.getMonth() + 11) % 12];
+
+  const [month, setMonth] = useState(prevMonth);
   const [busy, setBusy] = useState(false);
 
-  const needsMonth = /gstr1|gstr3b|tds_return|payroll_register|epf_esic|mis_report/.test(report.type);
+  const needsMonth = MONTHLY_TYPES.has(report.type);
 
   const submit = async () => {
     setBusy(true);
@@ -204,6 +218,7 @@ function GenerateModal({
     setBusy(false);
     onClose();
   };
+
 
   return (
     <div
@@ -251,8 +266,10 @@ function GenerateModal({
               Financial Year
             </div>
             <select value={fy} onChange={(e) => setFy(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(26,16,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
+              <option>FY 2026-27</option>
               <option>FY 2025-26</option>
               <option>FY 2024-25</option>
+
             </select>
           </div>
           {needsMonth && (
@@ -287,36 +304,55 @@ function GenerateModal({
   );
 }
 
+
 function ReportsContent({ mode }: { mode: IntelligenceMode }) {
-  const { businessId: liveBiz, profile } = useAuth();
+  const { businessId: liveBiz, profile, user } = useAuth() as any;
   const businessId = mode === "demo" ? DEMO_BIZ : liveBiz;
-  const userName = profile?.full_name || "User";
+  const userName =
+    mode === "demo"
+      ? "Tarun"
+      : profile?.full_name || user?.email || "User";
   const { data: reports = [], isLoading } = useGeneratedReports(businessId);
   const generate = useGenerateReport(businessId);
   const [pending, setPending] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [modalReport, setModalReport] = useState<ReportDef | null>(null);
 
-  const runGenerate = async (r: ReportDef, params?: Record<string, any>) => {
+  const runGenerate = async (
+    r: ReportDef,
+    params?: { format?: string; fy?: string; month?: string },
+  ) => {
     if (!businessId) {
       toast.error("Please sign in to generate reports");
       return;
     }
+    const format = params?.format ?? "pdf";
+    const fy = params?.fy ?? "FY 2025-26";
+    const month = params?.month;
+    // Build full report name with period for govt-format reports
+    const reportName = r.badge
+      ? `${r.dbName}${month ? ` — ${month} ${fy}` : ` — ${fy}`}`
+      : r.dbName;
+    const parameters: Record<string, unknown> = { format, period: fy };
+    if (month) parameters.month = month;
+
     setPending(r.type);
+    const tId = toast.loading(`Generating ${reportName} as ${format.toUpperCase()}...`);
     try {
       await generate.mutateAsync({
         report_type: r.type,
-        report_name: r.name,
+        report_name: reportName,
         generated_by: userName,
-        ...(params ? { parameters: params } : {}),
-      } as any);
-      toast.success(`${r.name} generated successfully`);
+        parameters,
+      });
+      toast.success("Ready — downloading", { id: tId });
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to generate report");
+      toast.error(e?.message ?? "Failed to generate report", { id: tId });
     } finally {
       setPending(null);
     }
   };
+
 
   const handleClick = (r: ReportDef) => {
     if (r.badge) {
@@ -364,7 +400,20 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
 
       <IntelCard title="Recent reports">
         {isLoading ? (
-          <div style={{ padding: 16, fontSize: 13, color: "#6B6B6B" }}>Loading reports…</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: 8 }}>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                style={{
+                  height: 36, borderRadius: 6,
+                  background: "linear-gradient(90deg, rgba(26,16,8,0.04), rgba(26,16,8,0.08), rgba(26,16,8,0.04))",
+                  backgroundSize: "200% 100%",
+                  animation: "fyn-shimmer 1.4s ease-in-out infinite",
+                }}
+              />
+            ))}
+            <style>{`@keyframes fyn-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
+          </div>
         ) : reports.length === 0 ? (
           <div style={{ padding: 24, fontSize: 13, color: "#6B6B6B", textAlign: "center" }}>
             No reports generated yet. Generate your first report above.
@@ -374,7 +423,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
                 <tr>
-                  {["Report name", "Generated on", "Generated by", "Download"].map((h) => (
+                  {["Report name", "Generated on", "Generated by", "Format", "Download"].map((h) => (
                     <th
                       key={h}
                       style={{
@@ -394,48 +443,60 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
                 </tr>
               </thead>
               <tbody>
-                {reports.map((r) => (
-                  <tr key={r.id}>
-                    <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: ACCENT.ink, fontWeight: 500 }}>
-                      {r.report_name}
-                      {r.status === "generating" && (
-                        <span style={{ marginLeft: 8, fontSize: 10, color: ACCENT.gold, fontStyle: "italic" }}>
-                          generating…
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
-                      {formatDate(r.generated_at)}
-                    </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
-                      {r.generated_by || "—"}
-                    </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)" }}>
-                      <button
-                        onClick={() => handleDownload(r)}
-                        disabled={r.status !== "completed" || downloading === r.id}
-                        aria-label={`Download ${r.report_name}`}
-                        style={{
-                          background: "transparent",
-                          border: `1px solid ${ACCENT.red}`,
-                          borderRadius: 6,
-                          padding: "4px 8px",
-                          color: ACCENT.red,
-                          cursor: r.status === "completed" ? "pointer" : "not-allowed",
-                          opacity: r.status === "completed" ? 1 : 0.4,
-                          display: "inline-flex", alignItems: "center", gap: 4,
-                          fontSize: 11,
-                        }}
-                      >
-                        {downloading === r.id ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {reports.map((r) => {
+                  const fmt = String((r.parameters as any)?.format ?? "pdf").toLowerCase();
+                  const c = FORMAT_BADGE_COLORS[fmt] ?? FORMAT_BADGE_COLORS.pdf;
+                  return (
+                    <tr key={r.id}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: ACCENT.ink, fontWeight: 500 }}>
+                        {r.report_name}
+                        {r.status === "generating" && (
+                          <span style={{ marginLeft: 8, fontSize: 10, color: ACCENT.gold, fontStyle: "italic" }}>
+                            generating…
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
+                        {formatDate(r.generated_at)}
+                      </td>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
+                        {r.generated_by || "—"}
+                      </td>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)" }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 600, letterSpacing: "0.04em",
+                          background: c.bg, color: c.fg,
+                          padding: "2px 6px", borderRadius: 4, textTransform: "uppercase",
+                        }}>{fmt}</span>
+                      </td>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)" }}>
+                        <button
+                          onClick={() => handleDownload(r)}
+                          disabled={r.status !== "completed" || downloading === r.id}
+                          aria-label={`Download ${r.report_name}`}
+                          style={{
+                            background: "transparent",
+                            border: `1px solid ${ACCENT.red}`,
+                            borderRadius: 6,
+                            padding: "4px 8px",
+                            color: ACCENT.red,
+                            cursor: r.status === "completed" ? "pointer" : "not-allowed",
+                            opacity: r.status === "completed" ? 1 : 0.4,
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                            fontSize: 11,
+                          }}
+                        >
+                          {downloading === r.id ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
+
       </IntelCard>
 
       {modalReport && (
