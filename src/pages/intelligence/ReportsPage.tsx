@@ -304,15 +304,6 @@ function GenerateModal({
   );
 }
 
-function ReportsContent({ mode }: { mode: IntelligenceMode }) {
-  const { businessId: liveBiz, profile } = useAuth();
-  const businessId = mode === "demo" ? DEMO_BIZ : liveBiz;
-  const userName = profile?.full_name || "User";
-  const { data: reports = [], isLoading } = useGeneratedReports(businessId);
-  const generate = useGenerateReport(businessId);
-  const [pending, setPending] = useState<string | null>(null);
-  const [downloading, setDownloading] = useState<string | null>(null);
-  const [modalReport, setModalReport] = useState<ReportDef | null>(null);
 
 function ReportsContent({ mode }: { mode: IntelligenceMode }) {
   const { businessId: liveBiz, profile, user } = useAuth() as any;
