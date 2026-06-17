@@ -137,7 +137,105 @@ const NotificationsPage = () => {
         <Row label="Weekly digest" sub="Every Monday at 9 AM — summary of the week">
           <Switch checked={digest} onCheckedChange={setDigest} />
         </Row>
+        <PushRow />
       </Card>
+    </div>
+  );
+};
+
+const PushRow = () => {
+  const { user, businessId } = useAuth();
+  const { status, isSubscribed, isIOSSafari, isStandalone, enable, disable, sendTest } =
+    usePushNotifications(user?.id ?? "", businessId ?? "");
+
+  const handleEnable = async () => {
+    const res = await enable();
+    if (res.success) {
+      toast.success("Push notifications enabled");
+    } else if (res.reason === "not-configured") {
+      toast("Push notifications are being set up — check back soon");
+    } else if (res.reason === "denied") {
+      toast.error("Permission denied — you can enable this later in your browser settings");
+    } else if (res.reason === "ios-needs-homescreen") {
+      toast("Add FynHelp to your Home Screen first");
+    } else if (res.reason === "unsupported") {
+      toast.error("Not supported on this browser");
+    } else {
+      toast.error("Could not enable push notifications");
+    }
+  };
+
+  const handleTest = async () => {
+    const { error } = await sendTest();
+    if (error) toast.error("No active subscriptions found");
+    else toast.success("Test sent — check your notifications");
+  };
+
+  const handleDisable = async () => {
+    await disable();
+    toast.success("Push notifications disabled");
+  };
+
+  return (
+    <div>
+      <Row
+        label="Push Notifications"
+        sub="Get instant alerts on this device — GST deadlines, overdue invoices, burn rate changes"
+      >
+        {status === "unsupported" && (
+          <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.6)" }}>
+            Not supported on this browser
+          </span>
+        )}
+        {status !== "unsupported" && isIOSSafari && !isStandalone && null}
+        {status === "denied" && (
+          <>
+            <span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(169,56,56,0.10)", color: RED }}>
+              Blocked
+            </span>
+            <span className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+              Enable in browser settings
+            </span>
+          </>
+        )}
+        {status !== "unsupported" && status !== "denied" && !(isIOSSafari && !isStandalone) && isSubscribed && (
+          <span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>
+            Enabled
+          </span>
+        )}
+        {status !== "unsupported" && status !== "denied" && !(isIOSSafari && !isStandalone) && !isSubscribed && (
+          <button
+            onClick={handleEnable}
+            className="px-3 py-1.5 rounded-md text-[12px] font-semibold text-white"
+            style={{ background: RED }}
+          >
+            Enable
+          </button>
+        )}
+      </Row>
+      {isIOSSafari && !isStandalone && status !== "unsupported" && (
+        <div className="mt-2 p-3 rounded-md text-[12px]" style={{ background: "rgba(26,16,8,0.05)", color: "rgba(26,16,8,0.7)", border: `1px solid ${BORDER}` }}>
+          On iPhone, add FynHelp to your Home Screen first (Share → Add to Home Screen) for push notifications to work.
+        </div>
+      )}
+      {isSubscribed && (
+        <div className="mt-2 flex items-center gap-3">
+          <button
+            onClick={handleTest}
+            className="px-3 py-1.5 rounded-md text-[12px] font-medium border"
+            style={{ color: RED, borderColor: RED }}
+          >
+            Send Test Notification
+          </button>
+          <button
+            onClick={handleDisable}
+            className="text-[12px] hover:underline"
+            style={{ color: "rgba(26,16,8,0.55)" }}
+          >
+            Disable
+          </button>
+        </div>
+      )}
     </div>
   );
 };
