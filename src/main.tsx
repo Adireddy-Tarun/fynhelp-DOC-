@@ -18,6 +18,10 @@ import "@fontsource/space-grotesk/700.css";
 document.documentElement.classList.remove("dark");
 document.documentElement.classList.add("light");
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
     <App />
