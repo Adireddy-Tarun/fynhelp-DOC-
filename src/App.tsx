@@ -25,6 +25,7 @@ import AdminContentPage from "./pages/admin/AdminContentPage.tsx";
 import AdminCeoViewPage from "./pages/admin/AdminCeoViewPage.tsx";
 import AdminWaitlistPage from "./pages/admin/AdminWaitlistPage.tsx";
 import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
+import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 import WaitlistPopup from "./components/WaitlistPopup";
