@@ -3,7 +3,7 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard, Lock, UserPlus,
+  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
