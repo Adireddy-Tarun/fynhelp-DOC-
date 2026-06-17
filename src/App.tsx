@@ -148,6 +148,7 @@ const App = () => (
               <Route path="feature-flags" element={<AdminFeatureFlagsPage />} />
               <Route path="system-health" element={<AdminSystemHealthPage />} />
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
+              <Route path="media" element={<AdminMediaLibraryPage />} />
             </Route>
             
             <Route path="/pricing" element={<PricingPage />} />
