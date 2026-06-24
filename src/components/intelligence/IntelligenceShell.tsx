@@ -39,6 +39,7 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
 
   return (
     <IntelPage>
+      <ChartGradients />
       <ModeBanner />
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
