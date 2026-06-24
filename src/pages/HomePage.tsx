@@ -866,52 +866,152 @@ function MetricCards({ items }: { items: { label: string; value: string; sub?: s
   );
 }
 
-const FRAMES: Frame[] = [
-  {
-    user: "What's my current runway?",
-    reply: <>At current burn, you have <b>8.4 months</b> runway with net burn of <b>₹2.1L/mo</b> and operating cash of <b>₹17.6L</b>.</>,
-    visual: <MiniBars values={[60, 56, 52, 48, 44, 40, 36, 32]} labels={["M1","M2","M3","M4","M5","M6","M7","M8"]} />,
-    buttons: ["Export Report", "Set Alert", "Run What-If"],
-  },
-  {
-    user: "Do I have any GST issues?",
-    reply: <><b>GSTR-3B</b> filing due in <b>3 days</b>. Available ITC to claim: <b>₹1.8L</b>. Notice risk score: <b>18/100</b> (Healthy).</>,
-    visual: <MetricCards items={[{ label: "GST DUE", value: "₹2.4L", sub: "in 3 days" }, { label: "ITC AVAILABLE", value: "₹1.8L", sub: "ready to claim" }]} />,
-    buttons: ["View Notice", "File Now"],
-  },
-  {
-    user: "How's revenue trending?",
-    reply: <>MRR increased <b>15% MoM</b> to <b>₹18.5L</b>. On track for <b>₹24L</b> this quarter. Top customer segment: Manufacturing (42%).</>,
-    visual: <MiniBars values={[28, 32, 38, 42, 48, 54, 62, 70]} labels={["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov"]} />,
-    buttons: ["Full Report", "Share with CA"],
-  },
-  {
-    user: "What if I hire 2 engineers?",
-    reply: <>Hiring 2 engineers at <b>₹1.2L/mo</b> each drops runway from <b>8.4 → 5.8 months</b>. Recommendation: Wait 45 days for next revenue milestone.</>,
-    visual: <MetricCards items={[{ label: "RUNWAY NOW", value: "8.4 mo", sub: "current burn" }, { label: "AFTER HIRES", value: "5.8 mo", sub: "−2.6 months" }]} />,
-    buttons: ["Run Full Model", "See Options"],
-  },
-  {
-    user: "Any updates I should know?",
-    reply: <>You also have <b>3 pending receivables</b> totaling <b>₹8.4L</b>. 2 are overdue by 15+ days.</>,
-    alert: "VENDOR PAYMENT DUE: ₹3.2L payment to Vendor X due in 2 days. Current balance: ₹17.6L",
-    buttons: ["Mark Paid", "Extend Terms", "Send Reminders"],
-  },
-];
+// Tiny INR formatter, identical rule to AskFynnyTab (lakhs / crores).
+function inrShort(n: number): string {
+  if (!isFinite(n) || n === 0) return "₹0";
+  const abs = Math.abs(n);
+  if (abs >= 1e7) return `₹${(n / 1e7).toFixed(2)}Cr`;
+  if (abs >= 1e5) return `₹${(n / 1e5).toFixed(2)}L`;
+  return `₹${Math.round(n).toLocaleString("en-IN")}`;
+}
+
+// Build FRAMES from real DEMO_BIZ tables — every number rendered here must
+// trace to one of these hooks. No hardcoded financial figures.
+function useDemoFrames(): Frame[] | null {
+  const { data: bank }      = useBankTxns();
+  const { data: invoices }  = useInvoices();
+  const { data: expenses }  = useExpenses();
+  const { data: customers } = useCustomers();
+  const { data: gst }       = useGstFilings();
+
+  return useMemo<Frame[] | null>(() => {
+    if (!bank || !invoices || !expenses || !customers || !gst) return null;
+    if (bank.length + invoices.length + expenses.length + customers.length === 0) return null;
+
+    const c30 = new Date(Date.now() - 30 * 86400000);
+
+    // cash = latest bank balance (rows arrive ordered by date desc from DataSource)
+    const cash = Number(bank[0]?.balance ?? 0);
+
+    // Revenue (paid invoices)
+    const totalRev = invoices
+      .filter((i) => i.status === "paid")
+      .reduce((s, i) => s + Number(i.paid_amount), 0);
+    const rev30 = invoices
+      .filter((i) => i.status === "paid" && i.payment_date && new Date(i.payment_date) >= c30)
+      .reduce((s, i) => s + Number(i.paid_amount), 0);
+
+    // Spend (last 30 days)
+    const burn30 = expenses
+      .filter((e) => new Date(e.date) >= c30)
+      .reduce((s, e) => s + Number(e.amount), 0);
+    const net30 = rev30 - burn30;
+
+    // Customer segments — every label/count comes from customer_category in DB
+    const segMap = new Map<string, number>();
+    customers.forEach((c) => {
+      const k = (c as any).customer_category || "Other";
+      segMap.set(k, (segMap.get(k) || 0) + 1);
+    });
+    const segments = [...segMap.entries()].sort((a, b) => b[1] - a[1]);
+    const segVals   = segments.map(([, n]) => n);
+    const segLabels = segments.map(([k]) => k);
+
+    // GST pending count + nearest upcoming due date
+    const today = new Date().toISOString().slice(0, 10);
+    const pending = gst.filter((g) => g.status !== "filed");
+    const gstPending = pending.length;
+    const nextDue = [...pending]
+      .filter((g) => g.due_date && g.due_date >= today)
+      .sort((a, b) => (a.due_date! < b.due_date! ? -1 : 1))[0];
+    const daysToNext = nextDue?.due_date
+      ? Math.max(0, Math.round((new Date(nextDue.due_date).getTime() - Date.now()) / 86400000))
+      : null;
+
+    // Bars for the runway/cashflow frame — last 8 weeks of net cash by week
+    const weeks: number[] = Array(8).fill(0);
+    invoices
+      .filter((i) => i.status === "paid" && i.payment_date)
+      .forEach((i) => {
+        const w = Math.floor((Date.now() - new Date(i.payment_date!).getTime()) / (7 * 86400000));
+        if (w >= 0 && w < 8) weeks[7 - w] += Number(i.paid_amount);
+      });
+    expenses.forEach((e) => {
+      const w = Math.floor((Date.now() - new Date(e.date).getTime()) / (7 * 86400000));
+      if (w >= 0 && w < 8) weeks[7 - w] -= Number(e.amount);
+    });
+    const weekVals = weeks.map((v) => Math.max(1, Math.abs(v) / 1000)); // visual scale
+
+    return [
+      {
+        user: "What's my current runway?",
+        reply: net30 >= 0 ? (
+          <>You're <b>cash-flow positive</b> — last 30 days you brought in <b>{inrShort(rev30)}</b> and spent <b>{inrShort(burn30)}</b>, net <b>+{inrShort(net30)}</b>. Cash on hand: <b>{inrShort(cash)}</b>.</>
+        ) : (
+          <>Cash on hand <b>{inrShort(cash)}</b>. Last 30 days: <b>{inrShort(rev30)}</b> in / <b>{inrShort(burn30)}</b> out (net <b>{inrShort(net30)}</b>).</>
+        ),
+        visual: <MetricCards items={[
+          { label: "CASH ON HAND",  value: inrShort(cash),   sub: "across accounts" },
+          { label: "NET LAST 30D",  value: `${net30 >= 0 ? "+" : ""}${inrShort(net30)}`, sub: net30 >= 0 ? "cash-flow positive" : "burning cash" },
+        ]} />,
+        buttons: ["Export Report", "Run What-If"],
+      },
+      {
+        user: "Am I GST compliant?",
+        reply: (
+          <>You have <b>{gstPending} filings</b> still pending{nextDue ? <> — nearest is <b>{nextDue.filing_type}</b> for <b>{nextDue.period}</b>, due in <b>{daysToNext} days</b></> : ""}. Stay ahead of due dates to avoid notices.</>
+        ),
+        visual: <MetricCards items={[
+          { label: "PENDING FILINGS", value: String(gstPending), sub: "across GSTR types" },
+          ...(nextDue ? [{ label: "NEXT DUE", value: nextDue.filing_type, sub: `in ${daysToNext} days` }] : []),
+        ]} />,
+        buttons: ["View Calendar", "Open GST"],
+      },
+      {
+        user: "How's revenue trending?",
+        reply: (
+          <>Total paid revenue is <b>{inrShort(totalRev)}</b>, with <b>{inrShort(rev30)}</b> collected in the last 30 days. Customer mix: {segments.map(([k, n], i) => (
+            <span key={k}>{i > 0 ? ", " : ""}<b>{k} ({n})</b></span>
+          ))}.</>
+        ),
+        visual: <MiniBars values={segVals.length ? segVals : [1]} labels={segLabels.length ? segLabels : ["—"]} />,
+        buttons: ["Full Report", "Share with CA"],
+      },
+      {
+        user: "Show me my cash flow trend.",
+        reply: (
+          <>Weekly net cash flow over the last 8 weeks. Current cash on hand: <b>{inrShort(cash)}</b>, with <b>{inrShort(rev30)}</b> collected in the trailing 30 days.</>
+        ),
+        visual: <MiniBars values={weekVals} labels={["W-7","W-6","W-5","W-4","W-3","W-2","W-1","Now"]} />,
+        buttons: ["Open Liquidity", "Set Alert"],
+      },
+    ];
+  }, [bank, invoices, expenses, customers, gst]);
+}
+
+// Static placeholder shown for a brief moment while DEMO_BIZ data loads.
+const LOADING_FRAME: Frame = {
+  user: "What's my current runway?",
+  reply: <>Pulling live numbers from your demo company…</>,
+  visual: <MetricCards items={[{ label: "CASH ON HAND", value: "…", sub: "loading" }, { label: "NET LAST 30D", value: "…", sub: "loading" }]} />,
+  buttons: ["Export Report", "Run What-If"],
+};
 
 function ChatWidget() {
   const [frame, setFrame] = useState(0);
   const [step, setStep] = useState<"user" | "typing" | "reply">("user");
+  const frames = useDemoFrames();
+  const FRAMES_LIVE: Frame[] = frames ?? [LOADING_FRAME];
 
   useEffect(() => {
     setStep("user");
     const t1 = setTimeout(() => setStep("typing"), 700);
     const t2 = setTimeout(() => setStep("reply"), 2200);
-    const t3 = setTimeout(() => setFrame((f) => (f + 1) % FRAMES.length), 6500);
+    const t3 = setTimeout(() => setFrame((f) => (f + 1) % FRAMES_LIVE.length), 6500);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [frame]);
+  }, [frame, FRAMES_LIVE.length]);
 
-  const f = FRAMES[frame];
+  const f = FRAMES_LIVE[frame % FRAMES_LIVE.length];
 
   return (
     <div className="cf-wrap">
