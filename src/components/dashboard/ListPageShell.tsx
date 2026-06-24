@@ -6,6 +6,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { FynPage, FynCard, FynSearchInput, FynSelect } from "@/components/dashboard/ui";
+import { useMode } from "@/components/intelligence/DataSource";
 import { cn } from "@/lib/utils";
 
 export function FilterChips({
@@ -98,10 +99,11 @@ export function ListPageShell({
   controls?: ReactNode;
   children: ReactNode;
 }) {
+  const base = useMode() === "demo" ? "/demo" : "/dashboard";
   return (
     <FynPage>
       <div className="flex items-center gap-fyn-sm text-fyn-tiny text-fyn-ink-45">
-        <Link to="/dashboard/cockpit" className="hover:text-fyn-ink inline-flex items-center gap-1">
+        <Link to={`${base}/cockpit`} className="hover:text-fyn-ink inline-flex items-center gap-1">
           <ChevronLeft size={14} /> Cockpit
         </Link>
         <span>/</span>

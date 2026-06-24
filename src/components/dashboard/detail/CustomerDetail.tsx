@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { useCustomerDetail } from "@/hooks/dashboard/useDashboardData";
+import { useMode } from "@/components/intelligence/DataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
@@ -10,6 +11,7 @@ export default function CustomerDetail({ id, onClose }: { id: string; onClose: (
   const { data, isLoading } = useCustomerDetail(id);
   const { open } = useDrawer();
   const navigate = useNavigate();
+  const base = useMode() === "demo" ? "/demo" : "/dashboard";
 
   if (isLoading || !data?.customer) return <div className="p-fyn-lg"><FynLoading rows={4} /></div>;
   const c = data.customer;
@@ -88,7 +90,7 @@ export default function CustomerDetail({ id, onClose }: { id: string; onClose: (
         )}
         <FynButton
           variant="secondary"
-          onClick={() => navigate(`/dashboard/invoices?customer=${encodeURIComponent(c.customer_name)}`)}
+          onClick={() => navigate(`${base}/invoices?customer=${encodeURIComponent(c.customer_name)}`)}
         >
           View All Invoices →
         </FynButton>
