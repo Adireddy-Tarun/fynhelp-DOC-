@@ -6,6 +6,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { FynPage, FynCard, FynSearchInput, FynSelect } from "@/components/dashboard/ui";
+import { useMode } from "@/components/intelligence/DataSource";
 import { cn } from "@/lib/utils";
 
 export function FilterChips({
