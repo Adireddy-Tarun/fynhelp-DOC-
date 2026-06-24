@@ -390,6 +390,17 @@ const IntegrationsPage = () => {
       {SECTIONS.map((s) => (
         <div key={s.title} style={CARD}>
           <SectionTitle title={s.title} sub={s.sub} />
+          {s.title === "Banking" && (
+            <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #F0EBD8" }}>
+              <div style={{ fontWeight: 600, fontSize: 13, color: "#1A1008", marginBottom: 4 }}>
+                Bank Statement Import
+              </div>
+              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.55)", marginBottom: 14 }}>
+                Upload a CSV or Excel export from your bank to import transactions instantly.
+              </div>
+              <BankStatementImport />
+            </div>
+          )}
           {s.slugs.map((slug, i) => renderRow(slug, i === s.slugs.length - 1))}
         </div>
       ))}
