@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useIntegrations } from "@/hooks/useIntegrations";
 import ConnectIntegrationModal, { ConnectMethod } from "@/components/integrations/ConnectIntegrationModal";
+import BankStatementImport from "@/components/integrations/BankStatementImport";
 
 /* ============================================================
    FynHelp · Integrations
@@ -294,6 +295,29 @@ const IntegrationsPage = () => {
     const row = byProvider.get(p.slug);
     const isActive = p.alwaysActive || row?.status === "active";
 
+    // PDF bank statement is an honest "coming soon" placeholder.
+    if (p.slug === "pdf_upload") {
+      return (
+        <Row
+          key={p.slug}
+          logo={p.logo}
+          name={p.label}
+          method={p.method}
+          note="PDF parsing is in development. Export CSV or Excel from your bank in the meantime."
+          status={
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: "#F5F5F4", color: "rgba(26,16,8,0.55)", border: "1px solid #E7E5E4",
+              borderRadius: 100, padding: "3px 10px",
+              fontWeight: 600, fontSize: 10, letterSpacing: "0.06em",
+            }}>COMING SOON</span>
+          }
+          action={<ConnectBtn disabled>Upload PDF →</ConnectBtn>}
+          isLast={isLast}
+        />
+      );
+    }
+
     return (
       <Row
         key={p.slug}
@@ -366,6 +390,17 @@ const IntegrationsPage = () => {
       {SECTIONS.map((s) => (
         <div key={s.title} style={CARD}>
           <SectionTitle title={s.title} sub={s.sub} />
+          {s.title === "Banking" && (
+            <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #F0EBD8" }}>
+              <div style={{ fontWeight: 600, fontSize: 13, color: "#1A1008", marginBottom: 4 }}>
+                Bank Statement Import
+              </div>
+              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.55)", marginBottom: 14 }}>
+                Upload a CSV or Excel export from your bank to import transactions instantly.
+              </div>
+              <BankStatementImport />
+            </div>
+          )}
           {s.slugs.map((slug, i) => renderRow(slug, i === s.slugs.length - 1))}
         </div>
       ))}
