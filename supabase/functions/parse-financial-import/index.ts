@@ -14,10 +14,13 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
+// ~15MB base64 ≈ ~10MB decoded file. Cap before decode to prevent OOM.
+const MAX_FILE_BASE64_LEN = 20_000_000;
+
 const BodySchema = z.object({
   documentId: z.string().uuid(),
   businessId: z.string().uuid(),
-  fileBase64: z.string().min(1),
+  fileBase64: z.string().min(1).max(MAX_FILE_BASE64_LEN),
   fileName: z.string().min(1).max(500),
 });
 

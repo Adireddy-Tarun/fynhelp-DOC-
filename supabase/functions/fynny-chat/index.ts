@@ -120,6 +120,22 @@ Deno.serve(async (req) => {
     // forced the demo into the streaming/profile path, which fails for
     // anonymous visitors and surfaces as an "auth/streaming" error.
     if (body?.org_id && body?.message && body?.context) {
+      // Hard size caps on the unauthenticated demo path to prevent
+      // AI-credit drain and oversized prompt-injection payloads.
+      const message = String(body.message ?? "");
+      const ctxStr = JSON.stringify(body.context ?? {});
+      if (message.length > 2000) {
+        return new Response(JSON.stringify({ error: "Message too long (max 2000 chars)" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (ctxStr.length > 10_000) {
+        return new Response(JSON.stringify({ error: "Context too large (max 10KB)" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const ctx = body.context || {};
       const systemPrompt = `You are FYNNY, an AI CFO assistant for Indian SMEs in a DEMO environment.
 Answer the user's question conversationally with specific numbers from the demo financial data below.
@@ -127,7 +143,7 @@ Use Indian currency formatting (₹, lakhs, crores). Be concise, professional, a
 If a metric is missing or zero, say so honestly — never invent numbers.
 
 DEMO FINANCIAL DATA:
-${JSON.stringify(ctx, null, 2)}
+${ctxStr}
 
 Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Keep responses under 200 words.`;
 
@@ -143,7 +159,7 @@ Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Kee
             model: "google/gemini-3-flash-preview",
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: String(body.message) },
+              { role: "user", content: message },
             ],
           }),
         },
