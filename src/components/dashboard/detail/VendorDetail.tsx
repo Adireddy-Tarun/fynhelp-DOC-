@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { useVendorDetail } from "@/hooks/dashboard/useDashboardData";
+import { useMode } from "@/components/intelligence/DataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
@@ -10,6 +11,7 @@ export default function VendorDetail({ id, onClose }: { id: string; onClose: () 
   const { data, isLoading } = useVendorDetail(id);
   const { open } = useDrawer();
   const navigate = useNavigate();
+  const base = useMode() === "demo" ? "/demo" : "/dashboard";
 
   if (isLoading || !data?.vendor) return <div className="p-fyn-lg"><FynLoading rows={4} /></div>;
   const v = data.vendor;
