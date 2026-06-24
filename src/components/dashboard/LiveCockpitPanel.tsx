@@ -121,7 +121,7 @@ export default function LiveCockpitPanel() {
             <FynCardTitle className="!mb-0">
               <span className="inline-flex items-center gap-2"><AlertTriangle size={16} className="text-fyn-red" /> Overdue Invoices</span>
             </FynCardTitle>
-            <ViewAllLink to=`${base}/invoices?status=overdue` />
+            <ViewAllLink to={`${base}/invoices?status=overdue`} />
           </div>
           {overdueInvoices.length === 0 ? (
             <p className="text-fyn-small text-fyn-ink-45">Nothing overdue. Nice.</p>
@@ -153,7 +153,7 @@ export default function LiveCockpitPanel() {
             <FynCardTitle className="!mb-0">
               <span className="inline-flex items-center gap-2"><Clock size={16} className="text-fyn-ink-60" /> Upcoming Payments</span>
             </FynCardTitle>
-            <ViewAllLink to=`${base}/expenses?status=Pending` />
+            <ViewAllLink to={`${base}/expenses?status=Pending`} />
           </div>
           {upcomingPayments.length === 0 ? (
             <p className="text-fyn-small text-fyn-ink-45">No pending payments.</p>
@@ -188,7 +188,7 @@ export default function LiveCockpitPanel() {
         <FynCard>
           <div className="flex items-center justify-between mb-fyn-md">
             <FynCardTitle className="!mb-0">Top Customers</FynCardTitle>
-            <ViewAllLink to=`${base}/customers` />
+            <ViewAllLink to={`${base}/customers`} />
           </div>
           {topCustomers.length === 0 ? (
             <p className="text-fyn-small text-fyn-ink-45">No paid invoices yet.</p>
@@ -212,7 +212,7 @@ export default function LiveCockpitPanel() {
         <FynCard>
           <div className="flex items-center justify-between mb-fyn-md">
             <FynCardTitle className="!mb-0">Top Vendor Spend</FynCardTitle>
-            <ViewAllLink to=`${base}/vendors` />
+            <ViewAllLink to={`${base}/vendors`} />
           </div>
           {topVendors.length === 0 ? (
             <p className="text-fyn-small text-fyn-ink-45">No vendor spend yet.</p>
@@ -239,7 +239,7 @@ export default function LiveCockpitPanel() {
         <FynCard>
           <div className="flex items-center justify-between mb-fyn-md">
             <FynCardTitle className="!mb-0">Expenses by Category</FynCardTitle>
-            <ViewAllLink to=`${base}/expenses` />
+            <ViewAllLink to={`${base}/expenses`} />
           </div>
           <ul className="space-y-fyn-xs">
             {categories.slice(0, 6).map((c) => (
@@ -261,7 +261,7 @@ export default function LiveCockpitPanel() {
             <FynCardTitle className="!mb-0">
               <span className="inline-flex items-center gap-2"><Users size={16} className="text-fyn-ink-60" /> Personnel Cost</span>
             </FynCardTitle>
-            <ViewAllLink to=`${base}/employees` />
+            <ViewAllLink to={`${base}/employees`} />
           </div>
           <p className="font-mono text-fyn-h2 text-fyn-ink mb-fyn-sm">{formatINR(personnelTotal)}</p>
           <ul className="space-y-fyn-xs">
