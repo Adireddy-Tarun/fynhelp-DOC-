@@ -77,7 +77,7 @@ export default function VendorDetail({ id, onClose }: { id: string; onClose: () 
         {Number(v.total_outstanding || 0) > 0 && (
           <FynButton variant="primary" onClick={() => alert("Payment scheduled (demo)")}>Pay Outstanding</FynButton>
         )}
-        <FynButton variant="secondary" onClick={() => navigate(`/dashboard/expenses?vendor=${encodeURIComponent(v.vendor_name)}`)}>
+        <FynButton variant="secondary" onClick={() => navigate(`${base}/expenses?vendor=${encodeURIComponent(v.vendor_name)}`)}>
           View All Expenses →
         </FynButton>
       </div>

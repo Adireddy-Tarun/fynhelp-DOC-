@@ -90,7 +90,7 @@ export default function CustomerDetail({ id, onClose }: { id: string; onClose: (
         )}
         <FynButton
           variant="secondary"
-          onClick={() => navigate(`/dashboard/invoices?customer=${encodeURIComponent(c.customer_name)}`)}
+          onClick={() => navigate(`${base}/invoices?customer=${encodeURIComponent(c.customer_name)}`)}
         >
           View All Invoices →
         </FynButton>
