@@ -207,13 +207,18 @@ export function EmptyState({
   title = "No data yet",
   description = "Upload CSV or connect integrations to see insights here.",
   icon = <Upload className="w-5 h-5" />,
-  cta = { label: "Upload CSV", href: "/dashboard/data-import" },
+  cta,
 }: {
   title?: string;
   description?: string;
   icon?: ReactNode;
   cta?: { label: string; href: string } | null;
 }) {
+  const mode = useMode();
+  const resolvedCta =
+    cta === undefined
+      ? { label: "Upload CSV", href: mode === "demo" ? "/demo/upload" : "/dashboard/data-import" }
+      : cta;
   return (
     <div className="text-center py-10 px-4">
       <div className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-3 text-[#6B6B6B]" style={{ background: "rgba(26,16,8,0.04)" }}>
