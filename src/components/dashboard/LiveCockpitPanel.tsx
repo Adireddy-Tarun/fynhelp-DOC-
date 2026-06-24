@@ -61,6 +61,8 @@ function ViewAllLink({ to }: { to: string }) {
 export default function LiveCockpitPanel() {
   const navigate = useNavigate();
   const { open } = useDrawer();
+  const mode = useMode();
+  const base = mode === "demo" ? "/demo" : "/dashboard";
   const liq = useLiquiditySummary();
   const { data: invoices } = useInvoices();
   const { data: expenses } = useExpenses();
