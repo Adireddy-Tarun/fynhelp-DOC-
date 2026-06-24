@@ -226,13 +226,13 @@ export function EmptyState({
       </div>
       <p className="font-serif text-sm text-fyn-ink font-semibold">{title}</p>
       <p className="text-xs text-[#6B6B6B] mt-1 max-w-xs mx-auto">{description}</p>
-      {cta && (
+      {resolvedCta && (
         <Link
-          to={cta.href}
+          to={resolvedCta.href}
           className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium px-3 py-1.5 rounded-md text-white transition-colors"
           style={{ background: ACCENT.red }}
         >
-          {cta.label}
+          {resolvedCta.label}
         </Link>
       )}
     </div>
