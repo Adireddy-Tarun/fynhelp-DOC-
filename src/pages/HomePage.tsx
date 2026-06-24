@@ -1419,7 +1419,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-          <ChatWidget />
+          <IntelligenceProvider mode="demo"><ChatWidget /></IntelligenceProvider>
         </div>
       </section>
 
