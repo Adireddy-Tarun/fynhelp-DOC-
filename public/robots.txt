@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /dashboard/
 Disallow: /ca/
 
-Sitemap: https://fynhelp.com/sitemap.xml
+Sitemap: https://www.fynhelp.com/sitemap.xml
