@@ -110,8 +110,16 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const auth = req.headers.get("Authorization") || "";
 
-    // ── Demo path: unauthenticated, single-shot JSON response ──────────
-    if (!auth.startsWith("Bearer ") && body?.org_id && body?.message) {
+    // ── Demo / single-shot path ────────────────────────────────────────
+    // Triggered when the client posts { org_id, message, context } — i.e.
+    // the caller already built the financial context (DEMO_BIZ on /demo,
+    // or scoped live data on the dashboard's Ask Fynny tab). Returns plain
+    // JSON so `supabase.functions.invoke` can parse it. We DON'T gate this
+    // on the absence of a Bearer header, because invoke() always attaches
+    // the publishable key — gating that way made the branch dead code and
+    // forced the demo into the streaming/profile path, which fails for
+    // anonymous visitors and surfaces as an "auth/streaming" error.
+    if (body?.org_id && body?.message && body?.context) {
       const ctx = body.context || {};
       const systemPrompt = `You are FYNNY, an AI CFO assistant for Indian SMEs in a DEMO environment.
 Answer the user's question conversationally with specific numbers from the demo financial data below.
