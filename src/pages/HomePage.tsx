@@ -6,6 +6,7 @@ import MobileProductsSection from "@/components/home/MobileProductsSection";
 import AIRecommendedSection from "@/components/AIRecommendedSection";
 import FAQSection from "@/components/home/FAQSection";
 import { Helmet } from "react-helmet-async";
+import { IntelligenceProvider, useBankTxns, useInvoices, useExpenses, useCustomers, useGstFilings } from "@/components/intelligence/DataSource";
 
 // ===== PALETTE (matches reference) =====
 const C = {
