@@ -14,7 +14,7 @@ import GovernanceTab from "./tabs/GovernanceTab";
 import HrTab from "./tabs/HrTab";
 import InvestorTab from "./tabs/InvestorTab";
 import AskFynnyTab from "./tabs/AskFynnyTab";
-import { IntelPage, ModeBanner, ACCENT, LiveTimestamp } from "./_primitives";
+import { IntelPage, ModeBanner, ACCENT, LiveTimestamp, ChartGradients } from "./_primitives";
 import { useMode } from "./DataSource";
 import { HeaderToolbar } from "./actions";
 
