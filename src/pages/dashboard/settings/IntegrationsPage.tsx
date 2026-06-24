@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useIntegrations } from "@/hooks/useIntegrations";
 import ConnectIntegrationModal, { ConnectMethod } from "@/components/integrations/ConnectIntegrationModal";
+import BankStatementImport from "@/components/integrations/BankStatementImport";
 
 /* ============================================================
    FynHelp · Integrations
