@@ -339,17 +339,29 @@ export const CHART = {
   tooltipBorder: "rgba(26,16,8,0.1)",
 } as const;
 
+// Render as a standalone hidden SVG so the gradient <defs> are guaranteed
+// to be in the document (recharts v3 strips unknown children from charts,
+// so an inline <defs> inside <BarChart> would not reach the DOM). SVG
+// url(#id) references resolve document-wide, so a hidden SVG works for
+// any chart on the page.
 export function ChartGradients() {
   return (
-    <defs>
-      <linearGradient id={CHART.redGrad.id} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={CHART.redGrad.from} />
-        <stop offset="100%" stopColor={CHART.redGrad.to} />
-      </linearGradient>
-      <linearGradient id={CHART.goldGrad.id} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={CHART.goldGrad.from} />
-        <stop offset="100%" stopColor={CHART.goldGrad.to} />
-      </linearGradient>
-    </defs>
+    <svg
+      width="0"
+      height="0"
+      style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={CHART.redGrad.id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={CHART.redGrad.from} />
+          <stop offset="100%" stopColor={CHART.redGrad.to} />
+        </linearGradient>
+        <linearGradient id={CHART.goldGrad.id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={CHART.goldGrad.from} />
+          <stop offset="100%" stopColor={CHART.goldGrad.to} />
+        </linearGradient>
+      </defs>
+    </svg>
   );
 }
