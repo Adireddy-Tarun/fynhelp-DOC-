@@ -45,7 +45,16 @@ Deno.serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const redirectTo = `${req.headers.get("origin") ?? "https://fynhelp.com"}/admin/login`;
+    const ALLOWED_ORIGINS = new Set([
+      "https://fynhelp.com",
+      "https://www.fynhelp.com",
+      "https://fynhelp.lovable.app",
+    ]);
+    const requestOrigin = req.headers.get("origin") ?? "";
+    const redirectBase = ALLOWED_ORIGINS.has(requestOrigin)
+      ? requestOrigin
+      : "https://fynhelp.com";
+    const redirectTo = `${redirectBase}/admin/login`;
     const { data, error } = await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
     if (error) return json({ error: error.message }, 400);
 

@@ -1,6 +1,15 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const APP_REDIRECT = 'https://fynhelp.lovable.app/demo/dashboard'
+
+function redirect(qs: string) {
+  return new Response(null, {
+    status: 302,
+    headers: { Location: `${APP_REDIRECT}${qs}` },
+  })
+}
+
 serve(async (req) => {
   try {
     const url = new URL(req.url)
@@ -10,15 +19,38 @@ serve(async (req) => {
 
     if (error) {
       console.error('Zoho OAuth error:', error)
-      return new Response(null, {
-        status: 302,
-        headers: { 'Location': `https://fynhelp.lovable.app/demo/dashboard?zoho=error&message=${error}` }
-      })
+      return redirect(`?zoho=error&message=${encodeURIComponent(error)}`)
     }
 
     if (!code || !state) throw new Error('Missing code or state')
 
-    const [orgId] = state.split(':')
+    const [orgId, nonce] = state.split(':')
+    if (!orgId || !nonce) throw new Error('Malformed state')
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // ── Verify state nonce was issued by zoho-auth and not expired ──
+    const { data: stateRow, error: stateLookupErr } = await supabase
+      .from('integration_oauth_states')
+      .select('nonce, organization_id, expires_at')
+      .eq('nonce', nonce)
+      .eq('provider', 'zoho_books')
+      .maybeSingle()
+    if (stateLookupErr || !stateRow) {
+      console.error('zoho-callback: unknown state', { nonce, err: stateLookupErr })
+      return redirect(`?zoho=error&message=${encodeURIComponent('Invalid OAuth state')}`)
+    }
+    if (String(stateRow.organization_id) !== String(orgId)) {
+      return redirect(`?zoho=error&message=${encodeURIComponent('State org mismatch')}`)
+    }
+    if (new Date(stateRow.expires_at).getTime() < Date.now()) {
+      return redirect(`?zoho=error&message=${encodeURIComponent('OAuth state expired')}`)
+    }
+    // Single-use: delete immediately
+    await supabase.from('integration_oauth_states').delete().eq('nonce', nonce)
 
     const clientId = Deno.env.get('ZOHO_CLIENT_ID')!
     const clientSecret = Deno.env.get('ZOHO_CLIENT_SECRET')!
@@ -32,17 +64,12 @@ serve(async (req) => {
         client_id: clientId,
         client_secret: clientSecret,
         redirect_uri: redirectUri,
-        code
-      })
+        code,
+      }),
     })
 
     const tokens = await tokenResponse.json()
     if (tokens.error) throw new Error(tokens.error)
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
 
     const { error: dbError } = await supabase
       .from('integrations')
@@ -54,22 +81,16 @@ serve(async (req) => {
         expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
         metadata: {
           api_domain: tokens.api_domain || 'https://books.zoho.com',
-          connected_at: new Date().toISOString()
+          connected_at: new Date().toISOString(),
         },
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
 
     if (dbError) throw dbError
 
-    return new Response(null, {
-      status: 302,
-      headers: { 'Location': `https://fynhelp.lovable.app/demo/dashboard?zoho=connected` }
-    })
+    return redirect(`?zoho=connected`)
   } catch (error) {
     console.error('OAuth callback error:', error)
-    return new Response(null, {
-      status: 302,
-      headers: { 'Location': `https://fynhelp.lovable.app/demo/dashboard?zoho=error&message=${encodeURIComponent(error.message)}` }
-    })
+    return redirect(`?zoho=error&message=${encodeURIComponent((error as Error).message)}`)
   }
 })

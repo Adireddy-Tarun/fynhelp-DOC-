@@ -7,10 +7,10 @@ import {
   Building2, UserCheck, Bell, Target, Mail,
 } from "lucide-react";
 import CircuitLedgerBackground from "@/components/demo/CircuitLedgerBackground";
-
-const DEMO_PASSWORD = "fynhelp2026";
+import { supabase } from "@/integrations/supabase/client";
 
 type Tab = "demo";
+
 
 function DemoGate({ onAccess }: { onAccess: () => void }) {
   const [password, setPassword] = useState("");
@@ -67,14 +67,25 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
 
   const handleAccess = async () => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
-    if (password === DEMO_PASSWORD) {
-      onAccess();
-    } else {
+    setError(false);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("verify-demo-password", {
+        body: { password },
+      });
+      if (fnErr || !data?.token) {
+        setError(true);
+        setLoading(false);
+      } else {
+        sessionStorage.setItem("demo_access_token", data.token as string);
+        sessionStorage.setItem("demo_access", "true");
+        onAccess();
+      }
+    } catch {
       setError(true);
       setLoading(false);
     }
   };
+
 
 
   const handleDemoSubmit = async () => {

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, AlertCircle, ChevronRight, CheckCircle } from "lucide-react";
-
-const DEMO_PASSWORD = "fynhelp2026";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Internal Access, moved from /demo/login (previously the "Access" tab).
- * Grants the team access to the demo dashboard by setting the
- * `demo_access` session flag, then redirects to /demo/dashboard.
+ * Grants the team access to the demo dashboard by validating the password
+ * server-side via the `verify-demo-password` edge function and storing the
+ * returned short-lived HMAC-signed token in sessionStorage.
  */
 export default function AdminInternalAccessPage() {
   const nav = useNavigate();
@@ -15,28 +15,37 @@ export default function AdminInternalAccessPage() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [granted, setGranted] = useState(
-    typeof window !== "undefined" && sessionStorage.getItem("demo_access") === "true",
+    typeof window !== "undefined" && !!sessionStorage.getItem("demo_access_token"),
   );
 
   const handleAccess = async () => {
     setLoading(true);
     setError(false);
-    await new Promise((r) => setTimeout(r, 500));
-    if (password === DEMO_PASSWORD) {
-      sessionStorage.setItem("demo_access", "true");
-      setGranted(true);
-      setLoading(false);
-    } else {
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("verify-demo-password", {
+        body: { password },
+      });
+      if (fnErr || !data?.token) {
+        setError(true);
+      } else {
+        sessionStorage.setItem("demo_access_token", data.token as string);
+        sessionStorage.setItem("demo_access", "true"); // back-compat for older gates
+        setGranted(true);
+      }
+    } catch {
       setError(true);
+    } finally {
       setLoading(false);
     }
   };
 
   const revoke = () => {
+    sessionStorage.removeItem("demo_access_token");
     sessionStorage.removeItem("demo_access");
     setGranted(false);
     setPassword("");
   };
+
 
   return (
     <div style={{ maxWidth: 560 }}>

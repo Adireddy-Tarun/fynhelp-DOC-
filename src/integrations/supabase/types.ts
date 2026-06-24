@@ -2340,6 +2340,33 @@ export type Database = {
         }
         Relationships: []
       }
+      integration_oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          nonce: string
+          organization_id: string
+          provider: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          nonce: string
+          organization_id: string
+          provider: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          nonce?: string
+          organization_id?: string
+          provider?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       integration_tokens: {
         Row: {
           access_token: string | null
