@@ -16,6 +16,7 @@ import {
   useLiquiditySummary, useInvoices, useExpenses,
   useTopCustomers, useVendorSpend, usePersonnelCosts, useExpensesByCategory,
 } from "@/hooks/dashboard/useDashboardData";
+import { useMode } from "@/components/intelligence/DataSource";
 import { formatINR, getRunwayColor } from "@/lib/indian-format";
 import { cn } from "@/lib/utils";
 
