@@ -122,21 +122,39 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await (supabase as any)
-          .from("gst_filings")
-          .select("*")
+        // Try demo table first (seeded data uses gst_filings_demo with capitalised
+        // status values + filing_type column). Falls back to real gst_filings.
+        const demoRes = await (supabase as any)
+          .from("gst_filings_demo")
+          .select("due_date, filing_type, status")
           .eq("business_id", businessId)
-          .in("status", ["pending", "overdue"])
+          .in("status", ["Pending", "Overdue"])
           .order("due_date", { ascending: true })
           .limit(1);
-        if (cancelled) return;
-        const row = data?.[0];
+
+        let row: any = demoRes?.data?.[0];
+        let periodField = "filing_type";
+
         if (!row) {
-          setGst({ state: "filed", days: 0, label: "GST ✓" });
+          const realRes = await (supabase as any)
+            .from("gst_filings")
+            .select("due_date, return_type, status")
+            .eq("business_id", businessId)
+            .in("status", ["pending", "overdue"])
+            .order("due_date", { ascending: true })
+            .limit(1);
+          row = realRes?.data?.[0];
+          periodField = "return_type";
+        }
+
+        if (cancelled) return;
+        if (!row || !row.due_date) {
+          // Empty != filed — hide the badge rather than show a false-positive "GST ✓".
+          setGst(null);
           return;
         }
         const days = Math.ceil((new Date(row.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-        const period = row.return_type || "GSTR-3B";
+        const period = row[periodField] || "GSTR-3B";
         if (days <= 0) setGst({ state: "overdue", days, label: `${period} overdue!` });
         else if (days <= 14) setGst({ state: "due", days, label: `${period} in ${days}d` });
         else setGst({ state: "filed", days, label: "GST ✓" });
