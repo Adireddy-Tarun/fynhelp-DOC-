@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, UserPlus } from "lucide-react";
-import { supabase as supabaseExternal } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 
 type Row = {
   id: string;
@@ -32,12 +32,12 @@ export default function WaitlistStatsWidget() {
     let cancelled = false;
     (async () => {
       const [recentRes, countRes] = await Promise.all([
-        supabaseExternal
+        supabase
           .from("waitlist")
           .select("id,email,name,company_name,created_at")
           .order("created_at", { ascending: false })
           .limit(5),
-        supabaseExternal
+        supabase
           .from("waitlist")
           .select("*", { count: "exact", head: true }),
       ]);
