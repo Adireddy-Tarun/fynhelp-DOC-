@@ -408,6 +408,7 @@ export type Database = {
           id: string
           is_demo: boolean
           reconciled: boolean
+          source_document_id: string | null
           type: string
           updated_at: string
         }
@@ -422,6 +423,7 @@ export type Database = {
           id?: string
           is_demo?: boolean
           reconciled?: boolean
+          source_document_id?: string | null
           type: string
           updated_at?: string
         }
@@ -436,10 +438,19 @@ export type Database = {
           id?: string
           is_demo?: boolean
           reconciled?: boolean
+          source_document_id?: string | null
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "business_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       blog_posts: {
         Row: {
@@ -489,6 +500,54 @@ export type Database = {
           title?: string
           updated_at?: string
           views?: number
+        }
+        Relationships: []
+      }
+      business_documents: {
+        Row: {
+          business_id: string
+          created_at: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          parse_error: string | null
+          parse_status: string
+          rows_imported: number
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          parse_error?: string | null
+          parse_status?: string
+          rows_imported?: number
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          parse_error?: string | null
+          parse_status?: string
+          rows_imported?: number
+          updated_at?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }
