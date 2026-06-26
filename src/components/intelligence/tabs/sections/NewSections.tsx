@@ -711,7 +711,7 @@ export function InsuranceSection() {
         {(rows) => (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {rows.map((p) => (
-              <div key={p.id} className="p-4 bg-white rounded-lg fyn-card-hover" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+              <div key={p.id} onClick={() => openDrawer("insurance", p.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <Badge tone="gold">{p.policy_type}</Badge>
                   {!p.is_adequate && <AlertTriangle className="w-4 h-4 text-amber-600" />}
