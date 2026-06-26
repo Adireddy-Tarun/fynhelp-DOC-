@@ -6,11 +6,11 @@ import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD, FynLabel } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
-import { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav } from "@/demo/lib/demoNav";
 
 export default function CustomerDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useCustomerDetail(id);
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   const navigate = useNavigate();
   const base = useMode() === "demo" ? "/demo" : "/dashboard";
 

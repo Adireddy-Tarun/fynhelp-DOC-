@@ -21,12 +21,12 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useDrawer, DrawerKind } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav, type DrawerKind } from "@/demo/lib/demoNav";
 import { ACCENT, fmtCompact } from "@/demo/components/DemoPrimitives";
 
 /* ─── Row click → drawer ──────────────────────────────────────────── */
 export function useOpenDrawer() {
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   return (kind: DrawerKind, id: string) => open(kind, id);
 }
 

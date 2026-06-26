@@ -6,7 +6,7 @@ import {
   FynSearchInput, FynSelect,
 } from "@/demo/components/DemoListShell";
 import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
-import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav } from "@/demo/lib/demoNav";
 import { useCustomers, useInvoices } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { Users } from "lucide-react";
@@ -16,7 +16,7 @@ const PAGE_SIZE = 10;
 export default function CustomersPage() {
   const { data: customers, isLoading, error } = useCustomers();
   const { data: invoices } = useInvoices();
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   const [params] = useSearchParams();
   const [search, setSearch] = useState(params.get("q") || "");
   const [filter, setFilter] = useState(params.get("filter") || "all");
@@ -126,7 +126,6 @@ export default function CustomersPage() {
           <Pagination page={page} pageSize={PAGE_SIZE} total={filtered.length} onPage={setPage} />
         </div>
       </ListPageShell>
-      <DetailDrawer />
     </DashboardLayout>
   );
 }

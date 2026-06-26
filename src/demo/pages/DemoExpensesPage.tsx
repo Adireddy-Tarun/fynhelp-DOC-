@@ -7,7 +7,7 @@ import {
 } from "@/demo/components/DemoListShell";
 import { FynTable, FynTH, FynTR, FynTD, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
 import { StatusBadgeFor } from "@/demo/components/DemoDetailParts";
-import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav } from "@/demo/lib/demoNav";
 import { useExpenses } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { Receipt } from "lucide-react";
@@ -16,7 +16,7 @@ const PAGE_SIZE = 10;
 
 export default function ExpensesListPage() {
   const { data: expenses, isLoading, error } = useExpenses();
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   const [params] = useSearchParams();
   const [search, setSearch] = useState(params.get("q") || params.get("vendor") || "");
   const [statusFilter, setStatusFilter] = useState(params.get("status") || "all");
@@ -109,7 +109,6 @@ export default function ExpensesListPage() {
           <Pagination page={page} pageSize={PAGE_SIZE} total={filtered.length} onPage={setPage} />
         </div>
       </ListPageShell>
-      <DetailDrawer />
     </DashboardLayout>
   );
 }

@@ -4,11 +4,11 @@ import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading, FynButton } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
-import { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav } from "@/demo/lib/demoNav";
 
 export default function DealDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useDealDetail(id);
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   const mode = useMode();
   if (isLoading || !data) return <div className="p-fyn-lg"><FynLoading rows={4} /></div>;
   const d = data.deal as any;
