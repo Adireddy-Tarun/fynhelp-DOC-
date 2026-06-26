@@ -664,7 +664,7 @@ export function RiskRegisterSection() {
             {(d) => (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {d.map((r) => (
-                  <div key={r.id} className="p-4 bg-white rounded-lg fyn-card-hover" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+                  <div key={r.id} onClick={() => openDrawer("risk", r.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <p className="font-semibold text-fyn-ink text-sm leading-tight">{r.risk_name}</p>
                       <Badge tone={sevTone(Number(r.risk_score))}>{Number(r.risk_score).toFixed(0)}</Badge>
