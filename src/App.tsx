@@ -200,6 +200,33 @@ const App = () => (
             <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
             <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
             <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
+            {/* Public demo — fully isolated tree (src/demo/*) */}
+            <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
+            <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
+            <Route path="/demo/liquidity"  element={<DemoIntelligencePage tab="liquidity" />} />
+            <Route path="/demo/revenue"    element={<DemoIntelligencePage tab="revenue" />} />
+            <Route path="/demo/cost"       element={<DemoIntelligencePage tab="cost" />} />
+            <Route path="/demo/gst"        element={<DemoIntelligencePage tab="gst" />} />
+            <Route path="/demo/governance" element={<DemoIntelligencePage tab="governance" />} />
+            <Route path="/demo/hr"         element={<DemoIntelligencePage tab="hr" />} />
+            <Route path="/demo/investor"   element={<DemoIntelligencePage tab="investor" />} />
+            <Route path="/demo/fynny"      element={<DemoIntelligencePage tab="fynny" />} />
+            <Route path="/demo/reports"    element={<DemoReportsPage />} />
+            <Route path="/demo/customers"  element={<DemoCustomersPage />} />
+            <Route path="/demo/customers/:id" element={<DemoCustomerPage />} />
+            <Route path="/demo/vendors"    element={<DemoVendorsPage />} />
+            <Route path="/demo/vendors/:id" element={<DemoVendorPage />} />
+            <Route path="/demo/invoices"   element={<DemoInvoicesPage />} />
+            <Route path="/demo/invoices/:id" element={<DemoInvoicePage />} />
+            <Route path="/demo/expenses"   element={<DemoExpensesPage />} />
+            <Route path="/demo/expenses/:id" element={<DemoExpensePage />} />
+            <Route path="/demo/employees"  element={<DemoEmployeesPage />} />
+            <Route path="/demo/employees/:id" element={<DemoEmployeePage />} />
+            <Route path="/demo/gst/:id"    element={<DemoGstFilingPage />} />
+            <Route path="/demo/risks/:id"  element={<DemoRiskPage />} />
+            <Route path="/demo/insurance/:id" element={<DemoInsurancePage />} />
+            <Route path="/demo/deals/:id"  element={<DemoDealPage />} />
+            <Route path="/demo/bank/:id"   element={<DemoBankTxnPage />} />
             <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
             <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
             <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
