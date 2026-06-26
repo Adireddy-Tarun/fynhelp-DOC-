@@ -33,7 +33,7 @@ export default function EmployeesListPage() {
             </thead>
             <tbody>
               {emps.map((e) => (
-                <FynTR key={e.id}>
+                <FynTR key={e.id} className="cursor-pointer" onClick={() => navigate(`/demo/employees/${e.id}`)}>
                   <FynTD>{e.name}</FynTD>
                   <FynTD>{e.department || "—"}</FynTD>
                   <FynTD>{e.designation || "—"}</FynTD>
