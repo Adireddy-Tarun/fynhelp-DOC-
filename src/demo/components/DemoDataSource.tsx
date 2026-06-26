@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const DEMO_BIZ = "4b30494f-4c30-4a74-a6bb-6bf56493a97d";
 
-export type IntelligenceMode = "demo";
+export type IntelligenceMode = "demo" | "live";
 export function IntelligenceProvider({ children }: { mode?: IntelligenceMode; children: ReactNode }) {
   return <>{children}</>;
 }
