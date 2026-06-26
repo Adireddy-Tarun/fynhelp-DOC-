@@ -4,7 +4,7 @@ import { useVendorDetail } from "@/demo/hooks/useDemoData";
 import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD } from "@/components/dashboard/ui";
-import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
+import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 import { useDrawer } from "@/demo/components/DemoDetailDrawer";
 
 export default function VendorDetail({ id, onClose }: { id: string; onClose: () => void }) {

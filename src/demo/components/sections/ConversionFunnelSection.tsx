@@ -1,5 +1,5 @@
-import { useConversionFunnel } from "../DataSource";
-import { IntelCard, ACCENT } from "../_primitives";
+import { useConversionFunnel } from "@/demo/components/DemoDataSource";
+import { IntelCard, ACCENT } from "@/demo/components/DemoPrimitives";
 
 export default function ConversionFunnelSection() {
   const { data, isLoading } = useConversionFunnel();

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { useRegulatoryCompliance } from "../DataSource";
-import { IntelCard, Badge, BadgeTone, ACCENT } from "../_primitives";
+import { useRegulatoryCompliance } from "@/demo/components/DemoDataSource";
+import { IntelCard, Badge, BadgeTone, ACCENT } from "@/demo/components/DemoPrimitives";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const tone: Record<string, BadgeTone> = { compliant: "green", due_soon: "gold", overdue: "red", not_applicable: "gray" };

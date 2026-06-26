@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useDeferredRevenue, useMode } from "../DataSource";
-import { KPI, IntelCard, fmtCompact } from "../_primitives";
+import { useDeferredRevenue, useMode } from "@/demo/components/DemoDataSource";
+import { KPI, IntelCard, fmtCompact } from "@/demo/components/DemoPrimitives";
 
 export default function UnbilledWipSection() {
   const mode = useMode();

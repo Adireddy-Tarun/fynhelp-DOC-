@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useDrawer, DrawerKind } from "@/demo/components/DemoDetailDrawer";
-import { ACCENT, fmtCompact } from "./_primitives";
+import { ACCENT, fmtCompact } from "@/demo/components/DemoPrimitives";
 
 /* ─── Row click → drawer ──────────────────────────────────────────── */
 export function useOpenDrawer() {

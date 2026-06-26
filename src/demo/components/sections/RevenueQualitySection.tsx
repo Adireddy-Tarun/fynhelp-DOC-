@@ -1,5 +1,5 @@
-import { useRevenueQuality } from "../DataSource";
-import { IntelCard, KPI, Badge, fmtCompact, fmtPct, ACCENT } from "../_primitives";
+import { useRevenueQuality } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, fmtCompact, fmtPct, ACCENT } from "@/demo/components/DemoPrimitives";
 
 export default function RevenueQualitySection() {
   const { data, isLoading } = useRevenueQuality();

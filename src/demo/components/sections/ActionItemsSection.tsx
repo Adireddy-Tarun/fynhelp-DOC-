@@ -1,5 +1,5 @@
-import { useActionItems } from "../DataSource";
-import { IntelCard, Badge, BadgeTone, ACCENT } from "../_primitives";
+import { useActionItems } from "@/demo/components/DemoDataSource";
+import { IntelCard, Badge, BadgeTone, ACCENT } from "@/demo/components/DemoPrimitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";

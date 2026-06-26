@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { useEmployees, useInvoices } from "../DataSource";
-import { IntelCard, KPI, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
+import { useEmployees, useInvoices } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, WithData, fmtCompact, fmtPct, ACCENT } from "@/demo/components/DemoPrimitives";
 import { EsopSection, HiringPipelineSection, CompBenchmarksSection } from "./sections/NewSections";
-import { HrmsDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import { HrmsDialog, ViewAllLink, useOpenDrawer } from "@/demo/components/DemoActions";
 
 export default function HrTab() {
   const { data: emps, isLoading } = useEmployees();

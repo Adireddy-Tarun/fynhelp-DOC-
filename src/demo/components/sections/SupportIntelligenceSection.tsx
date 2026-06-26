@@ -1,5 +1,5 @@
-import { useSupportIntelligence } from "../DataSource";
-import { IntelCard, KPI, ACCENT } from "../_primitives";
+import { useSupportIntelligence } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, ACCENT } from "@/demo/components/DemoPrimitives";
 
 export default function SupportIntelligenceSection() {
   const { data, isLoading } = useSupportIntelligence();

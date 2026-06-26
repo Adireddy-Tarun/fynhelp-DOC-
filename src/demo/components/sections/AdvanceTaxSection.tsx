@@ -1,5 +1,5 @@
-import { useAdvanceTaxSchedule } from "../DataSource";
-import { IntelCard, Badge, BadgeTone, fmtCompact, ACCENT } from "../_primitives";
+import { useAdvanceTaxSchedule } from "@/demo/components/DemoDataSource";
+import { IntelCard, Badge, BadgeTone, fmtCompact, ACCENT } from "@/demo/components/DemoPrimitives";
 
 const tone: Record<string, BadgeTone> = { exempt: "green", paid: "green", upcoming: "gray", overdue: "red" };
 

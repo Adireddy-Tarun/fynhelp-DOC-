@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AlertTriangle } from "lucide-react";
-import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
-import { RemindButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "@/demo/components/DemoPrimitives";
+import { RemindButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "@/demo/components/DemoActions";
 import SettlementsSection from "../sections/SettlementsSection";
 import FxExposureSection from "../sections/FxExposureSection";
 import UnbilledWipSection from "../sections/UnbilledWipSection";

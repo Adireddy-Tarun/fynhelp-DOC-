@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useFxExposure, useMode } from "../DataSource";
-import { IntelCard, KPI, Badge, fmtCompact } from "../_primitives";
+import { useFxExposure, useMode } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, fmtCompact } from "@/demo/components/DemoPrimitives";
 
 export default function FxExposureSection() {
   const mode = useMode();

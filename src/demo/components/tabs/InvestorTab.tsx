@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useInvoices, useExpenses, useBankTxns, useCustomers, useMode } from "../DataSource";
-import { IntelCard, KPI, fmtCompact, fmtPct, ACCENT, EMPTY } from "../_primitives";
+import { useInvoices, useExpenses, useBankTxns, useCustomers, useMode } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, fmtCompact, fmtPct, ACCENT, EMPTY } from "@/demo/components/DemoPrimitives";
 
 export default function InvestorTab() {
   const mode = useMode();

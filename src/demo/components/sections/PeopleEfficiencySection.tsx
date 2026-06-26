@@ -1,5 +1,5 @@
-import { usePeopleEfficiency } from "../DataSource";
-import { KPI, fmtCompact, fmtPct } from "../_primitives";
+import { usePeopleEfficiency } from "@/demo/components/DemoDataSource";
+import { KPI, fmtCompact, fmtPct } from "@/demo/components/DemoPrimitives";
 
 export default function PeopleEfficiencySection() {
   const { data, isLoading } = usePeopleEfficiency();

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useGstFilingDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading } from "@/components/dashboard/ui";
-import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
+import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 
 export default function GstFilingDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useGstFilingDetail(id);

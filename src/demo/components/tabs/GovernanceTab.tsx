@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { useInvoices, useExpenses, useBalanceSheet } from "../DataSource";
-import { IntelCard, KPI, Badge, fmtCompact, ACCENT, CHART, ChartGradients, WithData } from "../_primitives";
+import { useInvoices, useExpenses, useBalanceSheet } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, fmtCompact, ACCENT, CHART, ChartGradients, WithData } from "@/demo/components/DemoPrimitives";
 import { BalanceSheetSection, RiskRegisterSection, InsuranceSection } from "./sections/NewSections";
 
 export default function GovernanceTab() {

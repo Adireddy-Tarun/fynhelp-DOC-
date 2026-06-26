@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { useRiskDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading } from "@/components/dashboard/ui";
-import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
+import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 
 function RiskHeatmap({ likelihood, impact }: { likelihood: number; impact: number }) {
   // 5x5 grid; impact rows (top=5), likelihood cols (left=1)

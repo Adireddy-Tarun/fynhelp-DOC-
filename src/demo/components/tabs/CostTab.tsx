@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
+import { useExpenses, useVendors, useInvoices, useEmployees } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "@/demo/components/DemoPrimitives";
 import { AlertTriangle } from "lucide-react";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
-import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
+import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "@/demo/components/DemoActions";
 import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
 import ProjectEconomicsSection from "../sections/ProjectEconomicsSection";
 import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";

@@ -1,5 +1,5 @@
-import { useRevenueAlerts } from "../DataSource";
-import { ACCENT } from "../_primitives";
+import { useRevenueAlerts } from "@/demo/components/DemoDataSource";
+import { ACCENT } from "@/demo/components/DemoPrimitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";

@@ -7,7 +7,7 @@ import { ArrowUpRight, Upload, RefreshCw } from "lucide-react";
 import CountUp from "react-countup";
 import { cn } from "@/lib/utils";
 import { formatINR } from "@/lib/indian-format";
-import { useMode } from "./DataSource";
+import { useMode } from "@/demo/components/DemoDataSource";
 
 export const ACCENT = {
   red: "#A93838",

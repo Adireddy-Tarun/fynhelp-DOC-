@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useTdsIntelligence } from "../DataSource";
-import { IntelCard, Badge, BadgeTone, fmtCompact, ACCENT } from "../_primitives";
+import { useTdsIntelligence } from "@/demo/components/DemoDataSource";
+import { IntelCard, Badge, BadgeTone, fmtCompact, ACCENT } from "@/demo/components/DemoPrimitives";
 import { AlertTriangle } from "lucide-react";
 
 const tone: Record<string, BadgeTone> = { filed: "green", deposited: "gold", mismatch: "red", overdue: "red", pending: "gray" };

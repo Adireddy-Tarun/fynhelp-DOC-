@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { usePaymentSettlements, useMode } from "../DataSource";
-import { IntelCard, KPI, fmtCompact } from "../_primitives";
+import { usePaymentSettlements, useMode } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, fmtCompact } from "@/demo/components/DemoPrimitives";
 
 export default function SettlementsSection() {
   const mode = useMode();

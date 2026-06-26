@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useProjectsList } from "../DataSource";
-import { IntelCard, Badge, BadgeTone, fmtCompact, fmtPct } from "../_primitives";
+import { useProjectsList } from "@/demo/components/DemoDataSource";
+import { IntelCard, Badge, BadgeTone, fmtCompact, fmtPct } from "@/demo/components/DemoPrimitives";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const statusTone: Record<string, BadgeTone> = { active: "gold", completed: "green", pipeline: "gray", cancelled: "gray" };

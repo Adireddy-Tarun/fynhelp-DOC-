@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useInvoices, useCustomers, useMode } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+import { useInvoices, useCustomers, useMode } from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "@/demo/components/DemoPrimitives";
 import { CustomerAcquisitionSection, CohortRetentionSection, SalesPipelineSection, RevenueBreakdownSection, DeferredRevenueSection } from "./sections/NewSections";
-import { GenerateReportButton, ViewAllLink } from "../actions";
+import { GenerateReportButton, ViewAllLink } from "@/demo/components/DemoActions";
 import RevenueQualitySection from "../sections/RevenueQualitySection";
 import ConversionFunnelSection from "../sections/ConversionFunnelSection";
 import RevenueAlertsSection from "../sections/RevenueAlertsSection";

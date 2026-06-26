@@ -14,9 +14,9 @@ import GovernanceTab from "./tabs/GovernanceTab";
 import HrTab from "./tabs/HrTab";
 import InvestorTab from "./tabs/InvestorTab";
 import AskFynnyTab from "./tabs/AskFynnyTab";
-import { IntelPage, ModeBanner, ACCENT, LiveTimestamp, ChartGradients } from "./_primitives";
-import { useMode } from "./DataSource";
-import { HeaderToolbar } from "./actions";
+import { IntelPage, ModeBanner, ACCENT, LiveTimestamp, ChartGradients } from "@/demo/components/DemoPrimitives";
+import { useMode } from "@/demo/components/DemoDataSource";
+import { HeaderToolbar } from "@/demo/components/DemoActions";
 
 const TABS = [
   { id: "liquidity",  label: "Liquidity",      icon: Droplets,       Comp: LiquidityTab },

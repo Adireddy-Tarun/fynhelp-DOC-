@@ -1,12 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Send, Sparkles, Loader2 } from "lucide-react";
-import { IntelCard, ACCENT, Badge } from "../_primitives";
+import { IntelCard, ACCENT, Badge } from "@/demo/components/DemoPrimitives";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useMode, DEMO_BIZ,
   useBankTxns, useInvoices, useExpenses, useCustomers, useVendors,
   useGstFilings, useEmployees, useCAC, useSalesPipeline,
-} from "../DataSource";
+} from "@/demo/components/DemoDataSource";
 
 const QUICK_PROMPTS = [
   "What's my runway?",

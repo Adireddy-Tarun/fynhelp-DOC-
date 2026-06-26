@@ -2,7 +2,7 @@ import { X, AlertTriangle } from "lucide-react";
 import { useInsuranceDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading } from "@/components/dashboard/ui";
-import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
+import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 
 export default function InsuranceDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useInsuranceDetail(id);
