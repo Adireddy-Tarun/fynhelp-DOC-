@@ -810,15 +810,6 @@ export function EsopSection() {
     </>
   );
 }
-                </tbody>
-              </table>
-            </div>
-          )}
-        </WithData>
-      </IntelCard>
-    </>
-  );
-}
 
 export function HiringPipelineSection() {
   const { data, isLoading } = useHiringPipeline();
