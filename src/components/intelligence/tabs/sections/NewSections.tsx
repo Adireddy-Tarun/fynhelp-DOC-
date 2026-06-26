@@ -203,7 +203,7 @@ export function SalesPipelineSection() {
                 </thead>
                 <tbody>
                   {rows.map((d) => (
-                    <tr key={d.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={d.id} onClick={() => openDrawer("deal", d.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{d.deal_name}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{d.customer_name}</td>
                       <td className="py-2.5"><Badge tone={stageTone[d.stage] ?? "gray"}>{d.stage}</Badge></td>
