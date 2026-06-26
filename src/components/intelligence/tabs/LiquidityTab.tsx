@@ -293,6 +293,41 @@ export default function LiquidityTab() {
           )}
         </WithData>
       </IntelCard>
+      {/* Recent bank activity */}
+      <IntelCard title="Recent Bank Activity" sub="Latest 8 transactions" action={<ViewAllLink to="/demo/banking" />}>
+        <WithData data={(bank ?? []).slice(0, 8)} isLoading={bankL} emptyTitle="No transactions yet" cta={null}>
+          {(rows) => (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[rgba(26,16,8,0.08)]">
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Date</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Description</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Category</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Amount</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((t: any) => (
+                  <tr
+                    key={t.id}
+                    onClick={() => openDrawer("bank_txn", t.id)}
+                    className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors"
+                  >
+                    <td className="py-2.5 text-xs text-[#6B6B6B]">{t.date?.slice(0, 10)}</td>
+                    <td className="py-2.5 text-xs text-fyn-ink font-medium max-w-[280px] truncate">{t.description ?? "—"}</td>
+                    <td className="py-2.5 text-xs text-[#6B6B6B]">{t.category ?? "—"}</td>
+                    <td className={`py-2.5 text-right font-mono text-xs font-semibold ${t.type === "credit" ? "text-emerald-600" : "text-fyn-ink"}`}>
+                      {t.type === "credit" ? "+" : "−"}{fmtCompact(Number(t.amount))}
+                    </td>
+                    <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(t.balance))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </WithData>
+      </IntelCard>
 
       {/* Priority action */}
       <ActionItemsSection />
