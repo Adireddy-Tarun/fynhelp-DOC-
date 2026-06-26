@@ -11,7 +11,7 @@ import {
   FynCard, FynCardTitle, FynLabel, FynBadge, FynSectionTitle, FynLoading,
 } from "@/components/dashboard/ui";
 import { StatusBadgeFor } from "@/demo/components/DemoDetailParts";
-import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useDemoNav } from "@/demo/lib/demoNav";
 import {
   useLiquiditySummary, useInvoices, useExpenses,
   useTopCustomers, useVendorSpend, usePersonnelCosts, useExpensesByCategory,
@@ -60,7 +60,7 @@ function ViewAllLink({ to }: { to: string }) {
 
 export default function LiveCockpitPanel() {
   const navigate = useNavigate();
-  const { open } = useDrawer();
+  const { open } = useDemoNav();
   const mode = useMode();
   const base = mode === "demo" ? "/demo" : "/dashboard";
   const liq = useLiquiditySummary();
@@ -275,7 +275,6 @@ export default function LiveCockpitPanel() {
         </FynCard>
       </div>
 
-      <DetailDrawer />
     </section>
   );
 }

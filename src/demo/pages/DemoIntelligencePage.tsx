@@ -5,7 +5,6 @@
 import { Helmet } from "react-helmet-async";
 import DemoShell, { TabId } from "@/demo/components/DemoShell";
 import { IntelligenceProvider } from "@/demo/components/DemoDataSource";
-import DemoDetailDrawer from "@/demo/components/DemoDetailDrawer";
 import DemoModeBanner from "@/components/demo/DemoModeBanner";
 
 interface Props {
@@ -27,7 +26,6 @@ export default function DemoIntelligencePage({ tab = "liquidity" }: Props) {
         </Helmet>
         <div className="min-h-screen bg-fyn-beige" data-source="demo">
           <DemoShell initialTab={tab} />
-          <DemoDetailDrawer />
         </div>
       </IntelligenceProvider>
     </DemoModeBanner>

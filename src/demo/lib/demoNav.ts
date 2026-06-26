@@ -1,9 +1,7 @@
 /**
- * Demo entity navigation hub.
- * Drawer/sheet UI has been removed — every "open" call now navigates to the
- * dedicated full-page route at /demo/<entity>/:id. The `useDrawer` name is
- * preserved so existing call sites (tabs, sections, list pages, detail pages)
- * rewire without edits.
+ * Demo entity navigation. Replaces the deprecated DemoDetailDrawer.
+ * Every "open" call navigates to the dedicated full-page route at
+ * /demo/<entity>/:id. No drawer/sheet UI is rendered.
  */
 import { useNavigate } from "react-router-dom";
 
@@ -28,19 +26,11 @@ export function routeFor(kind: DrawerKind, id: string): string {
   return `${ROUTE[kind]}/${id}`;
 }
 
-export function useDrawer() {
+export function useDemoNav() {
   const navigate = useNavigate();
   const open = (kind: DrawerKind, id: string) => {
     if (!id) return;
     navigate(routeFor(kind, id));
   };
-  // close is a no-op now — kept for backward compat with consumers.
-  const close = () => {};
-  return { drawer: null as DrawerKind | null, id: null as string | null, open, close };
-}
-
-// Mount point kept so existing pages that render <DemoDetailDrawer /> don't break.
-// Renders nothing — full pages handle every detail view.
-export default function DemoDetailDrawer() {
-  return null;
+  return { open };
 }
