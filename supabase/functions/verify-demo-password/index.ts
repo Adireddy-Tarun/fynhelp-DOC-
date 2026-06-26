@@ -1,7 +1,7 @@
 // Validates the internal demo password server-side and returns a short-lived
 // HMAC-signed token. The client stores the token in sessionStorage to unlock
 // the internal demo dashboard. No password value ever ships in client code.
-import { encode as b64url } from 'https://deno.land/std@0.224.0/encoding/base64url.ts'
+import { encodeBase64Url as b64url } from 'https://deno.land/std@0.224.0/encoding/base64url.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
