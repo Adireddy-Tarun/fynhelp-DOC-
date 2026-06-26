@@ -137,6 +137,7 @@ export function CohortRetentionSection() {
 
 export function SalesPipelineSection() {
   const { data, isLoading } = useSalesPipeline();
+  const openDrawer = useOpenDrawer();
   const m = useMemo(() => {
     const rows = data ?? [];
     const open = rows.filter((d) => !d.is_won && !d.is_lost);
