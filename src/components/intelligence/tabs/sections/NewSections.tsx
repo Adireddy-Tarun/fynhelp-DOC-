@@ -738,7 +738,13 @@ export function InsuranceSection() {
 
 export function EsopSection() {
   const { data, isLoading } = useEsopGrants();
-  const m = useMemo(() => {
+  const { data: emps } = useEmployees();
+  const openDrawer = useOpenDrawer();
+  const empByName = useMemo(() => {
+    const m = new Map<string, string>();
+    (emps ?? []).forEach((e: any) => m.set(String(e.name || "").toLowerCase(), e.id));
+    return m;
+  }, [emps]);
     const rows = data ?? [];
     return {
       rows,
