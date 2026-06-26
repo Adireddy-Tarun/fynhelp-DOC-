@@ -87,6 +87,24 @@ import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
+// Demo-only tree (fully isolated from /dashboard)
+import DemoIntelligencePage from "./demo/pages/DemoIntelligencePage.tsx";
+import DemoReportsPage from "./demo/pages/DemoReportsPage.tsx";
+import DemoCustomersPage from "./demo/pages/DemoCustomersPage.tsx";
+import DemoVendorsPage from "./demo/pages/DemoVendorsPage.tsx";
+import DemoInvoicesPage from "./demo/pages/DemoInvoicesPage.tsx";
+import DemoExpensesPage from "./demo/pages/DemoExpensesPage.tsx";
+import DemoEmployeesPage from "./demo/pages/DemoEmployeesPage.tsx";
+import DemoCustomerPage from "./demo/pages/details/DemoCustomerPage.tsx";
+import DemoVendorPage from "./demo/pages/details/DemoVendorPage.tsx";
+import DemoInvoicePage from "./demo/pages/details/DemoInvoicePage.tsx";
+import DemoExpensePage from "./demo/pages/details/DemoExpensePage.tsx";
+import DemoGstFilingPage from "./demo/pages/details/DemoGstFilingPage.tsx";
+import DemoRiskPage from "./demo/pages/details/DemoRiskPage.tsx";
+import DemoInsurancePage from "./demo/pages/details/DemoInsurancePage.tsx";
+import DemoEmployeePage from "./demo/pages/details/DemoEmployeePage.tsx";
+import DemoDealPage from "./demo/pages/details/DemoDealPage.tsx";
+import DemoBankTxnPage from "./demo/pages/details/DemoBankTxnPage.tsx";
 import {
   DecisionSimulatorComingSoon,
   MarketGrowthComingSoon,
@@ -165,23 +183,33 @@ const App = () => (
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
             <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
-            {/* Public demo — fully-loaded intelligence dashboard, beige theme */}
+            {/* Public demo — fully isolated tree (src/demo/*) */}
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo/liquidity"  element={<IntelligencePage mode="demo" tab="liquidity" />} />
-            <Route path="/demo/revenue"    element={<IntelligencePage mode="demo" tab="revenue" />} />
-            <Route path="/demo/cost"       element={<IntelligencePage mode="demo" tab="cost" />} />
-            <Route path="/demo/gst"        element={<IntelligencePage mode="demo" tab="gst" />} />
-            <Route path="/demo/governance" element={<IntelligencePage mode="demo" tab="governance" />} />
-            <Route path="/demo/hr"         element={<IntelligencePage mode="demo" tab="hr" />} />
-            <Route path="/demo/investor"   element={<IntelligencePage mode="demo" tab="investor" />} />
-            <Route path="/demo/fynny"      element={<IntelligencePage mode="demo" tab="fynny" />} />
-            <Route path="/demo/reports"    element={<ReportsPage mode="demo" />} />
-            <Route path="/demo/customers"  element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
-            <Route path="/demo/vendors"    element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
-            <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
-            <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
-            <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
+            <Route path="/demo/liquidity"  element={<DemoIntelligencePage tab="liquidity" />} />
+            <Route path="/demo/revenue"    element={<DemoIntelligencePage tab="revenue" />} />
+            <Route path="/demo/cost"       element={<DemoIntelligencePage tab="cost" />} />
+            <Route path="/demo/gst"        element={<DemoIntelligencePage tab="gst" />} />
+            <Route path="/demo/governance" element={<DemoIntelligencePage tab="governance" />} />
+            <Route path="/demo/hr"         element={<DemoIntelligencePage tab="hr" />} />
+            <Route path="/demo/investor"   element={<DemoIntelligencePage tab="investor" />} />
+            <Route path="/demo/fynny"      element={<DemoIntelligencePage tab="fynny" />} />
+            <Route path="/demo/reports"    element={<DemoReportsPage />} />
+            <Route path="/demo/customers"  element={<DemoCustomersPage />} />
+            <Route path="/demo/customers/:id" element={<DemoCustomerPage />} />
+            <Route path="/demo/vendors"    element={<DemoVendorsPage />} />
+            <Route path="/demo/vendors/:id" element={<DemoVendorPage />} />
+            <Route path="/demo/invoices"   element={<DemoInvoicesPage />} />
+            <Route path="/demo/invoices/:id" element={<DemoInvoicePage />} />
+            <Route path="/demo/expenses"   element={<DemoExpensesPage />} />
+            <Route path="/demo/expenses/:id" element={<DemoExpensePage />} />
+            <Route path="/demo/employees"  element={<DemoEmployeesPage />} />
+            <Route path="/demo/employees/:id" element={<DemoEmployeePage />} />
+            <Route path="/demo/gst/:id"    element={<DemoGstFilingPage />} />
+            <Route path="/demo/risks/:id"  element={<DemoRiskPage />} />
+            <Route path="/demo/insurance/:id" element={<DemoInsurancePage />} />
+            <Route path="/demo/deals/:id"  element={<DemoDealPage />} />
+            <Route path="/demo/bank/:id"   element={<DemoBankTxnPage />} />
             <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
             <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
             <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
