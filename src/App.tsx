@@ -183,23 +183,6 @@ const App = () => (
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
             <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
-            {/* Public demo — fully-loaded intelligence dashboard, beige theme */}
-            <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo/liquidity"  element={<IntelligencePage mode="demo" tab="liquidity" />} />
-            <Route path="/demo/revenue"    element={<IntelligencePage mode="demo" tab="revenue" />} />
-            <Route path="/demo/cost"       element={<IntelligencePage mode="demo" tab="cost" />} />
-            <Route path="/demo/gst"        element={<IntelligencePage mode="demo" tab="gst" />} />
-            <Route path="/demo/governance" element={<IntelligencePage mode="demo" tab="governance" />} />
-            <Route path="/demo/hr"         element={<IntelligencePage mode="demo" tab="hr" />} />
-            <Route path="/demo/investor"   element={<IntelligencePage mode="demo" tab="investor" />} />
-            <Route path="/demo/fynny"      element={<IntelligencePage mode="demo" tab="fynny" />} />
-            <Route path="/demo/reports"    element={<ReportsPage mode="demo" />} />
-            <Route path="/demo/customers"  element={<DemoModeBanner><CustomersPage /></DemoModeBanner>} />
-            <Route path="/demo/vendors"    element={<DemoModeBanner><VendorsPage /></DemoModeBanner>} />
-            <Route path="/demo/invoices"   element={<DemoModeBanner><InvoicesListPage /></DemoModeBanner>} />
-            <Route path="/demo/expenses"   element={<DemoModeBanner><ExpensesListPage /></DemoModeBanner>} />
-            <Route path="/demo/employees"  element={<DemoModeBanner><EmployeesListPage /></DemoModeBanner>} />
             {/* Public demo — fully isolated tree (src/demo/*) */}
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
