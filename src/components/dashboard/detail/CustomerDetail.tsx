@@ -98,14 +98,14 @@ export default function CustomerDetail({ id, onClose }: { id: string; onClose: (
           <div className="h-32 -mx-fyn-xs">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sparkData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
-                <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(var(--fyn-ink-45))" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(24 53% 7% / 0.45)" }} axisLine={false} tickLine={false} />
                 <YAxis hide />
                 <Tooltip
                   formatter={(v: any) => formatINR(Number(v))}
                   labelStyle={{ fontSize: 11 }}
                   contentStyle={{ fontSize: 11, padding: "4px 8px" }}
                 />
-                <Line type="monotone" dataKey="amount" stroke="hsl(var(--fyn-accent-red))" strokeWidth={2} dot={{ r: 2 }} />
+                <Line type="monotone" dataKey="amount" stroke="hsl(0 73% 44%)" strokeWidth={2} dot={{ r: 2.5, fill: "hsl(0 73% 44%)" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
