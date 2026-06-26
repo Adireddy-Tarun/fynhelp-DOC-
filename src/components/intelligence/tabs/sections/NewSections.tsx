@@ -8,7 +8,7 @@ import {
   useCAC, useCohorts, useSalesPipeline, useRevenueBreakdowns, useDeferredRevenue,
   useSubscriptionAudit, useContractRenewals, useEwayBills, useHsnMaster, useTaxPlanning,
   useBalanceSheet, useRiskRegister, useInsurancePolicies, useEsopGrants, useHiringPipeline,
-  useCompBenchmarks,
+  useCompBenchmarks, useEmployees,
 } from "../../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, AnimatedBar } from "../../_primitives";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
