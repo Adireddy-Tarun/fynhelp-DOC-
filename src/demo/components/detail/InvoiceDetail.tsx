@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useInvoiceDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
-import { FynButton, FynLoading } from "@/components/demo/ui";
+import { FynButton, FynLoading } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 
 export default function InvoiceDetail({ id, onClose }: { id: string; onClose: () => void }) {

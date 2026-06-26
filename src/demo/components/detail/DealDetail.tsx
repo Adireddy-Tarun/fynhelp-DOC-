@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 import { useDealDetail } from "@/demo/hooks/useDemoData";
 import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
-import { FynLoading, FynButton } from "@/components/demo/ui";
+import { FynLoading, FynButton } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 import { useDrawer } from "@/demo/components/DemoDetailDrawer";
 

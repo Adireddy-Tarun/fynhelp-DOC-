@@ -5,7 +5,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
-import { FynPage, FynCard, FynSearchInput, FynSelect } from "@/components/demo/ui";
+import { FynPage, FynCard, FynSearchInput, FynSelect } from "@/components/dashboard/ui";
 import { useMode } from "@/demo/components/DemoDataSource";
 import { cn } from "@/lib/utils";
 
