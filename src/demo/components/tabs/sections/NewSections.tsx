@@ -9,10 +9,10 @@ import {
   useSubscriptionAudit, useContractRenewals, useEwayBills, useHsnMaster, useTaxPlanning,
   useBalanceSheet, useRiskRegister, useInsurancePolicies, useEsopGrants, useHiringPipeline,
   useCompBenchmarks, useEmployees,
-} from "../../DataSource";
-import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, AnimatedBar } from "../../_primitives";
+} from "@/demo/components/DemoDataSource";
+import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, AnimatedBar } from "@/demo/components/DemoPrimitives";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
-import { useOpenDrawer } from "../../actions";
+import { useOpenDrawer } from "@/demo/components/DemoActions";
 
 const fmtDate = (d?: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const daysUntil = (d?: string | null) => d ? Math.ceil((new Date(d).getTime() - Date.now()) / 86400000) : 0;
