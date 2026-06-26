@@ -8,11 +8,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useMode } from "@/components/intelligence/DataSource";
 
 const DEMO_BIZ = "4b30494f-4c30-4a74-a6bb-6bf56493a97d";
 
 export function useBusinessId(): string {
   const { businessId } = useAuth();
+  const mode = useMode();
+  // /demo/* routes wrap children in IntelligenceProvider mode="demo".
+  // Force DEMO_BIZ there so list pages always render seeded demo data,
+  // even when the visitor is authenticated as a different business.
+  if (mode === "demo") return DEMO_BIZ;
   return businessId || DEMO_BIZ;
 }
 
