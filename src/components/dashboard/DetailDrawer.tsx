@@ -13,8 +13,24 @@ import CustomerDetail from "./detail/CustomerDetail";
 import VendorDetail from "./detail/VendorDetail";
 import InvoiceDetail from "./detail/InvoiceDetail";
 import ExpenseDetail from "./detail/ExpenseDetail";
+import GstFilingDetail from "./detail/GstFilingDetail";
+import RiskDetail from "./detail/RiskDetail";
+import InsuranceDetail from "./detail/InsuranceDetail";
+import EmployeeDetail from "./detail/EmployeeDetail";
+import DealDetail from "./detail/DealDetail";
+import BankTxnDetail from "./detail/BankTxnDetail";
 
-export type DrawerKind = "customer" | "vendor" | "invoice" | "expense";
+export type DrawerKind =
+  | "customer"
+  | "vendor"
+  | "invoice"
+  | "expense"
+  | "gst_filing"
+  | "risk"
+  | "insurance"
+  | "employee"
+  | "deal"
+  | "bank_txn";
 
 export function useDrawer() {
   const [params, setParams] = useSearchParams();
@@ -42,16 +58,17 @@ export default function DetailDrawer() {
   const content = useMemo(() => {
     if (!isOpen) return null;
     switch (drawer) {
-      case "customer":
-        return <CustomerDetail id={id!} onClose={close} />;
-      case "vendor":
-        return <VendorDetail id={id!} onClose={close} />;
-      case "invoice":
-        return <InvoiceDetail id={id!} onClose={close} />;
-      case "expense":
-        return <ExpenseDetail id={id!} onClose={close} />;
-      default:
-        return null;
+      case "customer": return <CustomerDetail id={id!} onClose={close} />;
+      case "vendor": return <VendorDetail id={id!} onClose={close} />;
+      case "invoice": return <InvoiceDetail id={id!} onClose={close} />;
+      case "expense": return <ExpenseDetail id={id!} onClose={close} />;
+      case "gst_filing": return <GstFilingDetail id={id!} onClose={close} />;
+      case "risk": return <RiskDetail id={id!} onClose={close} />;
+      case "insurance": return <InsuranceDetail id={id!} onClose={close} />;
+      case "employee": return <EmployeeDetail id={id!} onClose={close} />;
+      case "deal": return <DealDetail id={id!} onClose={close} />;
+      case "bank_txn": return <BankTxnDetail id={id!} onClose={close} />;
+      default: return null;
     }
   }, [drawer, id, isOpen, close]);
 
@@ -59,7 +76,7 @@ export default function DetailDrawer() {
     <Sheet open={isOpen} onOpenChange={(o) => !o && close()}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-[500px] p-0 bg-fyn-beige border-l border-fyn-ink-10 overflow-y-auto"
+        className="w-full sm:max-w-[560px] p-0 bg-fyn-beige border-l border-fyn-ink-10 overflow-y-auto"
       >
         {content}
       </SheetContent>

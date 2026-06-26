@@ -333,6 +333,106 @@ export function useGstFilingsDemo() {
   });
 }
 
+/* ───────────── New detail hooks ───────────── */
+
+export function useGstFilingDetail(id: string | null) {
+  return useQuery({
+    queryKey: ["dash", "gst_filing", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await (supabase as any)
+        .from("gst_filings_demo").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data as GstFilingDemo | null;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useRiskDetail(id: string | null) {
+  return useQuery({
+    queryKey: ["dash", "risk", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await (supabase as any)
+        .from("risk_register").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useInsuranceDetail(id: string | null) {
+  return useQuery({
+    queryKey: ["dash", "insurance", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await (supabase as any)
+        .from("insurance_policies").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useEmployeeDetail(id: string | null) {
+  const businessId = useBusinessId();
+  return useQuery({
+    queryKey: ["dash", "employee", id, businessId],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data: emp, error } = await (supabase as any)
+        .from("employees_demo").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      if (!emp) return { employee: null, grant: null, benchmark: null };
+      const [grantRes, benchRes] = await Promise.all([
+        (supabase as any).from("esop_grants").select("*").eq("business_id", businessId).ilike("employee_name", emp.name).maybeSingle(),
+        (supabase as any).from("compensation_benchmarks").select("*").eq("business_id", businessId).ilike("role", emp.designation || "").maybeSingle(),
+      ]);
+      return { employee: emp as any, grant: grantRes.data as any, benchmark: benchRes.data as any };
+    },
+    enabled: !!id,
+  });
+}
+
+export function useDealDetail(id: string | null) {
+  const businessId = useBusinessId();
+  return useQuery({
+    queryKey: ["dash", "deal", id, businessId],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data: deal, error } = await (supabase as any)
+        .from("sales_pipeline").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      if (!deal) return { deal: null, customer: null };
+      let customer: any = null;
+      if (deal.customer_name) {
+        const { data: c } = await (supabase as any)
+          .from("customers").select("id, customer_name").eq("business_id", businessId).ilike("customer_name", deal.customer_name).maybeSingle();
+        customer = c;
+      }
+      return { deal: deal as any, customer };
+    },
+    enabled: !!id,
+  });
+}
+
+export function useBankTxnDetail(id: string | null) {
+  return useQuery({
+    queryKey: ["dash", "bank_txn", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data, error } = await (supabase as any)
+        .from("bank_transactions").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data as BankTxn | null;
+    },
+    enabled: !!id,
+  });
+}
+
 /* ───────────── Aggregates ───────────── */
 export function useLiquiditySummary() {
   const { data: bank } = useBankTransactions();

@@ -8,10 +8,11 @@ import {
   useCAC, useCohorts, useSalesPipeline, useRevenueBreakdowns, useDeferredRevenue,
   useSubscriptionAudit, useContractRenewals, useEwayBills, useHsnMaster, useTaxPlanning,
   useBalanceSheet, useRiskRegister, useInsurancePolicies, useEsopGrants, useHiringPipeline,
-  useCompBenchmarks,
+  useCompBenchmarks, useEmployees,
 } from "../../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, AnimatedBar } from "../../_primitives";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { useOpenDrawer } from "../../actions";
 
 const fmtDate = (d?: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const daysUntil = (d?: string | null) => d ? Math.ceil((new Date(d).getTime() - Date.now()) / 86400000) : 0;
@@ -136,6 +137,7 @@ export function CohortRetentionSection() {
 
 export function SalesPipelineSection() {
   const { data, isLoading } = useSalesPipeline();
+  const openDrawer = useOpenDrawer();
   const m = useMemo(() => {
     const rows = data ?? [];
     const open = rows.filter((d) => !d.is_won && !d.is_lost);
@@ -201,7 +203,7 @@ export function SalesPipelineSection() {
                 </thead>
                 <tbody>
                   {rows.map((d) => (
-                    <tr key={d.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={d.id} onClick={() => openDrawer("deal", d.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{d.deal_name}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{d.customer_name}</td>
                       <td className="py-2.5"><Badge tone={stageTone[d.stage] ?? "gray"}>{d.stage}</Badge></td>
@@ -633,6 +635,7 @@ export function BalanceSheetSection() {
 
 export function RiskRegisterSection() {
   const { data, isLoading } = useRiskRegister();
+  const openDrawer = useOpenDrawer();
   const rows = (data ?? []).filter((r) => r.is_active).sort((a, b) => Number(b.risk_score) - Number(a.risk_score));
   const avg = rows.length ? rows.reduce((s, r) => s + Number(r.risk_score), 0) / rows.length : 0;
   const sevTone = (s: number): "red" | "gold" | "amber" | "green" => s > 70 ? "red" : s >= 50 ? "gold" : s >= 30 ? "amber" : "green";
@@ -661,7 +664,7 @@ export function RiskRegisterSection() {
             {(d) => (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {d.map((r) => (
-                  <div key={r.id} className="p-4 bg-white rounded-lg fyn-card-hover" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+                  <div key={r.id} onClick={() => openDrawer("risk", r.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <p className="font-semibold text-fyn-ink text-sm leading-tight">{r.risk_name}</p>
                       <Badge tone={sevTone(Number(r.risk_score))}>{Number(r.risk_score).toFixed(0)}</Badge>
@@ -684,6 +687,7 @@ export function RiskRegisterSection() {
 
 export function InsuranceSection() {
   const { data, isLoading } = useInsurancePolicies();
+  const openDrawer = useOpenDrawer();
   const m = useMemo(() => {
     const rows = data ?? [];
     return {
@@ -707,7 +711,7 @@ export function InsuranceSection() {
         {(rows) => (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {rows.map((p) => (
-              <div key={p.id} className="p-4 bg-white rounded-lg fyn-card-hover" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+              <div key={p.id} onClick={() => openDrawer("insurance", p.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <Badge tone="gold">{p.policy_type}</Badge>
                   {!p.is_adequate && <AlertTriangle className="w-4 h-4 text-amber-600" />}
@@ -734,6 +738,13 @@ export function InsuranceSection() {
 
 export function EsopSection() {
   const { data, isLoading } = useEsopGrants();
+  const { data: emps } = useEmployees();
+  const openDrawer = useOpenDrawer();
+  const empByName = useMemo(() => {
+    const map = new Map<string, string>();
+    (emps ?? []).forEach((e: any) => map.set(String(e.name || "").toLowerCase(), e.id));
+    return map;
+  }, [emps]);
   const m = useMemo(() => {
     const rows = data ?? [];
     return {
@@ -771,18 +782,25 @@ export function EsopSection() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
-                      <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.employee_name}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.grant_date)}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.total_options).toLocaleString("en-IN")}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.strike_price}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.current_fair_value}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.cliff_date)}</td>
-                      <td className="py-2.5"><Badge tone="green">{r.status}</Badge></td>
-                    </tr>
-                  ))}
+                  {rows.map((r) => {
+                    const empId = empByName.get(String(r.employee_name || "").toLowerCase());
+                    return (
+                      <tr
+                        key={r.id}
+                        onClick={() => empId && openDrawer("employee", empId)}
+                        className={`border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row ${empId ? "cursor-pointer hover:bg-[rgba(169,56,56,0.04)]" : ""} transition-colors`}
+                      >
+                        <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.employee_name}</td>
+                        <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.grant_date)}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.total_options).toLocaleString("en-IN")}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.strike_price}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.current_fair_value}</td>
+                        <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.cliff_date)}</td>
+                        <td className="py-2.5"><Badge tone="green">{r.status}</Badge></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

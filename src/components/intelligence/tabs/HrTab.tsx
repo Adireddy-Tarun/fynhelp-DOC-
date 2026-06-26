@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useEmployees, useInvoices } from "../DataSource";
 import { IntelCard, KPI, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EsopSection, HiringPipelineSection, CompBenchmarksSection } from "./sections/NewSections";
-import { HrmsDialog, ViewAllLink } from "../actions";
+import { HrmsDialog, ViewAllLink, useOpenDrawer } from "../actions";
 
 export default function HrTab() {
   const { data: emps, isLoading } = useEmployees();
@@ -25,6 +25,7 @@ export default function HrTab() {
   }, [emps, invoices]);
 
   const [hrmsOpen, setHrmsOpen] = useState(false);
+  const openDrawer = useOpenDrawer();
 
   return (
     <div className="space-y-6">
@@ -91,7 +92,7 @@ export default function HrTab() {
                 </thead>
                 <tbody>
                   {rows.map((e) => (
-                    <tr key={e.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                    <tr key={e.id} onClick={() => openDrawer("employee", e.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{e.name}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.department ?? "—"}</td>
                       <td className="py-2.5 text-xs text-[#6B6B6B]">{e.designation ?? "—"}</td>
