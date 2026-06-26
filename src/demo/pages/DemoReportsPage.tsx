@@ -510,14 +510,12 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
   );
 }
 
-export default function ReportsPage({ mode = "live" }: { mode?: IntelligenceMode }) {
-  const content = (
-    <IntelligenceProvider mode={mode}>
-      <ReportsContent mode={mode} />
-    </IntelligenceProvider>
+export default function DemoReportsPage() {
+  return (
+    <DemoModeBanner>
+      <IntelligenceProvider mode="demo">
+        <ReportsContent mode="demo" />
+      </IntelligenceProvider>
+    </DemoModeBanner>
   );
-  if (mode === "demo") {
-    return <DemoModeBanner>{content}</DemoModeBanner>;
-  }
-  return <DashboardLayout>{content}</DashboardLayout>;
 }
