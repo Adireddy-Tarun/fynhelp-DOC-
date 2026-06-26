@@ -60,7 +60,7 @@ export default function GstTab() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                  <tr key={r.id} onClick={() => openDrawer("gst_filing", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                     <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.filing_type}</td>
                     <td className="py-2.5 text-xs text-[#6B6B6B]">{r.period}</td>
                     <td className="py-2.5"><Badge tone={statusTone(r.status)}>{r.status}</Badge></td>
