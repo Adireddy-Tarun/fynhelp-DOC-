@@ -687,6 +687,7 @@ export function RiskRegisterSection() {
 
 export function InsuranceSection() {
   const { data, isLoading } = useInsurancePolicies();
+  const openDrawer = useOpenDrawer();
   const m = useMemo(() => {
     const rows = data ?? [];
     return {
