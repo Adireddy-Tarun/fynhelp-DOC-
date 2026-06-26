@@ -1,23 +1,21 @@
 /**
- * Single intelligence dashboard page — used for both /demo/* and /demo/*.
- * The mode prop switches the data source between seeded demo data and the
- * authenticated user's live data.
+ * Demo Intelligence page — fully isolated from /dashboard.
+ * Mounts demo-only shell + demo-only detail drawer.
  */
 import { Helmet } from "react-helmet-async";
-import IntelligenceShell, { TabId } from "@/demo/components/DemoShell";
-import { IntelligenceProvider, IntelligenceMode } from "@/demo/components/DemoDataSource";
-import DetailDrawer from "@/demo/components/DemoDetailDrawer";
+import DemoShell, { TabId } from "@/demo/components/DemoShell";
+import { IntelligenceProvider } from "@/demo/components/DemoDataSource";
+import DemoDetailDrawer from "@/demo/components/DemoDetailDrawer";
+import DemoModeBanner from "@/components/demo/DemoModeBanner";
 
 interface Props {
-  mode: IntelligenceMode;
   tab?: TabId;
 }
 
-export default function IntelligencePage({ mode, tab = "liquidity" }: Props) {
-  const isDemo = mode === "demo";
+export default function DemoIntelligencePage({ tab = "liquidity" }: Props) {
   return (
-    <IntelligenceProvider mode={mode}>
-      {isDemo && (
+    <DemoModeBanner>
+      <IntelligenceProvider mode="demo">
         <Helmet>
           <title>FynHelp Demo — See AI CFO in Action</title>
           <meta name="description" content="Explore FynHelp's live demo. See liquidity intelligence, revenue tracking, GST compliance, and AI-powered financial insights for Indian businesses." />
@@ -27,16 +25,11 @@ export default function IntelligencePage({ mode, tab = "liquidity" }: Props) {
           <meta property="og:url" content={`https://fynhelp.com/demo/${tab}`} />
           <meta name="robots" content="index, follow" />
         </Helmet>
-      )}
-      {!isDemo && (
-        <Helmet>
-          <meta name="robots" content="noindex, nofollow" />
-        </Helmet>
-      )}
-      <div className="min-h-screen bg-fyn-beige">
-        <IntelligenceShell initialTab={tab} />
-        <DetailDrawer />
-      </div>
-    </IntelligenceProvider>
+        <div className="min-h-screen bg-fyn-beige" data-source="demo">
+          <DemoShell initialTab={tab} />
+          <DemoDetailDrawer />
+        </div>
+      </IntelligenceProvider>
+    </DemoModeBanner>
   );
 }
