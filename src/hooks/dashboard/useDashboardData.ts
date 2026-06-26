@@ -55,8 +55,9 @@ export function useCustomers() {
 }
 
 export function useCustomerDetail(id: string | null) {
+  const businessId = useBusinessId();
   return useQuery({
-    queryKey: ["dash", "customer", id],
+    queryKey: ["dash", "customer", id, businessId],
     queryFn: async () => {
       if (!id) return null;
       const { data: customer, error } = await (supabase as any)
@@ -70,7 +71,22 @@ export function useCustomerDetail(id: string | null) {
         .select("*")
         .eq("customer_id", id)
         .order("invoice_date", { ascending: false });
-      return { customer: customer as Customer | null, invoices: (invoices as Invoice[]) || [] };
+      let wonDeal: any = null;
+      if (customer?.customer_name) {
+        const { data: deal } = await (supabase as any)
+          .from("sales_pipeline")
+          .select("*")
+          .eq("business_id", businessId)
+          .eq("is_won", true)
+          .ilike("customer_name", customer.customer_name)
+          .maybeSingle();
+        wonDeal = deal;
+      }
+      return {
+        customer: customer as Customer | null,
+        invoices: (invoices as Invoice[]) || [],
+        wonDeal,
+      };
     },
     enabled: !!id,
   });
