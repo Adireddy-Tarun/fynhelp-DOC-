@@ -1,51 +1,31 @@
 /**
- * Intelligence DataSource — single source of truth for the 8 shared tabs.
- *
- * mode='demo' → reads seeded demo tables for the public DEMO_BIZ id.
- * mode='live' → reads tables scoped to the authenticated user's business_id.
- *               When the user has no business or no data, hooks return empty
- *               arrays so the same components render with empty-state CTAs.
+ * Demo DataSource — isolated from /dashboard. Always reads seeded DEMO_BIZ data.
+ * No mode switching, no auth lookup. The presence of `useMode` and
+ * `IntelligenceProvider` symbols below is for API compatibility with the copied
+ * intelligence shell/tabs only; they hardcode "demo" and do nothing else.
  */
-import { createContext, useContext, ReactNode } from "react";
+import { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export const DEMO_BIZ = "4b30494f-4c30-4a74-a6bb-6bf56493a97d";
 
-export type IntelligenceMode = "demo" | "live";
-const Ctx = createContext<IntelligenceMode>("live");
-
-export function IntelligenceProvider({ mode, children }: { mode: IntelligenceMode; children: ReactNode }) {
-  return <Ctx.Provider value={mode}>{children}</Ctx.Provider>;
+export type IntelligenceMode = "demo";
+export function IntelligenceProvider({ children }: { mode?: IntelligenceMode; children: ReactNode }) {
+  return <>{children}</>;
 }
+export function useMode(): IntelligenceMode { return "demo"; }
 
-export function useMode(): IntelligenceMode {
-  return useContext(Ctx);
-}
-
-function useScopedBusinessId(): string | null {
-  const mode = useMode();
-  const { businessId } = useAuth();
-  if (mode === "demo") return DEMO_BIZ;
-  return businessId || null;
-}
-
-/* Generic helper for tables scoped by business_id */
 function useScopedTable<T>(table: string, opts?: { order?: string; ascending?: boolean }) {
-  const mode = useMode();
-  const bizId = useScopedBusinessId();
   return useQuery({
-    queryKey: ["intel", table, mode, bizId],
+    queryKey: ["demo", table, DEMO_BIZ],
     queryFn: async (): Promise<T[]> => {
-      if (!bizId) return [];
-      let q = (supabase as any).from(table).select("*").eq("business_id", bizId);
+      let q = (supabase as any).from(table).select("*").eq("business_id", DEMO_BIZ);
       if (opts?.order) q = q.order(opts.order, { ascending: opts?.ascending ?? false });
       const { data, error } = await q;
       if (error) throw error;
       return (data as T[]) || [];
     },
-    enabled: true,
   });
 }
 
@@ -58,7 +38,6 @@ export type BankTxn = { id: string; date: string; amount: number; type: "credit"
 export type EmployeeDemo = { id: string; name: string; department: string | null; designation: string | null; salary: number; cost_to_company: number; joining_date: string | null; status: string };
 export type GstFiling = { id: string; filing_type: string; period: string; due_date: string | null; filed_date: string | null; status: string; tax_liability: number; itc_claimed: number; net_payable: number };
 
-/* ── Hooks ─────────────────────────────────────────────── */
 export const useCustomers = () => useScopedTable<Customer>("customers", { order: "customer_name", ascending: true });
 export const useVendors = () => useScopedTable<Vendor>("vendors", { order: "vendor_name", ascending: true });
 export const useInvoices = () => useScopedTable<Invoice>("invoices", { order: "invoice_date" });
@@ -67,7 +46,6 @@ export const useBankTxns = () => useScopedTable<BankTxn>("bank_transactions", { 
 export const useEmployees = () => useScopedTable<EmployeeDemo>("employees_demo", { order: "department", ascending: true });
 export const useGstFilings = () => useScopedTable<GstFiling>("gst_filings_demo", { order: "due_date" });
 
-/* ── New intelligence tables ────────────────────────────── */
 export const useCAC = () => useScopedTable<any>("customer_acquisition_costs", { order: "period_start", ascending: true });
 export const useCohorts = () => useScopedTable<any>("cohort_data", { order: "cohort_month", ascending: true });
 export const useSalesPipeline = () => useScopedTable<any>("sales_pipeline", { order: "deal_value" });
@@ -85,7 +63,6 @@ export const useEsopGrants = () => useScopedTable<any>("esop_grants", { order: "
 export const useHiringPipeline = () => useScopedTable<any>("hiring_pipeline", { order: "priority", ascending: true });
 export const useCompBenchmarks = () => useScopedTable<any>("compensation_benchmarks", { order: "percentile_position", ascending: true });
 
-/* ── Extra section tables (settlements, fx, action items, etc.) ── */
 export const usePaymentSettlements   = () => useScopedTable<any>("payment_settlements",   { order: "created_at" });
 export const useFxExposure           = () => useScopedTable<any>("fx_exposure",           { order: "monthly_amount_inr" });
 export const useActionItems          = () => useScopedTable<any>("action_items",          { order: "due_date", ascending: true });
