@@ -25,6 +25,7 @@ export default function HrTab() {
   }, [emps, invoices]);
 
   const [hrmsOpen, setHrmsOpen] = useState(false);
+  const openDrawer = useOpenDrawer();
 
   return (
     <div className="space-y-6">
