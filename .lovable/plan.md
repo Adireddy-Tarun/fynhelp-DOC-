@@ -1,81 +1,116 @@
-## Phase 1 — Clickable entity inventory (report-first)
 
-Before any code, produce a single audit table covering all 8 intelligence tabs + 5 list pages, with columns:
-**entity • surface (tab/list/section) • currently clickable? • current target (drawer/page/none) • demo-correct? (scoped to DEMO_BIZ)**
+# Sever /demo from /dashboard — structural fix
 
-Expected coverage (10 entity types):
+## Part 1 — Audit (shared surface today)
 
-| Entity | Surfaces today | Current state |
-|---|---|---|
-| Customer | Customers list, Revenue tab top-customers, Invoice rows (customer name), Cockpit aging | Drawer exists (`CustomerDetail.tsx`), opens via `?drawer=customer&id=` |
-| Vendor | Vendors list, Cost tab top-vendors, Expense rows (vendor name) | Drawer exists (`VendorDetail.tsx`) |
-| Invoice | Invoices list, Customer drawer history, Liquidity AR section, Cockpit overdue | Drawer exists (`InvoiceDetail.tsx`) — thin |
-| Expense | Expenses list, Vendor drawer history, Cost tab category drilldown | Drawer exists (`ExpenseDetail.tsx`) — thin |
-| GST Filing | GST tab filings table | **No detail view** |
-| Risk Register entry | Governance tab risk register | **No detail view** |
-| Insurance Policy | Governance tab insurance section | **No detail view** |
-| Employee | HR tab roster, Employees list page | **No detail view** |
-| Sales Pipeline Deal | Revenue tab pipeline section | **No detail view** |
-| Bank Transaction | Liquidity tab transactions list | **No detail view** |
+Every /demo/* route currently shares code with /dashboard/*. Grouped by leak path:
 
-Phase 1 deliverable: a single markdown table reported in chat, plus list of any surfaces where the entity name renders as plain text and needs to become clickable.
+**A. Shared page shells (rendered by both /demo/* and /dashboard/* routes)**
+- `src/pages/intelligence/IntelligencePage.tsx` — used by all 8 demo tabs AND dashboard tabs
+- `src/pages/intelligence/ReportsPage.tsx` — `/demo/reports` + `/dashboard/reports`
+- `src/pages/dashboard/CustomersPage.tsx` — `/demo/customers` + `/dashboard/customers`
+- `src/pages/dashboard/VendorsPage.tsx` — same pattern
+- `src/pages/dashboard/InvoicesListPage.tsx`
+- `src/pages/dashboard/ExpensesListPage.tsx`
+- `src/pages/dashboard/EmployeesListPage.tsx`
 
-## Phase 2 — Extend the drawer pattern
+**B. Shared "intelligence" components (mounted inside IntelligencePage)**
+- `src/components/intelligence/IntelligenceShell.tsx`
+- `src/components/intelligence/_primitives.tsx`
+- `src/components/intelligence/actions.tsx`
+- All of `src/components/intelligence/tabs/*` (8 tabs)
+- All of `src/components/intelligence/sections/*`
 
-Use the existing `DetailDrawer` + `useDrawer()` pattern (URL-controlled `?drawer=X&id=Y`, `Sheet` from shadcn, IntelligenceProvider mode auto-routes back to `/demo/*`). Add 6 new `DrawerKind` values: `gst_filing | risk | insurance | employee | deal | bank_txn`. All new detail components live under `src/components/dashboard/detail/`. All open through the same `useDrawer().open(kind, id)` so navigation, ESC, backdrop, URL sharing, and back-to-/demo behavior come free.
+**C. Shared list-page shell + cockpit panel**
+- `src/components/dashboard/ListPageShell.tsx`
+- `src/components/dashboard/LiveCockpitPanel.tsx`
+- `src/components/dashboard/ui.tsx` (presentational primitives — safe to keep shared, no data/navigation)
 
-## Phase 3 — Hooks
+**D. Shared detail drawer system**
+- `src/components/dashboard/DetailDrawer.tsx` (registry + portal)
+- `src/components/dashboard/detail/parts.tsx`
+- `src/components/dashboard/detail/CustomerDetail.tsx`
+- `VendorDetail.tsx`, `InvoiceDetail.tsx`, `ExpenseDetail.tsx`, `GstFilingDetail.tsx`, `RiskDetail.tsx`, `InsuranceDetail.tsx`, `EmployeeDetail.tsx`, `DealDetail.tsx`, `BankTxnDetail.tsx`
 
-Add to `src/hooks/dashboard/useDashboardData.ts` (mode-aware via `useBusinessId()` already fixed this session):
-- `useGstFilingDetail(id)` — from `gst_filings_demo` for demo, `gst_filings` for live
-- `useRiskDetail(id)` — `risk_register`
-- `useInsuranceDetail(id)` — `insurance_policies`
-- `useEmployeeDetail(id)` — `employees` + LEFT JOIN `esop_grants` + LEFT JOIN `compensation_benchmarks` on designation
-- `useDealDetail(id)` — `sales_pipeline` + LEFT JOIN `customers` when `closed_won`
-- `useBankTxnDetail(id)` — `bank_transactions`
-- Enrich `useCustomerDetail` to also return on-time-payment-rate + linked `closed_won` deal
-- Enrich `useVendorDetail` to return monthly-spend series
-- Enrich `useInvoiceDetail` to return computed days_overdue + partial-payment split (already partially present)
-- Enrich `useExpenseDetail` to compute recurring-pattern stats for the vendor
+**E. Shared data layer**
+- `src/hooks/dashboard/useDashboardData.ts` — every detail hook + list hook
+- `src/components/intelligence/DataSource.tsx` — `useMode()`, `useScopedBusinessId()`, all `useScopedTable` hooks for the 8 tabs
 
-## Phase 4 — Detail component specs
+**F. Shared navigation surfaces that can route demo→dashboard**
+- `GlobalHeader.tsx`, `GlobalBackBar.tsx`, `Sidebar.tsx`, `productMeta.ts`, `ProductsNav.tsx`, `ProductWidgetModal.tsx` — these render on /demo/* and link to /dashboard/* paths
 
-All reuse: `DrawerHeader`, `DrawerSection`, `DrawerMetricRow`, `StatusBadgeFor` from `detail/parts.tsx`; `FynButton`, `FynTable`, `FynLoading` from `dashboard/ui.tsx`; `formatINR`. New status mappings added to `StatusBadgeFor` for `risk_score`, `mitigation_status`, `policy_status`, `deal_stage`, `filing_status`, `employee_status`.
+## Part 2 — New demo-only tree (no `useMode`, no shared data hooks)
 
-Each detail page implements exactly the field list in the brief (header, summary metrics, history table or trend chart, plain-language insight line where the brief specifies one, action buttons with toast for non-mutating demo actions).
+Create a parallel tree. Every file hardcodes `DEMO_BIZ` and `/demo/...` paths. Zero conditional branching, zero imports from `/dashboard/*` or `useDashboardData.ts` or `DataSource.tsx`.
 
-Charts use the existing Recharts wrappers (`src/components/ui/chart.tsx`) so they inherit the v3-compatible defs fix from earlier today. Mini sparkline = `LineChart` for customer revenue and vendor monthly spend; risk heatmap = small 5×5 CSS grid (no chart dependency).
+```
+src/
+  demo/                              ← new isolated root
+    constants.ts                     ← export DEMO_BIZ
+    hooks/
+      useDemoData.ts                 ← ALL list hooks, hardcoded DEMO_BIZ
+      useDemoDetails.ts              ← ALL detail hooks (customer, vendor, invoice,
+                                       expense, gst, risk, insurance, employee,
+                                       deal, bankTxn), hardcoded DEMO_BIZ
+    pages/
+      DemoIntelligencePage.tsx       ← replaces IntelligencePage(mode="demo")
+      DemoReportsPage.tsx
+      DemoCustomersPage.tsx
+      DemoVendorsPage.tsx
+      DemoInvoicesPage.tsx
+      DemoExpensesPage.tsx
+      DemoEmployeesPage.tsx
+      details/
+        DemoCustomerPage.tsx         ← full pages, route /demo/customers/:id
+        DemoVendorPage.tsx           ← /demo/vendors/:id
+        DemoInvoicePage.tsx          ← /demo/invoices/:id
+        DemoExpensePage.tsx          ← /demo/expenses/:id
+        DemoGstFilingPage.tsx        ← /demo/gst/:id
+        DemoRiskPage.tsx             ← /demo/risks/:id
+        DemoInsurancePage.tsx        ← /demo/insurance/:id
+        DemoEmployeePage.tsx         ← /demo/employees/:id
+        DemoDealPage.tsx             ← /demo/deals/:id
+        DemoBankTxnPage.tsx          ← /demo/bank/:id
+    components/
+      DemoShell.tsx                  ← copies IntelligenceShell JSX
+      DemoListShell.tsx              ← copies ListPageShell JSX
+      DemoCockpitPanel.tsx           ← copies LiveCockpitPanel JSX
+      DemoDetailParts.tsx            ← copies detail/parts.tsx JSX
+      tabs/                          ← copies of all 8 intelligence tabs,
+                                       imports rewired to useDemoData
+      sections/                      ← copies of intelligence/sections/*
+```
 
-## Phase 5 — Wire entry points
+Rules enforced in every demo file:
+- Imports `DEMO_BIZ` from `src/demo/constants.ts`. Never reads auth state.
+- All Supabase queries `.eq("business_id", DEMO_BIZ)` directly.
+- Every `<Link>` / `navigate(...)` / back-button hardcodes `/demo/...`.
+- Presentational primitives from `components/dashboard/ui.tsx` are still imported (pure JSX, no data/nav) — this is the only allowed overlap and is documented at the top of each file.
 
-For each surface where an entity name currently renders as plain text, wrap in a button that calls `open(kind, id)`. Surfaces to update:
-- Revenue tab top-customers list, sales pipeline section
-- Cost tab top-vendors list, category breakdown rows
-- Liquidity tab AR aging buckets (invoice numbers), bank transactions list
-- GST tab filings table rows
-- Governance tab risk register + insurance tables
-- HR tab employee roster
-- Investor tab cap table → ESOP grants (route to Employee drawer for grantee)
-- Cockpit panel overdue invoices already wired
+## Part 3 — Detail pages as full routes
 
-## Phase 6 — Verification (per session standard)
+Replace the demo drawer pattern with full pages under `/demo/<entity>/:id`. Each page preserves the original spec (on-time payment rate + warning, revenue sparkline, deal-acquisition link, underinsured warning, ESOP/comp benchmarks, 5×5 risk heatmap, running-balance trace, etc.) by copying JSX from the current dashboard detail components and rewiring imports to `useDemoDetails`. List rows in demo list pages and demo tabs link to these routes instead of opening the shared `DetailDrawer`.
 
-Spawn Playwright as authenticated **non-DEMO_BIZ user** (the only case that exposes data-leakage bugs per today's findings). Click through every entity surface in the live `/demo/*` route and screenshot each opened drawer. Confirm: (1) drawer renders, (2) data is DEMO_BIZ's data, not the auth user's, (3) status badges match existing list-page colors, (4) back navigation lands at `/demo/*` not `/dashboard/*`, (5) action toasts fire.
+## Part 4 — Route table changes in `App.tsx`
 
-Report back as a single status table:
-**entity • drawer built • opened from live surface • real demo data • design matches • notes**
+Replace every `/demo/*` route to point at the new `src/demo/pages/*` components. Add the 10 new `/demo/<entity>/:id` routes. `/dashboard/*` routes are left untouched.
 
-## Phase 7 — Out of scope (will not touch)
+## Part 5 — Verification
 
-- Marketing pages (`/`, `/pricing`, `/about`, `/login`, `/signup`) — per memory rule.
-- `/dashboard/*` pages — only the shared components they share with `/demo/*` are affected; route trees unchanged.
-- No schema migrations expected. If a needed field is genuinely missing (unlikely given the rebuilt data), I'll stop and flag — per your "real product decision" carve-out.
+Playwright as a non-DEMO authenticated user:
+1. Visit each of 8 demo tabs + 5 demo list pages.
+2. Click one of each entity type → assert URL stays under `/demo/*` AND assert (via `data-source="demo"` marker added to demo pages' root div) that the mounted component is from `src/demo/*`.
+3. Assert the rendered data matches DEMO_BIZ row counts (e.g. 68 expenses, 80 bank txns).
+4. Screenshot each detail page.
+
+## Scope acknowledgement
+
+This creates ~25 new files and roughly doubles the line count for these surfaces. That duplication is the deliverable — it removes every shared code path a future change could regress through.
 
 ## Technical notes
 
-- All new files under `src/components/dashboard/detail/` + 1 edit to `DetailDrawer.tsx` switch statement.
-- No new dependencies. Recharts + shadcn Sheet + existing Fyn primitives only.
-- Single pass, no schema changes anticipated.
-- Estimated diff: ~6 new detail components (~120 LoC each), ~6 new hooks (~40 LoC each), `parts.tsx` badge extensions, `DetailDrawer.tsx` switch additions, ~8 tab/section edits to wire clicks.
+- `src/components/dashboard/ui.tsx` (FynButton, FynTable, FynLoading, etc.) stays shared. It's pure presentation, no data fetching, no navigation. Documented as the only sanctioned overlap.
+- `GlobalHeader`/`Sidebar`/etc. are NOT rendered inside the new demo pages (the current demo routes already render `IntelligencePage` / `DemoModeBanner` only, without app chrome). Confirmed by re-reading `App.tsx`.
+- `DemoModeBanner` stays but stops providing `IntelligenceProvider` (no longer needed — demo hooks don't read mode).
 
-Ready to start Phase 1 inventory on approval.
+Proceed?
