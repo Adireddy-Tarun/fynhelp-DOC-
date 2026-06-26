@@ -635,6 +635,7 @@ export function BalanceSheetSection() {
 
 export function RiskRegisterSection() {
   const { data, isLoading } = useRiskRegister();
+  const openDrawer = useOpenDrawer();
   const rows = (data ?? []).filter((r) => r.is_active).sort((a, b) => Number(b.risk_score) - Number(a.risk_score));
   const avg = rows.length ? rows.reduce((s, r) => s + Number(r.risk_score), 0) / rows.length : 0;
   const sevTone = (s: number): "red" | "gold" | "amber" | "green" => s > 70 ? "red" : s >= 50 ? "gold" : s >= 30 ? "amber" : "green";
