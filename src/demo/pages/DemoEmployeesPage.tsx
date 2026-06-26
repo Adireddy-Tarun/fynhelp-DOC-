@@ -4,9 +4,11 @@ import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty } from "@
 import { useEmployeesDemo } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { UsersRound } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function EmployeesListPage() {
   const { data: emps, isLoading, error } = useEmployeesDemo();
+  const navigate = useNavigate();
 
   if (isLoading) return <DashboardLayout><FynLoading rows={4} /></DashboardLayout>;
   if (error) return <DashboardLayout><FynEmpty icon={<UsersRound size={28} />} title="Couldn't load employees" description={(error as Error).message} /></DashboardLayout>;
@@ -31,7 +33,7 @@ export default function EmployeesListPage() {
             </thead>
             <tbody>
               {emps.map((e) => (
-                <FynTR key={e.id}>
+                <FynTR key={e.id} className="cursor-pointer" onClick={() => navigate(`/demo/employees/${e.id}`)}>
                   <FynTD>{e.name}</FynTD>
                   <FynTD>{e.department || "—"}</FynTD>
                   <FynTD>{e.designation || "—"}</FynTD>
