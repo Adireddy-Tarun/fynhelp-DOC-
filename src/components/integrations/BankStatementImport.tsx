@@ -130,7 +130,7 @@ export default function BankStatementImport() {
 
     try {
       setPhase("uploading");
-      const filePath = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const filePath = `${businessId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
 
       const { error: upErr } = await supabase.storage
         .from("financial-imports")
