@@ -741,10 +741,11 @@ export function EsopSection() {
   const { data: emps } = useEmployees();
   const openDrawer = useOpenDrawer();
   const empByName = useMemo(() => {
-    const m = new Map<string, string>();
-    (emps ?? []).forEach((e: any) => m.set(String(e.name || "").toLowerCase(), e.id));
-    return m;
+    const map = new Map<string, string>();
+    (emps ?? []).forEach((e: any) => map.set(String(e.name || "").toLowerCase(), e.id));
+    return map;
   }, [emps]);
+  const m = useMemo(() => {
     const rows = data ?? [];
     return {
       rows,
@@ -781,18 +782,34 @@ export function EsopSection() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
-                      <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.employee_name}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.grant_date)}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.total_options).toLocaleString("en-IN")}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.strike_price}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.current_fair_value}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.cliff_date)}</td>
-                      <td className="py-2.5"><Badge tone="green">{r.status}</Badge></td>
-                    </tr>
-                  ))}
+                  {rows.map((r) => {
+                    const empId = empByName.get(String(r.employee_name || "").toLowerCase());
+                    return (
+                      <tr
+                        key={r.id}
+                        onClick={() => empId && openDrawer("employee", empId)}
+                        className={`border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row ${empId ? "cursor-pointer hover:bg-[rgba(169,56,56,0.04)]" : ""} transition-colors`}
+                      >
+                        <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.employee_name}</td>
+                        <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.grant_date)}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.total_options).toLocaleString("en-IN")}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.strike_price}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.current_fair_value}</td>
+                        <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.cliff_date)}</td>
+                        <td className="py-2.5"><Badge tone="green">{r.status}</Badge></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </WithData>
+      </IntelCard>
+    </>
+  );
+}
                 </tbody>
               </table>
             </div>
