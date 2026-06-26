@@ -99,24 +99,26 @@ export function ListPageShell({
   controls?: ReactNode;
   children: ReactNode;
 }) {
-  const base = useMode() === "demo" ? "/demo" : "/dashboard";
+  const base = "/demo";
   return (
-    <FynPage>
-      <div className="flex items-center gap-fyn-sm text-fyn-tiny text-fyn-ink-45">
-        <Link to={`${base}/cockpit`} className="hover:text-fyn-ink inline-flex items-center gap-1">
-          <ChevronLeft size={14} /> Cockpit
-        </Link>
-        <span>/</span>
-        <span className="text-fyn-ink-60">{title}</span>
-      </div>
-      <header className="flex items-end justify-between gap-fyn-md flex-wrap">
-        <h1 className="font-serif text-fyn-h1 text-fyn-ink">
-          {title} <span className="text-fyn-ink-45 font-normal">({count})</span>
-        </h1>
-      </header>
-      {controls && <FynCard className="!p-fyn-md flex gap-fyn-md flex-wrap items-end">{controls}</FynCard>}
-      <FynCard className="!p-0 overflow-hidden">{children}</FynCard>
-    </FynPage>
+    <div data-source="demo">
+      <FynPage>
+        <div className="flex items-center gap-fyn-sm text-fyn-tiny text-fyn-ink-45">
+          <Link to={`${base}/cockpit`} className="hover:text-fyn-ink inline-flex items-center gap-1">
+            <ChevronLeft size={14} /> Cockpit
+          </Link>
+          <span>/</span>
+          <span className="text-fyn-ink-60">{title}</span>
+        </div>
+        <header className="flex items-end justify-between gap-fyn-md flex-wrap">
+          <h1 className="font-serif text-fyn-h1 text-fyn-ink">
+            {title} <span className="text-fyn-ink-45 font-normal">({count})</span>
+          </h1>
+        </header>
+        {controls && <FynCard className="!p-fyn-md flex gap-fyn-md flex-wrap items-end">{controls}</FynCard>}
+        <FynCard className="!p-0 overflow-hidden">{children}</FynCard>
+      </FynPage>
+    </div>
   );
 }
 
