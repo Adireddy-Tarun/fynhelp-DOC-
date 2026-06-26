@@ -31,6 +31,7 @@ export default function GstTab() {
   };
 
   const [filingOpen, setFilingOpen] = useState<string | null>(null);
+  const openDrawer = useOpenDrawer();
 
   return (
     <div className="space-y-6">
