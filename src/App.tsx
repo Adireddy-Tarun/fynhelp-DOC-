@@ -87,6 +87,24 @@ import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
+// Demo-only tree (fully isolated from /dashboard)
+import DemoIntelligencePage from "./demo/pages/DemoIntelligencePage.tsx";
+import DemoReportsPage from "./demo/pages/DemoReportsPage.tsx";
+import DemoCustomersPage from "./demo/pages/DemoCustomersPage.tsx";
+import DemoVendorsPage from "./demo/pages/DemoVendorsPage.tsx";
+import DemoInvoicesPage from "./demo/pages/DemoInvoicesPage.tsx";
+import DemoExpensesPage from "./demo/pages/DemoExpensesPage.tsx";
+import DemoEmployeesPage from "./demo/pages/DemoEmployeesPage.tsx";
+import DemoCustomerPage from "./demo/pages/details/DemoCustomerPage.tsx";
+import DemoVendorPage from "./demo/pages/details/DemoVendorPage.tsx";
+import DemoInvoicePage from "./demo/pages/details/DemoInvoicePage.tsx";
+import DemoExpensePage from "./demo/pages/details/DemoExpensePage.tsx";
+import DemoGstFilingPage from "./demo/pages/details/DemoGstFilingPage.tsx";
+import DemoRiskPage from "./demo/pages/details/DemoRiskPage.tsx";
+import DemoInsurancePage from "./demo/pages/details/DemoInsurancePage.tsx";
+import DemoEmployeePage from "./demo/pages/details/DemoEmployeePage.tsx";
+import DemoDealPage from "./demo/pages/details/DemoDealPage.tsx";
+import DemoBankTxnPage from "./demo/pages/details/DemoBankTxnPage.tsx";
 import {
   DecisionSimulatorComingSoon,
   MarketGrowthComingSoon,
