@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowUpRight, TrendingDown, Wallet, Clock, Users, AlertTriangle, Receipt } from "lucide-react";
 import {
   FynCard, FynCardTitle, FynLabel, FynBadge, FynSectionTitle, FynLoading,
-} from "@/components/dashboard/ui";
+} from "@/components/demo/ui";
 import { StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
 import {

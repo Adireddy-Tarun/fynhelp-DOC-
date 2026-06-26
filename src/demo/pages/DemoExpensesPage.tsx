@@ -5,7 +5,7 @@ import {
   ListPageShell, FilterChips, Pagination, useDebounced,
   FynSearchInput, FynSelect,
 } from "@/demo/components/DemoListShell";
-import { FynTable, FynTH, FynTR, FynTD, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
+import { FynTable, FynTH, FynTR, FynTD, FynLoading, FynEmpty, FynButton } from "@/components/demo/ui";
 import { StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
 import { useExpenses } from "@/demo/hooks/useDemoData";

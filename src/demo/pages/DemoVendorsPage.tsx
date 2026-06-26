@@ -5,7 +5,7 @@ import {
   ListPageShell, FilterChips, Pagination, useDebounced,
   FynSearchInput, FynSelect,
 } from "@/demo/components/DemoListShell";
-import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
+import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty, FynButton } from "@/components/demo/ui";
 import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
 import { useVendors } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";

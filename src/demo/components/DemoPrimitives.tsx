@@ -217,7 +217,7 @@ export function EmptyState({
   const mode = useMode();
   const resolvedCta =
     cta === undefined
-      ? { label: "Upload CSV", href: mode === "demo" ? "/demo/upload" : "/dashboard/data-import" }
+      ? { label: "Upload CSV", href: mode === "demo" ? "/demo/upload" : "/demo/data-import" }
       : cta;
   return (
     <div className="text-center py-10 px-4">

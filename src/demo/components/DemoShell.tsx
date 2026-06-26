@@ -1,6 +1,6 @@
 /**
  * Tab navigation shell for the 8 intelligence tabs.
- * Used by /demo/* and /dashboard/* via IntelligenceProvider mode.
+ * Used by /demo/* and /demo/* via IntelligenceProvider mode.
  */
 import { useState } from "react";
 import { Link } from "react-router-dom";

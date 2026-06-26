@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useEmployeeDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
-import { FynLoading } from "@/components/dashboard/ui";
+import { FynLoading } from "@/components/demo/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "@/demo/components/DemoDetailParts";
 
 export default function EmployeeDetail({ id, onClose }: { id: string; onClose: () => void }) {

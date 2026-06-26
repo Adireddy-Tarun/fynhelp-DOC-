@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useGeneratedReports, useGenerateReport } from "@/hooks/dashboard/useReports";
+import { useGeneratedReports, useGenerateReport } from "@/hooks/demo/useReports";
 import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/demo/components/DemoDataSource";
 import { IntelPage, IntelCard, ACCENT } from "@/demo/components/DemoPrimitives";
 import DashboardLayout from "@/components/DashboardLayout";

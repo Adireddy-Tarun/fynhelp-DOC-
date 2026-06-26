@@ -1,5 +1,5 @@
 /**
- * Single intelligence dashboard page — used for both /demo/* and /dashboard/*.
+ * Single intelligence dashboard page — used for both /demo/* and /demo/*.
  * The mode prop switches the data source between seeded demo data and the
  * authenticated user's live data.
  */

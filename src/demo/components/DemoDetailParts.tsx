@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { FynBadge, FynLabel } from "@/components/dashboard/ui";
+import { FynBadge, FynLabel } from "@/components/demo/ui";
 import { cn } from "@/lib/utils";
 
 export function DrawerHeader({
