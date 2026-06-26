@@ -12,6 +12,7 @@ import {
 } from "../../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, AnimatedBar } from "../../_primitives";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { useOpenDrawer } from "../../actions";
 
 const fmtDate = (d?: string | null) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const daysUntil = (d?: string | null) => d ? Math.ceil((new Date(d).getTime() - Date.now()) / 86400000) : 0;
