@@ -1,10 +1,10 @@
 import { X } from "lucide-react";
-import { useDealDetail } from "@/hooks/dashboard/useDashboardData";
-import { useMode } from "@/components/intelligence/DataSource";
+import { useDealDetail } from "@/demo/hooks/useDemoData";
+import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading, FynButton } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
-import { useDrawer } from "../DetailDrawer";
+import { useDrawer } from "@/demo/components/DemoDetailDrawer";
 
 export default function DealDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useDealDetail(id);

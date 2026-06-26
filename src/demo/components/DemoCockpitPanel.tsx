@@ -10,13 +10,13 @@ import { ArrowUpRight, TrendingDown, Wallet, Clock, Users, AlertTriangle, Receip
 import {
   FynCard, FynCardTitle, FynLabel, FynBadge, FynSectionTitle, FynLoading,
 } from "@/components/dashboard/ui";
-import { StatusBadgeFor } from "@/components/dashboard/detail/parts";
-import DetailDrawer, { useDrawer } from "@/components/dashboard/DetailDrawer";
+import { StatusBadgeFor } from "@/demo/components/DemoDetailParts";
+import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
 import {
   useLiquiditySummary, useInvoices, useExpenses,
   useTopCustomers, useVendorSpend, usePersonnelCosts, useExpensesByCategory,
-} from "@/hooks/dashboard/useDashboardData";
-import { useMode } from "@/components/intelligence/DataSource";
+} from "@/demo/hooks/useDemoData";
+import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR, getRunwayColor } from "@/lib/indian-format";
 import { cn } from "@/lib/utils";
 

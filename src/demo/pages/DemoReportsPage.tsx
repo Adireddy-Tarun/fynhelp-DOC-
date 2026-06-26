@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGeneratedReports, useGenerateReport } from "@/hooks/dashboard/useReports";
-import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/components/intelligence/DataSource";
-import { IntelPage, IntelCard, ACCENT } from "@/components/intelligence/_primitives";
+import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/demo/components/DemoDataSource";
+import { IntelPage, IntelCard, ACCENT } from "@/demo/components/DemoPrimitives";
 import DashboardLayout from "@/components/DashboardLayout";
 import DemoModeBanner from "@/components/demo/DemoModeBanner";
 import { toast } from "sonner";

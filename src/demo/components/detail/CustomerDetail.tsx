@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useCustomerDetail } from "@/hooks/dashboard/useDashboardData";
-import { useMode } from "@/components/intelligence/DataSource";
+import { useCustomerDetail } from "@/demo/hooks/useDemoData";
+import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD, FynLabel } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
-import { useDrawer } from "../DetailDrawer";
+import { useDrawer } from "@/demo/components/DemoDetailDrawer";
 
 export default function CustomerDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useCustomerDetail(id);

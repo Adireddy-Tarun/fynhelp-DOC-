@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { ListPageShell } from "@/components/dashboard/ListPageShell";
+import { ListPageShell } from "@/demo/components/DemoListShell";
 import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty } from "@/components/dashboard/ui";
-import { useEmployeesDemo } from "@/hooks/dashboard/useDashboardData";
+import { useEmployeesDemo } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { UsersRound } from "lucide-react";
 

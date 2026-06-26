@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useEmployeeDetail } from "@/hooks/dashboard/useDashboardData";
+import { useEmployeeDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";

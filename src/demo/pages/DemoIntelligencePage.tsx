@@ -4,9 +4,9 @@
  * authenticated user's live data.
  */
 import { Helmet } from "react-helmet-async";
-import IntelligenceShell, { TabId } from "@/components/intelligence/IntelligenceShell";
-import { IntelligenceProvider, IntelligenceMode } from "@/components/intelligence/DataSource";
-import DetailDrawer from "@/components/dashboard/DetailDrawer";
+import IntelligenceShell, { TabId } from "@/demo/components/DemoShell";
+import { IntelligenceProvider, IntelligenceMode } from "@/demo/components/DemoDataSource";
+import DetailDrawer from "@/demo/components/DemoDetailDrawer";
 
 interface Props {
   mode: IntelligenceMode;

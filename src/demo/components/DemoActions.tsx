@@ -21,7 +21,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useDrawer, DrawerKind } from "@/components/dashboard/DetailDrawer";
+import { useDrawer, DrawerKind } from "@/demo/components/DemoDetailDrawer";
 import { ACCENT, fmtCompact } from "./_primitives";
 
 /* ─── Row click → drawer ──────────────────────────────────────────── */

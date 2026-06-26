@@ -1,5 +1,5 @@
 import { X, AlertTriangle } from "lucide-react";
-import { useInsuranceDetail } from "@/hooks/dashboard/useDashboardData";
+import { useInsuranceDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynLoading } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";

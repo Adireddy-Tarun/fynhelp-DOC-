@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import { useVendorDetail } from "@/hooks/dashboard/useDashboardData";
-import { useMode } from "@/components/intelligence/DataSource";
+import { useVendorDetail } from "@/demo/hooks/useDemoData";
+import { useMode } from "@/demo/components/DemoDataSource";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading, FynTable, FynTH, FynTR, FynTD } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";
-import { useDrawer } from "../DetailDrawer";
+import { useDrawer } from "@/demo/components/DemoDetailDrawer";
 
 export default function VendorDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const { data, isLoading } = useVendorDetail(id);

@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { useGstFilingDetail } from "@/hooks/dashboard/useDashboardData";
+import { useGstFilingDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, DrawerMetricRow, StatusBadgeFor } from "./parts";

@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useInvoiceDetail } from "@/hooks/dashboard/useDashboardData";
+import { useInvoiceDetail } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { FynButton, FynLoading } from "@/components/dashboard/ui";
 import { DrawerHeader, DrawerSection, StatusBadgeFor } from "./parts";

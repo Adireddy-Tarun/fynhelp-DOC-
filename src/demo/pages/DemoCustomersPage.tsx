@@ -4,10 +4,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import {
   ListPageShell, FilterChips, Pagination, useDebounced,
   FynSearchInput, FynSelect,
-} from "@/components/dashboard/ListPageShell";
+} from "@/demo/components/DemoListShell";
 import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty, FynButton } from "@/components/dashboard/ui";
-import DetailDrawer, { useDrawer } from "@/components/dashboard/DetailDrawer";
-import { useCustomers, useInvoices } from "@/hooks/dashboard/useDashboardData";
+import DetailDrawer, { useDrawer } from "@/demo/components/DemoDetailDrawer";
+import { useCustomers, useInvoices } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { Users } from "lucide-react";
 

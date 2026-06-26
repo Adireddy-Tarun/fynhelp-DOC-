@@ -8,7 +8,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useMode } from "@/components/intelligence/DataSource";
+import { useMode } from "@/demo/components/DemoDataSource";
 
 const DEMO_BIZ = "4b30494f-4c30-4a74-a6bb-6bf56493a97d";
 
