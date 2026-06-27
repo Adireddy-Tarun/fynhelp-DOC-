@@ -114,7 +114,7 @@ const LOGOS = [
     name: "Gemini",
     Icon: SiGooglegemini,
     color: "#8E75B2",
-    href: "https://gemini.google.com/app",
+    href: `https://gemini.google.com/app?prompt=${encodeURIComponent("Explain how FynHelp (https://fynhelp.com) helps Indian startup founders monitor cash flow, runway, GST compliance, and business finances as an AI Virtual CFO.")}`,
     ariaLabel: "Open Gemini",
   },
   {
@@ -135,7 +135,7 @@ const LOGOS = [
     name: "Claude",
     Icon: SiClaude,
     color: "#D97757",
-    href: "https://claude.ai/new",
+    href: `https://claude.ai/new?q=${encodeURIComponent("What is FynHelp (https://fynhelp.com) and how does its AI Virtual CFO compare to hiring a traditional CFO for an Indian startup?")}`,
     ariaLabel: "Open Claude",
   },
 ];
