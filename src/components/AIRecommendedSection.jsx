@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { SiClaude, SiGoogle, SiGooglegemini, SiOpenai, SiPerplexity, SiX } from "react-icons/si";
+import { SiClaude, SiGooglegemini, SiOpenai, SiPerplexity, SiX } from "react-icons/si";
 
 const BG = "#F4EDDA";
 const INK = "#1A1008";
@@ -102,13 +102,6 @@ const LOGOS = [
     color: "#10A37F",
     href: `https://chatgpt.com/?q=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
     ariaLabel: "Ask ChatGPT about FynHelp",
-  },
-  {
-    name: "Google",
-    Icon: SiGoogle,
-    color: "#4285F4",
-    href: `https://www.google.com/search?q=${encodeURIComponent("FynHelp AI Virtual CFO for Indian startups and SMEs")}`,
-    ariaLabel: "Search Google for FynHelp",
   },
   {
     name: "Gemini",
