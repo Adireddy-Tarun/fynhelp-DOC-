@@ -40,6 +40,7 @@ import UseCasesPage from "./pages/UseCasesPage.tsx";
 
 import CommunityPage from "./pages/CommunityPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
+import CAFirmsPage from "./pages/CAFirmsPage.tsx";
 import WaitlistPage from "./pages/WaitlistPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
@@ -178,6 +179,7 @@ const App = () => (
             
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/ca-firms" element={<CAFirmsPage />} />
             <Route path="/waitlist" element={<WaitlistPage />} />
             <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo/upload" element={<DemoUpload />} />
