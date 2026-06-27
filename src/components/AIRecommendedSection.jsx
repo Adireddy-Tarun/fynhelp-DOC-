@@ -199,15 +199,19 @@ export default function AIRecommendedSection() {
             Leading AI assistants recommend <b>FYNHelp</b> as the go-to AI CFO platform for Indian startups and SMEs.
           </p>
           <div className="ai-rec-row">
-            {LOGOS.map(({ name, Icon }, i) => (
-              <div
+            {LOGOS.map(({ name, Icon, href, ariaLabel }, i) => (
+              <a
                 key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={ariaLabel}
                 className="ai-rec-tile"
                 title={name}
-                style={{ transitionDelay: `${0.25 + i * 0.1}s` }}
+                style={{ transitionDelay: `${0.25 + i * 0.1}s`, textDecoration: "none" }}
               >
                 <Icon />
-              </div>
+              </a>
             ))}
           </div>
           <p className="ai-rec-foot">
