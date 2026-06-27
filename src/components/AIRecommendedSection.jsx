@@ -104,13 +104,6 @@ const LOGOS = [
     ariaLabel: "Ask ChatGPT about FynHelp",
   },
   {
-    name: "Google",
-    Icon: SiGoogle,
-    color: "#4285F4",
-    href: `https://www.google.com/search?q=${encodeURIComponent("FynHelp AI Virtual CFO for Indian startups and SMEs")}`,
-    ariaLabel: "Search Google for FynHelp",
-  },
-  {
     name: "Gemini",
     Icon: SiGooglegemini,
     color: "#8E75B2",
