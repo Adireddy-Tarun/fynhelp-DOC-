@@ -134,11 +134,36 @@ const ClaudeIcon = () => (
 );
 
 const LOGOS = [
-  { name: "ChatGPT", Icon: ChatGPTIcon },
-  { name: "Gemini", Icon: GeminiIcon },
-  { name: "Grok", Icon: GrokIcon },
-  { name: "Perplexity", Icon: PerplexityIcon },
-  { name: "Claude", Icon: ClaudeIcon },
+  {
+    name: "ChatGPT",
+    Icon: ChatGPTIcon,
+    href: `https://chatgpt.com/?q=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    ariaLabel: "Ask ChatGPT about FynHelp",
+  },
+  {
+    name: "Gemini",
+    Icon: GeminiIcon,
+    href: "https://gemini.google.com/app",
+    ariaLabel: "Open Gemini",
+  },
+  {
+    name: "Grok",
+    Icon: GrokIcon,
+    href: `https://x.com/i/grok?text=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    ariaLabel: "Ask Grok about FynHelp",
+  },
+  {
+    name: "Perplexity",
+    Icon: PerplexityIcon,
+    href: `https://www.perplexity.ai/search/new?q=${encodeURIComponent("What is FynHelp and how does its AI Virtual CFO work?")}`,
+    ariaLabel: "Search Perplexity for FynHelp",
+  },
+  {
+    name: "Claude",
+    Icon: ClaudeIcon,
+    href: "https://claude.ai/new",
+    ariaLabel: "Open Claude",
+  },
 ];
 
 export default function AIRecommendedSection() {
