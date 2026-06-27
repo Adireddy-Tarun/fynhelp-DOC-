@@ -140,6 +140,42 @@ const LOGOS = [
   },
 ];
 
+const openExternalSearch = (href) => {
+  let popup = null;
+
+  try {
+    popup = window.open("about:blank", "_blank");
+  } catch {
+    popup = null;
+  }
+
+  if (popup) {
+    try {
+      popup.opener = null;
+      popup.location.replace(href);
+      return;
+    } catch {
+      try {
+        popup.location.href = href;
+        return;
+      } catch {
+        // Fall through to top-level navigation below.
+      }
+    }
+  }
+
+  try {
+    if (window.top && window.top !== window) {
+      window.top.location.href = href;
+      return;
+    }
+  } catch {
+    // Fall back to the current window if top navigation is unavailable.
+  }
+
+  window.location.href = href;
+};
+
 export default function AIRecommendedSection() {
   const sectionRef = useRef(null);
 
@@ -184,12 +220,10 @@ export default function AIRecommendedSection() {
                 title={name}
                 style={{ transitionDelay: `${0.25 + i * 0.1}s`, textDecoration: "none" }}
                 onClick={(e) => {
-                  // Force a real top-level new-tab open. Prevents Lovable's
-                  // sandboxed preview iframe from trying to load X-Frame-Options:DENY
-                  // sites (chatgpt.com, claude.ai, gemini.google.com) inline.
                   e.preventDefault();
-                  const w = window.open(href, "_blank", "noopener,noreferrer");
-                  if (w) w.opener = null;
+                  e.stopPropagation();
+                  e.nativeEvent?.stopImmediatePropagation?.();
+                  openExternalSearch(href);
                 }}
               >
                 <BrandIcon Icon={Icon} color={color} />
