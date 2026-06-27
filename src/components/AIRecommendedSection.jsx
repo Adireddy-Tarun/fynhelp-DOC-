@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { SiClaude, SiGoogle, SiGooglegemini, SiOpenai, SiPerplexity, SiX } from "react-icons/si";
+import { SiClaude, SiGooglegemini, SiOpenai, SiPerplexity, SiX } from "react-icons/si";
 
 const BG = "#F4EDDA";
 const INK = "#1A1008";
