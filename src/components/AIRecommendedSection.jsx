@@ -209,6 +209,14 @@ export default function AIRecommendedSection() {
                 className="ai-rec-tile"
                 title={name}
                 style={{ transitionDelay: `${0.25 + i * 0.1}s`, textDecoration: "none" }}
+                onClick={(e) => {
+                  // Force a real top-level new-tab open. Prevents Lovable's
+                  // sandboxed preview iframe from trying to load X-Frame-Options:DENY
+                  // sites (chatgpt.com, claude.ai, gemini.google.com) inline.
+                  e.preventDefault();
+                  const w = window.open(href, "_blank", "noopener,noreferrer");
+                  if (w) w.opener = null;
+                }}
               >
                 <Icon />
               </a>
