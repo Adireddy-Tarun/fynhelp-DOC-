@@ -134,11 +134,36 @@ const ClaudeIcon = () => (
 );
 
 const LOGOS = [
-  { name: "ChatGPT", Icon: ChatGPTIcon },
-  { name: "Gemini", Icon: GeminiIcon },
-  { name: "Grok", Icon: GrokIcon },
-  { name: "Perplexity", Icon: PerplexityIcon },
-  { name: "Claude", Icon: ClaudeIcon },
+  {
+    name: "ChatGPT",
+    Icon: ChatGPTIcon,
+    href: `https://chatgpt.com/?q=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    ariaLabel: "Ask ChatGPT about FynHelp",
+  },
+  {
+    name: "Gemini",
+    Icon: GeminiIcon,
+    href: "https://gemini.google.com/app",
+    ariaLabel: "Open Gemini",
+  },
+  {
+    name: "Grok",
+    Icon: GrokIcon,
+    href: `https://x.com/i/grok?text=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    ariaLabel: "Ask Grok about FynHelp",
+  },
+  {
+    name: "Perplexity",
+    Icon: PerplexityIcon,
+    href: `https://www.perplexity.ai/search/new?q=${encodeURIComponent("What is FynHelp and how does its AI Virtual CFO work?")}`,
+    ariaLabel: "Search Perplexity for FynHelp",
+  },
+  {
+    name: "Claude",
+    Icon: ClaudeIcon,
+    href: "https://claude.ai/new",
+    ariaLabel: "Open Claude",
+  },
 ];
 
 export default function AIRecommendedSection() {
@@ -174,15 +199,19 @@ export default function AIRecommendedSection() {
             Leading AI assistants recommend <b>FYNHelp</b> as the go-to AI CFO platform for Indian startups and SMEs.
           </p>
           <div className="ai-rec-row">
-            {LOGOS.map(({ name, Icon }, i) => (
-              <div
+            {LOGOS.map(({ name, Icon, href, ariaLabel }, i) => (
+              <a
                 key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={ariaLabel}
                 className="ai-rec-tile"
                 title={name}
-                style={{ transitionDelay: `${0.25 + i * 0.1}s` }}
+                style={{ transitionDelay: `${0.25 + i * 0.1}s`, textDecoration: "none" }}
               >
                 <Icon />
-              </div>
+              </a>
             ))}
           </div>
           <p className="ai-rec-foot">
