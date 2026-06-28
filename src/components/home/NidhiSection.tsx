@@ -9,7 +9,7 @@ const capabilities = [
   { title: "Named after a real person", desc: "Nidhi Siddhapura, Co-Founder and CMO of FynHelp, designed every insight this AI delivers. Fynny carries her judgment in every recommendation she makes." },
 ];
 
-export default function NidhiSection() {
+export default function FynnySection() {
   const ref = useScrollReveal();
 
   return (
