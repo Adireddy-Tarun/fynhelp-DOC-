@@ -1174,7 +1174,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                   Book a Live Demo
                 </h2>
                 <p style={{ fontSize: 13, color: "rgba(244,237,218,0.5)", marginTop: 4 }}>
-                  30-min session with real data. See Nidhi AI answer your actual questions.
+                  30-min session with real data. See Fynny AI answer your actual questions.
                 </p>
               </div>
 

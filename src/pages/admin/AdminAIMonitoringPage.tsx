@@ -131,7 +131,7 @@ export default function AdminAIMonitoringPage() {
         <h3 style={h3Style}>AI Usage (Last 30 days)</h3>
         <div style={{ width: "100%", height: 310 }}>
           {loading ? <Skel /> : logs.length === 0 ? (
-            <EmptyState icon={Bot} title="No AI usage yet" hint="Charts will populate as users send queries to Fynny / Nidhi." />
+            <EmptyState icon={Bot} title="No AI usage yet" hint="Charts will populate as users send queries to Fynny." />
           ) : (
             <ResponsiveContainer>
               <ComposedChart data={dailyData}>
