@@ -521,7 +521,7 @@ const CockpitPage = () => {
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
               style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
             >
-              N
+              F
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-muted-foreground mb-fyn-xs">
