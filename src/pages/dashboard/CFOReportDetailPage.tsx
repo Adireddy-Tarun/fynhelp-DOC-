@@ -116,7 +116,7 @@ const CFOReportDetailPage = () => {
     enabled: !!id && !!businessId,
     queryFn: async () => {
       const { data } = await supabase
-        .from("nidhi_briefs")
+        .from("fynny_briefs")
         .select("*")
         .eq("id", id!)
         .eq("business_id", businessId!)
