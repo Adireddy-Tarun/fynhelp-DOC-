@@ -32,7 +32,7 @@ function renderWidget(product: ModalProduct) {
     case "cost": return <CostWidget />;
     case "gst": return <GstWidget />;
     case "simulator": return <SimulatorWidget />;
-    case "nidhi": return <NidhiWidget />;
+    case "fynny": return <FynnyWidget />;
     default: return <GenericWidget name={product.name} />;
   }
 }
