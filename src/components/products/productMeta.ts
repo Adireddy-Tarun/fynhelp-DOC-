@@ -6,7 +6,7 @@ export type WidgetKey =
   | "cost"
   | "gst"
   | "simulator"
-  | "nidhi"
+  | "fynny"
   | "generic";
 
 export interface ProductItem extends SuiteMeta {
