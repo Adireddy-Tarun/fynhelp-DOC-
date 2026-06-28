@@ -20,7 +20,7 @@ export default function FynnySection() {
           <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 reveal-left">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-16 h-16 rounded-full bg-fyn-red flex items-center justify-center">
-                <span className="text-white font-display text-2xl font-bold">N</span>
+                <span className="text-white font-display text-2xl font-bold">F</span>
               </div>
               <div>
                 <p className="text-white font-serif text-3xl">CFO Fynny</p>
