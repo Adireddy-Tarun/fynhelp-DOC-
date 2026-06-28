@@ -93,7 +93,7 @@ export default function FynnyWidget() {
                 flexShrink: 0,
               }}
             >
-              N
+              F
             </div>
             <div
               style={{
