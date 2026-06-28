@@ -734,7 +734,7 @@ function TeamSection() {
     },
     {
       letter: "N",
-      name: "Nidhi Siddhpura",
+      name: "Nidhi Siddhapura",
       title: "CMO & CO-FOUNDER",
       bio: "MBA in Data Analytics with 3 years of experience in marketing and management. Built brand strategies for multiple startups and maintains a growing presence as a micro-influencer in the business and finance space. Leads all go-to-market and community-building efforts at FynHelp.",
     },

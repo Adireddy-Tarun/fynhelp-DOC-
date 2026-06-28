@@ -40,7 +40,7 @@ const menuSections: Section[] = [
       { icon: Shield, label: "Governance", path: "/dashboard/compliance" },
       { icon: Users, label: "HR & Workforce", path: "/dashboard/hr" },
       { icon: BarChart3, label: "Investor", path: "/dashboard/investor" },
-      { icon: MessageSquare, label: "Ask Fynny", path: "/dashboard/nidhi" },
+      { icon: MessageSquare, label: "Ask Fynny", path: "/dashboard/fynny-chat" },
       { icon: Brain, label: "Decision Simulator", path: "/dashboard/simulator", soon: true },
       { icon: BarChart, label: "Market & Growth", path: "/dashboard/market-growth", soon: true },
       { icon: Landmark, label: "Banking", path: "/dashboard/banking", soon: true },
