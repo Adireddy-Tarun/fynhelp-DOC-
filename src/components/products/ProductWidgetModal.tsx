@@ -7,7 +7,7 @@ import RevenueWidget from "./widgets/RevenueWidget";
 import CostWidget from "./widgets/CostWidget";
 import GstWidget from "./widgets/GstWidget";
 import SimulatorWidget from "./widgets/SimulatorWidget";
-import NidhiWidget from "./widgets/NidhiWidget";
+import FynnyWidget from "./widgets/FynnyWidget";
 import GenericWidget from "./widgets/GenericWidget";
 import type { WidgetKey } from "./productMeta";
 import { FYN } from "./widgets/Shared";
