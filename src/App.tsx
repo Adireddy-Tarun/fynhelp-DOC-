@@ -236,8 +236,6 @@ const App = () => (
             <Route path="/dashboard/decision-simulator" element={<DecisionSimulatorComingSoon />} />
             <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
-            <Route path="/dashboard/nidhi"      element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
-            <Route path="/dashboard/nidhi-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/reports" element={<ReportsPage mode="live" />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
