@@ -7,7 +7,7 @@ import RevenueWidget from "./widgets/RevenueWidget";
 import CostWidget from "./widgets/CostWidget";
 import GstWidget from "./widgets/GstWidget";
 import SimulatorWidget from "./widgets/SimulatorWidget";
-import NidhiWidget from "./widgets/NidhiWidget";
+import FynnyWidget from "./widgets/FynnyWidget";
 import GenericWidget from "./widgets/GenericWidget";
 import type { WidgetKey } from "./productMeta";
 import { FYN } from "./widgets/Shared";
@@ -32,7 +32,7 @@ function renderWidget(product: ModalProduct) {
     case "cost": return <CostWidget />;
     case "gst": return <GstWidget />;
     case "simulator": return <SimulatorWidget />;
-    case "nidhi": return <NidhiWidget />;
+    case "fynny": return <FynnyWidget />;
     default: return <GenericWidget name={product.name} />;
   }
 }

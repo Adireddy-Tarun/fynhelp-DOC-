@@ -6,7 +6,7 @@ export type WidgetKey =
   | "cost"
   | "gst"
   | "simulator"
-  | "nidhi"
+  | "fynny"
   | "generic";
 
 export interface ProductItem extends SuiteMeta {
@@ -52,8 +52,8 @@ export const PRODUCT_ITEMS: ProductItem[] = SUITES.map((s) => ({
 }));
 
 // CFO Fynny as a special platform feature item
-export const NIDHI_ITEM = {
-  id: "nidhi",
+export const FYNNY_ITEM = {
+  id: "fynny",
   name: "CFO Fynny",
   shortLabel: "Fynny",
   description: "Conversational financial intelligence, available 24/7",
@@ -61,8 +61,8 @@ export const NIDHI_ITEM = {
     "Ask Fynny anything about your business, burn rate, runway, vendor cuts, hiring decisions. She replies instantly with actionable advice grounded in your real data.",
   status: "live" as const,
   quarter: "Live" as const,
-  href: "/dashboard/nidhi",
-  widget: "nidhi" as WidgetKey,
+  href: "/dashboard/fynny-chat",
+  widget: "fynny" as WidgetKey,
 };
 
 export const BUSINESS_TYPES = [
@@ -74,7 +74,7 @@ export const BUSINESS_TYPES = [
 ];
 
 export const PLATFORM_FEATURES = [
-  NIDHI_ITEM,
+  FYNNY_ITEM,
   {
     id: "decision-simulator",
     name: "Decision Simulator",
