@@ -612,7 +612,7 @@ const CockpitPage = () => {
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                     style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
                   >
-                    N
+                    F
                   </div>
                   <div>
                     <h3 className="font-serif text-fyn-h3 text-foreground">CFO Fynny</h3>
