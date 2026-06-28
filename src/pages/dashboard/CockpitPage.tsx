@@ -282,9 +282,9 @@ const CockpitPage = () => {
     enabled: !!businessId, refetchInterval: REFETCH_MS,
   });
   const { data: brief } = useQuery({
-    queryKey: ["nidhi-brief", businessId],
+    queryKey: ["fynny-brief", businessId],
     queryFn: async () => {
-      const { data } = await supabase.from("nidhi_briefs").select("*")
+      const { data } = await supabase.from("fynny_briefs").select("*")
         .eq("business_id", businessId!).order("brief_date", { ascending: false })
         .limit(1).maybeSingle();
       return data;

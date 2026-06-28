@@ -62,7 +62,7 @@ const CFOReportsPage = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("nidhi_briefs").insert({
+    const { error } = await supabase.from("fynny_briefs").insert({
       business_id: businessId,
       brief_date: briefDate,
       content: content.trim(),
@@ -105,7 +105,7 @@ const CFOReportsPage = () => {
     queryFn: async () => {
       if (!businessId) return [];
       const { data } = await supabase
-        .from("nidhi_briefs")
+        .from("fynny_briefs")
         .select("*")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
