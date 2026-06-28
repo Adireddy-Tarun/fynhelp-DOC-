@@ -79,7 +79,7 @@ const SimulatorPage = () => {
             Run financial scenarios to see simulations here
           </p>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => navigate("/dashboard/fynny-chat")}
             className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             Create Simulation
@@ -95,7 +95,7 @@ const SimulatorPage = () => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink text-lg font-sans">Simulation History</h3>
           <button
-            onClick={() => navigate("/dashboard/nidhi-chat")}
+            onClick={() => navigate("/dashboard/fynny-chat")}
             className="bg-fyn-red text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition"
           >
             New Simulation

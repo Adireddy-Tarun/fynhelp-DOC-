@@ -21,7 +21,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard/gst": "GST Intelligence",
   "/dashboard/hr": "HR Intelligence",
   "/dashboard/filing-calendar": "Filing Calendar",
-  "/dashboard/nidhi": "Talk to CFO Fynny",
+  "/dashboard/fynny-chat": "Talk to CFO Fynny",
   "/dashboard/reports": "CFO Reports",
 };
 

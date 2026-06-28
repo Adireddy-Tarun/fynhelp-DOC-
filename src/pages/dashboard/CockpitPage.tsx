@@ -203,7 +203,7 @@ const CockpitPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [demoMode, setDemoMode] = useState(false);
-  const [showNidhiChat, setShowNidhiChat] = useState(false);
+  const [showFynnyChat, setShowFynnyChat] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 300], [0, -30]);
@@ -521,7 +521,7 @@ const CockpitPage = () => {
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
               style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
             >
-              N
+              F
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-fyn-tiny font-medium uppercase tracking-[0.08em] text-muted-foreground mb-fyn-xs">
@@ -532,7 +532,7 @@ const CockpitPage = () => {
                   "Connect your bank account to receive your first financial intelligence brief within 24 hours."}
               </p>
               <button
-                onClick={() => setShowNidhiChat(true)}
+                onClick={() => setShowFynnyChat(true)}
                 className="mt-fyn-md inline-flex items-center gap-2 px-4 py-2 rounded-md text-fyn-small font-medium bg-muted text-foreground border border-border hover:bg-muted/80"
               >
                 <MessageCircle size={14} /> Chat with Fynny
@@ -579,7 +579,7 @@ const CockpitPage = () => {
 
       {/* Floating Fynny FAB */}
       <motion.button
-        onClick={() => setShowNidhiChat(true)}
+        onClick={() => setShowFynnyChat(true)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         className="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full flex items-center justify-center text-white"
@@ -594,12 +594,12 @@ const CockpitPage = () => {
 
       {/* Fynny modal */}
       <AnimatePresence>
-        {showNidhiChat && (
+        {showFynnyChat && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-fyn-md"
             style={{ background: "rgba(26,16,8,0.55)", backdropFilter: "blur(6px)" }}
-            onClick={() => setShowNidhiChat(false)}
+            onClick={() => setShowFynnyChat(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
@@ -612,7 +612,7 @@ const CockpitPage = () => {
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                     style={{ background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)" }}
                   >
-                    N
+                    F
                   </div>
                   <div>
                     <h3 className="font-serif text-fyn-h3 text-foreground">CFO Fynny</h3>
@@ -620,7 +620,7 @@ const CockpitPage = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowNidhiChat(false)}
+                  onClick={() => setShowFynnyChat(false)}
                   aria-label="Close"
                   className="text-muted-foreground hover:text-foreground"
                 >
@@ -631,8 +631,8 @@ const CockpitPage = () => {
                 Open the full chat to get AI-powered insights and recommendations.
               </p>
               <Link
-                to="/dashboard/nidhi"
-                onClick={() => setShowNidhiChat(false)}
+                to="/dashboard/fynny-chat"
+                onClick={() => setShowFynnyChat(false)}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-white font-medium text-fyn-small"
                 style={{
                   background: "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)",
