@@ -74,7 +74,7 @@ export const BUSINESS_TYPES = [
 ];
 
 export const PLATFORM_FEATURES = [
-  NIDHI_ITEM,
+  FYNNY_ITEM,
   {
     id: "decision-simulator",
     name: "Decision Simulator",
