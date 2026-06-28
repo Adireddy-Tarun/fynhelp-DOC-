@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { FYN, ImpactStat, WidgetShell } from "./Shared";
 
-export default function NidhiWidget() {
+export default function FynnyWidget() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <WidgetShell>
