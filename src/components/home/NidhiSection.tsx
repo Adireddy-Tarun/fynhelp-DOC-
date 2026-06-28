@@ -6,7 +6,7 @@ const capabilities = [
   { title: "Speaks your language, literally", desc: "Hindi, Gujarati, Tamil, Marathi, English. CFO Fynny auto-detects your preference. Switch mid-conversation. The intelligence doesn't change, only the language does." },
   { title: "Grounded in live data, always", desc: "Every number CFO Fynny speaks is fetched live from your bank, your Tally, your GST portal. She is architecturally prevented from estimating or guessing any financial figure." },
   { title: "Action-first, not insight-last", desc: "Every CFO Fynny insight includes a recommended action and a one-tap way to execute it, draft the WhatsApp, open the simulator, generate the report." },
-  { title: "Named after a real person", desc: "Fynny Siddhpura, Co-Founder and Director of FynHelp, designed every insight this AI delivers. The product carries her name because it carries her character." },
+  { title: "Named after a real person", desc: "Nidhi Siddhapura, Co-Founder and CMO of FynHelp, designed every insight this AI delivers. Fynny carries her judgment in every recommendation she makes." },
 ];
 
 export default function NidhiSection() {
