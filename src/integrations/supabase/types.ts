@@ -2009,6 +2009,7 @@ export type Database = {
           generated_at: string
           generated_by: string | null
           id: string
+          is_demo: boolean
           parameters: Json
           report_name: string
           report_type: string
@@ -2023,6 +2024,7 @@ export type Database = {
           generated_at?: string
           generated_by?: string | null
           id?: string
+          is_demo?: boolean
           parameters?: Json
           report_name: string
           report_type: string
@@ -2037,6 +2039,7 @@ export type Database = {
           generated_at?: string
           generated_by?: string | null
           id?: string
+          is_demo?: boolean
           parameters?: Json
           report_name?: string
           report_type?: string
