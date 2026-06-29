@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -133,20 +133,46 @@ import CARevenuePage from "./pages/ca/CARevenuePage";
 import CANotificationsPage from "./pages/ca/CANotificationsPage";
 import CASettingsPage from "./pages/ca/CASettingsPage";
 
+// Route-tree-scoped provider wrappers.
+// Each wrapper mounts ONLY the auth context(s) its own route tree needs,
+// so CA pages never mount AuthProvider/AdminAuthProvider and vice versa.
+
+function MainAppProviders() {
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
+}
+
+function AdminAppProviders() {
+  return (
+    <AdminAuthProvider>
+      <Outlet />
+    </AdminAuthProvider>
+  );
+}
+
+function CAAppProviders() {
+  return (
+    <CAAuthProvider>
+      <Outlet />
+    </CAAuthProvider>
+  );
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <AdminAuthProvider>
-      <CAAuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <WaitlistPopup />
-          <Routes>
-            <Route path="/" element={<Index />} />
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <WaitlistPopup />
+        <Routes>
+          {/* ===== ADMIN TREE: only mounts AdminAuthProvider ===== */}
+          <Route element={<AdminAppProviders />}>
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
               <Route index element={<AdminDashboardPage />} />
@@ -169,14 +195,45 @@ const App = () => (
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
             </Route>
-            
+            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
+          </Route>
+
+          {/* ===== CA TREE: only mounts CAAuthProvider ===== */}
+          <Route element={<CAAppProviders />}>
+            <Route path="/ca/login" element={<CALoginPage />} />
+            <Route path="/ca/register" element={<CARegisterPage />} />
+            <Route path="/ca" element={<CALayout />}>
+              <Route path="dashboard" element={<CADashboardPage />} />
+              <Route path="clients" element={<CAClientsPage />} />
+              <Route path="clients/add" element={<CAAddClientPage />} />
+              <Route path="client/:id" element={<CAClientDetailPage />} />
+              <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
+              <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
+              <Route path="tds-tracker" element={<CATdsTrackerPage />} />
+              <Route path="compliance" element={<CACompliancePage />} />
+              <Route path="itc-recon" element={<CAItcReconPage />} />
+              <Route path="reports" element={<CAReportsPage />} />
+              <Route path="bulk-actions" element={<CABulkActionsPage />} />
+              <Route path="portfolio-health" element={<CAPortfolioHealthPage />} />
+              <Route path="revenue" element={<CARevenuePage />} />
+              <Route path="notifications" element={<CANotificationsPage />} />
+              <Route path="settings" element={<CASettingsPage />} />
+              <Route path="settings/team" element={<CASettingsPage />} />
+              <Route path="settings/notifications" element={<CASettingsPage />} />
+              <Route path="settings/defaults" element={<CASettingsPage />} />
+              <Route path="settings/billing" element={<CASettingsPage />} />
+            </Route>
+          </Route>
+
+          {/* ===== MAIN APP TREE: only mounts AuthProvider (public site, demo, real client dashboard) ===== */}
+          <Route element={<MainAppProviders />}>
+            <Route path="/" element={<Index />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/security" element={<PublicSecurityPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogArticlePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/use-cases" element={<UseCasesPage />} />
-            
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/ca-firms" element={<CAFirmsPage />} />
@@ -185,7 +242,6 @@ const App = () => (
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
             <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
-            {/* Public demo — fully isolated tree (src/demo/*) */}
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/liquidity"  element={<DemoIntelligencePage tab="liquidity" />} />
@@ -218,7 +274,6 @@ const App = () => (
             <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
-            {/* Real dashboard — same beige intelligence tabs with live data */}
             <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
             <Route path="/dashboard/360" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
@@ -253,7 +308,6 @@ const App = () => (
             <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
             <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
-            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={<Navigate to="/dashboard/settings/personal" replace />} />
               <Route path="personal" element={<ProfilePage />} />
@@ -268,37 +322,11 @@ const App = () => (
               <Route path="team" element={<TeamAccessPage />} />
               <Route path="ca-access" element={<CAAccessPage />} />
             </Route>
-            {/* CA Partner Portal */}
-            <Route path="/ca/login" element={<CALoginPage />} />
-            <Route path="/ca/register" element={<CARegisterPage />} />
-            <Route path="/ca" element={<CALayout />}>
-              <Route path="dashboard" element={<CADashboardPage />} />
-              <Route path="clients" element={<CAClientsPage />} />
-              <Route path="clients/add" element={<CAAddClientPage />} />
-              <Route path="client/:id" element={<CAClientDetailPage />} />
-              <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
-              <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
-              <Route path="tds-tracker" element={<CATdsTrackerPage />} />
-              <Route path="compliance" element={<CACompliancePage />} />
-              <Route path="itc-recon" element={<CAItcReconPage />} />
-              <Route path="reports" element={<CAReportsPage />} />
-              <Route path="bulk-actions" element={<CABulkActionsPage />} />
-              <Route path="portfolio-health" element={<CAPortfolioHealthPage />} />
-              <Route path="revenue" element={<CARevenuePage />} />
-              <Route path="notifications" element={<CANotificationsPage />} />
-              <Route path="settings" element={<CASettingsPage />} />
-              <Route path="settings/team" element={<CASettingsPage />} />
-              <Route path="settings/notifications" element={<CASettingsPage />} />
-              <Route path="settings/defaults" element={<CASettingsPage />} />
-              <Route path="settings/billing" element={<CASettingsPage />} />
-            </Route>
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-      </CAAuthProvider>
-      </AdminAuthProvider>
-    </AuthProvider>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
