@@ -2000,6 +2000,41 @@ export type Database = {
         }
         Relationships: []
       }
+      fynny_briefs: {
+        Row: {
+          brief_date: string
+          business_id: string
+          content: string
+          created_at: string
+          delivered: boolean | null
+          id: string
+        }
+        Insert: {
+          brief_date?: string
+          business_id: string
+          content: string
+          created_at?: string
+          delivered?: boolean | null
+          id?: string
+        }
+        Update: {
+          brief_date?: string
+          business_id?: string
+          content?: string
+          created_at?: string
+          delivered?: boolean | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fynny_briefs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       generated_reports: {
         Row: {
           business_id: string
@@ -2009,6 +2044,7 @@ export type Database = {
           generated_at: string
           generated_by: string | null
           id: string
+          is_demo: boolean
           parameters: Json
           report_name: string
           report_type: string
@@ -2023,6 +2059,7 @@ export type Database = {
           generated_at?: string
           generated_by?: string | null
           id?: string
+          is_demo?: boolean
           parameters?: Json
           report_name: string
           report_type: string
@@ -2037,6 +2074,7 @@ export type Database = {
           generated_at?: string
           generated_by?: string | null
           id?: string
+          is_demo?: boolean
           parameters?: Json
           report_name?: string
           report_type?: string
