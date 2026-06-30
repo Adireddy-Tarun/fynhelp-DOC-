@@ -35,14 +35,7 @@ const STYLES = `
   .fyn-h { font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: -0.025em; line-height: 1.02; color: ${C.ink}; }
   .fyn-container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-  /* Nav */
-  .fyn-nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 1180px; z-index: 50;
-    background: ${C.card}; border: 1px solid ${C.border}; border-radius: 100px; padding: 10px 14px 10px 22px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
-  .fyn-nav-links { display: none; gap: 28px; }
-  @media (min-width: 769px) { .fyn-nav-links { display: flex; } }
-  .fyn-nav a.fyn-nav-link { font-size: 14px; color: ${C.body}; text-decoration: none; font-weight: 500; }
-  .fyn-nav a.fyn-nav-link:hover { color: ${C.ink}; }
+  /* Logo (used in footer) */
   .fyn-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
   .fyn-logo-dot { width: 26px; height: 26px; border-radius: 50%; background: ${C.ink}; display: flex; align-items: center; justify-content: center; }
   .fyn-logo-dot::after { content:''; width:9px; height:9px; border-radius:50%; background: ${C.red}; }
