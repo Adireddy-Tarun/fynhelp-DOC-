@@ -53,7 +53,7 @@ const STYLES = `
   .btn-dark:hover { background: #222; }
 
   /* Hero */
-  .hero { padding: 140px 0 60px; text-align: center; }
+  .hero { padding: 40px 0 60px; text-align: center; }
   .hero h1 { font-size: clamp(56px, 9vw, 116px); font-weight: 900; }
   .hero .red-line { color: ${C.red}; }
   .hero-sub { max-width: 720px; margin: 32px auto 0; font-size: 19px; line-height: 1.55; color: ${C.body}; }
