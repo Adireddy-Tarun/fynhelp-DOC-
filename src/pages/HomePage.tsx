@@ -391,7 +391,7 @@ const STYLES = `
     .section { padding: 56px 0; }
     .section h2 { font-size: clamp(28px, 7.5vw, 42px); }
     .section .lead { font-size: 15px; padding: 0 8px; }
-    .hero { padding: 110px 0 40px; }
+    .hero { padding: 24px 0 40px; }
     .hero h1 { font-size: clamp(40px, 11vw, 64px); line-height: 1.04; }
     .hero-sub { font-size: 16px; padding: 0 8px; margin-top: 24px; }
     .hero-cta { gap: 10px; margin-top: 28px; padding: 0 12px; }
