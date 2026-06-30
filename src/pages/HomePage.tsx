@@ -420,14 +420,6 @@ const STYLES = `
 `;
 
 // ===== DATA =====
-const NAV_LINKS = [
-  { label: "Products", href: "/#products" },
-  { label: "Use Cases", href: "/use-cases" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Security", href: "/security" },
-  { label: "Resources", href: "/resources" },
-  { label: "About", href: "/about" },
-];
 
 const STATS = [
   { v: "63M+", l: "INDIAN MSMES" },
