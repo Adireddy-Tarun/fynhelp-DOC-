@@ -9,6 +9,7 @@ import GstWidget from "./widgets/GstWidget";
 import SimulatorWidget from "./widgets/SimulatorWidget";
 import FynnyWidget from "./widgets/FynnyWidget";
 import GenericWidget from "./widgets/GenericWidget";
+import CAPartnerWidget from "./widgets/CAPartnerWidget";
 import type { WidgetKey } from "./productMeta";
 import { FYN } from "./widgets/Shared";
 
@@ -33,6 +34,7 @@ function renderWidget(product: ModalProduct) {
     case "gst": return <GstWidget />;
     case "simulator": return <SimulatorWidget />;
     case "fynny": return <FynnyWidget />;
+    case "ca-partner": return <CAPartnerWidget />;
     default: return <GenericWidget name={product.name} />;
   }
 }
