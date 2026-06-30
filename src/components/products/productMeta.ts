@@ -7,6 +7,7 @@ export type WidgetKey =
   | "gst"
   | "simulator"
   | "fynny"
+  | "ca-partner"
   | "generic";
 
 export interface ProductItem extends SuiteMeta {
@@ -91,8 +92,8 @@ export const PLATFORM_FEATURES = [
     description: "White label for accountants",
     longDescription:
       "Manage your entire client portfolio from one dashboard. Compliance, GST, and reports, co-branded.",
-    status: "coming_soon" as const,
-    widget: "generic" as WidgetKey,
-    href: "/#product-ecosystem",
+    status: "live" as const,
+    widget: "ca-partner" as WidgetKey,
+    href: "/ca/login",
   },
 ];
