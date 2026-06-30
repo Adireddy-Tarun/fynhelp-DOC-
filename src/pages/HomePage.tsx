@@ -7,6 +7,7 @@ import AIRecommendedSection from "@/components/AIRecommendedSection";
 import FAQSection from "@/components/home/FAQSection";
 import { Helmet } from "react-helmet-async";
 import { IntelligenceProvider, useBankTxns, useInvoices, useExpenses, useCustomers, useGstFilings } from "@/components/intelligence/DataSource";
+import Navbar from "@/components/Navbar";
 
 // ===== PALETTE (matches reference) =====
 const C = {
@@ -34,14 +35,7 @@ const STYLES = `
   .fyn-h { font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: -0.025em; line-height: 1.02; color: ${C.ink}; }
   .fyn-container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-  /* Nav */
-  .fyn-nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 1180px; z-index: 50;
-    background: ${C.card}; border: 1px solid ${C.border}; border-radius: 100px; padding: 10px 14px 10px 22px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
-  .fyn-nav-links { display: none; gap: 28px; }
-  @media (min-width: 769px) { .fyn-nav-links { display: flex; } }
-  .fyn-nav a.fyn-nav-link { font-size: 14px; color: ${C.body}; text-decoration: none; font-weight: 500; }
-  .fyn-nav a.fyn-nav-link:hover { color: ${C.ink}; }
+  /* Logo (used in footer) */
   .fyn-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
   .fyn-logo-dot { width: 26px; height: 26px; border-radius: 50%; background: ${C.ink}; display: flex; align-items: center; justify-content: center; }
   .fyn-logo-dot::after { content:''; width:9px; height:9px; border-radius:50%; background: ${C.red}; }
@@ -59,7 +53,7 @@ const STYLES = `
   .btn-dark:hover { background: #222; }
 
   /* Hero */
-  .hero { padding: 140px 0 60px; text-align: center; }
+  .hero { padding: 40px 0 60px; text-align: center; }
   .hero h1 { font-size: clamp(56px, 9vw, 116px); font-weight: 900; }
   .hero .red-line { color: ${C.red}; }
   .hero-sub { max-width: 720px; margin: 32px auto 0; font-size: 19px; line-height: 1.55; color: ${C.body}; }
@@ -397,7 +391,7 @@ const STYLES = `
     .section { padding: 56px 0; }
     .section h2 { font-size: clamp(28px, 7.5vw, 42px); }
     .section .lead { font-size: 15px; padding: 0 8px; }
-    .hero { padding: 110px 0 40px; }
+    .hero { padding: 24px 0 40px; }
     .hero h1 { font-size: clamp(40px, 11vw, 64px); line-height: 1.04; }
     .hero-sub { font-size: 16px; padding: 0 8px; margin-top: 24px; }
     .hero-cta { gap: 10px; margin-top: 28px; padding: 0 12px; }
@@ -426,14 +420,6 @@ const STYLES = `
 `;
 
 // ===== DATA =====
-const NAV_LINKS = [
-  { label: "Products", href: "/#products" },
-  { label: "Use Cases", href: "/use-cases" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Security", href: "/security" },
-  { label: "Resources", href: "/resources" },
-  { label: "About", href: "/about" },
-];
 
 const STATS = [
   { v: "63M+", l: "INDIAN MSMES" },
@@ -531,271 +517,6 @@ const NUMS = [
 ];
 
 // ===== COMPONENTS =====
-function ProductsMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
-  const [open, setOpen] = useState(false);
-  const [mobile, setMobile] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const m = window.matchMedia("(max-width: 768px)");
-    const upd = () => setMobile(m.matches);
-    upd();
-    m.addEventListener("change", upd);
-    return () => m.removeEventListener("change", upd);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    const onClick = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onClick);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onClick);
-    };
-  }, []);
-
-  const handleEnter = () => { if (mobile) return; clearTimeout(closeTimer.current); setOpen(true); };
-  const handleLeave = () => { if (mobile) return; clearTimeout(closeTimer.current); closeTimer.current = setTimeout(() => setOpen(false), 200); };
-
-  // All product cards route to /waitlist
-  const go = (_href: string) => { setOpen(false); onNavigate?.(); navigate("/waitlist"); };
-
-
-  return (
-    <div ref={wrapRef} className="fyn-products-wrap" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ position: "relative" }}>
-      <button
-        type="button"
-        onClick={() => setOpen(v => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        className="fyn-nav-link"
-        style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Sora', 'Inter', sans-serif", fontWeight: 500, fontSize: 14, padding: 0 }}
-      >
-        Products
-        <ChevronDown size={13} style={{ transition: "transform 0.25s", transform: open ? "rotate(180deg)" : "none" }} />
-      </button>
-
-      {open && (
-        <>
-          {mobile && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", zIndex: 999 }} />}
-          <div
-            role="menu"
-            className={mobile ? "fyn-products-sheet" : "fyn-products-panel-anim fyn-products-panel"}
-            style={mobile ? undefined : {
-              position: "absolute", top: "calc(100% + 14px)", left: "50%", transform: "translateX(-50%)",
-              width: "min(820px, 92vw)", background: "#1A1008",
-              backgroundImage: "linear-gradient(180deg, #1F0E07 0%, #1A1008 100%)",
-              border: "1px solid rgba(244,237,218,0.08)", borderRadius: 16,
-              boxShadow: "0 24px 64px rgba(0,0,0,0.5)", padding: "22px 24px 24px", zIndex: 1000,
-            }}
-          >
-            {mobile && (
-              <>
-                <div aria-hidden style={{ width: 32, height: 4, borderRadius: 999, background: "rgba(244,237,218,0.2)", margin: "12px auto" }} />
-                <button type="button" onClick={() => setOpen(false)} aria-label="Close" style={{ position: "absolute", top: 12, right: 16, width: 36, height: 36, borderRadius: 999, border: "none", background: "transparent", color: "#F4EDDA", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                  <XIcon size={20} />
-                </button>
-              </>
-            )}
-            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 11, letterSpacing: 1.5, color: "rgba(244,237,218,0.55)", textTransform: "uppercase", padding: mobile ? "4px 20px 14px" : 0, marginBottom: mobile ? 0 : 14 }}>
-              Intelligence Suites
-            </div>
-            <div className="fyn-prod-grid" style={{ padding: mobile ? "0 16px 24px" : 0 }}>
-              {SUITES.map((s, i) => {
-                const Icon = s.Icon;
-                const isLive = s.status === "live";
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => go(s.href)}
-                    className="fyn-prod-row"
-                    style={{
-                      display: "flex", alignItems: "center", gap: 12, width: "100%",
-                      minHeight: mobile ? 56 : undefined,
-                      padding: mobile ? "14px 14px" : "10px 12px", borderRadius: 10, background: "transparent",
-                      border: "none", borderLeft: "2px solid transparent", cursor: "pointer",
-                      textAlign: "left", transition: "background 150ms ease, border-color 150ms ease",
-                      animation: `fyn-prod-in 200ms ease-out ${i * 0.03}s both`,
-                    }}
-                  >
-                    <div style={{ width: 34, height: 34, flexShrink: 0, borderRadius: 9, background: "rgba(244,237,218,0.04)", border: "1px solid rgba(244,237,218,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Icon size={17} color="#F4EDDA" strokeWidth={1.8} />
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3, minWidth: 0, flex: 1 }}>
-                      <div className="fyn-prod-title" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontFamily: "'Sora', sans-serif", fontWeight: 600, color: "#F4EDDA", lineHeight: 1.25 }}>
-                        <span>{s.name}</span>
-                        {isLive ? (
-                          <span className="fyn-prod-badge" style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(8,40,24,0.85)", border: "1px solid rgba(26,158,100,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontWeight: 500, color: "rgba(26,158,100,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
-                            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(26,158,100,0.95)", boxShadow: "0 0 5px rgba(26,158,100,0.7)", animation: "fyn-prod-pulse 1.4s ease-in-out infinite" }} />
-                            Live
-                          </span>
-                        ) : (
-                          <span className="fyn-prod-badge" style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(139,105,20,0.12)", border: "1px solid rgba(139,105,20,0.4)", padding: "2px 8px 2px 7px", borderRadius: 999, fontFamily: "'Sora', sans-serif", fontWeight: 500, color: "rgba(139,105,20,0.95)", textTransform: "uppercase", letterSpacing: 0.7, lineHeight: 1 }}>
-                            <Clock size={9} />
-                            Soon
-                          </span>
-                        )}
-                      </div>
-                      <p className="fyn-prod-desc" style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontWeight: 300, color: "rgba(244,237,218,0.55)", lineHeight: 1.45 }}>
-                        {s.description}
-                      </p>
-                    </div>
-                    {mobile && (
-                      <span aria-hidden style={{ color: "rgba(244,237,218,0.3)", flexShrink: 0, fontSize: 20, lineHeight: 1 }}>›</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <style>{`
-            .fyn-prod-row:hover { background: rgba(244,237,218,0.05) !important; border-left-color: #C41E1E !important; }
-            .fyn-products-panel-anim { animation: fyn-prod-fade 200ms ease-out; }
-            .fyn-prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-            .fyn-prod-title { font-size: 13.5px; }
-            .fyn-prod-desc { font-size: 11.5px; }
-            .fyn-prod-badge { font-size: 9px; }
-            @keyframes fyn-prod-fade { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-            @keyframes fyn-prod-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-            @keyframes fyn-prod-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
-            @media (min-width: 769px) and (max-width: 1024px) {
-              .fyn-products-panel { width: calc(100vw - 40px) !important; max-width: 100% !important; padding: 22px 20px 24px !important; }
-              .fyn-prod-grid { grid-template-columns: 1fr 1fr !important; }
-              .fyn-prod-row { padding: 20px 16px !important; }
-              .fyn-prod-title { font-size: 15px !important; }
-              .fyn-prod-desc { font-size: 12px !important; }
-              .fyn-prod-badge { font-size: 10px !important; }
-            }
-            @media (max-width: 768px) {
-              .fyn-products-sheet {
-                position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
-                background: #1A1008; height: 85vh; overflow-y: auto;
-                border-radius: 16px 16px 0 0; border-top: 1px solid rgba(244,237,218,0.1);
-                animation: fyn-sheet-up 250ms ease-out;
-              }
-              .fyn-prod-grid { grid-template-columns: 1fr !important; gap: 2px !important; }
-              .fyn-prod-title { font-size: 15px !important; }
-              .fyn-prod-desc { font-size: 12px !important; }
-            }
-            @keyframes fyn-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-          `}</style>
-        </>
-      )}
-
-    </div>
-  );
-}
-
-function Nav() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDrawerOpen(false); };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
-  useEffect(() => {
-    if (drawerOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
-  }, [drawerOpen]);
-
-  return (
-    <>
-      <nav className="fyn-nav">
-        <Link to="/" className="fyn-logo">
-          <div className="fyn-logo-dot" />
-          <div className="fyn-logo-text">Fyn<span>Help</span></div>
-        </Link>
-        <div className="fyn-nav-links">
-          {NAV_LINKS.map(l => l.label === "Products"
-            ? <ProductsMenu key="products" />
-            : <a key={l.label} href={l.href} className="fyn-nav-link">{l.label}</a>
-          )}
-        </div>
-        {/* Desktop CTAs (≥1025px) */}
-        <div className="fyn-nav-cta-desktop" style={{ gap: 8, alignItems: "center" }}>
-          <Link to="/demo/login" className="btn-pill btn-outline" style={{ padding: "10px 20px", fontSize: 14 }}>Try Demo</Link>
-          <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={16} /></Link>
-        </div>
-        {/* Tablet CTAs (769-1024px) */}
-        <div className="fyn-nav-cta-tablet" style={{ gap: 8, alignItems: "center" }}>
-          <Link to="/demo/login" style={{ display: "inline-flex", alignItems: "center", border: "1px solid rgba(26,16,8,0.25)", background: "transparent", color: "#1A1008", padding: "8px 16px", fontSize: 13, borderRadius: 20, textDecoration: "none", fontFamily: "'Sora', sans-serif", fontWeight: 600 }}>Try Demo</Link>
-          <Link to="/waitlist" style={{ display: "inline-flex", alignItems: "center", background: "#C41E1E", color: "#F4EDDA", padding: "8px 18px", fontSize: 13, borderRadius: 20, textDecoration: "none", fontFamily: "'Sora', sans-serif", fontWeight: 600 }}>Join Waitlist</Link>
-        </div>
-        {/* Mobile hamburger (≤768px) */}
-        <button
-          type="button"
-          className="fyn-mobile-hamburger"
-          aria-label="Open menu"
-          aria-expanded={drawerOpen}
-          onClick={() => setDrawerOpen(true)}
-        >
-          <span /><span /><span />
-        </button>
-      </nav>
-
-      {drawerOpen && (
-        <>
-          <div onClick={() => setDrawerOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 998 }} />
-          <aside className="fyn-mobile-drawer" role="dialog" aria-modal="true">
-            <button type="button" onClick={() => setDrawerOpen(false)} aria-label="Close menu" style={{ position: "absolute", top: 18, right: 18, background: "transparent", border: "none", color: "#F4EDDA", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36 }}>
-              <XIcon size={22} />
-            </button>
-            <div style={{ marginTop: 56, display: "flex", flexDirection: "column" }}>
-              {NAV_LINKS.map(l => (
-                <Link
-                  key={l.label}
-                  to={l.href.startsWith("/#") ? "/" : l.href}
-                  onClick={() => setDrawerOpen(false)}
-                  style={{ display: "block", padding: "16px 0", borderBottom: "1px solid rgba(244,237,218,0.08)", color: "#F4EDDA", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 18, textDecoration: "none" }}
-                >
-                  {l.label}
-                </Link>
-              ))}
-              <Link to="/demo/login" onClick={() => setDrawerOpen(false)} style={{ display: "block", padding: "16px 0", borderBottom: "1px solid rgba(244,237,218,0.08)", color: "#F4EDDA", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 18, textDecoration: "none" }}>
-                Try Demo
-              </Link>
-              <Link to="/waitlist" onClick={() => setDrawerOpen(false)} style={{ display: "block", marginTop: 24, background: "#C41E1E", color: "#F4EDDA", padding: 14, borderRadius: 6, textAlign: "center", fontFamily: "'Sora', sans-serif", fontWeight: 600, fontSize: 16, textDecoration: "none" }}>
-                Join Waitlist
-              </Link>
-            </div>
-          </aside>
-        </>
-      )}
-
-      <style>{`
-        .fyn-nav-cta-desktop { display: none; }
-        .fyn-nav-cta-tablet { display: none; }
-        .fyn-mobile-hamburger {
-          display: inline-flex; flex-direction: column; justify-content: center; gap: 4.5px;
-          width: 32px; height: 32px; padding: 0 7px; background: transparent; border: none; cursor: pointer;
-        }
-        .fyn-mobile-hamburger span { display: block; width: 18px; height: 1.5px; background: #1A1008; border-radius: 1px; }
-        @media (min-width: 769px) and (max-width: 1024px) {
-          .fyn-nav-cta-tablet { display: inline-flex; }
-          .fyn-mobile-hamburger { display: none; }
-        }
-        @media (min-width: 1025px) {
-          .fyn-nav-cta-desktop { display: inline-flex; }
-          .fyn-mobile-hamburger { display: none; }
-        }
-        .fyn-mobile-drawer {
-          position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px;
-          background: #1A1008; z-index: 999; padding: 32px 24px;
-          animation: fyn-drawer-in 250ms ease-out;
-        }
-        @keyframes fyn-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @media (min-width: 769px) { .fyn-mobile-drawer { display: none; } }
-      `}</style>
-    </>
-  );
-}
 
 
 
@@ -1395,7 +1116,7 @@ export default function HomePage() {
         <link rel="canonical" href="https://fynhelp.com/" />
       </Helmet>
       <style>{STYLES}</style>
-      <Nav />
+      <Navbar />
 
       {/* HERO */}
       <section className="hero">
