@@ -45,7 +45,7 @@ function Hero() {
   const badges = [
     { icon: Lock, label: "Bank-Grade Security" },
     { icon: MapPin, label: "Indian Data Residency" },
-    { icon: Shield, label: "SOC 2 Compliant" },
+    { icon: Shield, label: "SOC 2 In Progress" },
   ];
 
   return (
@@ -716,7 +716,7 @@ function StorySection() {
           "We're building what we wish we'd had. No founder should discover their crisis 14 days too late."
         </p>
         <p style={{ fontFamily: "Inter", fontWeight: 600, color: TERRACOTTA, marginTop: 16 }} className="text-[16px] md:text-[18px]">
-         , Tarun & Nidhi, Co-founders
+         — Tarun &amp; Nidhi, Co-Founders
         </p>
       </motion.div>
     </section>
@@ -731,12 +731,14 @@ function TeamSection() {
       name: "Adireddy Tarun",
       title: "CEO & CO-FOUNDER",
       bio: "B.Tech in Computer Science with 6 years of industry experience spanning technical development and management. Led engineering teams and product strategy at scale before founding FynHelp to solve the financial intelligence gap for Indian SMEs.",
+      linkedin: "https://www.linkedin.com/in/tarun-adireddy/",
     },
     {
       letter: "N",
       name: "Nidhi Siddhapura",
       title: "CMO & CO-FOUNDER",
       bio: "MBA in Data Analytics with 3 years of experience in marketing and management. Built brand strategies for multiple startups and maintains a growing presence as a micro-influencer in the business and finance space. Leads all go-to-market and community-building efforts at FynHelp.",
+      linkedin: "https://www.linkedin.com/in/nidhi-siddhapura/",
     },
   ];
   return (
@@ -797,7 +799,8 @@ function TeamSection() {
                     {f.bio}
                   </p>
                   <a
-                    href="#"
+                    href={f.linkedin}
+                    target="_blank" rel="noopener noreferrer"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -967,7 +970,7 @@ function FinalCTA() {
           style={{ fontFamily: "Inter", fontWeight: 500, color: "rgba(255,255,255,0.7)", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}
           className="text-[18px] md:text-[21px] mb-8 md:mb-12"
         >
-          Join 1,000+ beta users building the future of Indian SME finance
+          Join our founding member waitlist
         </motion.p>
         <Link
           to="/waitlist"
