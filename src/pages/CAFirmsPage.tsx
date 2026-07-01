@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
@@ -99,7 +101,7 @@ function Hero() {
           </div>
 
           <p className="mt-8 text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
-            Used by accounting firms managing 30–150 business clients
+            Built for accounting firms managing 30–150 business clients
           </p>
         </motion.div>
 
@@ -143,7 +145,7 @@ function DashboardMock() {
           className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
           style={{ color: RED, background: RED_TINT }}
         >
-          ● LIVE
+          ● PREVIEW
         </div>
       </div>
 
@@ -196,34 +198,25 @@ function DashboardMock() {
 function ProofStrip() {
   return (
     <section style={{ background: DARK }}>
-      <div className="mx-auto max-w-6xl px-6 py-12 grid md:grid-cols-2 gap-10 md:gap-0">
-        {[
-          {
-            q: "We cut our monthly reporting cycle from 12 days to 2.",
-            who: "Senior Partner, Accounting Firm, Bangalore",
-          },
-          {
-            q: "Finally I can grow my client base without adding headcount.",
-            who: "Founder, CA Practice, Mumbai",
-          },
-        ].map((p, i) => (
-          <div
-            key={p.who}
-            className={`md:px-10 ${i === 1 ? "md:border-l" : ""}`}
-            style={{ borderColor: "rgba(255,255,255,0.12)" }}
-          >
-            <p className="text-xl md:text-2xl leading-snug" style={{ ...serif, color: "#fff" }}>
-              “{p.q}”
-            </p>
-            <p className="mt-4 text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-              — {p.who}
-            </p>
-          </div>
-        ))}
+      <div className="mx-auto max-w-4xl px-6 py-16 text-center">
+        <p className="text-2xl md:text-3xl leading-snug" style={{ ...serif, color: "#fff" }}>
+          Be among the first CA firms to experience FynHelp.
+        </p>
+        <p className="mt-4 text-base" style={{ color: "rgba(255,255,255,0.6)" }}>
+          Share your feedback and shape the product.
+        </p>
+        <a
+          href="#early-access"
+          className="inline-flex items-center gap-2 mt-8 rounded-md px-6 py-3 font-semibold text-white"
+          style={{ background: RED }}
+        >
+          Reserve Early Access →
+        </a>
       </div>
     </section>
   );
 }
+
 
 /* ---------- PROBLEM (dark) ---------- */
 function Problem() {
@@ -463,6 +456,7 @@ function Quotes() {
 /* ---------- LEAD FORM ---------- */
 function LeadForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     firm: "",
@@ -470,15 +464,28 @@ function LeadForm() {
     city: "",
     clients: "30–75",
     pain: "",
+    email: "",
   });
+
 
   const onChange = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [k]: e.target.value });
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) { toast.error("Please enter a valid email"); return; }
+    setSubmitting(true);
+    const { error } = await (supabase.from("early_access_requests") as any).insert({
+      email: form.email,
+      module: "ca_firms",
+      user_id: null,
+      details: { name: form.name, firm: form.firm, role: form.role, city: form.city, client_count: form.clients, pain_point: form.pain },
+    });
+    setSubmitting(false);
+    if (error) toast.error(error.message);
+    else { setSubmitted(true); toast.success("Spot reserved — we'll be in touch"); }
   };
+
 
   const label = "block text-[12px] font-semibold mb-1.5";
   const field =
