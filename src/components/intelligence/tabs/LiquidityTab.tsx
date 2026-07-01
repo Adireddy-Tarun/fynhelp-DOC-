@@ -129,10 +129,10 @@ export default function LiquidityTab() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI href="/demo/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
+        <KPI href="/dashboard/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
         <KPI label="Runway" value={fmtMonths(m.runwayMonths)} isEmpty={liveEmpty || !Number.isFinite(m.runwayMonths)} emptySub={liveEmpty ? "Upload data to calculate" : "Profitable — no burn"} sub={zeroDate ? `Zero by ${zeroDate}` : undefined} deltaTone={Number.isFinite(m.runwayMonths) && m.runwayMonths < 6 ? "down" : "up"} delta={Number.isFinite(m.runwayMonths) ? (m.runwayMonths < 6 ? "Low" : "Healthy") : undefined} tone={runwayTone} />
-        <KPI href="/demo/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
-        <KPI href="/demo/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
+        <KPI href="/dashboard/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
+        <KPI href="/dashboard/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
 
       <SettlementsSection />
@@ -234,7 +234,7 @@ export default function LiquidityTab() {
           </div>
         </IntelCard>
 
-        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/demo/invoices?status=overdue" /></div>}>
+        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/dashboard/invoices?status=overdue" /></div>}>
           <WithData data={m.overdue} emptyTitle="No overdue invoices" emptyDescription="All receivables on track." cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
@@ -265,7 +265,7 @@ export default function LiquidityTab() {
 
 
       {/* Payments due */}
-      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/demo/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
+      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/dashboard/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
         <WithData data={m.payments} emptyTitle="No pending payments" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">
@@ -292,7 +292,7 @@ export default function LiquidityTab() {
         </WithData>
       </IntelCard>
       {/* Recent bank activity */}
-      <IntelCard title="Recent Bank Activity" sub="Latest 8 transactions" action={<ViewAllLink to="/demo/banking" />}>
+      <IntelCard title="Recent Bank Activity" sub="Latest 8 transactions" action={<ViewAllLink to="/dashboard/banking" />}>
         <WithData data={(bank ?? []).slice(0, 8)} isLoading={bankL} emptyTitle="No transactions yet" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">

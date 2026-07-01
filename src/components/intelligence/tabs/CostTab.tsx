@@ -73,8 +73,8 @@ export default function CostTab() {
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI href="/demo/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
-        <KPI href="/demo/expenses" label="COGS" value={fmtCompact(m.cogs)} />
+        <KPI href="/dashboard/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
+        <KPI href="/dashboard/expenses" label="COGS" value={fmtCompact(m.cogs)} />
         <KPI label="Gross Margin" value={fmtPct(m.grossMargin, 0)} deltaTone={m.grossMargin >= 30 ? "up" : "down"} delta={m.grossMargin >= 30 ? "Healthy" : "Below 30%"} />
         <KPI label="EBITDA" value={fmtCompact(m.ebitda)} sub={`${fmtPct(m.ebitdaMargin, 1)} margin`} />
       </div>
@@ -105,7 +105,7 @@ export default function CostTab() {
 
       {/* Vendor analysis */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/demo/vendors" /></div>}>
+        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/dashboard/vendors" /></div>}>
           <WithData data={m.vendorSpend.slice(0, 6)} cta={null}>
             {(rows) => (
               <table className="w-full text-sm">

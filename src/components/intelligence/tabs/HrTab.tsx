@@ -75,7 +75,7 @@ export default function HrTab() {
         </IntelCard>
       </div>
 
-      <IntelCard title="Personnel Table" action={<ViewAllLink to="/demo/employees" />}>
+      <IntelCard title="Personnel Table" action={<ViewAllLink to="/dashboard/employees" />}>
         <WithData data={m.active} isLoading={isLoading}>
           {(rows) => (
             <div className="overflow-x-auto">
