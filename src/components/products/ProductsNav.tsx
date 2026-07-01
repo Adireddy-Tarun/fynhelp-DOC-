@@ -30,6 +30,8 @@ export default function ProductsNav({
   mobileMenuOpen = false,
   onCloseMobileMenu,
 }: Props) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<ModalProduct | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
