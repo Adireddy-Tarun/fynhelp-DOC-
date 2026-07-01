@@ -157,7 +157,7 @@ export default function CARegisterPage() {
           </ul>
         </div>
         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-          800,000 CAs trust FynHelp
+          Built for India's 800,000+ chartered accountants
         </div>
       </div>
 

@@ -44,7 +44,7 @@ const menuSections: Section[] = [
       { icon: Brain, label: "Decision Simulator", path: "/dashboard/simulator", soon: true },
       { icon: BarChart, label: "Market & Growth", path: "/dashboard/market-growth", soon: true },
       { icon: Landmark, label: "Banking", path: "/dashboard/banking", soon: true },
-      { icon: Building2, label: "CA Partner", path: "/dashboard/ca-partner", soon: true },
+      { icon: Building2, label: "CA Partner", path: "/dashboard/ca-partner", soon: false },
     ],
   },
   {
@@ -103,7 +103,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
   const width = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
   const visible = isDesktop || isOpen;
 
-  const fullName = profile?.full_name || (user?.email ? user.email.split("@")[0] : "Tarun");
+  const fullName = profile?.full_name || (user?.email ? user.email.split("@")[0] : "User");
   const role = profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : "Owner";
   const initials = getInitials(profile?.full_name, user?.email);
 
@@ -512,7 +512,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {role} · Admin
+                  {role}
                 </span>
               </span>
               <ChevronUp size={13} strokeWidth={1.75} style={{ color: "#9E9E9E", flexShrink: 0 }} />

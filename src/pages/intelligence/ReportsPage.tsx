@@ -202,7 +202,7 @@ function GenerateModal({
 }) {
   const formats = report.formats ?? ["pdf","excel"];
   const [format, setFormat] = useState<string>(formats.includes("pdf" as any) ? "pdf" : formats[0]);
-  const [fy, setFy] = useState("FY 2025-26");
+  const [fy, setFy] = useState("FY 2026-27");
   const CAL = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const now = new Date();
   const prevMonth = CAL[(now.getMonth() + 11) % 12];
@@ -362,14 +362,15 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
     }
   };
 
-  const handleDownload = (r: { id: string; report_name: string }) => {
-    setDownloading(r.id);
-    toast(`Downloading ${r.report_name}...`);
-    setTimeout(() => {
-      toast.success("Download complete");
-      setDownloading(null);
-    }, 1500);
+  const handleDownload = (r: { id: string; report_name: string; file_url?: string | null }) => {
+    if (r.file_url) {
+      window.open(r.file_url, "_blank");
+      toast.success(`Opening ${r.report_name}`);
+    } else {
+      toast.info("This report has not been generated yet. Click Generate to create it.");
+    }
   };
+
 
   return (
     <IntelPage>

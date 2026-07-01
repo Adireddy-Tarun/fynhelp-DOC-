@@ -41,7 +41,7 @@ interface TemplateItem {
   title: string;
   description: string;
   format: string;
-  downloads: string;
+  downloads: string | null;
   href: string;
   icon?: string | null;
 }
@@ -296,7 +296,7 @@ const TemplateCardView = ({ t }: { t: TemplateItem }) => (
       )}
       <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "rgba(26,16,8,0.55)", marginTop: 4 }}>
         <span>{t.format}</span>
-        <span>↓ {t.downloads}</span>
+        <span>↓ {t.downloads ?? "—"}</span>
       </div>
       <a
         href={t.href}
@@ -525,7 +525,7 @@ const ResourcesPage = () => {
           title: row.title,
           description: row.description ?? "",
           format: row.format ?? "PDF",
-          downloads: `${(Math.floor(Math.random() * 30) + 5) / 10}K`,
+          downloads: null,
           href: downloadHref(row.id),
           icon: row.icon_url,
         }));

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 
 const categories = [
@@ -32,11 +34,21 @@ const CommunityPage = () => {
   const [event1Submitted, setEvent1Submitted] = useState(false);
   const [event2Submitted, setEvent2Submitted] = useState(false);
 
-  const handleWaitlist = (e: React.FormEvent) => {
+  const handleWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
-    // BACKEND: POST to community_waitlist table { email, joined_at }
-    setSubmitted(true);
+    const { error } = await (supabase.from("early_access_requests") as any)
+      .insert({ email, module: "community", user_id: null });
+    if (error) toast.error(error.message);
+    else { setSubmitted(true); toast.success("You're on the community waitlist"); }
   };
+
+  const registerEvent = async (eventEmail: string, module: "office_hours" | "gst_clinic", setDone: (v: boolean) => void) => {
+    const { error } = await (supabase.from("early_access_requests") as any)
+      .insert({ email: eventEmail, module, user_id: null });
+    if (error) toast.error(error.message);
+    else { setDone(true); toast.success("Registered — check your inbox"); }
+  };
+
 
   return (
     <Layout>
@@ -121,11 +133,11 @@ const CommunityPage = () => {
             <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
               <h3 className="font-serif text-lg text-fyn-ink mb-2">FynHelp CFO Office Hours</h3>
               <p className="text-fyn-ink/60 text-sm mb-2">Every Tuesday, 4PM IST, Adireddy Tarun answers your financial intelligence questions live. Any FynHelp module, any business problem.</p>
-              <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Tuesday, 6 May 2026, 4:00 PM IST</p>
+              <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Tuesday, 5 August 2026, 4:00 PM IST</p>
               {event1Submitted ? (
                 <p className="text-fyn-success text-sm">Registered! We'll send you the link. ✓</p>
               ) : (
-                <form onSubmit={(e) => { e.preventDefault(); setEvent1Submitted(true); }} className="flex gap-2">
+                <form onSubmit={(e) => { e.preventDefault(); registerEvent(eventEmail1, "office_hours", setEvent1Submitted); }} className="flex gap-2">
                   <input type="email" required value={eventEmail1} onChange={(e) => setEventEmail1(e.target.value)}
                     placeholder="your@email.com" aria-label="Register for CFO Office Hours"
                     className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm" />
@@ -136,11 +148,11 @@ const CommunityPage = () => {
             <div className="bg-fyn-beige-card border border-fyn-ink-10 rounded-lg p-6">
               <h3 className="font-serif text-lg text-fyn-ink mb-2">GST & Compliance Clinic</h3>
               <p className="text-fyn-ink/60 text-sm mb-2">Every Thursday, 11AM IST, Our CA partner network answers your GST, TDS, and compliance questions.</p>
-              <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Thursday, 8 May 2026, 11:00 AM IST</p>
+              <p className="text-fyn-ink/80 text-sm font-medium mb-4">Next session: Thursday, 7 August 2026, 11:00 AM IST</p>
               {event2Submitted ? (
                 <p className="text-fyn-success text-sm">Registered! We'll send you the link. ✓</p>
               ) : (
-                <form onSubmit={(e) => { e.preventDefault(); setEvent2Submitted(true); }} className="flex gap-2">
+                <form onSubmit={(e) => { e.preventDefault(); registerEvent(eventEmail2, "gst_clinic", setEvent2Submitted); }} className="flex gap-2">
                   <input type="email" required value={eventEmail2} onChange={(e) => setEventEmail2(e.target.value)}
                     placeholder="your@email.com" aria-label="Register for GST Clinic"
                     className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm" />

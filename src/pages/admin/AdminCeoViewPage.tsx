@@ -2,13 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from "recharts";
 import { PageHeader, Card } from "./AdminDashboardPage";
 import { supabase } from "@/integrations/supabase/client";
 import { LiveBadge } from "@/components/admin/LiveBadge";
 import { useRealtime } from "@/hooks/useRealtime";
+import { EmptyCard } from "@/components/intelligence/EmptyCard";
+
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -25,29 +24,14 @@ const statusColors: Record<Status, { bg: string; border: string; text: string }>
 };
 
 const strategic = [
-  { label: "Runway", value: "18.5 mo", status: "excellent" as Status },
-  { label: "Burn Rate", value: "₹4.5L/mo", status: "good" as Status },
-  { label: "Lifetime Value", value: "₹1.56L", status: "excellent" as Status },
-  { label: "CAC", value: "₹12K", status: "neutral" as Status },
-  { label: "LTV : CAC", value: "13×", status: "excellent" as Status },
-  { label: "Gross Margin", value: "87%", status: "excellent" as Status },
+  { label: "Runway" },
+  { label: "Burn Rate" },
+  { label: "Lifetime Value" },
+  { label: "CAC" },
+  { label: "LTV : CAC" },
+  { label: "Gross Margin" },
 ];
 
-const targetsData = [
-  { metric: "New Users", target: 150, actual: 145, status: "on-track" },
-  { metric: "MRR Growth", target: 200000, actual: 225000, status: "exceeds" },
-  { metric: "Churn Rate %", target: 3.5, actual: 2.8, status: "exceeds" },
-  { metric: "Support SLA %", target: 95, actual: 92, status: "at-risk" },
-];
-
-const cashFlowData = [
-  { month: "Jun", cash: 8200000 },
-  { month: "Jul", cash: 7900000 },
-  { month: "Aug", cash: 7700000 },
-  { month: "Sep", cash: 7600000 },
-  { month: "Oct", cash: 7600000 },
-  { month: "Nov", cash: 7700000 },
-];
 
 type Query = {
   id: string; user: string; type: string;
@@ -149,22 +133,11 @@ export default function AdminCeoViewPage() {
         </div>
       </div>
 
-      {/* Strategic metrics */}
+      {/* Strategic metrics — honest empty states, awaiting live wiring */}
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
-        {strategic.map((s) => {
-          const c = statusColors[s.status];
-          return (
-            <div key={s.label} className="p-4 rounded-xl"
-              style={{ background: c.bg, border: `1px solid ${c.border}` }}>
-              <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.65)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                {s.label}
-              </div>
-              <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 24, fontWeight: 700, color: c.text }}>
-                {s.value}
-              </div>
-            </div>
-          );
-        })}
+        {strategic.map((s) => (
+          <EmptyCard key={s.label} title={s.label} hint="Computed from live financial data once connected." />
+        ))}
         <div className="p-4 rounded-xl" style={{ background: statusColors.neutral.bg, border: `1px solid ${statusColors.neutral.border}` }}>
           <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.65)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
             AI Cost (This Month)
@@ -177,51 +150,13 @@ export default function AdminCeoViewPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Card>
-          <h3 style={cardTitle}>Monthly Targets vs Actuals</h3>
-          <div className="space-y-4">
-            {targetsData.map((t) => {
-              const pct = Math.min(150, Math.round((t.actual / t.target) * 100));
-              const barColor = t.status === "exceeds" ? "#10B981" : t.status === "on-track" ? "#8B6914" : "#C41E1E";
-              return (
-                <div key={t.metric}>
-                  <div className="flex justify-between mb-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
-                    <span style={{ color: "hsl(var(--fyn-ink))", fontWeight: 600 }}>{t.metric}</span>
-                    <span style={{ color: "hsl(var(--fyn-ink) / 0.6)" }}>
-                      {typeof t.actual === "number" && t.actual >= 1000 ? fmtINR(t.actual) : t.actual}
-                      {" / "}
-                      {typeof t.target === "number" && t.target >= 1000 ? fmtINR(t.target) : t.target}
-                    </span>
-                  </div>
-                  <div style={{ height: 8, background: "rgba(26,16,8,0.08)", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ width: `${Math.min(100, pct)}%`, height: "100%", background: barColor, transition: "width 0.4s ease" }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <EmptyCard title="Monthly Targets vs Actuals" hint="Set targets in Settings to track performance here." />
         </Card>
-
         <Card>
-          <h3 style={cardTitle}>6-Month Cash Flow Projection</h3>
-          <div style={{ width: "100%", height: 240 }}>
-            <ResponsiveContainer>
-              <AreaChart data={cashFlowData}>
-                <defs>
-                  <linearGradient id="ceoCash" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#8B6914" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#C41E1E" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-                <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <YAxis tickFormatter={(v) => fmtINR(v)} stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                <Tooltip formatter={(v: number) => fmtINR(v)} contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 13 }} />
-                <Area type="monotone" dataKey="cash" stroke="#8B6914" strokeWidth={2} fill="url(#ceoCash)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <EmptyCard title="6-Month Cash Flow Projection" hint="Connect your bank accounts to generate a real cash flow forecast." />
         </Card>
       </div>
+
 
       <h3 className="mt-10 mb-4" style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
         Customer Support Feed

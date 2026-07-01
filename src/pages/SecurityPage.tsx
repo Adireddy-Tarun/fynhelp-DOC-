@@ -298,7 +298,7 @@ const SecurityPage = () => {
             {[
               { Icon: Shield, label: "Enterprise-Grade Security" },
               { Icon: Server, label: "Indian Data Residency" },
-              { Icon: CheckCircle2, label: "Zero Breaches Since 2024" },
+              { Icon: CheckCircle2, label: "Zero security incidents in internal testing" },
             ].map((t, i, arr) => (
               <div key={t.label} className="security-trustitem-wrap">
                 <div className="security-trustitem">
@@ -709,7 +709,7 @@ const SecurityPage = () => {
                   Founder-Built · India-First
                 </div>
                 <div className="mt-8 inline-block px-5 py-2 rounded-full" style={{ background: "rgba(244,237,218,0.1)", border: `1px solid ${GOLD}` }}>
-                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 13, color: BEIGE }}>Tarun &amp; Fynny · Co-Founders</span>
+                  <span style={{ fontFamily: "'DM Sans'", fontWeight: 600, fontSize: 13, color: BEIGE }}>Tarun Adireddy · CEO &amp; Co-Founder</span>
                 </div>
               </div>
             </motion.div>
@@ -932,7 +932,7 @@ const SecurityPage = () => {
               }}
             >
               <Users size={18} style={{ color: RED }} />
-              Trusted by 1,000+ Beta Users
+              Built for Indian startups and SMEs
             </span>
           </motion.div>
 

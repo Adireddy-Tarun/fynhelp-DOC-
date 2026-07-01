@@ -1160,7 +1160,7 @@ function EngagementPopup() {
                   fontSize: 13, fontWeight: 700,
                 }}
               >✓</span>
-              Join 200+ Indian founders who chose FynHelp after a free chat.
+              Talk to our founders before you commit.
             </p>
 
             {done ? (
@@ -1252,37 +1252,7 @@ function EngagementPopup() {
               gap: 12,
             }}
           >
-            <div className="fyn-stat-card">
-              <span className="fyn-stat-icon" aria-hidden>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2 L4 14 H12 L11 22 L20 10 H12 Z" />
-                </svg>
-              </span>
-              <div>
-                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
-                  &lt; 2 hours
-                </div>
-                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
-                  Average callback time
-                </div>
-              </div>
-            </div>
-
-            <div className="fyn-stat-card">
-              <span className="fyn-stat-icon" aria-hidden>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12 L10 17 L19 7" />
-                </svg>
-              </span>
-              <div>
-                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
-                  94%
-                </div>
-                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
-                  Find the right plan on first call
-                </div>
-              </div>
-            </div>
+            {/* Trust stats: only kept honest ones */}
 
             <div className="fyn-stat-card">
               <span className="fyn-stat-icon" aria-hidden>

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8";
 
@@ -23,12 +25,14 @@ const selCls = inpCls;
 const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi"];
 const INDUSTRIES = ["Technology","D2C","Manufacturing","Retail","Healthcare","Education","Logistics","F&B","Real Estate","Services","Other"];
 
-const Save = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={onClick} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Save</button>
+const Save = ({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) => (
+  <button onClick={onClick} disabled={disabled} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}>Save</button>
 );
 
 const BusinessProfilePage = () => {
-  const [name, setName] = useState("FynHelp Demo Pvt Ltd");
+  const { businessId } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
   const [industry, setIndustry] = useState("Technology");
   const [desc, setDesc] = useState("");
   const [legalName, setLegalName] = useState("");
@@ -44,16 +48,68 @@ const BusinessProfilePage = () => {
   const [gstType, setGstType] = useState("regular");
   const [bank, setBank] = useState({ name: "", account: "", ifsc: "" });
 
-  const savePan = () => {
+  useEffect(() => {
+    (async () => {
+      if (!businessId) { setLoading(false); return; }
+      const { data } = await (supabase.from("businesses") as any).select("*").eq("id", businessId).maybeSingle();
+      if (data) {
+        setName(data.business_name ?? "");
+        setIndustry(data.industry ?? "Technology");
+        setDesc(data.description ?? "");
+        setLegalName(data.legal_name ?? "");
+        setPan(data.pan ?? "");
+        setGstin(data.gstin ?? "");
+        setCin(data.cin ?? "");
+        setMsme(data.msme_udyam ?? "");
+        setAddr({
+          street: data.address_street ?? "",
+          city: data.address_city ?? "",
+          state: data.state ?? "Karnataka",
+          pincode: data.address_pincode ?? "",
+        });
+        setEmail(data.contact_email ?? "");
+        setPhone(data.contact_phone ?? "");
+        setWebsite(data.website ?? "");
+        setFyStart(data.fy_start_month ?? "April");
+        setGstType(data.gst_registration_type ?? "regular");
+        setBank({
+          name: data.bank_name ?? "",
+          account: data.bank_account ?? "",
+          ifsc: data.bank_ifsc ?? "",
+        });
+      }
+      setLoading(false);
+    })();
+  }, [businessId]);
+
+  const update = async (patch: Record<string, unknown>) => {
+    if (!businessId) { toast.error("No business linked to your account yet"); return; }
+    const { error } = await (supabase.from("businesses") as any).update(patch).eq("id", businessId);
+    if (error) toast.error(error.message);
+    else toast.success("Saved");
+  };
+
+  const saveIdentity = () => update({ business_name: name, industry, description: desc });
+  const saveLegal = async () => {
     if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) return toast.error("Invalid PAN format");
     if (gstin && gstin.length !== 15) return toast.error("GSTIN must be 15 characters");
-    toast.success("Legal details saved");
+    await update({ legal_name: legalName, pan, gstin, cin, msme_udyam: msme });
   };
+  const saveAddress = () => update({
+    address_street: addr.street, address_city: addr.city, state: addr.state, address_pincode: addr.pincode,
+    contact_email: email, contact_phone: phone, website,
+  });
+  const saveFinancial = () => update({
+    fy_start_month: fyStart, gst_registration_type: gstType,
+    bank_name: bank.name, bank_account: bank.account, bank_ifsc: bank.ifsc,
+  });
 
   return (
     <div className="max-w-3xl">
       <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Business Profile</h2>
       <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Company identity, legal, address and financial settings.</p>
+
+      {loading && <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</p>}
 
       <Card title="Company Identity">
         <div className="border-2 border-dashed rounded-md p-6 text-center text-[12px]" style={{ borderColor: BORDER, color: "rgba(26,16,8,0.5)" }}>
@@ -66,7 +122,7 @@ const BusinessProfilePage = () => {
           </select>
         </Field>
         <Field label="Company description"><textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={2} className={inpCls + " h-auto py-2"} style={{ borderColor: BORDER }} /></Field>
-        <Save onClick={() => toast.success("Company identity saved")} />
+        <Save onClick={saveIdentity} disabled={loading} />
       </Card>
 
       <Card title="Legal & Registration">
@@ -75,12 +131,12 @@ const BusinessProfilePage = () => {
         <Field label="GSTIN">
           <div className="flex gap-2">
             <input value={gstin} onChange={(e) => setGstin(e.target.value.toUpperCase())} maxLength={15} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} />
-            <button onClick={() => toast.success("GSTIN verified")} className="px-4 rounded-md border text-[13px] font-medium" style={{ color: RED, borderColor: RED }}>Verify</button>
+            <button onClick={() => toast.info("GSTIN verification API coming soon")} className="px-4 rounded-md border text-[13px] font-medium" style={{ color: RED, borderColor: RED }}>Verify</button>
           </div>
         </Field>
         <Field label="CIN (optional)"><input value={cin} onChange={(e) => setCin(e.target.value.toUpperCase())} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
         <Field label="MSME registration number (optional)"><input value={msme} onChange={(e) => setMsme(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
-        <Save onClick={savePan} />
+        <Save onClick={saveLegal} disabled={loading} />
       </Card>
 
       <Card title="Address & Contact">
@@ -97,7 +153,7 @@ const BusinessProfilePage = () => {
           <Field label="Business phone"><input value={phone} onChange={(e) => setPhone(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
           <Field label="Website URL"><input value={website} onChange={(e) => setWebsite(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
         </div>
-        <Save onClick={() => toast.success("Address saved")} />
+        <Save onClick={saveAddress} disabled={loading} />
       </Card>
 
       <Card title="Financial Settings">
@@ -120,7 +176,7 @@ const BusinessProfilePage = () => {
           <Field label="Account number"><input value={bank.account} onChange={(e) => setBank({ ...bank, account: e.target.value })} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
           <Field label="IFSC"><input value={bank.ifsc} onChange={(e) => setBank({ ...bank, ifsc: e.target.value.toUpperCase() })} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>
         </div>
-        <Save onClick={() => toast.success("Financial settings saved")} />
+        <Save onClick={saveFinancial} disabled={loading} />
       </Card>
     </div>
   );

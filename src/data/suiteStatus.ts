@@ -39,7 +39,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Real-time cash flow tracking, burn rate alerts, runway forecasting",
     status: "live",
     quarter: "Live",
-    href: "/#product-ecosystem",
+    href: "/dashboard/liquidity",
   },
   {
     id: "revenue",
@@ -49,7 +49,7 @@ export const SUITES: SuiteMeta[] = [
     description: "MRR/ARR tracking, cohort analysis, churn prediction, revenue forecasts",
     status: "live",
     quarter: "Live",
-    href: "/#product-ecosystem",
+    href: "/dashboard/revenue-intelligence",
   },
   {
     id: "cost",
@@ -59,7 +59,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Expense categorization, vendor spend analysis, cost optimization insights",
     status: "live",
     quarter: "Live",
-    href: "/#product-ecosystem",
+    href: "/dashboard/cost",
   },
   {
     id: "gst",
@@ -69,7 +69,7 @@ export const SUITES: SuiteMeta[] = [
     description: "GST compliance tracking, ITC reconciliation, GSTR-2B matching, deadline alerts",
     status: "live",
     quarter: "Live",
-    href: "/#product-ecosystem",
+    href: "/dashboard/gst",
   },
   {
     id: "governance",
@@ -77,9 +77,9 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Governance",
     Icon: Shield,
     description: "Audit readiness, compliance tracking, regulatory alerts, risk monitoring",
-    status: "coming_soon",
-    quarter: "Q3 2026",
-    href: "/#product-ecosystem",
+    status: "live",
+    quarter: "Live",
+    href: "/dashboard/compliance",
   },
   {
     id: "hr",
@@ -87,9 +87,9 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "HR",
     Icon: Users,
     description: "Payroll analytics, cost-per-employee, headcount ROI, attrition insights",
-    status: "coming_soon",
-    quarter: "Q3 2026",
-    href: "/#product-ecosystem",
+    status: "live",
+    quarter: "Live",
+    href: "/dashboard/hr",
   },
   {
     id: "simulator",
@@ -99,7 +99,7 @@ export const SUITES: SuiteMeta[] = [
     description: "What-if scenarios, financial modeling, strategic decision simulations",
     status: "coming_soon",
     quarter: "Q4 2026",
-    href: "/#product-ecosystem",
+    href: "/dashboard/decision-simulator",
   },
   {
     id: "market",
@@ -109,7 +109,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Market trends, competitor benchmarking, growth opportunity identification",
     status: "coming_soon",
     quarter: "Q1 2027",
-    href: "/#product-ecosystem",
+    href: "/dashboard/market-growth",
   },
   {
     id: "banking",
@@ -119,7 +119,7 @@ export const SUITES: SuiteMeta[] = [
     description: "Multi-bank aggregation, credit analysis, fintech integrations, working capital",
     status: "coming_soon",
     quarter: "Q1 2027",
-    href: "/#product-ecosystem",
+    href: "/dashboard/banking",
   },
   {
     id: "ca-partner",
@@ -127,9 +127,9 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "CA Partner",
     Icon: Briefcase,
     description: "CA collaboration portal, client sharing, compliance delegation, ecosystem tools",
-    status: "coming_soon",
-    quarter: "Q2 2027",
-    href: "/#product-ecosystem",
+    status: "live",
+    quarter: "Live",
+    href: "/ca/login",
   },
 ];
 

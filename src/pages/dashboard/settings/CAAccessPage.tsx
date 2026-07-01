@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8";
 
@@ -13,17 +15,14 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
 
 const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
 
-const auditLog = [
-  { action: "Viewed GST Summary", module: "GST & Tax", ca: "CA Sharma", dt: "10 Jun 2026 3:42 PM" },
-  { action: "Exported P&L Report", module: "Reports", ca: "CA Sharma", dt: "09 Jun 2026 11:20 AM" },
-  { action: "Viewed ITC Reconciliation", module: "GST & Tax", ca: "CA Sharma", dt: "08 Jun 2026 2:15 PM" },
-];
-
 const moduleOpts = ["Liquidity", "Revenue", "Cost", "GST & Tax", "Governance"];
 
+type Access = { id: string; ca_name: string | null; ca_firm: string | null; ca_email: string; access_level: string | null; expiry_date: string | null; status: string };
+
 const CAAccessPage = () => {
-  const [showAdd, setShowAdd] = useState(false);
-  const [cas, setCas] = useState<{ name: string; firm: string; email: string; level: string; expiry: string; status: string }[]>([]);
+  const { businessId } = useAuth();
+  const [cas, setCas] = useState<Access[]>([]);
+  const [auditLog, setAuditLog] = useState<{ action: string; module: string; ca: string; dt: string }[]>([]);
   const [name, setName] = useState(""); const [firm, setFirm] = useState(""); const [email, setEmail] = useState("");
   const [level, setLevel] = useState<"full" | "limited">("full");
   const [limited, setLimited] = useState<string[]>([]);
@@ -31,12 +30,68 @@ const CAAccessPage = () => {
   const [expiry, setExpiry] = useState("");
   const [canExport, setCanExport] = useState(true);
   const [canViewHr, setCanViewHr] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const send = () => {
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast.error("Invalid CA email");
-    setCas((p) => [...p, { name, firm, email, level: level === "full" ? "Full" : `Limited (${limited.join(", ")})`, expiry: hasExpiry ? expiry : "No expiry", status: "Invited" }]);
-    toast.success(`CA invite sent to ${email}`);
+  const refresh = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await (supabase.from("ca_access_requests") as any)
+      .select("id, ca_name, ca_firm, ca_email, access_level, expiry_date, status")
+      .eq("client_user_id", user.id)
+      .order("created_at", { ascending: false });
+    setCas((data as Access[]) ?? []);
+
+    if (businessId) {
+      const { data: logs } = await (supabase.from("admin_audit_logs") as any)
+        .select("action, module, actor_name, created_at")
+        .eq("target_business_id", businessId)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      setAuditLog((logs ?? []).map((l: any) => ({
+        action: l.action ?? "",
+        module: l.module ?? "—",
+        ca: l.actor_name ?? "—",
+        dt: new Date(l.created_at).toLocaleString(),
+      })));
+    }
+  };
+
+  useEffect(() => { refresh(); }, [businessId]);
+
+  const handleSend = async () => {
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast.error("Invalid CA email"); return; }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Please sign in"); return; }
+    setSending(true);
+    const { error } = await (supabase.from("ca_access_requests") as any).insert({
+      client_user_id: user.id,
+      ca_email: email,
+      ca_name: name,
+      ca_firm: firm,
+      access_level: level,
+      module_access: level === "limited" ? limited : null,
+      has_expiry: hasExpiry,
+      expiry_date: hasExpiry ? expiry : null,
+      can_export: canExport,
+      can_view_hr: canViewHr,
+      status: "pending",
+    });
+    if (error) {
+      // Fallback to early_access_requests
+      const { error: eaErr } = await (supabase.from("early_access_requests") as any).insert({
+        email,
+        module: "ca_invite",
+        user_id: user.id,
+        details: { name, firm, level, limited, hasExpiry, expiry, canExport, canViewHr },
+      });
+      if (eaErr) toast.error(eaErr.message);
+      else toast.success("CA invite sent to " + email);
+    } else {
+      toast.success("CA invite sent to " + email);
+    }
+    setSending(false);
     setName(""); setFirm(""); setEmail(""); setLevel("full"); setLimited([]); setHasExpiry(false); setExpiry("");
+    refresh();
   };
 
   return (
@@ -47,20 +102,21 @@ const CAAccessPage = () => {
       <Card title="Current CA Access">
         {cas.length === 0 ? (
           <div className="text-center py-8 text-[13px]" style={{ color: "rgba(26,16,8,0.5)" }}>
-            No CA connected
-            <div className="mt-3"><button onClick={() => setShowAdd(true)} className="px-4 py-2 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Add CA</button></div>
+            No CA connected yet
           </div>
         ) : (
           <table className="w-full text-[13px]">
             <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
-              <th className="py-2">CA</th><th>Firm</th><th>Email</th><th>Access</th><th>Expiry</th><th>Status</th><th></th></tr></thead>
+              <th className="py-2">CA</th><th>Firm</th><th>Email</th><th>Access</th><th>Expiry</th><th>Status</th></tr></thead>
             <tbody>
-              {cas.map((c, i) => (
-                <tr key={i} className="border-t" style={{ borderColor: BORDER }}>
-                  <td className="py-3 font-medium">{c.name}</td><td>{c.firm}</td><td>{c.email}</td>
-                  <td>{c.level}</td><td>{c.expiry}</td>
+              {cas.map((c) => (
+                <tr key={c.id} className="border-t" style={{ borderColor: BORDER }}>
+                  <td className="py-3 font-medium">{c.ca_name ?? "—"}</td>
+                  <td>{c.ca_firm ?? "—"}</td>
+                  <td>{c.ca_email}</td>
+                  <td>{c.access_level ?? "—"}</td>
+                  <td>{c.expiry_date ?? "No expiry"}</td>
                   <td><span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>{c.status}</span></td>
-                  <td><button onClick={() => setCas((p) => p.filter((_, j) => j !== i))} className="text-[12px] px-3 py-1 rounded border font-medium" style={{ color: RED, borderColor: RED }}>Revoke</button></td>
                 </tr>
               ))}
             </tbody>
@@ -113,22 +169,28 @@ const CAAccessPage = () => {
           <Switch checked={canViewHr} onCheckedChange={setCanViewHr} />
         </div>
 
-        <button onClick={send} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Send CA Invite</button>
+        <button onClick={handleSend} disabled={sending} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}>
+          {sending ? "Sending…" : "Send CA Invite"}
+        </button>
       </Card>
 
       <Card title="Audit Log">
         <p className="text-[12px] mb-2" style={{ color: "rgba(26,16,8,0.55)" }}>Shows what your CA has been accessing</p>
-        <table className="w-full text-[13px]">
-          <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
-            <th className="py-2">Action</th><th>Module</th><th>CA Name</th><th>Date & Time</th></tr></thead>
-          <tbody>
-            {auditLog.map((a, i) => (
-              <tr key={i} className="border-t" style={{ borderColor: BORDER }}>
-                <td className="py-3">{a.action}</td><td>{a.module}</td><td>{a.ca}</td><td className="font-mono text-[12px]">{a.dt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {auditLog.length === 0 ? (
+          <p className="text-[13px] text-center py-6" style={{ color: "rgba(26,16,8,0.5)" }}>No CA access activity yet.</p>
+        ) : (
+          <table className="w-full text-[13px]">
+            <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
+              <th className="py-2">Action</th><th>Module</th><th>CA Name</th><th>Date & Time</th></tr></thead>
+            <tbody>
+              {auditLog.map((a, i) => (
+                <tr key={i} className="border-t" style={{ borderColor: BORDER }}>
+                  <td className="py-3">{a.action}</td><td>{a.module}</td><td>{a.ca}</td><td className="font-mono text-[12px]">{a.dt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </Card>
     </div>
   );

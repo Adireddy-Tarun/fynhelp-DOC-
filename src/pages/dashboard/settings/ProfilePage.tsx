@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const RED = "#A93838";
 const BORDER = "#E0D9C8";
@@ -27,8 +28,33 @@ const ProfilePage = () => {
   const [firstName, setFirstName] = useState(profile?.full_name?.split(" ")[0] ?? "");
   const [lastName, setLastName] = useState(profile?.full_name?.split(" ").slice(1).join(" ") ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState((profile as any)?.mobile ?? "");
+  const [saving, setSaving] = useState(false);
   const initials = ((firstName[0] || "") + (lastName[0] || "")).toUpperCase() || "U";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+  const accessLevel = (profile as any)?.role
+    ? String((profile as any).role).charAt(0).toUpperCase() + String((profile as any).role).slice(1)
+    : "Member";
+
+  const handleSave = async () => {
+    const { data: { user: current } } = await supabase.auth.getUser();
+    if (!current) {
+      toast.error("You must be signed in");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: fullName,
+        mobile: phone,
+        display_name: fullName,
+      } as any)
+      .eq("user_id", current.id);
+    setSaving(false);
+    if (error) toast.error(error.message);
+    else toast.success("Profile updated");
+  };
 
   return (
     <div className="max-w-3xl">
@@ -46,16 +72,16 @@ const ProfilePage = () => {
           <Field label="First name"><input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputCls} style={{ borderColor: BORDER }} /></Field>
           <Field label="Last name"><input value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputCls} style={{ borderColor: BORDER }} /></Field>
         </div>
-        <Field label="Email address"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} style={{ borderColor: BORDER }} /></Field>
+        <Field label="Email address"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled className={inputCls} style={{ borderColor: BORDER, background: "#FAF7F0" }} /></Field>
         <Field label="Phone number"><input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" className={inputCls} style={{ borderColor: BORDER }} /></Field>
-        <button className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}
-          onClick={() => toast.success("Profile updated")}>Save changes</button>
+        <button disabled={saving} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}
+          onClick={handleSave}>{saving ? "Saving..." : "Save changes"}</button>
       </Card>
 
       <Card title="Role & Access">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Role"><input disabled value={profile?.role || "owner"} className={inputCls} style={{ borderColor: BORDER, background: "#FAF7F0", textTransform: "capitalize" }} /></Field>
-          <Field label="Access level"><input disabled value="Admin" className={inputCls} style={{ borderColor: BORDER, background: "#FAF7F0" }} /></Field>
+          <Field label="Role"><input disabled value={(profile as any)?.role || "owner"} className={inputCls} style={{ borderColor: BORDER, background: "#FAF7F0", textTransform: "capitalize" }} /></Field>
+          <Field label="Access level"><input disabled value={accessLevel} className={inputCls} style={{ borderColor: BORDER, background: "#FAF7F0" }} /></Field>
         </div>
       </Card>
     </div>

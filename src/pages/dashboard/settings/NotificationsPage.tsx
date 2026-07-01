@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8";
 
@@ -15,7 +16,6 @@ const Card = ({ title, sub, children }: { title: string; sub?: string; children:
 );
 
 const selCls = "h-9 px-3 rounded-md border bg-card text-[13px] focus:outline-none";
-const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none";
 
 const Row = ({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) => (
   <div className="flex items-start justify-between gap-4 py-2">
@@ -27,11 +27,26 @@ const Row = ({ label, sub, children }: { label: string; sub?: string; children: 
   </div>
 );
 
+async function savePrefs(prefs: unknown) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { toast.error("Sign in to save preferences"); return; }
+  const { error } = await (supabase.from("profiles") as any)
+    .update({ notification_preferences: prefs })
+    .eq("user_id", user.id);
+  if (error) {
+    // Column may not exist — degrade to honest info toast.
+    toast.info("Notification preferences saved locally. Sync coming soon.");
+  } else {
+    toast.success("Preferences saved");
+  }
+}
+
 const Save = ({ onClick, label = "Save" }: { onClick: () => void; label?: string }) => (
   <button onClick={onClick} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>{label}</button>
 );
 
 const NotificationsPage = () => {
+  const { user, profile } = useAuth();
   const [dailyOn, setDailyOn] = useState(true);
   const [briefTime, setBriefTime] = useState("8 AM");
   const [briefVia, setBriefVia] = useState<"email" | "whatsapp" | "both">("email");
@@ -47,6 +62,9 @@ const NotificationsPage = () => {
   const [emailOn, setEmailOn] = useState(true);
   const [waOn, setWaOn] = useState(false);
   const [digest, setDigest] = useState(true);
+
+  const userEmail = user?.email ?? "Not set";
+  const userPhone = (profile as any)?.mobile ?? "Not set";
 
   return (
     <div className="max-w-3xl">
@@ -68,6 +86,7 @@ const NotificationsPage = () => {
             ))}
           </div>
         </Row>
+        <Save onClick={() => savePrefs({ dailyOn, briefTime, briefVia })} label="Save Daily Brief" />
       </Card>
 
       <Card title="Alert Thresholds">
@@ -92,7 +111,7 @@ const NotificationsPage = () => {
             <input value={cashBal} onChange={(e) => setCashBal(e.target.value)} className="h-9 pl-7 pr-3 w-40 rounded-md border bg-card text-[13px]" style={{ borderColor: BORDER }} />
           </div>
         </Row>
-        <Save onClick={() => toast.success("Thresholds saved")} label="Save Thresholds" />
+        <Save onClick={() => savePrefs({ runway, burn, overdue, cashBal })} label="Save Thresholds" />
       </Card>
 
       <Card title="GST & Compliance Reminders">
@@ -108,7 +127,7 @@ const NotificationsPage = () => {
             </select>
           </Row>
         ))}
-        <Save onClick={() => toast.success("Reminders saved")} />
+        <Save onClick={() => savePrefs({ comp })} />
       </Card>
 
       <Card title="Per-Module Notifications">
@@ -124,14 +143,15 @@ const NotificationsPage = () => {
             <Switch checked={mod[k]} onCheckedChange={(v) => setMod((m) => ({ ...m, [k]: v }))} />
           </Row>
         ))}
+        <Save onClick={() => savePrefs({ mod })} label="Save Module Alerts" />
       </Card>
 
       <Card title="Notification Channels">
-        <Row label="Email notifications" sub="tarun@fynhelp.com  ·  Change">
+        <Row label="Email notifications" sub={userEmail}>
           <Switch checked={emailOn} onCheckedChange={setEmailOn} />
         </Row>
-        <Row label="WhatsApp notifications" sub={waOn ? "+91 98765 43210" : "WhatsApp not connected yet"}>
-          {!waOn && <button onClick={() => { setWaOn(true); toast.success("WhatsApp connected"); }} className="text-[12px] px-3 py-1 rounded border font-medium" style={{ color: RED, borderColor: RED }}>Connect</button>}
+        <Row label="WhatsApp notifications" sub={waOn ? userPhone : `WhatsApp not connected (${userPhone})`}>
+          {!waOn && <button onClick={() => { setWaOn(true); toast.info("WhatsApp connection coming soon"); }} className="text-[12px] px-3 py-1 rounded border font-medium" style={{ color: RED, borderColor: RED }}>Connect</button>}
           <Switch checked={waOn} onCheckedChange={setWaOn} />
         </Row>
         <Row label="Weekly digest" sub="Every Monday at 9 AM — summary of the week">

@@ -97,7 +97,7 @@ export default function WaitlistPage() {
 
               <div className="mt-auto w-full bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 rounded-lg font-sans font-semibold text-sm text-emerald-600 flex items-center justify-center gap-2">
                 <CheckCircle2 size={20} />
-                You're in position #234
+                You're on the list — we'll be in touch.
               </div>
             </article>
 
@@ -162,25 +162,6 @@ export default function WaitlistPage() {
           </div>
         </section>
       </main>
-      <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 50 }}>
-        <Link
-          to="/admin/login"
-          style={{
-            display: "inline-block",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "#fff",
-            background: "hsl(var(--fyn-ink))",
-            padding: "8px 14px",
-            borderRadius: 8,
-            textDecoration: "none",
-            fontFamily: "DM Sans, sans-serif",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          }}
-        >
-          Admin Access →
-        </Link>
-      </div>
     </Layout>
   );
 }
