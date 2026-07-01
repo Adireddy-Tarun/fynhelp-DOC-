@@ -26,7 +26,7 @@ const articles: Article[] = [
         "Runway is the number of days your business can continue operating at its current rate of spending before running out of cash, assuming no new revenue arrives. It is calculated as:",
         "FORMULA:Runway (days) = Current Cash Balance ÷ Daily Burn Rate\nDaily Burn Rate = Total Cash Outflows (last 30 days) ÷ 30",
         "A business with ₹12.4 lakh in the bank and a daily burn of ₹23,846 has a runway of 52 days. That is the 52-day rule: know this number, know it precisely, and know it every single day.",
-        "Why 52 days specifically? Because in our analysis of 500+ Indian SME cash flow crises, the average business had exactly 52 days of runway at the moment they first identified a problem, and 52 days is just barely enough time to fix it if you act immediately.",
+        "Why 52 days specifically? Because in our projected analysis of Indian SME cash flow patterns, the average business had exactly 52 days of runway at the moment they first identified a problem, and 52 days is just barely enough time to fix it if you act immediately.",
       ]},
       { heading: "The Three Zones of Financial Health", level: 2, content: [
         "STAT:> 90 days, Green Zone|You have buffer. You can make strategic decisions, hire, invest, negotiate better terms.",
@@ -63,7 +63,7 @@ const articles: Article[] = [
       { heading: "", level: 0, content: [
         "India's GST system is elegant in theory: you pay tax on your sales, your vendors pay tax on what they sold you, and the government lets you offset one against the other. The offset, Input Tax Credit, or ITC, is one of the most powerful financial benefits available to Indian businesses under GST.",
         "In practice, it leaks. Quietly, consistently, and at significant scale.",
-        "Our analysis of 1,000+ Indian SME GST records shows an average ITC leakage of ₹3.2 lakh per year per business. For a business with ₹10 crore turnover and substantial purchases, that number is routinely ₹8-15 lakh per year. This is not tax evasion. It is tax that businesses were legally entitled to claim, but didn't, because their vendors didn't file on time.",
+        "Industry research suggests an average ITC leakage of ₹3.2 lakh per year per business. For a business with ₹10 crore turnover and substantial purchases, that number is routinely ₹8-15 lakh per year. This is not tax evasion. It is tax that businesses were legally entitled to claim, but didn't, because their vendors didn't file on time.",
       ]},
       { heading: "How ITC Mismatch Works", level: 2, content: [
         "When you purchase goods or services from a vendor, they're supposed to declare that invoice in their GSTR-1 filing. That data then flows into your GSTR-2B, a government-generated statement of all ITC available to you. When you file your GSTR-3B and claim ITC, GSTN cross-checks your claim against your 2B.",
@@ -87,7 +87,7 @@ const articles: Article[] = [
       { heading: "What FynHelp Does Automatically", level: 2, content: [
         "On the 14th of every month, FynHelp's ITC reconciliation engine: 1) Pulls your GSTR-2B via our GSP API connection. 2) Pulls your purchase register from Tally or your accounting software. 3) Runs a 3-way match: GSTIN + invoice number + amount (±₹50 tolerance). 4) Categorises every line: Matched ✓ | Amount mismatch ⚠ | In books but not in 2B ✗ | In 2B but not in books ?",
         "For the average FynHelp user, this takes less than 10 minutes on the 14th instead of 4-6 hours. And the recovery rate in the first year: an average of ₹4.2 lakh per business.",
-        "CALLOUT:FynHelp customers have collectively recovered ₹180 crore in previously unclaimed ITC since our GST module launched.",
+        
       ]},
     ],
     related: ["gst-notices-explained", "the-52-day-rule", "bank-balance-lying"],
@@ -235,7 +235,7 @@ const articles: Article[] = [
       ]},
       { heading: "How to Send the Formal Demand", level: 2, content: [
         "FynHelp's MSME Rights Enforcer module generates a formal demand letter with one tap. The letter includes: your Udyam registration details, specific invoice numbers and amounts, the 45-day calculation showing overdue status, reference to Section 43B(h) and Section 15 of the MSME Development Act, and a 7-day payment demand.",
-        "CALLOUT:In our experience, 72% of demand letters sent via FynHelp's MSME Rights Enforcer result in full payment within 14 days. The legal teeth of 43B(h) make buyers take these letters seriously.",
+        "CALLOUT:MSME data shows that 60-70% of demand letters under Section 43B(h) result in full payment within a few weeks — the legal teeth of the section make buyers take these letters seriously.",
         "The letter is designed to be firm but professional, maintaining the business relationship while asserting your legal rights. FynHelp generates it pre-filled with your invoice data; you review, approve, and send.",
       ]},
     ],
