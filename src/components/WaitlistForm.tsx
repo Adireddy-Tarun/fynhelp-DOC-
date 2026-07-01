@@ -76,31 +76,35 @@ export default function WaitlistForm({
     setMessage(null);
 
     try {
-      const response = await fetch(EXTERNAL_WAITLIST_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${EXTERNAL_ANON_KEY}`,
-        },
-        body: JSON.stringify({ ...formData, email }),
-      });
-      const body = await response.json().catch(() => ({} as any));
+      const { data: maxRow } = await supabase
+        .from("waitlist")
+        .select("position")
+        .order("position", { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      const nextPos = ((maxRow?.position as number | null) ?? 0) + 1;
 
-      if (response.ok && (body?.success ?? true)) {
+      const { error } = await supabase.from("waitlist").insert({
+        email: formData.email.trim().toLowerCase(),
+        name: formData.name || null,
+        company_name: formData.company_name || null,
+        phone: formData.phone || null,
+        company_type: formData.company_type || null,
+        company_size: formData.company_size || null,
+        location: formData.location || null,
+        position: nextPos,
+        is_converted: false,
+      });
+
+      if (error) {
+        setMessage({ type: "error", text: error.message || "Something went wrong. Please try again." });
+      } else {
         setSubmitted(true);
         setFormData(initial);
         onSuccess?.();
-      } else {
-        setMessage({
-          type: "error",
-          text: body?.error || "Something went wrong. Please try again.",
-        });
       }
     } catch {
-      setMessage({
-        type: "error",
-        text: "Network error. Please check your connection and try again.",
-      });
+      setMessage({ type: "error", text: "Network error. Please check your connection and try again." });
     } finally {
       setLoading(false);
     }
