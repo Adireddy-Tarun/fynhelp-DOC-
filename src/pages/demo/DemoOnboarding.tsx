@@ -26,7 +26,7 @@ export function DemoOnboarding() {
   const navigate = useNavigate()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Access guard temporarily disabled for design review
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
