@@ -2,13 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Send, Lock } from "lucide-react";
 import { toast } from "sonner";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from "recharts";
 import { PageHeader, Card } from "./AdminDashboardPage";
 import { supabase } from "@/integrations/supabase/client";
 import { LiveBadge } from "@/components/admin/LiveBadge";
 import { useRealtime } from "@/hooks/useRealtime";
+import { EmptyCard } from "@/components/intelligence/EmptyCard";
+
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -25,29 +24,14 @@ const statusColors: Record<Status, { bg: string; border: string; text: string }>
 };
 
 const strategic = [
-  { label: "Runway", value: "18.5 mo", status: "excellent" as Status },
-  { label: "Burn Rate", value: "₹4.5L/mo", status: "good" as Status },
-  { label: "Lifetime Value", value: "₹1.56L", status: "excellent" as Status },
-  { label: "CAC", value: "₹12K", status: "neutral" as Status },
-  { label: "LTV : CAC", value: "13×", status: "excellent" as Status },
-  { label: "Gross Margin", value: "87%", status: "excellent" as Status },
+  { label: "Runway" },
+  { label: "Burn Rate" },
+  { label: "Lifetime Value" },
+  { label: "CAC" },
+  { label: "LTV : CAC" },
+  { label: "Gross Margin" },
 ];
 
-const targetsData = [
-  { metric: "New Users", target: 150, actual: 145, status: "on-track" },
-  { metric: "MRR Growth", target: 200000, actual: 225000, status: "exceeds" },
-  { metric: "Churn Rate %", target: 3.5, actual: 2.8, status: "exceeds" },
-  { metric: "Support SLA %", target: 95, actual: 92, status: "at-risk" },
-];
-
-const cashFlowData = [
-  { month: "Jun", cash: 8200000 },
-  { month: "Jul", cash: 7900000 },
-  { month: "Aug", cash: 7700000 },
-  { month: "Sep", cash: 7600000 },
-  { month: "Oct", cash: 7600000 },
-  { month: "Nov", cash: 7700000 },
-];
 
 type Query = {
   id: string; user: string; type: string;
