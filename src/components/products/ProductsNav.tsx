@@ -9,6 +9,9 @@ import {
   BUSINESS_TYPES,
 } from "./productMeta";
 import { FYN } from "./widgets/Shared";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Props {
   /** Render a mobile-only trigger row inside the mobile drawer */
@@ -27,6 +30,8 @@ export default function ProductsNav({
   mobileMenuOpen = false,
   onCloseMobileMenu,
 }: Props) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<ModalProduct | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -57,6 +62,16 @@ export default function ProductsNav({
   const handleIntelligence = (id: string) => {
     const item = PRODUCT_ITEMS.find((p) => p.id === id);
     if (!item) return;
+
+    // If user is already logged in, navigate directly to their dashboard tab
+    if (user && item.status === "live") {
+      setOpen(false);
+      onCloseMobileMenu?.();
+      navigate(item.href);
+      return;
+    }
+
+    // Not logged in or coming-soon — show the modal as before
     openProduct({
       name: item.name,
       description: item.longDescription,
@@ -78,13 +93,48 @@ export default function ProductsNav({
     });
   };
 
-  const handlePlatform = (id: string) => {
+  const handlePlatform = async (id: string) => {
     const f = PLATFORM_FEATURES.find((x) => x.id === id);
     if (!f) return;
+
+    // CFO Fynny — navigate directly, skip the modal
+    if (id === "fynny") {
+      setOpen(false);
+      onCloseMobileMenu?.();
+      if (user) {
+        navigate("/dashboard/fynny-chat");
+      } else {
+        navigate("/demo/fynny");
+      }
+      return;
+    }
+
+    // CA Partner Program — navigate directly, skip the modal
+    if (id === "ca-partner-feature") {
+      setOpen(false);
+      onCloseMobileMenu?.();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: caFirm } = await supabase
+          .from("ca_firms")
+          .select("id")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        if (caFirm) {
+          navigate("/ca/dashboard");
+          return;
+        }
+        navigate("/ca/login");
+        return;
+      }
+      navigate("/ca/login");
+      return;
+    }
+
     openProduct({
       name: f.name,
       description: f.longDescription,
-      widget: f.widget,
+      widget: f.widget as any,
       href: f.href,
       status: f.status,
     });
