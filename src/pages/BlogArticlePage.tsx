@@ -386,6 +386,11 @@ const BlogArticlePage = () => {
           <div className="flex gap-12">
             {/* Article */}
             <div ref={articleRef} className="flex-1 max-w-3xl">
+              {article.category === "SUCCESS STORIES" && (
+                <div className="mb-6 p-4 rounded-md border-l-4 border-fyn-gold bg-fyn-gold/10 text-fyn-ink/80 text-sm">
+                  <strong>Note:</strong> The cases described below are illustrative examples based on common SME scenarios, not testimonials from actual FynHelp customers.
+                </div>
+              )}
               {article.sections.map((s, i) => (
                 <div key={i}>
                   {s.heading && <h2 id={s.heading.toLowerCase().replace(/[^a-z0-9]+/g, "-")} className="font-serif text-fyn-ink mb-4" style={{ fontSize: 32, fontWeight: 700, marginTop: i === 0 ? 0 : 40 }}>{s.heading}</h2>}
@@ -393,6 +398,7 @@ const BlogArticlePage = () => {
                 </div>
               ))}
             </div>
+
 
             {/* Sidebar */}
             <aside className="hidden lg:block w-64 shrink-0">
