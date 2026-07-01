@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
-import { Check, X, ChevronDown, Users, Bot, Coins } from "lucide-react";
+import { Check, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,7 @@ const plans: Plan[] = [
     name: "Starter",
     price: "FREE",
     priceSuffix: "for 30 days",
-    subline: "Then ₹30,000/year, Waitlist only",
+    subline: "Then ₹30,000/year · Waitlist only",
     features: [
       "8 AI CFO queries per month",
       "Real-time cash flow tracking",
@@ -86,29 +86,6 @@ const plans: Plan[] = [
     cta: { label: "Contact Sales", href: "mailto:hello@fynhelp.com", external: true },
     ctaStyle: "outline-ink",
   },
-];
-
-const comparisonRows: Array<{
-  label: string;
-  starter: string | boolean;
-  pro: string | boolean;
-  enterprise: string | boolean;
-}> = [
-  { label: "AI CFO queries / month", starter: "8", pro: "Unlimited", enterprise: "Unlimited" },
-  { label: "Real-time cash flow", starter: true, pro: true, enterprise: true },
-  { label: "Receivables & payables", starter: true, pro: true, enterprise: true },
-  { label: "GST & TDS tracking", starter: true, pro: true, enterprise: true },
-  { label: "HR intelligence", starter: "Basic", pro: "Advanced", enterprise: "Advanced" },
-  { label: "Cost intelligence", starter: false, pro: true, enterprise: true },
-  { label: "Market & growth analytics", starter: false, pro: true, enterprise: true },
-  { label: "Decision simulator", starter: false, pro: true, enterprise: true },
-  { label: "Custom reporting", starter: false, pro: true, enterprise: true },
-  { label: "API access", starter: false, pro: true, enterprise: true },
-  { label: "User accounts", starter: "1", pro: "Up to 5", enterprise: "Unlimited" },
-  { label: "Multi-entity support", starter: false, pro: false, enterprise: true },
-  { label: "Dedicated manager", starter: false, pro: false, enterprise: true },
-  { label: "SLA guarantees", starter: false, pro: false, enterprise: true },
-  { label: "Support", starter: "Email", pro: "Priority", enterprise: "Dedicated" },
 ];
 
 const roles = [
@@ -196,6 +173,15 @@ function Counter({ to, prefix = "", suffix = "" }: { to: number; prefix?: string
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [email, setEmail] = useState("");
+  const [isAnnual, setIsAnnual] = useState(false);
+  const [clientCount, setClientCount] = useState(35);
+
+  const baseMonthly = isAnnual ? 3999 : 4999;
+  const extraClients = Math.max(0, clientCount - 20);
+  const extraCost = extraClients * 99;
+  const totalMonthly = baseMonthly + extraCost;
+  const perClientCost = Math.round(totalMonthly / clientCount);
+
 
   return (
     <Layout>
@@ -361,6 +347,206 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* ========================= CA FIRM PLAN ========================= */}
+      <section className="fyn-bg-anim relative overflow-hidden px-6 py-24">
+        <Sparkles />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="font-subheading font-semibold text-xs uppercase tracking-[2px] text-fyn-gold mb-4">
+              For Chartered Accountants
+            </div>
+            <h2
+              className="font-display font-bold text-[32px] md:text-[42px] lg:text-[52px] leading-[1.2] text-fyn-ink mb-4"
+              style={{ letterSpacing: "-0.5px" }}
+            >
+              One plan. Every CA firm.
+            </h2>
+            <p className="font-body text-base md:text-lg text-fyn-ink/70 max-w-2xl mx-auto">
+              20 client seats included. Add more as you grow.
+            </p>
+
+            {/* Billing toggle */}
+            <div className="mt-8 inline-flex items-center gap-4 fyn-glass rounded-full px-2 py-2 border border-fyn-gold/20">
+              <button
+                type="button"
+                onClick={() => setIsAnnual(false)}
+                className={`font-button font-semibold text-sm px-5 py-2 rounded-full transition-all ${
+                  !isAnnual ? "bg-fyn-ink text-fyn-beige" : "text-fyn-ink/60 hover:text-fyn-ink"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAnnual(true)}
+                className={`font-button font-semibold text-sm px-5 py-2 rounded-full transition-all inline-flex items-center gap-2 ${
+                  isAnnual ? "bg-fyn-ink text-fyn-beige" : "text-fyn-ink/60 hover:text-fyn-ink"
+                }`}
+              >
+                Annual
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                  style={{ background: "#10B981", color: "#FFFFFF" }}
+                >
+                  Save 20%
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="fyn-glass relative rounded-[32px] p-10 border-2 border-fyn-gold shadow-[0_30px_80px_rgba(139,105,20,0.18)]"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Left column: price + CTAs */}
+              <div className="flex flex-col">
+                <div className="font-subheading font-semibold text-sm uppercase tracking-[1px] text-fyn-gold mb-3">
+                  CA Partner Plan
+                </div>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="font-display font-bold text-[52px] leading-none text-fyn-ink">
+                    ₹{isAnnual ? "3,999" : "4,999"}
+                  </span>
+                  <span className="font-body text-sm text-fyn-ink/60">
+                    {isAnnual ? "/month, billed annually" : "/month"}
+                  </span>
+                </div>
+                {isAnnual && (
+                  <p className="font-body text-sm text-fyn-gold mb-2">
+                    ₹47,988/year — save ₹11,988
+                  </p>
+                )}
+                <div className="mt-4 mb-3">
+                  <span
+                    className="inline-block font-button font-semibold text-sm px-4 py-2 rounded-full"
+                    style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}
+                  >
+                    Includes 20 client seats free
+                  </span>
+                </div>
+                <p className="font-body text-sm text-fyn-ink/60 mb-8">
+                  ₹99 per additional client per month
+                </p>
+
+                <div className="mt-auto space-y-3">
+                  <Link
+                    to="/waitlist"
+                    className="block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)] transition-all"
+                    style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+                  >
+                    Join CA Waitlist
+                  </Link>
+                  <Link
+                    to="/ca/register"
+                    className="block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5 transition-all"
+                  >
+                    Register as CA Partner →
+                  </Link>
+                  <p className="font-body text-xs text-fyn-ink/60 text-center pt-2">
+                    Early access CA firms: 3 months free on sign-up. No credit card required.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right column: features + calculator */}
+              <div className="flex flex-col">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8">
+                  {[
+                    "Client portfolio dashboard",
+                    "White-label reports",
+                    "GST filing calendar",
+                    "Portfolio health AI",
+                    "ITC reconciliation",
+                    "Compliance risk alerts",
+                    "Bulk GST filing",
+                    "TDS tracker",
+                    "5 CA team seats",
+                    "Priority support",
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fyn-gold text-white">
+                        <Check className="h-3 w-3" strokeWidth={3} />
+                      </span>
+                      <span className="font-body text-[14px] leading-relaxed text-fyn-ink/85">
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-6 border-t border-fyn-gold/20">
+                  <div className="font-subheading font-semibold text-sm text-fyn-ink mb-4">
+                    Estimate your cost
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-body text-sm text-fyn-ink/70">Number of clients</label>
+                    <span className="font-button font-bold text-lg text-fyn-ink tabular-nums">
+                      {clientCount}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={200}
+                    step={1}
+                    value={clientCount}
+                    onChange={(e) => setClientCount(Number(e.target.value))}
+                    className="w-full accent-fyn-gold"
+                  />
+
+                  <div
+                    className="mt-5 rounded-2xl p-5 space-y-3"
+                    style={{ background: "rgba(232,220,196,0.5)" }}
+                  >
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-body text-fyn-ink/75">
+                        Base plan (20 clients included)
+                      </span>
+                      <span className="font-button font-semibold text-fyn-ink tabular-nums">
+                        ₹{baseMonthly.toLocaleString("en-IN")}/mo
+                      </span>
+                    </div>
+                    {extraClients > 0 ? (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-body text-fyn-ink/75">
+                          {extraClients} additional clients × ₹99
+                        </span>
+                        <span className="font-button font-semibold text-fyn-ink tabular-nums">
+                          ₹{extraCost.toLocaleString("en-IN")}/mo
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-body text-fyn-ink/75">
+                          {20 - clientCount} free seats still available
+                        </span>
+                        <span
+                          className="font-button font-semibold tabular-nums"
+                          style={{ color: "#10B981" }}
+                        >
+                          ₹0
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-3 border-t border-fyn-ink/10">
+                      <span className="font-subheading font-bold text-fyn-ink">Total per month</span>
+                      <span className="font-button font-bold text-fyn-ink tabular-nums">
+                        ₹{totalMonthly.toLocaleString("en-IN")}/mo · ₹{perClientCost}/client
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
       {/* ========================= WAITLIST WIDGET ========================= */}
       <section
         className="relative overflow-hidden px-6 py-28 md:py-32"
@@ -432,7 +618,7 @@ export default function PricingPage() {
               marginBottom: 24,
             }}
           >
-            Join hundreds of startups and SMEs who've transformed their financial intelligence with FYNHelp.
+            Built for Indian startups, SMEs, and CA firms who want real financial intelligence — not just accounting software.
           </motion.p>
 
           <motion.p
@@ -669,67 +855,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* ========================= COMPARE PLANS ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden px-6 py-24">
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6 }}
-            className="font-display font-bold text-[36px] md:text-[42px] text-fyn-ink text-center mb-14 tracking-tight"
-          >
-            Compare plans
-          </motion.h2>
-
-          <div className="fyn-glass rounded-[24px] overflow-hidden shadow-[0_20px_60px_rgba(26,16,8,0.08)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr
-                    className="text-fyn-beige"
-                    style={{
-                      background: "linear-gradient(135deg,#1A1008 0%, rgba(26,16,8,0.92) 100%)",
-                    }}
-                  >
-                    <th className="text-left px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
-                      Feature
-                    </th>
-                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
-                      Starter
-                    </th>
-                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px] bg-fyn-red/30">
-                      Pro
-                    </th>
-                    <th className="px-6 py-5 font-subheading font-semibold uppercase tracking-[1px] text-[13px]">
-                      Enterprise
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonRows.map((r, i) => (
-                    <tr
-                      key={r.label}
-                      className="border-b border-fyn-ink/5 transition-colors hover:bg-fyn-gold/5"
-                    >
-                      <td className="px-6 py-4 font-body text-fyn-ink/90">{r.label}</td>
-                      <td className="px-6 py-4 text-center">
-                        <Cell value={r.starter} />
-                      </td>
-                      <td className="px-6 py-4 text-center bg-fyn-red/[0.04]">
-                        <Cell value={r.pro} />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Cell value={r.enterprise} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ========================= FAQ ========================= */}
       <section className="fyn-bg-anim relative overflow-hidden px-6 pt-12 pb-28">
@@ -851,19 +976,6 @@ function CTAButton({ plan }: { plan: Plan }) {
       {plan.cta.label}
     </Link>
   );
-}
-
-function Cell({ value }: { value: string | boolean }) {
-  if (typeof value === "boolean") {
-    return value ? (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-fyn-gold text-white">
-        <Check className="h-3.5 w-3.5" strokeWidth={3} />
-      </span>
-    ) : (
-      <X className="h-4 w-4 text-fyn-ink/25 mx-auto" />
-    );
-  }
-  return <span className="font-body text-[14px] text-fyn-ink/85">{value}</span>;
 }
 
 /* ====================== Engagement Popup ====================== */
