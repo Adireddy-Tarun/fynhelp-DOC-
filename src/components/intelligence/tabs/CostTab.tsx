@@ -131,22 +131,7 @@ export default function CostTab() {
           </WithData>
         </IntelCard>
 
-        <IntelCard title="Maverick Spend Detected" sub="Off-contract purchases requiring policy">
-          <div className="rounded-md p-3 mb-3" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: ACCENT.amber }} />
-              <p className="text-xs text-fyn-ink"><strong>{fmtCompact(m.totalOpex * 0.07)}</strong> in maverick spend across {Math.max(3, Math.floor((expenses?.length ?? 0) * 0.08))} transactions in last 90 days.</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <button onClick={() => setSpendOpen(true)} className="w-full text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
-            <div className="grid grid-cols-3 gap-2 text-[11px] text-[#6B6B6B] text-center">
-              <span>Approval Workflow</span>
-              <span>Centralize Procurement</span>
-              <span>Audit Last 90 Days</span>
-            </div>
-          </div>
-        </IntelCard>
+        <EmptyCard title="Maverick Spend Detection" hint="Spend policy analysis will appear after at least 30 days of transaction data." />
       </div>
 
       {/* Efficiency */}
