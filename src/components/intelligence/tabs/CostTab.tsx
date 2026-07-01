@@ -8,6 +8,15 @@ import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
 import ProjectEconomicsSection from "../sections/ProjectEconomicsSection";
 import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
 
+function EmptyCard({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="rounded-xl border border-fyn-ink/8 bg-fyn-beige/30 p-5">
+      <p className="text-sm font-semibold text-fyn-ink/70 mb-1">{title}</p>
+      <p className="text-xs text-fyn-ink/45">{hint}</p>
+    </div>
+  );
+}
+
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
   const { data: vendors } = useVendors();
