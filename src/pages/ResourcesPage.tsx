@@ -525,7 +525,7 @@ const ResourcesPage = () => {
           title: row.title,
           description: row.description ?? "",
           format: row.format ?? "PDF",
-          downloads: `${(Math.floor(Math.random() * 30) + 5) / 10}K`,
+          downloads: null,
           href: downloadHref(row.id),
           icon: row.icon_url,
         }));
