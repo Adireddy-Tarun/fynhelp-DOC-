@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
-import { AlertTriangle } from "lucide-react";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
 import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
