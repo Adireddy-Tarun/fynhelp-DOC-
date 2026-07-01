@@ -3,15 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useBalanceSheet } from "../DataSource";
 import { IntelCard, fmtCompact, ACCENT, CHART, ChartGradients, WithData } from "../_primitives";
 import { BalanceSheetSection, RiskRegisterSection, InsuranceSection } from "./sections/NewSections";
-
-function EmptyCard({ title, hint }: { title: string; hint: string }) {
-  return (
-    <div className="rounded-xl border border-fyn-ink/8 bg-fyn-beige/30 p-5">
-      <p className="text-sm font-semibold text-fyn-ink/70 mb-1">{title}</p>
-      <p className="text-xs text-fyn-ink/45">{hint}</p>
-    </div>
-  );
-}
+import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function GovernanceTab() {
   const { data: snapshots } = useBalanceSheet();
