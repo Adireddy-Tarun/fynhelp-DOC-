@@ -26,9 +26,9 @@ export default function GstTab() {
     const inputGst = (expenses ?? []).reduce((s, e) => s + Number(e.amount) * 0.18 / 1.18, 0);
     const netPayable = Math.max(0, outputGst - inputGst);
     const itcAvailable = inputGst;
-    const itcClaimed = inputGst * 0.94;
+    const itcClaimed = NaN;
     const itcGap = itcAvailable > 0 ? ((itcAvailable - itcClaimed) / itcAvailable) * 100 : 0;
-    const itcBlocked = inputGst * 0.03;
+    const itcBlocked = NaN;
     return { outputGst, inputGst, netPayable, itcAvailable, itcClaimed, itcGap, itcBlocked };
   }, [invoices, expenses]);
 
