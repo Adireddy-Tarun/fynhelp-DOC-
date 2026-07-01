@@ -42,7 +42,7 @@ export default function WaitlistPage() {
               Be first in line when we launch
             </h1>
             <p className="text-fyn-ink/70 text-base md:text-lg">
-              First 100 users get FYNHelp free for 6 months.
+              First 100 users get FYNHelp free for 30 days.
             </p>
           </header>
 
@@ -87,7 +87,7 @@ export default function WaitlistPage() {
               </p>
 
               <ul className="w-full list-none p-0 m-0 text-left space-y-3 mb-6">
-                {["6 months free access", "Email updates on progress", "No commitment required"].map((f) => (
+                {["30 days free access", "Email updates on progress", "No commitment required"].map((f) => (
                   <li key={f} className="flex items-center gap-2 font-sans font-medium text-sm text-black/70">
                     <Check size={18} className="text-emerald-500 shrink-0" />
                     {f}

@@ -101,7 +101,7 @@ export default function WaitlistPopup() {
             Be first in line when we launch
           </h2>
           <p className="mt-3 text-fyn-ink/65 text-sm md:text-base">
-            First 100 users get FYNHelp <span className="text-fyn-red font-semibold">free for 6 months</span>.
+            First 100 users get FYNHelp <span className="text-fyn-red font-semibold">free for 30 days</span>.
           </p>
         </div>
 

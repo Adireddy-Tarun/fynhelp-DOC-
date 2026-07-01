@@ -33,7 +33,7 @@ const plans: Plan[] = [
     id: "starter",
     name: "Starter",
     price: "FREE",
-    priceSuffix: "for 6 months",
+    priceSuffix: "for 30 days",
     subline: "Then ₹30,000/year, Waitlist only",
     features: [
       "8 AI CFO queries per month",
@@ -127,15 +127,15 @@ const faqs = [
   },
   {
     q: "Can I upgrade anytime?",
-    a: "Yes. Waitlisters get 50% off Pro plan if upgraded within the first 6 months.",
+    a: "Yes. Waitlisters get 50% off Pro plan if upgraded within the first 30 days.",
   },
   {
-    q: "What happens after 6 months free?",
+    q: "What happens after the 30-day free trial?",
     a: "Waitlisters can continue on Starter (₹30K/year) or upgrade to Pro at 50% off (₹45K instead of ₹90K/year).",
   },
   {
     q: "Is there a free trial?",
-    a: "First 100 waitlist founders get 6 months free. After that, we may offer 14-day trials.",
+    a: "First 100 waitlist founders get 30 days free. After that, we may offer 14-day trials.",
   },
 ];
 
@@ -455,7 +455,7 @@ export default function PricingPage() {
                 textUnderlineOffset: "4px",
               }}
             >
-              6-months free
+              30 days free
             </span>{" "}
             today, no credit card required.
           </motion.p>

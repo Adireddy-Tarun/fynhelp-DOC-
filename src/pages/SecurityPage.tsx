@@ -961,7 +961,7 @@ const SecurityPage = () => {
               textShadow: "0 2px 8px rgba(0,0,0,0.4)",
             }}
           >
-            Start your 6-month free trial. No credit card. No obligations.
+            Start your 30-day free trial. No credit card. No obligations.
           </motion.p>
 
           {/* Trust badges */}
@@ -973,7 +973,7 @@ const SecurityPage = () => {
             {[
               { Icon: CreditCard, label: "No Credit Card Required" },
               { Icon: XCircle, label: "Cancel Anytime" },
-              { Icon: Calendar, label: "6 Months Free Access" },
+              { Icon: Calendar, label: "30 Days Free Access" },
               { Icon: Sparkles, label: "Full Feature Access" },
             ].map(({ Icon, label }, i) => (
               <div key={i} className="fyn-cta-trustitem">
