@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8";
 
@@ -12,10 +14,7 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
 
 const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
 
-const initialMembers = [
-  { name: "Tarun Kumar", email: "tarun@fynhelp.com", role: "Admin", status: "Active", you: true },
-  { name: "Nidhi Siddhapura", email: "nidhi@fynhelp.com", role: "Admin", status: "Active", you: false },
-];
+type Member = { user_id: string; name: string; email: string; role: string; you: boolean };
 
 const permissions: [string, boolean, boolean, boolean, boolean][] = [
   ["View all data", true, true, true, true],
@@ -27,14 +26,58 @@ const permissions: [string, boolean, boolean, boolean, boolean][] = [
 ];
 
 const TeamAccessPage = () => {
-  const [members, setMembers] = useState(initialMembers);
+  const { businessId, user } = useAuth();
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("Admin");
+  const [sending, setSending] = useState(false);
 
-  const sendInvite = () => {
+  useEffect(() => {
+    (async () => {
+      if (!businessId) { setLoading(false); return; }
+      const { data } = await (supabase.from("profiles") as any)
+        .select("user_id, full_name, display_name, role")
+        .eq("business_id", businessId);
+      const rows = (data ?? []).map((p: any) => ({
+        user_id: p.user_id,
+        name: p.full_name || p.display_name || "Team member",
+        email: "",
+        role: p.role ? p.role.charAt(0).toUpperCase() + p.role.slice(1) : "Member",
+        you: p.user_id === user?.id,
+      }));
+      setMembers(rows);
+      setLoading(false);
+    })();
+  }, [businessId, user?.id]);
+
+  const sendInvite = async () => {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inviteEmail)) return toast.error("Invalid email");
-    toast.success(`Invite sent to ${inviteEmail}`);
-    setInviteEmail("");
+    if (!businessId) return toast.error("No business linked");
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-team-invite", {
+        body: { email: inviteEmail, business_id: businessId, role: inviteRole },
+      });
+      if (error) throw error;
+      toast.success(`Invite sent to ${inviteEmail}`);
+      setInviteEmail("");
+    } catch {
+      // Fallback: record as an early_access_request with type ca_invite-style payload
+      const { error: eaErr } = await (supabase.from("early_access_requests") as any).insert({
+        email: inviteEmail,
+        module: "team_invite",
+        user_id: user?.id ?? null,
+        details: { business_id: businessId, role: inviteRole },
+      });
+      if (eaErr) toast.error(eaErr.message);
+      else {
+        toast.success(`Invite queued for ${inviteEmail}`);
+        setInviteEmail("");
+      }
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -43,27 +86,27 @@ const TeamAccessPage = () => {
       <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Invite teammates and manage role-based permissions.</p>
 
       <Card title="Current Team Members">
-        <table className="w-full text-[13px]">
-          <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
-            <th className="py-2">Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {members.map((m) => (
-              <tr key={m.email} className="border-t" style={{ borderColor: BORDER }}>
-                <td className="py-3 font-medium">{m.name}</td><td>{m.email}</td><td>{m.role}</td>
-                <td><span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(22,163,74,0.15)", color: "#16A34A" }}>{m.status}</span></td>
-                <td className="text-right">
-                  {m.you ? <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>You</span> : (
-                    <div className="flex gap-2 justify-end">
-                      <button onClick={() => toast("Edit member")} className="text-[12px] px-3 py-1 rounded border" style={{ borderColor: BORDER }}>Edit</button>
-                      <button onClick={() => { setMembers((p) => p.filter((x) => x.email !== m.email)); toast.success("Member removed"); }}
-                        className="text-[12px] px-3 py-1 rounded border font-medium" style={{ color: RED, borderColor: RED }}>Remove</button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</p>
+        ) : members.length === 0 ? (
+          <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.55)" }}>No team members yet. Invite someone below.</p>
+        ) : (
+          <table className="w-full text-[13px]">
+            <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
+              <th className="py-2">Name</th><th>Role</th><th></th></tr></thead>
+            <tbody>
+              {members.map((m) => (
+                <tr key={m.user_id} className="border-t" style={{ borderColor: BORDER }}>
+                  <td className="py-3 font-medium">{m.name}</td>
+                  <td>{m.role}</td>
+                  <td className="text-right">
+                    {m.you && <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>You</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </Card>
 
       <Card title="Invite Team Member">
@@ -74,7 +117,9 @@ const TeamAccessPage = () => {
             <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className={inpCls} style={{ borderColor: BORDER }}>
               <option>Admin</option><option>Finance Manager</option><option>Viewer</option><option>CA (External)</option>
             </select></div>
-          <button onClick={sendInvite} className="h-10 px-5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Send Invite</button>
+          <button onClick={sendInvite} disabled={sending} className="h-10 px-5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}>
+            {sending ? "Sending…" : "Send Invite"}
+          </button>
         </div>
       </Card>
 

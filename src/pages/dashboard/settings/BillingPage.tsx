@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8"; const GOLD = "#8B6914";
 
@@ -13,12 +15,6 @@ const Card = ({ title, danger, children }: { title: string; danger?: boolean; ch
 
 const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none";
 
-const invoices = [
-  { num: "INV-2026-001", date: "Nov 2025", amount: "₹0 (Free)" },
-  { num: "INV-2026-002", date: "Dec 2025", amount: "₹0 (Free)" },
-  { num: "INV-2026-003", date: "Jan 2026", amount: "₹0 (Free)" },
-];
-
 const Metric = ({ label, used, total, pct }: { label: string; used: string; total: string; pct: number }) => (
   <div className="p-4 rounded-md border" style={{ borderColor: BORDER }}>
     <p className="text-[11px] uppercase tracking-wide font-semibold" style={{ color: "rgba(26,16,8,0.55)" }}>{label}</p>
@@ -30,8 +26,30 @@ const Metric = ({ label, used, total, pct }: { label: string; used: string; tota
 );
 
 const BillingPage = () => {
+  const { businessId, user } = useAuth();
   const [promo, setPromo] = useState("");
   const [showCancel, setShowCancel] = useState(false);
+  const [aiQueries, setAiQueries] = useState<number | null>(null);
+  const [teamCount, setTeamCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (user?.id) {
+        const start = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+        const { count } = await (supabase.from("ai_usage_logs") as any)
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .gte("created_at", start);
+        setAiQueries(count ?? 0);
+      }
+      if (businessId) {
+        const { count } = await (supabase.from("profiles") as any)
+          .select("user_id", { count: "exact", head: true })
+          .eq("business_id", businessId);
+        setTeamCount(count ?? 0);
+      }
+    })();
+  }, [user?.id, businessId]);
 
   return (
     <div className="max-w-3xl">
@@ -49,7 +67,6 @@ const BillingPage = () => {
                 <li key={f}><span style={{ color: "#16A34A" }}>✓</span> {f}</li>
               ))}
             </ul>
-            <p className="text-[12px] mt-3" style={{ color: "rgba(26,16,8,0.55)" }}>Early access ends: November 2026</p>
           </div>
         </div>
         <button onClick={() => toast("Coming Soon")} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Upgrade to Paid Plan</button>
@@ -57,27 +74,17 @@ const BillingPage = () => {
 
       <Card title="Usage This Month">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Metric label="Fynny queries" used="142" total="∞" pct={20} />
-          <Metric label="Reports generated" used="5" total="∞" pct={10} />
-          <Metric label="Team members" used="2" total="3" pct={66} />
-          <Metric label="Data storage" used="12 MB" total="1 GB" pct={1.2} />
+          <Metric label="Fynny queries" used={aiQueries === null ? "…" : String(aiQueries)} total="∞" pct={0} />
+          <Metric label="Reports generated" used="—" total="∞" pct={0} />
+          <Metric label="Team members" used={teamCount === null ? "…" : String(teamCount)} total="3" pct={teamCount ? Math.min(100, (teamCount / 3) * 100) : 0} />
+          <Metric label="Data storage" used="—" total="1 GB" pct={0} />
         </div>
       </Card>
 
       <Card title="Invoice History">
-        <table className="w-full text-[13px]">
-          <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
-            <th className="py-2">Invoice #</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {invoices.map((iv) => (
-              <tr key={iv.num} className="border-t" style={{ borderColor: BORDER }}>
-                <td className="py-3 font-mono">{iv.num}</td><td>{iv.date}</td><td>{iv.amount}</td>
-                <td><span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(22,163,74,0.15)", color: "#16A34A" }}>Paid</span></td>
-                <td className="text-right"><button onClick={() => toast("Downloading invoice...")} className="text-[12px] px-3 py-1 rounded border" style={{ color: RED, borderColor: RED }}>Download</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <p className="text-[13px] text-center py-6" style={{ color: "rgba(26,16,8,0.55)" }}>
+          No invoices yet. Invoices will appear here once you upgrade to a paid plan.
+        </p>
       </Card>
 
       <Card title="Payment Method">
@@ -92,7 +99,7 @@ const BillingPage = () => {
       <Card title="Promo Code">
         <div className="flex gap-2">
           <input value={promo} onChange={(e) => setPromo(e.target.value)} placeholder="Enter promo code" className={inpCls + " max-w-xs"} style={{ borderColor: BORDER }} />
-          <button onClick={() => toast.error("Invalid promo code")} className="px-4 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Apply</button>
+          <button onClick={() => toast.info("Promo codes will be available at launch.")} className="px-4 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Apply</button>
         </div>
         <p className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>Have a referral code? Enter it here for extended free access</p>
       </Card>
