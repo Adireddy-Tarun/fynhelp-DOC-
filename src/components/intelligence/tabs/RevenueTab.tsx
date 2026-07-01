@@ -73,8 +73,8 @@ export default function RevenueTab() {
     priorWindow.forEach((id) => { if (!recent.has(id)) churnedCount += 1; });
     const churn = priorWindow.size > 0 ? Math.max(0, (churnedCount / priorWindow.size) * 100) : NaN;
 
-    // Profit margin proxy from paid revenue × assumed gross margin (demo 72%)
-    const profitMargin = totalRevenue > 0 ? 72 : NaN;
+    // Profit margin — unavailable without real P&L in live mode
+    const profitMargin = totalRevenue > 0 ? NaN : NaN;
     // Rule of 40 = growth rate + profit margin, clamped to plausible range
     const rule = Number.isFinite(growthRate) && Number.isFinite(profitMargin)
       ? Math.max(-50, Math.min(80, growthRate + profitMargin))
@@ -83,18 +83,13 @@ export default function RevenueTab() {
     // Demo NRR; in live mode show "—" unless we can compute
     const nrr = mode === "demo" ? 118 : NaN;
 
-    const ltv = Number.isFinite(arpa) ? arpa * 12 * 1.5 : NaN;
-    const cac = Number.isFinite(arpa) ? arpa * 0.55 : NaN;
+    const ltv = mode === "demo" && Number.isFinite(arpa) ? arpa * 12 * 1.5 : NaN;
+    const cac = mode === "demo" && Number.isFinite(arpa) ? arpa * 0.55 : NaN;
     const ltvCac = Number.isFinite(ltv) && Number.isFinite(cac) && cac > 0 ? ltv / cac : NaN;
     const payback = Number.isFinite(ltvCac) && ltvCac > 0 ? 12 / ltvCac : NaN;
 
-    // Breakdown stub (only meaningful with revenue)
-    const breakdown = totalRevenue > 0 ? [
-      { label: "Liquidity Intelligence", value: totalRevenue * 0.30, pct: 30 },
-      { label: "Revenue Intelligence", value: totalRevenue * 0.26, pct: 26 },
-      { label: "GST & Tax Intelligence", value: totalRevenue * 0.22, pct: 22 },
-      { label: "Cost Intelligence", value: totalRevenue * 0.22, pct: 22 },
-    ] : [];
+    // Breakdown removed in live mode — fabricated splits are misleading
+    const breakdown: { label: string; value: number; pct: number }[] = [];
 
     return { totalRevenue, mom, growthRate, trend, activeCustomers, arpa, churn, nrr, ltv, cac, ltvCac, payback, concentration, top10Revenue, rule, breakdown };
   }, [invoices, mode]);
