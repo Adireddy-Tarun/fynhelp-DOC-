@@ -147,7 +147,7 @@ export default function LiquidityTab() {
             </div>
             <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(26,16,8,0.08)]">
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DSO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dso)}</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">12d</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">{mode === "demo" ? "12d" : "—"}</p></div>
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DPO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dpo)}</p></div>
             </div>
           </div>
