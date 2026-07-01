@@ -85,8 +85,8 @@ export default function LiquidityTab() {
     // 13-week forecast
     const weekly: { week: string; inflow: number; outflow: number; net: number }[] = [];
     for (let w = 1; w <= 13; w++) {
-      const inflow = revenue30 / 4.3 * (0.9 + Math.random() * 0.2);
-      const outflow = grossBurn / 4.3 * (0.9 + Math.random() * 0.2);
+      const inflow = revenue30 / 4.3;
+      const outflow = grossBurn / 4.3;
       weekly.push({ week: `W${w}`, inflow, outflow, net: inflow - outflow });
     }
 
