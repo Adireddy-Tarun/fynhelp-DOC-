@@ -1,9 +1,6 @@
 import { useState, FormEvent } from "react";
 import { Loader2, Check, Mail } from "lucide-react";
-const EXTERNAL_WAITLIST_URL =
-  "https://wiknwxniwqvsxgyzqqxu.supabase.co/functions/v1/waitlist-signup";
-const EXTERNAL_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indpa253eG5pd3F2c3hneXpxcXh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzc1MTksImV4cCI6MjA5MTgxMzUxOX0.MVIp_hMUZsiMQ-LFulVdYaFkGonNk5WwdcHYWsx__qY";
+import { supabase } from "@/integrations/supabase/client";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",
