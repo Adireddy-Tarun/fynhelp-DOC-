@@ -202,7 +202,7 @@ function GenerateModal({
 }) {
   const formats = report.formats ?? ["pdf","excel"];
   const [format, setFormat] = useState<string>(formats.includes("pdf" as any) ? "pdf" : formats[0]);
-  const [fy, setFy] = useState("FY 2025-26");
+  const [fy, setFy] = useState("FY 2026-27");
   const CAL = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const now = new Date();
   const prevMonth = CAL[(now.getMonth() + 11) % 12];

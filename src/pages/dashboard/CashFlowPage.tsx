@@ -41,18 +41,21 @@ const CashFlowPage = () => {
     fetchBusiness();
   }, []);
 
-  // Monthly cash flow (last 12 months)
+  const periodDays: Record<typeof periods[number], number> = { "30D": 30, "90D": 90, "6M": 180, "1Y": 365 };
+  const days = periodDays[activePeriod];
+
+  // Monthly cash flow, scoped to selected period
   const { data: monthlyFlow, isLoading } = useQuery<MonthlyFlow[]>({
-    queryKey: ["cash-flow-monthly", businessId],
+    queryKey: ["cash-flow-monthly", businessId, activePeriod],
     queryFn: async () => {
       if (!businessId) return [];
-      const twelveMonthsAgo = new Date();
-      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      const since = new Date();
+      since.setDate(since.getDate() - days);
       const { data } = await supabase
         .from("transactions")
         .select("amount, date, direction")
         .eq("business_id", businessId)
-        .gte("date", twelveMonthsAgo.toISOString().split("T")[0])
+        .gte("date", since.toISOString().split("T")[0])
         .order("date", { ascending: true });
       if (!data) return [];
 
@@ -76,21 +79,25 @@ const CashFlowPage = () => {
     enabled: !!businessId,
   });
 
-  // Recent transactions
+  // Recent transactions, scoped to selected period
   const { data: transactions } = useQuery<Txn[]>({
-    queryKey: ["cash-flow-transactions", businessId],
+    queryKey: ["cash-flow-transactions", businessId, activePeriod],
     queryFn: async () => {
       if (!businessId) return [];
+      const since = new Date();
+      since.setDate(since.getDate() - days);
       const { data } = await supabase
         .from("transactions")
         .select("id, date, amount, direction, description, category, counterparty")
         .eq("business_id", businessId)
+        .gte("date", since.toISOString().split("T")[0])
         .order("date", { ascending: false })
         .limit(50);
       return (data as Txn[]) || [];
     },
     enabled: !!businessId,
   });
+
 
   const currentMonthData = monthlyFlow?.[monthlyFlow.length - 1];
   const totalInflow = currentMonthData?.inflow || 0;
