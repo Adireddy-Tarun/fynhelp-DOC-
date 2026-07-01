@@ -74,8 +74,8 @@ export default function LiquidityTab() {
     const cogs90 = exp.filter((e) => new Date(e.date) >= c90).reduce((s, e) => s + Number(e.amount), 0);
     const dso = sales90 > 0 ? (recv / sales90) * 90 : NaN;
     const dpo = cogs90 > 0 ? (pay / cogs90) * 90 : NaN;
-    const dio = 12; // proxy
-    const ccc = Number.isFinite(dso) && Number.isFinite(dpo) ? dso + dio - dpo : NaN;
+    const dio = mode === "demo" ? 12 : NaN; // placeholder — real DIO needs inventory data
+    const ccc = Number.isFinite(dso) && Number.isFinite(dpo) && Number.isFinite(dio) ? dso + dio - dpo : NaN;
 
     const quickRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
     const currentRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
