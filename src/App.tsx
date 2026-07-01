@@ -78,7 +78,6 @@ import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import LanguagePage from "./pages/dashboard/settings/LanguagePage.tsx";
-import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import InvoicesListPage from "./pages/dashboard/InvoicesListPage.tsx";
 import ExpensesListPage from "./pages/dashboard/ExpensesListPage.tsx";
 import EmployeesListPage from "./pages/dashboard/EmployeesListPage.tsx";
