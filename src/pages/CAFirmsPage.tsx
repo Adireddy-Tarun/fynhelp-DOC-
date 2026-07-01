@@ -540,6 +540,10 @@ function LeadForm() {
                 <label className={label} style={{ color: DARK }}>Firm Name</label>
                 <input required value={form.firm} onChange={onChange("firm")} className={field} style={fieldStyle} />
               </div>
+              <div>
+                <label className={label} style={{ color: DARK }}>Email</label>
+                <input required type="email" value={form.email} onChange={onChange("email")} className={field} style={fieldStyle} />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={label} style={{ color: DARK }}>Your Role</label>
@@ -576,10 +580,11 @@ function LeadForm() {
               </div>
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 font-semibold text-white rounded-md"
+                disabled={submitting}
+                className="w-full inline-flex items-center justify-center gap-2 font-semibold text-white rounded-md disabled:opacity-60"
                 style={{ background: RED, height: 48 }}
               >
-                Reserve My Spot <ArrowRight size={18} />
+                {submitting ? "Reserving…" : <>Reserve My Spot <ArrowRight size={18} /></>}
               </button>
               <p className="text-center text-xs" style={{ color: "rgba(26,16,8,0.55)" }}>
                 No commitment. No credit card. We'll reach out within 48 hours.
@@ -598,7 +603,7 @@ function FooterStrip() {
     { icon: LayoutGrid, label: "Multi-Client Ready" },
     { icon: Lock, label: "Secure Data Handling" },
     { icon: Building2, label: "Built for Accounting Firms" },
-    { icon: Shield, label: "SOC 2 Compliant" },
+    { icon: Shield, label: "SOC 2 In Progress (Q4 2026)" },
   ];
   return (
     <section style={{ background: DARK }}>
