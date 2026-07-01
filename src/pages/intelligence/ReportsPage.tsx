@@ -362,14 +362,15 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
     }
   };
 
-  const handleDownload = (r: { id: string; report_name: string }) => {
-    setDownloading(r.id);
-    toast(`Downloading ${r.report_name}...`);
-    setTimeout(() => {
-      toast.success("Download complete");
-      setDownloading(null);
-    }, 1500);
+  const handleDownload = (r: { id: string; report_name: string; file_url?: string | null }) => {
+    if (r.file_url) {
+      window.open(r.file_url, "_blank");
+      toast.success(`Opening ${r.report_name}`);
+    } else {
+      toast.info("This report has not been generated yet. Click Generate to create it.");
+    }
   };
+
 
   return (
     <IntelPage>
