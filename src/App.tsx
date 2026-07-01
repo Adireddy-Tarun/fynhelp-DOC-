@@ -66,7 +66,7 @@ import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
 import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
 
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
-import TestSecureImportPage from "./pages/dashboard/TestSecureImportPage.tsx";
+
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
 import ProfilePage from "./pages/dashboard/settings/ProfilePage.tsx";
@@ -78,7 +78,6 @@ import BusinessProfilePage from "./pages/dashboard/settings/BusinessProfilePage.
 import TeamAccessPage from "./pages/dashboard/settings/TeamAccessPage.tsx";
 import CAAccessPage from "./pages/dashboard/settings/CAAccessPage.tsx";
 import LanguagePage from "./pages/dashboard/settings/LanguagePage.tsx";
-import AdminResourcesPage from "./pages/dashboard/AdminResourcesPage.tsx";
 import InvoicesListPage from "./pages/dashboard/InvoicesListPage.tsx";
 import ExpensesListPage from "./pages/dashboard/ExpensesListPage.tsx";
 import EmployeesListPage from "./pages/dashboard/EmployeesListPage.tsx";
@@ -195,7 +194,7 @@ const App = () => (
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
             </Route>
-            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
+            
           </Route>
 
           {/* ===== CA TREE: only mounts CAAuthProvider ===== */}
@@ -305,7 +304,7 @@ const App = () => (
             <Route path="/dashboard/market-growth" element={<MarketGrowthComingSoon />} />
             <Route path="/dashboard/banking" element={<BankingComingSoon />} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
-            <Route path="/dashboard/test-secure-import" element={<TestSecureImportPage />} />
+            
             <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>

@@ -69,13 +69,13 @@ export default function HrTab() {
             <div className="flex justify-between"><span className="text-[#6B6B6B]">Monthly Payroll</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.payroll)}</span></div>
             <div className="flex justify-between"><span className="text-[#6B6B6B]">Annual CTC</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.ctc * 12)}</span></div>
             <div className="flex justify-between"><span className="text-[#6B6B6B]">Average Salary</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.avgSalary)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Headcount Growth (YoY)</span><span className="font-mono font-semibold text-emerald-600">+25%</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Attrition (TTM)</span><span className="font-mono font-semibold text-fyn-ink">8%</span></div>
+            <div className="flex justify-between"><span className="text-[#6B6B6B]">Headcount Growth (YoY)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
+            <div className="flex justify-between"><span className="text-[#6B6B6B]">Attrition (TTM)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
           </div>
         </IntelCard>
       </div>
 
-      <IntelCard title="Personnel Table" action={<ViewAllLink to="/demo/employees" />}>
+      <IntelCard title="Personnel Table" action={<ViewAllLink to="/dashboard/employees" />}>
         <WithData data={m.active} isLoading={isLoading}>
           {(rows) => (
             <div className="overflow-x-auto">

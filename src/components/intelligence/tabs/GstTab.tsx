@@ -2,10 +2,19 @@ import { useMemo, useState } from "react";
 import { useGstFilings, useExpenses, useInvoices } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EwayBillSection, HsnMasterSection, TaxPlanningSection } from "./sections/NewSections";
-import { GstFilingDialog, ReconcileButton, useOpenDrawer } from "../actions";
+import { GstFilingDialog, useOpenDrawer } from "../actions";
 import TdsIntelligenceSection from "../sections/TdsIntelligenceSection";
 import AdvanceTaxSection from "../sections/AdvanceTaxSection";
 import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection";
+
+function EmptyCard({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="rounded-xl border border-fyn-ink/8 bg-fyn-beige/30 p-5">
+      <p className="text-sm font-semibold text-fyn-ink/70 mb-1">{title}</p>
+      <p className="text-xs text-fyn-ink/45">{hint}</p>
+    </div>
+  );
+}
 
 export default function GstTab() {
   const { data: filings, isLoading } = useGstFilings();
@@ -17,9 +26,9 @@ export default function GstTab() {
     const inputGst = (expenses ?? []).reduce((s, e) => s + Number(e.amount) * 0.18 / 1.18, 0);
     const netPayable = Math.max(0, outputGst - inputGst);
     const itcAvailable = inputGst;
-    const itcClaimed = inputGst * 0.94;
+    const itcClaimed = NaN;
     const itcGap = itcAvailable > 0 ? ((itcAvailable - itcClaimed) / itcAvailable) * 100 : 0;
-    const itcBlocked = inputGst * 0.03;
+    const itcBlocked = NaN;
     return { outputGst, inputGst, netPayable, itcAvailable, itcClaimed, itcGap, itcBlocked };
   }, [invoices, expenses]);
 
@@ -88,49 +97,10 @@ export default function GstTab() {
           </div>
         </IntelCard>
 
-        <IntelCard title="Compliance Health">
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Invoice Matching Rate</span><span className="font-mono font-semibold text-fyn-ink">94.3%</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">GSTIN Validation</span><Badge tone="green">All valid</Badge></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Audit Trail</span><Badge tone="green">Complete</Badge></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Effective Tax Rate</span><span className="font-mono font-semibold text-fyn-ink">22.8%</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Section 80IAC</span><Badge tone="gold">Eligible</Badge></div>
-          </div>
-        </IntelCard>
+        <EmptyCard title="Compliance Health" hint="Compliance health metrics will be computed from your GST filing history." />
       </div>
 
-      {/* Vendor matching */}
-      <IntelCard title="Vendor GSTIN Matching" sub="Reconciliation against GSTR-2A">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-[rgba(26,16,8,0.08)]">
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vendor GSTIN</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Invoice #</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">GST</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
-              <th className="py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { gstin: "27AABCU9603R1ZX", inv: "PUR-2025-441", val: 124000, gst: 22320, status: "Matched" as const, tone: "green" as const, reconcilable: false },
-              { gstin: "07AAACI1681G1ZP", inv: "PUR-2025-442", val: 87500, gst: 15750, status: "Mismatch" as const, tone: "amber" as const, reconcilable: true },
-              { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const, reconcilable: true },
-              { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const, reconcilable: false },
-            ].map((r) => (
-              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
-                <td className="py-2.5 font-mono text-xs text-fyn-ink">{r.gstin}</td>
-                <td className="py-2.5 text-xs text-[#6B6B6B]">{r.inv}</td>
-                <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.val)}</td>
-                <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.gst)}</td>
-                <td className="py-2.5 pl-3"><Badge tone={r.tone}>{r.status}</Badge></td>
-                <td className="py-2.5 text-right">{r.reconcilable && <ReconcileButton label={r.gstin} />}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </IntelCard>
+      <EmptyCard title="GSTIN Reconciliation" hint="Vendor GSTIN matching against GSTR-2B will appear once GST filing data is imported." />
 
       <TdsIntelligenceSection />
       <EwayBillSection />

@@ -1,12 +1,20 @@
 import { useMemo, useState } from "react";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
-import { AlertTriangle } from "lucide-react";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
 import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
 import ProjectEconomicsSection from "../sections/ProjectEconomicsSection";
 import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
+
+function EmptyCard({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="rounded-xl border border-fyn-ink/8 bg-fyn-beige/30 p-5">
+      <p className="text-sm font-semibold text-fyn-ink/70 mb-1">{title}</p>
+      <p className="text-xs text-fyn-ink/45">{hint}</p>
+    </div>
+  );
+}
 
 export default function CostTab() {
   const { data: expenses, isLoading: expL } = useExpenses();
@@ -73,8 +81,8 @@ export default function CostTab() {
     <div className="space-y-6">
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI href="/demo/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
-        <KPI href="/demo/expenses" label="COGS" value={fmtCompact(m.cogs)} />
+        <KPI href="/dashboard/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
+        <KPI href="/dashboard/expenses" label="COGS" value={fmtCompact(m.cogs)} />
         <KPI label="Gross Margin" value={fmtPct(m.grossMargin, 0)} deltaTone={m.grossMargin >= 30 ? "up" : "down"} delta={m.grossMargin >= 30 ? "Healthy" : "Below 30%"} />
         <KPI label="EBITDA" value={fmtCompact(m.ebitda)} sub={`${fmtPct(m.ebitdaMargin, 1)} margin`} />
       </div>
@@ -105,7 +113,7 @@ export default function CostTab() {
 
       {/* Vendor analysis */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/demo/vendors" /></div>}>
+        <IntelCard title="Top Vendors by Spend" action={<div className="flex items-center gap-2"><Badge tone={m.concentration > 30 ? "red" : "gold"}>{fmtPct(m.concentration, 0)} top 3</Badge><ViewAllLink to="/dashboard/vendors" /></div>}>
           <WithData data={m.vendorSpend.slice(0, 6)} cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
@@ -122,22 +130,7 @@ export default function CostTab() {
           </WithData>
         </IntelCard>
 
-        <IntelCard title="Maverick Spend Detected" sub="Off-contract purchases requiring policy">
-          <div className="rounded-md p-3 mb-3" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: ACCENT.amber }} />
-              <p className="text-xs text-fyn-ink"><strong>{fmtCompact(m.totalOpex * 0.07)}</strong> in maverick spend across {Math.max(3, Math.floor((expenses?.length ?? 0) * 0.08))} transactions in last 90 days.</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <button onClick={() => setSpendOpen(true)} className="w-full text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
-            <div className="grid grid-cols-3 gap-2 text-[11px] text-[#6B6B6B] text-center">
-              <span>Approval Workflow</span>
-              <span>Centralize Procurement</span>
-              <span>Audit Last 90 Days</span>
-            </div>
-          </div>
-        </IntelCard>
+        <EmptyCard title="Maverick Spend Detection" hint="Spend policy analysis will appear after at least 30 days of transaction data." />
       </div>
 
       {/* Efficiency */}
@@ -177,13 +170,7 @@ export default function CostTab() {
       <SupportIntelligenceSection />
 
 
-      <IntelCard title="Cost Optimization Opportunities">
-        <ul className="space-y-2 text-sm">
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">3 over-provisioned SaaS licenses detected — potential savings ₹38K/mo</span></li>
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Duplicate subscriptions: Zoom + Google Meet — consolidate to save ₹12K/mo</span></li>
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Vendor consolidation: 3 stationary vendors → 1, save ₹8K/mo</span></li>
-        </ul>
-      </IntelCard>
+      <EmptyCard title="Cost Optimization Opportunities" hint="AI-detected savings opportunities will appear as more transaction data is imported." />
 
       <SubscriptionAuditSection />
       <ContractRenewalsSection />

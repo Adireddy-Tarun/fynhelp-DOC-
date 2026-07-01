@@ -74,8 +74,8 @@ export default function LiquidityTab() {
     const cogs90 = exp.filter((e) => new Date(e.date) >= c90).reduce((s, e) => s + Number(e.amount), 0);
     const dso = sales90 > 0 ? (recv / sales90) * 90 : NaN;
     const dpo = cogs90 > 0 ? (pay / cogs90) * 90 : NaN;
-    const dio = 12; // proxy
-    const ccc = Number.isFinite(dso) && Number.isFinite(dpo) ? dso + dio - dpo : NaN;
+    const dio = mode === "demo" ? 12 : NaN; // placeholder — real DIO needs inventory data
+    const ccc = Number.isFinite(dso) && Number.isFinite(dpo) && Number.isFinite(dio) ? dso + dio - dpo : NaN;
 
     const quickRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
     const currentRatio = pay > 0 ? (cashBalance + recv) / pay : NaN;
@@ -85,8 +85,8 @@ export default function LiquidityTab() {
     // 13-week forecast
     const weekly: { week: string; inflow: number; outflow: number; net: number }[] = [];
     for (let w = 1; w <= 13; w++) {
-      const inflow = revenue30 / 4.3 * (0.9 + Math.random() * 0.2);
-      const outflow = grossBurn / 4.3 * (0.9 + Math.random() * 0.2);
+      const inflow = revenue30 / 4.3;
+      const outflow = grossBurn / 4.3;
       weekly.push({ week: `W${w}`, inflow, outflow, net: inflow - outflow });
     }
 
@@ -121,8 +121,6 @@ export default function LiquidityTab() {
         {hasCriticalAlert && <span className="w-1.5 h-1.5 rounded-full fyn-dot-blink flex-shrink-0" style={{ background: ACCENT.red }} />}
         <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT.red }} />
         <div className="flex gap-8 text-xs text-fyn-ink animate-[ticker-scroll_30s_linear_infinite] whitespace-nowrap">
-          <span>GST filing due in 3 days</span>
-          <span>•</span>
           <span>Receivables {fmtCompact(m.aging.d61_90 + m.aging.d90)} overdue 60+ days</span>
           <span>•</span>
           <span>Burn multiple {m.revenue30 > 0 ? (m.netBurn / m.revenue30).toFixed(2) : EMPTY}x</span>
@@ -131,10 +129,10 @@ export default function LiquidityTab() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPI href="/demo/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
+        <KPI href="/dashboard/invoices?status=paid" label="Cash Balance" count={m.cashBalance} format={fmtCompact} sub={`Operating ${fmtCompact(m.operating)}`} tone={liveEmpty ? "neutral" : m.cashBalance > 0 ? "healthy" : "critical"} />
         <KPI label="Runway" value={fmtMonths(m.runwayMonths)} isEmpty={liveEmpty || !Number.isFinite(m.runwayMonths)} emptySub={liveEmpty ? "Upload data to calculate" : "Profitable — no burn"} sub={zeroDate ? `Zero by ${zeroDate}` : undefined} deltaTone={Number.isFinite(m.runwayMonths) && m.runwayMonths < 6 ? "down" : "up"} delta={Number.isFinite(m.runwayMonths) ? (m.runwayMonths < 6 ? "Low" : "Healthy") : undefined} tone={runwayTone} />
-        <KPI href="/demo/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
-        <KPI href="/demo/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
+        <KPI href="/dashboard/expenses" label="Net Burn" value={`${fmtCompact(m.netBurn)}/mo`} sub={`Gross ${fmtCompact(m.grossBurn)}`} isEmpty={liveEmpty} tone={burnTone} />
+        <KPI href="/dashboard/invoices?status=overdue" label="Working Capital" count={m.workingCapital} format={fmtCompact} sub={Number.isFinite(m.quickRatio) ? `Quick Ratio ${m.quickRatio.toFixed(2)}` : undefined} isEmpty={liveEmpty} tone={liveEmpty ? "neutral" : m.workingCapital >= 0 ? "healthy" : "critical"} />
       </div>
 
       <SettlementsSection />
@@ -149,7 +147,7 @@ export default function LiquidityTab() {
             </div>
             <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(26,16,8,0.08)]">
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DSO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dso)}</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">12d</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">{mode === "demo" ? "12d" : "—"}</p></div>
               <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DPO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dpo)}</p></div>
             </div>
           </div>
@@ -236,7 +234,7 @@ export default function LiquidityTab() {
           </div>
         </IntelCard>
 
-        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/demo/invoices?status=overdue" /></div>}>
+        <IntelCard title="Overdue Invoices" sub="Action required" action={<div className="flex items-center gap-2"><Badge tone="red">{m.overdue.length} overdue</Badge><ViewAllLink to="/dashboard/invoices?status=overdue" /></div>}>
           <WithData data={m.overdue} emptyTitle="No overdue invoices" emptyDescription="All receivables on track." cta={null}>
             {(rows) => (
               <table className="w-full text-sm">
@@ -267,7 +265,7 @@ export default function LiquidityTab() {
 
 
       {/* Payments due */}
-      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/demo/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
+      <IntelCard title="Major Payments Due (next 30 days)" action={<div className="flex items-center gap-2"><ViewAllLink to="/dashboard/expenses" /><button onClick={() => setOptimizeOpen(true)} className="text-xs font-medium px-3 py-1.5 rounded text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Optimize Schedule</button></div>}>
         <WithData data={m.payments} emptyTitle="No pending payments" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">
@@ -294,7 +292,7 @@ export default function LiquidityTab() {
         </WithData>
       </IntelCard>
       {/* Recent bank activity */}
-      <IntelCard title="Recent Bank Activity" sub="Latest 8 transactions" action={<ViewAllLink to="/demo/banking" />}>
+      <IntelCard title="Recent Bank Activity" sub="Latest 8 transactions" action={<ViewAllLink to="/dashboard/banking" />}>
         <WithData data={(bank ?? []).slice(0, 8)} isLoading={bankL} emptyTitle="No transactions yet" cta={null}>
           {(rows) => (
             <table className="w-full text-sm">

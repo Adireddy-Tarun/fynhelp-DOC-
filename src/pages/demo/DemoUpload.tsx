@@ -10,7 +10,7 @@ export function DemoUpload() {
   const [progress, setProgress] = useState('')
   const navigate = useNavigate()
 
-  // Access guard temporarily disabled for design review
+
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]

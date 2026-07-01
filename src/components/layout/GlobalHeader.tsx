@@ -183,7 +183,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    navigate("/");
   };
 
   const Divider = () => (
