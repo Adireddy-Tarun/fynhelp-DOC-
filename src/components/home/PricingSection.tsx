@@ -19,7 +19,7 @@ interface Plan {
 const plans: Plan[] = [
   {
     name: "Starter",
-    priceMain: "FREE for 6 months",
+    priceMain: "FREE for 30 days",
     priceSub: "Then ₹30,000/year or ₹3,000/month",
     waitlistBadge: "For Waitlisters",
     target: "Businesses up to ₹5 Crore turnover",

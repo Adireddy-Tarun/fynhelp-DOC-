@@ -1493,7 +1493,7 @@ export default function HomePage() {
           <div className="cta-card">
             <span className="cta-eyebrow">EARLY ACCESS</span>
             <h2 className="fyn-h">Talk to your <span className="red">AI CFO</span>.</h2>
-            <p>Be among the first 100 businesses to get 6 months FREE access to CFO Fynny, worth ₹45,000.</p>
+            <p>Be among the first 100 businesses to get 30 days FREE access to CFO Fynny.</p>
             <form className="cta-form" onSubmit={onSubmit}>
               <input type="email" placeholder="Work email *" required />
               <input type="text" placeholder="Company name" />

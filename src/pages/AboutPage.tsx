@@ -994,7 +994,7 @@ function FinalCTA() {
         <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-8">
           {[
             { icon: Check, label: "No credit card required" },
-            { icon: Clock, label: "6 months free for beta users" },
+            { icon: Clock, label: "30 days free for beta users" },
             { icon: Shield, label: "Cancel anytime" },
           ].map((b) => {
             const Icon = b.icon;

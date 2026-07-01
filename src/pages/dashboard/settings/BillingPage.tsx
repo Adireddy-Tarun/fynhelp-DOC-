@@ -43,7 +43,7 @@ const BillingPage = () => {
           <div>
             <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide"
               style={{ background: "rgba(139,105,20,0.18)", border: `1px solid ${GOLD}55`, color: GOLD }}>★ EARLY ACCESS — FREE</span>
-            <p className="text-[13px] mt-3" style={{ color: "rgba(26,16,8,0.7)" }}>You're on the FynHelp Early Access plan. Free for 6 months.</p>
+            <p className="text-[13px] mt-3" style={{ color: "rgba(26,16,8,0.7)" }}>You're on the FynHelp Early Access plan. Free for 30 days.</p>
             <ul className="mt-3 space-y-1 text-[13px]">
               {["All 8 intelligence modules", "Unlimited Fynny AI queries", "Up to 3 team members", "CSV/PDF exports", "Email + WhatsApp alerts"].map((f) => (
                 <li key={f}><span style={{ color: "#16A34A" }}>✓</span> {f}</li>
