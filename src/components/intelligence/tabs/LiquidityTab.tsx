@@ -121,8 +121,6 @@ export default function LiquidityTab() {
         {hasCriticalAlert && <span className="w-1.5 h-1.5 rounded-full fyn-dot-blink flex-shrink-0" style={{ background: ACCENT.red }} />}
         <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT.red }} />
         <div className="flex gap-8 text-xs text-fyn-ink animate-[ticker-scroll_30s_linear_infinite] whitespace-nowrap">
-          <span>GST filing due in 3 days</span>
-          <span>•</span>
           <span>Receivables {fmtCompact(m.aging.d61_90 + m.aging.d90)} overdue 60+ days</span>
           <span>•</span>
           <span>Burn multiple {m.revenue30 > 0 ? (m.netBurn / m.revenue30).toFixed(2) : EMPTY}x</span>
