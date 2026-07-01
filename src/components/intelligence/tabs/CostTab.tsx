@@ -171,13 +171,7 @@ export default function CostTab() {
       <SupportIntelligenceSection />
 
 
-      <IntelCard title="Cost Optimization Opportunities">
-        <ul className="space-y-2 text-sm">
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">3 over-provisioned SaaS licenses detected — potential savings ₹38K/mo</span></li>
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Duplicate subscriptions: Zoom + Google Meet — consolidate to save ₹12K/mo</span></li>
-          <li className="flex items-start gap-2"><span className="text-emerald-600">✓</span><span className="text-fyn-ink">Vendor consolidation: 3 stationary vendors → 1, save ₹8K/mo</span></li>
-        </ul>
-      </IntelCard>
+      <EmptyCard title="Cost Optimization Opportunities" hint="AI-detected savings opportunities will appear as more transaction data is imported." />
 
       <SubscriptionAuditSection />
       <ContractRenewalsSection />
