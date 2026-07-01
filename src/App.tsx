@@ -194,7 +194,7 @@ const App = () => (
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
             </Route>
-            <Route path="/admin/resources" element={<AdminProtected><AdminResourcesPage /></AdminProtected>} />
+            
           </Route>
 
           {/* ===== CA TREE: only mounts CAAuthProvider ===== */}
