@@ -119,6 +119,8 @@ import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
 import CALoginPage from "./pages/ca/CALoginPage";
 import CARegisterPage from "./pages/ca/CARegisterPage";
+import CAOnboardingPage from "./pages/ca/CAOnboardingPage.tsx";
+import CAVerificationPendingPage from "./pages/ca/CAVerificationPendingPage.tsx";
 import CADashboardPage from "./pages/ca/CADashboardPage";
 import CAClientsPage from "./pages/ca/CAClientsPage";
 import CAAddClientPage from "./pages/ca/CAAddClientPage";
@@ -222,6 +224,8 @@ const App = () => (
           <Route element={<CAAppProviders />}>
             <Route path="/ca/login" element={<CALoginPage />} />
             <Route path="/ca/register" element={<CARegisterPage />} />
+            <Route path="/ca/onboarding" element={<CAOnboardingPage />} />
+            <Route path="/ca/verification-pending" element={<CAVerificationPendingPage />} />
             <Route path="/ca" element={<CALayout />}>
               <Route path="dashboard" element={<CADashboardPage />} />
               <Route path="clients" element={<CAClientsPage />} />

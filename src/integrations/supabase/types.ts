@@ -1130,10 +1130,15 @@ export type Database = {
       }
       ca_firms: {
         Row: {
+          aadhaar_document_path: string | null
+          aadhaar_last4: string | null
           city: string | null
           created_at: string | null
           email: string | null
           firm_name: string
+          firm_registration_number: string | null
+          icai_membership_number: string | null
+          icai_membership_type: string | null
           id: string
           is_active: boolean | null
           is_verified: boolean | null
@@ -1141,18 +1146,32 @@ export type Database = {
           max_clients: number | null
           membership_number: string | null
           notification_prefs: Json | null
+          onboarding_step: number
+          pan_number: string | null
           phone: string | null
           plan_type: string | null
+          practice_certificate_path: string | null
+          specializations: string[] | null
           state: string | null
           updated_at: string | null
           user_id: string
+          verification_rejected_reason: string | null
+          verification_reviewed_at: string | null
+          verification_status: string
+          verification_submitted_at: string | null
           whatsapp_phone: string | null
+          years_of_practice: number | null
         }
         Insert: {
+          aadhaar_document_path?: string | null
+          aadhaar_last4?: string | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           firm_name: string
+          firm_registration_number?: string | null
+          icai_membership_number?: string | null
+          icai_membership_type?: string | null
           id?: string
           is_active?: boolean | null
           is_verified?: boolean | null
@@ -1160,18 +1179,32 @@ export type Database = {
           max_clients?: number | null
           membership_number?: string | null
           notification_prefs?: Json | null
+          onboarding_step?: number
+          pan_number?: string | null
           phone?: string | null
           plan_type?: string | null
+          practice_certificate_path?: string | null
+          specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
           user_id: string
+          verification_rejected_reason?: string | null
+          verification_reviewed_at?: string | null
+          verification_status?: string
+          verification_submitted_at?: string | null
           whatsapp_phone?: string | null
+          years_of_practice?: number | null
         }
         Update: {
+          aadhaar_document_path?: string | null
+          aadhaar_last4?: string | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           firm_name?: string
+          firm_registration_number?: string | null
+          icai_membership_number?: string | null
+          icai_membership_type?: string | null
           id?: string
           is_active?: boolean | null
           is_verified?: boolean | null
@@ -1179,12 +1212,21 @@ export type Database = {
           max_clients?: number | null
           membership_number?: string | null
           notification_prefs?: Json | null
+          onboarding_step?: number
+          pan_number?: string | null
           phone?: string | null
           plan_type?: string | null
+          practice_certificate_path?: string | null
+          specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
           user_id?: string
+          verification_rejected_reason?: string | null
+          verification_reviewed_at?: string | null
+          verification_status?: string
+          verification_submitted_at?: string | null
           whatsapp_phone?: string | null
+          years_of_practice?: number | null
         }
         Relationships: []
       }
@@ -1607,6 +1649,47 @@ export type Database = {
           },
           {
             foreignKeyName: "ca_tds_records_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_verification_documents: {
+        Row: {
+          ca_firm_id: string
+          document_type: string
+          file_size_bytes: number | null
+          id: string
+          original_filename: string
+          storage_path: string
+          uploaded_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          ca_firm_id: string
+          document_type: string
+          file_size_bytes?: number | null
+          id?: string
+          original_filename: string
+          storage_path: string
+          uploaded_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          ca_firm_id?: string
+          document_type?: string
+          file_size_bytes?: number | null
+          id?: string
+          original_filename?: string
+          storage_path?: string
+          uploaded_at?: string
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_verification_documents_ca_firm_id_fkey"
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
