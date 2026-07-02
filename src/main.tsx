@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import { initMobileApp } from "@/lib/capacitor";
+import { initAnalytics } from "@/lib/analytics";
+import { initMonitoring } from "@/lib/monitoring";
 import "./index.css";
 import "./styles/typography.css";
 import "@fontsource/inter/400.css";
@@ -24,6 +26,8 @@ if ("serviceWorker" in navigator) {
 }
 
 initMobileApp();
+initAnalytics();
+initMonitoring();
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
