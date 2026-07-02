@@ -127,6 +127,21 @@ const MODULES: ModuleDef[] = [
     updates: "Real-time for all clients",
   },
   {
+    id: "ca-workbench", name: "CA Partner Workbench", shortLabel: "CA Workbench", Icon: Briefcase,
+    status: "live",
+    solves: "CAs juggling 50+ clients across spreadsheets and portals",
+    whatItDoes: [
+      "Manage client portfolios, file GST in bulk, run ITC reconciliation",
+      "Bulk-file GSTR-1/3B across dozens of clients in one flow",
+      "Runs ITC reconciliation against GSTR-2B automatically",
+      "Single dashboard for compliance status across all clients",
+    ],
+    metrics: ["Portfolio Overview", "Bulk GST Filing", "ITC Reconciliation", "Client Dashboard"],
+    poweredBy: ["Multi-tenancy", "GST Portal API", "Edge Functions"],
+    dataSources: ["All client modules", "GSTR-2B", "CA firm records"],
+    updates: "Real-time across all clients",
+  },
+  {
     id: "hr", name: "HR & Workforce Intelligence", shortLabel: "HR & Workforce", Icon: Users,
     status: "coming_soon",
     solves: "Hidden people costs and attrition surprises",
@@ -196,6 +211,7 @@ const CHILD_ICONS: Record<string, LucideIcon> = {
   "ITC Reconciliation": GitCompare, "Filing Deadlines": Calendar, "Notice Risk": AlertCircle, "Unclaimed ITC": DollarSign,
   "Obligation Calendar": CalendarDays, "Deadline Alerts": Bell, "Completion Rate": CheckCircle2, "Audit Score": Award,
   "Portfolio Health": Activity, "Compliance Status": Shield, "Shared Intelligence": Share2, "White-label Reports": FileText,
+  "Portfolio Overview": LayoutGrid, "Bulk GST Filing": FileText, "Client Dashboard": Briefcase,
   "Cost per Employee": User, "Attrition Risk": UserMinus, "Headcount ROI": Users, "Payroll Optimization": Wallet,
   "Scenario Impact": GitBranch, "Break-even Period": Target, "ROI Projections": TrendingUp, "Risk Score": AlertOctagon,
   "Unified View": LayoutGrid, "UPI Tracking": Smartphone, "Credit Utilization": CreditCard, "Financing Options": Banknote,
@@ -327,6 +343,7 @@ export default function NeuralNetwork() {
   /* ----- Navigation: live → /products anchor; others → waitlist with module slug ----- */
   const navigateToModule = (id: string) => {
     const m = nodeById[id];
+    if (id === "ca-workbench") { navigate("/ca/login"); return; }
     if (m?.status === "live") navigate(`/products#${id}`);
     else navigate(`/waitlist?module=${id}`);
   };
