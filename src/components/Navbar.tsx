@@ -8,6 +8,7 @@ import { Menu, X, Shield, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { label: "Use Cases", href: "/use-cases" },
+  { label: "CA Partners", href: "/ca-firms" },
   { label: "Pricing", href: "/pricing" },
   { label: "Security", href: "/security" },
   { label: "About", href: "/about" },

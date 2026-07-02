@@ -167,7 +167,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="max-md:flex max-md:flex-col max-md:items-center">
             <div className="flex items-center gap-3 mb-3">
-              <FynLogo variant="light" showTagline={false} size="md" />
+              <FynLogo variant="light" showTagline={false} size="md" iconOnly={true} />
             </div>
             <p
               className="text-white/40 uppercase"
