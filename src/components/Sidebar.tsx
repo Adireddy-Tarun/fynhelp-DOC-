@@ -45,6 +45,7 @@ const menuSections: Section[] = [
       { icon: BarChart, label: "Market & Growth", path: "/dashboard/market-growth", soon: true },
       { icon: Landmark, label: "Banking", path: "/dashboard/banking", soon: true },
       { icon: Building2, label: "CA Partner", path: "/dashboard/ca-partner", soon: false },
+      { icon: Users, label: "My CA", path: "/dashboard/my-ca" },
     ],
   },
   {
