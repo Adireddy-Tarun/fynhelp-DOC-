@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, X } from "lucide-react";
@@ -704,9 +704,9 @@ const ResourcesPage = () => {
         .filter((g) => matchesSearch(`${g.term} ${g.short} ${g.full}`)),
     [debounced],
   );
-  const filteredArticles = useMemo(
-    () => ARTICLES.filter((a) => matchesSearch(`${a.title} ${a.excerpt}`)),
-    [debounced],
+  const filteredBlogPosts = useMemo(
+    () => blogPosts.filter((a: any) => matchesSearch(`${a.title} ${a.excerpt} ${a.category}`)),
+    [blogPosts, debounced],
   );
   const filteredCommunity = useMemo(
     () => COMMUNITY.filter((c) => matchesSearch(`${c.title} ${c.preview} ${c.author}`)),
