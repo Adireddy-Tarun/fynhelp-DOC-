@@ -226,9 +226,31 @@ const Footer = () => {
             </a>
           </nav>
 
+          {/* CA Firms column (desktop only) */}
+          <div className="max-md:hidden flex flex-col gap-3 min-w-[160px]">
+            <h4
+              className="text-white/40 uppercase"
+              style={{ fontSize: 11, letterSpacing: "1.5px", fontWeight: 600 }}
+            >
+              For CA firms
+            </h4>
+            <ul className="flex flex-col gap-2">
+              {caItems.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="text-sm text-white/70 hover:text-[#C41E1E] transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Mobile nav grid */}
           <div className="hidden max-md:grid grid-cols-2 gap-4 text-sm w-full max-w-[320px]">
-            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2)].map(
+            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
               (item) => (
                 <Link
                   key={item.label}
