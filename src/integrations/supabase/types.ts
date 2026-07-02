@@ -295,6 +295,42 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_rate_limits: {
+        Row: {
+          action: string
+          attempt_count: number
+          created_at: string
+          first_attempt_at: string
+          id: string
+          identifier: string
+          ip_address: string | null
+          last_attempt_at: string
+          locked_until: string | null
+        }
+        Insert: {
+          action: string
+          attempt_count?: number
+          created_at?: string
+          first_attempt_at?: string
+          id?: string
+          identifier: string
+          ip_address?: string | null
+          last_attempt_at?: string
+          locked_until?: string | null
+        }
+        Update: {
+          action?: string
+          attempt_count?: number
+          created_at?: string
+          first_attempt_at?: string
+          id?: string
+          identifier?: string
+          ip_address?: string | null
+          last_attempt_at?: string
+          locked_until?: string | null
+        }
+        Relationships: []
+      }
       balance_sheet_snapshots: {
         Row: {
           accounts_payable: number
@@ -4300,6 +4336,16 @@ export type Database = {
     }
     Functions: {
       bytea_to_text: { Args: { data: string }; Returns: string }
+      check_and_increment_rate_limit: {
+        Args: {
+          p_action: string
+          p_identifier: string
+          p_lockout_seconds?: number
+          p_max_attempts?: number
+          p_window_seconds?: number
+        }
+        Returns: Json
+      }
       check_waitlist_status: {
         Args: { _email: string }
         Returns: {
@@ -4452,6 +4498,10 @@ export type Database = {
       }
       is_admin_user: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
+      reset_rate_limit: {
+        Args: { p_action: string; p_identifier: string }
+        Returns: undefined
+      }
       text_to_bytea: { Args: { data: string }; Returns: string }
       urlencode:
         | { Args: { data: Json }; Returns: string }
