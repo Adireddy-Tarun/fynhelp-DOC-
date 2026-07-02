@@ -27,6 +27,9 @@ import AdminWaitlistPage from "./pages/admin/AdminWaitlistPage.tsx";
 import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
+import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
+import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
+import { BlogAdminProvider } from "./contexts/BlogAdminContext.tsx";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 import WaitlistPopup from "./components/WaitlistPopup";
@@ -250,6 +253,21 @@ const App = () => (
               <Route path="settings/billing" element={<CASettingsPage />} />
             </Route>
           </Route>
+
+          {/* ===== BLOG ADMIN TREE: standalone, only mounts BlogAdminProvider ===== */}
+          <Route
+            element={
+              <BlogAdminProvider>
+                <Outlet />
+              </BlogAdminProvider>
+            }
+          >
+            <Route path="/blog-admin/login" element={<BlogAdminLoginPage />} />
+            <Route path="/blog-admin/editor" element={<BlogAdminEditorPage />} />
+            <Route path="/blog-admin" element={<Navigate to="/blog-admin/login" replace />} />
+          </Route>
+
+
 
           {/* ===== MAIN APP TREE: only mounts AuthProvider (public site, demo, real client dashboard) ===== */}
           <Route element={<MainAppProviders />}>

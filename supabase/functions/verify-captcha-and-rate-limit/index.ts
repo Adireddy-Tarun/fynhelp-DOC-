@@ -8,6 +8,7 @@ const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const LIMITS: Record<string, { max: number; window: number; lockout: number }> = {
   login:          { max: 5,  window: 900,  lockout: 1800 },
   ca_login:       { max: 5,  window: 900,  lockout: 1800 },
+  blog_admin_login: { max: 5, window: 900,  lockout: 1800 },
   admin_login:    { max: 3,  window: 900,  lockout: 3600 },
   register:       { max: 3,  window: 3600, lockout: 7200 },
   reset_password: { max: 3,  window: 3600, lockout: 3600 },

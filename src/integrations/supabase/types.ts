@@ -5198,6 +5198,7 @@ export type Database = {
       }
       increment_blog_views: { Args: { p_slug: string }; Returns: undefined }
       is_admin_user: { Args: never; Returns: boolean }
+      is_blog_admin: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
       lookup_client_by_reference: {
         Args: { p_ca_firm_id: string; p_reference_code: string }
@@ -5249,6 +5250,7 @@ export type Database = {
         | "ops_admin"
         | "support_agent"
         | "analyst"
+        | "blog_admin"
     }
     CompositeTypes: {
       http_header: {
@@ -5400,6 +5402,7 @@ export const Constants = {
         "ops_admin",
         "support_agent",
         "analyst",
+        "blog_admin",
       ],
     },
   },
