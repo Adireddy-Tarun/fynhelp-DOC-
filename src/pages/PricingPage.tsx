@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 import { Check, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
