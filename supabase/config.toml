@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.zoho-sync]
 verify_jwt = false
+
+[functions.ca-onboard-client]
+verify_jwt = true
+
+[functions.ca-process-gstr2b]
+verify_jwt = true
+
+[functions.ca-bulk-filing-queue]
+verify_jwt = true
