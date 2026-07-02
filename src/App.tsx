@@ -29,6 +29,8 @@ import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 import WaitlistPopup from "./components/WaitlistPopup";
+import { Sentry } from "@/lib/monitoring";
+import { usePageTracking } from "@/hooks/usePageTracking";
 
 import PricingPage from "./pages/PricingPage.tsx";
 import PublicSecurityPage from "./pages/SecurityPage.tsx";
@@ -162,13 +164,31 @@ function CAAppProviders() {
 
 const queryClient = new QueryClient();
 
+function RouteTracker() {
+  usePageTracking();
+  return null;
+}
+
+const ErrorFallback = ({ error }: { error: unknown }) => (
+  <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4EDDA" }}>
+    <div style={{ textAlign: "center", maxWidth: 400, padding: "0 24px" }}>
+      <p style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#1A1008", marginBottom: "12px" }}>Something went wrong</p>
+      <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14px", color: "rgba(26,16,8,0.6)", marginBottom: "24px" }}>Our team has been notified and is looking into it.</p>
+      <button onClick={() => (window.location.href = "/")} style={{ padding: "10px 24px", background: "#C41E1E", color: "#fff", border: "none", borderRadius: "8px", fontFamily: "Inter, sans-serif", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}>Return to Home</button>
+    </div>
+  </div>
+);
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <WaitlistPopup />
+  <Sentry.ErrorBoundary fallback={ErrorFallback}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <RouteTracker />
+          <WaitlistPopup />
+
         <Routes>
           {/* ===== ADMIN TREE: only mounts AdminAuthProvider ===== */}
           <Route element={<AdminAppProviders />}>
@@ -327,6 +347,8 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </Sentry.ErrorBoundary>
 );
 
 export default App;
+
