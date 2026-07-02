@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 import { Check, ChevronDown, Users, Bot, Coins } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -175,6 +175,21 @@ export default function PricingPage() {
   const [email, setEmail] = useState("");
   const [isAnnual, setIsAnnual] = useState(false);
   const [clientCount, setClientCount] = useState(35);
+  const [searchParams] = useSearchParams();
+
+  // Pre-select the CA section when the URL includes ?tab=ca.
+  // The page has no separate business/CA tab state — the CA section lives
+  // further down the page — so we scroll it into view on mount.
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "ca") {
+      const el = document.getElementById("ca-firm-plan");
+      if (el) {
+        // Defer so layout is ready
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      }
+    }
+  }, [searchParams]);
 
   const baseMonthly = isAnnual ? 3999 : 4999;
   const extraClients = Math.max(0, clientCount - 20);
@@ -348,7 +363,7 @@ export default function PricingPage() {
       </section>
 
       {/* ========================= CA FIRM PLAN ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden px-6 py-24">
+      <section id="ca-firm-plan" className="fyn-bg-anim relative overflow-hidden px-6 py-24">
         <Sparkles />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-12">
