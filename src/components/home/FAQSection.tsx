@@ -30,6 +30,10 @@ const FAQS: Record<string, QA[]> = {
     { q: "Is my financial data secure?", a: "Bank-grade encryption (AES-256), SOC 2 compliant infrastructure, data hosted in India (AWS Mumbai). We never sell or share your data." },
     { q: "Does FynHelp replace my CA?", a: "No. FynHelp gives you intelligence between CA visits. Your CA handles compliance — Fynny handles daily financial clarity. Many CAs love it because clients come to meetings better prepared." },
   ],
+  "CA Partners": [
+    { q: "What is the CA Partner Program?", a: "The CA Partner Program gives chartered accountants a dedicated workbench to manage all their client portfolios from a single dashboard. CAs can onboard clients, track GST and TDS compliance deadlines, run ITC reconciliation against GSTR-2B, and generate white-label reports. Each CA firm gets 20 client seats included in the base plan. Additional clients are billed at ₹99 per client per month." },
+    { q: "How does a CA manage multiple clients without data mixing?", a: "Every client onboarded by a CA receives a permanent unique reference code in the format FYN-XXXXX. All data, documents, and filings for that client are stored in an isolated namespace keyed to their UUID. Even if two clients upload files with identical names, they are stored in completely separate locations. No client can ever see another client's data." },
+  ],
 };
 
 const CATS = Object.keys(FAQS);
