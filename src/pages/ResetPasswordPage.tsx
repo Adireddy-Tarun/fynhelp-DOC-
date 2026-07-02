@@ -5,6 +5,7 @@ import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
 import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 // ---------------------------------------------------------------------------
 // Reset-link failure parsing
