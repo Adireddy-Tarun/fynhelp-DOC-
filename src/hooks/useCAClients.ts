@@ -19,6 +19,8 @@ export interface CAClientRow {
   notes: string | null;
   granted_at: string | null;
   gstin: string | null;
+  client_reference_code: string | null;
+  storage_namespace: string | null;
 }
 
 const reportLabel = (granted_at: string | null) => {
@@ -52,7 +54,7 @@ export function useCAClients() {
 
       const { data: access, error: e1 } = await supabase
         .from("ca_client_access")
-        .select("id, business_id, notes, granted_at, is_active")
+        .select("id, business_id, notes, granted_at, is_active, client_reference_code, storage_namespace")
         .eq("ca_firm_id", caFirm.id)
         .eq("is_active", true);
 
@@ -131,6 +133,8 @@ export function useCAClients() {
           notes: a.notes,
           granted_at: a.granted_at,
           gstin: (b as any)?.gstin ?? null,
+          client_reference_code: (a as any).client_reference_code ?? null,
+          storage_namespace: (a as any).storage_namespace ?? null,
         };
       });
 

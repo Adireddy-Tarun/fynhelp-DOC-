@@ -801,31 +801,37 @@ export type Database = {
           access_level: string | null
           business_id: string
           ca_firm_id: string
+          client_reference_code: string | null
           granted_at: string | null
           granted_by: string | null
           id: string
           is_active: boolean | null
           notes: string | null
+          storage_namespace: string | null
         }
         Insert: {
           access_level?: string | null
           business_id: string
           ca_firm_id: string
+          client_reference_code?: string | null
           granted_at?: string | null
           granted_by?: string | null
           id?: string
           is_active?: boolean | null
           notes?: string | null
+          storage_namespace?: string | null
         }
         Update: {
           access_level?: string | null
           business_id?: string
           ca_firm_id?: string
+          client_reference_code?: string | null
           granted_at?: string | null
           granted_by?: string | null
           id?: string
           is_active?: boolean | null
           notes?: string | null
+          storage_namespace?: string | null
         }
         Relationships: [
           {
@@ -837,6 +843,72 @@ export type Database = {
           },
           {
             foreignKeyName: "ca_client_access_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_client_documents: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          client_reference_code: string
+          created_at: string
+          description: string | null
+          document_type: string
+          file_size_bytes: number | null
+          filing_period: string | null
+          id: string
+          mime_type: string | null
+          original_filename: string
+          storage_path: string
+          stored_filename: string
+          uploaded_by: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          client_reference_code: string
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_size_bytes?: number | null
+          filing_period?: string | null
+          id?: string
+          mime_type?: string | null
+          original_filename: string
+          storage_path: string
+          stored_filename: string
+          uploaded_by: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          client_reference_code?: string
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_size_bytes?: number | null
+          filing_period?: string | null
+          id?: string
+          mime_type?: string | null
+          original_filename?: string
+          storage_path?: string
+          stored_filename?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_documents_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_documents_ca_firm_id_fkey"
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
@@ -4980,6 +5052,17 @@ export type Database = {
       }
       is_admin_user: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
+      lookup_client_by_reference: {
+        Args: { p_ca_firm_id: string; p_reference_code: string }
+        Returns: {
+          business_id: string
+          business_name: string
+          client_reference_code: string
+          gstin: string
+          is_active: boolean
+          storage_namespace: string
+        }[]
+      }
       mark_overdue_filings: { Args: never; Returns: number }
       reset_rate_limit: {
         Args: { p_action: string; p_identifier: string }
