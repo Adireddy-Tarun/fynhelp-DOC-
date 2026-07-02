@@ -612,6 +612,7 @@ export type Database = {
           gstin: string | null
           id: string
           industry: string | null
+          is_demo: boolean
           msme_udyam: string | null
           onboarding_completed: boolean
           onboarding_step: number
@@ -631,6 +632,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           industry?: string | null
+          is_demo?: boolean
           msme_udyam?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
@@ -650,6 +652,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           industry?: string | null
+          is_demo?: boolean
           msme_udyam?: string | null
           onboarding_completed?: boolean
           onboarding_step?: number
@@ -821,6 +824,7 @@ export type Database = {
           granted_by: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           notes: string | null
           storage_namespace: string | null
         }
@@ -833,6 +837,7 @@ export type Database = {
           granted_by?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           notes?: string | null
           storage_namespace?: string | null
         }
@@ -845,6 +850,7 @@ export type Database = {
           granted_by?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           notes?: string | null
           storage_namespace?: string | null
         }
@@ -940,6 +946,7 @@ export type Database = {
           compliance_score: number
           computed_at: string
           id: string
+          is_demo: boolean
           itc_risk_amount: number | null
           overall_score: number
           overdue_filings: number
@@ -955,6 +962,7 @@ export type Database = {
           compliance_score?: number
           computed_at?: string
           id?: string
+          is_demo?: boolean
           itc_risk_amount?: number | null
           overall_score?: number
           overdue_filings?: number
@@ -970,6 +978,7 @@ export type Database = {
           compliance_score?: number
           computed_at?: string
           id?: string
+          is_demo?: boolean
           itc_risk_amount?: number | null
           overall_score?: number
           overdue_filings?: number
@@ -1052,6 +1061,7 @@ export type Database = {
           filing_date: string | null
           filing_period: string
           id: string
+          is_demo: boolean
           late_fee_amount: number | null
           notes: string | null
           penalty_amount: number | null
@@ -1067,6 +1077,7 @@ export type Database = {
           filing_date?: string | null
           filing_period: string
           id?: string
+          is_demo?: boolean
           late_fee_amount?: number | null
           notes?: string | null
           penalty_amount?: number | null
@@ -1082,6 +1093,7 @@ export type Database = {
           filing_date?: string | null
           filing_period?: string
           id?: string
+          is_demo?: boolean
           late_fee_amount?: number | null
           notes?: string | null
           penalty_amount?: number | null
@@ -1156,6 +1168,7 @@ export type Database = {
           icai_membership_type: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           is_verified: boolean | null
           logo_url: string | null
           max_clients: number | null
@@ -1169,7 +1182,7 @@ export type Database = {
           specializations: string[] | null
           state: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
           verification_rejected_reason: string | null
           verification_reviewed_at: string | null
           verification_status: string
@@ -1189,6 +1202,7 @@ export type Database = {
           icai_membership_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_verified?: boolean | null
           logo_url?: string | null
           max_clients?: number | null
@@ -1202,7 +1216,7 @@ export type Database = {
           specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
           verification_rejected_reason?: string | null
           verification_reviewed_at?: string | null
           verification_status?: string
@@ -1222,6 +1236,7 @@ export type Database = {
           icai_membership_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_verified?: boolean | null
           logo_url?: string | null
           max_clients?: number | null
@@ -1235,7 +1250,7 @@ export type Database = {
           specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
           verification_rejected_reason?: string | null
           verification_reviewed_at?: string | null
           verification_status?: string
@@ -1326,6 +1341,7 @@ export type Database = {
           igst_amount: number
           invoice_date: string | null
           invoice_number: string | null
+          is_demo: boolean
           itc_blocked: boolean | null
           itc_eligible: boolean | null
           match_status: string
@@ -1354,6 +1370,7 @@ export type Database = {
           igst_amount?: number
           invoice_date?: string | null
           invoice_number?: string | null
+          is_demo?: boolean
           itc_blocked?: boolean | null
           itc_eligible?: boolean | null
           match_status?: string
@@ -1382,6 +1399,7 @@ export type Database = {
           igst_amount?: number
           invoice_date?: string | null
           invoice_number?: string | null
+          is_demo?: boolean
           itc_blocked?: boolean | null
           itc_eligible?: boolean | null
           match_status?: string
@@ -1416,6 +1434,7 @@ export type Database = {
           ca_firm_id: string
           created_at: string | null
           id: string
+          is_demo: boolean
           is_read: boolean | null
           message: string
           severity: string | null
@@ -1427,6 +1446,7 @@ export type Database = {
           ca_firm_id: string
           created_at?: string | null
           id?: string
+          is_demo?: boolean
           is_read?: boolean | null
           message: string
           severity?: string | null
@@ -1438,6 +1458,7 @@ export type Database = {
           ca_firm_id?: string
           created_at?: string | null
           id?: string
+          is_demo?: boolean
           is_read?: boolean | null
           message?: string
           severity?: string | null
@@ -1594,6 +1615,7 @@ export type Database = {
           financial_year: string
           id: string
           interest_amount: number | null
+          is_demo: boolean
           payment_amount: number
           payment_date: string | null
           penalty_amount: number | null
@@ -1618,6 +1640,7 @@ export type Database = {
           financial_year: string
           id?: string
           interest_amount?: number | null
+          is_demo?: boolean
           payment_amount?: number
           payment_date?: string | null
           penalty_amount?: number | null
@@ -1642,6 +1665,7 @@ export type Database = {
           financial_year?: string
           id?: string
           interest_amount?: number | null
+          is_demo?: boolean
           payment_amount?: number
           payment_date?: string | null
           penalty_amount?: number | null
@@ -5041,6 +5065,7 @@ export type Database = {
           total_count: number
         }[]
       }
+      clear_ca_demo_data: { Args: never; Returns: string }
       compute_client_health_score: {
         Args: { p_business_id: string; p_ca_firm_id: string }
         Returns: Json
