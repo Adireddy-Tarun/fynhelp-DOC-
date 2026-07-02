@@ -5249,6 +5249,7 @@ export type Database = {
         | "ops_admin"
         | "support_agent"
         | "analyst"
+        | "blog_admin"
     }
     CompositeTypes: {
       http_header: {
@@ -5400,6 +5401,7 @@ export const Constants = {
         "ops_admin",
         "support_agent",
         "analyst",
+        "blog_admin",
       ],
     },
   },
