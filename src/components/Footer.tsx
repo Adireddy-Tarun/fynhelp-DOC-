@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowRight, Linkedin, Twitter, Youtube, MessageCircle } from "lucide-react";
-import FynLogo from "./FynLogo";
+import iconCreamAsset from "@/assets/brand/fynhelp-icon-cream.png.asset.json";
 
 type DropdownItem = { label: string; href: string; accent?: boolean; divider?: boolean };
 
@@ -31,6 +31,13 @@ const legalItems: DropdownItem[] = [
   { label: "Refund Policy", href: "/refund" },
   { label: "Cookie Policy", href: "/cookies" },
   { label: "DPDP Act Compliance", href: "/dpdp-compliance" },
+];
+
+const caItems: DropdownItem[] = [
+  { label: "CA Partner Portal", href: "/ca/login" },
+  { label: "Register as CA", href: "/ca/register" },
+  { label: "CA Pricing", href: "/pricing" },
+  { label: "CA Login", href: "/ca/login" },
 ];
 
 type DropdownKey = "product" | "company" | "legal" | null;
@@ -167,7 +174,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="max-md:flex max-md:flex-col max-md:items-center">
             <div className="flex items-center gap-3 mb-3">
-              <FynLogo variant="light" showTagline={false} size="md" iconOnly={true} />
+              <img src={iconCreamAsset.url} alt="FYNHelp" style={{ height: 36, width: 36, objectFit: "contain", display: "block" }} />
             </div>
             <p
               className="text-white/40 uppercase"
@@ -219,9 +226,31 @@ const Footer = () => {
             </a>
           </nav>
 
+          {/* CA Firms column (desktop only) */}
+          <div className="max-md:hidden flex flex-col gap-3 min-w-[160px]">
+            <h4
+              className="text-white/40 uppercase"
+              style={{ fontSize: 11, letterSpacing: "1.5px", fontWeight: 600 }}
+            >
+              For CA firms
+            </h4>
+            <ul className="flex flex-col gap-2">
+              {caItems.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="text-sm text-white/70 hover:text-[#C41E1E] transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Mobile nav grid */}
           <div className="hidden max-md:grid grid-cols-2 gap-4 text-sm w-full max-w-[320px]">
-            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2)].map(
+            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
               (item) => (
                 <Link
                   key={item.label}
