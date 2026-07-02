@@ -299,6 +299,11 @@ export default function CALoginPage() {
                 </div>
               )}
 
+              <HCaptcha onVerify={(token) => { setCaptchaToken(token); setCaptchaError(null); }} onExpire={() => setCaptchaToken(null)} />
+              {captchaError && <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41E1E", textAlign: "center" }}>{captchaError}</p>}
+
+
+
               <button
                 type="submit" disabled={!formValid || loading}
                 className="w-full rounded-[10px] transition-opacity disabled:opacity-50 flex items-center justify-center gap-[7px]"
