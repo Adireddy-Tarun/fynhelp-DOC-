@@ -91,7 +91,7 @@ export default function CADashboardPage() {
     const gstr1 = filingsThisWeek - gstr3b;
     const criticalAlerts = clients.filter((c) => c.cash === "Critical" || c.health < 40).length;
     const itcRiskClients = clients.filter((c) => c.cash !== "Safe").length;
-    const itcAtRisk = itcRiskClients * 1.8; // lakhs (placeholder aggregate)
+    const itcAtRisk = clients.reduce((sum, c) => sum + (c.itcAtRisk ?? 0), 0) / 100000;
     return {
       activeClients,
       filingsThisWeek,
@@ -262,8 +262,9 @@ export default function CADashboardPage() {
                 const runwayDays = c.cash === "Safe" ? 120 : c.cash === "Watch" ? 60 : 18;
                 const runwayColor = runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red;
                 const alertCount = (c.cash === "Critical" ? 2 : 0) + (c.health < 40 ? 1 : 0) + (c.filing < 3 ? 1 : 0);
-                const dueDate = new Date(Date.now() + c.filing * 86400000)
-                  .toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+                const dueDate = c.nextFilingDate
+                  ? new Date(c.nextFilingDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })
+                  : "No filings";
                 const urgencyColor = c.filing < 3 ? COLORS.red : c.filing <= 7 ? COLORS.amber : "transparent";
                 return (
                   <tr key={c.id}
@@ -304,7 +305,7 @@ export default function CADashboardPage() {
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: urgencyColor }} />
                         <div>
                           <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.ink }}>
-                            GSTR-3B
+                            {c.nextFilingType === "-" ? "No pending" : c.nextFilingType}
                           </div>
                           <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.55)" }}>
                             Due {dueDate}
