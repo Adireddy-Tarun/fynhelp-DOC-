@@ -8,6 +8,7 @@ import FAQSection from "@/components/home/FAQSection";
 import { Helmet } from "react-helmet-async";
 import { IntelligenceProvider, useBankTxns, useInvoices, useExpenses, useCustomers, useGstFilings } from "@/components/intelligence/DataSource";
 import Navbar from "@/components/Navbar";
+import CAPartnerSection from "@/components/home/CAPartnerSection";
 
 // ===== PALETTE (matches reference) =====
 const C = {
