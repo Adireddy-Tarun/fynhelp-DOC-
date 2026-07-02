@@ -227,6 +227,12 @@ const ResetPasswordPage = () => {
     const toastId = "reset-resend";
     toast.loading("Sending a new reset link…", { id: toastId });
     setResending(true);
+    const security = await checkAuthSecurity(email, "reset_password");
+    if (!security.allowed) {
+      setResending(false);
+      toast.error(security.error ?? "Too many reset requests. Please try again later.", { id: toastId });
+      return false;
+    }
     const { error: resendErr } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
