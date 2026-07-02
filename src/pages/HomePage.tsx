@@ -1320,6 +1320,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* CA PARTNER SECTION */}
+      <CAPartnerSection />
+
+
 
       {/* SIMULATOR */}
       <section className="section">
