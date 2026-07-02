@@ -620,6 +620,7 @@ const EmptyState = ({ label }: { label: string }) => (
 // ============================================================
 const ResourcesPage = () => {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const rawTab = params.get("tab") as TabKey | null;
   const initialTab: TabKey = TABS.find((t) => t.key === rawTab) ? (rawTab as TabKey) : "getting-started";
 
@@ -629,6 +630,16 @@ const ResourcesPage = () => {
   const [videoModal, setVideoModal] = useState<VideoItem | null>(null);
   const [glossaryModal, setGlossaryModal] = useState<GlossaryItem | null>(null);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("blog_posts")
+      .select("id, slug, title, excerpt, category, views, reading_time_minutes, published_at, tags")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .then(({ data }) => setBlogPosts(data ?? []));
+  }, []);
 
   useEffect(() => {
     const cur = params.get("tab");
