@@ -254,6 +254,21 @@ const App = () => (
             </Route>
           </Route>
 
+          {/* ===== BLOG ADMIN TREE: standalone, only mounts BlogAdminProvider ===== */}
+          <Route
+            element={
+              <BlogAdminProvider>
+                <Outlet />
+              </BlogAdminProvider>
+            }
+          >
+            <Route path="/blog-admin/login" element={<BlogAdminLoginPage />} />
+            <Route path="/blog-admin/editor" element={<BlogAdminEditorPage />} />
+            <Route path="/blog-admin" element={<Navigate to="/blog-admin/login" replace />} />
+          </Route>
+
+
+
           {/* ===== MAIN APP TREE: only mounts AuthProvider (public site, demo, real client dashboard) ===== */}
           <Route element={<MainAppProviders />}>
             <Route path="/" element={<Index />} />
