@@ -363,7 +363,7 @@ export default function PricingPage() {
       </section>
 
       {/* ========================= CA FIRM PLAN ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden px-6 py-24">
+      <section id="ca-firm-plan" className="fyn-bg-anim relative overflow-hidden px-6 py-24">
         <Sparkles />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-12">
