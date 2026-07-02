@@ -120,6 +120,13 @@ Deno.serve(async (req) => {
 
   if (notifErr) console.error("Notification error:", notifErr.message);
 
+  const { data: accessRecord } = await serviceClient
+    .from("ca_client_access")
+    .select("client_reference_code, storage_namespace")
+    .eq("ca_firm_id", caFirm.id)
+    .eq("business_id", business_id)
+    .maybeSingle();
+
   return new Response(
     JSON.stringify({
       success: true,
@@ -128,6 +135,8 @@ Deno.serve(async (req) => {
       financial_year: fy,
       calendar_events_created: calResult ?? 0,
       health_score: healthResult,
+      client_reference_code: accessRecord?.client_reference_code,
+      storage_namespace: accessRecord?.storage_namespace,
     }),
     { status: 200, headers: corsHeaders }
   );
