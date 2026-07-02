@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
 import GlobalHeader from "@/components/layout/GlobalHeader";
+import OfflineBanner from "@/components/OfflineBanner";
 
 const STORAGE_KEY = "fynhelp_sidebar_open";
 
@@ -43,6 +44,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
+      <OfflineBanner />
       {!isMobile && (
         <Sidebar
           isOpen={drawerOpen}

@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
+import { initMobileApp } from "@/lib/capacitor";
 import "./index.css";
 import "./styles/typography.css";
 import "@fontsource/inter/400.css";
@@ -21,6 +22,8 @@ document.documentElement.classList.add("light");
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
+
+initMobileApp();
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
