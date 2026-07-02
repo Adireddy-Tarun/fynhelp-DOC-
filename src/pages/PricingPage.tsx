@@ -175,6 +175,21 @@ export default function PricingPage() {
   const [email, setEmail] = useState("");
   const [isAnnual, setIsAnnual] = useState(false);
   const [clientCount, setClientCount] = useState(35);
+  const [searchParams] = useSearchParams();
+
+  // Pre-select the CA section when the URL includes ?tab=ca.
+  // The page has no separate business/CA tab state — the CA section lives
+  // further down the page — so we scroll it into view on mount.
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "ca") {
+      const el = document.getElementById("ca-firm-plan");
+      if (el) {
+        // Defer so layout is ready
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      }
+    }
+  }, [searchParams]);
 
   const baseMonthly = isAnnual ? 3999 : 4999;
   const extraClients = Math.max(0, clientCount - 20);
