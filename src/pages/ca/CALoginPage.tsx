@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, Check, Users, FileText, ShieldCheck, Bell, Settings as SettingsIcon, UserCircle2, ArrowRight } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import HCaptcha from "@/components/HCaptcha";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 const FEATURES = [
   { icon: Users, text: "Portfolio dashboard, 50+ clients at a glance" },
@@ -20,6 +22,8 @@ export default function CALoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>({});
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const passwordValid = password.length >= 6;
@@ -28,24 +32,26 @@ export default function CALoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setCaptchaError(null);
     if (!formValid) return;
+    if (!captchaToken) { setCaptchaError("Please complete the CAPTCHA verification."); return; }
     setLoading(true);
-
+    const security = await checkAuthSecurity(email, "ca_login", captchaToken);
+    if (!security.allowed) {
+      setError(security.error ?? "Too many attempts. Please try again later.");
+      setLoading(false);
+      return;
+    }
     const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
     if (signInErr) {
       setError(signInErr.message);
       setLoading(false);
       return;
     }
-
     const { data: caFirm } = await supabase
-      .from("ca_firms")
-      .select("id, is_active, is_verified")
-      .eq("user_id", data.user!.id)
-      .maybeSingle();
-
+      .from("ca_firms").select("id, is_active, is_verified")
+      .eq("user_id", data.user!.id).maybeSingle();
     setLoading(false);
-
     if (!caFirm) {
       await supabase.auth.signOut();
       setError("Not a CA partner account. Please register for partner access.");
@@ -292,6 +298,11 @@ export default function CALoginPage() {
                   {error}
                 </div>
               )}
+
+              <HCaptcha onVerify={(token) => { setCaptchaToken(token); setCaptchaError(null); }} onExpire={() => setCaptchaToken(null)} />
+              {captchaError && <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41E1E", textAlign: "center" }}>{captchaError}</p>}
+
+
 
               <button
                 type="submit" disabled={!formValid || loading}

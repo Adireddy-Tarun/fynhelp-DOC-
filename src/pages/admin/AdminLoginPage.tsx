@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
 import { logAdminAction } from "@/lib/adminAudit";
+import HCaptcha from "@/components/HCaptcha";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 export default function AdminLoginPage() {
   const { user, isAdmin, loading: adminLoading, refresh } = useAdminAuth();
@@ -21,6 +23,8 @@ export default function AdminLoginPage() {
   const [showForgot, setShowForgot] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetBusy, setResetBusy] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!adminLoading && user && isAdmin) nav("/admin/dashboard", { replace: true });
@@ -28,7 +32,15 @@ export default function AdminLoginPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setErr(null); setNeedsVerify(false); setBusy(true);
+    setErr(null); setNeedsVerify(false); setCaptchaError(null);
+    if (!captchaToken) { setCaptchaError("Please complete the CAPTCHA verification."); return; }
+    setBusy(true);
+    const security = await checkAuthSecurity(email.trim(), "admin_login", captchaToken ?? undefined);
+    if (!security.allowed) {
+      setBusy(false);
+      setErr(security.error ?? "Too many attempts. Please try again later.");
+      return;
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(), password: pw,
     });
@@ -215,6 +227,8 @@ export default function AdminLoginPage() {
                 )}
               </div>
             )}
+            <HCaptcha onVerify={(token) => { setCaptchaToken(token); setCaptchaError(null); }} onExpire={() => setCaptchaToken(null)} />
+            {captchaError && <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41E1E", textAlign: "center" }}>{captchaError}</p>}
             <button
               type="submit" disabled={busy}
               style={{

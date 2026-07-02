@@ -5,6 +5,7 @@ import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff, MailWarning, Mail } from "lucide-react";
 import { reportAuthLinkEvent } from "@/lib/authLinkEvents";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 // ---------------------------------------------------------------------------
 // Reset-link failure parsing
@@ -226,6 +227,12 @@ const ResetPasswordPage = () => {
     const toastId = "reset-resend";
     toast.loading("Sending a new reset link…", { id: toastId });
     setResending(true);
+    const security = await checkAuthSecurity(email, "reset_password");
+    if (!security.allowed) {
+      setResending(false);
+      toast.error(security.error ?? "Too many reset requests. Please try again later.", { id: toastId });
+      return false;
+    }
     const { error: resendErr } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });

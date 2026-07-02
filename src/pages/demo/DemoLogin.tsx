@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import CircuitLedgerBackground from "@/components/demo/CircuitLedgerBackground";
 import { supabase } from "@/integrations/supabase/client";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 type Tab = "demo";
 
@@ -69,6 +70,12 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     setLoading(true);
     setError(false);
     try {
+      const security = await checkAuthSecurity(`demo:${password.slice(0, 4) || "anon"}`, "demo_access");
+      if (!security.allowed) {
+        setError(true);
+        setLoading(false);
+        return;
+      }
       const { data, error: fnErr } = await supabase.functions.invoke("verify-demo-password", {
         body: { password },
       });
@@ -91,6 +98,11 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
   const handleDemoSubmit = async () => {
     if (!formData.name || !formData.email || !formData.company) return;
     setLoading(true);
+    const security = await checkAuthSecurity(formData.email, "demo_access");
+    if (!security.allowed) {
+      setLoading(false);
+      return;
+    }
     await new Promise((r) => setTimeout(r, 900));
     setSubmitted(true);
     setLoading(false);
