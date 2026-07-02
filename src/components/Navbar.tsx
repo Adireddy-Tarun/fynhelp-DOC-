@@ -87,7 +87,7 @@ const Navbar = () => {
             <ProductsNav variant="desktop" />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 3).map((l) => (
+            {navLinks.slice(0, 4).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -211,7 +211,7 @@ const Navbar = () => {
             </div>
 
             {/* About */}
-            {navLinks.slice(3).map((l) => (
+            {navLinks.slice(4).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -230,6 +230,12 @@ const Navbar = () => {
               className="text-white/80 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
             >
               Demo Login
+            </Link>
+            <Link
+              to="/ca/register"
+              className="text-fyn-red hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-fyn-red/40 hover:bg-fyn-red hover:border-fyn-red transition-colors"
+            >
+              Register as CA
             </Link>
             <Link
               to="/waitlist"
@@ -275,7 +281,7 @@ const Navbar = () => {
             />
 
             {/* Pricing, Security */}
-            {navLinks.slice(0, 3).map((l) => (
+            {navLinks.slice(0, 4).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -318,7 +324,7 @@ const Navbar = () => {
             )}
 
             {/* About */}
-            {navLinks.slice(3).map((l) => (
+            {navLinks.slice(4).map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
@@ -331,6 +337,13 @@ const Navbar = () => {
 
             <div className="mt-4 space-y-3">
 
+              <Link
+                to="/ca/register"
+                onClick={() => setMobileOpen(false)}
+                className="block text-fyn-red text-center py-3 rounded-lg font-semibold border border-fyn-red/40"
+              >
+                Register as CA
+              </Link>
               <Link
                 to="/demo/login"
                 onClick={() => setMobileOpen(false)}
