@@ -127,6 +127,21 @@ const MODULES: ModuleDef[] = [
     updates: "Real-time for all clients",
   },
   {
+    id: "ca-workbench", name: "CA Partner Workbench", shortLabel: "CA Workbench", Icon: Briefcase,
+    status: "live",
+    solves: "CAs juggling 50+ clients across spreadsheets and portals",
+    whatItDoes: [
+      "Manage client portfolios, file GST in bulk, run ITC reconciliation",
+      "Bulk-file GSTR-1/3B across dozens of clients in one flow",
+      "Runs ITC reconciliation against GSTR-2B automatically",
+      "Single dashboard for compliance status across all clients",
+    ],
+    metrics: ["Portfolio Overview", "Bulk GST Filing", "ITC Reconciliation", "Client Dashboard"],
+    poweredBy: ["Multi-tenancy", "GST Portal API", "Edge Functions"],
+    dataSources: ["All client modules", "GSTR-2B", "CA firm records"],
+    updates: "Real-time across all clients",
+  },
+  {
     id: "hr", name: "HR & Workforce Intelligence", shortLabel: "HR & Workforce", Icon: Users,
     status: "coming_soon",
     solves: "Hidden people costs and attrition surprises",
