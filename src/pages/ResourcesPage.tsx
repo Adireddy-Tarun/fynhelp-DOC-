@@ -1049,7 +1049,7 @@ const ResourcesPage = () => {
 
           {activeTab === "blog" && (
             <>
-              {filteredArticles.length === 0 ? (
+              {filteredBlogPosts.length === 0 ? (
                 <EmptyState label="articles" />
               ) : (
                 <div
@@ -1060,15 +1060,45 @@ const ResourcesPage = () => {
                     gap: 18,
                   }}
                 >
-                  {filteredArticles.map((a, i) => (
-                    <div key={a.id} className="resource-anim" style={{ animationDelay: `${i * 40}ms` }}>
-                      <ArticleCardView a={a} />
-                    </div>
+                  {filteredBlogPosts.map((a: any, i: number) => (
+                    <article
+                      key={a.id}
+                      onClick={() => navigate(`/blog/${a.slug}`)}
+                      className="resource-anim"
+                      style={{
+                        ...cardBase,
+                        display: "flex",
+                        flexDirection: "column",
+                        cursor: "pointer",
+                        animationDelay: `${i * 40}ms`,
+                      }}
+                      onMouseEnter={onCardEnter}
+                      onMouseLeave={onCardLeave}
+                    >
+                      <MetaHeader Icon={IconNews} category={a.category} meta={`${a.reading_time_minutes ?? 4} min read`} />
+                      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                        <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.35, margin: 0 }}>
+                          {a.title}
+                        </h3>
+                        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.65)", lineHeight: 1.55, margin: 0 }}>
+                          {a.excerpt}
+                        </p>
+                        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "rgba(26,16,8,0.55)" }}>
+                            <IconEye size={13} /> {(a.views ?? 0).toLocaleString("en-IN")} views
+                          </span>
+                          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, fontWeight: 600, color: GOLD }}>
+                            Read article →
+                          </span>
+                        </div>
+                      </div>
+                    </article>
                   ))}
                 </div>
               )}
             </>
           )}
+
 
           {activeTab === "community" && (
             <>
