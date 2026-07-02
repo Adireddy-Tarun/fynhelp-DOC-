@@ -84,6 +84,7 @@ import InvoicesListPage from "./pages/dashboard/InvoicesListPage.tsx";
 import ExpensesListPage from "./pages/dashboard/ExpensesListPage.tsx";
 import EmployeesListPage from "./pages/dashboard/EmployeesListPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import MyCAPage from "./pages/dashboard/MyCAPage.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
@@ -327,6 +328,7 @@ const App = () => (
             
             <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
+            <Route path="/dashboard/my-ca" element={<DashboardLayout><MyCAPage /></DashboardLayout>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
               <Route index element={<Navigate to="/dashboard/settings/personal" replace />} />
               <Route path="personal" element={<ProfilePage />} />
