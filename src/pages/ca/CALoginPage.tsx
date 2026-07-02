@@ -49,7 +49,7 @@ export default function CALoginPage() {
       return;
     }
     const { data: caFirm } = await supabase
-      .from("ca_firms").select("id, is_active, is_verified")
+      .from("ca_firms").select("id, is_active, is_verified, verification_status, onboarding_step")
       .eq("user_id", data.user!.id).maybeSingle();
     setLoading(false);
     if (!caFirm) {
@@ -57,7 +57,16 @@ export default function CALoginPage() {
       setError("Not a CA partner account. Please register for partner access.");
       return;
     }
-    navigate("/ca/dashboard");
+    const anyFirm = caFirm as any;
+    const step = anyFirm.onboarding_step ?? 0;
+    const vstatus = anyFirm.verification_status ?? "incomplete";
+    if (!caFirm.is_verified || step < 4 || vstatus === "incomplete") {
+      navigate("/ca/onboarding");
+    } else if (vstatus === "pending") {
+      navigate("/ca/verification-pending");
+    } else {
+      navigate("/ca/dashboard");
+    }
   };
 
   const fieldBorder = (valid: boolean, isTouched?: boolean) => {
