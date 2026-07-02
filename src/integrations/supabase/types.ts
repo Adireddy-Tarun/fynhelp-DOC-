@@ -734,6 +734,68 @@ export type Database = {
           },
         ]
       }
+      ca_bulk_filing_jobs: {
+        Row: {
+          ca_firm_id: string
+          client_ids: string[]
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          error_log: Json | null
+          failed_clients: number
+          filing_period: string
+          filing_type: string
+          id: string
+          output_json: Json | null
+          processed_clients: number
+          started_at: string | null
+          status: string
+          total_clients: number
+        }
+        Insert: {
+          ca_firm_id: string
+          client_ids?: string[]
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          error_log?: Json | null
+          failed_clients?: number
+          filing_period: string
+          filing_type: string
+          id?: string
+          output_json?: Json | null
+          processed_clients?: number
+          started_at?: string | null
+          status?: string
+          total_clients?: number
+        }
+        Update: {
+          ca_firm_id?: string
+          client_ids?: string[]
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          error_log?: Json | null
+          failed_clients?: number
+          filing_period?: string
+          filing_type?: string
+          id?: string
+          output_json?: Json | null
+          processed_clients?: number
+          started_at?: string | null
+          status?: string
+          total_clients?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_bulk_filing_jobs_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_client_access: {
         Row: {
           access_level: string | null
@@ -775,6 +837,132 @@ export type Database = {
           },
           {
             foreignKeyName: "ca_client_access_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_client_health_scores: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          cash_runway_days: number | null
+          cash_status: string
+          compliance_score: number
+          computed_at: string
+          id: string
+          itc_risk_amount: number | null
+          overall_score: number
+          overdue_filings: number
+          pending_tds: number | null
+          revenue_trend: string
+          score_breakdown: Json | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          cash_runway_days?: number | null
+          cash_status?: string
+          compliance_score?: number
+          computed_at?: string
+          id?: string
+          itc_risk_amount?: number | null
+          overall_score?: number
+          overdue_filings?: number
+          pending_tds?: number | null
+          revenue_trend?: string
+          score_breakdown?: Json | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          cash_runway_days?: number | null
+          cash_status?: string
+          compliance_score?: number
+          computed_at?: string
+          id?: string
+          itc_risk_amount?: number | null
+          overall_score?: number
+          overdue_filings?: number
+          pending_tds?: number | null
+          revenue_trend?: string
+          score_breakdown?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_health_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_health_scores_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_compliance_events: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          due_date: string
+          event_type: string
+          filing_date: string | null
+          filing_period: string
+          id: string
+          late_fee_amount: number | null
+          notes: string | null
+          penalty_amount: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          due_date: string
+          event_type: string
+          filing_date?: string | null
+          filing_period: string
+          id?: string
+          late_fee_amount?: number | null
+          notes?: string | null
+          penalty_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          due_date?: string
+          event_type?: string
+          filing_date?: string | null
+          filing_period?: string
+          id?: string
+          late_fee_amount?: number | null
+          notes?: string | null
+          penalty_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_compliance_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_compliance_events_ca_firm_id_fkey"
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
@@ -879,6 +1067,171 @@ export type Database = {
           whatsapp_phone?: string | null
         }
         Relationships: []
+      }
+      ca_gstr2b_uploads: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          error_message: string | null
+          file_name: string
+          file_size_bytes: number | null
+          filing_period: string
+          id: string
+          processed_at: string | null
+          processing_status: string
+          raw_data: Json | null
+          record_count: number | null
+          uploaded_by: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          error_message?: string | null
+          file_name: string
+          file_size_bytes?: number | null
+          filing_period: string
+          id?: string
+          processed_at?: string | null
+          processing_status?: string
+          raw_data?: Json | null
+          record_count?: number | null
+          uploaded_by: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          error_message?: string | null
+          file_name?: string
+          file_size_bytes?: number | null
+          filing_period?: string
+          id?: string
+          processed_at?: string | null
+          processing_status?: string
+          raw_data?: Json | null
+          record_count?: number | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_gstr2b_uploads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_gstr2b_uploads_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_itc_records: {
+        Row: {
+          block_reason: string | null
+          business_id: string
+          ca_firm_id: string
+          cgst_amount: number
+          created_at: string
+          filing_period: string
+          gstin_supplier: string
+          gstr2b_cgst: number | null
+          gstr2b_igst: number | null
+          gstr2b_matched: boolean | null
+          gstr2b_sgst: number | null
+          gstr2b_taxable_value: number | null
+          id: string
+          igst_amount: number
+          invoice_date: string | null
+          invoice_number: string | null
+          itc_blocked: boolean | null
+          itc_eligible: boolean | null
+          match_status: string
+          mismatch_amount: number | null
+          sgst_amount: number
+          source: string
+          supplier_name: string | null
+          taxable_value: number
+          total_itc: number | null
+          updated_at: string
+        }
+        Insert: {
+          block_reason?: string | null
+          business_id: string
+          ca_firm_id: string
+          cgst_amount?: number
+          created_at?: string
+          filing_period: string
+          gstin_supplier: string
+          gstr2b_cgst?: number | null
+          gstr2b_igst?: number | null
+          gstr2b_matched?: boolean | null
+          gstr2b_sgst?: number | null
+          gstr2b_taxable_value?: number | null
+          id?: string
+          igst_amount?: number
+          invoice_date?: string | null
+          invoice_number?: string | null
+          itc_blocked?: boolean | null
+          itc_eligible?: boolean | null
+          match_status?: string
+          mismatch_amount?: number | null
+          sgst_amount?: number
+          source?: string
+          supplier_name?: string | null
+          taxable_value?: number
+          total_itc?: number | null
+          updated_at?: string
+        }
+        Update: {
+          block_reason?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          cgst_amount?: number
+          created_at?: string
+          filing_period?: string
+          gstin_supplier?: string
+          gstr2b_cgst?: number | null
+          gstr2b_igst?: number | null
+          gstr2b_matched?: boolean | null
+          gstr2b_sgst?: number | null
+          gstr2b_taxable_value?: number | null
+          id?: string
+          igst_amount?: number
+          invoice_date?: string | null
+          invoice_number?: string | null
+          itc_blocked?: boolean | null
+          itc_eligible?: boolean | null
+          match_status?: string
+          mismatch_amount?: number | null
+          sgst_amount?: number
+          source?: string
+          supplier_name?: string | null
+          taxable_value?: number
+          total_itc?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_itc_records_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_itc_records_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_notifications: {
         Row: {
@@ -1044,6 +1397,96 @@ export type Database = {
           },
           {
             foreignKeyName: "ca_reports_log_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_tds_records: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          challan_date: string | null
+          challan_number: string | null
+          created_at: string
+          deductee_name: string
+          deductee_pan: string | null
+          deposited_amount: number | null
+          financial_year: string
+          id: string
+          interest_amount: number | null
+          payment_amount: number
+          payment_date: string | null
+          penalty_amount: number | null
+          quarter: string
+          return_filed: boolean | null
+          return_filed_date: string | null
+          section_code: string
+          status: string
+          tds_amount: number
+          tds_rate: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          challan_date?: string | null
+          challan_number?: string | null
+          created_at?: string
+          deductee_name: string
+          deductee_pan?: string | null
+          deposited_amount?: number | null
+          financial_year: string
+          id?: string
+          interest_amount?: number | null
+          payment_amount?: number
+          payment_date?: string | null
+          penalty_amount?: number | null
+          quarter: string
+          return_filed?: boolean | null
+          return_filed_date?: string | null
+          section_code: string
+          status?: string
+          tds_amount?: number
+          tds_rate?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          challan_date?: string | null
+          challan_number?: string | null
+          created_at?: string
+          deductee_name?: string
+          deductee_pan?: string | null
+          deposited_amount?: number | null
+          financial_year?: string
+          id?: string
+          interest_amount?: number | null
+          payment_amount?: number
+          payment_date?: string | null
+          penalty_amount?: number | null
+          quarter?: string
+          return_filed?: boolean | null
+          return_filed_date?: string | null
+          section_code?: string
+          status?: string
+          tds_amount?: number
+          tds_rate?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_tds_records_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_tds_records_ca_firm_id_fkey"
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
@@ -4353,6 +4796,18 @@ export type Database = {
           total_count: number
         }[]
       }
+      compute_client_health_score: {
+        Args: { p_business_id: string; p_ca_firm_id: string }
+        Returns: Json
+      }
+      generate_compliance_calendar: {
+        Args: {
+          p_business_id: string
+          p_ca_firm_id: string
+          p_financial_year?: string
+        }
+        Returns: number
+      }
       get_latest_demo_insight: {
         Args: { p_org_id: string }
         Returns: {
@@ -4498,6 +4953,7 @@ export type Database = {
       }
       is_admin_user: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
+      mark_overdue_filings: { Args: never; Returns: number }
       reset_rate_limit: {
         Args: { p_action: string; p_identifier: string }
         Returns: undefined
