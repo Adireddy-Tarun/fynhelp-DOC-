@@ -54,8 +54,7 @@ interface Message {
 }
 
 export default function MyCAPage() {
-  const { user, profile } = useAuth();
-  const businessId = profile?.business_id;
+  const { user, businessId } = useAuth();
 
   const [caFirm, setCAFirm] = useState<CAFirmInfo | null>(null);
   const [compliance, setCompliance] = useState<ComplianceEvent[]>([]);
