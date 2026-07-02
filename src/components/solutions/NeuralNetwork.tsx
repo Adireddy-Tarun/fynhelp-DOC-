@@ -211,6 +211,7 @@ const CHILD_ICONS: Record<string, LucideIcon> = {
   "ITC Reconciliation": GitCompare, "Filing Deadlines": Calendar, "Notice Risk": AlertCircle, "Unclaimed ITC": DollarSign,
   "Obligation Calendar": CalendarDays, "Deadline Alerts": Bell, "Completion Rate": CheckCircle2, "Audit Score": Award,
   "Portfolio Health": Activity, "Compliance Status": Shield, "Shared Intelligence": Share2, "White-label Reports": FileText,
+  "Portfolio Overview": LayoutGrid, "Bulk GST Filing": FileText, "Client Dashboard": Briefcase,
   "Cost per Employee": User, "Attrition Risk": UserMinus, "Headcount ROI": Users, "Payroll Optimization": Wallet,
   "Scenario Impact": GitBranch, "Break-even Period": Target, "ROI Projections": TrendingUp, "Risk Score": AlertOctagon,
   "Unified View": LayoutGrid, "UPI Tracking": Smartphone, "Credit Utilization": CreditCard, "Financing Options": Banknote,
