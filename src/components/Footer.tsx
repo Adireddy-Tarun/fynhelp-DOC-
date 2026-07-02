@@ -33,6 +33,13 @@ const legalItems: DropdownItem[] = [
   { label: "DPDP Act Compliance", href: "/dpdp-compliance" },
 ];
 
+const caItems: DropdownItem[] = [
+  { label: "CA Partner Portal", href: "/ca/login" },
+  { label: "Register as CA", href: "/ca/register" },
+  { label: "CA Pricing", href: "/pricing" },
+  { label: "CA Login", href: "/ca/login" },
+];
+
 type DropdownKey = "product" | "company" | "legal" | null;
 
 const NavDropdown = ({
