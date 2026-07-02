@@ -3,7 +3,7 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon,
+  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/blog", label: "Blog", icon: Newspaper, roles: ["super_admin","ops_admin","admin"] },
   { to: "/admin/media", label: "Media Library", icon: ImageIcon, roles: ["super_admin","admin"] },
   { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent"] },
   { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },

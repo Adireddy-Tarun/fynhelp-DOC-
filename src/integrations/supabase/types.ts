@@ -490,14 +490,19 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          archived_at: string | null
           author_id: string | null
+          author_name: string
+          author_role: string
           category: string | null
           content: string | null
+          cover_image_url: string | null
           created_at: string
           excerpt: string | null
           featured_image: string | null
           id: string
           published_at: string | null
+          reading_time_minutes: number
           slug: string
           status: string
           tags: string[] | null
@@ -506,14 +511,19 @@ export type Database = {
           views: number
         }
         Insert: {
+          archived_at?: string | null
           author_id?: string | null
+          author_name?: string
+          author_role?: string
           category?: string | null
           content?: string | null
+          cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           featured_image?: string | null
           id?: string
           published_at?: string | null
+          reading_time_minutes?: number
           slug: string
           status?: string
           tags?: string[] | null
@@ -522,14 +532,19 @@ export type Database = {
           views?: number
         }
         Update: {
+          archived_at?: string | null
           author_id?: string | null
+          author_name?: string
+          author_role?: string
           category?: string | null
           content?: string | null
+          cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           featured_image?: string | null
           id?: string
           published_at?: string | null
+          reading_time_minutes?: number
           slug?: string
           status?: string
           tags?: string[] | null
@@ -5181,6 +5196,7 @@ export type Database = {
         Args: { curlopt: string; value: string }
         Returns: boolean
       }
+      increment_blog_views: { Args: { p_slug: string }; Returns: undefined }
       is_admin_user: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
       lookup_client_by_reference: {
