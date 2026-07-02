@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, Check, Users, FileText, ShieldCheck, Bell, Settings as SettingsIcon, UserCircle2, ArrowRight } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import HCaptcha from "@/components/HCaptcha";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 const FEATURES = [
   { icon: Users, text: "Portfolio dashboard, 50+ clients at a glance" },
