@@ -227,6 +227,8 @@ export default function AdminLoginPage() {
                 )}
               </div>
             )}
+            <HCaptcha onVerify={(token) => { setCaptchaToken(token); setCaptchaError(null); }} onExpire={() => setCaptchaToken(null)} />
+            {captchaError && <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41E1E", textAlign: "center" }}>{captchaError}</p>}
             <button
               type="submit" disabled={busy}
               style={{
