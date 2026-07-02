@@ -291,7 +291,7 @@ export default function CAOnboardingPage() {
       return;
     }
     setSubmitting(true);
-    const { error: updErr } = await supabase.from("ca_firms").update({
+    const finalPatch: any = {
       firm_name: form.firm_name.trim(),
       contact_name: form.ca_full_name.trim(),
       icai_membership_type: form.icai_membership_type || null,
@@ -311,7 +311,8 @@ export default function CAOnboardingPage() {
       onboarding_step: 4,
       verification_status: "pending",
       verification_submitted_at: new Date().toISOString(),
-    }).eq("id", caFirmId);
+    };
+    const { error: updErr } = await supabase.from("ca_firms").update(finalPatch).eq("id", caFirmId);
     if (updErr) { setSubmitting(false); toast.error("Submission failed: " + updErr.message); return; }
 
     const docRows = ([
