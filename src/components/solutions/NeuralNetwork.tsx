@@ -343,6 +343,7 @@ export default function NeuralNetwork() {
   /* ----- Navigation: live → /products anchor; others → waitlist with module slug ----- */
   const navigateToModule = (id: string) => {
     const m = nodeById[id];
+    if (id === "ca-workbench") { navigate("/ca/login"); return; }
     if (m?.status === "live") navigate(`/products#${id}`);
     else navigate(`/waitlist?module=${id}`);
   };
