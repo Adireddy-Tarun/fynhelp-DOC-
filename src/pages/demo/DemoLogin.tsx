@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import CircuitLedgerBackground from "@/components/demo/CircuitLedgerBackground";
 import { supabase } from "@/integrations/supabase/client";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 
 type Tab = "demo";
 
