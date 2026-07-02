@@ -26,6 +26,7 @@ import AdminCeoViewPage from "./pages/admin/AdminCeoViewPage.tsx";
 import AdminWaitlistPage from "./pages/admin/AdminWaitlistPage.tsx";
 import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
+import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 import WaitlistPopup from "./components/WaitlistPopup";
@@ -216,6 +217,7 @@ const App = () => (
               <Route path="system-health" element={<AdminSystemHealthPage />} />
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
+              <Route path="blog" element={<AdminBlogPage />} />
             </Route>
             
           </Route>
