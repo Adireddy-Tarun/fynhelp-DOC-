@@ -100,7 +100,7 @@ export default function CALoginPage() {
         />
 
         <div className="relative z-10" style={{ marginBottom: 28 }}>
-          <FynLogo variant="light" showTagline={false} className="bg-muted" />
+          <FynLogo variant="light" showTagline={false} size="md" />
           <div
             style={{
               fontSize: 10,
