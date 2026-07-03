@@ -30,6 +30,8 @@ import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
 import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
 import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
 import { BlogAdminProvider } from "./contexts/BlogAdminContext.tsx";
+import InternLoginPage from "./pages/intern/InternLoginPage";
+import InternResourcesPage from "./pages/intern/InternResourcesPage";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
 import WaitlistPopup from "./components/WaitlistPopup";
@@ -266,6 +268,9 @@ const App = () => (
             <Route path="/blog-admin/login" element={<BlogAdminLoginPage />} />
             <Route path="/blog-admin/editor" element={<BlogAdminEditorPage />} />
             <Route path="/blog-admin" element={<Navigate to="/blog-admin/login" replace />} />
+            <Route path="/intern/login" element={<InternLoginPage />} />
+            <Route path="/intern/resources" element={<InternResourcesPage />} />
+            <Route path="/intern" element={<Navigate to="/intern/login" replace />} />
           </Route>
 
 

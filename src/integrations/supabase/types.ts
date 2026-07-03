@@ -3886,10 +3886,98 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_glossary: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          full_definition: string
+          id: string
+          is_published: boolean
+          related_terms: string[] | null
+          short_definition: string
+          sort_order: number
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          full_definition: string
+          id?: string
+          is_published?: boolean
+          related_terms?: string[] | null
+          short_definition: string
+          sort_order?: number
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          full_definition?: string
+          id?: string
+          is_published?: boolean
+          related_terms?: string[] | null
+          short_definition?: string
+          sort_order?: number
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resource_videos: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string
+          duration: string
+          id: string
+          is_published: boolean
+          sort_order: number
+          step: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          duration?: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          step: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          duration?: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          step?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           created_at: string
           description: string
+          external_url: string | null
           file_path: string | null
           file_url: string | null
           format: string
@@ -3904,6 +3992,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string
+          external_url?: string | null
           file_path?: string | null
           file_url?: string | null
           format?: string
@@ -3918,6 +4007,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          external_url?: string | null
           file_path?: string | null
           file_url?: string | null
           format?: string
