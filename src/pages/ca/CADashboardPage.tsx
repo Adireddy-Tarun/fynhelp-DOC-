@@ -383,6 +383,7 @@ export default function CADashboardPage() {
           {fabOpen ? <X size={22} color="#fff" /> : <Plus size={24} color="#fff" />}
         </button>
       </div>
+      </div>
     </div>
   );
 }
