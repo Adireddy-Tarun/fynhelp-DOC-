@@ -92,6 +92,7 @@ import MyCAPage from "./pages/dashboard/MyCAPage.tsx";
 import DemoLogin from "./pages/demo/DemoLogin.tsx";
 import DemoUpload from "./pages/demo/DemoUpload.tsx";
 import DemoOnboarding from "./pages/demo/DemoOnboarding.tsx";
+import CADemoPage from "./pages/demo/CADemoPage.tsx";
 import DemoModeBanner from "./components/demo/DemoModeBanner";
 import IntelligencePage from "./pages/intelligence/IntelligencePage.tsx";
 // Demo-only tree (fully isolated from /dashboard)
@@ -285,6 +286,7 @@ const App = () => (
             <Route path="/demo/login" element={<DemoLogin />} />
             <Route path="/demo/upload" element={<DemoUpload />} />
             <Route path="/demo/onboarding" element={<DemoOnboarding />} />
+            <Route path="/demo/ca" element={<CADemoPage />} />
             <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
             <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
