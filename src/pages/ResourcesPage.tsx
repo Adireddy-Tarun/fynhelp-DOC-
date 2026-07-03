@@ -631,6 +631,7 @@ const ResourcesPage = () => {
   const [glossaryModal, setGlossaryModal] = useState<GlossaryItem | null>(null);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [dbGlossary, setDbGlossary] = useState<any[]>([]);
 
   useEffect(() => {
     supabase
@@ -639,6 +640,15 @@ const ResourcesPage = () => {
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .then(({ data }) => setBlogPosts(data ?? []));
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from("resource_glossary")
+      .select("id, term, short_definition, full_definition")
+      .eq("is_published", true)
+      .order("sort_order")
+      .then(({ data }) => setDbGlossary(data ?? []));
   }, []);
 
   useEffect(() => {
@@ -709,11 +719,21 @@ const ResourcesPage = () => {
     [templates, debounced],
   );
   const filteredGlossary = useMemo(
-    () =>
-      [...GLOSSARY]
+    () => {
+      const source: GlossaryItem[] =
+        dbGlossary.length > 0
+          ? dbGlossary.map((g: any) => ({
+              id: g.id,
+              term: g.term,
+              short: g.short_definition,
+              full: g.full_definition,
+            }))
+          : GLOSSARY;
+      return [...source]
         .sort((a, b) => a.term.localeCompare(b.term))
-        .filter((g) => matchesSearch(`${g.term} ${g.short} ${g.full}`)),
-    [debounced],
+        .filter((g) => matchesSearch(`${g.term} ${g.short} ${g.full}`));
+    },
+    [debounced, dbGlossary],
   );
   const filteredBlogPosts = useMemo(
     () => blogPosts.filter((a: any) => matchesSearch(`${a.title} ${a.excerpt} ${a.category}`)),
