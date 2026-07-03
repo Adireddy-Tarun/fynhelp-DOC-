@@ -381,60 +381,80 @@ const TemplateCardView = ({ t }: { t: TemplateItem }) => (
 // ============================================================
 // GLOSSARY ROW — table-row layout
 // ============================================================
-const GlossaryRow = ({ g, onOpen }: { g: GlossaryItem; onOpen: () => void }) => (
-  <div
-    onClick={onOpen}
-    style={{
-      display: "flex",
-      alignItems: "flex-start",
-      gap: 16,
-      padding: "14px 16px",
-      background: "#FFFFFF",
-      border: "1px solid rgba(26,16,8,0.08)",
-      borderRadius: 12,
-      cursor: "pointer",
-      transition: "border-color 0.2s ease",
-    }}
-    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "rgba(139,105,20,0.35)")}
-    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "rgba(26,16,8,0.08)")}
-  >
+const GlossaryRow = ({ g, onOpen }: { g: GlossaryItem; onOpen: () => void }) => {
+  const productMap: Record<string, { module: string; route: string }> = {
+    ARR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
+    MRR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
+    LTV: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
+    Churn: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
+    CAC: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
+    "Burn Rate": { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
+    Runway: { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
+    DSO: { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
+    "Working Capital": { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
+    "Gross Margin": { module: "Cost Intelligence", route: "/dashboard/cost" },
+    EBITDA: { module: "Cost Intelligence", route: "/dashboard/cost" },
+    "P&L": { module: "Cost Intelligence", route: "/dashboard/cost" },
+    ITC: { module: "Governance Intelligence", route: "/dashboard/gst" },
+    "GSTR-1": { module: "Governance Intelligence", route: "/dashboard/gst" },
+    NPS: { module: "Workforce Intelligence", route: "/dashboard/hr" },
+  };
+  const product = productMap[g.term] ?? null;
+
+  return (
     <div
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && onOpen()}
+      aria-label={`Open definition of ${g.term}`}
       style={{
-        width: 80,
-        minWidth: 80,
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: 14,
-        color: INK,
-        fontWeight: 600,
+        background: "#FFFFFF",
+        border: "1px solid rgba(26,16,8,0.08)",
+        borderRadius: 12,
+        padding: "16px 20px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,105,20,0.4)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 12px rgba(139,105,20,0.1)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.borderColor = "rgba(26,16,8,0.08)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
       }}
     >
-      {g.term}
+      <div style={{ minWidth: 96 }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, color: "#1A1008" }}>
+          {g.term}
+        </span>
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.7)", margin: 0, lineHeight: 1.5 }}>
+          {g.short}
+        </p>
+        {product && (
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 5, marginTop: 6,
+            fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600,
+            color: "#C41E1E", background: "rgba(196,30,30,0.07)",
+            padding: "3px 8px", borderRadius: 6,
+          }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
+            {product.module}
+          </span>
+        )}
+      </div>
+      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#8B6914", whiteSpace: "nowrap", flexShrink: 0 }}>
+        View details →
+      </span>
     </div>
-    <div
-      style={{
-        flex: 1,
-        fontFamily: "Inter, sans-serif",
-        fontSize: 13,
-        color: "rgba(26,16,8,0.75)",
-        lineHeight: 1.55,
-      }}
-    >
-      {g.short}
-    </div>
-    <span
-      style={{
-        fontFamily: "Inter, sans-serif",
-        fontWeight: 600,
-        fontSize: 12.5,
-        color: GOLD,
-        whiteSpace: "nowrap",
-        alignSelf: "center",
-      }}
-    >
-      Expand →
-    </span>
-  </div>
-);
+  );
+};
 
 // ============================================================
 // ARTICLE CARD
@@ -1210,55 +1230,129 @@ const ResourcesPage = () => {
       {/* Glossary modal */}
       {glossaryModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: "rgba(26,16,8,0.85)", backdropFilter: "blur(8px)" }}
           onClick={() => setGlossaryModal(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 50,
+            background: "rgba(26,16,8,0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 20,
+          }}
         >
           <div
-            style={{
-              background: "#FFFFFF",
-              borderRadius: 12,
-              maxWidth: 560,
-              width: "calc(100% - 32px)",
-              padding: 28,
-              position: "relative",
-              border: "1px solid rgba(26,16,8,0.08)",
-            }}
             onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#FDFAF3",
+              borderRadius: 16,
+              border: "1px solid rgba(26,16,8,0.1)",
+              width: "100%",
+              maxWidth: 640,
+              maxHeight: "85vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
           >
             <button
               onClick={() => setGlossaryModal(null)}
               aria-label="Close"
               style={{
-                position: "absolute",
-                top: 14,
-                right: 14,
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: "rgba(26,16,8,0.5)",
+                position: "absolute", top: 16, right: 16,
+                background: "rgba(26,16,8,0.06)", border: "none",
+                borderRadius: 8, width: 32, height: 32,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                color: "rgba(26,16,8,0.5)", fontSize: 18, fontWeight: 300,
               }}
             >
-              <X size={18} />
+              ×
             </button>
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-                letterSpacing: 1,
-                color: GOLD,
-                textTransform: "uppercase",
-                marginBottom: 8,
-              }}
-            >
-              Glossary term
+
+            <div style={{ padding: "28px 28px 0" }}>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                Financial term
+              </div>
+              <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 28, color: "#1A1008", margin: "0 0 12px 0", lineHeight: 1.2 }}>
+                {glossaryModal.term}
+              </h2>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 15, color: "rgba(26,16,8,0.75)", lineHeight: 1.7, margin: 0 }}>
+                {glossaryModal.full}
+              </p>
             </div>
-            <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 24, color: INK, margin: "0 0 12px 0" }}>
-              {glossaryModal.term}
-            </h3>
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14.5, color: "rgba(26,16,8,0.8)", lineHeight: 1.65, margin: 0 }}>
-              {glossaryModal.full}
-            </p>
+
+            <div style={{ margin: "24px 28px 0", height: "1px", background: "rgba(26,16,8,0.08)" }} />
+
+            {(() => {
+              const productMap: Record<string, { module: string; route: string; how: string; where: string }> = {
+                ARR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp computes your ARR automatically from Razorpay payment data. As each subscription payment syncs, the ARR card updates in real time. No manual calculation needed.", where: "Revenue Intelligence tab — ARR card at the top of the dashboard." },
+                MRR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "MRR is pulled live from Razorpay and Zoho Books. FYNHelp breaks it down by new MRR, expansion MRR, contraction MRR, and churned MRR so you see exactly what is driving growth or decline.", where: "Revenue Intelligence tab — MRR waterfall chart." },
+                LTV: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp calculates LTV per customer cohort using actual payment history. You can see which acquisition channels bring the highest LTV customers and prioritise accordingly.", where: "Revenue Intelligence tab — LTV by cohort section." },
+                Churn: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp tracks churn by monitoring payment failures, cancellations, and subscription gaps in Razorpay. It sends an alert when churn rate crosses your configured threshold.", where: "Revenue Intelligence tab — Churn signals card. Also visible in Fynny alerts." },
+                CAC: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "Enter your total marketing and sales spend and FYNHelp divides it by new customers acquired in the same period. Compare CAC against LTV to track your unit economics health.", where: "Revenue Intelligence tab — Unit economics section." },
+                "Burn Rate": { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp calculates burn rate daily using your connected bank account data. Net burn = total outflows minus total inflows. The number updates every time a new transaction syncs.", where: "Liquidity Intelligence tab — Burn rate card. Also accessible by asking Fynny: what is my burn rate this month." },
+                Runway: { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp divides your current bank balance by your average monthly net burn to compute runway in months. When runway drops below your configured alert threshold, Fynny sends a proactive warning.", where: "Liquidity Intelligence tab — Runway forecast card with month-by-month projection." },
+                DSO: { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp tracks every invoice date and payment received date from Zoho Books and Razorpay. It computes your rolling 30-day average DSO and flags customers who consistently pay late.", where: "Liquidity Intelligence tab — Receivables aging section." },
+                "Working Capital": { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp pulls current assets and current liabilities from your Zoho Books balance sheet sync and shows working capital as a single number updated each time a sync runs.", where: "Liquidity Intelligence tab — Balance position card." },
+                "Gross Margin": { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp computes gross margin from Zoho Books revenue and cost of goods sold data. You can see it broken down by product line or service type if your chart of accounts is structured correctly.", where: "Cost Intelligence tab — Margin analysis section." },
+                EBITDA: { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp builds the EBITDA calculation from your Zoho Books P and L sync. Interest, tax, depreciation, and amortisation are stripped out automatically using standard account category mapping.", where: "Cost Intelligence tab — EBITDA card." },
+                "P&L": { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp renders a live P and L statement that updates every time Zoho Books syncs. You can view it by month, quarter, or year and export it as a PDF for investor meetings.", where: "Cost Intelligence tab — P and L statement view." },
+                ITC: { module: "Governance Intelligence", route: "/dashboard/gst", how: "FYNHelp uploads your GSTR-2B data and matches it against your purchase invoice register. Mismatches, missing invoices, and at-risk ITC amounts are flagged automatically before you file GSTR-3B.", where: "Governance Intelligence tab — ITC reconciliation section. Also available in CA portal for your chartered accountant." },
+                "GSTR-1": { module: "Governance Intelligence", route: "/dashboard/gst", how: "FYNHelp tracks your GSTR-1 due date in the compliance calendar. It pulls outward supply data from Zoho Books and flags if any invoices are missing mandatory fields before you file.", where: "Governance Intelligence tab — GST filing calendar. GSTR-1 due date shows in red when within 7 days." },
+                NPS: { module: "Workforce Intelligence", route: "/dashboard/hr", how: "Connect your customer feedback tool or enter NPS survey results manually. FYNHelp tracks NPS trend over time alongside headcount and revenue so you can see the correlation between team growth and customer satisfaction.", where: "Workforce Intelligence tab — Team performance metrics section." },
+              };
+              const product = productMap[glossaryModal.term];
+              if (!product) return null;
+              return (
+                <div style={{ padding: "20px 28px 0" }}>
+                  <div style={{ background: "#F4EDDA", borderRadius: 12, padding: "18px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 700, color: "#C41E1E", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        How FYNHelp uses this
+                      </span>
+                    </div>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.8)", lineHeight: 1.65, margin: "0 0 12px 0" }}>
+                      {product.how}
+                    </p>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#8B6914", flexShrink: 0, marginTop: 1 }}>Where to find it:</span>
+                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.65)", lineHeight: 1.5 }}>{product.where}</span>
+                    </div>
+                    <a
+                      href={product.route}
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14,
+                        fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
+                        color: "#FFFFFF", background: "#C41E1E",
+                        padding: "8px 16px", borderRadius: 8, textDecoration: "none",
+                      }}
+                    >
+                      Open {product.module} →
+                    </a>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div style={{ padding: "20px 28px 28px" }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "rgba(26,16,8,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
+                Related terms
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {GLOSSARY.filter((g) => g.id !== glossaryModal.id).slice(0, 4).map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => setGlossaryModal(g)}
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600,
+                      color: "#8B6914", background: "rgba(139,105,20,0.1)",
+                      border: "1px solid rgba(139,105,20,0.2)", borderRadius: 8,
+                      padding: "6px 12px", cursor: "pointer",
+                    }}
+                  >
+                    {g.term}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
