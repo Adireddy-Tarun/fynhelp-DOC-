@@ -53,7 +53,7 @@ const timeAgo = (iso: string | null): string => {
 const ROWS_PER_PAGE = 10;
 
 export default function CADashboardPage() {
-  const { caFirm } = useCAAuth();
+  const { caFirm, isDemoCA } = useCAAuth();
   const navigate = useNavigate();
   const { clients, loading: clientsLoading } = useCAClients();
   const [notifications, setNotifications] = useState<CANotification[]>([]);
@@ -126,7 +126,21 @@ export default function CADashboardPage() {
   });
 
   return (
-    <div className="px-8 py-8 font-sans" style={{ background: COLORS.beige, minHeight: "calc(100vh - 56px)" }}>
+    <div className="font-sans" style={{ background: COLORS.beige, minHeight: "calc(100vh - 56px)" }}>
+      {isDemoCA && (
+        <div style={{ background: "rgba(245,158,11,0.12)", borderBottom: "1px solid rgba(245,158,11,0.25)", padding: "10px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#92400E" }}>
+            You are viewing the CA Partner Demo. Data is illustrative. No changes are saved.
+          </span>
+          <button
+            onClick={() => { sessionStorage.clear(); window.location.href = "/"; }}
+            style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#92400E", background: "transparent", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}
+          >
+            Exit demo
+          </button>
+        </div>
+      )}
+      <div className="px-8 py-8">
       {/* 1. Welcome */}
       <div className="mb-8">
         <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "28px", color: COLORS.ink, lineHeight: 1.2 }}>
@@ -368,6 +382,7 @@ export default function CADashboardPage() {
         >
           {fabOpen ? <X size={22} color="#fff" /> : <Plus size={24} color="#fff" />}
         </button>
+      </div>
       </div>
     </div>
   );

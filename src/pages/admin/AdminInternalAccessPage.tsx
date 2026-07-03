@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, AlertCircle, ChevronRight, CheckCircle } from "lucide-react";
+import { Lock, AlertCircle, ChevronRight, CheckCircle, Users } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -249,6 +250,55 @@ export default function AdminInternalAccessPage() {
             </p>
           </div>
         )}
+      </div>
+
+      {/* CA Partner Demo card */}
+      <div
+        style={{
+          marginTop: 24,
+          background: "#FFFFFF",
+          border: "1px solid hsl(var(--fyn-gold) / 0.25)",
+          borderRadius: 16,
+          padding: 28,
+          boxShadow: "0 8px 24px hsl(var(--fyn-ink) / 0.06)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          <Users size={18} style={{ color: "#A93838" }} />
+          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))", margin: 0 }}>
+            CA Partner Demo
+          </h2>
+        </div>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.65)", margin: 0, marginBottom: 18 }}>
+          8 demo clients covering Textiles, IT, Agriculture, Logistics, Food, Manufacturing, Pharma, and Creative Services. Includes compliance events, ITC records, TDS records, and notifications.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button
+            onClick={() => nav("/demo/ca")}
+            style={{
+              background: "#C41E1E", color: "#fff", border: "none", borderRadius: 10,
+              padding: "12px 18px", fontFamily: "Inter, sans-serif", fontWeight: 600,
+              fontSize: 14, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8,
+            }}
+          >
+            Launch CA Demo <ChevronRight size={16} />
+          </button>
+          <button
+            onClick={async () => {
+              const { error } = await supabase.rpc("clear_ca_demo_data" as any);
+              if (error) toast.error(error.message);
+              else toast.success("CA demo data cleared.");
+            }}
+            style={{
+              background: "transparent", color: "hsl(var(--fyn-ink))",
+              border: "1px solid hsl(var(--fyn-ink) / 0.2)", borderRadius: 10,
+              padding: "12px 18px", fontFamily: "Inter, sans-serif", fontWeight: 600,
+              fontSize: 14, cursor: "pointer",
+            }}
+          >
+            Clear demo data
+          </button>
+        </div>
       </div>
     </div>
   );
