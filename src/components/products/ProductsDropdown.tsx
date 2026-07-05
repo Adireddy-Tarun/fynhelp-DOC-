@@ -1,21 +1,26 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Bot, Lightbulb, UserCheck, X, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Clock, Bot, Lightbulb, UserCheck, BarChart3, X, type LucideIcon } from "lucide-react";
 import { SUITES } from "@/data/suiteStatus";
 
 const COLORS = {
-  panelBg: "#1A1008",
-  panelBgAlt: "#1F0E07",
-  border: "rgba(244,237,218,0.08)",
-  text: "#F4EDDA",
-  textDim: "rgba(244,237,218,0.55)",
+  panelBg: "#FDFAF3",
+  panelBgAlt: "#F9F5EB",
+  border: "rgba(26,16,8,0.08)",
+  borderStrong: "rgba(139,105,20,0.2)",
+  text: "#1A1008",
+  textDim: "rgba(26,16,8,0.55)",
   red: "#C41E1E",
   gold: "#8B6914",
 };
+
+const INVESTOR_BLUE = "#1D4ED8";
 
 const PLATFORM_ICONS: Record<string, LucideIcon> = {
   nidhi: Bot,
   "decision-simulator": Lightbulb,
   "ca-partner-feature": UserCheck,
+  "investor-view": BarChart3,
 };
 
 export function StatusBadge({ status }: { status: "live" | "coming_soon"; small?: boolean }) {
@@ -26,14 +31,14 @@ export function StatusBadge({ status }: { status: "live" | "coming_soon"; small?
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          background: "rgba(8,40,24,0.85)",
-          border: "1px solid rgba(26,158,100,0.4)",
+          background: "rgba(16,185,129,0.1)",
+          border: "1px solid rgba(16,185,129,0.3)",
           padding: "3px 9px 3px 8px",
           borderRadius: 999,
-          fontFamily: "'Sora', sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontSize: 10,
-          fontWeight: 500,
-          color: "rgba(26,158,100,0.95)",
+          fontWeight: 600,
+          color: "#065f46",
           textTransform: "uppercase",
           letterSpacing: 0.8,
           lineHeight: 1,
@@ -44,8 +49,8 @@ export function StatusBadge({ status }: { status: "live" | "coming_soon"; small?
             width: 6,
             height: 6,
             borderRadius: "50%",
-            background: "rgba(26,158,100,0.95)",
-            boxShadow: "0 0 6px rgba(26,158,100,0.7)",
+            background: "#10b981",
+            boxShadow: "0 0 6px rgba(16,185,129,0.6)",
             animation: "fyn-dropdown-pulse 1.4s ease-in-out infinite",
           }}
         />
@@ -59,14 +64,14 @@ export function StatusBadge({ status }: { status: "live" | "coming_soon"; small?
         display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        background: "rgba(139,105,20,0.12)",
-        border: "1px solid rgba(139,105,20,0.4)",
+        background: "rgba(139,105,20,0.1)",
+        border: "1px solid rgba(139,105,20,0.3)",
         padding: "3px 9px 3px 8px",
         borderRadius: 999,
-        fontFamily: "'Sora', sans-serif",
+        fontFamily: "Inter, sans-serif",
         fontSize: 10,
-        fontWeight: 500,
-        color: "rgba(139,105,20,0.95)",
+        fontWeight: 600,
+        color: "#92400e",
         textTransform: "uppercase",
         letterSpacing: 0.8,
         lineHeight: 1,
@@ -88,6 +93,7 @@ interface Row {
 }
 
 function ItemRow({ row, index }: { row: Row; index: number }) {
+  const isInvestor = row.id === "investor-view";
   return (
     <motion.button
       type="button"
@@ -97,8 +103,15 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
       transition={{ delay: 0.05 + index * 0.03, duration: 0.2, ease: "easeOut" }}
       className="fyn-intel-row"
     >
-      <div className="fyn-intel-node">
-        <row.Icon size={18} color={COLORS.text} strokeWidth={1.8} />
+      <div
+        className="fyn-intel-node"
+        style={
+          isInvestor
+            ? { background: "rgba(29,78,216,0.1)", borderColor: "rgba(29,78,216,0.25)" }
+            : undefined
+        }
+      >
+        <row.Icon size={18} color={isInvestor ? INVESTOR_BLUE : "#1A1008"} strokeWidth={1.8} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1, textAlign: "left" }}>
         <div
@@ -107,10 +120,10 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
             alignItems: "center",
             gap: 10,
             flexWrap: "wrap",
-            fontFamily: "'Sora', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 600,
             fontSize: 14,
-            color: COLORS.text,
+            color: isInvestor ? INVESTOR_BLUE : "#1A1008",
             letterSpacing: -0.1,
             lineHeight: 1.25,
           }}
@@ -121,10 +134,10 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
         <p
           style={{
             margin: 0,
-            fontFamily: "'Sora', sans-serif",
-            fontWeight: 300,
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 400,
             fontSize: 12.5,
-            color: COLORS.textDim,
+            color: "rgba(26,16,8,0.55)",
             lineHeight: 1.45,
           }}
         >
@@ -158,6 +171,8 @@ export default function ProductsDropdown({
   onMouseEnter,
   onMouseLeave,
 }: Props) {
+  const navigate = useNavigate();
+
   const intelRows: Row[] = intelligenceItems.map((it) => {
     const suite = SUITES.find((s) => s.id === it.id);
     return {
@@ -171,6 +186,8 @@ export default function ProductsDropdown({
     Icon: PLATFORM_ICONS[it.id] ?? Bot,
     onClick: () => onSelectPlatform(it.id),
   }));
+
+  const liveCount = intelRows.filter((r) => r.status === "live").length + platRows.filter((r) => r.status === "live").length;
 
   return (
     <AnimatePresence>
@@ -188,7 +205,7 @@ export default function ProductsDropdown({
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0,0,0,0.6)",
+              background: "rgba(26,16,8,0.4)",
               backdropFilter: "blur(6px)",
               WebkitBackdropFilter: "blur(6px)",
               zIndex: 999,
@@ -216,22 +233,41 @@ export default function ProductsDropdown({
             role="menu"
           >
             <div className="fyn-products-panel">
-              <div className="fyn-dropdown-headers">
-                <div className="fyn-dropdown-header">Intelligence Suites</div>
-                <div className="fyn-dropdown-header">Platform Features</div>
-              </div>
               <div className="fyn-dropdown-grid">
                 <div className="fyn-dropdown-col">
+                  <div className="fyn-dropdown-header">Intelligence suites</div>
                   {intelRows.map((row, i) => (
                     <ItemRow key={row.id} row={row} index={i} />
                   ))}
                 </div>
                 <div className="fyn-dropdown-col">
+                  <div className="fyn-dropdown-header">Platform features</div>
                   {platRows.map((row, i) => (
                     <ItemRow key={row.id} row={row} index={i} />
                   ))}
                 </div>
-                <div className="fyn-dropdown-divider" aria-hidden />
+              </div>
+              <div className="fyn-dropdown-footer">
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.45)" }}>
+                  {liveCount} live modules across your financial stack
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { onClose(); navigate("/#product-ecosystem"); }}
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: COLORS.red,
+                    background: "rgba(196,30,30,0.07)",
+                    borderRadius: 8,
+                    padding: "6px 14px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  View all products
+                </button>
               </div>
             </div>
           </motion.div>
@@ -269,7 +305,7 @@ export default function ProductsDropdown({
                 height: 40,
                 borderRadius: 999,
                 border: `1px solid ${COLORS.border}`,
-                background: "rgba(244,237,218,0.04)",
+                background: "rgba(26,16,8,0.04)",
                 color: COLORS.text,
                 display: "flex",
                 alignItems: "center",
@@ -279,16 +315,16 @@ export default function ProductsDropdown({
             >
               <X size={18} />
             </button>
-            <div style={{ marginBottom: 20 }}>
-              <div className="fyn-dropdown-header">Intelligence Suites</div>
+            <div style={{ marginBottom: 12 }}>
+              <div className="fyn-dropdown-header">Intelligence suites</div>
             </div>
             <div className="fyn-dropdown-col">
               {intelRows.map((row, i) => (
                 <ItemRow key={row.id} row={row} index={i} />
               ))}
             </div>
-            <div style={{ margin: "28px 0 16px" }}>
-              <div className="fyn-dropdown-header">Platform Features</div>
+            <div style={{ margin: "28px 0 12px" }}>
+              <div className="fyn-dropdown-header">Platform features</div>
             </div>
             <div className="fyn-dropdown-col">
               {platRows.map((row, i) => (
@@ -301,39 +337,35 @@ export default function ProductsDropdown({
             .fyn-products-panel {
               position: relative;
               background: ${COLORS.panelBg};
-              background-image: linear-gradient(180deg, ${COLORS.panelBgAlt} 0%, ${COLORS.panelBg} 100%);
-              border: 1px solid ${COLORS.border};
-              border-radius: 16px;
+              border: 1px solid ${COLORS.borderStrong};
+              border-radius: 20px;
               overflow: hidden;
-              box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-            }
-            .fyn-dropdown-headers {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 48px;
-              padding: 24px 32px 16px;
+              box-shadow: 0 16px 48px rgba(26,16,8,0.12), 0 0 1px rgba(139,105,20,0.2);
             }
             .fyn-dropdown-header {
-              font-family: 'Sora', sans-serif;
+              font-family: Inter, sans-serif;
               font-weight: 600;
               font-size: 11px;
               letter-spacing: 1.5px;
-              color: ${COLORS.textDim};
+              color: rgba(26,16,8,0.4);
               text-transform: uppercase;
+              padding: 4px 14px 8px;
             }
             .fyn-dropdown-grid {
               position: relative;
               display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 32px;
-              padding: 0 24px 24px;
+              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 8px;
+              padding: 20px 16px 20px;
             }
             .fyn-dropdown-col { display: flex; flex-direction: column; gap: 2px; }
-            .fyn-dropdown-divider {
-              position: absolute; top: 0; bottom: 16px; left: 50%;
-              width: 1px;
-              background: ${COLORS.border};
-              pointer-events: none;
+            .fyn-dropdown-footer {
+              background: rgba(26,16,8,0.02);
+              border-top: 1px solid rgba(26,16,8,0.06);
+              padding: 10px 24px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
             }
             .fyn-intel-row {
               display: flex;
@@ -349,21 +381,21 @@ export default function ProductsDropdown({
               transition: background 180ms ease, border-color 180ms ease;
             }
             .fyn-intel-row:hover {
-              background: rgba(244,237,218,0.04);
+              background: rgba(244,237,218,0.8);
               border-left-color: ${COLORS.red};
             }
             .fyn-intel-node {
               width: 36px; height: 36px;
               flex-shrink: 0;
               border-radius: 9px;
-              background: rgba(244,237,218,0.04);
-              border: 1px solid ${COLORS.border};
+              background: rgba(26,16,8,0.04);
+              border: 1px solid rgba(26,16,8,0.08);
               display: flex; align-items: center; justify-content: center;
               transition: background 180ms ease, border-color 180ms ease;
             }
             .fyn-intel-row:hover .fyn-intel-node {
-              background: rgba(196,30,30,0.12);
-              border-color: rgba(196,30,30,0.4);
+              background: rgba(196,30,30,0.08);
+              border-color: rgba(196,30,30,0.3);
             }
             @keyframes fyn-dropdown-pulse {
               0%, 100% { transform: scale(1); opacity: 1; }
