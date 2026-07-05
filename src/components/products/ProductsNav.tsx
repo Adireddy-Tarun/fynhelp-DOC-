@@ -77,7 +77,7 @@ export default function ProductsNav({
       description: item.longDescription,
       widget: item.widget,
       href: item.href,
-      status: item.status,
+      status: item.status as "live" | "coming_soon",
     });
   };
 
