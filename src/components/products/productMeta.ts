@@ -77,16 +77,6 @@ export const BUSINESS_TYPES = [
 export const PLATFORM_FEATURES = [
   FYNNY_ITEM,
   {
-    id: "decision-simulator",
-    name: "Decision Simulator",
-    description: "Model any business scenario",
-    longDescription:
-      "Drag a slider, see the future. Test hires, price changes, and capital decisions in seconds.",
-    status: "coming_soon" as const,
-    widget: "simulator" as WidgetKey,
-    href: "/#product-ecosystem",
-  },
-  {
     id: "ca-partner-feature",
     name: "CA Partner Program",
     description: "White label for accountants",
