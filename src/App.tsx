@@ -359,7 +359,7 @@ const App = () => (
             <Route path="/dashboard/banking" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             
-            <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
+            <Route path="/dashboard/ca-partner" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/dashboard/my-ca" element={<DashboardLayout><MyCAPage /></DashboardLayout>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
