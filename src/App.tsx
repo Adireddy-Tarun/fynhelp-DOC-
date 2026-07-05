@@ -335,8 +335,8 @@ const App = () => (
             <Route path="/dashboard/revenue-intelligence" element={<DashboardLayout><IntelligencePage mode="live" tab="revenue" /></DashboardLayout>} />
             <Route path="/dashboard/cost"                 element={<DashboardLayout><IntelligencePage mode="live" tab="cost" /></DashboardLayout>} />
             <Route path="/dashboard/gst"                  element={<DashboardLayout><IntelligencePage mode="live" tab="gst" /></DashboardLayout>} />
-            <Route path="/dashboard/compliance"           element={<DashboardLayout><IntelligencePage mode="live" tab="governance" /></DashboardLayout>} />
-            <Route path="/dashboard/hr"                   element={<DashboardLayout><IntelligencePage mode="live" tab="hr" /></DashboardLayout>} />
+            <Route path="/dashboard/compliance"           element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
+            <Route path="/dashboard/hr"                   element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/investor"             element={<DashboardLayout><InvestorPage /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
