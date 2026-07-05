@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type SuiteStatus = "live" | "coming_soon";
+export type SuiteStatus = "live" | "coming_soon" | "archived";
 export type SuiteQuarter = "Live" | "Q2 2026" | "Q3 2026" | "Q4 2026" | "Q1 2027" | "Q2 2027";
 
 export interface SuiteMeta {
