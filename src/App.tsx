@@ -340,8 +340,8 @@ const App = () => (
             <Route path="/dashboard/investor"             element={<DashboardLayout><InvestorPage /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
-            <Route path="/dashboard/simulator" element={<DecisionSimulatorComingSoon />} />
-            <Route path="/dashboard/decision-simulator" element={<DecisionSimulatorComingSoon />} />
+            <Route path="/dashboard/simulator" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
+            <Route path="/dashboard/decision-simulator" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
