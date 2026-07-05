@@ -77,7 +77,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Governance",
     Icon: Shield,
     description: "Audit readiness, compliance tracking, regulatory alerts, risk monitoring",
-    status: "live",
+    status: "archived",
     quarter: "Live",
     href: "/dashboard/compliance",
   },
@@ -87,7 +87,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "HR",
     Icon: Users,
     description: "Payroll analytics, cost-per-employee, headcount ROI, attrition insights",
-    status: "live",
+    status: "archived",
     quarter: "Live",
     href: "/dashboard/hr",
   },
@@ -97,7 +97,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Simulator",
     Icon: Zap,
     description: "What-if scenarios, financial modeling, strategic decision simulations",
-    status: "coming_soon",
+    status: "archived",
     quarter: "Q4 2026",
     href: "/dashboard/decision-simulator",
   },
@@ -107,7 +107,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Market",
     Icon: BarChart3,
     description: "Market trends, competitor benchmarking, growth opportunity identification",
-    status: "coming_soon",
+    status: "archived",
     quarter: "Q1 2027",
     href: "/dashboard/market-growth",
   },
@@ -117,7 +117,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "Banking",
     Icon: Building2,
     description: "Multi-bank aggregation, credit analysis, fintech integrations, working capital",
-    status: "coming_soon",
+    status: "archived",
     quarter: "Q1 2027",
     href: "/dashboard/banking",
   },
@@ -127,7 +127,7 @@ export const SUITES: SuiteMeta[] = [
     shortLabel: "CA Partner",
     Icon: Briefcase,
     description: "CA collaboration portal, client sharing, compliance delegation, ecosystem tools",
-    status: "live",
+    status: "archived",
     quarter: "Live",
     href: "/ca/login",
   },
@@ -136,5 +136,8 @@ export const SUITES: SuiteMeta[] = [
 export const QUARTERS: SuiteQuarter[] = ["Q2 2026", "Q3 2026", "Q4 2026", "Q1 2027", "Q2 2027"];
 
 export const isLive = (s: SuiteMeta) => s.status === "live";
+export const isArchived = (s: SuiteMeta) => s.status === "archived";
 export const comingSoonSuites = SUITES.filter((s) => s.status === "coming_soon");
 export const liveSuites = SUITES.filter((s) => s.status === "live");
+export const archivedSuites = SUITES.filter((s) => s.status === "archived");
+
