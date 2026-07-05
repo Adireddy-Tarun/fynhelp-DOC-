@@ -96,4 +96,14 @@ export const PLATFORM_FEATURES = [
     widget: "ca-partner" as WidgetKey,
     href: "/ca/login",
   },
+  {
+    id: "investor-view",
+    name: "Investor View",
+    description: "One-page financial summary built for due diligence",
+    longDescription:
+      "Generate a live investor-ready dashboard from your real financial data. MRR, runway, burn rate, unit economics, compliance score, and revenue trend — all in one exportable page. Built for founder meetings and due diligence.",
+    status: "live" as const,
+    widget: "generic" as WidgetKey,
+    href: "/dashboard/investor",
+  },
 ];

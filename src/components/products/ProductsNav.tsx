@@ -131,6 +131,18 @@ export default function ProductsNav({
       return;
     }
 
+    if (id === "investor-view") {
+      setOpen(false);
+      onCloseMobileMenu?.();
+      if (user) {
+        navigate("/dashboard/investor");
+      } else {
+        navigate("/waitlist");
+      }
+      return;
+    }
+
+
     openProduct({
       name: f.name,
       description: f.longDescription,
