@@ -152,26 +152,26 @@ export default function ProductsNav({
     });
   };
 
-  const intelligenceItems = PRODUCT_ITEMS.map((p) => ({
+  const intelligenceItems = PRODUCT_ITEMS.filter((p) => p.status !== "archived").map((p) => ({
     id: p.id,
     name: p.name,
     description: p.description,
-    status: p.status,
+    status: p.status as "live" | "coming_soon",
   }));
-  const platformItems = PLATFORM_FEATURES.map((f) => ({
+  const platformItems = PLATFORM_FEATURES.filter((f) => (f as any).status !== "archived").map((f) => ({
     id: f.id,
     name: f.name,
     description: f.description,
-    status: f.status,
+    status: f.status as "live" | "coming_soon",
   }));
 
   // Build mobile icon set (Intelligence Suites first, then platform features)
   const mobileIcons: MobileIcon[] = [
-    ...PRODUCT_ITEMS.map((p) => ({
+    ...PRODUCT_ITEMS.filter((p) => p.status !== "archived").map((p) => ({
       id: p.id,
       name: p.shortLabel,
       Icon: p.Icon,
-      status: p.status,
+      status: p.status as "live" | "coming_soon",
       onClick: () => handleIntelligence(p.id),
     })),
   ];
