@@ -65,6 +65,7 @@ import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
 import InvestorPage from "./pages/dashboard/InvestorPage.tsx";
+import ArchivedFeaturePage from "./pages/dashboard/ArchivedFeaturePage";
 import ReportsPage from "./pages/intelligence/ReportsPage.tsx";
 import CFOReportDetailPage from "./pages/dashboard/CFOReportDetailPage.tsx";
 import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
@@ -334,13 +335,13 @@ const App = () => (
             <Route path="/dashboard/revenue-intelligence" element={<DashboardLayout><IntelligencePage mode="live" tab="revenue" /></DashboardLayout>} />
             <Route path="/dashboard/cost"                 element={<DashboardLayout><IntelligencePage mode="live" tab="cost" /></DashboardLayout>} />
             <Route path="/dashboard/gst"                  element={<DashboardLayout><IntelligencePage mode="live" tab="gst" /></DashboardLayout>} />
-            <Route path="/dashboard/compliance"           element={<DashboardLayout><IntelligencePage mode="live" tab="governance" /></DashboardLayout>} />
-            <Route path="/dashboard/hr"                   element={<DashboardLayout><IntelligencePage mode="live" tab="hr" /></DashboardLayout>} />
+            <Route path="/dashboard/compliance"           element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
+            <Route path="/dashboard/hr"                   element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/investor"             element={<DashboardLayout><InvestorPage /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
-            <Route path="/dashboard/simulator" element={<DecisionSimulatorComingSoon />} />
-            <Route path="/dashboard/decision-simulator" element={<DecisionSimulatorComingSoon />} />
+            <Route path="/dashboard/simulator" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
+            <Route path="/dashboard/decision-simulator" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/tds-tax" element={<Navigate to="/dashboard/gst?tab=tds" replace />} />
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
@@ -354,11 +355,11 @@ const App = () => (
             <Route path="/dashboard/audit-readiness" element={<AuditReadinessPage />} />
             <Route path="/dashboard/payroll" element={<PayrollPlannerPage />} />
             <Route path="/dashboard/working-capital" element={<Navigate to="/dashboard/liquidity" replace />} />
-            <Route path="/dashboard/market-growth" element={<MarketGrowthComingSoon />} />
-            <Route path="/dashboard/banking" element={<BankingComingSoon />} />
+            <Route path="/dashboard/market-growth" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
+            <Route path="/dashboard/banking" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
             
-            <Route path="/dashboard/ca-partner" element={<CAPartnerComingSoon />} />
+            <Route path="/dashboard/ca-partner" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
             <Route path="/dashboard/my-ca" element={<DashboardLayout><MyCAPage /></DashboardLayout>} />
             <Route path="/dashboard/settings" element={<SettingsPage />}>
