@@ -3201,6 +3201,38 @@ export type Database = {
         }
         Relationships: []
       }
+      investor_manual_metrics: {
+        Row: {
+          business_id: string
+          id: string
+          metric_name: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          business_id: string
+          id?: string
+          metric_name: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          business_id?: string
+          id?: string
+          metric_name?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investor_manual_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           business_id: string

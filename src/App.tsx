@@ -64,6 +64,7 @@ import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
+import InvestorPage from "./pages/dashboard/InvestorPage.tsx";
 import ReportsPage from "./pages/intelligence/ReportsPage.tsx";
 import CFOReportDetailPage from "./pages/dashboard/CFOReportDetailPage.tsx";
 import VendorsPage from "./pages/dashboard/VendorsPage.tsx";
@@ -335,7 +336,7 @@ const App = () => (
             <Route path="/dashboard/gst"                  element={<DashboardLayout><IntelligencePage mode="live" tab="gst" /></DashboardLayout>} />
             <Route path="/dashboard/compliance"           element={<DashboardLayout><IntelligencePage mode="live" tab="governance" /></DashboardLayout>} />
             <Route path="/dashboard/hr"                   element={<DashboardLayout><IntelligencePage mode="live" tab="hr" /></DashboardLayout>} />
-            <Route path="/dashboard/investor"             element={<DashboardLayout><IntelligencePage mode="live" tab="investor" /></DashboardLayout>} />
+            <Route path="/dashboard/investor"             element={<DashboardLayout><InvestorPage /></DashboardLayout>} />
             <Route path="/dashboard/receivables" element={<ReceivablesPage />} />
             <Route path="/dashboard/payables" element={<PayablesPage />} />
             <Route path="/dashboard/simulator" element={<DecisionSimulatorComingSoon />} />
