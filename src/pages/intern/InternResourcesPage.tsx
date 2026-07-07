@@ -839,33 +839,306 @@ function GlossaryModal({
 }
 
 // ============= BLOG =============
+const BLOG_CATEGORIES = ["GST", "Cash flow", "MSME", "Startup finance", "Compliance", "CA resources", "Hiring"];
+
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, "-").slice(0, 80);
+
+const emptyBlogForm = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  content: "",
+  category: "Startup finance",
+  author_name: "FYNHelp Editorial",
+  author_role: "Editorial",
+  reading_time_minutes: 4,
+  tags: "",
+};
+
 function BlogTab() {
-  const navigate = useNavigate();
-  return (
-    <div
-      style={{
-        background: "#fff",
-        border: "1px solid rgba(26,16,8,0.08)",
-        borderRadius: 12,
-        padding: 28,
-        textAlign: "center",
-      }}
-    >
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008" }}>
-        Blog management is in the Blog Admin portal.
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyBlogForm);
+  const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("blog_posts")
+      .select("id, slug, title, category, views, status, published_at, created_at, author_name, reading_time_minutes, excerpt, content, author_role, tags")
+      .order("created_at", { ascending: false });
+    setPosts(data ?? []);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const openCreate = () => {
+    setEditId(null);
+    setForm(emptyBlogForm);
+    setModal(true);
+  };
+
+  const openEdit = (p: any) => {
+    setEditId(p.id);
+    setForm({
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt,
+      content: p.content,
+      category: p.category,
+      author_name: p.author_name,
+      author_role: p.author_role,
+      reading_time_minutes: p.reading_time_minutes,
+      tags: (p.tags ?? []).join(", "),
+    });
+    setModal(true);
+  };
+
+  const handleSave = async (publishNow: boolean) => {
+    if (!form.title.trim() || !form.slug.trim() || !form.excerpt.trim() || !form.content.trim()) {
+      toast.error("Title, slug, excerpt, and content are required.");
+      return;
+    }
+    setSaving(true);
+    const payload = {
+      title: form.title.trim(),
+      slug: form.slug.trim(),
+      excerpt: form.excerpt.trim(),
+      content: form.content.trim(),
+      category: form.category,
+      author_name: form.author_name.trim() || "FYNHelp Editorial",
+      author_role: form.author_role.trim() || "Editorial",
+      reading_time_minutes: form.reading_time_minutes,
+      tags: form.tags.split(",").map((t: string) => t.trim()).filter(Boolean),
+      status: publishNow ? "published" : "draft",
+      published_at: publishNow ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    };
+    let error;
+    if (editId) {
+      ({ error } = await supabase.from("blog_posts").update(payload).eq("id", editId));
+    } else {
+      ({ error } = await supabase.from("blog_posts").insert({ ...payload, views: 0 }));
+    }
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(publishNow ? "Post published." : "Saved as draft.");
+    setModal(false);
+    load();
+  };
+
+  const handleArchive = async (id: string) => {
+    const { error } = await supabase.from("blog_posts").update({ status: "archived", archived_at: new Date().toISOString() } as any).eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Post archived."); load(); }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    const { error } = await supabase.from("blog_posts").update({ status: "draft", archived_at: null } as any).eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Moved to drafts."); load(); }
+  };
+
+  const handlePublish = async (id: string) => {
+    const { error } = await supabase.from("blog_posts").update({ status: "published", published_at: new Date().toISOString() }).eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Post published."); load(); }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("blog_posts").delete().eq("id", deleteId);
+    if (error) toast.error(error.message);
+    else { toast.success("Post deleted."); load(); }
+    setDeleteId(null);
+  };
+
+  const published = posts.filter((p) => p.status === "published");
+  const drafts = posts.filter((p) => p.status === "draft");
+  const archived = posts.filter((p) => p.status === "archived");
+
+  const formatDate = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not set";
+
+  const PostSection = ({ title, rows, actions }: { title: string; rows: any[]; actions: (p: any) => React.ReactNode }) => (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: 16, fontWeight: 700, color: "#1A1008", marginBottom: 10 }}>
+        {title} ({rows.length})
       </div>
-      <p
-        style={{
-          fontFamily: "Inter, sans-serif",
-          fontSize: 14,
-          color: "rgba(26,16,8,0.6)",
-          marginTop: 8,
-          marginBottom: 20,
-        }}
-      >
-        Create, edit, publish and archive blog posts from the dedicated blog editor.
-      </p>
-      <button style={redBtn} onClick={() => navigate("/blog-admin/editor")}>Open Blog Editor</button>
+      <div style={cardStyle}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={thStyle}>Title</th>
+              <th style={thStyle}>Category</th>
+              <th style={thStyle}>Views</th>
+              <th style={thStyle}>Date</th>
+              <th style={thStyle}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ ...tdStyle, textAlign: "center", color: "rgba(26,16,8,0.4)" }}>
+                  No posts here yet.
+                </td>
+              </tr>
+            ) : (
+              rows.map((p, i) => (
+                <tr key={p.id} style={{ borderTop: i > 0 ? "1px solid rgba(26,16,8,0.05)" : "none" }}>
+                  <td style={tdStyle}>
+                    <div style={{ fontFamily: "Georgia, serif", fontSize: 13, fontWeight: 600, color: "#1A1008" }}>{p.title}</div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(26,16,8,0.4)", marginTop: 2 }}>{p.slug}</div>
+                  </td>
+                  <td style={tdStyle}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#C41E1E", background: "rgba(196,30,30,0.08)", padding: "3px 8px", borderRadius: 99 }}>
+                      {p.category}
+                    </span>
+                  </td>
+                  <td style={{ ...tdStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 12 }}>{p.views}</td>
+                  <td style={{ ...tdStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>
+                    {formatDate(p.published_at ?? p.created_at)}
+                  </td>
+                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{actions(p)}</div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.6)" }}>
+          {posts.length} total posts
+        </div>
+        <button style={redBtn} onClick={openCreate}>+ New Post</button>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: "center", padding: 48, fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+          Loading posts...
+        </div>
+      ) : (
+        <>
+          <PostSection
+            title="Published"
+            rows={published}
+            actions={(p) => (
+              <>
+                <button style={ghostBtn} onClick={() => openEdit(p)}>Edit</button>
+                <button style={{ ...ghostBtn, color: "#A93838", borderColor: "#A93838" }} onClick={() => handleArchive(p.id)}>Archive</button>
+              </>
+            )}
+          />
+          <PostSection
+            title="Drafts"
+            rows={drafts}
+            actions={(p) => (
+              <>
+                <button style={ghostBtn} onClick={() => openEdit(p)}>Edit</button>
+                <button style={{ ...ghostBtn, color: "#8B6914", borderColor: "#8B6914" }} onClick={() => handlePublish(p.id)}>Publish</button>
+                <button style={{ ...ghostBtn, color: "#A93838", borderColor: "#A93838" }} onClick={() => setDeleteId(p.id)}>Delete</button>
+              </>
+            )}
+          />
+          <PostSection
+            title="Archived"
+            rows={archived}
+            actions={(p) => (
+              <>
+                <button style={ghostBtn} onClick={() => handleUnarchive(p.id)}>Unarchive</button>
+                <button style={{ ...ghostBtn, color: "#A93838", borderColor: "#A93838" }} onClick={() => setDeleteId(p.id)}>Delete</button>
+              </>
+            )}
+          />
+        </>
+      )}
+
+      {modal && (
+        <div onClick={() => setModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 680, maxHeight: "90vh", overflowY: "auto", padding: 28 }}>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008", marginBottom: 18 }}>
+              {editId ? "Edit post" : "Create new post"}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <label style={labelStyle}>Title</label>
+                <input style={inputStyle} value={form.title} onChange={(e) => {
+                  const v = e.target.value;
+                  setForm((f) => ({ ...f, title: v, ...(!editId ? { slug: slugify(v) } : {}) }));
+                }} />
+              </div>
+              <div>
+                <label style={labelStyle}>Slug</label>
+                <input style={inputStyle} value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+              </div>
+              <div>
+                <label style={labelStyle}>Category</label>
+                <select style={inputStyle} value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
+                  {BLOG_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Excerpt (max 300 characters)</label>
+                <textarea style={{ ...inputStyle, minHeight: 70 }} maxLength={300} value={form.excerpt} onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))} />
+              </div>
+              <div>
+                <label style={labelStyle}>Content (separate paragraphs with a blank line)</label>
+                <textarea style={{ ...inputStyle, minHeight: 200, fontFamily: "Georgia, serif" }} value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 10 }}>
+                <div>
+                  <label style={labelStyle}>Author name</label>
+                  <input style={inputStyle} value={form.author_name} onChange={(e) => setForm((f) => ({ ...f, author_name: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Author role</label>
+                  <input style={inputStyle} value={form.author_role} onChange={(e) => setForm((f) => ({ ...f, author_role: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Tags (comma separated)</label>
+                  <input style={inputStyle} value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="GST, Startup" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Min read</label>
+                  <input type="number" min={1} max={60} style={{ ...inputStyle, width: 70 }} value={form.reading_time_minutes} onChange={(e) => setForm((f) => ({ ...f, reading_time_minutes: Number(e.target.value) }))} />
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(26,16,8,0.08)" }}>
+              <button style={ghostBtn} onClick={() => setModal(false)}>Cancel</button>
+              <button style={{ ...ghostBtn, fontWeight: 600 }} disabled={saving} onClick={() => handleSave(false)}>Save draft</button>
+              <button style={redBtn} disabled={saving} onClick={() => handleSave(true)}>{saving ? "Saving..." : "Publish"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteId && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.6)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#fff", borderRadius: 12, padding: 28, maxWidth: 400, width: "calc(100% - 32px)" }}>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 18, fontWeight: 700, color: "#1A1008", marginBottom: 8 }}>Delete this post?</div>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", marginBottom: 20 }}>
+              This is permanent and cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button style={ghostBtn} onClick={() => setDeleteId(null)}>Cancel</button>
+              <button style={redBtn} onClick={handleDelete}>Delete permanently</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
