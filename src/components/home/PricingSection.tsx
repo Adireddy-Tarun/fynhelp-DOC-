@@ -145,7 +145,7 @@ export default function PricingSection() {
 
               <ul className="space-y-2 mb-6">
                 {p.features.map((f, i) => (
-                  <li key={i} className={`flex gap-2 text-sm ${p.featured ? "text-fyn-ink/70" : "text-white/60"}`}>
+                  <li key={i} className={`flex gap-2 text-sm ${p.featured ? "text-fyn-ink/80" : "text-white/85"}`}>
                     {!f.endsWith(":") && <span className="text-fyn-success shrink-0">✓</span>}
                     <span className={f.endsWith(":") ? "font-semibold" : ""}>{f}</span>
                   </li>
