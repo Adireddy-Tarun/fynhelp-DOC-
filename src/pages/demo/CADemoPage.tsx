@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { track } from "@/lib/analytics";
 
 const DEMO_CA_FIRM_ID = "a0000000-ca00-de00-0000-000000000001";
 
