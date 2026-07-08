@@ -78,7 +78,7 @@ export default function HowItWorksSection() {
                     </div>
 
                     <h3 className="text-white font-semibold text-base mb-1 text-center" style={{ fontFamily: "'Raleway', sans-serif" }}>{s.title}</h3>
-                    <p className="text-white/40 text-sm mb-3 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>{s.sub}</p>
+                    <p className="text-white/80 text-sm mb-3 text-center" style={{ fontFamily: "'Roboto', sans-serif" }}>{s.sub}</p>
 
                     <div className={`overflow-hidden transition-all duration-500 ${
                       expanded === i ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"

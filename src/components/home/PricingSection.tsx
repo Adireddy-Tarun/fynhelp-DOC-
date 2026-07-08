@@ -140,12 +140,12 @@ export default function PricingSection() {
                 </span>
               )}
 
-              <p className={`text-sm mt-3 mb-1 ${p.featured ? "text-fyn-ink/70" : "text-white/60"}`}>{p.target}</p>
-              <p className={`text-xs mb-5 ${p.featured ? "text-fyn-ink/50" : "text-white/40"}`}>{p.sub}</p>
+              <p className={`text-sm mt-3 mb-1 ${p.featured ? "text-fyn-ink/80" : "text-white/85"}`}>{p.target}</p>
+              <p className={`text-xs mb-5 ${p.featured ? "text-fyn-ink/70" : "text-white/75"}`}>{p.sub}</p>
 
               <ul className="space-y-2 mb-6">
                 {p.features.map((f, i) => (
-                  <li key={i} className={`flex gap-2 text-sm ${p.featured ? "text-fyn-ink/70" : "text-white/60"}`}>
+                  <li key={i} className={`flex gap-2 text-sm ${p.featured ? "text-fyn-ink/80" : "text-white/85"}`}>
                     {!f.endsWith(":") && <span className="text-fyn-success shrink-0">✓</span>}
                     <span className={f.endsWith(":") ? "font-semibold" : ""}>{f}</span>
                   </li>
@@ -153,7 +153,7 @@ export default function PricingSection() {
               </ul>
 
               {p.isEnterprise ? (
-                <button className="w-full py-3 rounded-lg font-semibold text-sm border-[1.5px] border-white/30 text-white hover:bg-white hover:text-fyn-ink transition-all duration-200">
+                <button className="w-full py-3 rounded-lg font-semibold text-sm border-[1.5px] border-white/60 text-white hover:bg-white hover:text-fyn-ink transition-all duration-200">
                   {p.cta}
                 </button>
               ) : (
