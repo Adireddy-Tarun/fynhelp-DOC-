@@ -359,6 +359,7 @@ const App = () => (
             <Route path="/dashboard/market-growth" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/banking" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
+            <Route path="/dashboard/import" element={<DashboardLayout><ImportPage /></DashboardLayout>} />
             
             <Route path="/dashboard/ca-partner" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />
