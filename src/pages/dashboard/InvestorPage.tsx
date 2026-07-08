@@ -277,7 +277,7 @@ export default function InvestorPage() {
               <Share2 size={16} /> Share view
             </button>
             <button
-              onClick={() => window.print()}
+              onClick={() => { track("report_generated", { report_type: "investor_view" }); window.print(); }}
               style={{ ...BODY, display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: RED, color: "#fff", border: `1px solid ${RED}`, fontWeight: 600, cursor: "pointer" }}
             >
               <Printer size={16} /> Export as PDF
