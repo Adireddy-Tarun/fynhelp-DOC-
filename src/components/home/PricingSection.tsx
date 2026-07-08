@@ -140,7 +140,7 @@ export default function PricingSection() {
                 </span>
               )}
 
-              <p className={`text-sm mt-3 mb-1 ${p.featured ? "text-fyn-ink/70" : "text-white/60"}`}>{p.target}</p>
+              <p className={`text-sm mt-3 mb-1 ${p.featured ? "text-fyn-ink/80" : "text-white/85"}`}>{p.target}</p>
               <p className={`text-xs mb-5 ${p.featured ? "text-fyn-ink/70" : "text-white/75"}`}>{p.sub}</p>
 
               <ul className="space-y-2 mb-6">
