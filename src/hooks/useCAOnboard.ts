@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 
 export interface OnboardResult {
   success: boolean;
