@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowRight, Linkedin, Twitter, Youtube, MessageCircle } from "lucide-react";
-import iconCreamAsset from "@/assets/brand/fynhelp-icon-cream.png.asset.json";
+import iconCreamAsset from "@/assets/brand/fynhelp-icon-cream-new.png";
 
 type DropdownItem = { label: string; href: string; accent?: boolean; divider?: boolean };
 
