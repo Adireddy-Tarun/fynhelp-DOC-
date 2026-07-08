@@ -100,8 +100,11 @@ export default function WaitlistForm({
       if (error) {
         setMessage({ type: "error", text: error.message || "Something went wrong. Please try again." });
       } else {
+        track("waitlist_signup", { source: "homepage" });
         setSubmitted(true);
         setFormData(initial);
+        onSuccess?.();
+      }
         onSuccess?.();
       }
     } catch {
