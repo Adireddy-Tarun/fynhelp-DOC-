@@ -253,6 +253,7 @@ export default function CAOnboardingPage() {
   const handleNext = async () => {
     if (!validateStep(currentStep)) return;
     await persistStep(currentStep);
+    track("onboarding_step_completed", { step: currentStep, role: "ca" });
     setCurrentStep((s) => Math.min(4, s + 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
