@@ -2,25 +2,28 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { X } from "lucide-react";
 import WaitlistForm from "@/components/WaitlistForm";
+import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_KEY = "fyn_waitlist_popup_dismissed";
-const EXCLUDED_PREFIXES = ["/admin", "/dashboard", "/demo", "/ca", "/onboarding", "/reset-password"];
 
 export default function WaitlistPopup() {
   const { pathname } = useLocation();
+  const { user, loading } = useAuth();
   const [open, setOpen] = useState(false);
   const [canClose, setCanClose] = useState(false);
 
-  const excluded = EXCLUDED_PREFIXES.some((p) => pathname.startsWith(p));
+  const isHome = pathname === "/";
 
   useEffect(() => {
-    if (excluded) return;
+    if (!isHome) return;
+    if (loading || user) return;
     if (typeof window === "undefined") return;
-    if (sessionStorage.getItem(STORAGE_KEY)) return;
+    if (localStorage.getItem(STORAGE_KEY)) return;
 
     const openTimer = window.setTimeout(() => setOpen(true), 2000);
     return () => window.clearTimeout(openTimer);
-  }, [excluded]);
+  }, [isHome, loading, user]);
+
 
   useEffect(() => {
     if (!open) return;
@@ -40,7 +43,7 @@ export default function WaitlistPopup() {
 
   const close = () => {
     if (!canClose) return;
-    sessionStorage.setItem(STORAGE_KEY, "1");
+    localStorage.setItem(STORAGE_KEY, "1");
     setOpen(false);
   };
 
@@ -53,7 +56,7 @@ export default function WaitlistPopup() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, canClose]);
 
-  if (excluded || !open) return null;
+  if (!isHome || user || !open) return null;
 
   return (
     <div
