@@ -153,7 +153,7 @@ export default function PricingSection() {
               </ul>
 
               {p.isEnterprise ? (
-                <button className="w-full py-3 rounded-lg font-semibold text-sm border-[1.5px] border-white/30 text-white hover:bg-white hover:text-fyn-ink transition-all duration-200">
+                <button className="w-full py-3 rounded-lg font-semibold text-sm border-[1.5px] border-white/60 text-white hover:bg-white hover:text-fyn-ink transition-all duration-200">
                   {p.cta}
                 </button>
               ) : (
