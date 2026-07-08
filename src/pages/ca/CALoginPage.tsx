@@ -39,6 +39,7 @@ export default function CALoginPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      track("ca_login");
       navigate("/ca/dashboard");
     }, 200);
   };
