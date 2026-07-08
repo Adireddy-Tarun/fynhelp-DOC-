@@ -1,7 +1,7 @@
-import logoRed from "@/assets/brand/fynhelp-logo-red.png.asset.json";
-import logoCream from "@/assets/brand/fynhelp-logo-cream.png.asset.json";
-import iconRed from "@/assets/brand/fynhelp-icon-red.png.asset.json";
-import iconCream from "@/assets/brand/fynhelp-icon-cream.png.asset.json";
+import logoRed from "@/assets/brand/fynhelp-logo-red-new.png";
+import logoCream from "@/assets/brand/fynhelp-logo-cream-new.png";
+import iconRed from "@/assets/brand/fynhelp-icon-red-new.png";
+import iconCream from "@/assets/brand/fynhelp-icon-cream-new.png";
 
 interface FynLogoProps {
   /** "dark" = red logo for light backgrounds (default). "light" = cream logo for dark backgrounds. */
@@ -17,7 +17,7 @@ const FynLogo = ({ variant = "dark", className = "", iconOnly = false, size = "m
   const isLight = variant === "light";
 
   if (iconOnly) {
-    const src = isLight ? iconCream.url : iconRed.url;
+    const src = isLight ? iconCream : iconRed;
     return (
       <img
         src={src}
@@ -28,7 +28,7 @@ const FynLogo = ({ variant = "dark", className = "", iconOnly = false, size = "m
     );
   }
 
-  const src = isLight ? logoCream.url : logoRed.url;
+  const src = isLight ? logoCream : logoRed;
   return (
     <img
       src={src}
