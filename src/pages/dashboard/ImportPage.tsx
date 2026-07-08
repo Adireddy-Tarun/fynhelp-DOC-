@@ -137,8 +137,7 @@ function mapRows(rows: string[][], bank: BankMapping, businessId: string): { txn
 
 export default function ImportPage() {
   const navigate = useNavigate();
-  const { profile } = useAuth();
-  const businessId = profile?.business_id ?? null;
+  const { businessId } = useAuth();
 
   const [bankId, setBankId] = useState<BankId | null>(null);
   const [file, setFile] = useState<File | null>(null);
