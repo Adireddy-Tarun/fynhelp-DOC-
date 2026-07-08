@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
