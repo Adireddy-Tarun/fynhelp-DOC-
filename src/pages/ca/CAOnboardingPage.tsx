@@ -336,6 +336,7 @@ export default function CAOnboardingPage() {
     }
     setSubmitting(false);
     setSubmitted(true);
+    track("onboarding_completed", { role: "ca" });
     refreshFirm();
   };
 
