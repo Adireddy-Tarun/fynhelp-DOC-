@@ -211,6 +211,9 @@ const CockpitPage = () => {
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.85]);
 
   // Realtime invalidation (kept from previous version)
+  useEffect(() => { track("dashboard_viewed"); }, []);
+
+  // Realtime invalidation (kept from previous version)
   useEffect(() => {
     if (!businessId) return;
     const filter = `business_id=eq.${businessId}`;
