@@ -240,7 +240,14 @@ export default function AdminLayout() {
                 }}
               >
                 <Icon size={20} />
-                <span>{it.label}</span>
+                <span style={{ flex: 1 }}>{it.label}</span>
+                {it.badgeKey && badges[it.badgeKey] > 0 && (
+                  <span style={{
+                    background: "#C41E1E", color: "#fff", fontSize: 11, fontWeight: 700,
+                    padding: "2px 7px", borderRadius: 999, minWidth: 20, textAlign: "center",
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                  }}>{badges[it.badgeKey]}</span>
+                )}
               </NavLink>
             );
           })}
