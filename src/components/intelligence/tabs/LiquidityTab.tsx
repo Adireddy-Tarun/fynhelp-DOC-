@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AlertTriangle } from "lucide-react";
 import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
@@ -15,6 +16,7 @@ function daysBetween(a: string, b: string) {
 }
 
 export default function LiquidityTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "liquidity" }); }, []);
   const mode = useMode();
   const { data: bank, isLoading: bankL } = useBankTxns();
   const { data: invoices, isLoading: invL } = useInvoices();

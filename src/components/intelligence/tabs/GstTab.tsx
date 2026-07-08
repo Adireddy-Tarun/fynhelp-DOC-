@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useGstFilings, useExpenses, useInvoices } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { EwayBillSection, HsnMasterSection, TaxPlanningSection } from "./sections/NewSections";
@@ -9,6 +10,7 @@ import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function GstTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "gst" }); }, []);
   const { data: filings, isLoading } = useGstFilings();
   const { data: invoices } = useInvoices();
   const { data: expenses } = useExpenses();

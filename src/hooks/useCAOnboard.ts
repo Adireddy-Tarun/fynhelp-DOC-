@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 
 export interface OnboardResult {
   success: boolean;
@@ -33,6 +34,7 @@ export function useCAOnboard() {
         setError(msg);
         return { success: false, error: msg };
       }
+      track("ca_client_added", { business_id });
       return data as OnboardResult;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unknown error";

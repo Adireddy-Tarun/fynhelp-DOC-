@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { Check, Upload, X, FileText, Loader2, ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 const STEPS = ["Firm details", "Identity", "Credentials", "Review"];
 
@@ -252,6 +253,7 @@ export default function CAOnboardingPage() {
   const handleNext = async () => {
     if (!validateStep(currentStep)) return;
     await persistStep(currentStep);
+    track("onboarding_step_completed", { step: currentStep, role: "ca" });
     setCurrentStep((s) => Math.min(4, s + 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -334,6 +336,7 @@ export default function CAOnboardingPage() {
     }
     setSubmitting(false);
     setSubmitted(true);
+    track("onboarding_completed", { role: "ca" });
     refreshFirm();
   };
 

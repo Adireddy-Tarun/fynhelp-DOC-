@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { track } from "@/lib/analytics";
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
@@ -228,6 +229,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     const interval = setInterval(() => setProgress(prev => Math.min(prev + 8, 85)), 200);
     const rows = p.rows;
 
+    track("csv_import_started", { file_type: file.type || file.name.split(".").pop() || "unknown" });
     try {
       if (type === "bank") {
         const records = rows.map(r => {
@@ -296,6 +298,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
+      track("csv_import_completed", { records_inserted: rows.length });
       toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
       onSuccess();
       setTimeout(() => {
@@ -307,6 +310,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
       }, 1200);
     } catch (err: any) {
       clearInterval(interval);
+      track("csv_import_failed", { error: String(err?.message || err) });
       console.error("Upload error:", err);
       try {
         const { data: { user } } = await supabase.auth.getUser();

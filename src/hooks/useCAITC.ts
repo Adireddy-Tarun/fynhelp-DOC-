@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import { track } from "@/lib/analytics";
 
 export interface ITCRecord {
   id: string;
@@ -64,6 +65,7 @@ export function useCAITC(business_id: string | null, filing_period: string | nul
     invoice_date?: string; taxable_value: number;
     igst?: number; cgst?: number; sgst?: number;
   }>) => {
+    track("ca_gstr2b_uploaded", { filing_period, record_count: records.length });
     const { data, error } = await supabase.functions.invoke("ca-process-gstr2b", {
       body: { business_id, filing_period, file_name, records },
     });

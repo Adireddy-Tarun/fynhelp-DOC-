@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Loader2, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",
@@ -99,6 +100,7 @@ export default function WaitlistForm({
       if (error) {
         setMessage({ type: "error", text: error.message || "Something went wrong. Please try again." });
       } else {
+        track("waitlist_signup", { source: "homepage" });
         setSubmitted(true);
         setFormData(initial);
         onSuccess?.();

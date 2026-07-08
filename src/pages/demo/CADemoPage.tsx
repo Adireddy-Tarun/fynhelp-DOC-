@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { track } from "@/lib/analytics";
 
 const DEMO_CA_FIRM_ID = "a0000000-ca00-de00-0000-000000000001";
 
@@ -7,6 +8,7 @@ export default function CADemoPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    track("demo_started", { demo_type: "ca" });
     sessionStorage.setItem("fynhelp_ca_demo", "true");
     sessionStorage.setItem("fynhelp_ca_demo_firm_id", DEMO_CA_FIRM_ID);
     const t = setTimeout(() => navigate("/ca/dashboard", { replace: true }), 1800);

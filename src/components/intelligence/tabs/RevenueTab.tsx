@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useInvoices, useCustomers, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
@@ -10,6 +11,7 @@ import RevenueAlertsSection from "../sections/RevenueAlertsSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function RevenueTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "revenue" }); }, []);
   const mode = useMode();
   const { data: invoices, isLoading } = useInvoices();
   const { data: customers } = useCustomers();

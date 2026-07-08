@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import { track } from "@/lib/analytics";
 
 export interface ComplianceEvent {
   id: string;
@@ -50,6 +51,8 @@ export function useCACompliance(business_id: string | null) {
       .eq("id", event_id)
       .eq("ca_firm_id", caFirm?.id);
     if (!error) {
+      const ev = events.find((e) => e.id === event_id);
+      track("gst_filing_marked_filed", { event_type: ev?.event_type, filing_period: ev?.filing_period });
       setEvents((prev) => prev.map((e) => e.id === event_id ? { ...e, status: "filed", filing_date } : e));
     }
     return { error };

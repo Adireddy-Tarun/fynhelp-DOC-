@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
@@ -9,6 +10,7 @@ import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function CostTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "cost" }); }, []);
   const { data: expenses, isLoading: expL } = useExpenses();
   const { data: vendors } = useVendors();
   const { data: invoices } = useInvoices();

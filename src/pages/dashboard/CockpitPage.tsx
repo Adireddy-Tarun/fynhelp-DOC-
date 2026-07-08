@@ -14,6 +14,7 @@ import {
   Receipt, FileSpreadsheet, Bell,
 } from "lucide-react";
 import { logRealtimeEvent } from "@/lib/realtimeAudit";
+import { track } from "@/lib/analytics";
 import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
@@ -208,6 +209,9 @@ const CockpitPage = () => {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 300], [0, -30]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.85]);
+
+  // Realtime invalidation (kept from previous version)
+  useEffect(() => { track("dashboard_viewed"); }, []);
 
   // Realtime invalidation (kept from previous version)
   useEffect(() => {

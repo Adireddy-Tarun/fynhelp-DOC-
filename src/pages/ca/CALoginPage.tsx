@@ -5,6 +5,7 @@ import { Eye, EyeOff, Check, Users, FileText, ShieldCheck, Bell, Settings as Set
 import FynLogo from "@/components/FynLogo";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
+import { track } from "@/lib/analytics";
 
 const FEATURES = [
   { icon: Users, text: "Portfolio dashboard, 50+ clients at a glance" },
@@ -38,6 +39,7 @@ export default function CALoginPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      track("ca_login");
       navigate("/ca/dashboard");
     }, 200);
   };

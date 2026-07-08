@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { identifyUser, resetAnalytics } from "@/lib/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -82,10 +83,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: data.role || "owner",
       });
     }
+    identifyUser(userId, {
+      businessId: data?.business_id ?? undefined,
+      role: data?.role ?? "owner",
+    });
     setLoading(false);
   };
 
   const signOut = async () => {
+    resetAnalytics();
     await supabase.auth.signOut();
   };
 

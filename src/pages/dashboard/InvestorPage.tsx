@@ -5,6 +5,7 @@ import { ArrowDownRight, ArrowUpRight, Printer, Share2, Loader2 } from "lucide-r
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { track } from "@/lib/analytics";
 
 const BEIGE = "#F4EDDA";
 const CARD_BORDER = "1px solid rgba(26,16,8,0.08)";
@@ -276,7 +277,7 @@ export default function InvestorPage() {
               <Share2 size={16} /> Share view
             </button>
             <button
-              onClick={() => window.print()}
+              onClick={() => { track("report_generated", { report_type: "investor_view" }); window.print(); }}
               style={{ ...BODY, display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, background: RED, color: "#fff", border: `1px solid ${RED}`, fontWeight: 600, cursor: "pointer" }}
             >
               <Printer size={16} /> Export as PDF
