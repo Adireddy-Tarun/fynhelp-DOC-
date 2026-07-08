@@ -56,7 +56,7 @@ export default function WaitlistPopup() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, canClose]);
 
-  if (excluded || !open) return null;
+  if (!isHome || user || !open) return null;
 
   return (
     <div
