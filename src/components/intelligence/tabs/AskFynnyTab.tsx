@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { IntelCard, ACCENT, Badge } from "../_primitives";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import {
   useMode, DEMO_BIZ,
   useBankTxns, useInvoices, useExpenses, useCustomers, useVendors,
