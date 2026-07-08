@@ -298,6 +298,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
+      track("csv_import_completed", { records_inserted: rows.length });
       toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
       onSuccess();
       setTimeout(() => {
@@ -309,6 +310,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
       }, 1200);
     } catch (err: any) {
       clearInterval(interval);
+      track("csv_import_failed", { error: String(err?.message || err) });
       console.error("Upload error:", err);
       try {
         const { data: { user } } = await supabase.auth.getUser();
