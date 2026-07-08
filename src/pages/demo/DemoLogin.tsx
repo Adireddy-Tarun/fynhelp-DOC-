@@ -1438,6 +1438,7 @@ export function DemoLogin() {
   return (
     <DemoGate
       onAccess={() => {
+        import("@/lib/analytics").then(({ track }) => track("demo_started", { demo_type: "client" }));
         sessionStorage.setItem("demo_access", "true");
         navigate("/demo/onboarding");
       }}
