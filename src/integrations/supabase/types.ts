@@ -1159,6 +1159,7 @@ export type Database = {
         Row: {
           aadhaar_document_path: string | null
           aadhaar_last4: string | null
+          ca_name: string | null
           city: string | null
           created_at: string | null
           email: string | null
@@ -1193,6 +1194,7 @@ export type Database = {
         Insert: {
           aadhaar_document_path?: string | null
           aadhaar_last4?: string | null
+          ca_name?: string | null
           city?: string | null
           created_at?: string | null
           email?: string | null
@@ -1227,6 +1229,7 @@ export type Database = {
         Update: {
           aadhaar_document_path?: string | null
           aadhaar_last4?: string | null
+          ca_name?: string | null
           city?: string | null
           created_at?: string | null
           email?: string | null
