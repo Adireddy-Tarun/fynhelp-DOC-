@@ -105,8 +105,6 @@ export default function WaitlistForm({
         setFormData(initial);
         onSuccess?.();
       }
-        onSuccess?.();
-      }
     } catch {
       setMessage({ type: "error", text: "Network error. Please check your connection and try again." });
     } finally {
