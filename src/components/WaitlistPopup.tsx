@@ -43,7 +43,7 @@ export default function WaitlistPopup() {
 
   const close = () => {
     if (!canClose) return;
-    sessionStorage.setItem(STORAGE_KEY, "1");
+    localStorage.setItem(STORAGE_KEY, "1");
     setOpen(false);
   };
 
