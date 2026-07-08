@@ -46,6 +46,7 @@ const menuSections: Section[] = [
     title: "DATA",
     items: [
       { icon: ArrowLeftRight, label: "Transactions", path: "/dashboard/data-import" },
+      { icon: Upload, label: "Import Data", path: "/dashboard/import" },
       { icon: FileBarChart, label: "Reports", path: "/dashboard/reports" },
     ],
   },
