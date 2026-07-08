@@ -27,6 +27,7 @@ import AdminWaitlistPage from "./pages/admin/AdminWaitlistPage.tsx";
 import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
+import CAVerificationPage from "./pages/admin/CAVerificationPage.tsx";
 import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
 import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
 import { BlogAdminProvider } from "./contexts/BlogAdminContext.tsx";
@@ -227,6 +228,7 @@ const App = () => (
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
               <Route path="blog" element={<AdminBlogPage />} />
+              <Route path="ca-verification" element={<CAVerificationPage />} />
             </Route>
             
           </Route>

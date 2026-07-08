@@ -3,20 +3,22 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper,
+  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
 import FynLogo from "@/components/FynLogo";
 
 type NavItem =
   | { divider: true }
-  | { divider?: false; to: string; label: string; icon: typeof BarChart3; roles: AdminRole[] };
+  | { divider?: false; to: string; label: string; icon: typeof BarChart3; roles: AdminRole[]; badgeKey?: string };
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: BarChart3, roles: ["super_admin","ops_admin","support_agent","analyst"] },
   { to: "/admin/ceo-view", label: "CEO View", icon: LayoutDashboard, roles: ["super_admin"] },
   { to: "/admin/users", label: "Users", icon: Users, roles: ["super_admin","ops_admin","support_agent"] },
+  { to: "/admin/ca-verification", label: "CA Verification", icon: ShieldCheck, roles: ["super_admin","ops_admin"], badgeKey: "ca_pending" },
   { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin"] },
   { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin"] },
@@ -96,6 +98,22 @@ export default function AdminLayout() {
     window.addEventListener("keydown", onEsc);
     return () => window.removeEventListener("keydown", onEsc);
   }, [sidebarOpen, isDesktop]);
+
+  const [caPending, setCaPending] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const { count } = await supabase
+        .from("ca_firms")
+        .select("id", { count: "exact", head: true })
+        .eq("verification_status", "pending");
+      if (!cancelled) setCaPending(count ?? 0);
+    };
+    load();
+    const t = setInterval(load, 60000);
+    return () => { cancelled = true; clearInterval(t); };
+  }, [location.pathname]);
+  const badges: Record<string, number> = { ca_pending: caPending };
 
   // Auth disabled during design, show all items EXCEPT super_admin-only ones.
   const visible = NAV_ITEMS.filter((i) => {
