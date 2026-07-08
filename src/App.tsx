@@ -76,6 +76,7 @@ import AuditReadinessPage from "./pages/dashboard/AuditReadinessPage.tsx";
 import PayrollPlannerPage from "./pages/dashboard/PayrollPlannerPage.tsx";
 
 import DataImportPage from "./pages/dashboard/DataImportPage.tsx";
+import ImportPage from "./pages/dashboard/ImportPage";
 
 import CAAccessOverviewPage from "./pages/dashboard/CAAccessOverviewPage.tsx";
 import SettingsPage from "./pages/dashboard/settings/SettingsPage.tsx";
@@ -358,6 +359,7 @@ const App = () => (
             <Route path="/dashboard/market-growth" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/banking" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/data-import" element={<DataImportPage />} />
+            <Route path="/dashboard/import" element={<DashboardLayout><ImportPage /></DashboardLayout>} />
             
             <Route path="/dashboard/ca-partner" element={<DashboardLayout><ArchivedFeaturePage /></DashboardLayout>} />
             <Route path="/dashboard/ca-access" element={<CAAccessOverviewPage />} />

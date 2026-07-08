@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { track } from "@/lib/analytics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Upload } from "lucide-react";
 import { useBankTxns, useInvoices, useExpenses, useCustomers, useVendors, useMode } from "../DataSource";
 import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
 import { RemindButton, ScenarioPlannerDialog, OptimizeScheduleDialog, ViewAllLink, useOpenDrawer } from "../actions";
@@ -17,6 +18,7 @@ function daysBetween(a: string, b: string) {
 
 export default function LiquidityTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "liquidity" }); }, []);
+  const navigate = useNavigate();
   const mode = useMode();
   const { data: bank, isLoading: bankL } = useBankTxns();
   const { data: invoices, isLoading: invL } = useInvoices();
@@ -118,6 +120,22 @@ export default function LiquidityTab() {
 
   return (
     <div className="space-y-6 fyn-stagger">
+      {liveEmpty && (
+        <div className="bg-white rounded-md px-5 py-4 flex items-center gap-4" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: "4px solid #C41E1E" }}>
+          <Upload className="w-5 h-5 flex-shrink-0" style={{ color: "#C41E1E" }} />
+          <div className="flex-1">
+            <div className="text-sm font-semibold text-fyn-ink">No liquidity data yet</div>
+            <div className="text-xs text-fyn-ink/60">Import a bank statement CSV to see your real cash position, burn rate, and runway.</div>
+          </div>
+          <button
+            onClick={() => navigate("/dashboard/import")}
+            className="text-white text-sm font-semibold px-4 py-2 rounded-md"
+            style={{ background: "#C41E1E" }}
+          >
+            Import bank statement
+          </button>
+        </div>
+      )}
       {/* Alert ticker */}
       <div className={`bg-white rounded-md px-4 py-2 flex items-center gap-3 overflow-hidden ${hasCriticalAlert ? "fyn-alert-critical" : ""}`} style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
         {hasCriticalAlert && <span className="w-1.5 h-1.5 rounded-full fyn-dot-blink flex-shrink-0" style={{ background: ACCENT.red }} />}

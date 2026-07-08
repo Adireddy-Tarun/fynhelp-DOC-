@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Droplets, TrendingUp, DollarSign,
-  FileText, Users, BarChart3,
+  FileText, Users, BarChart3, Upload,
   ArrowLeftRight, FileBarChart, Plug, Building, Settings,
   X, ChevronLeft, ChevronRight, ChevronUp,
 } from "lucide-react";
@@ -46,6 +46,7 @@ const menuSections: Section[] = [
     title: "DATA",
     items: [
       { icon: ArrowLeftRight, label: "Transactions", path: "/dashboard/data-import" },
+      { icon: Upload, label: "Import Data", path: "/dashboard/import" },
       { icon: FileBarChart, label: "Reports", path: "/dashboard/reports" },
     ],
   },

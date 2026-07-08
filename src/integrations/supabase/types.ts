@@ -3310,6 +3310,7 @@ export type Database = {
           recorded_at: string
           runway_days: number
           runway_months: number
+          updated_at: string
         }
         Insert: {
           burn_rate_current?: number
@@ -3322,6 +3323,7 @@ export type Database = {
           recorded_at?: string
           runway_days?: number
           runway_months?: number
+          updated_at?: string
         }
         Update: {
           burn_rate_current?: number
@@ -3334,6 +3336,7 @@ export type Database = {
           recorded_at?: string
           runway_days?: number
           runway_months?: number
+          updated_at?: string
         }
         Relationships: []
       }
