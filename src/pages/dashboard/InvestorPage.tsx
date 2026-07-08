@@ -5,6 +5,7 @@ import { ArrowDownRight, ArrowUpRight, Printer, Share2, Loader2 } from "lucide-r
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { track } from "@/lib/analytics";
 
 const BEIGE = "#F4EDDA";
 const CARD_BORDER = "1px solid rgba(26,16,8,0.08)";
