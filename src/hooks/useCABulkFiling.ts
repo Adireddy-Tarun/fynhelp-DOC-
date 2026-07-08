@@ -35,6 +35,7 @@ export function useCABulkFiling() {
     setLoading(true);
     setError(null);
     try {
+      track("ca_bulk_filing_started", { client_count: client_ids.length, filing_type });
       const { data, error: fnErr } = await supabase.functions.invoke("ca-bulk-filing-queue", {
         body: { client_ids, filing_type, filing_period },
       });
