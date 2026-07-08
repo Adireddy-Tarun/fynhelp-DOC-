@@ -229,6 +229,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     const interval = setInterval(() => setProgress(prev => Math.min(prev + 8, 85)), 200);
     const rows = p.rows;
 
+    track("csv_import_started", { file_type: file.type || file.name.split(".").pop() || "unknown" });
     try {
       if (type === "bank") {
         const records = rows.map(r => {
