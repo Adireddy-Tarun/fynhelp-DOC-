@@ -83,10 +83,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: data.role || "owner",
       });
     }
+    identifyUser(userId, {
+      businessId: data?.business_id ?? undefined,
+      role: data?.role ?? "owner",
+    });
     setLoading(false);
   };
 
   const signOut = async () => {
+    resetAnalytics();
     await supabase.auth.signOut();
   };
 
