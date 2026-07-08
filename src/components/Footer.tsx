@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowRight, Linkedin, Twitter, Youtube, MessageCircle } from "lucide-react";
-import iconCreamAsset from "@/assets/brand/fynhelp-icon-cream.png.asset.json";
+import iconCreamAsset from "@/assets/brand/fynhelp-icon-cream-new.png";
 
 type DropdownItem = { label: string; href: string; accent?: boolean; divider?: boolean };
 
@@ -174,7 +174,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="max-md:flex max-md:flex-col max-md:items-center">
             <div className="flex items-center gap-3 mb-3">
-              <img src={iconCreamAsset.url} alt="FYNHelp" style={{ height: 36, width: 36, objectFit: "contain", display: "block" }} />
+              <img src={iconCreamAsset} alt="FYNHelp" style={{ height: 36, width: 36, objectFit: "contain", display: "block" }} />
             </div>
             <p
               className="text-white/40 uppercase"
@@ -235,16 +235,28 @@ const Footer = () => {
               For CA firms
             </h4>
             <ul className="flex flex-col gap-2">
-              {caItems.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    to={item.href}
-                    className="text-sm text-white/70 hover:text-[#C41E1E] transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {caItems.map((item) => {
+                const isRegister = item.href === "/ca/register";
+                return (
+                  <li key={item.label}>
+                    {isRegister ? (
+                      <Link
+                        to={item.href}
+                        className="inline-block bg-[#C41E1E] hover:bg-[#9E2A30] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <Link
+                        to={item.href}
+                        className="text-sm text-white/70 hover:text-[#C41E1E] transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

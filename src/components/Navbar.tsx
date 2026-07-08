@@ -233,7 +233,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/ca/register"
-              className="text-fyn-red hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-fyn-red/40 hover:bg-fyn-red hover:border-fyn-red transition-colors"
+              className="bg-fyn-red text-white hover:bg-[#9E2A30] text-sm font-semibold px-4 py-2.5 rounded-lg border border-fyn-red transition-colors"
             >
               Register as CA
             </Link>
@@ -340,7 +340,7 @@ const Navbar = () => {
               <Link
                 to="/ca/register"
                 onClick={() => setMobileOpen(false)}
-                className="block text-fyn-red text-center py-3 rounded-lg font-semibold border border-fyn-red/40"
+                className="block bg-fyn-red text-white text-center py-3 rounded-lg font-semibold border border-fyn-red"
               >
                 Register as CA
               </Link>
