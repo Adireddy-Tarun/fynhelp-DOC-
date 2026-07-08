@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Loader2, Check, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 
 const COMPANY_TYPES = [
   "E-commerce & D2C",
