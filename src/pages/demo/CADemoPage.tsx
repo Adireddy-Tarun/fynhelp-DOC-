@@ -8,6 +8,7 @@ export default function CADemoPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    track("demo_started", { demo_type: "ca" });
     sessionStorage.setItem("fynhelp_ca_demo", "true");
     sessionStorage.setItem("fynhelp_ca_demo_firm_id", DEMO_CA_FIRM_ID);
     const t = setTimeout(() => navigate("/ca/dashboard", { replace: true }), 1800);
