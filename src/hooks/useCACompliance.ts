@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import { track } from "@/lib/analytics";
 
 export interface ComplianceEvent {
   id: string;
