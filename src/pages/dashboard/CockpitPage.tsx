@@ -14,6 +14,7 @@ import {
   Receipt, FileSpreadsheet, Bell,
 } from "lucide-react";
 import { logRealtimeEvent } from "@/lib/realtimeAudit";
+import { track } from "@/lib/analytics";
 import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
