@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.ca-bulk-filing-queue]
 verify_jwt = true
+
+[functions.send-ca-notification]
+verify_jwt = true
