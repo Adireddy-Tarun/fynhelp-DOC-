@@ -18,6 +18,7 @@ function daysBetween(a: string, b: string) {
 
 export default function LiquidityTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "liquidity" }); }, []);
+  const navigate = useNavigate();
   const mode = useMode();
   const { data: bank, isLoading: bankL } = useBankTxns();
   const { data: invoices, isLoading: invL } = useInvoices();
