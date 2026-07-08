@@ -10,6 +10,7 @@ import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function CostTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "cost" }); }, []);
   const { data: expenses, isLoading: expL } = useExpenses();
   const { data: vendors } = useVendors();
   const { data: invoices } = useInvoices();

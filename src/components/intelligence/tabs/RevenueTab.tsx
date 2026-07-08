@@ -11,6 +11,7 @@ import RevenueAlertsSection from "../sections/RevenueAlertsSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 
 export default function RevenueTab() {
+  useEffect(() => { track("intelligence_tab_viewed", { tab: "revenue" }); }, []);
   const mode = useMode();
   const { data: invoices, isLoading } = useInvoices();
   const { data: customers } = useCustomers();
