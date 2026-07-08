@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { Check, Upload, X, FileText, Loader2, ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 const STEPS = ["Firm details", "Identity", "Credentials", "Review"];
 
