@@ -267,6 +267,50 @@ export default function ImportPage() {
 
     try {
       const text = await file.text();
+      const isXML = file.name.toLowerCase().endsWith(".xml");
+      if (bankId === "tally" && isXML) {
+        const { txns: xmlTxns, error: xmlErr } = parseTallyXML(text, businessId);
+        if (xmlErr || !xmlTxns.length) {
+          const msg = xmlErr || "No rows parsed from Tally XML";
+          setError(msg);
+          track("csv_import_failed", { error: msg, bank: "tally_xml" });
+          setBusy(false);
+          return;
+        }
+
+        const BATCH_XML = 100;
+        setProgress({ done: 0, total: xmlTxns.length });
+        for (let i = 0; i < xmlTxns.length; i += BATCH_XML) {
+          const chunk = xmlTxns.slice(i, i + BATCH_XML);
+          const { error: insErr } = await supabase.from("transactions").insert(chunk);
+          if (insErr) {
+            const msg = `Database insert failed: ${insErr.message}`;
+            setError(msg);
+            track("csv_import_failed", { error: msg, bank: "tally_xml", inserted: i });
+            setBusy(false);
+            return;
+          }
+          setProgress({ done: Math.min(i + BATCH_XML, xmlTxns.length), total: xmlTxns.length });
+        }
+
+        const { data: compData, error: compErr } = await supabase.functions.invoke("compute-liquidity", {
+          body: { business_id: businessId },
+        });
+        if (compErr) {
+          setError(`Imported ${xmlTxns.length} rows but liquidity computation failed: ${compErr.message}`);
+          setBusy(false);
+          return;
+        }
+        setResult({
+          rows: xmlTxns.length,
+          cash_position: compData?.cash_position ?? 0,
+          burn_rate_current: compData?.burn_rate_current ?? 0,
+          runway_months: compData?.runway_months ?? 0,
+        });
+        track("csv_import_completed", { records: xmlTxns.length, bank: "tally_xml" });
+        setBusy(false);
+        return;
+      }
       const rows = parseCSV(text);
       const { txns, error: mapErr } = mapRows(rows, bank, businessId);
       if (mapErr || !txns.length) {
