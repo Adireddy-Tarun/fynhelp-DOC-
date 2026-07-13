@@ -229,6 +229,14 @@ export default function ImportPage() {
     runway_months: number;
   }>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [tallyColumnMap, setTallyColumnMap] = useState<{
+    dateCol: string;
+    amountCol: string;
+    descriptionCol: string;
+    directionCol: string;
+    balanceCol: string;
+  } | null>(null);
+  const [showColumnMapper, setShowColumnMapper] = useState(false);
 
   const bank = useMemo(() => BANKS.find((b) => b.id === bankId) ?? null, [bankId]);
 
@@ -236,13 +244,21 @@ export default function ImportPage() {
     setError(null);
     setResult(null);
     if (!f) { setFile(null); setRawRows([]); return; }
-    if (!f.name.toLowerCase().endsWith(".csv")) { setError("Only .csv files are supported"); return; }
+    const isCSV = f.name.toLowerCase().endsWith(".csv");
+    const isXML = f.name.toLowerCase().endsWith(".xml");
+    if (!isCSV && !isXML) { setError("Tally supports CSV and XML exports. Other file types are not accepted."); return; }
     if (f.size > MAX_SIZE) { setError("File exceeds 10MB limit"); return; }
     const text = await f.text();
+    if (isXML && bankId === "tally") {
+      setFile(f);
+      setRawRows([["XML file detected — Tally XML will be parsed automatically on import"]]);
+      return;
+    }
     const rows = parseCSV(text);
     setFile(f);
     setRawRows(rows.slice(0, 6));
   }
+
 
   async function runImport() {
     if (!bank || !file || !businessId) return;
