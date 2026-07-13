@@ -523,6 +523,38 @@ export default function ImportPage() {
           )}
         </section>
 
+        {bankId === "tally" && rawRows.length > 1 && (() => {
+          const headers = rawRows[0];
+          const hasKnownDate = headers.some(h => ["Date","DATE","Voucher Date","VoucherDate","Txn Date"].some(k => h.toLowerCase() === k.toLowerCase()));
+          if (hasKnownDate) return null;
+          return (
+            <div style={{ background: "#FFF7ED", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#92400e", marginBottom: 8 }}>
+                Column names not recognised — please map them below
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Date column", key: "dateCol" as const },
+                  { label: "Amount column", key: "amountCol" as const },
+                  { label: "Description column", key: "descriptionCol" as const },
+                  { label: "Type or direction column", key: "directionCol" as const },
+                ].map(({ label, key }) => (
+                  <div key={key}>
+                    <label style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "#92400e", display: "block", marginBottom: 4 }}>{label}</label>
+                    <select
+                      onChange={(e) => setTallyColumnMap(prev => ({ ...(prev || { dateCol:"", amountCol:"", descriptionCol:"", directionCol:"", balanceCol:"" }), [key]: e.target.value }))}
+                      style={{ width: "100%", height: 36, padding: "0 10px", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: "#1A1008", background: "white" }}
+                    >
+                      <option value="">Select column</option>
+                      {headers.map((h, i) => <option key={i} value={h}>{h}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Section 3 — import + result */}
         <section className="mb-8">
           <div className="text-[11px] tracking-widest mb-3" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace" }}>STEP 3 · IMPORT</div>
