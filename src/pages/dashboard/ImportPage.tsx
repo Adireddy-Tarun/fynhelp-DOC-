@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 
-type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic";
+type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally";
 
 interface BankMapping {
   id: BankId;
