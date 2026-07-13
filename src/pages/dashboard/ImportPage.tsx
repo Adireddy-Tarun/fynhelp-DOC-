@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 
-type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic";
+type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally";
 
 interface BankMapping {
   id: BankId;
@@ -27,6 +27,18 @@ const BANKS: BankMapping[] = [
   { id: "axis",    name: "Axis Bank",              note: "Account statement CSV",             date: ["Tran Date"],        debit: ["Dr Amount"],       credit: ["Cr Amount"],    description: ["Particulars"],         balance: ["Balance"] },
   { id: "kotak",   name: "Kotak Mahindra Bank",    note: "eStatement CSV export",             date: ["Transaction Date"], debit: ["Debit"],           credit: ["Credit"],       description: ["Description"],         balance: ["Closing Balance"] },
   { id: "generic", name: "Generic CSV",            note: "date, amount, type/direction, description", date: ["date","Date","DATE"], debit: [], credit: [], amount: ["amount","Amount"], direction: ["type","direction","Type","Direction"], description: ["description","narration","remarks","Description","Narration","Remarks"], balance: ["balance","Balance","closing_balance"] },
+  {
+    id: "tally" as BankId,
+    name: "Tally (ERP 9 / Prime)",
+    note: "Export Day Book or Cash/Bank Ledger as CSV or XML from Tally",
+    date: ["Date", "DATE", "Voucher Date", "VoucherDate", "Txn Date"],
+    debit: ["Debit", "DEBIT", "Dr", "DR", "Withdrawal", "Outflow"],
+    credit: ["Credit", "CREDIT", "Cr", "CR", "Deposit", "Inflow"],
+    amount: ["Amount", "AMOUNT", "Voucher Amount", "VoucherAmount"],
+    direction: ["Type", "VoucherType", "Voucher Type", "Direction"],
+    description: ["Particulars", "PARTICULARS", "Narration", "NARRATION", "Ledger Name", "LedgerName", "Remarks"],
+    balance: ["Closing Balance", "ClosingBalance", "Balance", "BALANCE", "Running Balance"],
+  },
 ];
 
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -35,6 +47,70 @@ function parseCSV(text: string): string[][] {
   return text.trim().split(/\r?\n/).map((row) =>
     row.split(",").map((cell) => cell.trim().replace(/^"|"$/g, ""))
   );
+}
+
+function parseTallyXML(xmlText: string, businessId: string): { txns: ParsedTxn[]; error?: string } {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, "text/xml");
+    const parserError = doc.querySelector("parsererror");
+    if (parserError) return { txns: [], error: "Invalid XML file. Export from Tally as CSV instead." };
+
+    const txns: ParsedTxn[] = [];
+    const vouchers = doc.querySelectorAll("VOUCHER, Voucher, voucher");
+    if (vouchers.length === 0) {
+      const tallymsg = doc.querySelector("TALLYMESSAGE, TALLYMESSAGES");
+      if (!tallymsg) return { txns: [], error: "No voucher data found in this XML. Try exporting as CSV from Tally." };
+      const vouchers2 = tallymsg.querySelectorAll("VOUCHER");
+      if (vouchers2.length === 0) return { txns: [], error: "No transactions found in this Tally XML file." };
+      vouchers2.forEach((v) => extractTallyVoucher(v, businessId, txns));
+    } else {
+      vouchers.forEach((v) => extractTallyVoucher(v, businessId, txns));
+    }
+
+    if (!txns.length) return { txns: [], error: "No valid transactions found in this Tally XML file." };
+    return { txns };
+  } catch {
+    return { txns: [], error: "Could not parse this XML file. Try exporting as CSV from Tally instead." };
+  }
+}
+
+function extractTallyVoucher(v: Element, businessId: string, txns: ParsedTxn[]) {
+  const getText = (tags: string[]): string => {
+    for (const tag of tags) {
+      const el = v.querySelector(tag);
+      if (el && el.textContent?.trim()) return el.textContent.trim();
+    }
+    return "";
+  };
+
+  const rawDate = getText(["DATE", "Date", "VOUCHERDATE", "VoucherDate"]);
+  const rawAmt = getText(["AMOUNT", "Amount", "DR", "CR", "DEBIT", "CREDIT"]);
+  const narration = getText(["NARRATION", "Narration", "PARTICULARS", "Particulars", "LEDGERNAME", "LedgerName"]) || "Tally voucher";
+  const vtype = getText(["VOUCHERTYPENAME", "VoucherTypeName", "VOUCHERTYPE", "Type"]).toLowerCase();
+  const balText = getText(["CLOSINGBALANCE", "ClosingBalance", "BALANCE", "Balance"]);
+
+  if (!rawDate || !rawAmt) return;
+
+  const iso = toISODate(rawDate.replace(/(\d{8})/, (m) => `${m.slice(0,2)}-${m.slice(2,4)}-${m.slice(4)}`));
+  if (!iso) return;
+
+  const amt = Math.abs(toNumber(rawAmt));
+  if (!amt) return;
+
+  const isInflow = /receipt|bank receipt|contra|deposit|inflow|cr/.test(vtype);
+  const dir: "in" | "out" = isInflow ? "in" : "out";
+  const bal = balText ? toNumber(balText) : null;
+
+  txns.push({
+    business_id: businessId,
+    date: iso,
+    transaction_date: iso,
+    amount: amt,
+    direction: dir,
+    description: narration.slice(0, 500),
+    balance_after: bal && isFinite(bal) ? bal : null,
+  });
 }
 
 function pick(headers: string[], candidates: string[]): number {
@@ -153,6 +229,14 @@ export default function ImportPage() {
     runway_months: number;
   }>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [tallyColumnMap, setTallyColumnMap] = useState<{
+    dateCol: string;
+    amountCol: string;
+    descriptionCol: string;
+    directionCol: string;
+    balanceCol: string;
+  } | null>(null);
+  const [showColumnMapper, setShowColumnMapper] = useState(false);
 
   const bank = useMemo(() => BANKS.find((b) => b.id === bankId) ?? null, [bankId]);
 
@@ -160,13 +244,21 @@ export default function ImportPage() {
     setError(null);
     setResult(null);
     if (!f) { setFile(null); setRawRows([]); return; }
-    if (!f.name.toLowerCase().endsWith(".csv")) { setError("Only .csv files are supported"); return; }
+    const isCSV = f.name.toLowerCase().endsWith(".csv");
+    const isXML = f.name.toLowerCase().endsWith(".xml");
+    if (!isCSV && !isXML) { setError("Tally supports CSV and XML exports. Other file types are not accepted."); return; }
     if (f.size > MAX_SIZE) { setError("File exceeds 10MB limit"); return; }
     const text = await f.text();
+    if (isXML && bankId === "tally") {
+      setFile(f);
+      setRawRows([["XML file detected — Tally XML will be parsed automatically on import"]]);
+      return;
+    }
     const rows = parseCSV(text);
     setFile(f);
     setRawRows(rows.slice(0, 6));
   }
+
 
   async function runImport() {
     if (!bank || !file || !businessId) return;
@@ -175,6 +267,50 @@ export default function ImportPage() {
 
     try {
       const text = await file.text();
+      const isXML = file.name.toLowerCase().endsWith(".xml");
+      if (bankId === "tally" && isXML) {
+        const { txns: xmlTxns, error: xmlErr } = parseTallyXML(text, businessId);
+        if (xmlErr || !xmlTxns.length) {
+          const msg = xmlErr || "No rows parsed from Tally XML";
+          setError(msg);
+          track("csv_import_failed", { error: msg, bank: "tally_xml" });
+          setBusy(false);
+          return;
+        }
+
+        const BATCH_XML = 100;
+        setProgress({ done: 0, total: xmlTxns.length });
+        for (let i = 0; i < xmlTxns.length; i += BATCH_XML) {
+          const chunk = xmlTxns.slice(i, i + BATCH_XML);
+          const { error: insErr } = await supabase.from("transactions").insert(chunk);
+          if (insErr) {
+            const msg = `Database insert failed: ${insErr.message}`;
+            setError(msg);
+            track("csv_import_failed", { error: msg, bank: "tally_xml", inserted: i });
+            setBusy(false);
+            return;
+          }
+          setProgress({ done: Math.min(i + BATCH_XML, xmlTxns.length), total: xmlTxns.length });
+        }
+
+        const { data: compData, error: compErr } = await supabase.functions.invoke("compute-liquidity", {
+          body: { business_id: businessId },
+        });
+        if (compErr) {
+          setError(`Imported ${xmlTxns.length} rows but liquidity computation failed: ${compErr.message}`);
+          setBusy(false);
+          return;
+        }
+        setResult({
+          rows: xmlTxns.length,
+          cash_position: compData?.cash_position ?? 0,
+          burn_rate_current: compData?.burn_rate_current ?? 0,
+          runway_months: compData?.runway_months ?? 0,
+        });
+        track("csv_import_completed", { records: xmlTxns.length, bank: "tally_xml" });
+        setBusy(false);
+        return;
+      }
       const rows = parseCSV(text);
       const { txns, error: mapErr } = mapRows(rows, bank, businessId);
       if (mapErr || !txns.length) {
@@ -280,6 +416,37 @@ export default function ImportPage() {
           </div>
         </section>
 
+        {bankId === "tally" && (
+          <div style={{ background: "#FDFAF3", border: "1px solid rgba(139,105,20,0.2)", borderRadius: 12, padding: "20px 24px", marginBottom: 24 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              How to export from Tally
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally Prime</div>
+                {["Gateway of Tally", "Display More Reports", "Account Books", "Cash or Bank Book", "Select your date range", "Press Alt + E to Export", "Choose Excel or XML format", "Save and upload here"].map((step, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 20 }}>{i + 1}.</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>{step}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally ERP 9</div>
+                {["Gateway of Tally", "Display", "Account Books", "Cash or Bank Book", "Select period (F2)", "Press Alt + E to Export", "Select Excel format", "Save and upload here"].map((step, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 20 }}>{i + 1}.</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginTop: 16, padding: "10px 14px", background: "rgba(196,30,30,0.06)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 12, color: "#92400e" }}>
+              If your columns are not recognised automatically, FYNHelp will show a mapping screen where you can match your Tally columns to the correct fields. No data is lost.
+            </div>
+          </div>
+        )}
+
         {/* Section 2 — upload */}
         <section className="mb-8">
           <div className="text-[11px] tracking-widest mb-3" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace" }}>STEP 2 · UPLOAD CSV</div>
@@ -302,11 +469,11 @@ export default function ImportPage() {
             <div className="text-fyn-ink font-medium mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
               Drop your bank statement CSV here or click to browse
             </div>
-            <div className="text-xs text-fyn-ink/50" style={{ fontFamily: "Inter, sans-serif" }}>.csv only · up to 10MB</div>
+            <div className="text-xs text-fyn-ink/50" style={{ fontFamily: "Inter, sans-serif" }}>.csv and .xml supported · up to 10MB (for Tally select XML or CSV export)</div>
             <input
               ref={inputRef}
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,.xml,text/csv,text/xml,application/xml"
               className="hidden"
               onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
             />
@@ -355,6 +522,38 @@ export default function ImportPage() {
             </div>
           )}
         </section>
+
+        {bankId === "tally" && rawRows.length > 1 && (() => {
+          const headers = rawRows[0];
+          const hasKnownDate = headers.some(h => ["Date","DATE","Voucher Date","VoucherDate","Txn Date"].some(k => h.toLowerCase() === k.toLowerCase()));
+          if (hasKnownDate) return null;
+          return (
+            <div style={{ background: "#FFF7ED", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#92400e", marginBottom: 8 }}>
+                Column names not recognised — please map them below
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Date column", key: "dateCol" as const },
+                  { label: "Amount column", key: "amountCol" as const },
+                  { label: "Description column", key: "descriptionCol" as const },
+                  { label: "Type or direction column", key: "directionCol" as const },
+                ].map(({ label, key }) => (
+                  <div key={key}>
+                    <label style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "#92400e", display: "block", marginBottom: 4 }}>{label}</label>
+                    <select
+                      onChange={(e) => setTallyColumnMap(prev => ({ ...(prev || { dateCol:"", amountCol:"", descriptionCol:"", directionCol:"", balanceCol:"" }), [key]: e.target.value }))}
+                      style={{ width: "100%", height: 36, padding: "0 10px", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: "#1A1008", background: "white" }}
+                    >
+                      <option value="">Select column</option>
+                      {headers.map((h, i) => <option key={i} value={h}>{h}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Section 3 — import + result */}
         <section className="mb-8">
