@@ -49,6 +49,70 @@ function parseCSV(text: string): string[][] {
   );
 }
 
+function parseTallyXML(xmlText: string, businessId: string): { txns: ParsedTxn[]; error?: string } {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, "text/xml");
+    const parserError = doc.querySelector("parsererror");
+    if (parserError) return { txns: [], error: "Invalid XML file. Export from Tally as CSV instead." };
+
+    const txns: ParsedTxn[] = [];
+    const vouchers = doc.querySelectorAll("VOUCHER, Voucher, voucher");
+    if (vouchers.length === 0) {
+      const tallymsg = doc.querySelector("TALLYMESSAGE, TALLYMESSAGES");
+      if (!tallymsg) return { txns: [], error: "No voucher data found in this XML. Try exporting as CSV from Tally." };
+      const vouchers2 = tallymsg.querySelectorAll("VOUCHER");
+      if (vouchers2.length === 0) return { txns: [], error: "No transactions found in this Tally XML file." };
+      vouchers2.forEach((v) => extractTallyVoucher(v, businessId, txns));
+    } else {
+      vouchers.forEach((v) => extractTallyVoucher(v, businessId, txns));
+    }
+
+    if (!txns.length) return { txns: [], error: "No valid transactions found in this Tally XML file." };
+    return { txns };
+  } catch {
+    return { txns: [], error: "Could not parse this XML file. Try exporting as CSV from Tally instead." };
+  }
+}
+
+function extractTallyVoucher(v: Element, businessId: string, txns: ParsedTxn[]) {
+  const getText = (tags: string[]): string => {
+    for (const tag of tags) {
+      const el = v.querySelector(tag);
+      if (el && el.textContent?.trim()) return el.textContent.trim();
+    }
+    return "";
+  };
+
+  const rawDate = getText(["DATE", "Date", "VOUCHERDATE", "VoucherDate"]);
+  const rawAmt = getText(["AMOUNT", "Amount", "DR", "CR", "DEBIT", "CREDIT"]);
+  const narration = getText(["NARRATION", "Narration", "PARTICULARS", "Particulars", "LEDGERNAME", "LedgerName"]) || "Tally voucher";
+  const vtype = getText(["VOUCHERTYPENAME", "VoucherTypeName", "VOUCHERTYPE", "Type"]).toLowerCase();
+  const balText = getText(["CLOSINGBALANCE", "ClosingBalance", "BALANCE", "Balance"]);
+
+  if (!rawDate || !rawAmt) return;
+
+  const iso = toISODate(rawDate.replace(/(\d{8})/, (m) => `${m.slice(0,2)}-${m.slice(2,4)}-${m.slice(4)}`));
+  if (!iso) return;
+
+  const amt = Math.abs(toNumber(rawAmt));
+  if (!amt) return;
+
+  const isInflow = /receipt|bank receipt|contra|deposit|inflow|cr/.test(vtype);
+  const dir: "in" | "out" = isInflow ? "in" : "out";
+  const bal = balText ? toNumber(balText) : null;
+
+  txns.push({
+    business_id: businessId,
+    date: iso,
+    transaction_date: iso,
+    amount: amt,
+    direction: dir,
+    description: narration.slice(0, 500),
+    balance_after: bal && isFinite(bal) ? bal : null,
+  });
+}
+
 function pick(headers: string[], candidates: string[]): number {
   for (const c of candidates) {
     const idx = headers.findIndex((h) => h.toLowerCase() === c.toLowerCase());
