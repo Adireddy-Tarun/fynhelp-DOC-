@@ -416,6 +416,37 @@ export default function ImportPage() {
           </div>
         </section>
 
+        {bankId === "tally" && (
+          <div style={{ background: "#FDFAF3", border: "1px solid rgba(139,105,20,0.2)", borderRadius: 12, padding: "20px 24px", marginBottom: 24 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              How to export from Tally
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally Prime</div>
+                {["Gateway of Tally", "Display More Reports", "Account Books", "Cash or Bank Book", "Select your date range", "Press Alt + E to Export", "Choose Excel or XML format", "Save and upload here"].map((step, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 20 }}>{i + 1}.</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>{step}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally ERP 9</div>
+                {["Gateway of Tally", "Display", "Account Books", "Cash or Bank Book", "Select period (F2)", "Press Alt + E to Export", "Select Excel format", "Save and upload here"].map((step, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 20 }}>{i + 1}.</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginTop: 16, padding: "10px 14px", background: "rgba(196,30,30,0.06)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 12, color: "#92400e" }}>
+              If your columns are not recognised automatically, FYNHelp will show a mapping screen where you can match your Tally columns to the correct fields. No data is lost.
+            </div>
+          </div>
+        )}
+
         {/* Section 2 — upload */}
         <section className="mb-8">
           <div className="text-[11px] tracking-widest mb-3" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace" }}>STEP 2 · UPLOAD CSV</div>
