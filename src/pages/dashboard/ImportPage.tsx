@@ -27,6 +27,18 @@ const BANKS: BankMapping[] = [
   { id: "axis",    name: "Axis Bank",              note: "Account statement CSV",             date: ["Tran Date"],        debit: ["Dr Amount"],       credit: ["Cr Amount"],    description: ["Particulars"],         balance: ["Balance"] },
   { id: "kotak",   name: "Kotak Mahindra Bank",    note: "eStatement CSV export",             date: ["Transaction Date"], debit: ["Debit"],           credit: ["Credit"],       description: ["Description"],         balance: ["Closing Balance"] },
   { id: "generic", name: "Generic CSV",            note: "date, amount, type/direction, description", date: ["date","Date","DATE"], debit: [], credit: [], amount: ["amount","Amount"], direction: ["type","direction","Type","Direction"], description: ["description","narration","remarks","Description","Narration","Remarks"], balance: ["balance","Balance","closing_balance"] },
+  {
+    id: "tally" as BankId,
+    name: "Tally (ERP 9 / Prime)",
+    note: "Export Day Book or Cash/Bank Ledger as CSV or XML from Tally",
+    date: ["Date", "DATE", "Voucher Date", "VoucherDate", "Txn Date"],
+    debit: ["Debit", "DEBIT", "Dr", "DR", "Withdrawal", "Outflow"],
+    credit: ["Credit", "CREDIT", "Cr", "CR", "Deposit", "Inflow"],
+    amount: ["Amount", "AMOUNT", "Voucher Amount", "VoucherAmount"],
+    direction: ["Type", "VoucherType", "Voucher Type", "Direction"],
+    description: ["Particulars", "PARTICULARS", "Narration", "NARRATION", "Ledger Name", "LedgerName", "Remarks"],
+    balance: ["Closing Balance", "ClosingBalance", "Balance", "BALANCE", "Running Balance"],
+  },
 ];
 
 const MAX_SIZE = 10 * 1024 * 1024;
