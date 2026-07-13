@@ -438,11 +438,11 @@ export default function ImportPage() {
             <div className="text-fyn-ink font-medium mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
               Drop your bank statement CSV here or click to browse
             </div>
-            <div className="text-xs text-fyn-ink/50" style={{ fontFamily: "Inter, sans-serif" }}>.csv only · up to 10MB</div>
+            <div className="text-xs text-fyn-ink/50" style={{ fontFamily: "Inter, sans-serif" }}>.csv and .xml supported · up to 10MB (for Tally select XML or CSV export)</div>
             <input
               ref={inputRef}
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,.xml,text/csv,text/xml,application/xml"
               className="hidden"
               onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
             />
