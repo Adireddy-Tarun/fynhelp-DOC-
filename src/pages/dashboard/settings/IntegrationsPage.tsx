@@ -7,6 +7,10 @@ import {
 import { useIntegrations } from "@/hooks/useIntegrations";
 import ConnectIntegrationModal, { ConnectMethod } from "@/components/integrations/ConnectIntegrationModal";
 import BankStatementImport from "@/components/integrations/BankStatementImport";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 /* ============================================================
    FynHelp · Integrations
@@ -282,7 +286,54 @@ const PROVIDER_BY_SLUG = new Map(ALL.map((p) => [p.slug, p]));
 
 const IntegrationsPage = () => {
   const { byProvider, connectedCount, connect, disconnect, isConnecting } = useIntegrations();
+  const { businessId } = useAuth();
+  const qc = useQueryClient();
   const [modal, setModal] = useState<Provider | null>(null);
+  const [verifyingRazorpay, setVerifyingRazorpay] = useState(false);
+
+  const handleRazorpayConnect = async (key_id: string, key_secret: string) => {
+    if (!businessId) {
+      toast.error("Complete onboarding before connecting Razorpay.");
+      return;
+    }
+    setVerifyingRazorpay(true);
+    const t = toast.loading("Verifying with Razorpay…");
+    try {
+      const { data, error } = await supabase.functions.invoke("razorpay-verify-keys", {
+        body: { organization_id: businessId, key_id, key_secret },
+      });
+      if (error) {
+        // Try to surface edge function body error
+        const ctx = (error as any).context;
+        let msg = error.message ?? "Verification failed";
+        try {
+          const body = await ctx?.json?.();
+          if (body?.error) msg = body.error;
+        } catch { /* ignore */ }
+        toast.error(msg, { id: t });
+        return;
+      }
+      if ((data as any)?.error) {
+        toast.error((data as any).error, { id: t });
+        return;
+      }
+      const mode = (data as any)?.mode ?? "test";
+      const registered = (data as any)?.webhook_registered;
+      const warn = (data as any)?.webhook_warning;
+      toast.success(
+        `Razorpay connected (${mode}). ${registered ? "Webhook registered." : "Webhook not registered — see instructions."}`,
+        { id: t },
+      );
+      if (warn) toast.warning(warn, { duration: 12000 });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingRazorpay(false);
+    }
+  };
+
 
   // Effective connected count = DB active integrations + always-active built-ins.
   const alwaysActiveSlugs = ALL.filter((p) => p.alwaysActive).map((p) => p.slug);
@@ -408,13 +459,25 @@ const IntegrationsPage = () => {
       {modal && (
         <ConnectIntegrationModal
           open={!!modal}
-          onClose={() => setModal(null)}
+          onClose={() => (verifyingRazorpay ? null : setModal(null))}
           provider={modal.slug}
           providerLabel={modal.label}
           method={modal.connect}
-          busy={isConnecting}
+          busy={isConnecting || (modal.slug === "razorpay" && verifyingRazorpay)}
+          helperText={
+            modal.slug === "razorpay"
+              ? "Paste your Razorpay Key ID and Key Secret from Dashboard → Settings → API Keys. We'll verify them with Razorpay before saving."
+              : undefined
+          }
           onConfirm={(metadata) => {
-            connect({ provider: modal.slug, metadata });
+            if (modal.slug === "razorpay") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleRazorpayConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            // Strip raw credentials from generic path — they must not be persisted
+            const { __credentials: _ignored, ...safe } = metadata as Record<string, unknown>;
+            connect({ provider: modal.slug, metadata: safe });
             setModal(null);
           }}
         />
