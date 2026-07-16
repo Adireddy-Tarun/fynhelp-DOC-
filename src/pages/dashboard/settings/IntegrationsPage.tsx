@@ -7,6 +7,9 @@ import {
 import { useIntegrations } from "@/hooks/useIntegrations";
 import ConnectIntegrationModal, { ConnectMethod } from "@/components/integrations/ConnectIntegrationModal";
 import BankStatementImport from "@/components/integrations/BankStatementImport";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 /* ============================================================
    FynHelp · Integrations
