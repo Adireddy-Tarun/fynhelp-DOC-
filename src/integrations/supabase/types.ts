@@ -5117,6 +5117,39 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string
+          id: string
+          organization_id: string | null
+          payload: Json
+          processed: boolean
+          provider: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          organization_id?: string | null
+          payload: Json
+          processed?: boolean
+          provider: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          organization_id?: string | null
+          payload?: Json
+          processed?: boolean
+          provider?: string
+        }
+        Relationships: []
+      }
       whatsapp_messages: {
         Row: {
           created_at: string
