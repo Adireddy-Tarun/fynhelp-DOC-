@@ -459,13 +459,25 @@ const IntegrationsPage = () => {
       {modal && (
         <ConnectIntegrationModal
           open={!!modal}
-          onClose={() => setModal(null)}
+          onClose={() => (verifyingRazorpay ? null : setModal(null))}
           provider={modal.slug}
           providerLabel={modal.label}
           method={modal.connect}
-          busy={isConnecting}
+          busy={isConnecting || (modal.slug === "razorpay" && verifyingRazorpay)}
+          helperText={
+            modal.slug === "razorpay"
+              ? "Paste your Razorpay Key ID and Key Secret from Dashboard → Settings → API Keys. We'll verify them with Razorpay before saving."
+              : undefined
+          }
           onConfirm={(metadata) => {
-            connect({ provider: modal.slug, metadata });
+            if (modal.slug === "razorpay") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleRazorpayConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            // Strip raw credentials from generic path — they must not be persisted
+            const { __credentials: _ignored, ...safe } = metadata as Record<string, unknown>;
+            connect({ provider: modal.slug, metadata: safe });
             setModal(null);
           }}
         />
