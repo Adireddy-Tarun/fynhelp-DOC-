@@ -285,10 +285,55 @@ const SECTIONS: { title: string; sub?: string; slugs: string[] }[] = [
 const PROVIDER_BY_SLUG = new Map(ALL.map((p) => [p.slug, p]));
 
 const IntegrationsPage = () => {
-  const { byProvider, connectedCount, connect, disconnect, isConnecting, refetch } = useIntegrations() as any;
+  const { byProvider, connectedCount, connect, disconnect, isConnecting } = useIntegrations();
   const { businessId } = useAuth();
+  const qc = useQueryClient();
   const [modal, setModal] = useState<Provider | null>(null);
   const [verifyingRazorpay, setVerifyingRazorpay] = useState(false);
+
+  const handleRazorpayConnect = async (key_id: string, key_secret: string) => {
+    if (!businessId) {
+      toast.error("Complete onboarding before connecting Razorpay.");
+      return;
+    }
+    setVerifyingRazorpay(true);
+    const t = toast.loading("Verifying with Razorpay…");
+    try {
+      const { data, error } = await supabase.functions.invoke("razorpay-verify-keys", {
+        body: { organization_id: businessId, key_id, key_secret },
+      });
+      if (error) {
+        // Try to surface edge function body error
+        const ctx = (error as any).context;
+        let msg = error.message ?? "Verification failed";
+        try {
+          const body = await ctx?.json?.();
+          if (body?.error) msg = body.error;
+        } catch { /* ignore */ }
+        toast.error(msg, { id: t });
+        return;
+      }
+      if ((data as any)?.error) {
+        toast.error((data as any).error, { id: t });
+        return;
+      }
+      const mode = (data as any)?.mode ?? "test";
+      const registered = (data as any)?.webhook_registered;
+      const warn = (data as any)?.webhook_warning;
+      toast.success(
+        `Razorpay connected (${mode}). ${registered ? "Webhook registered." : "Webhook not registered — see instructions."}`,
+        { id: t },
+      );
+      if (warn) toast.warning(warn, { duration: 12000 });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingRazorpay(false);
+    }
+  };
+
 
   // Effective connected count = DB active integrations + always-active built-ins.
   const alwaysActiveSlugs = ALL.filter((p) => p.alwaysActive).map((p) => p.slug);
