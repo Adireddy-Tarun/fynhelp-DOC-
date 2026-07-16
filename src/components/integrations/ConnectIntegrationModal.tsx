@@ -50,8 +50,11 @@ export default function ConnectIntegrationModal({
     if (method === "api_key") {
       meta.api_key_last4 = apiKey.slice(-4);
       if (apiSecret) meta.has_secret = true;
+      // Raw credentials for handlers that need to verify (never persisted by generic flow)
+      meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
+      meta.__credentials = { token: botToken.trim() };
     } else if (method === "file") {
       meta.file_name = file?.name;
       meta.file_size = file?.size;
