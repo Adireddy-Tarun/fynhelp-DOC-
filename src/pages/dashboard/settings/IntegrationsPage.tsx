@@ -284,8 +284,10 @@ const SECTIONS: { title: string; sub?: string; slugs: string[] }[] = [
 const PROVIDER_BY_SLUG = new Map(ALL.map((p) => [p.slug, p]));
 
 const IntegrationsPage = () => {
-  const { byProvider, connectedCount, connect, disconnect, isConnecting } = useIntegrations();
+  const { byProvider, connectedCount, connect, disconnect, isConnecting, refetch } = useIntegrations() as any;
+  const { businessId } = useAuth();
   const [modal, setModal] = useState<Provider | null>(null);
+  const [verifyingRazorpay, setVerifyingRazorpay] = useState(false);
 
   // Effective connected count = DB active integrations + always-active built-ins.
   const alwaysActiveSlugs = ALL.filter((p) => p.alwaysActive).map((p) => p.slug);
