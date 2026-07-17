@@ -124,8 +124,22 @@ export default function ConnectIntegrationModal({
 
         {method === "api_key" && (
           <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
-            <LabeledInput label="API Key" value={apiKey} onChange={setApiKey} placeholder="rzp_live_XXXXXXXXXXXX" />
-            <LabeledInput label="API Secret (optional)" value={apiSecret} onChange={setApiSecret} placeholder="••••••••" type="password" />
+            {isWoo && (
+              <LabeledInput label="Store URL" value={storeUrl} onChange={setStoreUrl} placeholder="https://your-store.com" />
+            )}
+            <LabeledInput
+              label={isWoo ? "Consumer Key" : "API Key"}
+              value={apiKey}
+              onChange={setApiKey}
+              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : "rzp_live_XXXXXXXXXXXX"}
+            />
+            <LabeledInput
+              label={isWoo ? "Consumer Secret" : "API Secret (optional)"}
+              value={apiSecret}
+              onChange={setApiSecret}
+              placeholder="••••••••"
+              type="password"
+            />
           </div>
         )}
         {method === "bot_token" && (
