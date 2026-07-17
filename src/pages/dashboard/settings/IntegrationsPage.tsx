@@ -207,13 +207,14 @@ const ALL: Provider[] = [
   { slug: "razorpayx", label: "RazorpayX (Current Account)", method: "API Key", connect: "api_key", logo: L.razorpayx, note: "For RazorpayX current account holders" },
 
   // Banking (8)
-  { slug: "bank_aa_hdfc", label: "HDFC Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_icici", label: "ICICI Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_sbi", label: "SBI", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_axis", label: "Axis Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_kotak", label: "Kotak Mahindra Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_fi", label: "Fi Money", method: "Account Aggregator", connect: "oauth", logo: L.fi, note: "Neo-bank for startups" },
-  { slug: "bank_aa_jupiter", label: "Jupiter", method: "Account Aggregator", connect: "oauth", logo: L.jupiter },
+  // Banking (8) — Account Aggregator connections require AA-provider registration
+  { slug: "bank_aa_hdfc", label: "HDFC Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_icici", label: "ICICI Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_sbi", label: "SBI", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_axis", label: "Axis Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_kotak", label: "Kotak Mahindra Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_fi", label: "Fi Money", method: "Account Aggregator", connect: "oauth", logo: L.fi, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_jupiter", label: "Jupiter", method: "Account Aggregator", connect: "oauth", logo: L.jupiter, comingSoon: true, note: "Requires Account Aggregator provider registration." },
   { slug: "pdf_upload", label: "PDF Bank Statement", method: "File Upload + OCR", connect: "file", logo: L.doc, alwaysActive: true },
 
   // Accounting (4)
@@ -223,21 +224,21 @@ const ALL: Provider[] = [
   { slug: "busy", label: "Busy Accounting", method: "CSV Upload", connect: "file", logo: L.busy },
 
   // Payroll & HR (6)
-  { slug: "keka_hr", label: "Keka HR", method: "OAuth API", connect: "oauth", logo: L.keka },
-  { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr },
-  { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay },
-  { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox },
+  { slug: "keka_hr", label: "Keka HR", method: "OAuth API", connect: "oauth", logo: L.keka, comingSoon: true, note: "Partner API access required. Apply at https://www.keka.com/partners." },
+  { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr, comingSoon: true, note: "Partner API access required. Apply at https://www.greythr.com/partners." },
+  { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay, comingSoon: true, note: "Partner API access required. Apply at https://razorpay.com/payroll/partners." },
+  { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox, comingSoon: true, note: "Partner API access required. Apply at https://darwinbox.com/partners." },
   { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Separate from Zoho Books" },
   { slug: "manual_payroll", label: "Manual Payroll Entry", method: "Always available", connect: "oauth", logo: L.manualPay, alwaysActive: true },
 
   // GST & Compliance (2)
-  { slug: "gst_portal", label: "GST Portal via GSP", method: "Direct API", connect: "api_key", logo: L.gst },
-  { slug: "traces_tds", label: "TRACES (TDS)", method: "Read-only", connect: "api_key", logo: L.traces, note: "Required for 26AS reconciliation" },
+  { slug: "gst_portal", label: "GST Portal via GSP", method: "Direct API", connect: "api_key", logo: L.gst, comingSoon: true, note: "Requires GSP registration with GSTN. Application in progress." },
+  { slug: "traces_tds", label: "TRACES (TDS)", method: "Read-only", connect: "api_key", logo: L.traces, comingSoon: true, note: "Requires GSP registration with GSTN. Application in progress." },
 
   // E-Commerce (4)
   { slug: "shopify", label: "Shopify", method: "OAuth 2.0", connect: "oauth", logo: L.shopify },
   { slug: "woocommerce", label: "WooCommerce", method: "API Key", connect: "api_key", logo: L.woo },
-  { slug: "amazon_seller", label: "Amazon Seller Central", method: "MWS API", connect: "api_key", logo: L.amazon },
+  { slug: "amazon_seller", label: "Amazon Seller Central", method: "SP-API Refresh Token", connect: "api_key", logo: L.amazon },
   { slug: "fynd_unicommerce", label: "Fynd / Unicommerce", method: "API Key", connect: "api_key", logo: L.fynd, note: "For multi-channel D2C brands" },
 
   // CRM & Sales (2)
