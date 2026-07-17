@@ -44,3 +44,21 @@ verify_jwt = true
 
 [functions.send-email-digest]
 verify_jwt = true
+
+[functions.payu-verify-keys]
+verify_jwt = true
+
+[functions.cashfree-verify-keys]
+verify_jwt = true
+
+[functions.instamojo-verify-keys]
+verify_jwt = true
+
+[functions.phonepe-verify-keys]
+verify_jwt = true
+
+[functions.paytm-verify-keys]
+verify_jwt = true
+
+[functions.razorpayx-verify-keys]
+verify_jwt = true
