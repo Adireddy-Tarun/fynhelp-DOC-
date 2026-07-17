@@ -584,11 +584,28 @@ const IntegrationsPage = () => {
         </div>
       ))}
 
-      {modal && (
+      {modal && (() => {
+        const API_KEY_VERIFIERS: Record<string, { fn: string; label: string; busy: boolean; setBusy: (b: boolean) => void; helper: string }> = {
+          payu: { fn: "payu-verify-keys", label: "PayU", busy: verifyingPayU, setBusy: setVerifyingPayU,
+            helper: "Paste your PayU Merchant Key and Merchant Salt from PayU Dashboard → Settings → My Account → Merchant Key/Salt." },
+          cashfree: { fn: "cashfree-verify-keys", label: "Cashfree", busy: verifyingCashfree, setBusy: setVerifyingCashfree,
+            helper: "Paste your Cashfree App ID and Secret Key from Dashboard → Developers → API Keys." },
+          instamojo: { fn: "instamojo-verify-keys", label: "Instamojo", busy: verifyingInstamojo, setBusy: setVerifyingInstamojo,
+            helper: "Paste your Instamojo Client ID and Client Secret from Dashboard → Integrations → API & Plugins." },
+          phonepe_business: { fn: "phonepe-verify-keys", label: "PhonePe Business", busy: verifyingPhonePe, setBusy: setVerifyingPhonePe,
+            helper: "Paste your PhonePe Merchant ID and Salt Key from the PhonePe Business dashboard. PhonePe cannot be probed without a live txn — the first webhook confirms your keys." },
+          paytm_business: { fn: "paytm-verify-keys", label: "Paytm for Business", busy: verifyingPaytm, setBusy: setVerifyingPaytm,
+            helper: "Paste your Paytm MID and Merchant Key from Paytm for Business → Developer Settings → API Keys." },
+          razorpayx: { fn: "razorpayx-verify-keys", label: "RazorpayX", busy: verifyingRazorpayX, setBusy: setVerifyingRazorpayX,
+            helper: "Paste your Razorpay Key ID (rzp_live_/rzp_test_) and Key Secret. RazorpayX must be enabled on this account." },
+        };
+        const api = API_KEY_VERIFIERS[modal.slug];
+        const anyApiBusy = Object.values(API_KEY_VERIFIERS).some((v) => v.busy);
+        return (
         <ConnectIntegrationModal
           open={!!modal}
           onClose={() =>
-            (verifyingRazorpay || verifyingStripe || verifyingWoo ? null : setModal(null))
+            (verifyingRazorpay || verifyingStripe || verifyingWoo || anyApiBusy ? null : setModal(null))
           }
           provider={modal.slug}
           providerLabel={modal.label}
@@ -597,7 +614,8 @@ const IntegrationsPage = () => {
             isConnecting ||
             (modal.slug === "razorpay" && verifyingRazorpay) ||
             (modal.slug === "stripe" && verifyingStripe) ||
-            (modal.slug === "woocommerce" && verifyingWoo)
+            (modal.slug === "woocommerce" && verifyingWoo) ||
+            (!!api && api.busy)
           }
           helperText={
             modal.slug === "razorpay"
@@ -606,7 +624,7 @@ const IntegrationsPage = () => {
               ? "Paste your Stripe Publishable Key (pk_…) and Secret Key (sk_…) from Dashboard → Developers → API keys. We'll verify them with Stripe before saving."
               : modal.slug === "woocommerce"
               ? "Enter your store URL (https://…) and a REST API Consumer Key + Secret from WooCommerce → Settings → Advanced → REST API. We'll verify against your store before saving."
-              : undefined
+              : api?.helper
           }
           onConfirm={(metadata) => {
             if (modal.slug === "razorpay") {
@@ -628,6 +646,16 @@ const IntegrationsPage = () => {
               );
               return;
             }
+            if (api) {
+              const creds = (metadata as any).__credentials ?? {};
+              handleApiKeyVerify(
+                api.fn, api.label,
+                String(creds.key_id ?? ""),
+                String(creds.key_secret ?? ""),
+                api.setBusy,
+              );
+              return;
+            }
             // For slack/telegram, promote credentials into metadata so send functions can read them.
             const rawCreds = (metadata as any).__credentials ?? {};
             const { __credentials: _ignored, ...safe } = metadata as Record<string, unknown>;
@@ -641,7 +669,8 @@ const IntegrationsPage = () => {
             setModal(null);
           }}
         />
-      )}
+        );
+      })()}
     </div>
   );
 };
