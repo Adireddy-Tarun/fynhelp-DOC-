@@ -26,7 +26,7 @@ export default function ConnectIntegrationModal({
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setBotToken(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setFile(null);
     }
   }, [open]);
 
