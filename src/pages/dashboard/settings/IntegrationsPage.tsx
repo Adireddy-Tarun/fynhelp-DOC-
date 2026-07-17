@@ -197,7 +197,7 @@ const lastSynced = "Last synced: just now";
 const ALL: Provider[] = [
   // Payments (8)
   { slug: "razorpay", label: "Razorpay", method: "API Key + Secret", connect: "api_key", logo: L.razorpay, note: "⭐ Recommended — most used by Indian startups", primary: true },
-  { slug: "stripe", label: "Stripe", method: "OAuth 2.0", connect: "oauth", logo: L.stripe, note: "For international payments in USD/EUR" },
+  { slug: "stripe", label: "Stripe", method: "API Key + Secret", connect: "api_key", logo: L.stripe, note: "For international payments in USD/EUR" },
   { slug: "payu", label: "PayU", method: "API Key", connect: "api_key", logo: L.payu },
   { slug: "cashfree", label: "Cashfree", method: "API Key", connect: "api_key", logo: L.cashfree },
   { slug: "phonepe_business", label: "PhonePe Business", method: "API Key", connect: "api_key", logo: L.phonepe },
