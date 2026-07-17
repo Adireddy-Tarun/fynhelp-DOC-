@@ -21,12 +21,15 @@ export default function ConnectIntegrationModal({
   const [apiSecret, setApiSecret] = useState("");
   const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
+  const [chatId, setChatId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const isWoo = provider === "woocommerce";
+  const isTelegram = provider === "telegram";
+  const isSlack = provider === "slack";
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setFile(null);
     }
   }, [open]);
 
@@ -46,7 +49,7 @@ export default function ConnectIntegrationModal({
       ? (isWoo
           ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
           : apiKey.trim().length > 0) :
-    method === "bot_token" ? botToken.trim().length > 5 :
+    method === "bot_token" ? (isTelegram ? (botToken.trim().length > 5 && chatId.trim().length > 0) : botToken.trim().length > 5) :
     method === "file" ? !!file : false;
 
   const submit = () => {
@@ -68,7 +71,12 @@ export default function ConnectIntegrationModal({
       }
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
-      meta.__credentials = { token: botToken.trim() };
+      if (isTelegram) {
+        meta.chat_id = chatId.trim();
+        meta.__credentials = { token: botToken.trim(), chat_id: chatId.trim() };
+      } else {
+        meta.__credentials = { token: botToken.trim() };
+      }
     } else if (method === "file") {
       meta.file_name = file?.name;
       meta.file_size = file?.size;
@@ -143,8 +151,21 @@ export default function ConnectIntegrationModal({
           </div>
         )}
         {method === "bot_token" && (
-          <div style={{ marginBottom: 18 }}>
-            <LabeledInput label="Bot Token" value={botToken} onChange={setBotToken} placeholder="123456:ABC-DEF..." />
+          <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+            <LabeledInput
+              label={isSlack ? "Incoming Webhook URL" : "Bot Token"}
+              value={botToken}
+              onChange={setBotToken}
+              placeholder={isSlack ? "https://hooks.slack.com/services/T.../B.../xxx" : "123456:ABC-DEF..."}
+            />
+            {isTelegram && (
+              <LabeledInput
+                label="Chat ID"
+                value={chatId}
+                onChange={setChatId}
+                placeholder="-1001234567890 or personal chat id"
+              />
+            )}
           </div>
         )}
         {method === "file" && (

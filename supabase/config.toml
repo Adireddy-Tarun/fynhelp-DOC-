@@ -35,3 +35,12 @@ verify_jwt = false
 
 [functions.woocommerce-verify-keys]
 verify_jwt = true
+
+[functions.send-slack-alert]
+verify_jwt = true
+
+[functions.send-telegram-alert]
+verify_jwt = true
+
+[functions.send-email-digest]
+verify_jwt = true

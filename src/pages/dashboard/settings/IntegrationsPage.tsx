@@ -245,7 +245,7 @@ const ALL: Provider[] = [
 
   // Alerts & Communication (3)
   { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Get daily briefs and alerts on WhatsApp" },
-  { slug: "slack", label: "Slack", method: "OAuth 2.0", connect: "oauth", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
+  { slug: "slack", label: "Slack", method: "Incoming Webhook URL", connect: "bot_token", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
   { slug: "telegram", label: "Telegram", method: "Bot Token", connect: "bot_token", logo: L.telegram, note: "Get Fynny alerts in Telegram" },
 
   // Productivity & Export (2)
@@ -575,8 +575,15 @@ const IntegrationsPage = () => {
               );
               return;
             }
-            // Strip raw credentials from generic path — they must not be persisted
+            // For slack/telegram, promote credentials into metadata so send functions can read them.
+            const rawCreds = (metadata as any).__credentials ?? {};
             const { __credentials: _ignored, ...safe } = metadata as Record<string, unknown>;
+            if (modal.slug === "slack") {
+              (safe as any).token = rawCreds.token;
+            } else if (modal.slug === "telegram") {
+              (safe as any).token = rawCreds.token;
+              (safe as any).chat_id = rawCreds.chat_id;
+            }
             connect({ provider: modal.slug, metadata: safe });
             setModal(null);
           }}

@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
 
-type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally";
+type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally" | "busy";
 
 interface BankMapping {
   id: BankId;
@@ -148,6 +148,18 @@ const BANKS: BankMapping[] = [
       "Closing Balance", "ClosingBalance", "Balance", "BALANCE",
       "Running Balance", "RunningBalance", "Ledger Balance",
     ],
+  },
+  {
+    id: "busy" as BankId,
+    name: "Busy Accounting",
+    note: "Export Day Book or Cash/Bank Book as CSV from Busy",
+    date: ["Date", "DATE", "Voucher Date", "Transaction Date"],
+    debit: ["Debit", "DEBIT", "Dr", "DR", "Debit Amount"],
+    credit: ["Credit", "CREDIT", "Cr", "CR", "Credit Amount"],
+    amount: ["Amount", "AMOUNT", "Voucher Amount"],
+    direction: ["Voucher Type", "VoucherType", "Type"],
+    description: ["Particulars", "PARTICULARS", "Narration", "NARRATION", "Description"],
+    balance: ["Balance", "BALANCE", "Closing Balance"],
   },
 ];
 
@@ -900,6 +912,28 @@ export default function ImportPage() {
                 Export the Cash or Bank Book — not the Day Book or Ledger Summary. If your columns are not recognised automatically, FYNHelp shows a mapping screen. XML exports from Tally Prime are also supported and recommended for the most accurate data.
               </span>
             </div>
+          </div>
+        )}
+
+        {/* BUSY EXPORT INSTRUCTIONS */}
+        {bankId === "busy" && (
+          <div style={{ background: "#FDFAF3", border: "1px solid rgba(139,105,20,0.2)", borderRadius: 12, padding: "20px 24px", marginBottom: 24 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              How to export from Busy Accounting
+            </div>
+            {[
+              "Open Busy Accounting",
+              "Go to Display then Day Book or Cash and Bank Book",
+              "Select the date range",
+              "Press Ctrl and E together or click Export",
+              "Choose CSV format",
+              "Save the file and upload below",
+            ].map((step, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
+                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 22, flexShrink: 0 }}>{i + 1}.</span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.75)", lineHeight: 1.4 }}>{step}</span>
+              </div>
+            ))}
           </div>
         )}
 
