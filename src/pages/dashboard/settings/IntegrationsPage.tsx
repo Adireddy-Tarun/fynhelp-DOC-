@@ -292,6 +292,12 @@ const IntegrationsPage = () => {
   const [verifyingRazorpay, setVerifyingRazorpay] = useState(false);
   const [verifyingStripe, setVerifyingStripe] = useState(false);
   const [verifyingWoo, setVerifyingWoo] = useState(false);
+  const [verifyingPayU, setVerifyingPayU] = useState(false);
+  const [verifyingCashfree, setVerifyingCashfree] = useState(false);
+  const [verifyingInstamojo, setVerifyingInstamojo] = useState(false);
+  const [verifyingPhonePe, setVerifyingPhonePe] = useState(false);
+  const [verifyingPaytm, setVerifyingPaytm] = useState(false);
+  const [verifyingRazorpayX, setVerifyingRazorpayX] = useState(false);
 
   const extractEdgeError = async (error: any, fallback: string) => {
     let msg = error?.message ?? fallback;
