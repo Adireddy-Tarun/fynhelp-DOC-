@@ -445,6 +445,7 @@ export type Database = {
           is_demo: boolean
           reconciled: boolean
           source_document_id: string | null
+          source_reference: string | null
           type: string
           updated_at: string
         }
@@ -460,6 +461,7 @@ export type Database = {
           is_demo?: boolean
           reconciled?: boolean
           source_document_id?: string | null
+          source_reference?: string | null
           type: string
           updated_at?: string
         }
@@ -475,6 +477,7 @@ export type Database = {
           is_demo?: boolean
           reconciled?: boolean
           source_document_id?: string | null
+          source_reference?: string | null
           type?: string
           updated_at?: string
         }
