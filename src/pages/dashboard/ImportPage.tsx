@@ -149,6 +149,18 @@ const BANKS: BankMapping[] = [
       "Running Balance", "RunningBalance", "Ledger Balance",
     ],
   },
+  {
+    id: "busy" as BankId,
+    name: "Busy Accounting",
+    note: "Export Day Book or Cash/Bank Book as CSV from Busy",
+    date: ["Date", "DATE", "Voucher Date", "Transaction Date"],
+    debit: ["Debit", "DEBIT", "Dr", "DR", "Debit Amount"],
+    credit: ["Credit", "CREDIT", "Cr", "CR", "Credit Amount"],
+    amount: ["Amount", "AMOUNT", "Voucher Amount"],
+    direction: ["Voucher Type", "VoucherType", "Type"],
+    description: ["Particulars", "PARTICULARS", "Narration", "NARRATION", "Description"],
+    balance: ["Balance", "BALANCE", "Closing Balance"],
+  },
 ];
 
 // ── TALLY VOUCHER TYPE CLASSIFICATION ────────────────────────────────────────
