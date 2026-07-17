@@ -663,7 +663,7 @@ const IntegrationsPage = () => {
         <ConnectIntegrationModal
           open={!!modal}
           onClose={() =>
-            (verifyingRazorpay || verifyingStripe || verifyingWoo || anyApiBusy ? null : setModal(null))
+            (verifyingRazorpay || verifyingStripe || verifyingWoo || verifyingAmazon || anyApiBusy || !!oauthBusy ? null : setModal(null))
           }
           provider={modal.slug}
           providerLabel={modal.label}
@@ -673,6 +673,8 @@ const IntegrationsPage = () => {
             (modal.slug === "razorpay" && verifyingRazorpay) ||
             (modal.slug === "stripe" && verifyingStripe) ||
             (modal.slug === "woocommerce" && verifyingWoo) ||
+            (modal.slug === "amazon_seller" && verifyingAmazon) ||
+            (oauthBusy === modal.slug) ||
             (!!api && api.busy)
           }
           helperText={
@@ -682,6 +684,14 @@ const IntegrationsPage = () => {
               ? "Paste your Stripe Publishable Key (pk_…) and Secret Key (sk_…) from Dashboard → Developers → API keys. We'll verify them with Stripe before saving."
               : modal.slug === "woocommerce"
               ? "Enter your store URL (https://…) and a REST API Consumer Key + Secret from WooCommerce → Settings → Advanced → REST API. We'll verify against your store before saving."
+              : modal.slug === "shopify"
+              ? "Enter your Shopify store domain (e.g. your-store.myshopify.com). You'll be redirected to Shopify to authorise FynHelp for read access to orders, products, and inventory."
+              : modal.slug === "quickbooks"
+              ? "You'll be redirected to Intuit to authorise FynHelp for read access to your QuickBooks accounting data."
+              : modal.slug === "hubspot"
+              ? "You'll be redirected to HubSpot to authorise FynHelp for read access to your contacts and deals."
+              : modal.slug === "amazon_seller"
+              ? "Enter your Marketplace ID (e.g. A21TJRUUN4KGV for Amazon.in), Seller ID, and the SP-API Refresh Token from Seller Central → Apps and Services → Develop apps. We'll verify with Amazon before saving."
               : api?.helper
           }
           onConfirm={(metadata) => {
@@ -704,14 +714,31 @@ const IntegrationsPage = () => {
               );
               return;
             }
+            if (modal.slug === "shopify") {
+              const creds = (metadata as any).__credentials ?? {};
+              startOAuth("shopify-auth", "Shopify", "shopify", { shop_domain: String(creds.shop_domain ?? "") });
+              return;
+            }
+            if (modal.slug === "quickbooks") {
+              startOAuth("quickbooks-auth", "QuickBooks", "quickbooks");
+              return;
+            }
+            if (modal.slug === "hubspot") {
+              startOAuth("hubspot-auth", "HubSpot", "hubspot");
+              return;
+            }
+            if (modal.slug === "amazon_seller") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleAmazonConnect({
+                marketplace_id: String(creds.marketplace_id ?? ""),
+                seller_id: String(creds.seller_id ?? ""),
+                refresh_token: String(creds.refresh_token ?? ""),
+              });
+              return;
+            }
             if (api) {
               const creds = (metadata as any).__credentials ?? {};
-              handleApiKeyVerify(
-                api.fn, api.label,
-                String(creds.key_id ?? ""),
-                String(creds.key_secret ?? ""),
-                api.setBusy,
-              );
+              handleApiKeyVerify(api.fn, api.label, String(creds.key_id ?? ""), String(creds.key_secret ?? ""), api.setBusy);
               return;
             }
             // For slack/telegram, promote credentials into metadata so send functions can read them.
