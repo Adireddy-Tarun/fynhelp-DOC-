@@ -150,6 +150,16 @@ export default function ConnectIntegrationModal({
             />
           </div>
         )}
+        {method === "oauth" && isShopify && (
+          <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+            <LabeledInput
+              label="Shop Domain"
+              value={shopDomain}
+              onChange={setShopDomain}
+              placeholder="your-store.myshopify.com"
+            />
+          </div>
+        )}
         {method === "bot_token" && (
           <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
             <LabeledInput
