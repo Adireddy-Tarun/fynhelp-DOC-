@@ -19,8 +19,10 @@ export default function ConnectIntegrationModal({
 }: ConnectIntegrationModalProps) {
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
+  const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const isWoo = provider === "woocommerce";
 
   useEffect(() => {
     if (open) {
