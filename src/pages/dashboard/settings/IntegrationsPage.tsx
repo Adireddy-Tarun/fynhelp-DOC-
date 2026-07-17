@@ -414,6 +414,53 @@ const IntegrationsPage = () => {
     }
   };
 
+  const handleApiKeyVerify = async (
+    fnName: string,
+    providerLabel: string,
+    key_id: string,
+    key_secret: string,
+    setBusy: (b: boolean) => void,
+    extraBody: Record<string, unknown> = {},
+  ) => {
+    if (!businessId) {
+      toast.error(`Complete onboarding before connecting ${providerLabel}.`);
+      return;
+    }
+    setBusy(true);
+    const t = toast.loading(`Verifying with ${providerLabel}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(fnName, {
+        body: { organization_id: businessId, key_id, key_secret, ...extraBody },
+      });
+      if (error) {
+        toast.error(await extractEdgeError(error, "Verification failed"), { id: t });
+        return;
+      }
+      if ((data as any)?.error) {
+        toast.error((data as any).error, { id: t });
+        return;
+      }
+      const mode = (data as any)?.mode ?? "live";
+      const warn = (data as any)?.webhook_warning;
+      const byApi = (data as any)?.verified_by_api;
+      toast.success(
+        byApi === false
+          ? `${providerLabel} saved (${mode}) — will complete verification on first webhook.`
+          : `${providerLabel} connected (${mode}).`,
+        { id: t },
+      );
+      if (warn) toast.warning(warn, { duration: 12000 });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+
+
 
 
   // Effective connected count = DB active integrations + always-active built-ins.
