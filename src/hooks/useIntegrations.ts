@@ -8,7 +8,6 @@ export type IntegrationRow = {
   organization_id: string;
   provider: string;
   status: string;
-  metadata: Record<string, unknown> | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -22,9 +21,10 @@ export function useIntegrations() {
     queryKey: ["integrations", orgId],
     enabled: !!orgId,
     queryFn: async (): Promise<IntegrationRow[]> => {
+      // SECURITY: never select `metadata` client-side — it holds secrets like key_secret / webhook_secret.
       const { data, error } = await supabase
         .from("integrations")
-        .select("id, organization_id, provider, status, metadata, created_at, updated_at")
+        .select("id, organization_id, provider, status, created_at, updated_at")
         .eq("organization_id", orgId);
       if (error) throw error;
       return (data ?? []) as unknown as IntegrationRow[];

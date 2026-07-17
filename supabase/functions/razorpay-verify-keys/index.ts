@@ -66,6 +66,55 @@ Deno.serve(async (req) => {
       return json({ error: "You do not own this organization" }, 403);
     }
 
+    // Rate limit: max 3 attempts per organization per 15 minutes
+    {
+      const rateLimitAction = "razorpay_verify";
+      const rateLimitWindow = 15 * 60 * 1000;
+      const maxAttempts = 3;
+      const { data: rateRow } = await admin
+        .from("auth_rate_limits")
+        .select("id, attempt_count, first_attempt_at, locked_until")
+        .eq("identifier", organization_id)
+        .eq("action", rateLimitAction)
+        .maybeSingle();
+      const now = Date.now();
+      if (rateRow) {
+        if (rateRow.locked_until && new Date(rateRow.locked_until).getTime() > now) {
+          const minutesLeft = Math.ceil((new Date(rateRow.locked_until).getTime() - now) / 60000);
+          return json({ error: `Too many verification attempts. Try again in ${minutesLeft} minutes.` }, 429);
+        }
+        const windowStart = new Date(rateRow.first_attempt_at).getTime();
+        if (now - windowStart < rateLimitWindow) {
+          if (rateRow.attempt_count >= maxAttempts) {
+            await admin.from("auth_rate_limits").update({
+              locked_until: new Date(now + 30 * 60 * 1000).toISOString(),
+              last_attempt_at: new Date().toISOString(),
+            }).eq("id", rateRow.id);
+            return json({ error: "Too many verification attempts. Locked for 30 minutes." }, 429);
+          }
+          await admin.from("auth_rate_limits").update({
+            attempt_count: rateRow.attempt_count + 1,
+            last_attempt_at: new Date().toISOString(),
+          }).eq("id", rateRow.id);
+        } else {
+          await admin.from("auth_rate_limits").update({
+            attempt_count: 1,
+            first_attempt_at: new Date().toISOString(),
+            last_attempt_at: new Date().toISOString(),
+            locked_until: null,
+          }).eq("id", rateRow.id);
+        }
+      } else {
+        await admin.from("auth_rate_limits").insert({
+          identifier: organization_id,
+          action: rateLimitAction,
+          attempt_count: 1,
+          first_attempt_at: new Date().toISOString(),
+          last_attempt_at: new Date().toISOString(),
+        });
+      }
+    }
+
     // Verify keys with Razorpay
     const verifyRes = await fetch(`${RZP_BASE}/payments?count=1`, {
       method: "GET",
@@ -127,6 +176,12 @@ Deno.serve(async (req) => {
     }
 
     const nowIso = new Date().toISOString();
+    // SECURITY NOTE: key_secret is stored in metadata jsonb on the integrations table.
+    // This is server-side only — the frontend never queries metadata directly.
+    // The integrations table has RLS scoped by organization_id so cross-org access is blocked.
+    // FUTURE: migrate to Supabase Vault (pgsodium) when available on this project tier
+    // for encrypted-at-rest secret storage. Until then, this is the accepted risk.
+    // key_secret must NEVER appear in any API response, log, or client-facing query.
     const metadata = {
       key_id,
       key_secret, // stored server-side only; never returned to client
