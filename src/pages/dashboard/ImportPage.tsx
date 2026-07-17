@@ -915,6 +915,28 @@ export default function ImportPage() {
           </div>
         )}
 
+        {/* BUSY EXPORT INSTRUCTIONS */}
+        {bankId === "busy" && (
+          <div style={{ background: "#FDFAF3", border: "1px solid rgba(139,105,20,0.2)", borderRadius: 12, padding: "20px 24px", marginBottom: 24 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              How to export from Busy Accounting
+            </div>
+            {[
+              "Open Busy Accounting",
+              "Go to Display then Day Book or Cash and Bank Book",
+              "Select the date range",
+              "Press Ctrl and E together or click Export",
+              "Choose CSV format",
+              "Save the file and upload below",
+            ].map((step, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
+                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 22, flexShrink: 0 }}>{i + 1}.</span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.75)", lineHeight: 1.4 }}>{step}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* STEP 2 — FILE UPLOAD */}
         <section className="mb-6">
           <div className="text-[11px] tracking-widest mb-3" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace" }}>
