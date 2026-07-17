@@ -116,8 +116,23 @@ Deno.serve(async (req) => {
         amountPaise: number; // signed, in paise
         description: string;
         date: string;
+        sourceRef: string;
       }) => {
         const amount = row.amountPaise / 100;
+        // Sanity bounds: reject obviously wrong amounts. Catches corrupted payloads / test-data pollution.
+        const MAX_SINGLE_TXN = 5000000; // Rs 50 lakhs
+        if (Math.abs(amount) > MAX_SINGLE_TXN) {
+          await admin.from("webhook_events").insert({
+            provider: "razorpay",
+            event_type: "AMOUNT_SANITY_BREACH",
+            organization_id: businessId,
+            payload: { amount, sourceRef: row.sourceRef, original_paise: row.amountPaise },
+            processed: false,
+            error: `Amount Rs ${Math.abs(amount)} exceeds sanity limit of Rs ${MAX_SINGLE_TXN}. Flagged for manual review.`,
+          });
+          return;
+        }
+        if (amount === 0) return;
         const { error } = await admin.from("bank_transactions").insert({
           business_id: businessId,
           date: row.date,
@@ -128,33 +143,44 @@ Deno.serve(async (req) => {
           category: "razorpay",
           reconciled: false,
           is_demo: false,
+          source_reference: row.sourceRef,
         });
-        if (error) throw error;
+        if (error) {
+          if ((error as { code?: string }).code === "23505") {
+            // Duplicate — event already processed. Skip silently (idempotency).
+            return;
+          }
+          throw error;
+        }
       };
 
       if (eventType === "payment.captured" || eventType === "order.paid") {
         const p = payload.payment?.entity ?? payload.order?.entity;
         if (p) {
+          const entityId = p.id ?? "";
           await insertTxn({
             amountPaise: Number(p.amount ?? 0),
-            description: `Razorpay ${eventType} ${p.id ?? ""}`.trim(),
+            description: `Razorpay ${eventType} ${entityId}`.trim(),
             date: (p.created_at
               ? new Date(Number(p.created_at) * 1000)
               : new Date()
             ).toISOString().slice(0, 10),
+            sourceRef: `rzp_${eventType}_${entityId}`,
           });
           processed = true;
         }
       } else if (eventType === "refund.created" || eventType === "refund.processed") {
         const r = payload.refund?.entity;
         if (r) {
+          const entityId = r.id ?? "";
           await insertTxn({
             amountPaise: -Math.abs(Number(r.amount ?? 0)),
-            description: `Razorpay ${eventType} ${r.id ?? ""}`.trim(),
+            description: `Razorpay ${eventType} ${entityId}`.trim(),
             date: (r.created_at
               ? new Date(Number(r.created_at) * 1000)
               : new Date()
             ).toISOString().slice(0, 10),
+            sourceRef: `rzp_${eventType}_${entityId}`,
           });
           processed = true;
         }
