@@ -140,17 +140,20 @@ export default function ConnectIntegrationModal({
             {isWoo && (
               <LabeledInput label="Store URL" value={storeUrl} onChange={setStoreUrl} placeholder="https://your-store.com" />
             )}
+            {isAmazon && (
+              <LabeledInput label="Marketplace ID" value={storeUrl} onChange={setStoreUrl} placeholder="A21TJRUUN4KGV (Amazon.in)" />
+            )}
             <LabeledInput
-              label={isWoo ? "Consumer Key" : "API Key"}
+              label={isWoo ? "Consumer Key" : isAmazon ? "Seller ID" : "API Key"}
               value={apiKey}
               onChange={setApiKey}
-              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : "rzp_live_XXXXXXXXXXXX"}
+              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : isAmazon ? "A1B2C3DEF4GHIJ" : "rzp_live_XXXXXXXXXXXX"}
             />
             <LabeledInput
-              label={isWoo ? "Consumer Secret" : "API Secret (optional)"}
+              label={isWoo ? "Consumer Secret" : isAmazon ? "SP-API Refresh Token" : "API Secret (optional)"}
               value={apiSecret}
               onChange={setApiSecret}
-              placeholder="••••••••"
+              placeholder={isAmazon ? "Atzr|IwEBI..." : "••••••••"}
               type="password"
             />
           </div>
