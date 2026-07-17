@@ -151,8 +151,21 @@ export default function ConnectIntegrationModal({
           </div>
         )}
         {method === "bot_token" && (
-          <div style={{ marginBottom: 18 }}>
-            <LabeledInput label="Bot Token" value={botToken} onChange={setBotToken} placeholder="123456:ABC-DEF..." />
+          <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+            <LabeledInput
+              label={isSlack ? "Incoming Webhook URL" : "Bot Token"}
+              value={botToken}
+              onChange={setBotToken}
+              placeholder={isSlack ? "https://hooks.slack.com/services/T.../B.../xxx" : "123456:ABC-DEF..."}
+            />
+            {isTelegram && (
+              <LabeledInput
+                label="Chat ID"
+                value={chatId}
+                onChange={setChatId}
+                placeholder="-1001234567890 or personal chat id"
+              />
+            )}
           </div>
         )}
         {method === "file" && (
