@@ -62,15 +62,13 @@ export default function ConnectIntegrationModal({
       if (apiSecret) meta.has_secret = true;
       if (isWoo) {
         meta.store_url = storeUrl.trim();
-        // Raw credentials for verification handler (never persisted by generic flow)
-        meta.__credentials = {
-          store_url: storeUrl.trim(),
-          consumer_key: apiKey.trim(),
-          consumer_secret: apiSecret,
-        };
+        meta.__credentials = { store_url: storeUrl.trim(), consumer_key: apiKey.trim(), consumer_secret: apiSecret };
       } else {
         meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
       }
+    } else if (method === "oauth" && isShopify) {
+      meta.shop_domain = shopDomain.trim().toLowerCase();
+      meta.__credentials = { shop_domain: shopDomain.trim().toLowerCase() };
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
       if (isTelegram) {
