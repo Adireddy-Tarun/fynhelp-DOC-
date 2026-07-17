@@ -190,6 +190,7 @@ type Provider = {
   note?: string;
   alwaysActive?: boolean;    // file uploads / built-ins
   primary?: boolean;         // primary "recommended" red button
+  comingSoon?: boolean;      // show Coming Soon badge instead of Connect
 };
 
 const lastSynced = "Last synced: just now";
