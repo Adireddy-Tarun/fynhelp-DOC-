@@ -21,12 +21,15 @@ export default function ConnectIntegrationModal({
   const [apiSecret, setApiSecret] = useState("");
   const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
+  const [chatId, setChatId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const isWoo = provider === "woocommerce";
+  const isTelegram = provider === "telegram";
+  const isSlack = provider === "slack";
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setFile(null);
     }
   }, [open]);
 
