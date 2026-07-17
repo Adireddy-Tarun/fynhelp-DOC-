@@ -28,6 +28,7 @@ export default function ConnectIntegrationModal({
   const isTelegram = provider === "telegram";
   const isSlack = provider === "slack";
   const isShopify = provider === "shopify";
+  const isAmazon = provider === "amazon_seller";
 
   useEffect(() => {
     if (open) {
