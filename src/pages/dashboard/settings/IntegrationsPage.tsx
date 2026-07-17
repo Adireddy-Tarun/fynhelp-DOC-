@@ -575,8 +575,15 @@ const IntegrationsPage = () => {
               );
               return;
             }
-            // Strip raw credentials from generic path — they must not be persisted
+            // For slack/telegram, promote credentials into metadata so send functions can read them.
+            const rawCreds = (metadata as any).__credentials ?? {};
             const { __credentials: _ignored, ...safe } = metadata as Record<string, unknown>;
+            if (modal.slug === "slack") {
+              (safe as any).token = rawCreds.token;
+            } else if (modal.slug === "telegram") {
+              (safe as any).token = rawCreds.token;
+              (safe as any).chat_id = rawCreds.chat_id;
+            }
             connect({ provider: modal.slug, metadata: safe });
             setModal(null);
           }}
