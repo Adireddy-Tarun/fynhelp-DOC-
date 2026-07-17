@@ -245,7 +245,7 @@ const ALL: Provider[] = [
 
   // Alerts & Communication (3)
   { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Get daily briefs and alerts on WhatsApp" },
-  { slug: "slack", label: "Slack", method: "OAuth 2.0", connect: "oauth", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
+  { slug: "slack", label: "Slack", method: "Incoming Webhook URL", connect: "bot_token", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
   { slug: "telegram", label: "Telegram", method: "Bot Token", connect: "bot_token", logo: L.telegram, note: "Get Fynny alerts in Telegram" },
 
   // Productivity & Export (2)
