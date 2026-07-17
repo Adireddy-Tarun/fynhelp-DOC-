@@ -197,7 +197,7 @@ const lastSynced = "Last synced: just now";
 const ALL: Provider[] = [
   // Payments (8)
   { slug: "razorpay", label: "Razorpay", method: "API Key + Secret", connect: "api_key", logo: L.razorpay, note: "⭐ Recommended — most used by Indian startups", primary: true },
-  { slug: "stripe", label: "Stripe", method: "OAuth 2.0", connect: "oauth", logo: L.stripe, note: "For international payments in USD/EUR" },
+  { slug: "stripe", label: "Stripe", method: "API Key + Secret", connect: "api_key", logo: L.stripe, note: "For international payments in USD/EUR" },
   { slug: "payu", label: "PayU", method: "API Key", connect: "api_key", logo: L.payu },
   { slug: "cashfree", label: "Cashfree", method: "API Key", connect: "api_key", logo: L.cashfree },
   { slug: "phonepe_business", label: "PhonePe Business", method: "API Key", connect: "api_key", logo: L.phonepe },
@@ -290,6 +290,17 @@ const IntegrationsPage = () => {
   const qc = useQueryClient();
   const [modal, setModal] = useState<Provider | null>(null);
   const [verifyingRazorpay, setVerifyingRazorpay] = useState(false);
+  const [verifyingStripe, setVerifyingStripe] = useState(false);
+  const [verifyingWoo, setVerifyingWoo] = useState(false);
+
+  const extractEdgeError = async (error: any, fallback: string) => {
+    let msg = error?.message ?? fallback;
+    try {
+      const body = await error?.context?.json?.();
+      if (body?.error) msg = body.error;
+    } catch { /* ignore */ }
+    return msg;
+  };
 
   const handleRazorpayConnect = async (key_id: string, key_secret: string) => {
     if (!businessId) {
@@ -303,14 +314,7 @@ const IntegrationsPage = () => {
         body: { organization_id: businessId, key_id, key_secret },
       });
       if (error) {
-        // Try to surface edge function body error
-        const ctx = (error as any).context;
-        let msg = error.message ?? "Verification failed";
-        try {
-          const body = await ctx?.json?.();
-          if (body?.error) msg = body.error;
-        } catch { /* ignore */ }
-        toast.error(msg, { id: t });
+        toast.error(await extractEdgeError(error, "Verification failed"), { id: t });
         return;
       }
       if ((data as any)?.error) {
@@ -333,6 +337,77 @@ const IntegrationsPage = () => {
       setVerifyingRazorpay(false);
     }
   };
+
+  const handleStripeConnect = async (key_id: string, key_secret: string) => {
+    if (!businessId) {
+      toast.error("Complete onboarding before connecting Stripe.");
+      return;
+    }
+    setVerifyingStripe(true);
+    const t = toast.loading("Verifying with Stripe…");
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-verify-keys", {
+        body: { organization_id: businessId, key_id, key_secret },
+      });
+      if (error) {
+        toast.error(await extractEdgeError(error, "Verification failed"), { id: t });
+        return;
+      }
+      if ((data as any)?.error) {
+        toast.error((data as any).error, { id: t });
+        return;
+      }
+      const mode = (data as any)?.mode ?? "test";
+      const registered = (data as any)?.webhook_registered;
+      const warn = (data as any)?.webhook_warning;
+      toast.success(
+        `Stripe connected (${mode}). ${registered ? "Webhook registered." : "Webhook not registered — see instructions."}`,
+        { id: t },
+      );
+      if (warn) toast.warning(warn, { duration: 12000 });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingStripe(false);
+    }
+  };
+
+  const handleWooCommerceConnect = async (
+    store_url: string,
+    consumer_key: string,
+    consumer_secret: string,
+  ) => {
+    if (!businessId) {
+      toast.error("Complete onboarding before connecting WooCommerce.");
+      return;
+    }
+    setVerifyingWoo(true);
+    const t = toast.loading("Verifying with your WooCommerce store…");
+    try {
+      const { data, error } = await supabase.functions.invoke("woocommerce-verify-keys", {
+        body: { organization_id: businessId, store_url, consumer_key, consumer_secret },
+      });
+      if (error) {
+        toast.error(await extractEdgeError(error, "Verification failed"), { id: t });
+        return;
+      }
+      if ((data as any)?.error) {
+        toast.error((data as any).error, { id: t });
+        return;
+      }
+      const url = (data as any)?.store_url ?? store_url;
+      toast.success(`WooCommerce connected — ${url}`, { id: t });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingWoo(false);
+    }
+  };
+
 
 
   // Effective connected count = DB active integrations + always-active built-ins.
@@ -459,20 +534,45 @@ const IntegrationsPage = () => {
       {modal && (
         <ConnectIntegrationModal
           open={!!modal}
-          onClose={() => (verifyingRazorpay ? null : setModal(null))}
+          onClose={() =>
+            (verifyingRazorpay || verifyingStripe || verifyingWoo ? null : setModal(null))
+          }
           provider={modal.slug}
           providerLabel={modal.label}
           method={modal.connect}
-          busy={isConnecting || (modal.slug === "razorpay" && verifyingRazorpay)}
+          busy={
+            isConnecting ||
+            (modal.slug === "razorpay" && verifyingRazorpay) ||
+            (modal.slug === "stripe" && verifyingStripe) ||
+            (modal.slug === "woocommerce" && verifyingWoo)
+          }
           helperText={
             modal.slug === "razorpay"
               ? "Paste your Razorpay Key ID and Key Secret from Dashboard → Settings → API Keys. We'll verify them with Razorpay before saving."
+              : modal.slug === "stripe"
+              ? "Paste your Stripe Publishable Key (pk_…) and Secret Key (sk_…) from Dashboard → Developers → API keys. We'll verify them with Stripe before saving."
+              : modal.slug === "woocommerce"
+              ? "Enter your store URL (https://…) and a REST API Consumer Key + Secret from WooCommerce → Settings → Advanced → REST API. We'll verify against your store before saving."
               : undefined
           }
           onConfirm={(metadata) => {
             if (modal.slug === "razorpay") {
               const creds = (metadata as any).__credentials ?? {};
               handleRazorpayConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            if (modal.slug === "stripe") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleStripeConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            if (modal.slug === "woocommerce") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleWooCommerceConnect(
+                String(creds.store_url ?? ""),
+                String(creds.consumer_key ?? ""),
+                String(creds.consumer_secret ?? ""),
+              );
               return;
             }
             // Strip raw credentials from generic path — they must not be persisted

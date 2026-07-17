@@ -19,12 +19,14 @@ export default function ConnectIntegrationModal({
 }: ConnectIntegrationModalProps) {
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
+  const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const isWoo = provider === "woocommerce";
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setBotToken(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setFile(null);
     }
   }, [open]);
 
@@ -40,7 +42,10 @@ export default function ConnectIntegrationModal({
   const Icon = method === "api_key" ? KeyRound : method === "oauth" ? Link2 : method === "bot_token" ? MessageCircle : UploadIcon;
   const canConfirm =
     method === "oauth" ? true :
-    method === "api_key" ? apiKey.trim().length > 0 :
+    method === "api_key"
+      ? (isWoo
+          ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
+          : apiKey.trim().length > 0) :
     method === "bot_token" ? botToken.trim().length > 5 :
     method === "file" ? !!file : false;
 
@@ -50,8 +55,17 @@ export default function ConnectIntegrationModal({
     if (method === "api_key") {
       meta.api_key_last4 = apiKey.slice(-4);
       if (apiSecret) meta.has_secret = true;
-      // Raw credentials for handlers that need to verify (never persisted by generic flow)
-      meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
+      if (isWoo) {
+        meta.store_url = storeUrl.trim();
+        // Raw credentials for verification handler (never persisted by generic flow)
+        meta.__credentials = {
+          store_url: storeUrl.trim(),
+          consumer_key: apiKey.trim(),
+          consumer_secret: apiSecret,
+        };
+      } else {
+        meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
+      }
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
       meta.__credentials = { token: botToken.trim() };
@@ -110,8 +124,22 @@ export default function ConnectIntegrationModal({
 
         {method === "api_key" && (
           <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
-            <LabeledInput label="API Key" value={apiKey} onChange={setApiKey} placeholder="rzp_live_XXXXXXXXXXXX" />
-            <LabeledInput label="API Secret (optional)" value={apiSecret} onChange={setApiSecret} placeholder="••••••••" type="password" />
+            {isWoo && (
+              <LabeledInput label="Store URL" value={storeUrl} onChange={setStoreUrl} placeholder="https://your-store.com" />
+            )}
+            <LabeledInput
+              label={isWoo ? "Consumer Key" : "API Key"}
+              value={apiKey}
+              onChange={setApiKey}
+              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : "rzp_live_XXXXXXXXXXXX"}
+            />
+            <LabeledInput
+              label={isWoo ? "Consumer Secret" : "API Secret (optional)"}
+              value={apiSecret}
+              onChange={setApiSecret}
+              placeholder="••••••••"
+              type="password"
+            />
           </div>
         )}
         {method === "bot_token" && (

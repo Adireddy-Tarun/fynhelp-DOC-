@@ -26,3 +26,12 @@ verify_jwt = true
 
 [functions.razorpay-webhook]
 verify_jwt = false
+
+[functions.stripe-verify-keys]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.woocommerce-verify-keys]
+verify_jwt = true
