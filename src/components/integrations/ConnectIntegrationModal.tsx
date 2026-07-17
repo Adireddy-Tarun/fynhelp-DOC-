@@ -22,14 +22,16 @@ export default function ConnectIntegrationModal({
   const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
   const [chatId, setChatId] = useState("");
+  const [shopDomain, setShopDomain] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const isWoo = provider === "woocommerce";
   const isTelegram = provider === "telegram";
   const isSlack = provider === "slack";
+  const isShopify = provider === "shopify";
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setShopDomain(""); setFile(null);
     }
   }, [open]);
 
@@ -44,7 +46,7 @@ export default function ConnectIntegrationModal({
 
   const Icon = method === "api_key" ? KeyRound : method === "oauth" ? Link2 : method === "bot_token" ? MessageCircle : UploadIcon;
   const canConfirm =
-    method === "oauth" ? true :
+    method === "oauth" ? (isShopify ? /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(shopDomain.trim()) : true) :
     method === "api_key"
       ? (isWoo
           ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
