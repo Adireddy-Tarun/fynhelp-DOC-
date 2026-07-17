@@ -71,7 +71,12 @@ export default function ConnectIntegrationModal({
       }
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
-      meta.__credentials = { token: botToken.trim() };
+      if (isTelegram) {
+        meta.chat_id = chatId.trim();
+        meta.__credentials = { token: botToken.trim(), chat_id: chatId.trim() };
+      } else {
+        meta.__credentials = { token: botToken.trim() };
+      }
     } else if (method === "file") {
       meta.file_name = file?.name;
       meta.file_size = file?.size;
