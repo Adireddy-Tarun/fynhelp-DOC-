@@ -300,6 +300,59 @@ const IntegrationsPage = () => {
   const [verifyingPhonePe, setVerifyingPhonePe] = useState(false);
   const [verifyingPaytm, setVerifyingPaytm] = useState(false);
   const [verifyingRazorpayX, setVerifyingRazorpayX] = useState(false);
+  const [verifyingAmazon, setVerifyingAmazon] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState<string | null>(null);
+
+  const startOAuth = async (
+    fnName: string,
+    providerLabel: string,
+    providerSlug: string,
+    body: Record<string, unknown> = {},
+  ) => {
+    if (!businessId) {
+      toast.error(`Complete onboarding before connecting ${providerLabel}.`);
+      return;
+    }
+    setOauthBusy(providerSlug);
+    const t = toast.loading(`Redirecting to ${providerLabel}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(fnName, {
+        body: { organization_id: businessId, ...body },
+      });
+      if (error) { toast.error(await extractEdgeError(error, "Failed to start OAuth"), { id: t }); return; }
+      if ((data as any)?.error) { toast.error((data as any).error, { id: t }); return; }
+      const url = (data as any)?.authorization_url;
+      if (!url) { toast.error("No authorization URL returned", { id: t }); return; }
+      toast.success(`Opening ${providerLabel}…`, { id: t });
+      setModal(null);
+      window.location.href = url;
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setOauthBusy(null);
+    }
+  };
+
+  const handleAmazonConnect = async (creds: { seller_id: string; marketplace_id: string; refresh_token: string }) => {
+    if (!businessId) { toast.error("Complete onboarding before connecting Amazon."); return; }
+    setVerifyingAmazon(true);
+    const t = toast.loading("Verifying with Amazon SP-API…");
+    try {
+      const { data, error } = await supabase.functions.invoke("amazon-verify-keys", {
+        body: { organization_id: businessId, ...creds },
+      });
+      if (error) { toast.error(await extractEdgeError(error, "Verification failed"), { id: t }); return; }
+      if ((data as any)?.error) { toast.error((data as any).error, { id: t }); return; }
+      toast.success(`Amazon Seller connected (${(data as any)?.seller_id ?? ""}).`, { id: t });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingAmazon(false);
+    }
+  };
+
 
   const extractEdgeError = async (error: any, fallback: string) => {
     let msg = error?.message ?? fallback;
