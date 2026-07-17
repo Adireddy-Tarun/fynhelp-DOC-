@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
 
-type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally";
+type BankId = "hdfc" | "icici" | "sbi" | "axis" | "kotak" | "generic" | "tally" | "busy";
 
 interface BankMapping {
   id: BankId;
