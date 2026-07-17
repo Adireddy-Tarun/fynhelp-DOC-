@@ -49,7 +49,7 @@ export default function ConnectIntegrationModal({
       ? (isWoo
           ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
           : apiKey.trim().length > 0) :
-    method === "bot_token" ? botToken.trim().length > 5 :
+    method === "bot_token" ? (isTelegram ? (botToken.trim().length > 5 && chatId.trim().length > 0) : botToken.trim().length > 5) :
     method === "file" ? !!file : false;
 
   const submit = () => {
