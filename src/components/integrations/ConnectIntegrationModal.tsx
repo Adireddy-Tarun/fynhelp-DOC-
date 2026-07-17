@@ -51,6 +51,8 @@ export default function ConnectIntegrationModal({
     method === "api_key"
       ? (isWoo
           ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
+          : isAmazon
+          ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
           : apiKey.trim().length > 0) :
     method === "bot_token" ? (isTelegram ? (botToken.trim().length > 5 && chatId.trim().length > 0) : botToken.trim().length > 5) :
     method === "file" ? !!file : false;
@@ -64,6 +66,8 @@ export default function ConnectIntegrationModal({
       if (isWoo) {
         meta.store_url = storeUrl.trim();
         meta.__credentials = { store_url: storeUrl.trim(), consumer_key: apiKey.trim(), consumer_secret: apiSecret };
+      } else if (isAmazon) {
+        meta.__credentials = { marketplace_id: storeUrl.trim(), seller_id: apiKey.trim(), refresh_token: apiSecret };
       } else {
         meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
       }
