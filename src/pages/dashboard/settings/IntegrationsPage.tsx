@@ -534,20 +534,45 @@ const IntegrationsPage = () => {
       {modal && (
         <ConnectIntegrationModal
           open={!!modal}
-          onClose={() => (verifyingRazorpay ? null : setModal(null))}
+          onClose={() =>
+            (verifyingRazorpay || verifyingStripe || verifyingWoo ? null : setModal(null))
+          }
           provider={modal.slug}
           providerLabel={modal.label}
           method={modal.connect}
-          busy={isConnecting || (modal.slug === "razorpay" && verifyingRazorpay)}
+          busy={
+            isConnecting ||
+            (modal.slug === "razorpay" && verifyingRazorpay) ||
+            (modal.slug === "stripe" && verifyingStripe) ||
+            (modal.slug === "woocommerce" && verifyingWoo)
+          }
           helperText={
             modal.slug === "razorpay"
               ? "Paste your Razorpay Key ID and Key Secret from Dashboard → Settings → API Keys. We'll verify them with Razorpay before saving."
+              : modal.slug === "stripe"
+              ? "Paste your Stripe Publishable Key (pk_…) and Secret Key (sk_…) from Dashboard → Developers → API keys. We'll verify them with Stripe before saving."
+              : modal.slug === "woocommerce"
+              ? "Enter your store URL (https://…) and a REST API Consumer Key + Secret from WooCommerce → Settings → Advanced → REST API. We'll verify against your store before saving."
               : undefined
           }
           onConfirm={(metadata) => {
             if (modal.slug === "razorpay") {
               const creds = (metadata as any).__credentials ?? {};
               handleRazorpayConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            if (modal.slug === "stripe") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleStripeConnect(String(creds.key_id ?? ""), String(creds.key_secret ?? ""));
+              return;
+            }
+            if (modal.slug === "woocommerce") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleWooCommerceConnect(
+                String(creds.store_url ?? ""),
+                String(creds.consumer_key ?? ""),
+                String(creds.consumer_secret ?? ""),
+              );
               return;
             }
             // Strip raw credentials from generic path — they must not be persisted
