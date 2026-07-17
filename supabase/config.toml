@@ -62,3 +62,24 @@ verify_jwt = true
 
 [functions.razorpayx-verify-keys]
 verify_jwt = true
+
+[functions.shopify-auth]
+verify_jwt = true
+
+[functions.shopify-callback]
+verify_jwt = false
+
+[functions.quickbooks-auth]
+verify_jwt = true
+
+[functions.quickbooks-callback]
+verify_jwt = false
+
+[functions.hubspot-auth]
+verify_jwt = true
+
+[functions.hubspot-callback]
+verify_jwt = false
+
+[functions.amazon-verify-keys]
+verify_jwt = true

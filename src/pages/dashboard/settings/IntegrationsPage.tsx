@@ -190,6 +190,7 @@ type Provider = {
   note?: string;
   alwaysActive?: boolean;    // file uploads / built-ins
   primary?: boolean;         // primary "recommended" red button
+  comingSoon?: boolean;      // show Coming Soon badge instead of Connect
 };
 
 const lastSynced = "Last synced: just now";
@@ -206,13 +207,14 @@ const ALL: Provider[] = [
   { slug: "razorpayx", label: "RazorpayX (Current Account)", method: "API Key", connect: "api_key", logo: L.razorpayx, note: "For RazorpayX current account holders" },
 
   // Banking (8)
-  { slug: "bank_aa_hdfc", label: "HDFC Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_icici", label: "ICICI Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_sbi", label: "SBI", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_axis", label: "Axis Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_kotak", label: "Kotak Mahindra Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank },
-  { slug: "bank_aa_fi", label: "Fi Money", method: "Account Aggregator", connect: "oauth", logo: L.fi, note: "Neo-bank for startups" },
-  { slug: "bank_aa_jupiter", label: "Jupiter", method: "Account Aggregator", connect: "oauth", logo: L.jupiter },
+  // Banking (8) — Account Aggregator connections require AA-provider registration
+  { slug: "bank_aa_hdfc", label: "HDFC Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_icici", label: "ICICI Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_sbi", label: "SBI", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_axis", label: "Axis Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_kotak", label: "Kotak Mahindra Bank", method: "Account Aggregator", connect: "oauth", logo: L.bank, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_fi", label: "Fi Money", method: "Account Aggregator", connect: "oauth", logo: L.fi, comingSoon: true, note: "Requires Account Aggregator provider registration." },
+  { slug: "bank_aa_jupiter", label: "Jupiter", method: "Account Aggregator", connect: "oauth", logo: L.jupiter, comingSoon: true, note: "Requires Account Aggregator provider registration." },
   { slug: "pdf_upload", label: "PDF Bank Statement", method: "File Upload + OCR", connect: "file", logo: L.doc, alwaysActive: true },
 
   // Accounting (4)
@@ -222,21 +224,21 @@ const ALL: Provider[] = [
   { slug: "busy", label: "Busy Accounting", method: "CSV Upload", connect: "file", logo: L.busy },
 
   // Payroll & HR (6)
-  { slug: "keka_hr", label: "Keka HR", method: "OAuth API", connect: "oauth", logo: L.keka },
-  { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr },
-  { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay },
-  { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox },
+  { slug: "keka_hr", label: "Keka HR", method: "OAuth API", connect: "oauth", logo: L.keka, comingSoon: true, note: "Partner API access required. Apply at https://www.keka.com/partners." },
+  { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr, comingSoon: true, note: "Partner API access required. Apply at https://www.greythr.com/partners." },
+  { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay, comingSoon: true, note: "Partner API access required. Apply at https://razorpay.com/payroll/partners." },
+  { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox, comingSoon: true, note: "Partner API access required. Apply at https://darwinbox.com/partners." },
   { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Separate from Zoho Books" },
   { slug: "manual_payroll", label: "Manual Payroll Entry", method: "Always available", connect: "oauth", logo: L.manualPay, alwaysActive: true },
 
   // GST & Compliance (2)
-  { slug: "gst_portal", label: "GST Portal via GSP", method: "Direct API", connect: "api_key", logo: L.gst },
-  { slug: "traces_tds", label: "TRACES (TDS)", method: "Read-only", connect: "api_key", logo: L.traces, note: "Required for 26AS reconciliation" },
+  { slug: "gst_portal", label: "GST Portal via GSP", method: "Direct API", connect: "api_key", logo: L.gst, comingSoon: true, note: "Requires GSP registration with GSTN. Application in progress." },
+  { slug: "traces_tds", label: "TRACES (TDS)", method: "Read-only", connect: "api_key", logo: L.traces, comingSoon: true, note: "Requires GSP registration with GSTN. Application in progress." },
 
   // E-Commerce (4)
   { slug: "shopify", label: "Shopify", method: "OAuth 2.0", connect: "oauth", logo: L.shopify },
   { slug: "woocommerce", label: "WooCommerce", method: "API Key", connect: "api_key", logo: L.woo },
-  { slug: "amazon_seller", label: "Amazon Seller Central", method: "MWS API", connect: "api_key", logo: L.amazon },
+  { slug: "amazon_seller", label: "Amazon Seller Central", method: "SP-API Refresh Token", connect: "api_key", logo: L.amazon },
   { slug: "fynd_unicommerce", label: "Fynd / Unicommerce", method: "API Key", connect: "api_key", logo: L.fynd, note: "For multi-channel D2C brands" },
 
   // CRM & Sales (2)
@@ -298,6 +300,59 @@ const IntegrationsPage = () => {
   const [verifyingPhonePe, setVerifyingPhonePe] = useState(false);
   const [verifyingPaytm, setVerifyingPaytm] = useState(false);
   const [verifyingRazorpayX, setVerifyingRazorpayX] = useState(false);
+  const [verifyingAmazon, setVerifyingAmazon] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState<string | null>(null);
+
+  const startOAuth = async (
+    fnName: string,
+    providerLabel: string,
+    providerSlug: string,
+    body: Record<string, unknown> = {},
+  ) => {
+    if (!businessId) {
+      toast.error(`Complete onboarding before connecting ${providerLabel}.`);
+      return;
+    }
+    setOauthBusy(providerSlug);
+    const t = toast.loading(`Redirecting to ${providerLabel}…`);
+    try {
+      const { data, error } = await supabase.functions.invoke(fnName, {
+        body: { organization_id: businessId, ...body },
+      });
+      if (error) { toast.error(await extractEdgeError(error, "Failed to start OAuth"), { id: t }); return; }
+      if ((data as any)?.error) { toast.error((data as any).error, { id: t }); return; }
+      const url = (data as any)?.authorization_url;
+      if (!url) { toast.error("No authorization URL returned", { id: t }); return; }
+      toast.success(`Opening ${providerLabel}…`, { id: t });
+      setModal(null);
+      window.location.href = url;
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setOauthBusy(null);
+    }
+  };
+
+  const handleAmazonConnect = async (creds: { seller_id: string; marketplace_id: string; refresh_token: string }) => {
+    if (!businessId) { toast.error("Complete onboarding before connecting Amazon."); return; }
+    setVerifyingAmazon(true);
+    const t = toast.loading("Verifying with Amazon SP-API…");
+    try {
+      const { data, error } = await supabase.functions.invoke("amazon-verify-keys", {
+        body: { organization_id: businessId, ...creds },
+      });
+      if (error) { toast.error(await extractEdgeError(error, "Verification failed"), { id: t }); return; }
+      if ((data as any)?.error) { toast.error((data as any).error, { id: t }); return; }
+      toast.success(`Amazon Seller connected (${(data as any)?.seller_id ?? ""}).`, { id: t });
+      setModal(null);
+      qc.invalidateQueries({ queryKey: ["integrations", businessId] });
+    } catch (e) {
+      toast.error((e as Error).message ?? "Unexpected error", { id: t });
+    } finally {
+      setVerifyingAmazon(false);
+    }
+  };
+
 
   const extractEdgeError = async (error: any, fallback: string) => {
     let msg = error?.message ?? fallback;
@@ -474,24 +529,27 @@ const IntegrationsPage = () => {
     const row = byProvider.get(p.slug);
     const isActive = p.alwaysActive || row?.status === "active";
 
-    // PDF bank statement is an honest "coming soon" placeholder.
-    if (p.slug === "pdf_upload") {
+    // Coming-soon providers: honest badge, no Connect button
+    if (p.slug === "pdf_upload" || p.comingSoon) {
+      const noteText = p.slug === "pdf_upload"
+        ? "PDF parsing is in development. Export CSV or Excel from your bank in the meantime."
+        : p.note;
       return (
         <Row
           key={p.slug}
           logo={p.logo}
           name={p.label}
           method={p.method}
-          note="PDF parsing is in development. Export CSV or Excel from your bank in the meantime."
+          note={noteText}
           status={
             <span style={{
               display: "inline-flex", alignItems: "center", gap: 6,
-              background: "#F5F5F4", color: "rgba(26,16,8,0.55)", border: "1px solid #E7E5E4",
+              background: "#FEF3C7", color: "#92400E", border: "1px solid #FCD34D",
               borderRadius: 100, padding: "3px 10px",
               fontWeight: 600, fontSize: 10, letterSpacing: "0.06em",
             }}>COMING SOON</span>
           }
-          action={<ConnectBtn disabled>Upload PDF →</ConnectBtn>}
+          action={p.slug === "pdf_upload" ? <ConnectBtn disabled>Upload PDF →</ConnectBtn> : null}
           isLast={isLast}
         />
       );
@@ -605,7 +663,7 @@ const IntegrationsPage = () => {
         <ConnectIntegrationModal
           open={!!modal}
           onClose={() =>
-            (verifyingRazorpay || verifyingStripe || verifyingWoo || anyApiBusy ? null : setModal(null))
+            (verifyingRazorpay || verifyingStripe || verifyingWoo || verifyingAmazon || anyApiBusy || !!oauthBusy ? null : setModal(null))
           }
           provider={modal.slug}
           providerLabel={modal.label}
@@ -615,6 +673,8 @@ const IntegrationsPage = () => {
             (modal.slug === "razorpay" && verifyingRazorpay) ||
             (modal.slug === "stripe" && verifyingStripe) ||
             (modal.slug === "woocommerce" && verifyingWoo) ||
+            (modal.slug === "amazon_seller" && verifyingAmazon) ||
+            (oauthBusy === modal.slug) ||
             (!!api && api.busy)
           }
           helperText={
@@ -624,6 +684,14 @@ const IntegrationsPage = () => {
               ? "Paste your Stripe Publishable Key (pk_…) and Secret Key (sk_…) from Dashboard → Developers → API keys. We'll verify them with Stripe before saving."
               : modal.slug === "woocommerce"
               ? "Enter your store URL (https://…) and a REST API Consumer Key + Secret from WooCommerce → Settings → Advanced → REST API. We'll verify against your store before saving."
+              : modal.slug === "shopify"
+              ? "Enter your Shopify store domain (e.g. your-store.myshopify.com). You'll be redirected to Shopify to authorise FynHelp for read access to orders, products, and inventory."
+              : modal.slug === "quickbooks"
+              ? "You'll be redirected to Intuit to authorise FynHelp for read access to your QuickBooks accounting data."
+              : modal.slug === "hubspot"
+              ? "You'll be redirected to HubSpot to authorise FynHelp for read access to your contacts and deals."
+              : modal.slug === "amazon_seller"
+              ? "Enter your Marketplace ID (e.g. A21TJRUUN4KGV for Amazon.in), Seller ID, and the SP-API Refresh Token from Seller Central → Apps and Services → Develop apps. We'll verify with Amazon before saving."
               : api?.helper
           }
           onConfirm={(metadata) => {
@@ -646,14 +714,31 @@ const IntegrationsPage = () => {
               );
               return;
             }
+            if (modal.slug === "shopify") {
+              const creds = (metadata as any).__credentials ?? {};
+              startOAuth("shopify-auth", "Shopify", "shopify", { shop_domain: String(creds.shop_domain ?? "") });
+              return;
+            }
+            if (modal.slug === "quickbooks") {
+              startOAuth("quickbooks-auth", "QuickBooks", "quickbooks");
+              return;
+            }
+            if (modal.slug === "hubspot") {
+              startOAuth("hubspot-auth", "HubSpot", "hubspot");
+              return;
+            }
+            if (modal.slug === "amazon_seller") {
+              const creds = (metadata as any).__credentials ?? {};
+              handleAmazonConnect({
+                marketplace_id: String(creds.marketplace_id ?? ""),
+                seller_id: String(creds.seller_id ?? ""),
+                refresh_token: String(creds.refresh_token ?? ""),
+              });
+              return;
+            }
             if (api) {
               const creds = (metadata as any).__credentials ?? {};
-              handleApiKeyVerify(
-                api.fn, api.label,
-                String(creds.key_id ?? ""),
-                String(creds.key_secret ?? ""),
-                api.setBusy,
-              );
+              handleApiKeyVerify(api.fn, api.label, String(creds.key_id ?? ""), String(creds.key_secret ?? ""), api.setBusy);
               return;
             }
             // For slack/telegram, promote credentials into metadata so send functions can read them.

@@ -22,14 +22,17 @@ export default function ConnectIntegrationModal({
   const [storeUrl, setStoreUrl] = useState("");
   const [botToken, setBotToken] = useState("");
   const [chatId, setChatId] = useState("");
+  const [shopDomain, setShopDomain] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const isWoo = provider === "woocommerce";
   const isTelegram = provider === "telegram";
   const isSlack = provider === "slack";
+  const isShopify = provider === "shopify";
+  const isAmazon = provider === "amazon_seller";
 
   useEffect(() => {
     if (open) {
-      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setFile(null);
+      setApiKey(""); setApiSecret(""); setStoreUrl(""); setBotToken(""); setChatId(""); setShopDomain(""); setFile(null);
     }
   }, [open]);
 
@@ -44,9 +47,11 @@ export default function ConnectIntegrationModal({
 
   const Icon = method === "api_key" ? KeyRound : method === "oauth" ? Link2 : method === "bot_token" ? MessageCircle : UploadIcon;
   const canConfirm =
-    method === "oauth" ? true :
+    method === "oauth" ? (isShopify ? /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(shopDomain.trim()) : true) :
     method === "api_key"
       ? (isWoo
+          ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
+          : isAmazon
           ? (storeUrl.trim().length > 0 && apiKey.trim().length > 0 && apiSecret.trim().length > 0)
           : apiKey.trim().length > 0) :
     method === "bot_token" ? (isTelegram ? (botToken.trim().length > 5 && chatId.trim().length > 0) : botToken.trim().length > 5) :
@@ -60,15 +65,15 @@ export default function ConnectIntegrationModal({
       if (apiSecret) meta.has_secret = true;
       if (isWoo) {
         meta.store_url = storeUrl.trim();
-        // Raw credentials for verification handler (never persisted by generic flow)
-        meta.__credentials = {
-          store_url: storeUrl.trim(),
-          consumer_key: apiKey.trim(),
-          consumer_secret: apiSecret,
-        };
+        meta.__credentials = { store_url: storeUrl.trim(), consumer_key: apiKey.trim(), consumer_secret: apiSecret };
+      } else if (isAmazon) {
+        meta.__credentials = { marketplace_id: storeUrl.trim(), seller_id: apiKey.trim(), refresh_token: apiSecret };
       } else {
         meta.__credentials = { key_id: apiKey.trim(), key_secret: apiSecret };
       }
+    } else if (method === "oauth" && isShopify) {
+      meta.shop_domain = shopDomain.trim().toLowerCase();
+      meta.__credentials = { shop_domain: shopDomain.trim().toLowerCase() };
     } else if (method === "bot_token") {
       meta.token_last4 = botToken.slice(-4);
       if (isTelegram) {
@@ -135,18 +140,31 @@ export default function ConnectIntegrationModal({
             {isWoo && (
               <LabeledInput label="Store URL" value={storeUrl} onChange={setStoreUrl} placeholder="https://your-store.com" />
             )}
+            {isAmazon && (
+              <LabeledInput label="Marketplace ID" value={storeUrl} onChange={setStoreUrl} placeholder="A21TJRUUN4KGV (Amazon.in)" />
+            )}
             <LabeledInput
-              label={isWoo ? "Consumer Key" : "API Key"}
+              label={isWoo ? "Consumer Key" : isAmazon ? "Seller ID" : "API Key"}
               value={apiKey}
               onChange={setApiKey}
-              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : "rzp_live_XXXXXXXXXXXX"}
+              placeholder={isWoo ? "ck_XXXXXXXXXXXX" : isAmazon ? "A1B2C3DEF4GHIJ" : "rzp_live_XXXXXXXXXXXX"}
             />
             <LabeledInput
-              label={isWoo ? "Consumer Secret" : "API Secret (optional)"}
+              label={isWoo ? "Consumer Secret" : isAmazon ? "SP-API Refresh Token" : "API Secret (optional)"}
               value={apiSecret}
               onChange={setApiSecret}
-              placeholder="••••••••"
+              placeholder={isAmazon ? "Atzr|IwEBI..." : "••••••••"}
               type="password"
+            />
+          </div>
+        )}
+        {method === "oauth" && isShopify && (
+          <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+            <LabeledInput
+              label="Shop Domain"
+              value={shopDomain}
+              onChange={setShopDomain}
+              placeholder="your-store.myshopify.com"
             />
           </div>
         )}
