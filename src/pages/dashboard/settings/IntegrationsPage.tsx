@@ -218,7 +218,7 @@ const ALL: Provider[] = [
   { slug: "pdf_upload", label: "PDF Bank Statement", method: "File Upload + OCR", connect: "file", logo: L.doc, alwaysActive: true },
 
   // Accounting (4)
-  { slug: "tally", label: "Tally Prime", method: "ODBC Agent", connect: "oauth", logo: L.tally },
+  { slug: "tally", label: "Tally Prime", method: "CSV / XML Upload", connect: "file", logo: L.tally, note: "Export Day Book or Cash/Bank Book from Tally and upload here. See Import page for step-by-step instructions." },
   { slug: "zoho_books", label: "Zoho Books", method: "OAuth 2.0", connect: "oauth", logo: L.zoho },
   { slug: "quickbooks", label: "QuickBooks India", method: "OAuth 2.0", connect: "oauth", logo: L.qb },
   { slug: "busy", label: "Busy Accounting", method: "CSV Upload", connect: "file", logo: L.busy },
