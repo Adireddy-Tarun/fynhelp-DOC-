@@ -83,3 +83,15 @@ verify_jwt = false
 
 [functions.amazon-verify-keys]
 verify_jwt = true
+
+[functions.zoho-crm-auth]
+verify_jwt = true
+
+[functions.zoho-crm-callback]
+verify_jwt = false
+
+[functions.zoho-payroll-auth]
+verify_jwt = true
+
+[functions.zoho-payroll-callback]
+verify_jwt = false
