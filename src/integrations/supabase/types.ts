@@ -5212,6 +5212,14 @@ export type Database = {
     }
     Functions: {
       bytea_to_text: { Args: { data: string }; Returns: string }
+      ca_firm_has_all_client_access: {
+        Args: { _business_ids: string[]; _firm_id: string }
+        Returns: boolean
+      }
+      ca_firm_has_client_access: {
+        Args: { _business_id: string; _firm_id: string }
+        Returns: boolean
+      }
       check_and_increment_rate_limit: {
         Args: {
           p_action: string
