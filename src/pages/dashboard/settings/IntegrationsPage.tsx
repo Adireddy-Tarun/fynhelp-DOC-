@@ -690,6 +690,8 @@ const IntegrationsPage = () => {
               ? "You'll be redirected to Intuit to authorise FynHelp for read access to your QuickBooks accounting data."
               : modal.slug === "hubspot"
               ? "You'll be redirected to HubSpot to authorise FynHelp for read access to your contacts and deals."
+              : modal.slug === "zoho_books"
+              ? "You'll be redirected to Zoho to authorise FynHelp for read access to your Zoho Books accounting data — invoices, expenses, contacts, and transactions."
               : modal.slug === "zoho_crm"
               ? "You'll be redirected to Zoho to authorise FynHelp for read access to your CRM contacts and deals."
               : modal.slug === "zoho_payroll"
