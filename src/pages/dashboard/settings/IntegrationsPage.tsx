@@ -228,7 +228,7 @@ const ALL: Provider[] = [
   { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr, comingSoon: true, note: "Partner API access required. Apply at https://www.greythr.com/partners." },
   { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay, comingSoon: true, note: "Partner API access required. Apply at https://razorpay.com/payroll/partners." },
   { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox, comingSoon: true, note: "Partner API access required. Apply at https://darwinbox.com/partners." },
-  { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Separate from Zoho Books" },
+  { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Requires an active Zoho Payroll subscription." },
   { slug: "manual_payroll", label: "Manual Payroll Entry", method: "Always available", connect: "oauth", logo: L.manualPay, alwaysActive: true },
 
   // GST & Compliance (2)
