@@ -246,7 +246,7 @@ const ALL: Provider[] = [
   { slug: "hubspot", label: "HubSpot", method: "OAuth 2.0", connect: "oauth", logo: L.hubspot },
 
   // Alerts & Communication (3)
-  { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Get daily briefs and alerts on WhatsApp" },
+  { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Paste your Gupshup API key. Alerts will be sent via WhatsApp Business API." },
   { slug: "slack", label: "Slack", method: "Incoming Webhook URL", connect: "bot_token", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
   { slug: "telegram", label: "Telegram", method: "Bot Token", connect: "bot_token", logo: L.telegram, note: "Get Fynny alerts in Telegram" },
 
