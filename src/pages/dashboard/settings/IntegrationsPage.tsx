@@ -251,7 +251,7 @@ const ALL: Provider[] = [
   { slug: "telegram", label: "Telegram", method: "Bot Token", connect: "bot_token", logo: L.telegram, note: "Get Fynny alerts in Telegram" },
 
   // Productivity & Export (2)
-  { slug: "google_sheets", label: "Google Sheets", method: "OAuth 2.0", connect: "oauth", logo: L.sheets, note: "Auto-export reports and dashboards to Sheets" },
+  { slug: "google_sheets", label: "Google Sheets", method: "OAuth 2.0", connect: "oauth", logo: L.sheets, comingSoon: true, note: "Google Sheets export — coming soon. OAuth setup in progress." },
   { slug: "email_reports", label: "Email Reports", method: "Built-in", connect: "oauth", logo: L.email, note: "Weekly financial digest sent every Monday", alwaysActive: true },
 
   // Data Import (3)
