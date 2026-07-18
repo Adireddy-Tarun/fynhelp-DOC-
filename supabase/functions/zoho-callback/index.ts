@@ -76,6 +76,7 @@ serve(async (req) => {
       .upsert({
         organization_id: orgId,
         provider: 'zoho_books',
+        status: 'active',
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
         expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
@@ -84,7 +85,7 @@ serve(async (req) => {
           connected_at: new Date().toISOString(),
         },
         updated_at: new Date().toISOString(),
-      })
+      }, { onConflict: 'organization_id,provider' })
 
     if (dbError) throw dbError
 
