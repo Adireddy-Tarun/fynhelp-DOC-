@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const APP_REDIRECT = 'https://fynhelp.lovable.app/demo/dashboard'
+const APP_REDIRECT = 'https://fynhelp.com/dashboard/settings/integrations'
 
 function redirect(qs: string) {
   return new Response(null, {
