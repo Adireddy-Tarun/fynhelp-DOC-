@@ -218,7 +218,7 @@ const ALL: Provider[] = [
   { slug: "pdf_upload", label: "PDF Bank Statement", method: "File Upload + OCR", connect: "file", logo: L.doc, alwaysActive: true },
 
   // Accounting (4)
-  { slug: "tally", label: "Tally Prime", method: "ODBC Agent", connect: "oauth", logo: L.tally },
+  { slug: "tally", label: "Tally Prime", method: "CSV / XML Upload", connect: "file", logo: L.tally, note: "Export Day Book or Cash/Bank Book from Tally and upload here. See Import page for step-by-step instructions." },
   { slug: "zoho_books", label: "Zoho Books", method: "OAuth 2.0", connect: "oauth", logo: L.zoho },
   { slug: "quickbooks", label: "QuickBooks India", method: "OAuth 2.0", connect: "oauth", logo: L.qb },
   { slug: "busy", label: "Busy Accounting", method: "CSV Upload", connect: "file", logo: L.busy },
@@ -228,7 +228,7 @@ const ALL: Provider[] = [
   { slug: "greythr", label: "GreytHR", method: "OAuth API", connect: "oauth", logo: L.greythr, comingSoon: true, note: "Partner API access required. Apply at https://www.greythr.com/partners." },
   { slug: "razorpay_payroll", label: "Razorpay Payroll", method: "OAuth API", connect: "oauth", logo: L.razorpay, comingSoon: true, note: "Partner API access required. Apply at https://razorpay.com/payroll/partners." },
   { slug: "darwinbox", label: "Darwinbox", method: "OAuth API", connect: "oauth", logo: L.darwinbox, comingSoon: true, note: "Partner API access required. Apply at https://darwinbox.com/partners." },
-  { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Separate from Zoho Books" },
+  { slug: "zoho_payroll", label: "Zoho Payroll", method: "OAuth 2.0", connect: "oauth", logo: L.zoho, note: "Requires an active Zoho Payroll subscription." },
   { slug: "manual_payroll", label: "Manual Payroll Entry", method: "Always available", connect: "oauth", logo: L.manualPay, alwaysActive: true },
 
   // GST & Compliance (2)
@@ -246,12 +246,12 @@ const ALL: Provider[] = [
   { slug: "hubspot", label: "HubSpot", method: "OAuth 2.0", connect: "oauth", logo: L.hubspot },
 
   // Alerts & Communication (3)
-  { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Get daily briefs and alerts on WhatsApp" },
+  { slug: "whatsapp_business", label: "WhatsApp Business (via Gupshup)", method: "API Key", connect: "api_key", logo: L.whatsapp, note: "Paste your Gupshup API key. Alerts will be sent via WhatsApp Business API." },
   { slug: "slack", label: "Slack", method: "Incoming Webhook URL", connect: "bot_token", logo: L.slack, note: "Get FynHelp alerts in your Slack workspace" },
   { slug: "telegram", label: "Telegram", method: "Bot Token", connect: "bot_token", logo: L.telegram, note: "Get Fynny alerts in Telegram" },
 
   // Productivity & Export (2)
-  { slug: "google_sheets", label: "Google Sheets", method: "OAuth 2.0", connect: "oauth", logo: L.sheets, note: "Auto-export reports and dashboards to Sheets" },
+  { slug: "google_sheets", label: "Google Sheets", method: "OAuth 2.0", connect: "oauth", logo: L.sheets, comingSoon: true, note: "Google Sheets export — coming soon. OAuth setup in progress." },
   { slug: "email_reports", label: "Email Reports", method: "Built-in", connect: "oauth", logo: L.email, note: "Weekly financial digest sent every Monday", alwaysActive: true },
 
   // Data Import (3)
@@ -690,6 +690,8 @@ const IntegrationsPage = () => {
               ? "You'll be redirected to Intuit to authorise FynHelp for read access to your QuickBooks accounting data."
               : modal.slug === "hubspot"
               ? "You'll be redirected to HubSpot to authorise FynHelp for read access to your contacts and deals."
+              : modal.slug === "zoho_books"
+              ? "You'll be redirected to Zoho to authorise FynHelp for read access to your Zoho Books accounting data — invoices, expenses, contacts, and transactions."
               : modal.slug === "zoho_crm"
               ? "You'll be redirected to Zoho to authorise FynHelp for read access to your CRM contacts and deals."
               : modal.slug === "zoho_payroll"
@@ -729,6 +731,10 @@ const IntegrationsPage = () => {
             }
             if (modal.slug === "hubspot") {
               startOAuth("hubspot-auth", "HubSpot", "hubspot");
+              return;
+            }
+            if (modal.slug === "zoho_books") {
+              startOAuth("zoho-auth", "Zoho Books", "zoho_books");
               return;
             }
             if (modal.slug === "zoho_crm") {
