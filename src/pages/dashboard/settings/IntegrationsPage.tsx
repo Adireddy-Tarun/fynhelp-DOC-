@@ -731,6 +731,14 @@ const IntegrationsPage = () => {
               startOAuth("hubspot-auth", "HubSpot", "hubspot");
               return;
             }
+            if (modal.slug === "zoho_crm") {
+              startOAuth("zoho-crm-auth", "Zoho CRM", "zoho_crm");
+              return;
+            }
+            if (modal.slug === "zoho_payroll") {
+              startOAuth("zoho-payroll-auth", "Zoho Payroll", "zoho_payroll");
+              return;
+            }
             if (modal.slug === "amazon_seller") {
               const creds = (metadata as any).__credentials ?? {};
               handleAmazonConnect({
