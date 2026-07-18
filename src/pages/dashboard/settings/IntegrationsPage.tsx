@@ -690,6 +690,10 @@ const IntegrationsPage = () => {
               ? "You'll be redirected to Intuit to authorise FynHelp for read access to your QuickBooks accounting data."
               : modal.slug === "hubspot"
               ? "You'll be redirected to HubSpot to authorise FynHelp for read access to your contacts and deals."
+              : modal.slug === "zoho_crm"
+              ? "You'll be redirected to Zoho to authorise FynHelp for read access to your CRM contacts and deals."
+              : modal.slug === "zoho_payroll"
+              ? "You'll be redirected to Zoho to authorise FynHelp for read access to your Zoho Payroll data."
               : modal.slug === "amazon_seller"
               ? "Enter your Marketplace ID (e.g. A21TJRUUN4KGV for Amazon.in), Seller ID, and the SP-API Refresh Token from Seller Central → Apps and Services → Develop apps. We'll verify with Amazon before saving."
               : api?.helper
@@ -725,6 +729,14 @@ const IntegrationsPage = () => {
             }
             if (modal.slug === "hubspot") {
               startOAuth("hubspot-auth", "HubSpot", "hubspot");
+              return;
+            }
+            if (modal.slug === "zoho_crm") {
+              startOAuth("zoho-crm-auth", "Zoho CRM", "zoho_crm");
+              return;
+            }
+            if (modal.slug === "zoho_payroll") {
+              startOAuth("zoho-payroll-auth", "Zoho Payroll", "zoho_payroll");
               return;
             }
             if (modal.slug === "amazon_seller") {

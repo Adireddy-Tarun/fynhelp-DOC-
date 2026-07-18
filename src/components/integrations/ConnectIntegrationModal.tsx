@@ -159,13 +159,16 @@ export default function ConnectIntegrationModal({
           </div>
         )}
         {method === "oauth" && isShopify && (
-          <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+          <div style={{ display: "grid", gap: 6, marginBottom: 18 }}>
             <LabeledInput
-              label="Shop Domain"
+              label="Shopify Store Domain"
               value={shopDomain}
               onChange={setShopDomain}
               placeholder="your-store.myshopify.com"
             />
+            <p style={{ fontSize: 11, color: "rgba(26,16,8,0.55)", lineHeight: 1.5, margin: 0 }}>
+              Find this in your Shopify admin URL — it ends in .myshopify.com
+            </p>
           </div>
         )}
         {method === "bot_token" && (
