@@ -711,7 +711,7 @@ const CustomerLedgerTable = ({ data }: { data: any[] }) => {
       </TableHeader>
       <TableBody>
         {data.map((c) => (
-          <>
+          <Fragment key={c.name}>
             <TableRow key={c.name} className="cursor-pointer" onClick={() => setExpanded(expanded === c.name ? null : c.name)}>
               <TableCell className="w-8">
                 <ChevronRight className={`w-4 h-4 transition ${expanded === c.name ? "rotate-90" : ""}`} />
@@ -735,7 +735,7 @@ const CustomerLedgerTable = ({ data }: { data: any[] }) => {
                 </TableCell>
               </TableRow>
             )}
-          </>
+          </Fragment>
         ))}
       </TableBody>
     </Table>
@@ -757,7 +757,7 @@ const VendorLedgerTable = ({ data }: { data: any[] }) => {
       </TableHeader>
       <TableBody>
         {data.map((v) => (
-          <>
+          <Fragment key={c.name}>
             <TableRow key={v.name} className="cursor-pointer" onClick={() => setExpanded(expanded === v.name ? null : v.name)}>
               <TableCell className="w-8">
                 <ChevronRight className={`w-4 h-4 transition ${expanded === v.name ? "rotate-90" : ""}`} />
@@ -781,7 +781,7 @@ const VendorLedgerTable = ({ data }: { data: any[] }) => {
                 </TableCell>
               </TableRow>
             )}
-          </>
+          </Fragment>
         ))}
       </TableBody>
     </Table>
