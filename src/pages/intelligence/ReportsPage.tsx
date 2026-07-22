@@ -307,6 +307,7 @@ function GenerateModal({
 
 
 function ReportsContent({ mode }: { mode: IntelligenceMode }) {
+  const navigate = useNavigate();
   const { businessId: liveBiz, profile, user } = useAuth() as any;
   const businessId = mode === "demo" ? DEMO_BIZ : liveBiz;
   const userName =
