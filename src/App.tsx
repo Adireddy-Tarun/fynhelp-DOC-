@@ -65,6 +65,8 @@ import HRPage from "./pages/dashboard/HRPage.tsx";
 import FilingCalendarPage from "./pages/dashboard/FilingCalendarPage.tsx";
 import FynnyChatPage from "./pages/dashboard/FynnyChatPage.tsx";
 import CFOReportsPage from "./pages/dashboard/CFOReportsPage.tsx";
+import BooksOfAccountsPage from "./pages/dashboard/BooksOfAccountsPage.tsx";
+
 import InvestorPage from "./pages/dashboard/InvestorPage.tsx";
 import ArchivedFeaturePage from "./pages/dashboard/ArchivedFeaturePage";
 import ReportsPage from "./pages/intelligence/ReportsPage.tsx";
