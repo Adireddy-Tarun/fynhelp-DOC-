@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGeneratedReports, useGenerateReport } from "@/hooks/dashboard/useReports";
 import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/components/intelligence/DataSource";
@@ -9,7 +10,7 @@ import { toast } from "sonner";
 import {
   TrendingUp, Droplets, Flame, FileText, ArrowLeftRight, IndianRupee,
   Users, BarChart3, Download, Loader2, Receipt, Calculator, Building,
-  FileBarChart, Shield, User, ShoppingCart, Rocket, PieChart, Target, X,
+  FileBarChart, Shield, User, ShoppingCart, Rocket, PieChart, Target, X, BookOpen,
 } from "lucide-react";
 
 type ReportDef = {
@@ -306,6 +307,7 @@ function GenerateModal({
 
 
 function ReportsContent({ mode }: { mode: IntelligenceMode }) {
+  const navigate = useNavigate();
   const { businessId: liveBiz, profile, user } = useAuth() as any;
   const businessId = mode === "demo" ? DEMO_BIZ : liveBiz;
   const userName =
@@ -374,13 +376,28 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
 
   return (
     <IntelPage>
-      <header>
-        <h1 style={{ fontSize: 18, fontWeight: 500, color: ACCENT.ink, fontFamily: "'Space Grotesk', sans-serif" }}>
-          CFO Reports
-        </h1>
-        <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>
-          Generate and download financial reports for your business
-        </p>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+        <div>
+          <h1 style={{ fontSize: 18, fontWeight: 500, color: ACCENT.ink, fontFamily: "'Space Grotesk', sans-serif" }}>
+            CFO Reports
+          </h1>
+          <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>
+            Generate and download financial reports for your business
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/dashboard/reports/books")}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "10px 16px", fontSize: 13, fontWeight: 500,
+            background: ACCENT.red, color: "#FFFFFF",
+            border: "none", borderRadius: 6, cursor: "pointer",
+            fontFamily: "'Space Grotesk', sans-serif", whiteSpace: "nowrap",
+          }}
+        >
+          <BookOpen size={14} />
+          Books of Accounts
+        </button>
       </header>
 
       {CATEGORIES.map((cat) => (
