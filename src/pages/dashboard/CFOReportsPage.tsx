@@ -192,12 +192,21 @@ const CFOReportsPage = () => {
           <p className="text-fyn-ink/60 text-sm mb-6">
             Fynny will automatically generate CFO reports based on your data
           </p>
-          <button
-            onClick={() => setOpen(true)}
-            className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
-          >
-            Generate Report
-          </button>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={() => navigate("/dashboard/reports/books")}
+              className="bg-fyn-beige-card text-fyn-ink border border-fyn-ink-10 px-5 py-2.5 rounded-md text-sm font-medium hover:bg-fyn-ink-05 transition"
+            >
+              Books of Accounts
+            </button>
+            <button
+              onClick={() => setOpen(true)}
+              className="bg-fyn-red text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
+            >
+              Generate Report
+            </button>
+          </div>
+
         </div>
         {newReportDialog}
       </DashboardLayout>
