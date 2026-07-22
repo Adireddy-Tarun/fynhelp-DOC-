@@ -351,8 +351,10 @@ const App = () => (
             <Route path="/dashboard/filing-calendar" element={<FilingCalendarPage />} />
             <Route path="/dashboard/fynny-chat" element={<DashboardLayout><IntelligencePage mode="live" tab="fynny" /></DashboardLayout>} />
             <Route path="/dashboard/reports" element={<ReportsPage mode="live" />} />
+            <Route path="/dashboard/reports/books" element={<BooksOfAccountsPage />} />
             <Route path="/dashboard/reports/:id" element={<CFOReportDetailPage />} />
             <Route path="/dashboard/vendors" element={<VendorsPage />} />
+
             <Route path="/dashboard/customers" element={<CustomersPage />} />
             <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
             <Route path="/dashboard/expenses" element={<ExpensesListPage />} />
