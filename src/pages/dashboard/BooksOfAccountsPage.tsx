@@ -757,7 +757,7 @@ const VendorLedgerTable = ({ data }: { data: any[] }) => {
       </TableHeader>
       <TableBody>
         {data.map((v) => (
-          <Fragment key={c.name}>
+          <Fragment key={v.name}>
             <TableRow key={v.name} className="cursor-pointer" onClick={() => setExpanded(expanded === v.name ? null : v.name)}>
               <TableCell className="w-8">
                 <ChevronRight className={`w-4 h-4 transition ${expanded === v.name ? "rotate-90" : ""}`} />
