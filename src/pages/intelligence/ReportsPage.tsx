@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import {
   TrendingUp, Droplets, Flame, FileText, ArrowLeftRight, IndianRupee,
   Users, BarChart3, Download, Loader2, Receipt, Calculator, Building,
-  FileBarChart, Shield, User, ShoppingCart, Rocket, PieChart, Target, X,
+  FileBarChart, Shield, User, ShoppingCart, Rocket, PieChart, Target, X, BookOpen,
 } from "lucide-react";
 
 type ReportDef = {
