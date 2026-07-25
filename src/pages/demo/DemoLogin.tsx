@@ -491,7 +491,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
             {[
               { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#C9A84C", dotColor: "#C9A84C", delay: "1.8s" },
               { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#C9A84C", dotColor: "#C9A84C", delay: "2.4s" },
-              { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
+              { label: "GST Portal", logo: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 16'%3E%3Crect width='44' height='16' rx='3' fill='%238B6914'/%3E%3Ctext x='22' y='11.5' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='10' fill='%23ffffff'%3EGST%3C/text%3E%3C/svg%3E", status: "READY", color: "#8B6914", dotColor: "#8B6914", delay: "3s" },
             ].map((src, i) => (
               <div
                 key={i}
@@ -1002,7 +1002,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
                     {[
                       { label: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF", status: "LIVE SYNC", color: "#C9A84C" },
                       { label: "HDFC Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg", status: "CONNECTED", color: "#C9A84C" },
-                      { label: "GST Portal", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Goods_and_Services_Tax_%28India%29_logo.svg", status: "READY", color: "#8B6914" },
+                      { label: "GST Portal", logo: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 16'%3E%3Crect width='44' height='16' rx='3' fill='%238B6914'/%3E%3Ctext x='22' y='11.5' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='10' fill='%23ffffff'%3EGST%3C/text%3E%3C/svg%3E", status: "READY", color: "#8B6914" },
                     ].map((src, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", background: "rgba(244,237,218,0.025)", borderRadius: 6 }}>
                         <div style={{ width: 5, height: 5, borderRadius: "50%", background: src.color, flexShrink: 0, animation: `blink ${1.8 + i * 0.6}s ease-in-out infinite` }} />
