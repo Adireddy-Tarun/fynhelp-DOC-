@@ -177,14 +177,17 @@ export default function AskFynnyTab() {
       const reply = (data as any)?.response;
       if (error || !reply) throw error || new Error("No response");
       track("ai_cfo_query_received", { response_length: String(reply).length });
-      setMessages((m) => [...m, { role: "assistant", text: String(reply) }]);
+      const text = String(reply);
+      setMessages((m) => [...m, { role: "assistant", text, needsReview: shouldFlagForReview(q, text) }]);
     } catch {
-      setMessages((m) => [...m, { role: "assistant", text: offlineAnswer(q) }]);
+      const text = offlineAnswer(q);
+      setMessages((m) => [...m, { role: "assistant", text, needsReview: shouldFlagForReview(q, text) }]);
     } finally {
       setLoading(false);
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   };
+
 
   const renderText = (s: string) =>
     s.split("\n").map((line, i) => (
