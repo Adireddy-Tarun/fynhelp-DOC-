@@ -219,14 +219,26 @@ export default function AskFynnyTab() {
         <div ref={scrollRef} className="p-5 space-y-3 min-h-[420px] max-h-[520px] overflow-y-auto">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`max-w-[80%] px-3.5 py-2.5 rounded-lg text-sm leading-relaxed ${m.role === "user" ? "text-white" : "text-fyn-ink"}`}
-                style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(26,16,8,0.04)" }}
-              >
-                {renderText(m.text)}
+              <div className="max-w-[80%] flex flex-col gap-1.5 items-start">
+                <div
+                  className={`px-3.5 py-2.5 rounded-lg text-sm leading-relaxed ${m.role === "user" ? "text-white self-end" : "text-fyn-ink"}`}
+                  style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(26,16,8,0.04)" }}
+                >
+                  {renderText(m.text)}
+                </div>
+                {m.role === "assistant" && m.needsReview && (
+                  <span
+                    data-testid="fynny-review-badge"
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border"
+                    style={{ background: "rgba(245,158,11,0.12)", color: "#92400E", borderColor: "rgba(245,158,11,0.35)" }}
+                  >
+                    ⚑ Recommendation — review with your accountant before acting
+                  </span>
+                )}
               </div>
             </div>
           ))}
+
           {loading && (
             <div className="flex justify-start">
               <div className="px-3.5 py-2.5 rounded-lg text-sm text-fyn-ink flex items-center gap-2" style={{ background: "rgba(26,16,8,0.04)" }}>
