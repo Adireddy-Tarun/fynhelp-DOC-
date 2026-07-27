@@ -65,7 +65,7 @@ const OnboardingPage = () => {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      navigate("/?auth=signin");
+      navigate("/login");
       return;
     }
     (async () => {
