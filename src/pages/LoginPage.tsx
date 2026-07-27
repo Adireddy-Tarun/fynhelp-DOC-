@@ -429,6 +429,12 @@ const LoginPage = () => {
                 )}
               </div>
 
+              <HCaptcha
+                onVerify={(t) => setSuCaptcha(t)}
+                onExpire={() => setSuCaptcha(null)}
+                onError={() => setSuCaptcha(null)}
+              />
+
               <button
                 type="submit"
                 disabled={!canSignUp}
