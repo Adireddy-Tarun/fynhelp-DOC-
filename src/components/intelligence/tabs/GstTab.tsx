@@ -61,7 +61,10 @@ export default function GstTab() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Output GST" value={fmtCompact(m.outputGst)} sub="Collected" />
-        <KPI label="Input GST" value={fmtCompact(m.inputGst)} sub="Paid on purchases" />
+        <div title="Estimated — categorized by expense type (payroll & rent excluded). Verify against actual GST invoices before filing.">
+          <KPI label="Input GST (est.)" value={fmtCompact(m.inputGst)} sub="Estimate · verify vs invoices" />
+        </div>
+
         <KPI label="Net Payable" value={fmtCompact(m.netPayable)} deltaTone="down" delta="Due this period" />
         <KPI label="ITC Gap" value={fmtPct(m.itcGap, 1)} deltaTone={m.itcGap < 5 ? "up" : "down"} delta={m.itcGap < 5 ? "Healthy" : "Reconcile"} />
       </div>
