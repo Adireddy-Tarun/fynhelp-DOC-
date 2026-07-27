@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
