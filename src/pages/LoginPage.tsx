@@ -74,7 +74,7 @@ const LoginPage = () => {
     if (!siPassword) { toast.error("Enter your password."); return; }
 
     setSiSubmitting(true);
-    const security = await checkAuthSecurity(email, "sign_in");
+    const security = await checkAuthSecurity(email, "sign_in", siCaptcha ?? undefined);
     if (!security.allowed) {
       setSiSubmitting(false);
       toast.error(security.error ?? "Too many attempts. Please try again later.");
