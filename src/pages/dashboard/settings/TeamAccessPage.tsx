@@ -115,14 +115,34 @@ const TeamAccessPage = () => {
               {members.map((m) => (
                 <tr key={m.user_id} className="border-t" style={{ borderColor: BORDER }}>
                   <td className="py-3 font-medium">{m.name}</td>
-                  <td>{m.role}</td>
+                  <td>
+                    {isOwner && !m.you ? (
+                      <select
+                        data-testid={`role-select-${m.user_id}`}
+                        value={m.role}
+                        disabled={savingRoleFor === m.user_id}
+                        onChange={(e) => changeRole(m.user_id, e.target.value as TeamRole)}
+                        className="h-8 px-2 rounded-md border bg-card text-[13px]"
+                        style={{ borderColor: BORDER }}
+                      >
+                        {TEAM_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                      </select>
+                    ) : (
+                      <span className="capitalize">{m.role}</span>
+                    )}
+                  </td>
                   <td className="text-right">
-                    {m.you && <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>You</span>}
+                    {m.you && <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}>You · {myRole}</span>}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        )}
+        {!isOwner && (
+          <p className="mt-3 text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+            Only the workspace Owner can change team roles.
+          </p>
         )}
       </Card>
 
@@ -131,23 +151,32 @@ const TeamAccessPage = () => {
           <div><label className="block text-[13px] font-medium mb-1.5">Email</label>
             <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></div>
           <div><label className="block text-[13px] font-medium mb-1.5">Role</label>
-            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className={inpCls} style={{ borderColor: BORDER }}>
-              <option>Admin</option><option>Finance Manager</option><option>Viewer</option><option>CA (External)</option>
+            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value as TeamRole)} className={inpCls} style={{ borderColor: BORDER }} disabled={!isOwner}>
+              {TEAM_ROLES.filter((r) => r.value !== "owner").map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select></div>
-          <button onClick={sendInvite} disabled={sending} className="h-10 px-5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}>
+          <button onClick={sendInvite} disabled={sending || !isOwner} className="h-10 px-5 rounded-md text-sm font-semibold text-white disabled:opacity-60" style={{ background: RED }}>
             {sending ? "Sending…" : "Send Invite"}
           </button>
         </div>
+        {!isOwner && <p className="mt-2 text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>Only the Owner can invite new teammates.</p>}
       </Card>
 
       <Card title="Roles & Permissions">
         <table className="w-full text-[13px]">
           <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
-            <th className="py-2">Permission</th><th className="text-center">Admin</th><th className="text-center">Finance Manager</th>
-            <th className="text-center">Viewer</th><th className="text-center">CA</th></tr></thead>
+            <th className="py-2">Permission</th>
+            <th className="text-center">Owner</th><th className="text-center">Manager</th>
+            <th className="text-center">Accountant</th><th className="text-center">Viewer</th></tr></thead>
           <tbody>
-            {permissions.map(([perm, ...vals]) => (
-              <tr key={perm as string} className="border-t" style={{ borderColor: BORDER }}>
+            {([
+              ["View all data", true, true, true, true],
+              ["Edit financial data", true, true, false, false],
+              ["GST / Tax / Reports edit", true, true, true, false],
+              ["Company settings", true, false, false, false],
+              ["Billing & payment methods", true, false, false, false],
+              ["Delete workspace", true, false, false, false],
+            ] as [string, boolean, boolean, boolean, boolean][]).map(([perm, ...vals]) => (
+              <tr key={perm} className="border-t" style={{ borderColor: BORDER }}>
                 <td className="py-2.5">{perm}</td>
                 {(vals as boolean[]).map((v, i) => (
                   <td key={i} className="text-center">
@@ -162,6 +191,7 @@ const TeamAccessPage = () => {
           </tbody>
         </table>
       </Card>
+
     </div>
   );
 };
