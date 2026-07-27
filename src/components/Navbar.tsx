@@ -262,8 +262,8 @@ const Navbar = () => {
                   <c.icon size={16} />
                 </span>
                 <span className="flex flex-col">
-                  <span className="text-[14px] font-semibold text-fyn-ink">{c.label}</span>
-                  <span className="text-[12.5px] text-fyn-ink/60">{c.desc}</span>
+                  <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
+                  <span className="text-[13.5px] text-fyn-ink/60">{c.desc}</span>
                 </span>
               </Link>
             ))}
