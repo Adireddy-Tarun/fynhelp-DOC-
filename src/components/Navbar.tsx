@@ -226,6 +226,12 @@ const Navbar = () => {
 
           <div className="hidden lg:flex items-center gap-3">
             <Link
+              to="/login"
+              className="text-white/80 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
               to="/demo/login"
               className="text-white/80 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
             >
@@ -337,6 +343,13 @@ const Navbar = () => {
 
             <div className="mt-4 space-y-3">
 
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block text-white text-center py-3 rounded-lg font-semibold border border-white/20"
+              >
+                Sign In
+              </Link>
               <Link
                 to="/ca/register"
                 onClick={() => setMobileOpen(false)}

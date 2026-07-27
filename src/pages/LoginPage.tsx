@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
+import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { RULES, COMMON_WEAK, evaluateStrength } from "@/lib/passwordRules";
 
@@ -25,6 +26,8 @@ const LoginPage = () => {
   const [remember, setRemember] = useState(true);
   const [siSubmitting, setSiSubmitting] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [siCaptcha, setSiCaptcha] = useState<string | null>(null);
+  const [suCaptcha, setSuCaptcha] = useState<string | null>(null);
 
   // Sign-up state
   const [suName, setSuName] = useState("");
@@ -47,7 +50,8 @@ const LoginPage = () => {
   const passwordsMatch = suPassword === suConfirm && suConfirm.length > 0;
   const strength = useMemo(() => evaluateStrength(suPassword, passedCount), [suPassword, passedCount]);
   const canSignUp =
-    !!suName.trim() && isValidEmail(suEmail) && allRulesPassed && !isCommonWeak && passwordsMatch && !suSubmitting;
+    !!suName.trim() && isValidEmail(suEmail) && allRulesPassed && !isCommonWeak && passwordsMatch && !!suCaptcha && !suSubmitting;
+  const canSignIn = isValidEmail(siEmail) && !!siPassword && !!siCaptcha && !siSubmitting;
 
   const routeAfterSignIn = async (userId: string) => {
     const { data: profile } = await supabase
@@ -70,7 +74,7 @@ const LoginPage = () => {
     if (!siPassword) { toast.error("Enter your password."); return; }
 
     setSiSubmitting(true);
-    const security = await checkAuthSecurity(email, "sign_in");
+    const security = await checkAuthSecurity(email, "sign_in", siCaptcha ?? undefined);
     if (!security.allowed) {
       setSiSubmitting(false);
       toast.error(security.error ?? "Too many attempts. Please try again later.");
@@ -98,7 +102,7 @@ const LoginPage = () => {
     const email = siEmail.trim();
     if (!isValidEmail(email)) { toast.error("Enter your email above first, then tap Forgot password."); return; }
     setResetting(true);
-    const security = await checkAuthSecurity(email, "reset_password");
+    const security = await checkAuthSecurity(email, "reset_password", siCaptcha ?? undefined);
     if (!security.allowed) {
       setResetting(false);
       toast.error(security.error ?? "Too many reset requests. Please try again later.");
@@ -127,7 +131,7 @@ const LoginPage = () => {
     if (!passwordsMatch) { toast.error("Passwords do not match."); return; }
 
     setSuSubmitting(true);
-    const security = await checkAuthSecurity(email, "sign_up");
+    const security = await checkAuthSecurity(email, "sign_up", suCaptcha ?? undefined);
     if (!security.allowed) {
       setSuSubmitting(false);
       toast.error(security.error ?? "Too many sign-up attempts. Please try again later.");
@@ -263,10 +267,15 @@ const LoginPage = () => {
                   {resetting ? "Sending…" : "Forgot password?"}
                 </button>
               </div>
+              <HCaptcha
+                onVerify={(t) => setSiCaptcha(t)}
+                onExpire={() => setSiCaptcha(null)}
+                onError={() => setSiCaptcha(null)}
+              />
               <button
                 type="submit"
-                disabled={siSubmitting}
-                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
+                disabled={!canSignIn}
+                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ fontSize: "var(--fyn-type-body)" }}
               >
                 {siSubmitting ? "Signing in…" : "Sign In"}
@@ -419,6 +428,12 @@ const LoginPage = () => {
                   </p>
                 )}
               </div>
+
+              <HCaptcha
+                onVerify={(t) => setSuCaptcha(t)}
+                onExpire={() => setSuCaptcha(null)}
+                onError={() => setSuCaptcha(null)}
+              />
 
               <button
                 type="submit"
