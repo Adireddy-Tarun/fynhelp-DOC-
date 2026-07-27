@@ -29,11 +29,84 @@ import FynLogo from "@/components/FynLogo";
 import type { LucideIcon } from "lucide-react";
 type IconType = LucideIcon;
 
-const PRODUCT_MODULES: { icon: IconType; label: string; href: string; desc: string }[] = [
-  { icon: Droplet,   label: "Liquidity intelligence", href: "/pricing", desc: "Cash, runway, forecasts" },
-  { icon: TrendingUp,label: "Revenue intelligence",   href: "/pricing", desc: "MRR, churn, growth" },
-  { icon: Receipt,   label: "GST intelligence",       href: "/pricing", desc: "Filings, ITC, 2B recon" },
-  { icon: Sparkles,  label: "Fynny, the AI CFO",      href: "/pricing", desc: "Ask anything about your books" },
+type ModuleKey = "liquidity" | "revenue" | "gst" | "fynny";
+
+type ModuleStat = { label: string; value: string; sub?: string; tone?: "healthy" | "warning" | "critical" | "neutral" };
+type ModulePreview = { title: string; sub: string; stats: ModuleStat[]; footer?: string };
+
+const PRODUCT_MODULES: { key: ModuleKey; icon: IconType; label: string; href: string; desc: string; preview: ModulePreview }[] = [
+  {
+    key: "liquidity",
+    icon: Droplet,
+    label: "Liquidity intelligence",
+    href: "/demo/liquidity",
+    desc: "Cash, runway, forecasts",
+    preview: {
+      title: "Liquidity",
+      sub: "Live cash position",
+      stats: [
+        { label: "Cash Balance", value: "₹42.1L", sub: "Operating ₹38.7L", tone: "healthy" },
+        { label: "Runway",       value: "8.2 mo", sub: "Zero by Mar 2027", tone: "warning" },
+        { label: "Net Burn",     value: "₹5.1L/mo", sub: "Gross ₹9.8L", tone: "warning" },
+        { label: "Working Cap.", value: "₹18.4L", sub: "Quick ratio 2.14", tone: "healthy" },
+      ],
+      footer: "13-week forecast · CCC · AR aging",
+    },
+  },
+  {
+    key: "revenue",
+    icon: TrendingUp,
+    label: "Revenue intelligence",
+    href: "/demo/revenue",
+    desc: "MRR, churn, growth",
+    preview: {
+      title: "Revenue",
+      sub: "Last 30 days",
+      stats: [
+        { label: "MRR",       value: "₹18.2L", sub: "+8.4% MoM", tone: "healthy" },
+        { label: "NRR",       value: "112%",  sub: "+3.2% QoQ", tone: "healthy" },
+        { label: "Churn",     value: "3.2%",  sub: "Below benchmark", tone: "healthy" },
+        { label: "LTV:CAC",   value: "3.8x",  sub: "Healthy", tone: "healthy" },
+      ],
+      footer: "ARPA · Rule of 40 · Cohort retention",
+    },
+  },
+  {
+    key: "gst",
+    icon: Receipt,
+    label: "GST intelligence",
+    href: "/demo/gst",
+    desc: "Filings, ITC, 2B recon",
+    preview: {
+      title: "GST",
+      sub: "Current period",
+      stats: [
+        { label: "Net Payable",  value: "₹2.4L", sub: "Due 20 Nov",     tone: "warning" },
+        { label: "ITC Gap",      value: "4.1%",  sub: "Reconcile 2B",   tone: "warning" },
+        { label: "Output GST",   value: "₹6.8L", sub: "Collected",      tone: "neutral" },
+        { label: "Input GST",    value: "₹4.4L", sub: "Est · verify",   tone: "neutral" },
+      ],
+      footer: "GSTR-1 · GSTR-3B · 2B match rate",
+    },
+  },
+  {
+    key: "fynny",
+    icon: Sparkles,
+    label: "Fynny, the AI CFO",
+    href: "/demo/fynny",
+    desc: "Ask anything about your books",
+    preview: {
+      title: "Fynny",
+      sub: "AI CFO briefing",
+      stats: [
+        { label: "Today's alerts",   value: "3",   sub: "1 critical",       tone: "critical" },
+        { label: "Insights",         value: "12",  sub: "Reviewed 4",       tone: "neutral" },
+        { label: "Recommendations",  value: "5",   sub: "Reviewed w/ CA",   tone: "warning" },
+        { label: "Model",            value: "Gemini 2.5", sub: "Grounded on your data", tone: "healthy" },
+      ],
+      footer: "Ask anything · Auto-briefings · Scenario planning",
+    },
+  },
 ];
 
 const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
@@ -48,6 +121,13 @@ const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }
   { icon: FileStack,       label: "Bulk filing & ITC reconciliation", href: "/ca-firms", desc: "GSTR filing in batches" },
   { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
   { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
+];
+
+const CA_PREVIEW_STATS: ModuleStat[] = [
+  { label: "Active Clients",       value: "48",     sub: "↑ 3 new this month", tone: "neutral" },
+  { label: "Filings Due This Week",value: "12",     sub: "GSTR-3B 8 · GSTR-1 4", tone: "warning" },
+  { label: "Critical Alerts",      value: "5",      sub: "Across 4 clients", tone: "critical" },
+  { label: "ITC at Risk",          value: "₹8.4L",  sub: "Across 6 clients", tone: "warning" },
 ];
 
 const TOP_LINKS: { label: string; href: string }[] = [
