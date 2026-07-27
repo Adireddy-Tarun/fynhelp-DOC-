@@ -390,7 +390,7 @@ const Navbar = () => {
             </div>
             <Link
               to="/waitlist"
-              className="bg-fyn-red hover:bg-fyn-red-dark text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors"
+              className="bg-fyn-red hover:bg-fyn-red-dark text-white text-[15px] font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors"
             >
               Join waitlist
             </Link>
