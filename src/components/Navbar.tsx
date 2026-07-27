@@ -282,17 +282,14 @@ const Navbar = () => {
             <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
               <Briefcase size={22} />
             </span>
-            <div
-              className="text-[20px] font-bold text-white leading-tight mb-2"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
+            <div className="text-[20px] font-bold text-white leading-tight mb-2">
               Bring your clients
             </div>
-            <p className="text-[13.5px] text-white/65 leading-relaxed">
+            <p className="text-[14px] text-white/65 leading-relaxed">
               One firm, dozens of clients, one relationship.
             </p>
           </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
+          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
             Register as CA <span aria-hidden>→</span>
           </div>
         </Link>
