@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Tag,
 } from "lucide-react";
+import FynLogo from "@/components/FynLogo";
 
 /* ────────────────────────────────────────────────────────────────
    Data
@@ -115,7 +116,7 @@ const Navbar = () => {
         onClick={() => setOpenMenu(isOpen ? null : menuKey)}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className="relative flex items-center gap-1.5 py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+        className="relative flex items-center gap-1.5 py-6 text-[15.5px] font-medium text-white/75 hover:text-white transition-colors"
       >
         <span className={active || isOpen ? "text-white" : ""}>{label}</span>
         <ChevronDown
@@ -134,7 +135,7 @@ const Navbar = () => {
   const PlainLink = ({ href, label }: { href: string; label: string }) => (
     <Link
       to={href}
-      className="relative py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+      className="relative py-6 text-[15.5px] font-medium text-white/75 hover:text-white transition-colors"
     >
       <span className={isActive(href) ? "text-white" : ""}>{label}</span>
       <span
@@ -176,8 +177,8 @@ const Navbar = () => {
                   <m.icon size={16} />
                 </span>
                 <span className="flex flex-col">
-                  <span className="text-[14px] font-semibold text-fyn-ink">{m.label}</span>
-                  <span className="text-[12.5px] text-fyn-ink/60">{m.desc}</span>
+                  <span className="text-[15px] font-semibold text-fyn-ink">{m.label}</span>
+                  <span className="text-[13.5px] text-fyn-ink/60">{m.desc}</span>
                 </span>
               </Link>
             ))}
@@ -199,7 +200,7 @@ const Navbar = () => {
                 <span className="flex h-8 w-8 items-center justify-center rounded-md bg-fyn-gold/15 text-fyn-gold">
                   <u.icon size={16} />
                 </span>
-                <span className="text-[14px] font-medium text-fyn-ink">{u.label}</span>
+                <span className="text-[15px] font-medium text-fyn-ink">{u.label}</span>
               </Link>
             ))}
           </div>
@@ -218,17 +219,14 @@ const Navbar = () => {
             <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
               <PlayCircle size={22} />
             </span>
-            <div
-              className="text-[20px] font-bold text-white leading-tight mb-2"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
+            <div className="text-[20px] font-bold text-white leading-tight mb-2">
               See it live
             </div>
-            <p className="text-[13.5px] text-white/65 leading-relaxed">
+            <p className="text-[14px] text-white/65 leading-relaxed">
               No signup needed — explore real data in a demo account.
             </p>
           </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
+          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
             Demo login <span aria-hidden>→</span>
           </div>
         </Link>
@@ -264,8 +262,8 @@ const Navbar = () => {
                   <c.icon size={16} />
                 </span>
                 <span className="flex flex-col">
-                  <span className="text-[14px] font-semibold text-fyn-ink">{c.label}</span>
-                  <span className="text-[12.5px] text-fyn-ink/60">{c.desc}</span>
+                  <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
+                  <span className="text-[13.5px] text-fyn-ink/60">{c.desc}</span>
                 </span>
               </Link>
             ))}
@@ -284,17 +282,14 @@ const Navbar = () => {
             <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
               <Briefcase size={22} />
             </span>
-            <div
-              className="text-[20px] font-bold text-white leading-tight mb-2"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
+            <div className="text-[20px] font-bold text-white leading-tight mb-2">
               Bring your clients
             </div>
-            <p className="text-[13.5px] text-white/65 leading-relaxed">
+            <p className="text-[14px] text-white/65 leading-relaxed">
               One firm, dozens of clients, one relationship.
             </p>
           </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
+          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
             Register as CA <span aria-hidden>→</span>
           </div>
         </Link>
@@ -327,7 +322,7 @@ const Navbar = () => {
           <Store size={16} />
         </span>
         <span className="flex flex-col">
-          <span className="text-[14px] font-semibold text-fyn-ink">Client login</span>
+          <span className="text-[15px] font-semibold text-fyn-ink">Client login</span>
           <span className="text-[12.5px] text-fyn-ink/60">Business owners & founders</span>
         </span>
       </Link>
@@ -340,7 +335,7 @@ const Navbar = () => {
           <Briefcase size={16} />
         </span>
         <span className="flex flex-col">
-          <span className="text-[14px] font-semibold text-fyn-ink">CA login</span>
+          <span className="text-[15px] font-semibold text-fyn-ink">CA login</span>
           <span className="text-[12.5px] text-fyn-ink/60">Chartered accountants & firms</span>
         </span>
       </Link>
@@ -361,32 +356,8 @@ const Navbar = () => {
           style={{ minHeight: NAV_HEIGHT }}
         >
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 shrink-0 mr-6 lg:mr-10 group">
-            <span
-              className="flex items-center justify-center rounded-[9px] bg-fyn-red text-white font-bold shadow-md group-hover:scale-105 transition-transform"
-              style={{
-                width: 34,
-                height: 34,
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 20,
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              F
-            </span>
-            <span
-              className="text-white"
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: "-0.01em",
-                lineHeight: 1,
-              }}
-            >
-              FynHelp
-            </span>
+          <Link to="/" className="flex items-center shrink-0 mr-6 lg:mr-10 group">
+            <FynLogo variant="light" size="md" />
           </Link>
 
           {/* Desktop nav */}
@@ -407,7 +378,7 @@ const Navbar = () => {
                 onClick={() => setOpenMenu(openMenu === "signin" ? null : "signin")}
                 aria-haspopup="true"
                 aria-expanded={openMenu === "signin"}
-                className="flex items-center gap-1.5 text-[14px] font-medium text-white/85 hover:text-white transition-colors py-2"
+                className="flex items-center gap-1.5 text-[15px] font-medium text-white/85 hover:text-white transition-colors py-2"
               >
                 Sign in
                 <ChevronDown
@@ -419,7 +390,7 @@ const Navbar = () => {
             </div>
             <Link
               to="/waitlist"
-              className="bg-fyn-red hover:bg-fyn-red-dark text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors"
+              className="bg-fyn-red hover:bg-fyn-red-dark text-white text-[15px] font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors"
             >
               Join waitlist
             </Link>
