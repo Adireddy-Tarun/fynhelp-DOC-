@@ -135,7 +135,7 @@ const Navbar = () => {
   const PlainLink = ({ href, label }: { href: string; label: string }) => (
     <Link
       to={href}
-      className="relative py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+      className="relative py-6 text-[15.5px] font-medium text-white/75 hover:text-white transition-colors"
     >
       <span className={isActive(href) ? "text-white" : ""}>{label}</span>
       <span
