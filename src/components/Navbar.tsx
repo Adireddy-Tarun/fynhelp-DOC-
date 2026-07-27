@@ -378,7 +378,7 @@ const Navbar = () => {
                 onClick={() => setOpenMenu(openMenu === "signin" ? null : "signin")}
                 aria-haspopup="true"
                 aria-expanded={openMenu === "signin"}
-                className="flex items-center gap-1.5 text-[14px] font-medium text-white/85 hover:text-white transition-colors py-2"
+                className="flex items-center gap-1.5 text-[15px] font-medium text-white/85 hover:text-white transition-colors py-2"
               >
                 Sign in
                 <ChevronDown
