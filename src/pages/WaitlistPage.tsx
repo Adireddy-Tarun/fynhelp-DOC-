@@ -13,6 +13,7 @@ import {
   Calendar,
   Video,
   Users,
+  LogIn,
 } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/30min";
