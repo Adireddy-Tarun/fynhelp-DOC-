@@ -31,6 +31,31 @@ export default function WaitlistPage() {
             "linear-gradient(180deg, #F9F7F4 0%, #FFFFFF 60%, #F9F7F4 100%)",
         }}
       >
+        <div className="mx-auto mb-8" style={{ maxWidth: 600 }}>
+          <div className="bg-white rounded-xl border border-fyn-ink/10 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-fyn-red/10 text-fyn-red shrink-0">
+                <LogIn className="w-5 h-5" />
+              </span>
+              <div className="min-w-0">
+                <p className="font-serif font-semibold text-fyn-ink text-[15px] md:text-base leading-tight">
+                  Already have an account?
+                </p>
+                <p className="text-fyn-ink/60 text-[13px] leading-tight mt-0.5">
+                  Sign in to your FynHelp dashboard.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/login"
+              className="shrink-0 inline-flex items-center gap-1.5 bg-fyn-red text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Sign in
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
         <div className="mx-auto" style={{ maxWidth: 600 }}>
           <header className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-fyn-red/10 text-fyn-red mb-6">
@@ -43,7 +68,7 @@ export default function WaitlistPage() {
               Be first in line when we launch
             </h1>
             <p className="text-fyn-ink/70 text-base md:text-lg">
-              First 100 users get FYNHelp free for 30 days.
+              New here? Join the list below — first 100 users get FynHelp free for 30 days.
             </p>
           </header>
 
