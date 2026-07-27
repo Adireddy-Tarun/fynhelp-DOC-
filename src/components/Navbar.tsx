@@ -331,21 +331,29 @@ const Navbar = () => {
             By module
           </div>
           <div className="flex flex-col gap-1.5">
-            {PRODUCT_MODULES.map((m) => (
-              <Link
-                key={m.label}
-                to={m.href}
-                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
-              >
-                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
-                  <m.icon size={16} />
-                </span>
-                <span className="flex flex-col">
-                  <span className="text-[15px] font-semibold text-fyn-ink">{m.label}</span>
-                  <span className="text-[13.5px] text-fyn-ink/60">{m.desc}</span>
-                </span>
-              </Link>
-            ))}
+            {PRODUCT_MODULES.map((m) => {
+              const isActivePreview = previewModule === m.key;
+              return (
+                <Link
+                  key={m.label}
+                  to={m.href}
+                  onMouseEnter={() => setPreviewModule(m.key)}
+                  onFocus={() => setPreviewModule(m.key)}
+                  className={`flex items-start gap-3 rounded-lg px-3 py-3 transition-colors ${
+                    isActivePreview ? "bg-white" : "hover:bg-fyn-ink/5"
+                  }`}
+                  style={isActivePreview ? { boxShadow: "0 1px 3px rgba(26,16,8,0.06)" } : undefined}
+                >
+                  <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
+                    <m.icon size={16} />
+                  </span>
+                  <span className="flex flex-col">
+                    <span className="text-[15px] font-semibold text-fyn-ink">{m.label}</span>
+                    <span className="text-[13.5px] text-fyn-ink/60">{m.desc}</span>
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
