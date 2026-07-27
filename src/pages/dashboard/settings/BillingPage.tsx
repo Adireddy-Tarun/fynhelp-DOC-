@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Lock } from "lucide-react";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8"; const GOLD = "#8B6914";
+
 
 const Card = ({ title, danger, children }: { title: string; danger?: boolean; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in"
