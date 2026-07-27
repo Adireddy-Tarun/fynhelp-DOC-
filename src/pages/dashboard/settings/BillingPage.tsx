@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Lock } from "lucide-react";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8"; const GOLD = "#8B6914";
+
 
 const Card = ({ title, danger, children }: { title: string; danger?: boolean; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in"
@@ -27,7 +30,9 @@ const Metric = ({ label, used, total, pct }: { label: string; used: string; tota
 
 const BillingPage = () => {
   const { businessId, user } = useAuth();
+  const { canAccessBilling, role, loading: roleLoading } = useUserRole();
   const [promo, setPromo] = useState("");
+
   const [showCancel, setShowCancel] = useState(false);
   const [aiQueries, setAiQueries] = useState<number | null>(null);
   const [teamCount, setTeamCount] = useState<number | null>(null);
@@ -51,10 +56,26 @@ const BillingPage = () => {
     })();
   }, [user?.id, businessId]);
 
+  if (!roleLoading && !canAccessBilling) {
+    return (
+      <div className="max-w-3xl">
+        <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Billing</h2>
+        <div data-testid="billing-locked" className="mt-6 border rounded-lg p-8 text-center bg-card" style={{ borderColor: BORDER }}>
+          <Lock className="w-8 h-8 mx-auto mb-3" style={{ color: RED }} />
+          <p className="text-[15px] font-semibold" style={{ color: "#1A1008" }}>Billing is restricted to the Owner</p>
+          <p className="text-[13px] mt-2" style={{ color: "rgba(26,16,8,0.6)" }}>
+            Your role is <span className="font-semibold capitalize">{role}</span>. Ask the workspace Owner to update billing, payment methods, or the plan.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl">
       <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Billing</h2>
       <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Manage plan, usage, invoices and payment methods.</p>
+
 
       <Card title="Current Plan">
         <div className="flex items-start justify-between">

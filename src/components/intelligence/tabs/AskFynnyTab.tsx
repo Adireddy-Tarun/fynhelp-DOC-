@@ -19,7 +19,16 @@ const QUICK_PROMPTS = [
 
 const WELCOME = "Hi, I'm FYNNY — your virtual CFO. Ask me anything about your cash, revenue, costs, taxes, or growth. I see your financial data in real time.";
 
-type Msg = { role: "user" | "assistant"; text: string };
+type Msg = { role: "user" | "assistant"; text: string; needsReview?: boolean };
+
+// Heuristic: flag messages that recommend or discuss material financial actions
+// (hiring, fundraising, large payments, loans/investment). Routine data lookups
+// like "what's my cash balance" or "what's due this week" are not flagged.
+const REVIEW_PATTERN = /\b(hire|hiring|headcount plan|fire|layoff|raise (money|capital|a round)|fundrais|investor|invest\b|investment|loan|borrow|term sheet|large payment|big payment|acquire|acquisition|equity|valuation|esop|dividend|write.?off|pay off|prepay)\b/i;
+function shouldFlagForReview(q: string, a: string): boolean {
+  return REVIEW_PATTERN.test(q) || REVIEW_PATTERN.test(a);
+}
+
 
 function inr(n: number) {
   if (!isFinite(n) || n === 0) return "₹0";
@@ -168,14 +177,17 @@ export default function AskFynnyTab() {
       const reply = (data as any)?.response;
       if (error || !reply) throw error || new Error("No response");
       track("ai_cfo_query_received", { response_length: String(reply).length });
-      setMessages((m) => [...m, { role: "assistant", text: String(reply) }]);
+      const text = String(reply);
+      setMessages((m) => [...m, { role: "assistant", text, needsReview: shouldFlagForReview(q, text) }]);
     } catch {
-      setMessages((m) => [...m, { role: "assistant", text: offlineAnswer(q) }]);
+      const text = offlineAnswer(q);
+      setMessages((m) => [...m, { role: "assistant", text, needsReview: shouldFlagForReview(q, text) }]);
     } finally {
       setLoading(false);
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   };
+
 
   const renderText = (s: string) =>
     s.split("\n").map((line, i) => (
@@ -207,14 +219,26 @@ export default function AskFynnyTab() {
         <div ref={scrollRef} className="p-5 space-y-3 min-h-[420px] max-h-[520px] overflow-y-auto">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`max-w-[80%] px-3.5 py-2.5 rounded-lg text-sm leading-relaxed ${m.role === "user" ? "text-white" : "text-fyn-ink"}`}
-                style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(26,16,8,0.04)" }}
-              >
-                {renderText(m.text)}
+              <div className="max-w-[80%] flex flex-col gap-1.5 items-start">
+                <div
+                  className={`px-3.5 py-2.5 rounded-lg text-sm leading-relaxed ${m.role === "user" ? "text-white self-end" : "text-fyn-ink"}`}
+                  style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(26,16,8,0.04)" }}
+                >
+                  {renderText(m.text)}
+                </div>
+                {m.role === "assistant" && m.needsReview && (
+                  <span
+                    data-testid="fynny-review-badge"
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border"
+                    style={{ background: "rgba(245,158,11,0.12)", color: "#92400E", borderColor: "rgba(245,158,11,0.35)" }}
+                  >
+                    ⚑ Recommendation — review with your accountant before acting
+                  </span>
+                )}
               </div>
             </div>
           ))}
+
           {loading && (
             <div className="flex justify-start">
               <div className="px-3.5 py-2.5 rounded-lg text-sm text-fyn-ink flex items-center gap-2" style={{ background: "rgba(26,16,8,0.04)" }}>

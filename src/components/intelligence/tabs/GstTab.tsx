@@ -15,9 +15,28 @@ export default function GstTab() {
   const { data: invoices } = useInvoices();
   const { data: expenses } = useExpenses();
 
+  // Category-aware GST rate estimation. Payroll and rent typically carry no
+  // recoverable ITC (salaries are outside GST scope; rent is often composition
+  // or exempt for many SMEs). Everything else defaults to the standard 18%.
+  // If the row exposes an explicit tax_amount / gst_rate we use that instead.
+  const gstRateForExpense = (e: any): number => {
+    const cat = String(e?.category ?? "");
+    const sub = String(e?.subcategory ?? "");
+    const hay = `${cat} ${sub}`;
+    if (/salary|payroll|wages|stipend|bonus/i.test(hay)) return 0;
+    if (/rent|lease/i.test(hay)) return 0;
+    return 0.18;
+  };
+
   const m = useMemo(() => {
     const outputGst = (invoices ?? []).reduce((s, i) => s + Number(i.tax_amount), 0);
-    const inputGst = (expenses ?? []).reduce((s, e) => s + Number(e.amount) * 0.18 / 1.18, 0);
+    const inputGst = (expenses ?? []).reduce((s, e: any) => {
+      const explicit = Number(e?.tax_amount ?? e?.gst_amount ?? 0);
+      if (explicit > 0) return s + explicit;
+      const rate = typeof e?.gst_rate === "number" ? Number(e.gst_rate) : gstRateForExpense(e);
+      if (!rate) return s;
+      return s + (Number(e.amount) * rate) / (1 + rate);
+    }, 0);
     const netPayable = Math.max(0, outputGst - inputGst);
     const itcAvailable = inputGst;
     const itcClaimed = NaN;
@@ -25,6 +44,7 @@ export default function GstTab() {
     const itcBlocked = NaN;
     return { outputGst, inputGst, netPayable, itcAvailable, itcClaimed, itcGap, itcBlocked };
   }, [invoices, expenses]);
+
 
   const statusTone = (status: string) => {
     if (/filed/i.test(status)) return "green" as const;
@@ -41,7 +61,10 @@ export default function GstTab() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Output GST" value={fmtCompact(m.outputGst)} sub="Collected" />
-        <KPI label="Input GST" value={fmtCompact(m.inputGst)} sub="Paid on purchases" />
+        <div title="Estimated — categorized by expense type (payroll & rent excluded). Verify against actual GST invoices before filing.">
+          <KPI label="Input GST (est.)" value={fmtCompact(m.inputGst)} sub="Estimate · verify vs invoices" />
+        </div>
+
         <KPI label="Net Payable" value={fmtCompact(m.netPayable)} deltaTone="down" delta="Due this period" />
         <KPI label="ITC Gap" value={fmtPct(m.itcGap, 1)} deltaTone={m.itcGap < 5 ? "up" : "down"} delta={m.itcGap < 5 ? "Healthy" : "Reconcile"} />
       </div>
