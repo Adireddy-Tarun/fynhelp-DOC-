@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole, TEAM_ROLES, TeamRole } from "@/hooks/useUserRole";
+
 
 const RED = "#A93838"; const BORDER = "#E0D9C8";
 
