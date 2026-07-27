@@ -25,7 +25,8 @@ import {
    Data
 ──────────────────────────────────────────────────────────────── */
 
-type IconType = React.ComponentType<{ size?: number; className?: string }>;
+import type { LucideIcon } from "lucide-react";
+type IconType = LucideIcon;
 
 const PRODUCT_MODULES: { icon: IconType; label: string; href: string; desc: string }[] = [
   { icon: Droplet,   label: "Liquidity intelligence", href: "/pricing", desc: "Cash, runway, forecasts" },
