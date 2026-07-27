@@ -344,6 +344,13 @@ const Navbar = () => {
             <div className="mt-4 space-y-3">
 
               <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block text-white text-center py-3 rounded-lg font-semibold border border-white/20"
+              >
+                Sign In
+              </Link>
+              <Link
                 to="/ca/register"
                 onClick={() => setMobileOpen(false)}
                 className="block bg-fyn-red text-white text-center py-3 rounded-lg font-semibold border border-fyn-red"
