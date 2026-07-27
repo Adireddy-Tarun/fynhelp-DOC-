@@ -286,6 +286,12 @@ const LoginPage = () => {
                   Create an account
                 </button>
               </p>
+              <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)", marginTop: 4 }}>
+                Signing in as a CA firm instead?{" "}
+                <Link to="/ca/login" className="text-fyn-red hover:underline font-medium">
+                  CA login
+                </Link>
+              </p>
             </form>
           ) : (
             <form onSubmit={handleSignUp} className="space-y-5" noValidate>
