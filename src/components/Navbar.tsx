@@ -378,30 +378,29 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Column 3 — conversion card */}
-        <Link
-          to="/demo/login"
-          className="group flex flex-col justify-between rounded-xl p-6 transition-all"
-          style={{
-            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
-            border: "1px solid rgba(196,30,30,0.35)",
-          }}
-        >
-          <div>
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
-              <PlayCircle size={22} />
-            </span>
-            <div className="text-[20px] font-bold text-white leading-tight mb-2">
-              See it live
+        {/* Column 3 — live dashboard preview (styled to match real product) */}
+        {(() => {
+          const active = PRODUCT_MODULES.find((m) => m.key === previewModule) ?? PRODUCT_MODULES[0];
+          return (
+            <div className="flex flex-col gap-3">
+              <DashboardPreviewCard
+                eyebrow={active.preview.title}
+                title={active.preview.title}
+                sub={active.preview.sub}
+                stats={active.preview.stats}
+                footer={active.preview.footer}
+                ctaLabel="Open live demo"
+                ctaHref={active.href}
+              />
+              <Link
+                to="/demo/login"
+                className="group inline-flex items-center gap-1.5 self-end text-[12.5px] font-semibold text-fyn-ink/70 hover:text-fyn-red transition-colors"
+              >
+                <PlayCircle size={14} /> Or start from demo login <span aria-hidden>→</span>
+              </Link>
             </div>
-            <p className="text-[14px] text-white/65 leading-relaxed">
-              No signup needed — explore real data in a demo account.
-            </p>
-          </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
-            Demo login <span aria-hidden>→</span>
-          </div>
-        </Link>
+          );
+        })()}
       </div>
     </div>
   );
