@@ -1,253 +1,426 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import FynLogo from "./FynLogo";
-import ProductsNav from "./products/ProductsNav";
-import FYNIcon, { type FYNIconName } from "./FYNIcon";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  Store,
+  Briefcase,
+  PlayCircle,
+  Droplet,
+  TrendingUp,
+  Receipt,
+  Sparkles,
+  Rocket,
+  ShoppingBag,
+  Factory,
+  ShieldCheck,
+  LayoutDashboard,
+  FileStack,
+  MessageSquare,
+  Tag,
+} from "lucide-react";
 
-import { Menu, X, Shield, ChevronDown } from "lucide-react";
+/* ────────────────────────────────────────────────────────────────
+   Data
+──────────────────────────────────────────────────────────────── */
 
-const navLinks = [
-  { label: "Use Cases", href: "/use-cases" },
-  { label: "CA Partners", href: "/ca-firms" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Security", href: "/security" },
-  { label: "About", href: "/about" },
+type IconType = React.ComponentType<{ size?: number; className?: string }>;
+
+const PRODUCT_MODULES: { icon: IconType; label: string; href: string; desc: string }[] = [
+  { icon: Droplet,   label: "Liquidity intelligence", href: "/pricing", desc: "Cash, runway, forecasts" },
+  { icon: TrendingUp,label: "Revenue intelligence",   href: "/pricing", desc: "MRR, churn, growth" },
+  { icon: Receipt,   label: "GST intelligence",       href: "/pricing", desc: "Filings, ITC, 2B recon" },
+  { icon: Sparkles,  label: "Fynny, the AI CFO",      href: "/pricing", desc: "Ask anything about your books" },
 ];
 
-const resourceItems: { icon: FYNIconName; label: string; desc: string; tab: string }[] = [
-  { icon: "getting-started", label: "Getting Started", desc: "Day 1 to mastery", tab: "getting-started" },
-  { icon: "templates", label: "Templates & Downloads", desc: "Excel, guides, tools", tab: "templates" },
-  { icon: "glossary", label: "Financial Glossary", desc: "A–Z definitions", tab: "glossary" },
-  { icon: "blog", label: "Blog", desc: "Insights & updates", tab: "blog" },
-  { icon: "community", label: "Community", desc: "Q&A & discussions", tab: "community" },
+const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
+  { icon: Rocket,      label: "Startups & founders",       href: "/use-cases" },
+  { icon: ShoppingBag, label: "D2C brands",                href: "/use-cases" },
+  { icon: Factory,     label: "Trading & manufacturing",   href: "/use-cases" },
+  { icon: ShieldCheck, label: "Security & compliance",     href: "/security" },
 ];
+
+const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }[] = [
+  { icon: LayoutDashboard, label: "Portfolio dashboard",             href: "/ca-firms", desc: "All clients, one view" },
+  { icon: FileStack,       label: "Bulk filing & ITC reconciliation", href: "/ca-firms", desc: "GSTR filing in batches" },
+  { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
+  { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
+];
+
+const TOP_LINKS: { label: string; href: string }[] = [
+  { label: "Pricing",   href: "/pricing" },
+  { label: "Resources", href: "/resources" },
+  { label: "About",     href: "/about" },
+];
+
+/* ────────────────────────────────────────────────────────────────
+   Component
+──────────────────────────────────────────────────────────────── */
+
+type MenuKey = "products" | "ca" | "signin" | null;
+
+const NAV_HEIGHT = 76;
 
 const Navbar = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [resourcesOpen, setResourcesOpen] = useState(false);
-  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
-  const resourcesRef = useRef<HTMLDivElement>(null);
-  const resourcesCloseTimer = useRef<ReturnType<typeof setTimeout>>();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<MenuKey>(null);
+  const [mProducts, setMProducts] = useState(false);
+  const [mCA, setMCA] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const openResources = () => {
-    clearTimeout(resourcesCloseTimer.current);
-    setResourcesOpen(true);
+  const scheduleClose = () => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpenMenu(null), 220);
   };
-  const scheduleCloseResources = () => {
-    clearTimeout(resourcesCloseTimer.current);
-    resourcesCloseTimer.current = setTimeout(() => setResourcesOpen(false), 600);
+  const openNow = (key: MenuKey) => {
+    clearTimeout(closeTimer.current);
+    setOpenMenu(key);
   };
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setMobileOpen(false);
-    setResourcesOpen(false);
+    setOpenMenu(null);
   }, [location.pathname, location.search]);
 
-  // Close resources dropdown on outside click
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
-        setResourcesOpen(false);
-      }
+    const onDown = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target as Node)) setOpenMenu(null);
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  const isHome = location.pathname === "/";
-  const navBg = isHome && !scrolled
-    ? "bg-transparent"
-    : "bg-fyn-ink border-b border-white/10 backdrop-blur-xl";
+  const isActive = (href: string) => location.pathname === href;
 
-  const isResourcesActive = location.pathname === "/resources";
+  // Top-level trigger button
+  const Trigger = ({
+    label,
+    menuKey,
+    active,
+  }: {
+    label: string;
+    menuKey: Exclude<MenuKey, null>;
+    active?: boolean;
+  }) => {
+    const isOpen = openMenu === menuKey;
+    return (
+      <button
+        onMouseEnter={() => openNow(menuKey)}
+        onMouseLeave={scheduleClose}
+        onClick={() => setOpenMenu(isOpen ? null : menuKey)}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        className="relative flex items-center gap-1.5 py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+      >
+        <span className={active || isOpen ? "text-white" : ""}>{label}</span>
+        <ChevronDown
+          size={13}
+          className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        />
+        <span
+          className={`absolute left-0 right-0 -bottom-[1px] h-[2px] rounded-full transition-all duration-200 ${
+            active || isOpen ? "bg-fyn-red opacity-100" : "opacity-0"
+          }`}
+        />
+      </button>
+    );
+  };
+
+  const PlainLink = ({ href, label }: { href: string; label: string }) => (
+    <Link
+      to={href}
+      className="relative py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+    >
+      <span className={isActive(href) ? "text-white" : ""}>{label}</span>
+      <span
+        className={`absolute left-0 right-0 -bottom-[1px] h-[2px] rounded-full transition-all duration-200 ${
+          isActive(href) ? "bg-fyn-red opacity-100" : "opacity-0"
+        }`}
+      />
+    </Link>
+  );
+
+  /* ── Mega menu shells ─────────────────────────────────────── */
+
+  const ProductsMenu = (
+    <div
+      onMouseEnter={() => openNow("products")}
+      onMouseLeave={scheduleClose}
+      className="absolute inset-x-0 top-full"
+      style={{
+        background: "hsl(var(--fyn-beige))",
+        borderTop: "1px solid rgba(26,16,8,0.08)",
+        boxShadow: "0 24px 48px -12px rgba(26,16,8,0.18)",
+        animation: "fade-in 180ms ease-out",
+      }}
+    >
+      <div className="max-w-[1400px] mx-auto px-14 py-10 grid grid-cols-[1fr_1fr_360px] gap-14">
+        {/* Column 1 */}
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/50 mb-4">
+            By module
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {PRODUCT_MODULES.map((m) => (
+              <Link
+                key={m.label}
+                to={m.href}
+                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+              >
+                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
+                  <m.icon size={16} />
+                </span>
+                <span className="flex flex-col">
+                  <span className="text-[14px] font-semibold text-fyn-ink">{m.label}</span>
+                  <span className="text-[12.5px] text-fyn-ink/60">{m.desc}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Column 2 */}
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/50 mb-4">
+            By use case
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {PRODUCT_USECASES.map((u) => (
+              <Link
+                key={u.label}
+                to={u.href}
+                className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-fyn-gold/15 text-fyn-gold">
+                  <u.icon size={16} />
+                </span>
+                <span className="text-[14px] font-medium text-fyn-ink">{u.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Column 3 — conversion card */}
+        <Link
+          to="/demo/login"
+          className="group flex flex-col justify-between rounded-xl p-6 transition-all"
+          style={{
+            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
+            border: "1px solid rgba(196,30,30,0.35)",
+          }}
+        >
+          <div>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
+              <PlayCircle size={22} />
+            </span>
+            <div
+              className="text-[20px] font-bold text-white leading-tight mb-2"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              See it live
+            </div>
+            <p className="text-[13.5px] text-white/65 leading-relaxed">
+              No signup needed — explore real data in a demo account.
+            </p>
+          </div>
+          <div className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
+            Demo login <span aria-hidden>→</span>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+
+  const CAMenu = (
+    <div
+      onMouseEnter={() => openNow("ca")}
+      onMouseLeave={scheduleClose}
+      className="absolute inset-x-0 top-full"
+      style={{
+        background: "hsl(var(--fyn-beige))",
+        borderTop: "1px solid rgba(26,16,8,0.08)",
+        boxShadow: "0 24px 48px -12px rgba(26,16,8,0.18)",
+        animation: "fade-in 180ms ease-out",
+      }}
+    >
+      <div className="max-w-[1400px] mx-auto px-14 py-10 grid grid-cols-[1fr_400px] gap-14">
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/50 mb-4">
+            For your practice
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {CA_PRACTICE.map((c) => (
+              <Link
+                key={c.label}
+                to={c.href}
+                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+              >
+                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
+                  <c.icon size={16} />
+                </span>
+                <span className="flex flex-col">
+                  <span className="text-[14px] font-semibold text-fyn-ink">{c.label}</span>
+                  <span className="text-[12.5px] text-fyn-ink/60">{c.desc}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <Link
+          to="/ca/register"
+          className="group flex flex-col justify-between rounded-xl p-6"
+          style={{
+            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
+            border: "1px solid rgba(196,30,30,0.35)",
+          }}
+        >
+          <div>
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
+              <Briefcase size={22} />
+            </span>
+            <div
+              className="text-[20px] font-bold text-white leading-tight mb-2"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              Bring your clients
+            </div>
+            <p className="text-[13.5px] text-white/65 leading-relaxed">
+              One firm, dozens of clients, one relationship.
+            </p>
+          </div>
+          <div className="mt-6 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
+            Register as CA <span aria-hidden>→</span>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+
+  const SignInMenu = (
+    <div
+      onMouseEnter={() => openNow("signin")}
+      onMouseLeave={scheduleClose}
+      className="absolute right-0 top-full"
+      style={{
+        width: 300,
+        marginTop: 10,
+        background: "#FFFFFF",
+        border: "1px solid rgba(26,16,8,0.08)",
+        borderRadius: 14,
+        boxShadow: "0 20px 48px -12px rgba(26,16,8,0.28)",
+        padding: 8,
+        animation: "fade-in 180ms ease-out",
+        zIndex: 60,
+      }}
+    >
+      <Link
+        to="/login"
+        className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+      >
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
+          <Store size={16} />
+        </span>
+        <span className="flex flex-col">
+          <span className="text-[14px] font-semibold text-fyn-ink">Client login</span>
+          <span className="text-[12.5px] text-fyn-ink/60">Business owners & founders</span>
+        </span>
+      </Link>
+      <div className="my-1 h-px bg-fyn-ink/8" />
+      <Link
+        to="/ca/login"
+        className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+      >
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-fyn-gold/15 text-fyn-gold">
+          <Briefcase size={16} />
+        </span>
+        <span className="flex flex-col">
+          <span className="text-[14px] font-semibold text-fyn-ink">CA login</span>
+          <span className="text-[12.5px] text-fyn-ink/60">Chartered accountants & firms</span>
+        </span>
+      </Link>
+    </div>
+  );
+
+  /* ── Render ───────────────────────────────────────────────── */
 
   return (
     <>
       <nav
-        ref={navRef}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navBg}`}
-        style={{ height: 72 }}
+        className="fixed top-0 inset-x-0 z-50 bg-fyn-ink border-b border-white/10"
+        style={{ minHeight: NAV_HEIGHT }}
       >
-        <div className="fyn-container h-full flex items-center justify-between">
-          <Link to="/" className="hover:opacity-85 transition-opacity">
-            <FynLogo variant="light" showTagline={false} size="md" />
+        <div
+          ref={containerRef}
+          className="relative w-full flex items-center justify-between px-6 md:px-10 lg:px-14"
+          style={{ minHeight: NAV_HEIGHT }}
+        >
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 shrink-0 mr-6 lg:mr-10 group">
+            <span
+              className="flex items-center justify-center rounded-[9px] bg-fyn-red text-white font-bold shadow-md group-hover:scale-105 transition-transform"
+              style={{
+                width: 34,
+                height: 34,
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: 20,
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              F
+            </span>
+            <span
+              className="text-white"
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: 22,
+                fontWeight: 700,
+                letterSpacing: "-0.01em",
+                lineHeight: 1,
+              }}
+            >
+              FynHelp
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-8">
-            <ProductsNav variant="desktop" />
-
-            {/* Pricing, Security */}
-            {navLinks.slice(0, 4).map((l) => (
-              <Link
-                key={l.href}
-                to={l.href}
-                className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
-                  location.pathname === l.href ? "text-white" : "text-white/70 hover:text-white"
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
-
-            {/* Resources dropdown */}
-            <div
-              ref={resourcesRef}
-              className="relative py-6"
-              onMouseEnter={openResources}
-              onMouseLeave={scheduleCloseResources}
-            >
-              <button
-                onClick={() => setResourcesOpen((v) => !v)}
-                className={`nav-link-underline text-sm font-medium transition-colors flex items-center gap-1 ${
-                  isResourcesActive ? "text-white" : "text-white/70 hover:text-white"
-                }`}
-                aria-haspopup="true"
-                aria-expanded={resourcesOpen}
-              >
-                Resources
-                <ChevronDown
-                  size={14}
-                  className={`transition-transform duration-200 ${resourcesOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {resourcesOpen && (
-                <div
-                  className="absolute right-0 top-full"
-                  style={{
-                    width: 320,
-                    marginTop: 12,
-                    background: "rgba(255,255,255,0.98)",
-                    backdropFilter: "blur(20px) saturate(110%)",
-                    WebkitBackdropFilter: "blur(20px) saturate(110%)",
-                    borderRadius: 20,
-                    border: "1px solid rgba(139,105,20,0.25)",
-                    boxShadow: "0 16px 48px rgba(26,16,8,0.18), 0 0 1px rgba(139,105,20,0.3)",
-                    padding: "16px 0",
-                    zIndex: 1000,
-                    animation: "fade-in 200ms ease-out",
-                  }}
-                  role="menu"
-                >
-                  {resourceItems.map((item, i) => {
-                    const isActive =
-                      isResourcesActive &&
-                      new URLSearchParams(location.search).get("tab") === item.tab;
-                    return (
-                      <div key={item.tab}>
-                        {i === 3 && (
-                          <div
-                            style={{
-                              borderTop: "1px solid rgba(26,16,8,0.08)",
-                              margin: "8px 24px",
-                            }}
-                          />
-                        )}
-                        <Link
-                          to={`/resources?tab=${item.tab}`}
-                          role="menuitem"
-                          className="group flex items-center gap-[14px] transition-colors"
-                          style={{
-                            padding: isActive ? "14px 24px 14px 20px" : "14px 24px",
-                            background: isActive ? "rgba(139,105,20,0.12)" : "transparent",
-                            borderLeft: isActive ? "4px solid #8B6914" : "4px solid transparent",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isActive)
-                              (e.currentTarget as HTMLElement).style.background =
-                                "rgba(139,105,20,0.08)";
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isActive)
-                              (e.currentTarget as HTMLElement).style.background = "transparent";
-                          }}
-                        >
-                          <span
-                            className="transition-transform duration-200 group-hover:scale-110"
-                            style={{ display: "inline-flex" }}
-                          >
-                            <FYNIcon name={item.icon} size={32} animated={false} />
-                          </span>
-                          <span className="flex flex-col">
-                            <span
-                              style={{
-                                fontFamily: "Raleway, sans-serif",
-                                fontWeight: 600,
-                                fontSize: 16,
-                                color: isActive ? "#8B6914" : "#1A1008",
-                              }}
-                              className="group-hover:text-fyn-gold"
-                            >
-                              {item.label}
-                            </span>
-                            <span
-                              style={{
-                                fontFamily: "Roboto, sans-serif",
-                                fontWeight: 400,
-                                fontSize: 13,
-                                color: "rgba(26,16,8,0.6)",
-                                marginTop: 2,
-                              }}
-                            >
-                              {item.desc}
-                            </span>
-                          </span>
-                        </Link>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* About */}
-            {navLinks.slice(4).map((l) => (
-              <Link
-                key={l.href}
-                to={l.href}
-                className={`nav-link-underline text-sm font-medium transition-colors py-6 ${
-                  location.pathname === l.href ? "text-white" : "text-white/70 hover:text-white"
-                }`}
-              >
-                {l.label}
-              </Link>
+          <div className="hidden lg:flex items-center gap-10 flex-1">
+            <Trigger label="Products"    menuKey="products" />
+            <Trigger label="CA partners" menuKey="ca" />
+            {TOP_LINKS.map((l) => (
+              <PlainLink key={l.href} href={l.href} label={l.label} />
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
-            <Link
-              to="/login"
-              className="text-white/80 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/demo/login"
-              className="text-white/80 hover:text-white text-sm font-semibold px-4 py-2.5 rounded-lg border border-white/20 hover:border-white/40 transition-colors"
-            >
-              Demo Login
-            </Link>
-            <Link
-              to="/ca/register"
-              className="bg-fyn-red text-white hover:bg-[#9E2A30] text-sm font-semibold px-4 py-2.5 rounded-lg border border-fyn-red transition-colors"
-            >
-              Register as CA
-            </Link>
+          {/* Right cluster */}
+          <div className="hidden lg:flex items-center gap-4 shrink-0">
+            <div className="relative">
+              <button
+                onMouseEnter={() => openNow("signin")}
+                onMouseLeave={scheduleClose}
+                onClick={() => setOpenMenu(openMenu === "signin" ? null : "signin")}
+                aria-haspopup="true"
+                aria-expanded={openMenu === "signin"}
+                className="flex items-center gap-1.5 text-[14px] font-medium text-white/85 hover:text-white transition-colors py-2"
+              >
+                Sign in
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform duration-200 ${openMenu === "signin" ? "rotate-180" : ""}`}
+                />
+              </button>
+              {openMenu === "signin" && SignInMenu}
+            </div>
             <Link
               to="/waitlist"
-              className="bg-fyn-red text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover-btn-primary"
+              className="bg-fyn-red hover:bg-fyn-red-dark text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors"
             >
-              Join Waitlist
+              Join waitlist
             </Link>
           </div>
 
@@ -260,11 +433,15 @@ const Navbar = () => {
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
+
+          {/* Mega menus */}
+          {openMenu === "products" && ProductsMenu}
+          {openMenu === "ca" && CAMenu}
         </div>
       </nav>
 
       {/* Spacer */}
-      <div style={{ height: 72, background: "#1A1008" }} />
+      <div style={{ height: NAV_HEIGHT, background: "#1A1008" }} />
 
       {/* Mobile drawer */}
       <div
@@ -272,104 +449,132 @@ const Navbar = () => {
           mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+        <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
         <div
-          className={`absolute right-0 top-0 bottom-0 w-[300px] bg-fyn-ink transition-transform duration-400 overflow-y-auto ${
+          className={`absolute right-0 top-0 bottom-0 w-[320px] bg-fyn-ink overflow-y-auto transition-transform duration-300 ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
-          style={{ transitionTimingFunction: "var(--ease-spring)" }}
         >
-          <div className="flex flex-col gap-2 pt-20 px-6 pb-8">
-            <ProductsNav
-              variant="mobile"
-              mobileMenuOpen={mobileOpen}
-              onCloseMobileMenu={() => setMobileOpen(false)}
-            />
-
-            {/* Pricing, Security */}
-            {navLinks.slice(0, 4).map((l) => (
-              <Link
-                key={l.href}
-                to={l.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5 flex items-center gap-2"
-              >
-                {l.href === "/security" && <Shield size={18} className="text-fyn-gold" />}
-                {l.label}
-              </Link>
-            ))}
-
-            {/* Mobile Resources accordion */}
+          <div className="flex flex-col gap-1 pt-24 px-6 pb-10">
+            {/* Products accordion */}
             <button
-              onClick={() => setMobileResourcesOpen((v) => !v)}
-              className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5 flex items-center justify-between w-full"
-              aria-expanded={mobileResourcesOpen}
+              onClick={() => setMProducts((v) => !v)}
+              className="flex items-center justify-between py-3 border-b border-white/10 text-white text-base font-medium"
+              aria-expanded={mProducts}
             >
-              <span>Resources</span>
+              Products
               <ChevronDown
                 size={18}
-                className={`transition-transform duration-200 ${
-                  mobileResourcesOpen ? "rotate-180" : ""
-                }`}
+                className={`transition-transform ${mProducts ? "rotate-180" : ""}`}
               />
             </button>
-            {mobileResourcesOpen && (
-              <div className="flex flex-col pl-4 border-b border-white/5">
-                {resourceItems.map((item) => (
+            {mProducts && (
+              <div className="pl-3 pb-2 border-b border-white/5 flex flex-col">
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  By module
+                </div>
+                {PRODUCT_MODULES.map((m) => (
                   <Link
-                    key={item.tab}
-                    to={`/resources?tab=${item.tab}`}
+                    key={m.label}
+                    to={m.href}
                     onClick={() => setMobileOpen(false)}
-                    className="text-white/70 hover:text-white text-sm py-2.5 flex items-center gap-3"
+                    className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
                   >
-                    <FYNIcon name={item.icon} size={24} animated={false} />
-                    <span>{item.label}</span>
+                    <m.icon size={16} className="text-fyn-red" />
+                    {m.label}
                   </Link>
                 ))}
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  By use case
+                </div>
+                {PRODUCT_USECASES.map((u) => (
+                  <Link
+                    key={u.label}
+                    to={u.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
+                  >
+                    <u.icon size={16} className="text-fyn-gold" />
+                    {u.label}
+                  </Link>
+                ))}
+                <Link
+                  to="/demo/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-3 mb-1 flex items-center gap-2 text-fyn-red text-[13.5px] font-semibold"
+                >
+                  <PlayCircle size={16} /> Demo login →
+                </Link>
               </div>
             )}
 
-            {/* About */}
-            {navLinks.slice(4).map((l) => (
+            {/* CA partners accordion */}
+            <button
+              onClick={() => setMCA((v) => !v)}
+              className="flex items-center justify-between py-3 border-b border-white/10 text-white text-base font-medium"
+              aria-expanded={mCA}
+            >
+              CA partners
+              <ChevronDown
+                size={18}
+                className={`transition-transform ${mCA ? "rotate-180" : ""}`}
+              />
+            </button>
+            {mCA && (
+              <div className="pl-3 pb-2 border-b border-white/5 flex flex-col">
+                {CA_PRACTICE.map((c) => (
+                  <Link
+                    key={c.label}
+                    to={c.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
+                  >
+                    <c.icon size={16} className="text-fyn-red" />
+                    {c.label}
+                  </Link>
+                ))}
+                <Link
+                  to="/ca/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-3 mb-1 flex items-center gap-2 text-fyn-red text-[13.5px] font-semibold"
+                >
+                  <Briefcase size={16} /> Register as CA →
+                </Link>
+              </div>
+            )}
+
+            {TOP_LINKS.map((l) => (
               <Link
                 key={l.href}
                 to={l.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-white/80 hover:text-white text-base font-medium py-3 border-b border-white/5"
+                className="py-3 border-b border-white/10 text-white text-base font-medium"
               >
                 {l.label}
               </Link>
             ))}
 
-            <div className="mt-4 space-y-3">
-
+            <div className="mt-6 space-y-3">
               <Link
                 to="/login"
                 onClick={() => setMobileOpen(false)}
-                className="block text-white text-center py-3 rounded-lg font-semibold border border-white/20"
+                className="flex items-center justify-center gap-2 py-3 rounded-lg border border-white/20 text-white text-[14px] font-semibold"
               >
-                Sign In
+                <Store size={16} /> Client login
               </Link>
               <Link
-                to="/ca/register"
+                to="/ca/login"
                 onClick={() => setMobileOpen(false)}
-                className="block bg-fyn-red text-white text-center py-3 rounded-lg font-semibold border border-fyn-red"
+                className="flex items-center justify-center gap-2 py-3 rounded-lg border border-white/20 text-white text-[14px] font-semibold"
               >
-                Register as CA
-              </Link>
-              <Link
-                to="/demo/login"
-                onClick={() => setMobileOpen(false)}
-                className="block text-white text-center py-3 rounded-lg font-semibold border border-white/20"
-              >
-                Demo Login
+                <Briefcase size={16} /> CA login
               </Link>
               <Link
                 to="/waitlist"
                 onClick={() => setMobileOpen(false)}
                 className="block bg-fyn-red text-white text-center py-3 rounded-lg font-semibold"
               >
-                Join Waitlist
+                Join waitlist
               </Link>
             </div>
           </div>
