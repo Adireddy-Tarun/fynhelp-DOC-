@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -285,6 +285,12 @@ const LoginPage = () => {
                 <button type="button" onClick={() => setMode("signup")} className="text-fyn-red hover:underline">
                   Create an account
                 </button>
+              </p>
+              <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)", marginTop: 4 }}>
+                Signing in as a CA firm instead?{" "}
+                <Link to="/ca/login" className="text-fyn-red hover:underline font-medium">
+                  CA login
+                </Link>
               </p>
             </form>
           ) : (

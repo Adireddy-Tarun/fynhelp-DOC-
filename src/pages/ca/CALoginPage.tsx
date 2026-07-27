@@ -317,6 +317,12 @@ export default function CALoginPage() {
                 }}>
                 New CA firm? Register for partner access <ArrowRight size={13} />
               </Link>
+              <p className="text-center" style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.55)", marginTop: 4 }}>
+                Signing in as a business instead?{" "}
+                <Link to="/login" style={{ color: "#C41E1E", fontWeight: 600 }} className="hover:underline">
+                  Client login
+                </Link>
+              </p>
             </form>
           </div>
         </div>
