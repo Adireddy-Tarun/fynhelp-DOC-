@@ -29,29 +29,44 @@ const permissions: [string, boolean, boolean, boolean, boolean][] = [
 
 const TeamAccessPage = () => {
   const { businessId, user } = useAuth();
+  const { isOwner, role: myRole } = useUserRole();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("Admin");
+  const [inviteRole, setInviteRole] = useState<TeamRole>("manager");
   const [sending, setSending] = useState(false);
+  const [savingRoleFor, setSavingRoleFor] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      if (!businessId) { setLoading(false); return; }
-      const { data } = await (supabase.from("profiles") as any)
-        .select("user_id, full_name, display_name, role")
-        .eq("business_id", businessId);
-      const rows = (data ?? []).map((p: any) => ({
-        user_id: p.user_id,
-        name: p.full_name || p.display_name || "Team member",
-        email: "",
-        role: p.role ? p.role.charAt(0).toUpperCase() + p.role.slice(1) : "Member",
-        you: p.user_id === user?.id,
-      }));
-      setMembers(rows);
-      setLoading(false);
-    })();
-  }, [businessId, user?.id]);
+  const loadMembers = async () => {
+    if (!businessId) { setLoading(false); return; }
+    const { data } = await (supabase.from("profiles") as any)
+      .select("user_id, full_name, display_name, role")
+      .eq("business_id", businessId);
+    const rows = (data ?? []).map((p: any) => ({
+      user_id: p.user_id,
+      name: p.full_name || p.display_name || "Team member",
+      email: "",
+      role: (p.role ?? "owner").toLowerCase(),
+      you: p.user_id === user?.id,
+    }));
+    setMembers(rows);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadMembers(); }, [businessId, user?.id]);
+
+  const changeRole = async (userId: string, next: TeamRole) => {
+    if (!isOwner) return toast.error("Only the Owner can change roles.");
+    setSavingRoleFor(userId);
+    const { error } = await (supabase.from("profiles") as any)
+      .update({ role: next })
+      .eq("user_id", userId);
+    setSavingRoleFor(null);
+    if (error) return toast.error(error.message);
+    toast.success("Role updated");
+    setMembers((m) => m.map((x) => x.user_id === userId ? { ...x, role: next } : x));
+  };
+
 
   const sendInvite = async () => {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inviteEmail)) return toast.error("Invalid email");
