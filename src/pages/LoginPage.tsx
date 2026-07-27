@@ -131,7 +131,7 @@ const LoginPage = () => {
     if (!passwordsMatch) { toast.error("Passwords do not match."); return; }
 
     setSuSubmitting(true);
-    const security = await checkAuthSecurity(email, "sign_up");
+    const security = await checkAuthSecurity(email, "sign_up", suCaptcha ?? undefined);
     if (!security.allowed) {
       setSuSubmitting(false);
       toast.error(security.error ?? "Too many sign-up attempts. Please try again later.");
