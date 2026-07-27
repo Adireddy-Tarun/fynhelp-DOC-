@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Lock } from "lucide-react";
 
 const RED = "#A93838"; const BORDER = "#E0D9C8"; const GOLD = "#8B6914";
@@ -31,6 +32,7 @@ const Metric = ({ label, used, total, pct }: { label: string; used: string; tota
 const BillingPage = () => {
   const { businessId, user } = useAuth();
   const { canAccessBilling, role, loading: roleLoading } = useUserRole();
+  const trial = useTrialStatus();
   const [promo, setPromo] = useState("");
 
   const [showCancel, setShowCancel] = useState(false);
@@ -80,17 +82,40 @@ const BillingPage = () => {
       <Card title="Current Plan">
         <div className="flex items-start justify-between">
           <div>
-            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide"
-              style={{ background: "rgba(139,105,20,0.18)", border: `1px solid ${GOLD}55`, color: GOLD }}>★ EARLY ACCESS — FREE</span>
-            <p className="text-[13px] mt-3" style={{ color: "rgba(26,16,8,0.7)" }}>You're on the FynHelp Early Access plan. Free for 30 days.</p>
+            {(() => {
+              const expired = trial.isExpired && !trial.hasPaidSubscription;
+              const paid = trial.hasPaidSubscription;
+              const badgeBg = expired ? "rgba(169,56,56,0.12)" : "rgba(139,105,20,0.18)";
+              const badgeBorder = expired ? `${RED}55` : `${GOLD}55`;
+              const badgeColor = expired ? RED : GOLD;
+              const badgeText = paid
+                ? "★ PAID PLAN"
+                : expired
+                  ? "TRIAL EXPIRED"
+                  : "★ EARLY ACCESS — FREE TRIAL";
+              const statusLine = paid
+                ? `You're on the ${trial.plan ?? "paid"} plan.`
+                : expired
+                  ? "Your free trial has ended. Upgrade to continue using FynHelp."
+                  : trial.daysRemaining !== null
+                    ? `${trial.daysRemaining} day${trial.daysRemaining === 1 ? "" : "s"} left in your free trial${trial.trialEndsAt ? ` — ends ${trial.trialEndsAt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}` : ""}.`
+                  : "You're on the FynHelp Early Access plan.";
+              return (
+                <>
+                  <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+                    style={{ background: badgeBg, border: `1px solid ${badgeBorder}`, color: badgeColor }}>{badgeText}</span>
+                  <p className="text-[13px] mt-3" style={{ color: "rgba(26,16,8,0.7)" }}>{statusLine}</p>
+                </>
+              );
+            })()}
             <ul className="mt-3 space-y-1 text-[13px]">
-              {["All 8 intelligence modules", "Unlimited Fynny AI queries", "Up to 3 team members", "CSV/PDF exports", "Email + WhatsApp alerts"].map((f) => (
-                <li key={f}><span style={{ color: "#16A34A" }}>✓</span> {f}</li>
+              {["All 8 intelligence modules", "Fynny AI queries", "Team members", "CSV/PDF exports", "Email + WhatsApp alerts"].map((f) => (
+                <li key={f}><span style={{ color: "#16A34A" }}>✓</span> {f} <span style={{ color: "rgba(26,16,8,0.45)" }}>— limits vary by plan</span></li>
               ))}
             </ul>
           </div>
         </div>
-        <button onClick={() => toast("Coming Soon")} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Upgrade to Paid Plan</button>
+        <button onClick={() => toast("Coming Soon — paid plans launch shortly. Reach us at support@fynhelp.com to upgrade early.")} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white" style={{ background: RED }}>Upgrade to Paid Plan</button>
       </Card>
 
       <Card title="Usage This Month">
