@@ -26,6 +26,8 @@ const LoginPage = () => {
   const [remember, setRemember] = useState(true);
   const [siSubmitting, setSiSubmitting] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [siCaptcha, setSiCaptcha] = useState<string | null>(null);
+  const [suCaptcha, setSuCaptcha] = useState<string | null>(null);
 
   // Sign-up state
   const [suName, setSuName] = useState("");
