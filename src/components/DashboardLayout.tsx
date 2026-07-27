@@ -18,7 +18,17 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   // Allow the Billing page even when the trial has expired, so users can upgrade.
   const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
-  if (!trial.loading && trial.shouldBlock && !isBillingRoute) {
+  if (trial.loading && !isBillingRoute) {
+    // Wait for trial status before mounting dashboard children so an expired
+    // tenant never briefly renders the dashboard (which may then crash on
+    // empty-tenant data and get trapped by the top-level ErrorBoundary).
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
+        <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
+      </div>
+    );
+  }
+  if (trial.shouldBlock && !isBillingRoute) {
     return <TrialExpiredBlock />;
   }
 
