@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Tag,
 } from "lucide-react";
+import FynLogo from "@/components/FynLogo";
 
 /* ────────────────────────────────────────────────────────────────
    Data
