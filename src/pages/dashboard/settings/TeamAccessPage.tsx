@@ -18,14 +18,6 @@ const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:out
 
 type Member = { user_id: string; name: string; email: string; role: string; you: boolean };
 
-const permissions: [string, boolean, boolean, boolean, boolean][] = [
-  ["View all data", true, true, true, true],
-  ["Export reports", true, true, false, true],
-  ["Edit data", true, true, false, false],
-  ["Manage integrations", true, false, false, false],
-  ["Invite team members", true, false, false, false],
-  ["Billing access", true, false, false, false],
-];
 
 const TeamAccessPage = () => {
   const { businessId, user } = useAuth();
