@@ -335,7 +335,7 @@ const Navbar = () => {
           <Briefcase size={16} />
         </span>
         <span className="flex flex-col">
-          <span className="text-[14px] font-semibold text-fyn-ink">CA login</span>
+          <span className="text-[15px] font-semibold text-fyn-ink">CA login</span>
           <span className="text-[12.5px] text-fyn-ink/60">Chartered accountants & firms</span>
         </span>
       </Link>
