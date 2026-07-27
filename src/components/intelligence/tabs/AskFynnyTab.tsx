@@ -19,7 +19,16 @@ const QUICK_PROMPTS = [
 
 const WELCOME = "Hi, I'm FYNNY — your virtual CFO. Ask me anything about your cash, revenue, costs, taxes, or growth. I see your financial data in real time.";
 
-type Msg = { role: "user" | "assistant"; text: string };
+type Msg = { role: "user" | "assistant"; text: string; needsReview?: boolean };
+
+// Heuristic: flag messages that recommend or discuss material financial actions
+// (hiring, fundraising, large payments, loans/investment). Routine data lookups
+// like "what's my cash balance" or "what's due this week" are not flagged.
+const REVIEW_PATTERN = /\b(hire|hiring|headcount plan|fire|layoff|raise (money|capital|a round)|fundrais|investor|invest\b|investment|loan|borrow|term sheet|large payment|big payment|acquire|acquisition|equity|valuation|esop|dividend|write.?off|pay off|prepay)\b/i;
+function shouldFlagForReview(q: string, a: string): boolean {
+  return REVIEW_PATTERN.test(q) || REVIEW_PATTERN.test(a);
+}
+
 
 function inr(n: number) {
   if (!isFinite(n) || n === 0) return "₹0";
