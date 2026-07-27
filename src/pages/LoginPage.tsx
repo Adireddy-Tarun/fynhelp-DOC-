@@ -50,7 +50,8 @@ const LoginPage = () => {
   const passwordsMatch = suPassword === suConfirm && suConfirm.length > 0;
   const strength = useMemo(() => evaluateStrength(suPassword, passedCount), [suPassword, passedCount]);
   const canSignUp =
-    !!suName.trim() && isValidEmail(suEmail) && allRulesPassed && !isCommonWeak && passwordsMatch && !suSubmitting;
+    !!suName.trim() && isValidEmail(suEmail) && allRulesPassed && !isCommonWeak && passwordsMatch && !!suCaptcha && !suSubmitting;
+  const canSignIn = isValidEmail(siEmail) && !!siPassword && !!siCaptcha && !siSubmitting;
 
   const routeAfterSignIn = async (userId: string) => {
     const { data: profile } = await supabase
