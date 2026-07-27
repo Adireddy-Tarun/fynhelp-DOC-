@@ -441,29 +441,23 @@ const Navbar = () => {
           </div>
         </div>
 
-        <Link
-          to="/ca/register"
-          className="group flex flex-col justify-between rounded-xl p-6"
-          style={{
-            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
-            border: "1px solid rgba(196,30,30,0.35)",
-          }}
-        >
-          <div>
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
-              <Briefcase size={22} />
-            </span>
-            <div className="text-[20px] font-bold text-white leading-tight mb-2">
-              Bring your clients
-            </div>
-            <p className="text-[14px] text-white/65 leading-relaxed">
-              One firm, dozens of clients, one relationship.
-            </p>
-          </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
-            Register as CA <span aria-hidden>→</span>
-          </div>
-        </Link>
+        <div className="flex flex-col gap-3">
+          <DashboardPreviewCard
+            eyebrow="CA Portal"
+            title="Portfolio"
+            sub="Live snapshot"
+            stats={CA_PREVIEW_STATS}
+            footer="Client health · Filings · ITC recon"
+            ctaLabel="Explore CA portal"
+            ctaHref="/ca-firms"
+          />
+          <Link
+            to="/ca/register"
+            className="group inline-flex items-center gap-1.5 self-end text-[12.5px] font-semibold text-fyn-ink/70 hover:text-fyn-red transition-colors"
+          >
+            <Briefcase size={14} /> Register as CA <span aria-hidden>→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
