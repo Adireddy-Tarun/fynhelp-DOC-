@@ -52,6 +52,7 @@ import AboutPage from "./pages/AboutPage.tsx";
 import CAFirmsPage from "./pages/CAFirmsPage.tsx";
 import WaitlistPage from "./pages/WaitlistPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
 import OnboardingPage from "./pages/OnboardingPage.tsx";
 import CockpitPage from "./pages/dashboard/CockpitPage.tsx";
 import CashFlowPage from "./pages/dashboard/CashFlowPage.tsx";
@@ -331,7 +332,10 @@ const App = () => (
             <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
             <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<Navigate to="/login" replace />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
+
             <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
             <Route path="/dashboard/360" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
