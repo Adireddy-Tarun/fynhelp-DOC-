@@ -148,6 +148,7 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
+  const [previewModule, setPreviewModule] = useState<ModuleKey>("liquidity");
   const [mProducts, setMProducts] = useState(false);
   const [mCA, setMCA] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
