@@ -95,3 +95,6 @@ verify_jwt = true
 
 [functions.zoho-payroll-callback]
 verify_jwt = false
+
+[functions.send-trial-reminder-emails]
+verify_jwt = false
