@@ -227,7 +227,90 @@ const Navbar = () => {
     </Link>
   );
 
+  /* ── Dashboard-styled preview panel (matches IntelCard from real product) ── */
+
+  const toneColor = (t?: ModuleStat["tone"]) =>
+    t === "critical" ? "#A93838" : t === "warning" ? "#8B6914" : t === "healthy" ? "#10B981" : "transparent";
+
+  const DashboardPreviewCard = ({
+    eyebrow,
+    title,
+    sub,
+    stats,
+    footer,
+    ctaLabel,
+    ctaHref,
+  }: {
+    eyebrow: string;
+    title: string;
+    sub: string;
+    stats: ModuleStat[];
+    footer?: string;
+    ctaLabel: string;
+    ctaHref: string;
+  }) => (
+    <Link
+      to={ctaHref}
+      className="group flex flex-col rounded-lg overflow-hidden bg-white transition-all hover:-translate-y-0.5"
+      style={{
+        border: "1px solid rgba(26,16,8,0.10)",
+        borderLeft: "3px solid #A93838",
+        boxShadow: "0 8px 24px -8px rgba(26,16,8,0.16), 0 2px 8px rgba(26,16,8,0.06)",
+      }}
+    >
+      {/* Header strip — mimics IntelCard title area */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-3" style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/45">
+            {eyebrow} · live preview
+          </div>
+          <div className="mt-0.5 flex items-baseline gap-2">
+            <span className="text-[15px] font-semibold text-fyn-ink" style={{ fontFamily: "Georgia, ui-serif, serif" }}>{title}</span>
+            <span className="text-[11.5px] text-[#6B6B6B]">{sub}</span>
+          </div>
+        </div>
+        <span className="flex items-center gap-1 text-[10px] text-fyn-ink/50">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Demo data
+        </span>
+      </div>
+
+      {/* KPI grid */}
+      <div className="grid grid-cols-2 gap-px bg-[rgba(26,16,8,0.06)]">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white px-4 py-3">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-[#6B6B6B]">{s.label}</div>
+            <div
+              className="mt-1 font-mono text-[17px] font-semibold tabular-nums text-fyn-ink"
+              style={{ color: s.tone === "critical" ? "#A93838" : "#1A1008" }}
+            >
+              {s.value}
+            </div>
+            {s.sub && (
+              <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] text-[#6B6B6B]">
+                {s.tone && s.tone !== "neutral" && (
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: toneColor(s.tone) }} />
+                )}
+                {s.sub}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between px-5 py-3 bg-[#FAF7F0]" style={{ borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+        <span className="text-[11px] text-[#6B6B6B] truncate pr-3">{footer}</span>
+        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-fyn-red group-hover:gap-2 transition-all whitespace-nowrap">
+          {ctaLabel} <span aria-hidden>→</span>
+        </span>
+      </div>
+    </Link>
+  );
+
   /* ── Mega menu shells ─────────────────────────────────────── */
+
+
 
   const ProductsMenu = (
     <div
