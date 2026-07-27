@@ -1312,7 +1312,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
             {[
-              { val: "6", unit: "MONTHS FREE", desc: "Full platform · No credit card", color: "#C9A84C" },
+              { val: "30", unit: "DAYS FREE", desc: "Full platform · No credit card", color: "#C9A84C" },
               { val: "1st", unit: "PRIORITY ACCESS", desc: "Every new feature · Early", color: "#8B6914" },
               { val: "50%", unit: "OFF PRO PLAN", desc: "Locked in · Forever yours", color: "#C41E1E" },
               { val: "10x", unit: "AI USAGE LIMITS", desc: "Enterprise-grade · Included", color: "#8B6914" },

@@ -36,7 +36,7 @@ const plans: Plan[] = [
       "Email support (within 8 hours)",
       "1 user account",
     ],
-    cta: "Start 15 Day Free Trial",
+    cta: "Start 30 Day Free Trial",
   },
   {
     name: "Pro",
@@ -61,7 +61,7 @@ const plans: Plan[] = [
       "3 user accounts + monthly CFO report",
     ],
     featured: true,
-    cta: "Start 15 Day Free Trial",
+    cta: "Start 30 Day Free Trial",
   },
   {
     name: "Enterprise",
@@ -169,7 +169,7 @@ export default function PricingSection() {
         </div>
 
         <p className="text-center text-white/50 text-sm mt-8">
-          All plans include a 15-day free trial. No credit card required. Cancel anytime.
+          All plans include a 30-day free trial. No credit card required. Cancel anytime.
         </p>
       </div>
     </section>

@@ -3,15 +3,24 @@ import { useLocation } from "react-router-dom";
 import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
 import GlobalHeader from "@/components/layout/GlobalHeader";
 import OfflineBanner from "@/components/OfflineBanner";
+import TrialExpiredBlock from "@/components/TrialExpiredBlock";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 
 const STORAGE_KEY = "fynhelp_sidebar_open";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
+  const trial = useTrialStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" ? window.innerWidth >= 1024 : true);
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
+
+  // Allow the Billing page even when the trial has expired, so users can upgrade.
+  const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
+  if (!trial.loading && trial.shouldBlock && !isBillingRoute) {
+    return <TrialExpiredBlock />;
+  }
 
   useEffect(() => {
     const onResize = () => {

@@ -623,6 +623,10 @@ export type Database = {
           razorpay_customer_id: string | null
           state: string | null
           subscription_status: string | null
+          trial_ends_at: string | null
+          trial_expired_notified: boolean
+          trial_reminder_1d_sent: boolean
+          trial_reminder_7d_sent: boolean
           turnover_range: string | null
           updated_at: string
         }
@@ -643,6 +647,10 @@ export type Database = {
           razorpay_customer_id?: string | null
           state?: string | null
           subscription_status?: string | null
+          trial_ends_at?: string | null
+          trial_expired_notified?: boolean
+          trial_reminder_1d_sent?: boolean
+          trial_reminder_7d_sent?: boolean
           turnover_range?: string | null
           updated_at?: string
         }
@@ -663,6 +671,10 @@ export type Database = {
           razorpay_customer_id?: string | null
           state?: string | null
           subscription_status?: string | null
+          trial_ends_at?: string | null
+          trial_expired_notified?: boolean
+          trial_reminder_1d_sent?: boolean
+          trial_reminder_7d_sent?: boolean
           turnover_range?: string | null
           updated_at?: string
         }

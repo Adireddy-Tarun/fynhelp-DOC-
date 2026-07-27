@@ -112,7 +112,7 @@ const faqs = [
   },
   {
     q: "Is there a free trial?",
-    a: "First 100 waitlist founders get 30 days free. After that, we may offer 14-day trials.",
+    a: "First 100 waitlist founders get 30 days free. After that, standard plans start at their listed price.",
   },
 ];
 
@@ -462,7 +462,7 @@ export default function PricingPage() {
                     Register as CA Partner →
                   </Link>
                   <p className="font-body text-xs text-fyn-ink/60 text-center pt-2">
-                    Early access CA firms: 3 months free on sign-up. No credit card required.
+                    Early access CA firms: 30 days free on sign-up. No credit card required.
                   </p>
                 </div>
               </div>
