@@ -322,7 +322,7 @@ const Navbar = () => {
           <Store size={16} />
         </span>
         <span className="flex flex-col">
-          <span className="text-[14px] font-semibold text-fyn-ink">Client login</span>
+          <span className="text-[15px] font-semibold text-fyn-ink">Client login</span>
           <span className="text-[12.5px] text-fyn-ink/60">Business owners & founders</span>
         </span>
       </Link>
