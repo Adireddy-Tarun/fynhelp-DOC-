@@ -133,7 +133,7 @@ export default function BlogArticlePage() {
 
           <div style={{ background: "white", border: "1px solid rgba(26,16,8,0.08)", borderRadius: 12, padding: 24, marginTop: 48, textAlign: "center" }}>
             <div style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 18, color: INK, marginBottom: 8 }}>Want financial intelligence like this, built into your dashboard?</div>
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", marginBottom: 20 }}>FYNHelp gives Indian SMEs real-time AI CFO access. Free for the first 1,000 founders.</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", marginBottom: 20 }}>FYNHelp gives Indian SMEs real-time AI CFO access. Free for 30 days for the first 100 founders.</p>
             <Link to="/waitlist" style={{ display: "inline-block", padding: "11px 28px", background: RED, color: "white", fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 14, borderRadius: 8, textDecoration: "none" }}>Join the waitlist</Link>
           </div>
         </div>
