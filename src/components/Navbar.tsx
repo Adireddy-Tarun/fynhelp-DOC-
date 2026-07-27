@@ -200,7 +200,7 @@ const Navbar = () => {
                 <span className="flex h-8 w-8 items-center justify-center rounded-md bg-fyn-gold/15 text-fyn-gold">
                   <u.icon size={16} />
                 </span>
-                <span className="text-[14px] font-medium text-fyn-ink">{u.label}</span>
+                <span className="text-[15px] font-medium text-fyn-ink">{u.label}</span>
               </Link>
             ))}
           </div>
