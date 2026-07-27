@@ -29,11 +29,84 @@ import FynLogo from "@/components/FynLogo";
 import type { LucideIcon } from "lucide-react";
 type IconType = LucideIcon;
 
-const PRODUCT_MODULES: { icon: IconType; label: string; href: string; desc: string }[] = [
-  { icon: Droplet,   label: "Liquidity intelligence", href: "/pricing", desc: "Cash, runway, forecasts" },
-  { icon: TrendingUp,label: "Revenue intelligence",   href: "/pricing", desc: "MRR, churn, growth" },
-  { icon: Receipt,   label: "GST intelligence",       href: "/pricing", desc: "Filings, ITC, 2B recon" },
-  { icon: Sparkles,  label: "Fynny, the AI CFO",      href: "/pricing", desc: "Ask anything about your books" },
+type ModuleKey = "liquidity" | "revenue" | "gst" | "fynny";
+
+type ModuleStat = { label: string; value: string; sub?: string; tone?: "healthy" | "warning" | "critical" | "neutral" };
+type ModulePreview = { title: string; sub: string; stats: ModuleStat[]; footer?: string };
+
+const PRODUCT_MODULES: { key: ModuleKey; icon: IconType; label: string; href: string; desc: string; preview: ModulePreview }[] = [
+  {
+    key: "liquidity",
+    icon: Droplet,
+    label: "Liquidity intelligence",
+    href: "/demo/liquidity",
+    desc: "Cash, runway, forecasts",
+    preview: {
+      title: "Liquidity",
+      sub: "Live cash position",
+      stats: [
+        { label: "Cash Balance", value: "₹42.1L", sub: "Operating ₹38.7L", tone: "healthy" },
+        { label: "Runway",       value: "8.2 mo", sub: "Zero by Mar 2027", tone: "warning" },
+        { label: "Net Burn",     value: "₹5.1L/mo", sub: "Gross ₹9.8L", tone: "warning" },
+        { label: "Working Cap.", value: "₹18.4L", sub: "Quick ratio 2.14", tone: "healthy" },
+      ],
+      footer: "13-week forecast · CCC · AR aging",
+    },
+  },
+  {
+    key: "revenue",
+    icon: TrendingUp,
+    label: "Revenue intelligence",
+    href: "/demo/revenue",
+    desc: "MRR, churn, growth",
+    preview: {
+      title: "Revenue",
+      sub: "Last 30 days",
+      stats: [
+        { label: "MRR",       value: "₹18.2L", sub: "+8.4% MoM", tone: "healthy" },
+        { label: "NRR",       value: "112%",  sub: "+3.2% QoQ", tone: "healthy" },
+        { label: "Churn",     value: "3.2%",  sub: "Below benchmark", tone: "healthy" },
+        { label: "LTV:CAC",   value: "3.8x",  sub: "Healthy", tone: "healthy" },
+      ],
+      footer: "ARPA · Rule of 40 · Cohort retention",
+    },
+  },
+  {
+    key: "gst",
+    icon: Receipt,
+    label: "GST intelligence",
+    href: "/demo/gst",
+    desc: "Filings, ITC, 2B recon",
+    preview: {
+      title: "GST",
+      sub: "Current period",
+      stats: [
+        { label: "Net Payable",  value: "₹2.4L", sub: "Due 20 Nov",     tone: "warning" },
+        { label: "ITC Gap",      value: "4.1%",  sub: "Reconcile 2B",   tone: "warning" },
+        { label: "Output GST",   value: "₹6.8L", sub: "Collected",      tone: "neutral" },
+        { label: "Input GST",    value: "₹4.4L", sub: "Est · verify",   tone: "neutral" },
+      ],
+      footer: "GSTR-1 · GSTR-3B · 2B match rate",
+    },
+  },
+  {
+    key: "fynny",
+    icon: Sparkles,
+    label: "Fynny, the AI CFO",
+    href: "/demo/fynny",
+    desc: "Ask anything about your books",
+    preview: {
+      title: "Fynny",
+      sub: "AI CFO briefing",
+      stats: [
+        { label: "Today's alerts",   value: "3",   sub: "1 critical",       tone: "critical" },
+        { label: "Insights",         value: "12",  sub: "Reviewed 4",       tone: "neutral" },
+        { label: "Recommendations",  value: "5",   sub: "Reviewed w/ CA",   tone: "warning" },
+        { label: "Model",            value: "Gemini 2.5", sub: "Grounded on your data", tone: "healthy" },
+      ],
+      footer: "Ask anything · Auto-briefings · Scenario planning",
+    },
+  },
 ];
 
 const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
@@ -48,6 +121,13 @@ const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }
   { icon: FileStack,       label: "Bulk filing & ITC reconciliation", href: "/ca-firms", desc: "GSTR filing in batches" },
   { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
   { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
+];
+
+const CA_PREVIEW_STATS: ModuleStat[] = [
+  { label: "Active Clients",       value: "48",     sub: "↑ 3 new this month", tone: "neutral" },
+  { label: "Filings Due This Week",value: "12",     sub: "GSTR-3B 8 · GSTR-1 4", tone: "warning" },
+  { label: "Critical Alerts",      value: "5",      sub: "Across 4 clients", tone: "critical" },
+  { label: "ITC at Risk",          value: "₹8.4L",  sub: "Across 6 clients", tone: "warning" },
 ];
 
 const TOP_LINKS: { label: string; href: string }[] = [
@@ -68,6 +148,7 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
+  const [previewModule, setPreviewModule] = useState<ModuleKey>("liquidity");
   const [mProducts, setMProducts] = useState(false);
   const [mCA, setMCA] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -146,7 +227,90 @@ const Navbar = () => {
     </Link>
   );
 
+  /* ── Dashboard-styled preview panel (matches IntelCard from real product) ── */
+
+  const toneColor = (t?: ModuleStat["tone"]) =>
+    t === "critical" ? "#A93838" : t === "warning" ? "#8B6914" : t === "healthy" ? "#10B981" : "transparent";
+
+  const DashboardPreviewCard = ({
+    eyebrow,
+    title,
+    sub,
+    stats,
+    footer,
+    ctaLabel,
+    ctaHref,
+  }: {
+    eyebrow: string;
+    title: string;
+    sub: string;
+    stats: ModuleStat[];
+    footer?: string;
+    ctaLabel: string;
+    ctaHref: string;
+  }) => (
+    <Link
+      to={ctaHref}
+      className="group flex flex-col rounded-lg overflow-hidden bg-white transition-all hover:-translate-y-0.5"
+      style={{
+        border: "1px solid rgba(26,16,8,0.10)",
+        borderLeft: "3px solid #A93838",
+        boxShadow: "0 8px 24px -8px rgba(26,16,8,0.16), 0 2px 8px rgba(26,16,8,0.06)",
+      }}
+    >
+      {/* Header strip — mimics IntelCard title area */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-3" style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/45">
+            {eyebrow} · live preview
+          </div>
+          <div className="mt-0.5 flex items-baseline gap-2">
+            <span className="text-[15px] font-semibold text-fyn-ink" style={{ fontFamily: "Georgia, ui-serif, serif" }}>{title}</span>
+            <span className="text-[11.5px] text-[#6B6B6B]">{sub}</span>
+          </div>
+        </div>
+        <span className="flex items-center gap-1 text-[10px] text-fyn-ink/50">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Demo data
+        </span>
+      </div>
+
+      {/* KPI grid */}
+      <div className="grid grid-cols-2 gap-px bg-[rgba(26,16,8,0.06)]">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white px-4 py-3">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-[#6B6B6B]">{s.label}</div>
+            <div
+              className="mt-1 font-mono text-[17px] font-semibold tabular-nums text-fyn-ink"
+              style={{ color: s.tone === "critical" ? "#A93838" : "#1A1008" }}
+            >
+              {s.value}
+            </div>
+            {s.sub && (
+              <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] text-[#6B6B6B]">
+                {s.tone && s.tone !== "neutral" && (
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: toneColor(s.tone) }} />
+                )}
+                {s.sub}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between px-5 py-3 bg-[#FAF7F0]" style={{ borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+        <span className="text-[11px] text-[#6B6B6B] truncate pr-3">{footer}</span>
+        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-fyn-red group-hover:gap-2 transition-all whitespace-nowrap">
+          {ctaLabel} <span aria-hidden>→</span>
+        </span>
+      </div>
+    </Link>
+  );
+
   /* ── Mega menu shells ─────────────────────────────────────── */
+
+
 
   const ProductsMenu = (
     <div
@@ -167,21 +331,29 @@ const Navbar = () => {
             By module
           </div>
           <div className="flex flex-col gap-1.5">
-            {PRODUCT_MODULES.map((m) => (
-              <Link
-                key={m.label}
-                to={m.href}
-                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
-              >
-                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
-                  <m.icon size={16} />
-                </span>
-                <span className="flex flex-col">
-                  <span className="text-[15px] font-semibold text-fyn-ink">{m.label}</span>
-                  <span className="text-[13.5px] text-fyn-ink/60">{m.desc}</span>
-                </span>
-              </Link>
-            ))}
+            {PRODUCT_MODULES.map((m) => {
+              const isActivePreview = previewModule === m.key;
+              return (
+                <Link
+                  key={m.label}
+                  to={m.href}
+                  onMouseEnter={() => setPreviewModule(m.key)}
+                  onFocus={() => setPreviewModule(m.key)}
+                  className={`flex items-start gap-3 rounded-lg px-3 py-3 transition-colors ${
+                    isActivePreview ? "bg-white" : "hover:bg-fyn-ink/5"
+                  }`}
+                  style={isActivePreview ? { boxShadow: "0 1px 3px rgba(26,16,8,0.06)" } : undefined}
+                >
+                  <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
+                    <m.icon size={16} />
+                  </span>
+                  <span className="flex flex-col">
+                    <span className="text-[15px] font-semibold text-fyn-ink">{m.label}</span>
+                    <span className="text-[13.5px] text-fyn-ink/60">{m.desc}</span>
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -206,30 +378,29 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Column 3 — conversion card */}
-        <Link
-          to="/demo/login"
-          className="group flex flex-col justify-between rounded-xl p-6 transition-all"
-          style={{
-            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
-            border: "1px solid rgba(196,30,30,0.35)",
-          }}
-        >
-          <div>
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
-              <PlayCircle size={22} />
-            </span>
-            <div className="text-[20px] font-bold text-white leading-tight mb-2">
-              See it live
+        {/* Column 3 — live dashboard preview (styled to match real product) */}
+        {(() => {
+          const active = PRODUCT_MODULES.find((m) => m.key === previewModule) ?? PRODUCT_MODULES[0];
+          return (
+            <div className="flex flex-col gap-3">
+              <DashboardPreviewCard
+                eyebrow={active.preview.title}
+                title={active.preview.title}
+                sub={active.preview.sub}
+                stats={active.preview.stats}
+                footer={active.preview.footer}
+                ctaLabel="Open live demo"
+                ctaHref={active.href}
+              />
+              <Link
+                to="/demo/login"
+                className="group inline-flex items-center gap-1.5 self-end text-[12.5px] font-semibold text-fyn-ink/70 hover:text-fyn-red transition-colors"
+              >
+                <PlayCircle size={14} /> Or start from demo login <span aria-hidden>→</span>
+              </Link>
             </div>
-            <p className="text-[14px] text-white/65 leading-relaxed">
-              No signup needed — explore real data in a demo account.
-            </p>
-          </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
-            Demo login <span aria-hidden>→</span>
-          </div>
-        </Link>
+          );
+        })()}
       </div>
     </div>
   );
@@ -270,29 +441,23 @@ const Navbar = () => {
           </div>
         </div>
 
-        <Link
-          to="/ca/register"
-          className="group flex flex-col justify-between rounded-xl p-6"
-          style={{
-            background: "linear-gradient(145deg, #1A1008 0%, #2A180D 100%)",
-            border: "1px solid rgba(196,30,30,0.35)",
-          }}
-        >
-          <div>
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-fyn-red/15 text-fyn-red mb-4">
-              <Briefcase size={22} />
-            </span>
-            <div className="text-[20px] font-bold text-white leading-tight mb-2">
-              Bring your clients
-            </div>
-            <p className="text-[14px] text-white/65 leading-relaxed">
-              One firm, dozens of clients, one relationship.
-            </p>
-          </div>
-          <div className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-fyn-red group-hover:gap-2.5 transition-all">
-            Register as CA <span aria-hidden>→</span>
-          </div>
-        </Link>
+        <div className="flex flex-col gap-3">
+          <DashboardPreviewCard
+            eyebrow="CA Portal"
+            title="Portfolio"
+            sub="Live snapshot"
+            stats={CA_PREVIEW_STATS}
+            footer="Client health · Filings · ITC recon"
+            ctaLabel="Explore CA portal"
+            ctaHref="/ca-firms"
+          />
+          <Link
+            to="/ca/register"
+            className="group inline-flex items-center gap-1.5 self-end text-[12.5px] font-semibold text-fyn-ink/70 hover:text-fyn-red transition-colors"
+          >
+            <Briefcase size={14} /> Register as CA <span aria-hidden>→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
