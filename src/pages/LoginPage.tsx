@@ -102,7 +102,7 @@ const LoginPage = () => {
     const email = siEmail.trim();
     if (!isValidEmail(email)) { toast.error("Enter your email above first, then tap Forgot password."); return; }
     setResetting(true);
-    const security = await checkAuthSecurity(email, "reset_password");
+    const security = await checkAuthSecurity(email, "reset_password", siCaptcha ?? undefined);
     if (!security.allowed) {
       setResetting(false);
       toast.error(security.error ?? "Too many reset requests. Please try again later.");
