@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
+import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { RULES, COMMON_WEAK, evaluateStrength } from "@/lib/passwordRules";
 
