@@ -116,7 +116,7 @@ const Navbar = () => {
         onClick={() => setOpenMenu(isOpen ? null : menuKey)}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className="relative flex items-center gap-1.5 py-6 text-[14px] font-medium text-white/75 hover:text-white transition-colors"
+        className="relative flex items-center gap-1.5 py-6 text-[15.5px] font-medium text-white/75 hover:text-white transition-colors"
       >
         <span className={active || isOpen ? "text-white" : ""}>{label}</span>
         <ChevronDown
