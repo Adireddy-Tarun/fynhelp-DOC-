@@ -134,14 +134,20 @@ const OnboardingPage = () => {
         const { error } = await supabase.from("businesses").update(payload).eq("id", bizId);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("businesses").insert({
+        // NOTE: cannot use .select() here — SELECT RLS on businesses reads profiles.business_id
+        // via a STABLE function, which is stale within the same statement even though the
+        // AFTER INSERT trigger link_business_to_creator has already linked the profile.
+        const { error: insErr } = await supabase.from("businesses").insert({
           business_name: form.industry ? `My ${form.industry} Business` : "My Business",
           ...payload,
-        }).select("id").single();
-        if (error) throw error;
-        bizId = data.id;
+        });
+        if (insErr) throw insErr;
+        const { data: linked, error: lookupErr } = await supabase
+          .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
+        if (lookupErr) throw lookupErr;
+        if (!linked?.business_id) throw new Error("Business was created but not linked to your profile.");
+        bizId = linked.business_id;
         setBusinessId(bizId);
-        await supabase.from("profiles").update({ business_id: bizId }).eq("user_id", user.id);
       }
       toast.success("Business profile saved");
       goTo(1);
