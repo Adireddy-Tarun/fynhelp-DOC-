@@ -356,32 +356,8 @@ const Navbar = () => {
           style={{ minHeight: NAV_HEIGHT }}
         >
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 shrink-0 mr-6 lg:mr-10 group">
-            <span
-              className="flex items-center justify-center rounded-[9px] bg-fyn-red text-white font-bold shadow-md group-hover:scale-105 transition-transform"
-              style={{
-                width: 34,
-                height: 34,
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 20,
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              F
-            </span>
-            <span
-              className="text-white"
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: "-0.01em",
-                lineHeight: 1,
-              }}
-            >
-              FynHelp
-            </span>
+          <Link to="/" className="flex items-center shrink-0 mr-6 lg:mr-10 group">
+            <FynLogo variant="light" size="md" />
           </Link>
 
           {/* Desktop nav */}
