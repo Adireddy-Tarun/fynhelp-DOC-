@@ -30,7 +30,9 @@ const Metric = ({ label, used, total, pct }: { label: string; used: string; tota
 
 const BillingPage = () => {
   const { businessId, user } = useAuth();
+  const { canAccessBilling, role, loading: roleLoading } = useUserRole();
   const [promo, setPromo] = useState("");
+
   const [showCancel, setShowCancel] = useState(false);
   const [aiQueries, setAiQueries] = useState<number | null>(null);
   const [teamCount, setTeamCount] = useState<number | null>(null);
