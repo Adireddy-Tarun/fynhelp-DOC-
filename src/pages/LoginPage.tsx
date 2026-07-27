@@ -267,10 +267,15 @@ const LoginPage = () => {
                   {resetting ? "Sending…" : "Forgot password?"}
                 </button>
               </div>
+              <HCaptcha
+                onVerify={(t) => setSiCaptcha(t)}
+                onExpire={() => setSiCaptcha(null)}
+                onError={() => setSiCaptcha(null)}
+              />
               <button
                 type="submit"
-                disabled={siSubmitting}
-                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60"
+                disabled={!canSignIn}
+                className="w-full bg-fyn-red text-fyn-beige h-[42px] rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ fontSize: "var(--fyn-type-body)" }}
               >
                 {siSubmitting ? "Signing in…" : "Sign In"}
