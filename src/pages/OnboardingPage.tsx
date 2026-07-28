@@ -107,23 +107,28 @@ const OnboardingPage = () => {
     setStep(next);
   };
 
-  const saveStep1 = async () => {
-    const e: Record<string, string> = {};
-    if (!form.business_type) e.business_type = "Required";
-    if (!form.industry) e.industry = "Required";
-    if (!form.state) e.state = "Required";
-    setErrors(e);
-    if (Object.keys(e).length || !user) {
-      if (Object.keys(e).length) toast.error("Please fill in required fields");
-      return;
+  const saveStep1 = async (skip = false) => {
+    if (!user) return;
+    if (!skip) {
+      const e: Record<string, string> = {};
+      if (!form.business_type) e.business_type = "Required";
+      if (!form.industry) e.industry = "Required";
+      if (!form.state) e.state = "Required";
+      setErrors(e);
+      if (Object.keys(e).length) {
+        toast.error("Please fill in required fields");
+        return;
+      }
+    } else {
+      setErrors({});
     }
     setLoading(true);
     try {
       const payload = {
-        business_type: form.business_type,
-        industry: form.industry,
+        business_type: form.business_type || null,
+        industry: form.industry || null,
         turnover_range: form.turnover_range || null,
-        state: form.state,
+        state: form.state || null,
         msme_udyam: form.msme_udyam || null,
         employee_count: form.employee_count || null,
         onboarding_step: 2,
@@ -133,11 +138,12 @@ const OnboardingPage = () => {
         const { error } = await supabase.from("businesses").update(payload).eq("id", bizId);
         if (error) throw error;
       } else {
+        const defaultName = form.industry ? `My ${form.industry} Business` : "My Business";
         // NOTE: cannot use .select() here — SELECT RLS on businesses reads profiles.business_id
         // via a STABLE function, which is stale within the same statement even though the
         // AFTER INSERT trigger link_business_to_creator has already linked the profile.
         const { error: insErr } = await supabase.from("businesses").insert({
-          business_name: form.industry ? `My ${form.industry} Business` : "My Business",
+          business_name: defaultName,
           ...payload,
         });
         if (insErr) throw insErr;
@@ -148,7 +154,8 @@ const OnboardingPage = () => {
         bizId = linked.business_id;
         setBusinessId(bizId);
       }
-      toast.success("Business profile saved");
+      if (skip) toast.info("Skipped — you can fill this in later from Settings");
+      else toast.success("Business profile saved");
       goTo(1);
     } catch (err: any) {
       console.error(err);
