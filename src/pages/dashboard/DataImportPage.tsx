@@ -769,6 +769,7 @@ interface UploadRow {
   status: string;
   error_message: string | null;
   created_at: string;
+  source_type?: string | null;
 }
 
 const UploadHistory = ({ businessId }: { businessId: string | null }) => {
@@ -778,7 +779,7 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
       if (!businessId) return [] as UploadRow[];
       const { data, error } = await supabase
         .from("csv_uploads")
-        .select("id, upload_type, file_name, file_size, row_count, status, error_message, created_at")
+        .select("id, upload_type, file_name, file_size, row_count, status, error_message, created_at, source_type")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
         .limit(50);
