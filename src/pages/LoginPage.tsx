@@ -169,6 +169,14 @@ const LoginPage = () => {
     }
   };
 
+  if (!authReady) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-fyn-beige">
+        <div className="text-sm text-fyn-ink/60">Loading…</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-fyn-beige">
       {/* Left dark panel */}
