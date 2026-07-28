@@ -64,8 +64,21 @@ const num = (s: string) => {
 };
 
 const pick = (row: Record<string, string>, keys: string[]) => {
+  const headers = Object.keys(row);
+  // 1) exact case-insensitive match
   for (const k of keys) {
-    const found = Object.keys(row).find(h => h.toLowerCase() === k.toLowerCase());
+    const found = headers.find(h => h.toLowerCase() === k.toLowerCase());
+    if (found && row[found]) return row[found];
+  }
+  // 2) fuzzy: header contains candidate, or candidate contains header (normalized)
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const k of keys) {
+    const nk = norm(k);
+    if (!nk) continue;
+    const found = headers.find(h => {
+      const nh = norm(h);
+      return nh && (nh.includes(nk) || nk.includes(nh));
+    });
     if (found && row[found]) return row[found];
   }
   return "";
