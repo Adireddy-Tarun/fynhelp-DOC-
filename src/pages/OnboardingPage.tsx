@@ -61,14 +61,12 @@ const OnboardingPage = () => {
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { ready: authReady } = useAuthRedirect("onboarding");
 
   // Load existing onboarding progress
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      navigate("/login");
-      return;
-    }
+    if (authLoading || !authReady) return;
+    if (!user) return; // hook will redirect
     (async () => {
       const { data: profile } = await supabase
         .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
