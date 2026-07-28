@@ -814,10 +814,15 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
             )}
             {history.map(h => (
               <tr key={h.id} className="border-b border-fyn-ink/5">
-                <td className="py-3 text-fyn-ink font-medium truncate max-w-[260px]" title={h.file_name}>
+                <td className="py-3 text-fyn-ink font-medium truncate max-w-[320px]" title={h.file_name}>
                   <span className="inline-flex items-center gap-2">
                     <FileText className="w-4 h-4 text-fyn-ink/50" />
-                    {h.file_name}
+                    <span className="truncate">{h.file_name}</span>
+                    {h.source_type === "ai_extracted" && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-fyn-red/10 text-fyn-red whitespace-nowrap">
+                        <Sparkles className="w-3 h-3" /> AI extracted — verify
+                      </span>
+                    )}
                   </span>
                 </td>
                 <td className="py-3 text-fyn-ink/70">{TYPE_LABEL[h.upload_type] ?? h.upload_type}</td>
