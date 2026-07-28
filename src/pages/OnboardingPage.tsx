@@ -95,7 +95,7 @@ const OnboardingPage = () => {
       }
       setHydrated(true);
     })();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, authReady, navigate]);
 
   const updateField = (key: string, value: string) => {
     setForm((p) => ({ ...p, [key]: value }));
