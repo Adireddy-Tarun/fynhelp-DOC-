@@ -18,7 +18,10 @@ import {
 
 const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/30min";
 
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+
 export default function WaitlistPage() {
+  useAuthRedirect("public-only");
   const openCalendly = () =>
     window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
 

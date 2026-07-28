@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { Building2, Landmark, BookOpen, Rocket, ChevronLeft, Check, Loader2 } from "lucide-react";
 import StepConnectBanks from "@/components/onboarding/StepConnectBanks";
 import StepSyncBooks from "@/components/onboarding/StepSyncBooks";
@@ -60,14 +61,12 @@ const OnboardingPage = () => {
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { ready: authReady } = useAuthRedirect("onboarding");
 
   // Load existing onboarding progress
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      navigate("/login");
-      return;
-    }
+    if (authLoading || !authReady) return;
+    if (!user) return; // hook will redirect
     (async () => {
       const { data: profile } = await supabase
         .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
@@ -96,7 +95,7 @@ const OnboardingPage = () => {
       }
       setHydrated(true);
     })();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, authReady, navigate]);
 
   const updateField = (key: string, value: string) => {
     setForm((p) => ({ ...p, [key]: value }));

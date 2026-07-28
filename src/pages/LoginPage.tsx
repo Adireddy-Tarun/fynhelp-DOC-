@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
@@ -17,6 +19,8 @@ const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { ready: authReady } = useAuthRedirect("public-only");
   const [mode, setMode] = useState<Mode>("signin");
 
   // Sign-in state
@@ -63,9 +67,15 @@ const LoginPage = () => {
     }
     const { data: biz } = await supabase
       .from("businesses").select("onboarding_completed").eq("id", businessId).maybeSingle();
-    if (biz?.onboarding_completed) navigate("/dashboard/cockpit");
+    const rawRedirect = searchParams.get("redirect");
+    const safeRedirect =
+      rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+        ? rawRedirect
+        : null;
+    if (biz?.onboarding_completed) navigate(safeRedirect ?? "/dashboard/cockpit");
     else navigate("/onboarding");
   };
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +168,14 @@ const LoginPage = () => {
       setSiEmail(email);
     }
   };
+
+  if (!authReady) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-fyn-beige">
+        <div className="text-sm text-fyn-ink/60">Loading…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-fyn-beige">
