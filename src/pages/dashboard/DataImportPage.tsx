@@ -322,6 +322,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         file_hash: p.hash,
         min_date: p.minDate,
         max_date: p.maxDate,
+        source_type: sourceMode,
       });
 
       clearInterval(interval);
