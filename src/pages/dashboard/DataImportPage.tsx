@@ -504,6 +504,96 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     toast.info("Upload cancelled, no duplicate data inserted");
   };
 
+  // Convert AI-extracted structured rows into the same header-keyed shape the
+  // CSV pipeline already handles, so performInsert / pick() work unchanged.
+  const aiRowsToCsvShape = (rows: any[]): Record<string, string>[] => {
+    if (type === "bank") {
+      return rows.map((r) => {
+        const amt = Number(r?.amount ?? 0);
+        const dir = String(r?.direction ?? "").toLowerCase();
+        return {
+          Date: String(r?.date ?? ""),
+          Description: String(r?.description ?? ""),
+          Debit: dir === "debit" || dir === "withdrawal" || dir === "out" ? String(amt) : "",
+          Credit: dir === "credit" || dir === "deposit" || dir === "in" ? String(amt) : "",
+        };
+      });
+    }
+    if (type === "invoice") {
+      return rows.map((r) => ({
+        Customer: String(r?.customer ?? ""),
+        "Invoice Number": String(r?.invoice_number ?? ""),
+        Date: String(r?.date ?? ""),
+        "Due Date": String(r?.date ?? ""),
+        Amount: String(Number(r?.amount ?? 0)),
+      }));
+    }
+    return rows.map((r) => ({
+      Vendor: String(r?.vendor ?? ""),
+      Category: String(r?.category ?? ""),
+      Date: String(r?.date ?? ""),
+      "Due Date": String(r?.date ?? ""),
+      Amount: String(Number(r?.amount ?? 0)),
+    }));
+  };
+
+  const handleAiFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!businessId) { toast.error("No business linked."); return; }
+    const n = f.name.toLowerCase();
+    const ok = f.type.startsWith("image/") || n.endsWith(".pdf") || n.endsWith(".png") || n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".webp");
+    if (!ok) { toast.error("Upload a photo (PNG/JPG) or PDF"); return; }
+    if (f.size > 8 * 1024 * 1024) { toast.error("File too large (max 8MB)"); return; }
+
+    setFile(f);
+    setSourceMode("ai_extracted");
+    setAiExtracting(true);
+    setUploading(true);
+    setProgress(15);
+    const progInt = setInterval(() => setProgress((p) => Math.min(p + 5, 70)), 400);
+    try {
+      const buf = await f.arrayBuffer();
+      // base64 encode
+      const bytes = new Uint8Array(buf);
+      let bin = "";
+      for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+      const b64 = btoa(bin);
+      const hash = await sha256Hex(buf);
+
+      const { data, error } = await supabase.functions.invoke("extract-document-ai", {
+        body: {
+          doc_type: type,
+          mime_type: f.type || (n.endsWith(".pdf") ? "application/pdf" : "image/png"),
+          file_base64: b64,
+        },
+      });
+      clearInterval(progInt);
+      if (error) throw error;
+      const aiRows = Array.isArray(data?.rows) ? data.rows : [];
+      if (aiRows.length === 0) {
+        throw new Error("AI could not find any rows in this document. Try a clearer photo or a different page.");
+      }
+      const shaped = aiRowsToCsvShape(aiRows);
+      const { minDate, maxDate } = computeRange(shaped);
+      setProgress(80);
+      await performInsert({ rows: shaped, hash, minDate, maxDate });
+    } catch (err: any) {
+      clearInterval(progInt);
+      console.error("AI extract error", err);
+      toast.error(err?.message || "AI extraction failed");
+      setUploading(false);
+      setAiExtracting(false);
+      setProgress(0);
+      setFile(null);
+      setSourceMode("csv");
+    } finally {
+      setAiExtracting(false);
+      if (aiInputRef.current) aiInputRef.current.value = "";
+    }
+  };
+
+
   return (
     <Card data-upload-zone={type} className="p-6 flex flex-col h-full scroll-mt-24">
       <div
