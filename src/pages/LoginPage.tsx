@@ -19,6 +19,8 @@ const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { ready: authReady } = useAuthRedirect("public-only");
   const [mode, setMode] = useState<Mode>("signin");
 
   // Sign-in state
