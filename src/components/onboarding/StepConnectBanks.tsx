@@ -257,21 +257,13 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
 
       {/* Bottom action bar */}
       <div className="flex items-center justify-between mt-10 pt-6" style={{ borderTop: "1px solid hsl(var(--fyn-ink) / 0.08)" }}>
-        <div>
-          {!showSkipWarning ? (
-            <button onClick={() => setShowSkipWarning(true)} className="text-[13px] hover:underline text-secondary-foreground">
-              Skip for now, I'll connect banks later
-            </button>
-          ) : (
-            <div className="text-xs max-w-sm" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-              <p className="mb-2">Without bank data, CFO Fynny's cash insights will be limited. You can connect anytime from Settings → Integrations.</p>
-              <div className="flex gap-3">
-                <button onClick={onSkip} className="text-[13px] font-medium hover:underline" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>Connect later</button>
-                <button onClick={() => setShowSkipWarning(false)} className="text-[13px] font-medium hover:underline" style={{ color: "hsl(var(--fyn-red))" }}>Actually, let me connect now</button>
-              </div>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={onSkip}
+          className="text-[13px] hover:underline"
+          style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+        >
+          I'll set this up later →
+        </button>
         <button
           onClick={handleContinue}
           disabled={selectedBanks.length === 0}
