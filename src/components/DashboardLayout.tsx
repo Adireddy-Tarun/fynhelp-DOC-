@@ -5,11 +5,13 @@ import GlobalHeader from "@/components/layout/GlobalHeader";
 import OfflineBanner from "@/components/OfflineBanner";
 import TrialExpiredBlock from "@/components/TrialExpiredBlock";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 const STORAGE_KEY = "fynhelp_sidebar_open";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
+  const { ready: authReady } = useAuthRedirect("protected");
   const trial = useTrialStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -18,10 +20,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   // Allow the Billing page even when the trial has expired, so users can upgrade.
   const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
-  if (trial.loading && !isBillingRoute) {
-    // Wait for trial status before mounting dashboard children so an expired
-    // tenant never briefly renders the dashboard (which may then crash on
-    // empty-tenant data and get trapped by the top-level ErrorBoundary).
+  if (!authReady || (trial.loading && !isBillingRoute)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
         <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
