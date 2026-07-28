@@ -399,16 +399,17 @@ const OnboardingPage = () => {
                 </div>
                 <div className="flex items-center justify-between mt-8">
                   <button
-                    onClick={() => goTo(1)}
+                    onClick={() => saveStep1(true)}
+                    disabled={loading}
                     className="text-[13px] hover:underline"
                     style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
-                    Skip for now
+                    I'll set this up later →
                   </button>
                   <motion.button
                     whileHover={{ y: -2 }}
                     whileTap={{ y: 1 }}
-                    onClick={saveStep1}
+                    onClick={() => saveStep1(false)}
                     disabled={loading}
                     className="px-8 py-3 rounded-lg font-medium text-white disabled:opacity-50 inline-flex items-center gap-2"
                     style={{
