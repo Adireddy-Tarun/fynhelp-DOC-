@@ -67,9 +67,15 @@ const LoginPage = () => {
     }
     const { data: biz } = await supabase
       .from("businesses").select("onboarding_completed").eq("id", businessId).maybeSingle();
-    if (biz?.onboarding_completed) navigate("/dashboard/cockpit");
+    const rawRedirect = searchParams.get("redirect");
+    const safeRedirect =
+      rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+        ? rawRedirect
+        : null;
+    if (biz?.onboarding_completed) navigate(safeRedirect ?? "/dashboard/cockpit");
     else navigate("/onboarding");
   };
+
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
