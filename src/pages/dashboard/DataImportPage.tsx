@@ -64,8 +64,21 @@ const num = (s: string) => {
 };
 
 const pick = (row: Record<string, string>, keys: string[]) => {
+  const headers = Object.keys(row);
+  // 1) exact case-insensitive match
   for (const k of keys) {
-    const found = Object.keys(row).find(h => h.toLowerCase() === k.toLowerCase());
+    const found = headers.find(h => h.toLowerCase() === k.toLowerCase());
+    if (found && row[found]) return row[found];
+  }
+  // 2) fuzzy: header contains candidate, or candidate contains header (normalized)
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const k of keys) {
+    const nk = norm(k);
+    if (!nk) continue;
+    const found = headers.find(h => {
+      const nh = norm(h);
+      return nh && (nh.includes(nk) || nk.includes(nh));
+    });
     if (found && row[found]) return row[found];
   }
   return "";
@@ -232,23 +245,35 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     track("csv_import_started", { file_type: file.type || file.name.split(".").pop() || "unknown" });
     try {
       if (type === "bank") {
+        let skipped = 0;
         const records = rows.map(r => {
-          const debit = num(pick(r, ["Debit", "Withdrawal", "Out"]));
-          const credit = num(pick(r, ["Credit", "Deposit", "In"]));
-          const amount = debit > 0 ? debit : credit > 0 ? credit : Math.abs(num(pick(r, ["Amount"])));
-          const direction = debit > 0 ? "debit" : credit > 0 ? "credit" : (num(pick(r, ["Amount"])) < 0 ? "debit" : "credit");
+          const debit = num(pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]));
+          const credit = num(pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]));
+          const rawAmt = num(pick(r, ["Amount", "Transaction Amount", "Txn Amount"]));
+          const amount = debit > 0 ? debit : credit > 0 ? credit : Math.abs(rawAmt);
+          const direction = debit > 0 ? "debit" : credit > 0 ? "credit" : (rawAmt < 0 ? "debit" : "credit");
+          if (amount === 0) return null;
           return {
             business_id: businessId,
-            date: toDate(pick(r, ["Date", "Transaction Date"])),
-            description: pick(r, ["Description", "Narration", "Particulars"]) || "-",
+            date: toDate(pick(r, ["Date", "Transaction Date", "Txn Date", "Value Date"])),
+            description: pick(r, ["Description", "Narration", "Particulars", "Details"]) || "-",
             counterparty: pick(r, ["Counterparty", "Payee", "Vendor", "Customer"]) || null,
             amount,
             direction,
             category: pick(r, ["Category"]) || null,
           };
+        }).filter((x): x is NonNullable<typeof x> => {
+          if (x === null) { skipped++; return false; }
+          return true;
         });
+        if (records.length === 0) {
+          throw new Error("No parseable rows found. Please check your column headers (Date, Debit/Withdrawal, Credit/Deposit or Amount).");
+        }
         const { error } = await supabase.from("transactions").insert(records);
         if (error) throw error;
+        if (skipped > 0) {
+          toast.warning(`${skipped} row${skipped === 1 ? "" : "s"} could not be parsed and were skipped — please verify your column headers.`);
+        }
       } else if (type === "invoice") {
         const records = rows.map(r => {
           const amount = num(pick(r, ["Amount", "Total", "Invoice Amount"]));
