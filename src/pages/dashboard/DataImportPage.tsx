@@ -629,8 +629,35 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
                 <span><Upload className="w-4 h-4 mr-2" /> Select File</span>
               </Button>
             </label>
+            <div className="flex items-center gap-2 my-3 w-full max-w-[220px]">
+              <div className="flex-1 h-px bg-fyn-ink/10" />
+              <span className="text-[10px] uppercase tracking-wide text-fyn-ink/40">or</span>
+              <div className="flex-1 h-px bg-fyn-ink/10" />
+            </div>
+            <input
+              ref={aiInputRef}
+              type="file"
+              accept="image/*,application/pdf,.pdf,.png,.jpg,.jpeg,.webp"
+              onChange={handleAiFileSelect}
+              className="hidden"
+              id={`ai-${type}`}
+            />
+            <label htmlFor={`ai-${type}`}>
+              <Button asChild variant="ghost" className="cursor-pointer text-fyn-red hover:bg-fyn-red/5">
+                <span><Camera className="w-4 h-4 mr-2" /> Upload photo / PDF <Sparkles className="w-3 h-3 ml-1.5 opacity-70" /></span>
+              </Button>
+            </label>
             <p className="text-xs text-fyn-ink/40 mt-3">Expected: {meta.sample}</p>
+            <p className="text-[11px] text-fyn-ink/40 mt-1">Photo/PDF is read by AI — please verify the extracted rows.</p>
           </>
+        )}
+
+        {file && (uploading || aiExtracting) && sourceMode === "ai_extracted" && (
+          <div className="w-full space-y-2 mt-2">
+            <p className="text-xs text-fyn-ink/60 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Reading your document with AI…
+            </p>
+          </div>
         )}
 
         {file && !uploading && (
