@@ -166,7 +166,10 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dupMatch, setDupMatch] = useState<DupMatch | null>(null);
   const [pending, setPending] = useState<PendingUpload | null>(null);
+  const [aiExtracting, setAiExtracting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const aiInputRef = useRef<HTMLInputElement>(null);
+  const [sourceMode, setSourceMode] = useState<"csv" | "ai_extracted">("csv");
 
   useEffect(() => {
     zoneOpeners[type] = () => inputRef.current?.click();
