@@ -2107,6 +2107,7 @@ export type Database = {
           max_date: string | null
           min_date: string | null
           row_count: number
+          source_type: string
           status: string
           upload_type: string
           uploaded_by: string | null
@@ -2122,6 +2123,7 @@ export type Database = {
           max_date?: string | null
           min_date?: string | null
           row_count?: number
+          source_type?: string
           status?: string
           upload_type: string
           uploaded_by?: string | null
@@ -2137,6 +2139,7 @@ export type Database = {
           max_date?: string | null
           min_date?: string | null
           row_count?: number
+          source_type?: string
           status?: string
           upload_type?: string
           uploaded_by?: string | null

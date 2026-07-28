@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
-import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw } from "lucide-react";
+import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", buf);
@@ -166,7 +166,10 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dupMatch, setDupMatch] = useState<DupMatch | null>(null);
   const [pending, setPending] = useState<PendingUpload | null>(null);
+  const [aiExtracting, setAiExtracting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const aiInputRef = useRef<HTMLInputElement>(null);
+  const [sourceMode, setSourceMode] = useState<"csv" | "ai_extracted">("csv");
 
   useEffect(() => {
     zoneOpeners[type] = () => inputRef.current?.click();
@@ -319,6 +322,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         file_hash: p.hash,
         min_date: p.minDate,
         max_date: p.maxDate,
+        source_type: sourceMode,
       });
 
       clearInterval(interval);
@@ -351,6 +355,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
           file_hash: p.hash,
           min_date: p.minDate,
           max_date: p.maxDate,
+          source_type: sourceMode,
         });
       } catch {}
       toast.error(err?.message || "Upload failed");
@@ -499,6 +504,96 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     toast.info("Upload cancelled, no duplicate data inserted");
   };
 
+  // Convert AI-extracted structured rows into the same header-keyed shape the
+  // CSV pipeline already handles, so performInsert / pick() work unchanged.
+  const aiRowsToCsvShape = (rows: any[]): Record<string, string>[] => {
+    if (type === "bank") {
+      return rows.map((r) => {
+        const amt = Number(r?.amount ?? 0);
+        const dir = String(r?.direction ?? "").toLowerCase();
+        return {
+          Date: String(r?.date ?? ""),
+          Description: String(r?.description ?? ""),
+          Debit: dir === "debit" || dir === "withdrawal" || dir === "out" ? String(amt) : "",
+          Credit: dir === "credit" || dir === "deposit" || dir === "in" ? String(amt) : "",
+        };
+      });
+    }
+    if (type === "invoice") {
+      return rows.map((r) => ({
+        Customer: String(r?.customer ?? ""),
+        "Invoice Number": String(r?.invoice_number ?? ""),
+        Date: String(r?.date ?? ""),
+        "Due Date": String(r?.date ?? ""),
+        Amount: String(Number(r?.amount ?? 0)),
+      }));
+    }
+    return rows.map((r) => ({
+      Vendor: String(r?.vendor ?? ""),
+      Category: String(r?.category ?? ""),
+      Date: String(r?.date ?? ""),
+      "Due Date": String(r?.date ?? ""),
+      Amount: String(Number(r?.amount ?? 0)),
+    }));
+  };
+
+  const handleAiFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!businessId) { toast.error("No business linked."); return; }
+    const n = f.name.toLowerCase();
+    const ok = f.type.startsWith("image/") || n.endsWith(".pdf") || n.endsWith(".png") || n.endsWith(".jpg") || n.endsWith(".jpeg") || n.endsWith(".webp");
+    if (!ok) { toast.error("Upload a photo (PNG/JPG) or PDF"); return; }
+    if (f.size > 8 * 1024 * 1024) { toast.error("File too large (max 8MB)"); return; }
+
+    setFile(f);
+    setSourceMode("ai_extracted");
+    setAiExtracting(true);
+    setUploading(true);
+    setProgress(15);
+    const progInt = setInterval(() => setProgress((p) => Math.min(p + 5, 70)), 400);
+    try {
+      const buf = await f.arrayBuffer();
+      // base64 encode
+      const bytes = new Uint8Array(buf);
+      let bin = "";
+      for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+      const b64 = btoa(bin);
+      const hash = await sha256Hex(buf);
+
+      const { data, error } = await supabase.functions.invoke("extract-document-ai", {
+        body: {
+          doc_type: type,
+          mime_type: f.type || (n.endsWith(".pdf") ? "application/pdf" : "image/png"),
+          file_base64: b64,
+        },
+      });
+      clearInterval(progInt);
+      if (error) throw error;
+      const aiRows = Array.isArray(data?.rows) ? data.rows : [];
+      if (aiRows.length === 0) {
+        throw new Error("AI could not find any rows in this document. Try a clearer photo or a different page.");
+      }
+      const shaped = aiRowsToCsvShape(aiRows);
+      const { minDate, maxDate } = computeRange(shaped);
+      setProgress(80);
+      await performInsert({ rows: shaped, hash, minDate, maxDate });
+    } catch (err: any) {
+      clearInterval(progInt);
+      console.error("AI extract error", err);
+      toast.error(err?.message || "AI extraction failed");
+      setUploading(false);
+      setAiExtracting(false);
+      setProgress(0);
+      setFile(null);
+      setSourceMode("csv");
+    } finally {
+      setAiExtracting(false);
+      if (aiInputRef.current) aiInputRef.current.value = "";
+    }
+  };
+
+
   return (
     <Card data-upload-zone={type} className="p-6 flex flex-col h-full scroll-mt-24">
       <div
@@ -534,8 +629,35 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
                 <span><Upload className="w-4 h-4 mr-2" /> Select File</span>
               </Button>
             </label>
+            <div className="flex items-center gap-2 my-3 w-full max-w-[220px]">
+              <div className="flex-1 h-px bg-fyn-ink/10" />
+              <span className="text-[10px] uppercase tracking-wide text-fyn-ink/40">or</span>
+              <div className="flex-1 h-px bg-fyn-ink/10" />
+            </div>
+            <input
+              ref={aiInputRef}
+              type="file"
+              accept="image/*,application/pdf,.pdf,.png,.jpg,.jpeg,.webp"
+              onChange={handleAiFileSelect}
+              className="hidden"
+              id={`ai-${type}`}
+            />
+            <label htmlFor={`ai-${type}`}>
+              <Button asChild variant="ghost" className="cursor-pointer text-fyn-red hover:bg-fyn-red/5">
+                <span><Camera className="w-4 h-4 mr-2" /> Upload photo / PDF <Sparkles className="w-3 h-3 ml-1.5 opacity-70" /></span>
+              </Button>
+            </label>
             <p className="text-xs text-fyn-ink/40 mt-3">Expected: {meta.sample}</p>
+            <p className="text-[11px] text-fyn-ink/40 mt-1">Photo/PDF is read by AI — please verify the extracted rows.</p>
           </>
+        )}
+
+        {file && (uploading || aiExtracting) && sourceMode === "ai_extracted" && (
+          <div className="w-full space-y-2 mt-2">
+            <p className="text-xs text-fyn-ink/60 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Reading your document with AI…
+            </p>
+          </div>
         )}
 
         {file && !uploading && (
@@ -647,6 +769,7 @@ interface UploadRow {
   status: string;
   error_message: string | null;
   created_at: string;
+  source_type?: string | null;
 }
 
 const UploadHistory = ({ businessId }: { businessId: string | null }) => {
@@ -656,7 +779,7 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
       if (!businessId) return [] as UploadRow[];
       const { data, error } = await supabase
         .from("csv_uploads")
-        .select("id, upload_type, file_name, file_size, row_count, status, error_message, created_at")
+        .select("id, upload_type, file_name, file_size, row_count, status, error_message, created_at, source_type")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -691,10 +814,15 @@ const UploadHistory = ({ businessId }: { businessId: string | null }) => {
             )}
             {history.map(h => (
               <tr key={h.id} className="border-b border-fyn-ink/5">
-                <td className="py-3 text-fyn-ink font-medium truncate max-w-[260px]" title={h.file_name}>
+                <td className="py-3 text-fyn-ink font-medium truncate max-w-[320px]" title={h.file_name}>
                   <span className="inline-flex items-center gap-2">
                     <FileText className="w-4 h-4 text-fyn-ink/50" />
-                    {h.file_name}
+                    <span className="truncate">{h.file_name}</span>
+                    {h.source_type === "ai_extracted" && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-fyn-red/10 text-fyn-red whitespace-nowrap">
+                        <Sparkles className="w-3 h-3" /> AI extracted — verify
+                      </span>
+                    )}
                   </span>
                 </td>
                 <td className="py-3 text-fyn-ink/70">{TYPE_LABEL[h.upload_type] ?? h.upload_type}</td>
