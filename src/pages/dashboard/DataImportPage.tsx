@@ -251,7 +251,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
           const credit = num(pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]));
           const rawAmt = num(pick(r, ["Amount", "Transaction Amount", "Txn Amount"]));
           const amount = debit > 0 ? debit : credit > 0 ? credit : Math.abs(rawAmt);
-          const direction = debit > 0 ? "debit" : credit > 0 ? "credit" : (rawAmt < 0 ? "debit" : "credit");
+          const direction = debit > 0 ? "out" : credit > 0 ? "in" : (rawAmt < 0 ? "out" : "in");
           if (amount === 0) return null;
           return {
             business_id: businessId,
