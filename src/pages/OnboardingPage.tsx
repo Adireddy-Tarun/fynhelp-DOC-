@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { Building2, Landmark, BookOpen, Rocket, ChevronLeft, Check, Loader2 } from "lucide-react";
 import StepConnectBanks from "@/components/onboarding/StepConnectBanks";
 import StepSyncBooks from "@/components/onboarding/StepSyncBooks";
