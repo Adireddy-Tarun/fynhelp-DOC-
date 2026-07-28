@@ -18,19 +18,6 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" ? window.innerWidth >= 1024 : true);
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 768 : false);
 
-  // Allow the Billing page even when the trial has expired, so users can upgrade.
-  const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
-  if (!authReady || (trial.loading && !isBillingRoute)) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
-        <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
-      </div>
-    );
-  }
-  if (trial.shouldBlock && !isBillingRoute) {
-    return <TrialExpiredBlock />;
-  }
-
   useEffect(() => {
     const onResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
@@ -48,6 +35,20 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       setSidebarOpen(false);
     }
   }, []);
+
+  // Allow the Billing page even when the trial has expired, so users can upgrade.
+  const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
+  if (!authReady || (trial.loading && !isBillingRoute)) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
+        <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
+      </div>
+    );
+  }
+  if (trial.shouldBlock && !isBillingRoute) {
+    return <TrialExpiredBlock />;
+  }
+
 
   const handleToggleSidebar = () => {
     setSidebarOpen((v) => {
