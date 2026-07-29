@@ -1179,7 +1179,7 @@ export default function HomePage() {
       {/* INTEGRATIONS */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">✦&nbsp; 12+ LIVE INTEGRATIONS</span>
+          
           <h2 className="fyn-h">Connect your entire financial stack.</h2>
           <p className="lead">All systems connected. One coherent view of your business.</p>
           <div className="int-stage">
