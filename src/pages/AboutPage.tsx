@@ -208,25 +208,32 @@ export default function AboutPage() {
     const fill = trackFillRef.current;
     if (!container || !fill) return;
     const items = Array.from(container.querySelectorAll<HTMLElement>(".ab-tl-item"));
+    if (!items.length) return;
 
     let rafId = 0;
     const compute = () => {
       const rect = container.getBoundingClientRect();
       const vh = window.innerHeight;
-      const start = vh * 0.75;
-      const end = vh * 0.25;
-      const distance = rect.height + (start - end);
-      const traveled = start - rect.top;
-      const progress = Math.max(0, Math.min(1, traveled / distance));
-      fill.style.height = `${progress * 100}%`;
+      // Anchor progress to the viewport line at 55% down — feels like a natural
+      // "read line". Fill begins when the container's top crosses that line and
+      // completes when the LAST dot crosses it.
+      const anchorY = vh * 0.55;
+      const firstDotY = items[0].getBoundingClientRect().top + 8 - rect.top; // dot offset within container
+      const lastDotY = items[items.length - 1].getBoundingClientRect().top + 8 - rect.top;
+      const span = Math.max(1, lastDotY - firstDotY);
+      const traveled = anchorY - (rect.top + firstDotY);
+      const progress = Math.max(0, Math.min(1, traveled / span));
+      // Draw the line from the first dot down to the last dot (not full container).
+      const trackTopPct = (firstDotY / rect.height) * 100;
+      const trackSpanPct = (span / rect.height) * 100;
+      fill.style.top = `${trackTopPct}%`;
+      fill.style.height = `${trackSpanPct * progress}%`;
 
-      // Activate dots when the item is within the drawn portion
-      const drawnBottomY = rect.top + progress * rect.height;
+      // Activate a dot once it has passed the read-line anchor.
       let lastActive = -1;
       items.forEach((el, i) => {
-        const irect = el.getBoundingClientRect();
-        const dotY = irect.top + 26;
-        if (dotY <= drawnBottomY + 4) {
+        const dotY = el.getBoundingClientRect().top + 8;
+        if (dotY <= anchorY + 8) {
           el.classList.add("on");
           lastActive = i;
         } else {
