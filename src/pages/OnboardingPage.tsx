@@ -487,60 +487,22 @@ const OnboardingPage = () => {
 
             {step === 3 && (
               <div className="max-w-2xl">
-                <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
-                  CFO Fynny is ready. Here's what she's found.
+                <h1 className="text-3xl font-serif mb-3" style={{ color: "hsl(var(--fyn-ink))" }}>
+                  You're all set.
                 </h1>
-                <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-                  {selectedBanks.length > 0
-                    ? `We've connected ${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""} and are ready to start monitoring.`
-                    : "Connect a bank account anytime to unlock full cash intelligence."}
+                <p className="mb-8 text-base" style={{ color: "hsl(var(--fyn-ink) / 0.65)" }}>
+                  Your dashboard is ready. You can connect banks, sync books and refine your profile anytime from Settings.
                 </p>
 
                 <div
-                  className="rounded-xl p-6 mb-8"
-                  style={{
-                    background: "hsl(var(--fyn-ink))",
-                    boxShadow: "0 20px 50px rgba(26,16,8,0.35)",
-                  }}
+                  className="rounded-lg p-5 mb-8 border text-sm"
+                  style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)", color: "hsl(var(--fyn-ink) / 0.75)" }}
                 >
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    {[
-                      { label: "Cash Runway", value: "- days", sub: "Awaiting bank data" },
-                      { label: "Bank Balance", value: "-", sub: "Connect to see" },
-                      { label: "GST Notice Risk", value: "-", sub: "Enter GSTIN to score" },
-                    ].map((m) => (
-                      <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
-                        <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>
-                        <p className="text-2xl text-white fyn-metric mt-1">{m.value}</p>
-                        <p className="text-xs text-primary-foreground">{m.sub}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                      style={{ background: "hsl(var(--fyn-red))" }}
-                    >
-                      N
-                    </div>
-                    <p className="text-primary-foreground text-base">
-                      Welcome! I'm CFO Fynny, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-lg p-4 mb-8 border"
-                  style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)" }}
-                >
-                  <h3 className="font-serif text-lg mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Setup summary</h3>
-                  <ul className="space-y-1 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                    <li className="text-secondary-foreground">Business type: {form.business_type || "Not set"}</li>
-                    <li className="text-secondary-foreground">Industry: {form.industry || "Not set"}</li>
-                    <li className="text-secondary-foreground">Turnover: {form.turnover_range || "Not set"}</li>
-                    <li className="text-secondary-foreground">Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
-                    <li className="text-secondary-foreground">Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
-                  </ul>
+                  <span style={{ color: "hsl(var(--fyn-gold))", fontWeight: 600 }}>{form.industry || "Business"}</span>
+                  {" · "}
+                  {selectedBanks.length > 0 ? `${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""}` : "No banks yet"}
+                  {" · "}
+                  {selectedSoftware.length > 0 ? `${selectedSoftware.length} accounting tool${selectedSoftware.length > 1 ? "s" : ""}` : "No accounting sync yet"}
                 </div>
 
                 <div className="flex items-center justify-between">
