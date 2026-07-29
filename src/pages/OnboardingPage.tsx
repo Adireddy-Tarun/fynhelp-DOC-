@@ -223,8 +223,13 @@ const OnboardingPage = () => {
         .update({ onboarding_completed: true, onboarding_step: 4 })
         .eq("id", businessId);
       if (error) throw error;
+      // Prime the cache with the fresh value BEFORE navigating so DashboardLayout's
+      // useAuthRedirect doesn't briefly see stale onboarding_completed=false and
+      // bounce the user back to /onboarding.
+      queryClient.setQueryData(["business-onboarding", businessId], true);
+      await queryClient.invalidateQueries({ queryKey: ["business-onboarding", businessId] });
       toast.success("Welcome to FynHelp! 🎉");
-      navigate("/dashboard/cockpit");
+      navigate("/dashboard/cockpit", { replace: true });
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Failed to complete onboarding");
