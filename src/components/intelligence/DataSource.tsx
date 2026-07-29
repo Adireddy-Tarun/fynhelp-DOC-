@@ -46,6 +46,11 @@ function useScopedTable<T>(table: string, opts?: { order?: string; ascending?: b
       return (data as T[]) || [];
     },
     enabled: true,
+    // Cache within-session to avoid re-fetching on every tab switch / revisit.
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 }
 

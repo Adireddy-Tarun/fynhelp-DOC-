@@ -259,10 +259,15 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
       <div className="flex items-center justify-between mt-10 pt-6" style={{ borderTop: "1px solid hsl(var(--fyn-ink) / 0.08)" }}>
         <button
           onClick={onSkip}
-          className="text-[13px] hover:underline"
-          style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+          className="px-5 py-2.5 rounded-lg text-sm font-medium"
+          style={{
+            background: "#FFFFFF",
+            color: "hsl(var(--fyn-ink))",
+            border: "1.5px solid rgba(26,16,8,0.18)",
+            cursor: "pointer",
+          }}
         >
-          I'll set this up later →
+          Skip for now →
         </button>
         <button
           onClick={handleContinue}

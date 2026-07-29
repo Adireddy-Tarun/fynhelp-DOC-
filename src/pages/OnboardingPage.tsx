@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +61,7 @@ const OnboardingPage = () => {
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
   const { ready: authReady } = useAuthRedirect("onboarding");
 
@@ -221,8 +223,13 @@ const OnboardingPage = () => {
         .update({ onboarding_completed: true, onboarding_step: 4 })
         .eq("id", businessId);
       if (error) throw error;
+      // Prime the cache with the fresh value BEFORE navigating so DashboardLayout's
+      // useAuthRedirect doesn't briefly see stale onboarding_completed=false and
+      // bounce the user back to /onboarding.
+      queryClient.setQueryData(["business-onboarding", businessId], true);
+      await queryClient.invalidateQueries({ queryKey: ["business-onboarding", businessId] });
       toast.success("Welcome to FynHelp! 🎉");
-      navigate("/dashboard/cockpit");
+      navigate("/dashboard/cockpit", { replace: true });
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Failed to complete onboarding");
@@ -350,7 +357,7 @@ const OnboardingPage = () => {
                   Tell us about your business
                 </h1>
                 <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-                  This helps CFO Fynny personalize your financial intelligence.
+                  Just three quick fields to personalise your dashboard. Everything else can wait.
                 </p>
                 <div
                   className="rounded-xl p-6 space-y-4"
@@ -364,9 +371,7 @@ const OnboardingPage = () => {
                   {[
                     { key: "business_type", label: "Business type", required: true, options: ["Pvt Ltd", "LLP", "Proprietorship", "Partnership"] },
                     { key: "industry", label: "Industry vertical", required: true, options: industries },
-                    { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
                     { key: "state", label: "State of registration", required: true, options: states },
-                    { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
                   ].map(({ key, label, options, required }) => (
                     <div key={key}>
                       <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
@@ -384,27 +389,56 @@ const OnboardingPage = () => {
                       {errors[key] && <p className="text-xs mt-1" style={{ color: "#EF4444" }}>{errors[key]}</p>}
                     </div>
                   ))}
-                  <div>
-                    <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                      MSME Udyam number (optional)
-                    </label>
-                    <input
-                      value={form.msme_udyam}
-                      onChange={(e) => updateField("msme_udyam", e.target.value)}
-                      className={inputBase}
-                      style={fieldStyle("msme_udyam")}
-                      placeholder="UDYAM-XX-00-0000000"
-                    />
-                  </div>
+                  <details className="pt-1">
+                    <summary className="text-[13px] cursor-pointer" style={{ color: "hsl(var(--fyn-gold))" }}>
+                      Add optional details (turnover, headcount, MSME) — you can also fill these later
+                    </summary>
+                    <div className="mt-3 space-y-4">
+                      {[
+                        { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
+                        { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
+                      ].map(({ key, label, options }) => (
+                        <div key={key}>
+                          <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>{label}</label>
+                          <select
+                            value={(form as any)[key]}
+                            onChange={(e) => updateField(key, e.target.value)}
+                            className={inputBase + " appearance-none"}
+                            style={fieldStyle(key)}
+                          >
+                            <option value="">Select {label.toLowerCase()}</option>
+                            {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                      ))}
+                      <div>
+                        <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
+                          MSME Udyam number
+                        </label>
+                        <input
+                          value={form.msme_udyam}
+                          onChange={(e) => updateField("msme_udyam", e.target.value)}
+                          className={inputBase}
+                          style={fieldStyle("msme_udyam")}
+                          placeholder="UDYAM-XX-00-0000000"
+                        />
+                      </div>
+                    </div>
+                  </details>
                 </div>
-                <div className="flex items-center justify-between mt-8">
+                <div className="flex items-center justify-between mt-8 gap-3 flex-wrap">
                   <button
                     onClick={() => saveStep1(true)}
                     disabled={loading}
-                    className="text-[13px] hover:underline"
-                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                    className="px-5 py-2.5 rounded-lg text-sm font-medium"
+                    style={{
+                      background: "#FFFFFF",
+                      color: "hsl(var(--fyn-ink))",
+                      border: "1.5px solid rgba(26,16,8,0.18)",
+                      cursor: "pointer",
+                    }}
                   >
-                    I'll set this up later →
+                    Skip for now →
                   </button>
                   <motion.button
                     whileHover={{ y: -2 }}
@@ -453,60 +487,22 @@ const OnboardingPage = () => {
 
             {step === 3 && (
               <div className="max-w-2xl">
-                <h1 className="text-3xl font-serif mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>
-                  CFO Fynny is ready. Here's what she's found.
+                <h1 className="text-3xl font-serif mb-3" style={{ color: "hsl(var(--fyn-ink))" }}>
+                  You're all set.
                 </h1>
-                <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-                  {selectedBanks.length > 0
-                    ? `We've connected ${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""} and are ready to start monitoring.`
-                    : "Connect a bank account anytime to unlock full cash intelligence."}
+                <p className="mb-8 text-base" style={{ color: "hsl(var(--fyn-ink) / 0.65)" }}>
+                  Your dashboard is ready. You can connect banks, sync books and refine your profile anytime from Settings.
                 </p>
 
                 <div
-                  className="rounded-xl p-6 mb-8"
-                  style={{
-                    background: "hsl(var(--fyn-ink))",
-                    boxShadow: "0 20px 50px rgba(26,16,8,0.35)",
-                  }}
+                  className="rounded-lg p-5 mb-8 border text-sm"
+                  style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)", color: "hsl(var(--fyn-ink) / 0.75)" }}
                 >
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    {[
-                      { label: "Cash Runway", value: "- days", sub: "Awaiting bank data" },
-                      { label: "Bank Balance", value: "-", sub: "Connect to see" },
-                      { label: "GST Notice Risk", value: "-", sub: "Enter GSTIN to score" },
-                    ].map((m) => (
-                      <div key={m.label} className="rounded-lg p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
-                        <p className="text-xs fyn-label text-primary-foreground">{m.label}</p>
-                        <p className="text-2xl text-white fyn-metric mt-1">{m.value}</p>
-                        <p className="text-xs text-primary-foreground">{m.sub}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="rounded-lg p-4 flex gap-3 items-start" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                      style={{ background: "hsl(var(--fyn-red))" }}
-                    >
-                      N
-                    </div>
-                    <p className="text-primary-foreground text-base">
-                      Welcome! I'm CFO Fynny, your AI CFO. Once your data starts flowing, I'll give you your first morning brief within 24 hours.
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-lg p-4 mb-8 border"
-                  style={{ background: "hsl(var(--fyn-beige-dark))", borderColor: "hsl(var(--fyn-ink) / 0.10)" }}
-                >
-                  <h3 className="font-serif text-lg mb-2" style={{ color: "hsl(var(--fyn-ink))" }}>Setup summary</h3>
-                  <ul className="space-y-1 text-sm" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                    <li className="text-secondary-foreground">Business type: {form.business_type || "Not set"}</li>
-                    <li className="text-secondary-foreground">Industry: {form.industry || "Not set"}</li>
-                    <li className="text-secondary-foreground">Turnover: {form.turnover_range || "Not set"}</li>
-                    <li className="text-secondary-foreground">Banks: {selectedBanks.length > 0 ? selectedBanks.join(", ") : "Not connected"}</li>
-                    <li className="text-secondary-foreground">Accounting: {selectedSoftware.length > 0 ? selectedSoftware.join(", ") : "Not connected"}</li>
-                  </ul>
+                  <span style={{ color: "hsl(var(--fyn-gold))", fontWeight: 600 }}>{form.industry || "Business"}</span>
+                  {" · "}
+                  {selectedBanks.length > 0 ? `${selectedBanks.length} bank${selectedBanks.length > 1 ? "s" : ""}` : "No banks yet"}
+                  {" · "}
+                  {selectedSoftware.length > 0 ? `${selectedSoftware.length} accounting tool${selectedSoftware.length > 1 ? "s" : ""}` : "No accounting sync yet"}
                 </div>
 
                 <div className="flex items-center justify-between">

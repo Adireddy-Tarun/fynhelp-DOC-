@@ -285,6 +285,30 @@ export default function InvestorPage() {
           </div>
         </div>
 
+        {(txns.length === 0 && cash == null && thisMonth === 0) && (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+            padding: "16px 20px", borderRadius: 10,
+            background: "rgba(139,105,20,0.08)", border: `1px solid ${AMBER}`,
+            margin: "0 0 20px",
+          }}>
+            <div>
+              <div style={{ ...BODY, fontWeight: 600, color: INK, marginBottom: 4 }}>
+                Your Investor View is ready — it's just waiting for data.
+              </div>
+              <div style={{ ...BODY, fontSize: 13, color: "rgba(26,16,8,0.65)" }}>
+                Connect your bank and payment accounts to populate MRR, ARR, cash, burn and runway automatically.
+              </div>
+            </div>
+            <Link
+              to="/dashboard/settings/integrations"
+              style={{ ...BODY, whiteSpace: "nowrap", padding: "10px 16px", borderRadius: 8, background: RED, color: "#fff", fontWeight: 600, textDecoration: "none" }}
+            >
+              Connect accounts →
+            </Link>
+          </div>
+        )}
+
         {/* SECTION 1 */}
         <Eyebrow>Financial health summary</Eyebrow>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "10px 0 28px" }}>
