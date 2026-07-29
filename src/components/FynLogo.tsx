@@ -23,7 +23,7 @@ const FynLogo = ({ variant = "dark", className = "", iconOnly = false, size = "m
         src={src}
         alt="FynHelp"
         className={className}
-        style={{ height: heightPx, width: heightPx, objectFit: "contain", display: "block" }}
+        style={{ height: heightPx, width: heightPx, objectFit: "contain", display: "block", flexShrink: 0 }}
       />
     );
   }
@@ -34,7 +34,7 @@ const FynLogo = ({ variant = "dark", className = "", iconOnly = false, size = "m
       src={src}
       alt="FynHelp"
       className={className}
-      style={{ height: heightPx, width: "auto", objectFit: "contain", display: "block" }}
+      style={{ height: heightPx, width: "auto", objectFit: "contain", display: "block", flexShrink: 0, aspectRatio: "519 / 99" }}
     />
   );
 };

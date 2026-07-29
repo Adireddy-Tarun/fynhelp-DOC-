@@ -10,7 +10,6 @@ export default function WaitlistPopup() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
   const [open, setOpen] = useState(false);
-  const [canClose, setCanClose] = useState(false);
 
   const isHome = pathname === "/";
 
@@ -24,14 +23,6 @@ export default function WaitlistPopup() {
     return () => window.clearTimeout(openTimer);
   }, [isHome, loading, user]);
 
-
-  useEffect(() => {
-    if (!open) return;
-    setCanClose(false);
-    const t = window.setTimeout(() => setCanClose(true), 10000);
-    return () => window.clearTimeout(t);
-  }, [open]);
-
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -42,7 +33,6 @@ export default function WaitlistPopup() {
   }, [open]);
 
   const close = () => {
-    if (!canClose) return;
     localStorage.setItem(STORAGE_KEY, "1");
     setOpen(false);
   };
@@ -50,11 +40,11 @@ export default function WaitlistPopup() {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && canClose) close();
+      if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, canClose]);
+  }, [open]);
 
   if (!isHome || user || !open) return null;
 
@@ -70,36 +60,26 @@ export default function WaitlistPopup() {
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-fyn-beige-card border border-fyn-ink/10 rounded-2xl shadow-2xl animate-[scale-in_0.25s_ease-out]"
       >
-        {canClose ? (
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close"
-            className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-9 h-9 rounded-full bg-fyn-ink/5 hover:bg-fyn-ink/15 text-fyn-ink/70 hover:text-fyn-ink flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        ) : (
-          <span
-            aria-hidden
-            className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.15em] text-fyn-ink/40"
-            style={{ fontFamily: "'Work Sans', sans-serif" }}
-          >
-            • • •
-          </span>
-        )}
+        <button
+          type="button"
+          onClick={close}
+          aria-label="Close"
+          className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-9 h-9 rounded-full bg-fyn-ink/5 hover:bg-fyn-ink/15 text-fyn-ink/70 hover:text-fyn-ink flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
         <div className="px-5 pt-8 pb-3 md:px-10 md:pt-10 md:pb-4 text-center">
           <span
             className="inline-block text-[10px] uppercase tracking-[0.18em] text-fyn-red mb-3"
-            style={{ fontFamily: "'Work Sans', sans-serif" }}
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
           >
             Limited early access
           </span>
           <h2
             id="wl-popup-title"
-            className="text-fyn-ink leading-[1.1] text-[26px] md:text-[36px]"
-            style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}
+            className="text-fyn-ink leading-[1.05] text-[26px] md:text-[36px]"
+            style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 600, letterSpacing: "-0.035em" }}
           >
             Be first in line when we launch
           </h2>
@@ -109,11 +89,7 @@ export default function WaitlistPopup() {
         </div>
 
         <div className="px-5 pb-7 md:px-10 md:pb-9">
-          <WaitlistForm
-            variant="detailed"
-            theme="light"
-            onSuccess={() => setCanClose(true)}
-          />
+          <WaitlistForm variant="detailed" theme="light" />
         </div>
       </div>
     </div>
