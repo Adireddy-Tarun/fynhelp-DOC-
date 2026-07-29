@@ -79,8 +79,8 @@ const STYLES = `
 
   /* Timeline */
   .ab-timeline { position: relative; max-width: 780px; margin: 56px auto 0; padding-left: 56px; }
-  .ab-timeline-track { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-  .ab-timeline-track > i { display: block; width: 100%; background: ${C.red}; height: 0; transition: height .1s linear; box-shadow: 0 0 12px ${C.red}; }
+  .ab-timeline-track { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .ab-timeline-track > i { display: block; position: absolute; left: 0; right: 0; top: 0; background: ${C.red}; height: 0; will-change: height, top; box-shadow: 0 0 12px ${C.red}; border-radius: 2px; }
   .ab-tl-item { position: relative; padding: 22px 0 22px 8px; }
   .ab-tl-item + .ab-tl-item { border-top: 1px solid rgba(255,255,255,0.06); }
   .ab-tl-dot { position: absolute; left: -44px; top: 26px; width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); transition: background .3s, border-color .3s, box-shadow .3s; }
