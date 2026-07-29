@@ -1550,6 +1550,7 @@ export default function HomePage() {
         <link rel="canonical" href="https://fynhelp.com/" />
       </Helmet>
       <style>{STYLES}</style>
+      <LedgerCanvas />
       <Navbar />
 
       {/* HERO */}
