@@ -357,7 +357,7 @@ const OnboardingPage = () => {
                   Tell us about your business
                 </h1>
                 <p className="mb-8" style={{ color: "hsl(var(--fyn-ink) / 0.60)" }}>
-                  This helps CFO Fynny personalize your financial intelligence.
+                  Just three quick fields to personalise your dashboard. Everything else can wait.
                 </p>
                 <div
                   className="rounded-xl p-6 space-y-4"
@@ -371,9 +371,7 @@ const OnboardingPage = () => {
                   {[
                     { key: "business_type", label: "Business type", required: true, options: ["Pvt Ltd", "LLP", "Proprietorship", "Partnership"] },
                     { key: "industry", label: "Industry vertical", required: true, options: industries },
-                    { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
                     { key: "state", label: "State of registration", required: true, options: states },
-                    { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
                   ].map(({ key, label, options, required }) => (
                     <div key={key}>
                       <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
@@ -391,27 +389,56 @@ const OnboardingPage = () => {
                       {errors[key] && <p className="text-xs mt-1" style={{ color: "#EF4444" }}>{errors[key]}</p>}
                     </div>
                   ))}
-                  <div>
-                    <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
-                      MSME Udyam number (optional)
-                    </label>
-                    <input
-                      value={form.msme_udyam}
-                      onChange={(e) => updateField("msme_udyam", e.target.value)}
-                      className={inputBase}
-                      style={fieldStyle("msme_udyam")}
-                      placeholder="UDYAM-XX-00-0000000"
-                    />
-                  </div>
+                  <details className="pt-1">
+                    <summary className="text-[13px] cursor-pointer" style={{ color: "hsl(var(--fyn-gold))" }}>
+                      Add optional details (turnover, headcount, MSME) — you can also fill these later
+                    </summary>
+                    <div className="mt-3 space-y-4">
+                      {[
+                        { key: "turnover_range", label: "Annual turnover range", options: ["< ₹1 Cr", "₹1–5 Cr", "₹5–25 Cr", "₹25–100 Cr", "₹100 Cr+"] },
+                        { key: "employee_count", label: "Number of employees", options: ["1-5", "6-10", "11-25", "26-50", "51-100", "100+"] },
+                      ].map(({ key, label, options }) => (
+                        <div key={key}>
+                          <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>{label}</label>
+                          <select
+                            value={(form as any)[key]}
+                            onChange={(e) => updateField(key, e.target.value)}
+                            className={inputBase + " appearance-none"}
+                            style={fieldStyle(key)}
+                          >
+                            <option value="">Select {label.toLowerCase()}</option>
+                            {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                      ))}
+                      <div>
+                        <label className="text-sm mb-1 block" style={{ color: "hsl(var(--fyn-ink) / 0.70)" }}>
+                          MSME Udyam number
+                        </label>
+                        <input
+                          value={form.msme_udyam}
+                          onChange={(e) => updateField("msme_udyam", e.target.value)}
+                          className={inputBase}
+                          style={fieldStyle("msme_udyam")}
+                          placeholder="UDYAM-XX-00-0000000"
+                        />
+                      </div>
+                    </div>
+                  </details>
                 </div>
-                <div className="flex items-center justify-between mt-8">
+                <div className="flex items-center justify-between mt-8 gap-3 flex-wrap">
                   <button
                     onClick={() => saveStep1(true)}
                     disabled={loading}
-                    className="text-[13px] hover:underline"
-                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                    className="px-5 py-2.5 rounded-lg text-sm font-medium"
+                    style={{
+                      background: "#FFFFFF",
+                      color: "hsl(var(--fyn-ink))",
+                      border: "1.5px solid rgba(26,16,8,0.18)",
+                      cursor: "pointer",
+                    }}
                   >
-                    I'll set this up later →
+                    Skip for now →
                   </button>
                   <motion.button
                     whileHover={{ y: -2 }}
