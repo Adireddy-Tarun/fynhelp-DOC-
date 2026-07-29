@@ -1324,7 +1324,7 @@ export default function HomePage() {
       {/* STEPS */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow">GETTING STARTED</span>
+          
           <h2 className="fyn-h">Your finance team in 4 steps.</h2>
           <div className="steps-wrap">
             <div className="steps-line" aria-hidden />
@@ -1497,25 +1497,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECURITY */}
+      {/* Books stay yours (Security) */}
       <section className="section">
         <div className="fyn-container" style={{ textAlign: "center" }}>
-          <span className="section-eyebrow dot">SECURITY & TRUST</span>
-          <h2 className="fyn-h">Enterprise-grade security.<br /><span style={{ color: C.red }}>Zero compromise.</span></h2>
-          <p className="lead">Trusted by 1000+ beta users. Your financial data deserves military-grade protection.</p>
-          <div className="sec-wrap">
-            <div className="sec-grid">
-              {SECURITY.map(({ Icon, l, d }) => (
-                <div key={l} className="sec-card">
-                  <Icon className="sec-icon-line" strokeWidth={1.4} />
-                  <div className="sec-label">{l}</div>
-                  <div className="sec-desc">{d}</div>
-                </div>
-              ))}
-            </div>
+          <h2 className="fyn-h">Your books stay yours.</h2>
+          <p className="lead">Read-only, revocable, encrypted, and hosted in India. Fynny observes. It never owns.</p>
+          <div className="yours-grid">
+            {[
+              { Icon: Shield, t: "RBI-licensed Account Aggregator", d: "Read-only, consent-based access. You approve every fetch, and you can revoke access instantly from within FynHelp." },
+              { Icon: Lock, t: "AES-256 encryption", d: "Books are encrypted at rest with AES-256 and in transit over TLS 1.3. Signed URLs for every document." },
+              { Icon: UserCheck, t: "Scoped, revocable access", d: "Invite your CA, controller, or team with role-based scopes. Owner, Manager, Accountant, or Viewer. Revoke in one click." },
+              { Icon: FileCheck, t: "Data stays in India", d: "Hosted in Indian data centres with full immutable audit trails. DPDP-ready, with export-and-delete on request." },
+            ].map(({ Icon, t, d }) => (
+              <div key={t} className="yours-card">
+                <div className="yours-ic"><Icon size={22} strokeWidth={1.6} /></div>
+                <div className="yours-t">{t}</div>
+                <div className="yours-d">{d}</div>
+              </div>
+            ))}
+          </div>
+          <div className="yours-pills">
+            {["RBI Account Aggregator", "DPDP Act ready", "AES-256 at rest", "TLS 1.3 in transit", "Full audit trail", "No data resale, ever"].map((p) => (
+              <span key={p} className="yours-pill">{p}</span>
+            ))}
           </div>
         </div>
       </section>
+
 
       <FAQSection />
 
