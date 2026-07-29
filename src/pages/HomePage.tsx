@@ -1128,18 +1128,36 @@ export default function HomePage() {
       {/* HERO */}
       <section className="hero">
         <div className="fyn-container">
-          <h1 className="fyn-h fade-up">
-            Don't just track your data.<br />
-            <span className="red-line">Interrogate it.</span>
+          <h1>
+            {"Don't just track your data.".split(" ").map((w, i) => (
+              <span key={`w1-${i}`} className="word" style={{ animationDelay: `${i * 75}ms` }}>
+                {w}&nbsp;
+              </span>
+            ))}
+            <br />
+            {"Interrogate it.".split(" ").map((w, i) => (
+              <span
+                key={`w2-${i}`}
+                className="word red-line"
+                style={{ animationDelay: `${(4 + i) * 75}ms` }}
+              >
+                {w}&nbsp;
+              </span>
+            ))}
           </h1>
-          <p className="hero-sub fade-up">
-            Meet <b>CFO Fynny</b>, stop running your business on gut feeling. Start running it on intelligence. Predictive what-if scenarios and instant financial clarity.
+          <p className="hero-sub">
+            Meet <b>CFO Fynny</b>, stop running your business on gut feeling. Start running it on
+            intelligence. Predictive what-if scenarios and instant financial clarity.
           </p>
-          <div className="hero-cta fade-up">
-            <Link to="/waitlist" className="btn-pill btn-red">Join Waitlist <ArrowRight size={18} /></Link>
-            <Link to="/demo/liquidity" className="btn-pill btn-outline"><Calendar size={16} /> Watch Demo</Link>
+          <div className="hero-cta">
+            <Link to="/waitlist" className="btn-pill btn-red">
+              Join Waitlist <ArrowRight size={18} />
+            </Link>
+            <Link to="/demo/liquidity" className="btn-pill btn-outline">
+              <Calendar size={16} /> Watch Demo
+            </Link>
           </div>
-          <div className="stats-row fade-up">
+          <div className="stats-row">
             {STATS.map((s) => (
               <div key={s.l} className="stat-card">
                 <div className="v">{s.v}</div>
@@ -1147,9 +1165,12 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-          <IntelligenceProvider mode="demo"><ChatWidget /></IntelligenceProvider>
+          <div className="chat-wrap-anim">
+            <FynnyReel />
+          </div>
         </div>
       </section>
+
 
       <AIRecommendedSection />
 
