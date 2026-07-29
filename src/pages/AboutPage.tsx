@@ -218,8 +218,10 @@ export default function AboutPage() {
       // "read line". Fill begins when the container's top crosses that line and
       // completes when the LAST dot crosses it.
       const anchorY = vh * 0.55;
-      const firstDotY = items[0].getBoundingClientRect().top + 8 - rect.top; // dot offset within container
-      const lastDotY = items[items.length - 1].getBoundingClientRect().top + 8 - rect.top;
+      // Dot center = item.top + 26(dot top offset) + 8(half of 16px dot)
+      const dotOffset = 34;
+      const firstDotY = items[0].getBoundingClientRect().top + dotOffset - rect.top;
+      const lastDotY = items[items.length - 1].getBoundingClientRect().top + dotOffset - rect.top;
       const span = Math.max(1, lastDotY - firstDotY);
       const traveled = anchorY - (rect.top + firstDotY);
       const progress = Math.max(0, Math.min(1, traveled / span));
@@ -232,8 +234,8 @@ export default function AboutPage() {
       // Activate a dot once it has passed the read-line anchor.
       let lastActive = -1;
       items.forEach((el, i) => {
-        const dotY = el.getBoundingClientRect().top + 8;
-        if (dotY <= anchorY + 8) {
+        const dotY = el.getBoundingClientRect().top + dotOffset;
+        if (dotY <= anchorY + 6) {
           el.classList.add("on");
           lastActive = i;
         } else {
