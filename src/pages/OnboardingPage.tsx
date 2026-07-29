@@ -61,6 +61,7 @@ const OnboardingPage = () => {
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [selectedSoftware, setSelectedSoftware] = useState<string[]>([]);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
   const { ready: authReady } = useAuthRedirect("onboarding");
 
