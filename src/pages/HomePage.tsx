@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef, FormEvent, ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco, Search, Database, ArrowUpRight, Landmark, BookOpen, FileText, Sparkles, ChevronDown, Clock, X as XIcon } from "lucide-react";
+import { ArrowRight, Calendar, Send, ShieldCheck, Lock, EyeOff, User as UserIco, Search, Database, ArrowUpRight, Landmark, BookOpen, FileText, Sparkles, ChevronDown, Clock, X as XIcon, Shield, UserCheck, FileCheck, Paperclip, Mic, TrendingUp, AlertTriangle, CheckCircle2, Scale } from "lucide-react";
 import { SUITES } from "@/data/suiteStatus";
 import MobileProductsSection from "@/components/home/MobileProductsSection";
 import AIRecommendedSection from "@/components/AIRecommendedSection";
