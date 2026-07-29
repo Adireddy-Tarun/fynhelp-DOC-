@@ -1067,7 +1067,434 @@ function CreditSimulator() {
 
 
 
+// ===== Fynny fox icon (compact svg mark) =====
+const FoxHead = ({ size = 18, color = "#fff" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    {/* ears */}
+    <path d="M4 5 L8 3 L8.5 8" />
+    <path d="M20 5 L16 3 L15.5 8" />
+    {/* head */}
+    <path d="M5 8c1.5-1 4-2 7-2s5.5 1 7 2c.6 1.4.8 3 .3 4.5-.6 1.9-2 3.4-3.9 4.2-1 .4-2.2.6-3.4.6s-2.4-.2-3.4-.6C6.7 15.9 5.3 14.4 4.7 12.5 4.2 11 4.4 9.4 5 8z" />
+    {/* eyes */}
+    <circle cx="9.5" cy="11.4" r="0.9" fill={color} stroke="none" />
+    <circle cx="14.5" cy="11.4" r="0.9" fill={color} stroke="none" />
+    {/* muzzle */}
+    <path d="M10.5 15.2 L12 16.4 L13.5 15.2" />
+    {/* collar notch */}
+    <path d="M7 17.5 L10 19 L12 17.5 L14 19 L17 17.5" />
+  </svg>
+);
+
+// ===== FynnyReel (auto-looping 5-scenario demo) =====
+type Pipe = { l: string; c: string };
+type Opt = { t: string; s: number; win?: boolean };
+type Tile = { k: string; v: string; tone?: "red" | "g" };
+type GstRow = { gstin: string; amt: string; status: "check" | "match" | "miss" | "mm" };
+
+type Scenario = {
+  id: string;
+  q: string;
+  label: string;
+  Icon: typeof TrendingUp;
+  answer: string; // typed out char-by-char
+  duration: number; // total ms until next
+  render: (progress: number) => ReactNode; // extra body rendered under answer, animated by progress 0..1
+};
+
+function useLetterType(text: string, active: boolean, msPerChar = 22) {
+  const [out, setOut] = useState("");
+  useEffect(() => {
+    if (!active) { setOut(""); return; }
+    let i = 0;
+    setOut("");
+    const id = window.setInterval(() => {
+      i++;
+      setOut(text.slice(0, i));
+      if (i >= text.length) window.clearInterval(id);
+    }, msPerChar);
+    return () => window.clearInterval(id);
+  }, [text, active, msPerChar]);
+  return out;
+}
+
+function useTypeInto(text: string, active: boolean, onDone: () => void, msPerChar = 34) {
+  const [out, setOut] = useState("");
+  useEffect(() => {
+    if (!active) { setOut(""); return; }
+    let i = 0;
+    setOut("");
+    const id = window.setInterval(() => {
+      i++;
+      setOut(text.slice(0, i));
+      if (i >= text.length) {
+        window.clearInterval(id);
+        window.setTimeout(onDone, 500);
+      }
+    }, msPerChar);
+    return () => window.clearInterval(id);
+  }, [text, active, msPerChar]);
+  return out;
+}
+
+const SCENARIOS: Scenario[] = [
+  {
+    id: "report",
+    q: "Generate my Q2 board report",
+    label: "GENERATING REPORT",
+    Icon: FileText,
+    answer: "Here's your Q2 board report — fully reconciled and ready to send.",
+    duration: 14500,
+    render: (p) => {
+      const pipes: Pipe[] = [
+        { l: "Fetching bank + Tally entries", c: "1,482 rows" },
+        { l: "Reconciling GSTR-2B", c: "7 mismatches" },
+        { l: "Computing runway & burn", c: "8.2 mo" },
+        { l: "Drafting commentary", c: "412 words" },
+        { l: "Rendering PDF", c: "14 pages" },
+      ];
+      const doneCount = Math.min(pipes.length, Math.floor(p * (pipes.length + 0.4)));
+      const showPdf = p > 0.85;
+      return (
+        <>
+          <div style={{ marginTop: 10 }}>
+            {pipes.map((row, i) => (
+              <div key={i} className={`fx-pipe ${i < doneCount ? "done" : ""}`}>
+                <span className="fx-pipe-i" />
+                <span className="fx-pipe-l">{row.l}</span>
+                <span className="fx-pipe-c">{i < doneCount ? row.c : "…"}</span>
+              </div>
+            ))}
+          </div>
+          {showPdf && (
+            <>
+              <div className="fx-pdf">
+                <div className="fx-pdf-i">PDF</div>
+                <div>
+                  <div className="fx-pdf-t">FynHelp_Q2_Board_Report.pdf</div>
+                  <div className="fx-pdf-s">14 pages · 2.4 MB · reconciled to ₹1</div>
+                </div>
+              </div>
+              <div className="fx-btns">
+                <button className="primary">Download</button>
+                <button>Email to board</button>
+                <button>Send to CA</button>
+              </div>
+            </>
+          )}
+        </>
+      );
+    },
+  },
+  {
+    id: "options",
+    q: "Should I take the ₹40L working capital loan?",
+    label: "WEIGHING OPTIONS",
+    Icon: Scale,
+    answer: "Three ways to play this — here's how they stack up on cost, flexibility, and runway impact.",
+    duration: 11500,
+    render: (p) => {
+      const opts: Opt[] = [
+        { t: "Take the full ₹40L", s: 48 },
+        { t: "Take ₹18L now, keep rest as a line", s: 86, win: true },
+        { t: "Skip it, chase receivables instead", s: 41 },
+      ];
+      const shown = Math.min(opts.length, Math.floor(p * (opts.length + 0.4)));
+      const barsUp = p > 0.55;
+      const verdict = p > 0.82;
+      return (
+        <div style={{ marginTop: 10 }}>
+          {opts.slice(0, shown).map((o, i) => (
+            <div key={o.t} className={`fx-opt ${o.win ? "win" : ""}`}>
+              <div className="fx-opt-t">{o.t}</div>
+              <div className="fx-opt-s">{o.s}/100</div>
+              <div className="fx-opt-bar"><i style={{ width: barsUp ? `${o.s}%` : 0 }} /></div>
+            </div>
+          ))}
+          {verdict && (
+            <div className="fx-verdict">
+              <CheckCircle2 size={14} /> My call: take ₹18L now, keep ₹22L as an undrawn line.
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "forecast",
+    q: "What does my cash look like in 6 months?",
+    label: "FORECASTING",
+    Icon: TrendingUp,
+    answer: "Trending down. Two months of runway left at current burn — actionable if you close AR this month.",
+    duration: 11000,
+    render: (p) => {
+      const tiles: Tile[] = [
+        { k: "IN 6 MONTHS", v: "₹9.4L" },
+        { k: "RUNWAY LEFT", v: "2.1 mo", tone: "red" },
+        { k: "CONFIDENCE", v: "72%" },
+      ];
+      // stroke-dashoffset animation via inline style
+      const drawn = Math.max(0, Math.min(1, (p - 0.15) / 0.55));
+      const showTiles = p > 0.7;
+      return (
+        <div style={{ marginTop: 10 }}>
+          <svg viewBox="0 0 320 100" width="100%" height="90" style={{ display: "block" }} aria-hidden>
+            <defs>
+              <linearGradient id="cone" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#B8333A" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#B8333A" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {/* grid */}
+            {[20, 40, 60, 80].map((y) => (
+              <line key={y} x1="0" x2="320" y1={y} y2={y} stroke="rgba(0,0,0,0.06)" />
+            ))}
+            {/* today marker */}
+            <line x1="180" x2="180" y1="0" y2="100" stroke="rgba(0,0,0,0.15)" strokeDasharray="3 3" />
+            {/* confidence cone */}
+            {p > 0.6 && (
+              <path d="M180,44 L320,20 L320,80 L180,64 Z" fill="url(#cone)" />
+            )}
+            {/* actuals */}
+            <path
+              d="M0,70 L30,60 L60,55 L90,50 L120,52 L150,48 L180,44"
+              fill="none"
+              stroke="#B8333A"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ strokeDasharray: 260, strokeDashoffset: 260 - drawn * 260 }}
+            />
+            {/* projection */}
+            {p > 0.5 && (
+              <path
+                d="M180,44 L220,50 L260,58 L300,68 L320,72"
+                fill="none"
+                stroke="#B8333A"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="4 4"
+                opacity={Math.min(1, (p - 0.5) / 0.25)}
+              />
+            )}
+          </svg>
+          {showTiles && (
+            <div className="fx-tiles">
+              {tiles.map((t) => (
+                <div key={t.k} className={`fx-tile ${t.tone || ""}`}>
+                  <div className="k">{t.k}</div>
+                  <div className="v">{t.v}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "alert",
+    q: "Anything I should worry about today?",
+    label: "CRITICAL ALERT",
+    Icon: AlertTriangle,
+    answer: "Yes — payroll on 5 Aug will short by ₹2.15L unless you act this week.",
+    duration: 11000,
+    render: (p) => {
+      const show = p > 0.35;
+      const tiles: Tile[] = [
+        { k: "GST 3B DUE", v: "4 days" },
+        { k: "ITC AT RISK", v: "₹1.2L", tone: "red" },
+        { k: "OVERDUE AR", v: "₹6.8L", tone: "red" },
+      ];
+      const showTiles = p > 0.7;
+      return (
+        <div style={{ marginTop: 10 }}>
+          {show && (
+            <div className="fx-alert">
+              <div className="fx-alert-h">
+                <AlertTriangle size={16} className="fx-warn" />
+                <span className="fx-sev">SEVERITY 1</span>
+                <span style={{ fontWeight: 700, color: "#111", fontSize: 13 }}>Payroll shortfall on 5 Aug</span>
+              </div>
+              <div style={{ color: "#3A3A3A", fontSize: 12.5, marginTop: 8, fontVariantNumeric: "tabular-nums" }}>
+                Payroll debits <b>₹8.20L</b>. Projected balance <b>₹6.05L</b>. Short by <b style={{ color: "#B8333A" }}>₹2.15L</b>.
+              </div>
+              <div className="fx-tiles" style={{ marginTop: 10 }}>
+                <div className="fx-tile red"><div className="k">DAYS LEFT</div><div className="v">6</div></div>
+                <div className="fx-tile"><div className="k">HOURS</div><div className="v">14</div></div>
+                <div className="fx-tile red"><div className="k">SHORTFALL</div><div className="v">₹2.15L</div></div>
+              </div>
+            </div>
+          )}
+          {showTiles && (
+            <div className="fx-tiles" style={{ marginTop: 8 }}>
+              {tiles.map((t) => (
+                <div key={t.k} className={`fx-tile ${t.tone || ""}`}>
+                  <div className="k">{t.k}</div>
+                  <div className="v">{t.v}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {p > 0.85 && (
+            <div className="fx-btns">
+              <button className="primary">Draft chaser emails</button>
+              <button>Draw on credit line</button>
+              <button>Escalate to CA</button>
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "gst",
+    q: "Reconcile my GST for July",
+    label: "RECONCILING GSTR-2B",
+    Icon: BookOpen,
+    answer: "1,204 of 1,209 invoices matched. 5 flagged — ₹1.2L in ITC still recoverable.",
+    duration: 12500,
+    render: (p) => {
+      const rows: GstRow[] = [
+        { gstin: "27AABCU9603R1ZM", amt: "₹1,84,200", status: "match" },
+        { gstin: "29AAGCB7383J1Z4", amt: "₹62,400", status: "match" },
+        { gstin: "06AABCS1429B1ZX", amt: "₹1,12,750", status: "miss" },
+        { gstin: "24AAACR5055K1Z7", amt: "₹48,900", status: "match" },
+        { gstin: "33AAFCD5862R1ZR", amt: "₹7,300", status: "mm" },
+      ];
+      const shown = Math.min(rows.length, Math.floor(p * (rows.length + 0.5)));
+      const showTiles = p > 0.78;
+      const labelFor = (s: GstRow["status"]) =>
+        s === "match" ? "MATCHED" : s === "miss" ? "NOT IN 2B" : s === "mm" ? "VALUE MISMATCH" : "CHECKING";
+      return (
+        <div style={{ marginTop: 10 }}>
+          {rows.slice(0, shown).map((r) => (
+            <div key={r.gstin} className="fx-gst-row">
+              <div>{r.gstin}</div>
+              <div>{r.amt}</div>
+              <span className={`fx-badge ${r.status}`}>{labelFor(r.status)}</span>
+            </div>
+          ))}
+          {showTiles && (
+            <div className="fx-tiles" style={{ marginTop: 10 }}>
+              <div className="fx-tile g"><div className="k">MATCHED</div><div className="v">1,204/1,209</div></div>
+              <div className="fx-tile red"><div className="k">MISMATCHED</div><div className="v">5 · ₹1.20L</div></div>
+              <div className="fx-tile"><div className="k">ITC RECOVERABLE</div><div className="v">₹1.2L</div></div>
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+];
+
+type Phase = "typing_q" | "sending" | "answering" | "resting";
+
+function FynnyReel() {
+  const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState<Phase>("typing_q");
+  const [progress, setProgress] = useState(0);
+  const [userMsg, setUserMsg] = useState<string | null>(null);
+  const [sendPulse, setSendPulse] = useState(false);
+
+  const scenario = SCENARIOS[idx];
+
+  // Typing question into input
+  const typedInput = useTypeInto(
+    scenario.q,
+    phase === "typing_q",
+    () => {
+      setSendPulse(true);
+      setPhase("sending");
+      window.setTimeout(() => {
+        setUserMsg(scenario.q);
+        setSendPulse(false);
+        setPhase("answering");
+      }, 450);
+    }
+  );
+
+  // Answer typewriter
+  const typedAnswer = useLetterType(scenario.answer, phase === "answering", 20);
+
+  // Progress ticker for body content during answering
+  useEffect(() => {
+    if (phase !== "answering") { setProgress(0); return; }
+    const start = performance.now();
+    const total = scenario.duration - 2400; // leave time for question + rest
+    let raf = 0;
+    const step = (t: number) => {
+      const el = t - start;
+      const pr = Math.min(1, el / total);
+      setProgress(pr);
+      if (pr < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, scenario.duration]);
+
+  // Advance to next scenario at end
+  useEffect(() => {
+    if (phase !== "answering") return;
+    const id = window.setTimeout(() => {
+      setPhase("resting");
+      window.setTimeout(() => {
+        setUserMsg(null);
+        setIdx((i) => (i + 1) % SCENARIOS.length);
+        setPhase("typing_q");
+      }, 900);
+    }, scenario.duration - 1500);
+    return () => window.clearTimeout(id);
+  }, [phase, scenario.duration]);
+
+  const ScLabelIcon = scenario.Icon;
+
+  return (
+    <div className="fx" role="region" aria-label="CFO Fynny live demo">
+      <div className="fx-head">
+        <div className="fx-head-tile"><FoxHead size={20} /></div>
+        <div style={{ minWidth: 0 }}>
+          <div className="fx-head-name">CFO Fynny</div>
+          <div className="fx-head-sub">Grounded on your books · updated 4 min ago</div>
+        </div>
+        <div className="fx-live"><span className="fx-live-t">LIVE</span></div>
+      </div>
+
+      <div className="fx-body">
+        {userMsg && <div className="fx-user">{userMsg}</div>}
+        {(phase === "answering" || phase === "resting") && (
+          <div className="fx-reply">
+            <div className="fx-fox"><FoxHead size={18} /></div>
+            <div className="fx-panel">
+              <div className="fx-label"><ScLabelIcon size={12} /> {scenario.label}</div>
+              <div className="fx-answer">
+                {typedAnswer}
+                {phase === "answering" && typedAnswer.length < scenario.answer.length && <span className="fx-caret" />}
+              </div>
+              {scenario.render(progress)}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="fx-foot">
+        <button className="fx-icon-btn" aria-label="Attach"><Paperclip size={16} /></button>
+        <input
+          className="fx-input"
+          value={phase === "typing_q" ? typedInput : ""}
+          placeholder="Ask Fynny anything about your business…"
+          readOnly
+          aria-label="Ask Fynny"
+        />
+        <button className="fx-icon-btn" aria-label="Voice"><Mic size={16} /></button>
+        <button className={`fx-send ${sendPulse ? "pulse" : ""}`} aria-label="Send"><ArrowRight size={16} /></button>
+      </div>
+    </div>
+  );
+}
+
+
 // ===== PAGE =====
+
 export default function HomePage() {
   const navigate = useNavigate();
   const onSubmit = (e: FormEvent) => { e.preventDefault(); navigate("/waitlist"); };
