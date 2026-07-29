@@ -9,6 +9,7 @@ import { Helmet } from "react-helmet-async";
 import { IntelligenceProvider, useBankTxns, useInvoices, useExpenses, useCustomers, useGstFilings } from "@/components/intelligence/DataSource";
 import Navbar from "@/components/Navbar";
 import CAPartnerSection from "@/components/home/CAPartnerSection";
+import LedgerCanvas from "@/components/LedgerCanvas";
 
 // ===== PALETTE (matches reference) =====
 const C = {
@@ -1549,6 +1550,7 @@ export default function HomePage() {
         <link rel="canonical" href="https://fynhelp.com/" />
       </Helmet>
       <style>{STYLES}</style>
+      <LedgerCanvas />
       <Navbar />
 
       {/* HERO */}
