@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +21,6 @@ import {
   IconPlayerPlayFilled,
   IconClock,
   IconEye,
-  IconFileText,
   IconDownload,
   IconMessageCircle2,
   type IconProps,
@@ -31,19 +30,25 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const downloadHref = (id: string) =>
   `${SUPABASE_URL}/functions/v1/download-resource?id=${encodeURIComponent(id)}`;
 
-// ============================================================
-// BRAND
-// ============================================================
-const INK = "#1A1008";
-const RED = "#C41E1E";
-const BEIGE = "#F4EDDA";
-const GOLD = "#8B6914";
+/* --------------------------- Palette --------------------------- */
+const C = {
+  bg: "#ECE6D2",
+  card: "#FAF7EC",
+  panel: "#F1F0EC",
+  panelBorder: "#E3E1DA",
+  ink: "#111111",
+  body: "#3A3A3A",
+  muted: "#6B6B6B",
+  red: "#B8333A",
+  redDark: "#9E2A30",
+  green: "#10B981",
+  black: "#0E0E0E",
+  border: "rgba(0,0,0,0.08)",
+};
 
 type IconCmp = React.ComponentType<IconProps>;
 
-// ============================================================
-// TYPES
-// ============================================================
+/* --------------------------- Types --------------------------- */
 type TabKey = "getting-started" | "templates" | "glossary" | "blog" | "community";
 
 interface VideoItem {
@@ -89,9 +94,7 @@ interface CommunityItem {
   tags: string[];
 }
 
-// ============================================================
-// SEED DATA
-// ============================================================
+/* --------------------------- Seed data --------------------------- */
 const VIDEOS: VideoItem[] = [
   { id: "v1", step: "DAY 1", title: "Connecting your bank account", description: "Link HDFC, ICICI, SBI and 50+ Indian banks securely via account aggregator.", duration: "5 min", icon: IconBuildingBank, category: "Bank connection" },
   { id: "v2", step: "DAY 1", title: "Syncing Tally or accounting software", description: "One-click sync with Tally Prime, Zoho Books, QuickBooks and more.", duration: "15 min", icon: IconRefresh, category: "Sync" },
@@ -114,12 +117,7 @@ const ARTICLES: ArticleItem[] = [
 
 type ArticleCategory = "GST" | "Cash flow" | "MSME" | "Startup finance" | "Compliance";
 const ARTICLE_CATEGORY: Record<string, ArticleCategory> = {
-  a1: "Startup finance",
-  a2: "MSME",
-  a3: "Cash flow",
-  a4: "GST",
-  a5: "Compliance",
-  a6: "Startup finance",
+  a1: "Startup finance", a2: "MSME", a3: "Cash flow", a4: "GST", a5: "Compliance", a6: "Startup finance",
 };
 
 const GLOSSARY: GlossaryItem[] = [
@@ -141,503 +139,128 @@ const GLOSSARY: GlossaryItem[] = [
 ];
 
 const COMMUNITY: CommunityItem[] = [
-  { id: "c1", author: "Rajesh Kumar", initials: "R", color: GOLD, title: "How do I reconcile ITC mismatches in GSTR-2A vs 2B?", preview: "I'm seeing a ~₹40K gap between 2A and 2B for March. Some vendors filed late. Best way to handle this cleanly?", replies: 12, ago: "2h ago", tags: ["GST", "Compliance"] },
-  { id: "c2", author: "Priya Sharma", initials: "P", color: RED, title: "Best practices for tracking marketplace settlements?", preview: "Amazon and Flipkart settlements come in batched. How are folks reconciling fees, returns and TCS?", replies: 8, ago: "5h ago", tags: ["Cash Flow", "Taxes"] },
-  { id: "c3", author: "Ankit Mehta", initials: "A", color: "rgba(26,16,8,0.7)", title: "Should I hire full-time accountant or quarterly CA?", preview: "₹3 Cr ARR, 14 people. CA fees feel high but FT accountant feels overkill. What did you do at this stage?", replies: 15, ago: "1d ago", tags: ["Funding", "Runway"] },
-  { id: "c4", author: "Neha Gupta", initials: "N", color: GOLD, title: "Razorpay settlement reconciliation tips?", preview: "Settlement files don't tag back to invoice numbers. Anyone built a clean mapping or using a tool for it?", replies: 6, ago: "2d ago", tags: ["Cash Flow"] },
-  { id: "c5", author: "Vikram Singh", initials: "V", color: RED, title: "How to handle RCM (Reverse Charge Mechanism) entries?", preview: "Started using a freelance designer abroad. Do I need to self-invoice every payment under RCM?", replies: 9, ago: "3d ago", tags: ["GST", "Compliance"] },
-  { id: "c6", author: "Kavita Reddy", initials: "K", color: "rgba(26,16,8,0.7)", title: "Cash vs accrual accounting for small businesses?", preview: "Turnover ₹80L. Currently on cash basis. CA is pushing me to move to accrual. Worth the switch now?", replies: 4, ago: "4d ago", tags: ["MSME", "Forecasting"] },
-  { id: "c7", author: "Amit Patel", initials: "A", color: GOLD, title: "TDS deduction rates for FY 2026-27?", preview: "Looking for a clean updated table for 194C, 194J, 194Q. Some thresholds changed in the latest budget.", replies: 11, ago: "5d ago", tags: ["Taxes", "Compliance"] },
-  { id: "c8", author: "Deepak Jain", initials: "D", color: RED, title: "Invoice numbering best practices for GST compliance?", preview: "Multi-state ops, multiple GSTINs. How are you structuring invoice series so audit doesn't flag gaps?", replies: 7, ago: "1w ago", tags: ["GST", "MSME"] },
-  { id: "c9", author: "Sanjay Kumar", initials: "S", color: "rgba(26,16,8,0.7)", title: "How to claim GST refund on exports?", preview: "First year of LUT-based exports. Refund stuck for 3 months. Anything I should pre-empt before filing?", replies: 13, ago: "1w ago", tags: ["GST", "Cash Flow"] },
-  { id: "c10", author: "Ritu Agarwal", initials: "R", color: GOLD, title: "Difference between GSTR-3B and GSTR-1?", preview: "Junior team keeps confusing the two. Looking for a 1-page explainer I can share internally.", replies: 5, ago: "2w ago", tags: ["GST"] },
+  { id: "c1", author: "Rajesh Kumar", initials: "R", color: C.red, title: "How do I reconcile ITC mismatches in GSTR-2A vs 2B?", preview: "I'm seeing a ~₹40K gap between 2A and 2B for March. Some vendors filed late. Best way to handle this cleanly?", replies: 12, ago: "2h ago", tags: ["GST", "Compliance"] },
+  { id: "c2", author: "Priya Sharma", initials: "P", color: C.red, title: "Best practices for tracking marketplace settlements?", preview: "Amazon and Flipkart settlements come in batched. How are folks reconciling fees, returns and TCS?", replies: 8, ago: "5h ago", tags: ["Cash Flow", "Taxes"] },
+  { id: "c3", author: "Ankit Mehta", initials: "A", color: C.ink, title: "Should I hire full-time accountant or quarterly CA?", preview: "₹3 Cr ARR, 14 people. CA fees feel high but FT accountant feels overkill. What did you do at this stage?", replies: 15, ago: "1d ago", tags: ["Funding", "Runway"] },
+  { id: "c4", author: "Neha Gupta", initials: "N", color: C.red, title: "Razorpay settlement reconciliation tips?", preview: "Settlement files don't tag back to invoice numbers. Anyone built a clean mapping or using a tool for it?", replies: 6, ago: "2d ago", tags: ["Cash Flow"] },
+  { id: "c5", author: "Vikram Singh", initials: "V", color: C.red, title: "How to handle RCM (Reverse Charge Mechanism) entries?", preview: "Started using a freelance designer abroad. Do I need to self-invoice every payment under RCM?", replies: 9, ago: "3d ago", tags: ["GST", "Compliance"] },
+  { id: "c6", author: "Kavita Reddy", initials: "K", color: C.ink, title: "Cash vs accrual accounting for small businesses?", preview: "Turnover ₹80L. Currently on cash basis. CA is pushing me to move to accrual. Worth the switch now?", replies: 4, ago: "4d ago", tags: ["MSME", "Forecasting"] },
+  { id: "c7", author: "Amit Patel", initials: "A", color: C.red, title: "TDS deduction rates for FY 2026-27?", preview: "Looking for a clean updated table for 194C, 194J, 194Q. Some thresholds changed in the latest budget.", replies: 11, ago: "5d ago", tags: ["Taxes", "Compliance"] },
+  { id: "c8", author: "Deepak Jain", initials: "D", color: C.red, title: "Invoice numbering best practices for GST compliance?", preview: "Multi-state ops, multiple GSTINs. How are you structuring invoice series so audit doesn't flag gaps?", replies: 7, ago: "1w ago", tags: ["GST", "MSME"] },
+  { id: "c9", author: "Sanjay Kumar", initials: "S", color: C.ink, title: "How to claim GST refund on exports?", preview: "First year of LUT-based exports. Refund stuck for 3 months. Anything I should pre-empt before filing?", replies: 13, ago: "1w ago", tags: ["GST", "Cash Flow"] },
+  { id: "c10", author: "Ritu Agarwal", initials: "R", color: C.red, title: "Difference between GSTR-3B and GSTR-1?", preview: "Junior team keeps confusing the two. Looking for a 1-page explainer I can share internally.", replies: 5, ago: "2w ago", tags: ["GST"] },
 ];
 
-// ============================================================
-// TABS CONFIG
-// ============================================================
 const TABS: { key: TabKey; label: string; shortLabel: string; icon: IconCmp; badge: string; placeholder: string }[] = [
-  { key: "getting-started", label: "Getting Started", shortLabel: "Getting Started", icon: IconRocket, badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
-  { key: "templates", label: "Templates & Downloads", shortLabel: "Templates", icon: IconFileDownload, badge: "5 files", placeholder: "Search templates..." },
-  { key: "glossary", label: "Financial Glossary", shortLabel: "Glossary", icon: IconBook, badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
+  { key: "getting-started", label: "Getting Started", shortLabel: "Start", icon: IconRocket, badge: `${VIDEOS.length} videos`, placeholder: "Search videos..." },
+  { key: "templates", label: "Templates", shortLabel: "Templates", icon: IconFileDownload, badge: "5 files", placeholder: "Search templates..." },
+  { key: "glossary", label: "Glossary", shortLabel: "Glossary", icon: IconBook, badge: `${GLOSSARY.length}+ terms`, placeholder: "Search terms..." },
   { key: "blog", label: "Blog", shortLabel: "Blog", icon: IconNews, badge: "New", placeholder: "Search articles..." },
-  { key: "community", label: "Community", shortLabel: "Community", icon: IconMessages, badge: `${COMMUNITY.length} discussions`, placeholder: "Search discussions..." },
+  { key: "community", label: "Community", shortLabel: "Community", icon: IconMessages, badge: `${COMMUNITY.length} threads`, placeholder: "Search discussions..." },
 ];
 
 const STEP_ORDER = ["DAY 1", "WEEK 1", "WEEK 2", "WEEK 3", "MONTH 1"];
 
-// ============================================================
-// CARD STYLES — flat dashboard look
-// ============================================================
-const cardBase: React.CSSProperties = {
-  background: "#FFFFFF",
-  borderRadius: 12,
-  border: "1px solid rgba(26,16,8,0.08)",
-  overflow: "hidden",
-  transition: "border-color 0.2s ease, transform 0.2s ease",
-};
-const onCardEnter = (e: React.MouseEvent<HTMLElement>) => {
-  const el = e.currentTarget as HTMLElement;
-  el.style.borderColor = "rgba(139,105,20,0.35)";
-};
-const onCardLeave = (e: React.MouseEvent<HTMLElement>) => {
-  const el = e.currentTarget as HTMLElement;
-  el.style.borderColor = "rgba(26,16,8,0.08)";
-};
+/* --------------------------- Styles --------------------------- */
 
-// Compact 48px metadata header used across cards
-const MetaHeader = ({
-  Icon,
-  category,
-  meta,
-}: {
-  Icon: IconCmp;
-  category: string;
-  meta?: string;
-}) => (
-  <div
-    style={{
-      height: 48,
-      background: BEIGE,
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      padding: "0 14px",
-      borderBottom: "1px solid rgba(26,16,8,0.06)",
-    }}
-  >
-    <div
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        background: "#FFFFFF",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: INK,
-        flexShrink: 0,
-      }}
-    >
-      <Icon size={18} stroke={1.75} />
-    </div>
-    <span
-      style={{
-        fontFamily: "Inter, sans-serif",
-        fontWeight: 600,
-        fontSize: 11,
-        letterSpacing: 0.8,
-        textTransform: "uppercase",
-        color: GOLD,
-        flex: 1,
-        minWidth: 0,
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }}
-    >
-      {category}
-    </span>
-    {meta && (
-      <span
-        style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 11,
-          color: "rgba(26,16,8,0.6)",
-          flexShrink: 0,
-        }}
-      >
-        {meta}
-      </span>
-    )}
-  </div>
-);
+const STYLES = `
+  .rs-page { background: ${C.bg}; color: ${C.ink}; font-family: 'Satoshi', system-ui, sans-serif; min-height: 100vh; }
+  .rs-page * { box-sizing: border-box; }
+  .rs-page :where(h1,h2,h3,h4,h5,h6) { font-family: 'Clash Display', sans-serif; font-weight: 600; letter-spacing: -0.035em; line-height: 1.06; color: ${C.ink}; margin: 0; }
+  .rs-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .num { font-variant-numeric: tabular-nums; }
 
-// ============================================================
-// VIDEO ROW
-// ============================================================
-const VideoRow = ({ v, onPlay }: { v: VideoItem; onPlay: () => void }) => (
-  <article
-    style={{ ...cardBase, cursor: "pointer" }}
-    onMouseEnter={onCardEnter}
-    onMouseLeave={onCardLeave}
-    onClick={onPlay}
-  >
-    <MetaHeader Icon={v.icon} category={v.category} meta={v.duration} />
-    <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-      <span
-        style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 10,
-          fontWeight: 600,
-          color: GOLD,
-          letterSpacing: 0.8,
-        }}
-      >
-        {v.step}
-      </span>
-      <h3
-        style={{
-          fontFamily: "Georgia, serif",
-          fontWeight: 600,
-          fontSize: 18,
-          color: INK,
-          lineHeight: 1.3,
-          margin: 0,
-        }}
-      >
-        {v.title}
-      </h3>
-      <p
-        style={{
-          fontFamily: "Inter, sans-serif",
-          fontSize: 13.5,
-          color: "rgba(26,16,8,0.65)",
-          lineHeight: 1.55,
-          margin: 0,
-        }}
-      >
-        {v.description}
-      </p>
-      <div style={{ marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 11,
-            color: "rgba(26,16,8,0.55)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <IconClock size={13} stroke={1.75} /> {v.duration}
-        </span>
-        <span
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontWeight: 600,
-            fontSize: 13,
-            color: "#FFFFFF",
-            background: RED,
-            padding: "7px 14px",
-            borderRadius: 8,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <IconPlayerPlayFilled size={12} /> Watch
-        </span>
-      </div>
-    </div>
-  </article>
-);
+  .rs-hero { padding: 80px 0 32px; }
+  .rs-hero h1 { font-size: clamp(40px, 6vw, 72px); }
+  .rs-hero p { margin-top: 16px; font-size: 18px; color: ${C.body}; max-width: 640px; line-height: 1.55; }
 
-// ============================================================
-// TEMPLATE CARD
-// ============================================================
-const TemplateCardView = ({ t }: { t: TemplateItem }) => (
-  <article
-    style={{ ...cardBase, display: "flex", flexDirection: "column" }}
-    onMouseEnter={onCardEnter}
-    onMouseLeave={onCardLeave}
-  >
-    <MetaHeader Icon={IconFileText} category={t.format} meta={t.downloads ? `↓ ${t.downloads}` : "—"} />
-    <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
-      <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 17, color: INK, margin: 0, lineHeight: 1.3 }}>
-        {t.title}
-      </h3>
-      {t.description && (
-        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.65)", lineHeight: 1.55, margin: 0 }}>
-          {t.description}
-        </p>
-      )}
-      <a
-        href={t.href}
-        download
-        rel="noopener noreferrer"
-        style={{
-          marginTop: "auto",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          padding: "10px 16px",
-          background: RED,
-          color: "#FFFFFF",
-          fontFamily: "Inter, sans-serif",
-          fontWeight: 600,
-          fontSize: 13.5,
-          borderRadius: 8,
-          textDecoration: "none",
-        }}
-      >
-        <IconDownload size={15} stroke={2} /> Download
-      </a>
-    </div>
-  </article>
-);
+  /* Search pill */
+  .rs-search { position: relative; max-width: 520px; margin-top: 28px; }
+  .rs-search input { width: 100%; padding: 14px 20px 14px 46px; border-radius: 100px; border: 1px solid ${C.border}; background: ${C.card}; font-family: 'Satoshi',sans-serif; font-size: 14.5px; color: ${C.ink}; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .rs-search input:focus { border-color: ${C.red}; box-shadow: 0 0 0 3px rgba(184,51,58,0.10); }
+  .rs-search .icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: ${C.muted}; pointer-events: none; }
 
-// ============================================================
-// GLOSSARY ROW — table-row layout
-// ============================================================
-const GlossaryRow = ({ g, onOpen }: { g: GlossaryItem; onOpen: () => void }) => {
-  const productMap: Record<string, { module: string; route: string }> = {
-    ARR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
-    MRR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
-    LTV: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
-    Churn: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
-    CAC: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence" },
-    "Burn Rate": { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
-    Runway: { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
-    DSO: { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
-    "Working Capital": { module: "Liquidity Intelligence", route: "/dashboard/liquidity" },
-    "Gross Margin": { module: "Cost Intelligence", route: "/dashboard/cost" },
-    EBITDA: { module: "Cost Intelligence", route: "/dashboard/cost" },
-    "P&L": { module: "Cost Intelligence", route: "/dashboard/cost" },
-    ITC: { module: "Governance Intelligence", route: "/dashboard/gst" },
-    "GSTR-1": { module: "Governance Intelligence", route: "/dashboard/gst" },
-    NPS: { module: "Workforce Intelligence", route: "/dashboard/hr" },
-  };
-  const product = productMap[g.term] ?? null;
+  /* Tabs (pill) */
+  .rs-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 28px; }
+  .rs-tab { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 100px; background: ${C.card}; border: 1px solid ${C.border}; color: ${C.body}; font-family: 'Satoshi',sans-serif; font-weight: 600; font-size: 13.5px; cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+  .rs-tab:hover { background: ${C.panel}; color: ${C.ink}; }
+  .rs-tab.active { background: ${C.ink}; color: ${C.bg}; border-color: ${C.ink}; }
+  .rs-tab .badge { padding: 2px 8px; border-radius: 100px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; background: rgba(0,0,0,0.06); color: ${C.muted}; }
+  .rs-tab.active .badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); }
 
-  return (
-    <div
-      onClick={onOpen}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onOpen()}
-      aria-label={`Open definition of ${g.term}`}
-      style={{
-        background: "#FFFFFF",
-        border: "1px solid rgba(26,16,8,0.08)",
-        borderRadius: 12,
-        padding: "16px 20px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "rgba(139,105,20,0.4)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 12px rgba(139,105,20,0.1)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "rgba(26,16,8,0.08)";
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
-      }}
-    >
-      <div style={{ minWidth: 96 }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700, color: "#1A1008" }}>
-          {g.term}
-        </span>
-      </div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.7)", margin: 0, lineHeight: 1.5 }}>
-          {g.short}
-        </p>
-        {product && (
-          <span style={{
-            display: "inline-flex", alignItems: "center", gap: 5, marginTop: 6,
-            fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600,
-            color: "#C41E1E", background: "rgba(196,30,30,0.07)",
-            padding: "3px 8px", borderRadius: 6,
-          }}>
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
-            {product.module}
-          </span>
-        )}
-      </div>
-      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#8B6914", whiteSpace: "nowrap", flexShrink: 0 }}>
-        View details →
-      </span>
-    </div>
-  );
-};
+  /* Content */
+  .rs-content { padding: 40px 0 96px; }
+  .rs-step-h { display: inline-flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.02em; color: ${C.ink}; margin: 0 0 16px; }
+  .rs-step-h .dot { width: 6px; height: 6px; border-radius: 50%; background: ${C.red}; }
 
-// ============================================================
-// ARTICLE CARD
-// ============================================================
-const readingTime = (text: string) => {
-  const words = text.trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-};
+  .rs-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 
-const ArticleCardView = ({ a }: { a: ArticleItem }) => {
-  const category = ARTICLE_CATEGORY[a.id] ?? "Startup finance";
-  const isRed = category === "GST" || category === "Compliance";
-  const dot = isRed ? RED : GOLD;
-  const rt = readingTime(a.excerpt);
-  return (
-    <article
-      style={{ ...cardBase, display: "flex", flexDirection: "column", cursor: "pointer" }}
-      onMouseEnter={onCardEnter}
-      onMouseLeave={onCardLeave}
-    >
-      <MetaHeader Icon={IconNews} category={category} meta={`${rt} min read`} />
-      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
-        <h3
-          style={{
-            fontFamily: "Georgia, serif",
-            fontWeight: 600,
-            fontSize: 18,
-            color: INK,
-            lineHeight: 1.35,
-            margin: 0,
-          }}
-        >
-          {a.title}
-        </h3>
-        <p
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 13.5,
-            color: "rgba(26,16,8,0.65)",
-            lineHeight: 1.55,
-            margin: 0,
-          }}
-        >
-          {a.excerpt}
-        </p>
-        <div
-          style={{
-            marginTop: "auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingTop: 8,
-          }}
-        >
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: "Inter, sans-serif",
-              fontSize: 12.5,
-              color: "rgba(26,16,8,0.7)",
-            }}
-          >
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: dot }} />
-            {category} · {rt} min read
-          </span>
-          <span
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11,
-              color: "rgba(26,16,8,0.5)",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-            }}
-          >
-            <IconEye size={13} stroke={1.75} /> {a.views}
-          </span>
-        </div>
-      </div>
-    </article>
-  );
-};
+  /* Cards (pop) */
+  .rs-card { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 16px; overflow: hidden; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s; display: flex; flex-direction: column; }
+  .rs-card:hover { transform: translateY(-4px); box-shadow: 0 22px 50px -20px rgba(0,0,0,0.15); }
 
-// ============================================================
-// COMMUNITY ROW
-// ============================================================
-const CommunityRow = ({ c }: { c: CommunityItem }) => (
-  <article
-    style={{ ...cardBase, padding: 20, cursor: "pointer", display: "flex", gap: 14 }}
-    onMouseEnter={onCardEnter}
-    onMouseLeave={onCardLeave}
-  >
-    <div
-      style={{
-        width: 40,
-        height: 40,
-        minWidth: 40,
-        borderRadius: "50%",
-        background: c.color,
-        color: "#FFFFFF",
-        fontFamily: "Inter, sans-serif",
-        fontWeight: 700,
-        fontSize: 16,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {c.initials}
-    </div>
-    <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13.5, color: "rgba(26,16,8,0.85)" }}>
-          {c.author}
-        </span>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>
-          {c.ago}
-        </span>
-      </div>
-      <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 16, color: INK, lineHeight: 1.35, margin: "0 0 6px 0" }}>
-        {c.title}
-      </h3>
-      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.65)", lineHeight: 1.5, margin: "0 0 10px 0" }}>
-        {c.preview}
-      </p>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {c.tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 10,
-                color: GOLD,
-                background: "rgba(139,105,20,0.12)",
-                padding: "3px 8px",
-                borderRadius: 999,
-                fontWeight: 600,
-              }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <span
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 12.5,
-            color: "rgba(26,16,8,0.55)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-          }}
-        >
-          <IconMessageCircle2 size={13} stroke={1.75} /> {c.replies} replies
-        </span>
-      </div>
-    </div>
-  </article>
-);
+  /* Video card */
+  .rs-thumb { position: relative; height: 140px; background: ${C.panel}; border-bottom: 1px solid ${C.border}; display: flex; align-items: center; justify-content: center; color: ${C.ink}; }
+  .rs-thumb .play { width: 52px; height: 52px; border-radius: 50%; background: ${C.red}; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(184,51,58,0.35); }
+  .rs-thumb .dur { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .rs-thumb .cat-icon { position: absolute; top: 12px; left: 12px; background: ${C.card}; border: 1px solid ${C.border}; padding: 6px; border-radius: 8px; color: ${C.ink}; }
 
-// ============================================================
-// EMPTY STATE
-// ============================================================
-const EmptyState = ({ label }: { label: string }) => (
-  <div style={{ textAlign: "center", padding: "72px 20px" }}>
-    <div style={{ display: "inline-flex", padding: 16, borderRadius: 12, background: "rgba(139,105,20,0.1)", marginBottom: 14 }}>
-      <Search size={28} color={GOLD} />
-    </div>
-    <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 20, color: INK, marginBottom: 6 }}>
-      No {label} found
-    </h3>
-    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)" }}>
-      Try different keywords or switch tabs.
-    </p>
-  </div>
-);
+  .rs-card-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .rs-card-step { font-size: 10.5px; font-weight: 700; color: ${C.red}; letter-spacing: 0.14em; }
+  .rs-card-title { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 17px; letter-spacing: -0.02em; color: ${C.ink}; line-height: 1.3; }
+  .rs-card-desc { font-size: 13.5px; color: ${C.body}; line-height: 1.55; }
+  .rs-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 6px; }
+  .rs-mono { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: ${C.muted}; display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
 
-// ============================================================
-// MAIN PAGE
-// ============================================================
+  /* Template card */
+  .rs-fmt { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 100px; background: ${C.red}; color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; }
+  .rs-fmt.xlsx { background: ${C.green}; }
+  .rs-fmt.docx { background: ${C.ink}; }
+  .rs-download { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 100px; background: ${C.ink}; color: ${C.bg}; text-decoration: none; font-family: 'Satoshi',sans-serif; font-weight: 700; font-size: 12.5px; transition: background .2s; }
+  .rs-download:hover { background: ${C.red}; }
+
+  /* Blog card */
+  .rs-blog-card { cursor: pointer; }
+  .rs-blog-cat { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: ${C.red}; text-transform: uppercase; }
+  .rs-blog-cat .d { width: 6px; height: 6px; border-radius: 50%; background: ${C.red}; }
+  .rs-blog-cat.gold { color: ${C.ink}; } .rs-blog-cat.gold .d { background: ${C.ink}; }
+
+  /* Glossary */
+  .rs-gl-list { display: flex; flex-direction: column; gap: 10px; max-width: 860px; margin: 0 auto; }
+  .rs-gl { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; overflow: hidden; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+  .rs-gl:hover { transform: translateY(-2px); }
+  .rs-gl summary { list-style: none; cursor: pointer; padding: 18px 22px; display: grid; grid-template-columns: 120px 1fr auto; gap: 18px; align-items: center; }
+  .rs-gl summary::-webkit-details-marker { display: none; }
+  .rs-gl-term { font-family: 'Clash Display', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: ${C.ink}; }
+  .rs-gl-short { font-size: 14px; color: ${C.body}; line-height: 1.5; }
+  .rs-gl-toggle { width: 32px; height: 32px; border-radius: 50%; border: 1px solid ${C.border}; color: ${C.red}; display: inline-flex; align-items: center; justify-content: center; transition: transform .3s; font-size: 20px; line-height: 1; }
+  .rs-gl[open] .rs-gl-toggle { transform: rotate(45deg); }
+  .rs-gl-full { padding: 0 22px 22px 22px; font-size: 14px; color: ${C.body}; line-height: 1.65; }
+  @media (max-width: 640px) { .rs-gl summary { grid-template-columns: 1fr auto; } .rs-gl-short { grid-column: 1 / -1; } }
+
+  /* Community */
+  .rs-community { display: flex; flex-direction: column; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .rs-c { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 16px; padding: 20px; display: flex; gap: 14px; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+  .rs-c:hover { transform: translateY(-3px); }
+  .rs-avatar { width: 40px; height: 40px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-family: 'Satoshi',sans-serif; }
+  .rs-c-title { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; color: ${C.ink}; margin: 4px 0 6px; }
+  .rs-c-preview { font-size: 13.5px; color: ${C.body}; line-height: 1.5; margin: 0 0 10px; }
+  .rs-tag { padding: 3px 10px; border-radius: 100px; background: ${C.panel}; border: 1px solid ${C.panelBorder}; font-size: 10.5px; font-weight: 700; color: ${C.body}; letter-spacing: 0.06em; }
+
+  /* Empty */
+  .rs-empty { text-align: center; padding: 72px 20px; color: ${C.muted}; }
+  .rs-empty h3 { font-size: 22px; margin-bottom: 8px; }
+
+  /* Reveal — pop (matches HomePage) */
+  .pop { opacity: 0; transform: translateY(52px) scale(.86) rotate(-1.5deg); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.34,1.56,.64,1); will-change: opacity, transform; }
+  .pop.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .pop { opacity: 1 !important; transform: none !important; transition: none !important; } }
+
+  html, body, #root { max-width: 100%; overflow-x: hidden; }
+`;
+
+/* --------------------------- Page --------------------------- */
+
 const ResourcesPage = () => {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -738,23 +361,21 @@ const ResourcesPage = () => {
     () => templates.filter((t) => matchesSearch(`${t.title} ${t.description} ${t.format}`)),
     [templates, debounced],
   );
-  const filteredGlossary = useMemo(
-    () => {
-      const source: GlossaryItem[] =
-        dbGlossary.length > 0
-          ? dbGlossary.map((g: any) => ({
-              id: g.id,
-              term: g.term,
-              short: g.short_definition,
-              full: g.full_definition,
-            }))
-          : GLOSSARY;
-      return [...source]
-        .sort((a, b) => a.term.localeCompare(b.term))
-        .filter((g) => matchesSearch(`${g.term} ${g.short} ${g.full}`));
-    },
-    [debounced, dbGlossary],
-  );
+  const filteredGlossary = useMemo(() => {
+    const source: GlossaryItem[] =
+      dbGlossary.length > 0
+        ? dbGlossary.map((g: any) => ({
+            id: g.id,
+            term: g.term,
+            short: g.short_definition,
+            full: g.full_definition,
+          }))
+        : GLOSSARY;
+    return [...source]
+      .sort((a, b) => a.term.localeCompare(b.term))
+      .filter((g) => matchesSearch(`${g.term} ${g.short} ${g.full}`));
+  }, [debounced, dbGlossary]);
+
   const filteredBlogPosts = useMemo(
     () => blogPosts.filter((a: any) => matchesSearch(`${a.title} ${a.excerpt} ${a.category}`)),
     [blogPosts, debounced],
@@ -766,598 +387,346 @@ const ResourcesPage = () => {
 
   const currentTabConfig = TABS.find((t) => t.key === activeTab)!;
 
+  // Bidirectional reveal on scroll
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root) return;
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(".rs-card, .rs-gl, .rs-c"));
+    targets.forEach((el, i) => {
+      el.classList.add("pop");
+      const idx = Array.from(el.parentElement?.children || []).indexOf(el);
+      el.style.transitionDelay = `${Math.min(idx, 8) * 60}ms`;
+    });
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.target.classList.toggle("in", e.isIntersecting)),
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    );
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [activeTab, filteredVideos.length, filteredTemplates.length, filteredGlossary.length, filteredBlogPosts.length, filteredCommunity.length]);
+
+  const fmtClass = (fmt: string) => {
+    const f = fmt.toLowerCase();
+    if (f.includes("xls")) return "rs-fmt xlsx";
+    if (f.includes("doc")) return "rs-fmt docx";
+    return "rs-fmt";
+  };
+
   return (
     <Layout>
-      <style>{`
-        @keyframes fade-card {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .resource-anim { animation: fade-card 300ms ease-out both; }
-        .fyn-tabs-row::-webkit-scrollbar { display: none; }
-        .fyn-tabs-row { scrollbar-width: none; -ms-overflow-style: none; }
-        @media (max-width: 768px) {
-          .fyn-resources-hero { padding: 32px 20px 28px !important; }
-          .fyn-resources-tabs-wrap { padding: 14px 16px !important; }
-          .fyn-resources-content { padding: 28px 16px 56px !important; }
-          .fyn-tab-btn { min-width: 0 !important; padding: 10px 14px !important; font-size: 13px !important; }
-          .fyn-resources-grid-tpl { grid-template-columns: 1fr !important; gap: 14px !important; }
-          .fyn-resources-grid-blog { grid-template-columns: 1fr !important; gap: 14px !important; }
-          .fyn-resources-stats { flex-direction: column !important; }
-          .fyn-resources-stats > div { width: 100% !important; }
-        }
-      `}</style>
+      <div ref={pageRef} className="rs-page">
+        <style>{STYLES}</style>
 
-      {/* HERO */}
-      <section
-        className="fyn-resources-hero"
-        style={{
-          background: BEIGE,
-          padding: "56px 32px 44px",
-          borderBottom: "1px solid rgba(26,16,8,0.08)",
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div
-            style={{
-              fontFamily: "Georgia, serif",
-              fontSize: 11,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-              color: GOLD,
-              marginBottom: 10,
-            }}
-          >
-            Resource centre
-          </div>
-          <h1
-            style={{
-              fontFamily: "Georgia, serif",
-              fontWeight: 700,
-              fontSize: 32,
-              color: INK,
-              lineHeight: 1.2,
-              margin: "0 0 24px 0",
-            }}
-          >
-            Learn, reference, and connect
-          </h1>
-          <div
-            className="fyn-resources-stats"
-            style={{ display: "flex", gap: 12, flexWrap: "wrap" }}
-          >
-            {[
-              { value: VIDEOS.length, label: "video guides" },
-              { value: GLOSSARY.length, label: "glossary terms" },
-              { value: COMMUNITY.length, label: "community threads" },
-            ].map((s) => (
-              <div
-                key={s.label}
-                style={{
-                  background: "#FFFFFF",
-                  border: "1px solid rgba(26,16,8,0.08)",
-                  borderRadius: 12,
-                  padding: "14px 18px",
-                  display: "inline-flex",
-                  alignItems: "baseline",
-                  gap: 8,
-                  minWidth: 180,
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontWeight: 700,
-                    fontSize: 22,
-                    color: RED,
-                  }}
-                >
-                  {s.value}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: 13,
-                    color: "rgba(26,16,8,0.7)",
-                  }}
-                >
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        {/* HERO */}
+        <section className="rs-hero">
+          <div className="rs-container">
+            <h1>Learn, reference, and connect.</h1>
+            <p>Video guides, templates, financial glossary, blog, and community — everything an Indian SME needs to run finance like a founder.</p>
 
-      {/* TABS */}
-      <div
-        style={{
-          background: BEIGE,
-          borderBottom: "1px solid rgba(26,16,8,0.1)",
-          position: "sticky",
-          top: 72,
-          zIndex: 30,
-        }}
-      >
-        <div className="fyn-resources-tabs-wrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "16px 24px" }}>
-          <div
-            className="fyn-tabs-row"
-            style={{
-              display: "flex",
-              gap: 6,
-              overflowX: "auto",
-              overflowY: "hidden",
-              paddingBottom: 2,
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            {TABS.map((t) => {
-              const isActive = activeTab === t.key;
-              const TabIcon = t.icon;
-              return (
-                <button
-                  key={t.key}
-                  onClick={(e) => {
-                    setActiveTab(t.key);
-                    (e.currentTarget as HTMLElement).scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-                  }}
-                  aria-pressed={isActive}
-                  className="fyn-tab-btn"
-                  style={{
-                    flex: "0 0 auto",
-                    padding: "10px 16px",
-                    borderRadius: 8,
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 600,
-                    fontSize: 13.5,
-                    cursor: "pointer",
-                    transition: "background 0.15s ease, color 0.15s ease",
-                    whiteSpace: "nowrap",
-                    border: "none",
-                    background: isActive ? RED : "transparent",
-                    color: isActive ? "#FFFFFF" : "rgba(26,16,8,0.75)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(26,16,8,0.05)";
-                      (e.currentTarget as HTMLElement).style.color = INK;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = "transparent";
-                      (e.currentTarget as HTMLElement).style.color = "rgba(26,16,8,0.75)";
-                    }
-                  }}
-                >
-                  <TabIcon size={16} stroke={1.75} />
-                  <span>
-                    <span className="hidden sm:inline">{t.label}</span>
-                    <span className="sm:hidden">{t.shortLabel}</span>
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 10.5,
-                      fontWeight: 600,
-                      padding: "2px 7px",
-                      borderRadius: 5,
-                      background: isActive ? "rgba(255,255,255,0.22)" : "rgba(139,105,20,0.14)",
-                      color: isActive ? "#FFFFFF" : GOLD,
-                    }}
-                  >
-                    {t.badge}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search */}
-          <div style={{ marginTop: 14, maxWidth: 520 }}>
-            <div style={{ position: "relative" }}>
-              <Search
-                size={18}
-                color={GOLD}
-                style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-              />
+            <div className="rs-search">
+              <Search size={18} className="icon" />
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={currentTabConfig.placeholder}
                 aria-label={currentTabConfig.placeholder}
-                style={{
-                  width: "100%",
-                  height: 44,
-                  background: "#FFFFFF",
-                  border: "1px solid rgba(26,16,8,0.12)",
-                  borderRadius: 10,
-                  padding: "0 14px 0 42px",
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 14,
-                  color: INK,
-                  outline: "none",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.border = `1px solid ${GOLD}`;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.border = "1px solid rgba(26,16,8,0.12)";
-                }}
               />
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* CONTENT */}
-      <section
-        className="fyn-resources-content"
-        style={{
-          background: BEIGE,
-          padding: "32px 24px 72px",
-          minHeight: 400,
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          {activeTab === "getting-started" && (
-            <>
-              {filteredVideos.length === 0 ? (
+            <div className="rs-tabs" role="tablist">
+              {TABS.map((t) => {
+                const isActive = activeTab === t.key;
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setActiveTab(t.key)}
+                    className={`rs-tab${isActive ? " active" : ""}`}
+                    aria-pressed={isActive}
+                    role="tab"
+                  >
+                    <Icon size={15} stroke={2} />
+                    <span>{t.label}</span>
+                    <span className="badge">{t.badge}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* CONTENT */}
+        <section className="rs-content">
+          <div className="rs-container">
+            {activeTab === "getting-started" && (
+              filteredVideos.length === 0 ? (
                 <EmptyState label="videos" />
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
                   {groupedVideos.map((g) => (
                     <div key={g.step}>
-                      <h2
-                        style={{
-                          fontFamily: "Georgia, serif",
-                          fontWeight: 700,
-                          fontSize: 18,
-                          letterSpacing: 0.5,
-                          color: INK,
-                          margin: "0 0 14px 0",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 10,
-                        }}
-                      >
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: RED }} />
-                        {g.step}
-                      </h2>
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                          gap: 16,
-                        }}
-                      >
-                        {g.items.map((v, i) => (
-                          <div key={v.id} className="resource-anim" style={{ animationDelay: `${i * 40}ms` }}>
-                            <VideoRow v={v} onPlay={() => setVideoModal(v)} />
-                          </div>
+                      <h2 className="rs-step-h"><span className="dot" />{g.step}</h2>
+                      <div className="rs-grid">
+                        {g.items.map((v) => (
+                          <article key={v.id} className="rs-card" onClick={() => setVideoModal(v)} style={{ cursor: "pointer" }}>
+                            <div className="rs-thumb">
+                              <div className="cat-icon"><v.icon size={16} stroke={1.75} /></div>
+                              <div className="dur">{v.duration}</div>
+                              <div className="play"><IconPlayerPlayFilled size={20} /></div>
+                            </div>
+                            <div className="rs-card-body">
+                              <div className="rs-card-step">{v.step} · {v.category}</div>
+                              <h3 className="rs-card-title">{v.title}</h3>
+                              <div className="rs-card-desc">{v.description}</div>
+                              <div className="rs-card-foot">
+                                <span className="rs-mono"><IconClock size={13} stroke={1.75} /> {v.duration}</span>
+                                <span style={{ color: C.red, fontWeight: 700, fontSize: 12.5 }}>Watch →</span>
+                              </div>
+                            </div>
+                          </article>
                         ))}
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </>
-          )}
+              )
+            )}
 
-          {activeTab === "templates" && (
-            <>
-              {filteredTemplates.length === 0 ? (
+            {activeTab === "templates" && (
+              filteredTemplates.length === 0 ? (
                 <EmptyState label="templates" />
               ) : (
-                <div
-                  className="fyn-resources-grid-tpl"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                    gap: 16,
-                  }}
-                >
-                  {filteredTemplates.map((t, i) => (
-                    <div key={t.id} className="resource-anim" style={{ animationDelay: `${i * 40}ms` }}>
-                      <TemplateCardView t={t} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {activeTab === "glossary" && (
-            <>
-              {filteredGlossary.length === 0 ? (
-                <EmptyState label="terms" />
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 900, margin: "0 auto" }}>
-                  {filteredGlossary.map((g, i) => (
-                    <div key={g.id} className="resource-anim" style={{ animationDelay: `${i * 20}ms` }}>
-                      <GlossaryRow g={g} onOpen={() => setGlossaryModal(g)} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {activeTab === "blog" && (
-            <>
-              {filteredBlogPosts.length === 0 ? (
-                <EmptyState label="articles" />
-              ) : (
-                <div
-                  className="fyn-resources-grid-blog"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
-                    gap: 18,
-                  }}
-                >
-                  {filteredBlogPosts.map((a: any, i: number) => (
-                    <article
-                      key={a.id}
-                      onClick={() => navigate(`/blog/${a.slug}`)}
-                      className="resource-anim"
-                      style={{
-                        ...cardBase,
-                        display: "flex",
-                        flexDirection: "column",
-                        cursor: "pointer",
-                        animationDelay: `${i * 40}ms`,
-                      }}
-                      onMouseEnter={onCardEnter}
-                      onMouseLeave={onCardLeave}
-                    >
-                      <MetaHeader Icon={IconNews} category={a.category} meta={`${a.reading_time_minutes ?? 4} min read`} />
-                      <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
-                        <h3 style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 18, color: INK, lineHeight: 1.35, margin: 0 }}>
-                          {a.title}
-                        </h3>
-                        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "rgba(26,16,8,0.65)", lineHeight: 1.55, margin: 0 }}>
-                          {a.excerpt}
-                        </p>
-                        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 10, borderTop: "1px solid rgba(26,16,8,0.06)" }}>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "rgba(26,16,8,0.55)" }}>
-                            <IconEye size={13} /> {(a.views ?? 0).toLocaleString("en-IN")} views
-                          </span>
-                          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, fontWeight: 600, color: GOLD }}>
-                            Read article →
-                          </span>
+                <div className="rs-grid">
+                  {filteredTemplates.map((t) => (
+                    <article key={t.id} className="rs-card">
+                      <div className="rs-card-body">
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                          <span className={fmtClass(t.format)}>{t.format}</span>
+                          {t.downloads && <span className="rs-mono">↓ {t.downloads}</span>}
+                        </div>
+                        <h3 className="rs-card-title" style={{ marginTop: 12 }}>{t.title}</h3>
+                        {t.description && <div className="rs-card-desc">{t.description}</div>}
+                        <div className="rs-card-foot">
+                          <a
+                            href={t.href}
+                            download
+                            rel="noopener noreferrer"
+                            className="rs-download"
+                          >
+                            <IconDownload size={14} stroke={2} /> Download
+                          </a>
                         </div>
                       </div>
                     </article>
                   ))}
                 </div>
-              )}
-            </>
-          )}
+              )
+            )}
 
-
-          {activeTab === "community" && (
-            <>
-              {filteredCommunity.length === 0 ? (
-                <EmptyState label="discussions" />
+            {activeTab === "glossary" && (
+              filteredGlossary.length === 0 ? (
+                <EmptyState label="terms" />
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 900, margin: "0 auto" }}>
-                  {filteredCommunity.map((c, i) => (
-                    <div key={c.id} className="resource-anim" style={{ animationDelay: `${i * 30}ms` }}>
-                      <CommunityRow c={c} />
-                    </div>
+                <div className="rs-gl-list">
+                  {filteredGlossary.map((g) => (
+                    <details key={g.id} className="rs-gl">
+                      <summary>
+                        <span className="rs-gl-term num">{g.term}</span>
+                        <span className="rs-gl-short">{g.short}</span>
+                        <span className="rs-gl-toggle">+</span>
+                      </summary>
+                      <div className="rs-gl-full">
+                        {g.full}
+                        <div style={{ marginTop: 14 }}>
+                          <button
+                            onClick={() => setGlossaryModal(g)}
+                            style={{
+                              background: "transparent", border: `1px solid ${C.border}`,
+                              padding: "6px 14px", borderRadius: 100, color: C.red, fontWeight: 700,
+                              fontFamily: "'Satoshi',sans-serif", fontSize: 12.5, cursor: "pointer",
+                            }}
+                          >
+                            See how FynHelp uses this →
+                          </button>
+                        </div>
+                      </div>
+                    </details>
                   ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
+              )
+            )}
 
-      {/* Video modal */}
-      {videoModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: "rgba(26,16,8,0.85)", backdropFilter: "blur(8px)" }}
-          onClick={() => setVideoModal(null)}
-        >
+            {activeTab === "blog" && (
+              filteredBlogPosts.length === 0 ? (
+                <EmptyState label="articles" />
+              ) : (
+                <div className="rs-grid">
+                  {filteredBlogPosts.map((a: any) => (
+                    <article
+                      key={a.id}
+                      className="rs-card rs-blog-card"
+                      onClick={() => navigate(`/blog/${a.slug}`)}
+                    >
+                      <div className="rs-card-body">
+                        <div className="rs-blog-cat"><span className="d" />{a.category}</div>
+                        <h3 className="rs-card-title" style={{ marginTop: 4 }}>{a.title}</h3>
+                        <div className="rs-card-desc">{a.excerpt}</div>
+                        <div className="rs-card-foot">
+                          <span className="rs-mono"><IconEye size={13} /> {(a.views ?? 0).toLocaleString("en-IN")} views</span>
+                          <span style={{ color: C.red, fontWeight: 700, fontSize: 12.5 }}>Read →</span>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )
+            )}
+
+            {activeTab === "community" && (
+              filteredCommunity.length === 0 ? (
+                <EmptyState label="discussions" />
+              ) : (
+                <div className="rs-community">
+                  {filteredCommunity.map((c) => (
+                    <article key={c.id} className="rs-c">
+                      <div className="rs-avatar" style={{ background: c.color }}>{c.initials}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+                          <span style={{ fontSize: 13.5, fontWeight: 700, color: C.ink }}>{c.author}</span>
+                          <span className="rs-mono">{c.ago}</span>
+                        </div>
+                        <h3 className="rs-c-title">{c.title}</h3>
+                        <p className="rs-c-preview">{c.preview}</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "space-between", alignItems: "center" }}>
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                            {c.tags.map((tag) => <span key={tag} className="rs-tag">{tag}</span>)}
+                          </div>
+                          <span className="rs-mono"><IconMessageCircle2 size={13} /> {c.replies} replies</span>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </section>
+
+        {/* Video modal */}
+        {videoModal && (
           <div
+            onClick={() => setVideoModal(null)}
             style={{
-              background: "#FFFFFF",
-              borderRadius: 12,
-              maxWidth: 640,
-              width: "calc(100% - 32px)",
-              overflow: "hidden",
-              border: "1px solid rgba(26,16,8,0.08)",
+              position: "fixed", inset: 0, zIndex: 50,
+              background: "rgba(14,14,14,0.85)", backdropFilter: "blur(8px)",
+              display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
             }}
-            onClick={(e) => e.stopPropagation()}
           >
             <div
+              onClick={(e) => e.stopPropagation()}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "14px 18px",
-                borderBottom: "1px solid rgba(26,16,8,0.08)",
+                background: C.card, borderRadius: 18, maxWidth: 640, width: "100%",
+                overflow: "hidden", border: `1px solid ${C.border}`,
               }}
             >
-              <h3 style={{ fontFamily: "Georgia, serif", fontSize: 17, color: INK, margin: 0 }}>{videoModal.title}</h3>
-              <button
-                onClick={() => setVideoModal(null)}
-                style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(26,16,8,0.5)" }}
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div style={{ padding: 32, textAlign: "center", background: BEIGE }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  padding: 14,
-                  borderRadius: 12,
-                  background: "#FFFFFF",
-                  border: "1px solid rgba(26,16,8,0.08)",
-                  marginBottom: 14,
-                  color: GOLD,
-                }}
-              >
-                <IconMessage size={22} stroke={1.75} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 22px", borderBottom: `1px solid ${C.border}` }}>
+                <h3 style={{ fontFamily: "'Clash Display',sans-serif", fontSize: 18 }}>{videoModal.title}</h3>
+                <button onClick={() => setVideoModal(null)} style={{ background: "transparent", border: "none", cursor: "pointer", color: C.muted }} aria-label="Close">
+                  <X size={18} />
+                </button>
               </div>
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 14,
-                  color: "rgba(26,16,8,0.75)",
-                  lineHeight: 1.6,
-                  margin: 0,
-                  maxWidth: 460,
-                  marginInline: "auto",
-                }}
-              >
-                Our tutorial library is being recorded and will be published here. In the meantime, explore our written
-                guides and templates in the tabs above.
-              </p>
+              <div style={{ padding: 40, textAlign: "center", background: C.panel }}>
+                <div style={{ display: "inline-flex", padding: 14, borderRadius: 12, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
+                  <IconMessage size={22} stroke={1.75} />
+                </div>
+                <p style={{ fontSize: 14, color: C.body, lineHeight: 1.6, margin: 0, maxWidth: 460, marginInline: "auto" }}>
+                  Our tutorial library is being recorded and will be published here. In the meantime, explore our written
+                  guides and templates in the tabs above.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Glossary modal */}
-      {glossaryModal && (
-        <div
-          onClick={() => setGlossaryModal(null)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 50,
-            background: "rgba(26,16,8,0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 20,
-          }}
-        >
+        {/* Glossary modal */}
+        {glossaryModal && (
           <div
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setGlossaryModal(null)}
             style={{
-              background: "#FDFAF3",
-              borderRadius: 16,
-              border: "1px solid rgba(26,16,8,0.1)",
-              width: "100%",
-              maxWidth: 640,
-              maxHeight: "85vh",
-              overflowY: "auto",
-              position: "relative",
+              position: "fixed", inset: 0, zIndex: 50,
+              background: "rgba(14,14,14,0.7)", backdropFilter: "blur(6px)",
+              display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
             }}
           >
-            <button
-              onClick={() => setGlossaryModal(null)}
-              aria-label="Close"
+            <div
+              onClick={(e) => e.stopPropagation()}
               style={{
-                position: "absolute", top: 16, right: 16,
-                background: "rgba(26,16,8,0.06)", border: "none",
-                borderRadius: 8, width: 32, height: 32,
-                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "rgba(26,16,8,0.5)", fontSize: 18, fontWeight: 300,
+                background: C.card, borderRadius: 18, width: "100%", maxWidth: 640,
+                maxHeight: "85vh", overflowY: "auto", border: `1px solid ${C.border}`, position: "relative",
               }}
             >
-              ×
-            </button>
-
-            <div style={{ padding: "28px 28px 0" }}>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#8B6914", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
-                Financial term
+              <button
+                onClick={() => setGlossaryModal(null)}
+                aria-label="Close"
+                style={{
+                  position: "absolute", top: 14, right: 14, width: 32, height: 32,
+                  background: C.panel, border: `1px solid ${C.border}`, borderRadius: 50,
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.ink,
+                }}
+              >
+                <X size={16} />
+              </button>
+              <div style={{ padding: "28px 28px 20px" }}>
+                <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, color: C.red, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 8 }}>
+                  Financial term
+                </div>
+                <h2 style={{ fontFamily: "'Clash Display',sans-serif", fontSize: 30, letterSpacing: "-0.03em", color: C.ink }}>
+                  {glossaryModal.term}
+                </h2>
+                <p style={{ marginTop: 14, fontSize: 15, color: C.body, lineHeight: 1.7 }}>
+                  {glossaryModal.full}
+                </p>
               </div>
-              <h2 style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 28, color: "#1A1008", margin: "0 0 12px 0", lineHeight: 1.2 }}>
-                {glossaryModal.term}
-              </h2>
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 15, color: "rgba(26,16,8,0.75)", lineHeight: 1.7, margin: 0 }}>
-                {glossaryModal.full}
-              </p>
-            </div>
-
-            <div style={{ margin: "24px 28px 0", height: "1px", background: "rgba(26,16,8,0.08)" }} />
-
-            {(() => {
-              const productMap: Record<string, { module: string; route: string; how: string; where: string }> = {
-                ARR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp computes your ARR automatically from Razorpay payment data. As each subscription payment syncs, the ARR card updates in real time. No manual calculation needed.", where: "Revenue Intelligence tab — ARR card at the top of the dashboard." },
-                MRR: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "MRR is pulled live from Razorpay and Zoho Books. FYNHelp breaks it down by new MRR, expansion MRR, contraction MRR, and churned MRR so you see exactly what is driving growth or decline.", where: "Revenue Intelligence tab — MRR waterfall chart." },
-                LTV: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp calculates LTV per customer cohort using actual payment history. You can see which acquisition channels bring the highest LTV customers and prioritise accordingly.", where: "Revenue Intelligence tab — LTV by cohort section." },
-                Churn: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "FYNHelp tracks churn by monitoring payment failures, cancellations, and subscription gaps in Razorpay. It sends an alert when churn rate crosses your configured threshold.", where: "Revenue Intelligence tab — Churn signals card. Also visible in Fynny alerts." },
-                CAC: { module: "Revenue Intelligence", route: "/dashboard/revenue-intelligence", how: "Enter your total marketing and sales spend and FYNHelp divides it by new customers acquired in the same period. Compare CAC against LTV to track your unit economics health.", where: "Revenue Intelligence tab — Unit economics section." },
-                "Burn Rate": { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp calculates burn rate daily using your connected bank account data. Net burn = total outflows minus total inflows. The number updates every time a new transaction syncs.", where: "Liquidity Intelligence tab — Burn rate card. Also accessible by asking Fynny: what is my burn rate this month." },
-                Runway: { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp divides your current bank balance by your average monthly net burn to compute runway in months. When runway drops below your configured alert threshold, Fynny sends a proactive warning.", where: "Liquidity Intelligence tab — Runway forecast card with month-by-month projection." },
-                DSO: { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp tracks every invoice date and payment received date from Zoho Books and Razorpay. It computes your rolling 30-day average DSO and flags customers who consistently pay late.", where: "Liquidity Intelligence tab — Receivables aging section." },
-                "Working Capital": { module: "Liquidity Intelligence", route: "/dashboard/liquidity", how: "FYNHelp pulls current assets and current liabilities from your Zoho Books balance sheet sync and shows working capital as a single number updated each time a sync runs.", where: "Liquidity Intelligence tab — Balance position card." },
-                "Gross Margin": { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp computes gross margin from Zoho Books revenue and cost of goods sold data. You can see it broken down by product line or service type if your chart of accounts is structured correctly.", where: "Cost Intelligence tab — Margin analysis section." },
-                EBITDA: { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp builds the EBITDA calculation from your Zoho Books P and L sync. Interest, tax, depreciation, and amortisation are stripped out automatically using standard account category mapping.", where: "Cost Intelligence tab — EBITDA card." },
-                "P&L": { module: "Cost Intelligence", route: "/dashboard/cost", how: "FYNHelp renders a live P and L statement that updates every time Zoho Books syncs. You can view it by month, quarter, or year and export it as a PDF for investor meetings.", where: "Cost Intelligence tab — P and L statement view." },
-                ITC: { module: "Governance Intelligence", route: "/dashboard/gst", how: "FYNHelp uploads your GSTR-2B data and matches it against your purchase invoice register. Mismatches, missing invoices, and at-risk ITC amounts are flagged automatically before you file GSTR-3B.", where: "Governance Intelligence tab — ITC reconciliation section. Also available in CA portal for your chartered accountant." },
-                "GSTR-1": { module: "Governance Intelligence", route: "/dashboard/gst", how: "FYNHelp tracks your GSTR-1 due date in the compliance calendar. It pulls outward supply data from Zoho Books and flags if any invoices are missing mandatory fields before you file.", where: "Governance Intelligence tab — GST filing calendar. GSTR-1 due date shows in red when within 7 days." },
-                NPS: { module: "Workforce Intelligence", route: "/dashboard/hr", how: "Connect your customer feedback tool or enter NPS survey results manually. FYNHelp tracks NPS trend over time alongside headcount and revenue so you can see the correlation between team growth and customer satisfaction.", where: "Workforce Intelligence tab — Team performance metrics section." },
-              };
-              const product = productMap[glossaryModal.term];
-              if (!product) return null;
-              return (
-                <div style={{ padding: "20px 28px 0" }}>
-                  <div style={{ background: "#F4EDDA", borderRadius: 12, padding: "18px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C41E1E", display: "inline-block" }} />
-                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 700, color: "#C41E1E", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                        How FYNHelp uses this
-                      </span>
-                    </div>
-                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.8)", lineHeight: 1.65, margin: "0 0 12px 0" }}>
-                      {product.how}
-                    </p>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#8B6914", flexShrink: 0, marginTop: 1 }}>Where to find it:</span>
-                      <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.65)", lineHeight: 1.5 }}>{product.where}</span>
-                    </div>
-                    <a
-                      href={product.route}
+              <div style={{ padding: "20px 28px 28px", borderTop: `1px solid ${C.border}` }}>
+                <div style={{ fontFamily: "'Satoshi',sans-serif", fontSize: 11, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
+                  Related terms
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {GLOSSARY.filter((g) => g.id !== glossaryModal.id).slice(0, 5).map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setGlossaryModal(g)}
                       style={{
-                        display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14,
-                        fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
-                        color: "#FFFFFF", background: "#C41E1E",
-                        padding: "8px 16px", borderRadius: 8, textDecoration: "none",
+                        background: C.panel, border: `1px solid ${C.panelBorder}`, borderRadius: 100,
+                        padding: "6px 12px", cursor: "pointer",
+                        fontFamily: "'Satoshi',sans-serif", fontSize: 12, fontWeight: 700, color: C.ink,
                       }}
                     >
-                      Open {product.module} →
-                    </a>
-                  </div>
+                      {g.term}
+                    </button>
+                  ))}
                 </div>
-              );
-            })()}
-
-            <div style={{ padding: "20px 28px 28px" }}>
-              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "rgba(26,16,8,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-                Related terms
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {GLOSSARY.filter((g) => g.id !== glossaryModal.id).slice(0, 4).map((g) => (
-                  <button
-                    key={g.id}
-                    onClick={() => setGlossaryModal(g)}
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600,
-                      color: "#8B6914", background: "rgba(139,105,20,0.1)",
-                      border: "1px solid rgba(139,105,20,0.2)", borderRadius: 8,
-                      padding: "6px 12px", cursor: "pointer",
-                    }}
-                  >
-                    {g.term}
-                  </button>
-                ))}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </Layout>
   );
 };
+
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div className="rs-empty">
+      <div style={{ display: "inline-flex", padding: 16, borderRadius: 14, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
+        <Search size={26} />
+      </div>
+      <h3>No {label} found</h3>
+      <p style={{ fontSize: 14 }}>Try different keywords or switch tabs.</p>
+    </div>
+  );
+}
 
 export default ResourcesPage;

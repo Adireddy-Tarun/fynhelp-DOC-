@@ -1,17 +1,29 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
-import { Check, ChevronDown, Users, Bot, Coins } from "lucide-react";
+import { Check, Plus, X as XIcon } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 /* ================================================================
-   FYNHelp Pricing Page, brand palette only
-   Ink #1A1008 | Red #C41E1E | Beige #F4EDDA | Gold #8B6914
-   Fonts: Oswald, Raleway, Roboto, DM Sans
+   FynHelp — Pricing (restyled to match HomePage.tsx design system)
 ================================================================ */
+
+const C = {
+  bg: "#ECE6D2",
+  card: "#FAF7EC",
+  panel: "#F1F0EC",
+  panelBorder: "#E3E1DA",
+  ink: "#111111",
+  body: "#3A3A3A",
+  muted: "#6B6B6B",
+  red: "#B8333A",
+  redDark: "#9E2A30",
+  green: "#10B981",
+  black: "#0E0E0E",
+  border: "rgba(0,0,0,0.08)",
+};
 
 /* --------------------------- Data --------------------------- */
 
@@ -50,7 +62,7 @@ const plans: Plan[] = [
   {
     id: "pro",
     name: "Pro",
-    badge: "POPULAR",
+    badge: "MOST POPULAR",
     highlight: true,
     price: "₹90,000",
     priceSuffix: "/year",
@@ -116,80 +128,211 @@ const faqs = [
   },
 ];
 
-/* ----------------------- Small primitives ----------------------- */
+/* --------------------------- Styles --------------------------- */
 
-function Sparkles() {
-  // 18 deterministic gold particles
-  const dots = Array.from({ length: 18 }, (_, i) => {
-    const left = (i * 53) % 100;
-    const top = (i * 37) % 100;
-    const size = 4 + (i % 3) * 2;
-    const dur = 12 + (i % 7) * 1.2;
-    const delay = (i % 8) * 1.1;
-    return { left, top, size, dur, delay, i };
-  });
+const STYLES = `
+  .pr-page { background: ${C.bg}; color: ${C.ink}; font-family: 'Satoshi', system-ui, sans-serif; min-height: 100vh; }
+  .pr-page * { box-sizing: border-box; }
+  .pr-page :where(h1,h2,h3,h4,h5,h6) { font-family: 'Clash Display', sans-serif; font-weight: 600; letter-spacing: -0.035em; line-height: 1.04; color: ${C.ink}; margin: 0; }
+  .pr-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .pr-hero { padding: 88px 0 40px; text-align: center; }
+  .pr-hero h1 { font-size: clamp(44px, 7vw, 88px); }
+  .pr-hero p { max-width: 640px; margin: 24px auto 0; font-size: 18px; color: ${C.body}; line-height: 1.6; }
+
+  /* Toggle */
+  .pr-toggle { display: inline-flex; margin: 40px auto 0; background: ${C.card}; border: 1px solid ${C.border}; border-radius: 100px; padding: 4px; }
+  .pr-toggle button { border: none; background: transparent; padding: 10px 22px; font-family: 'Satoshi', sans-serif; font-weight: 600; font-size: 14px; color: ${C.muted}; border-radius: 100px; cursor: pointer; transition: color .2s, background .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .pr-toggle button.active { background: ${C.ink}; color: ${C.bg}; }
+  .pr-toggle .save { font-size: 10px; padding: 2px 8px; background: ${C.green}; color: #fff; border-radius: 100px; letter-spacing: 0.06em; font-weight: 700; }
+
+  /* Plan cards */
+  .pr-plans { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 56px; }
+  @media (min-width: 900px) { .pr-plans { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+  .pr-plan { position: relative; background: ${C.card}; border: 1px solid ${C.border}; border-radius: 20px; padding: 32px 28px; display: flex; flex-direction: column; transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s; }
+  .pr-plan:hover { transform: translateY(-4px); box-shadow: 0 24px 60px -20px rgba(0,0,0,0.15); }
+  .pr-plan.pro { background: ${C.black}; color: #fff; border-color: ${C.black}; transform: translateY(-8px); box-shadow: 0 30px 70px -20px rgba(0,0,0,0.35); }
+  .pr-plan.pro:hover { transform: translateY(-12px); }
+  .pr-plan.pro :where(h3,.price,.suffix,.feat) { color: #fff; }
+  .pr-plan.pro .subline { color: rgba(255,255,255,0.65); }
+  .pr-plan.pro .feat.section { color: rgba(255,255,255,0.9); }
+  .pr-plan .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: ${C.red}; color: #fff; padding: 6px 14px; border-radius: 100px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; font-family: 'Satoshi', sans-serif; }
+  .pr-plan .name { font-family: 'Satoshi', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: ${C.muted}; text-transform: uppercase; }
+  .pr-plan.pro .name { color: rgba(255,255,255,0.55); }
+  .pr-plan .price-wrap { margin-top: 12px; display: flex; align-items: baseline; gap: 8px; }
+  .pr-plan .price { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 52px; line-height: 1; letter-spacing: -0.04em; color: ${C.ink}; font-variant-numeric: tabular-nums; }
+  .pr-plan .suffix { font-size: 14px; color: ${C.muted}; }
+  .pr-plan .subline { margin-top: 12px; font-size: 14px; color: ${C.body}; }
+  .pr-plan ul { list-style: none; padding: 0; margin: 24px 0 28px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .pr-plan .feat { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: ${C.body}; line-height: 1.45; }
+  .pr-plan.pro .feat { color: rgba(255,255,255,0.85); }
+  .pr-plan .feat.section { font-weight: 700; color: ${C.ink}; }
+  .pr-plan .feat .ck { flex-shrink: 0; margin-top: 2px; width: 18px; height: 18px; border-radius: 50%; background: ${C.red}; color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+  .pr-plan.pro .feat .ck { background: ${C.green}; }
+  .pr-plan .cta { display: inline-flex; align-items: center; justify-content: center; padding: 14px 20px; border-radius: 100px; font-family: 'Satoshi', sans-serif; font-weight: 700; font-size: 14.5px; text-decoration: none; cursor: pointer; transition: transform .2s, background .2s, color .2s; letter-spacing: 0.02em; }
+  .pr-plan .cta.outline-red { background: transparent; border: 1.5px solid ${C.red}; color: ${C.red}; }
+  .pr-plan .cta.outline-red:hover { background: ${C.red}; color: #fff; }
+  .pr-plan .cta.gradient { background: ${C.red}; color: #fff; border: 1.5px solid ${C.red}; }
+  .pr-plan .cta.gradient:hover { background: ${C.redDark}; border-color: ${C.redDark}; transform: translateY(-2px); }
+  .pr-plan .cta.outline-ink { background: transparent; border: 1.5px solid ${C.ink}; color: ${C.ink}; }
+  .pr-plan .cta.outline-ink:hover { background: ${C.ink}; color: ${C.bg}; }
+  .pr-plan.pro .cta.outline-ink { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+  /* Section */
+  .pr-section { padding: 80px 0; overflow-x: clip; }
+  .pr-section h2 { font-size: clamp(34px, 5vw, 56px); text-align: center; }
+  .pr-section .lead { text-align: center; color: ${C.muted}; font-size: 16px; margin: 14px auto 0; max-width: 620px; }
+
+  /* Comparison table */
+  .pr-table-wrap { margin-top: 48px; background: ${C.card}; border: 1px solid ${C.border}; border-radius: 20px; overflow: hidden; }
+  .pr-table { width: 100%; border-collapse: collapse; font-family: 'Satoshi', sans-serif; }
+  .pr-table th, .pr-table td { padding: 16px 20px; text-align: left; font-size: 14px; color: ${C.body}; border-bottom: 1px solid ${C.border}; }
+  .pr-table th { font-family: 'Clash Display', sans-serif; font-weight: 600; color: ${C.ink}; background: ${C.panel}; font-size: 15px; letter-spacing: -0.02em; }
+  .pr-table th:not(:first-child), .pr-table td:not(:first-child) { text-align: center; }
+  .pr-table td:first-child { color: ${C.ink}; font-weight: 500; }
+  .pr-table tr:last-child td { border-bottom: none; }
+  .pr-table .yes { color: ${C.green}; }
+  .pr-table .no { color: ${C.muted}; }
+  .pr-table-row { opacity: 0; transform: translateX(-40px); transition: opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1); }
+  .pr-table-row.in { opacity: 1; transform: none; }
+
+  /* CA firm plan card */
+  .pr-ca-card { margin-top: 40px; background: ${C.card}; border: 1px solid ${C.border}; border-radius: 24px; padding: 40px; }
+  @media (min-width: 900px) { .pr-ca-card { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; } }
+  .pr-ca-card .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+  .pr-ca-card .price-big { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 56px; letter-spacing: -0.04em; color: ${C.ink}; font-variant-numeric: tabular-nums; line-height: 1; }
+  .pr-ca-card .price-sfx { font-size: 14px; color: ${C.muted}; }
+  .pr-ca-card ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pr-ca-card ul li { display: flex; gap: 8px; font-size: 13.5px; color: ${C.body}; align-items: flex-start; }
+  .pr-ca-card ul li svg { flex-shrink: 0; margin-top: 2px; color: ${C.red}; }
+
+  /* Cost comparison */
+  .pr-cost { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 48px; }
+  @media (min-width: 900px) { .pr-cost { grid-template-columns: 1fr 1fr; } }
+  .pr-cost-col { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 20px; overflow: hidden; }
+  .pr-cost-col.fyn { background: ${C.black}; color: #fff; border-color: ${C.black}; }
+  .pr-cost-col .head { padding: 24px 28px; font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 22px; letter-spacing: -0.02em; border-bottom: 1px solid ${C.border}; }
+  .pr-cost-col.fyn .head { border-bottom-color: rgba(255,255,255,0.1); }
+  .pr-cost-col .row { padding: 18px 28px; border-bottom: 1px solid ${C.border}; }
+  .pr-cost-col.fyn .row { border-bottom-color: rgba(255,255,255,0.08); }
+  .pr-cost-col .row:last-child { border-bottom: none; }
+  .pr-cost-col .rl { font-size: 15px; font-weight: 600; }
+  .pr-cost-col .rv { font-size: 13.5px; color: ${C.red}; font-weight: 600; margin-top: 3px; }
+  .pr-cost-col.fyn .rv { color: ${C.green}; }
+  .pr-cost-col .total { background: ${C.panel}; padding: 24px 28px; }
+  .pr-cost-col.fyn .total { background: rgba(255,255,255,0.06); }
+  .pr-cost-col .total .lbl { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: ${C.muted}; }
+  .pr-cost-col.fyn .total .lbl { color: rgba(255,255,255,0.55); }
+  .pr-cost-col .total .val { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.03em; margin-top: 6px; color: ${C.red}; font-variant-numeric: tabular-nums; }
+  .pr-cost-col.fyn .total .val { color: ${C.green}; }
+
+  /* FAQ accordion */
+  .pr-faq { max-width: 760px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 12px; }
+  .pr-faq-item { background: ${C.card}; border: 1px solid ${C.border}; border-radius: 14px; overflow: hidden; }
+  .pr-faq-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: transparent; border: none; cursor: pointer; text-align: left; font-family: 'Satoshi', sans-serif; font-weight: 600; font-size: 16px; color: ${C.ink}; }
+  .pr-faq-icon { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: 1px solid ${C.border}; display: inline-flex; align-items: center; justify-content: center; color: ${C.red}; transition: transform .35s cubic-bezier(.16,1,.3,1); }
+  .pr-faq-item.open .pr-faq-icon { transform: rotate(45deg); }
+  .pr-faq-body { max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .4s ease; padding: 0 24px; color: ${C.body}; font-size: 15px; line-height: 1.65; }
+  .pr-faq-item.open .pr-faq-body { max-height: 500px; padding: 0 24px 20px; }
+
+  /* Digit roll — vertical strip 0-9 */
+  .digits { display: inline-flex; overflow: hidden; font-variant-numeric: tabular-nums; }
+  .digit { display: inline-block; width: 0.6em; height: 1em; overflow: hidden; text-align: center; vertical-align: baseline; }
+  .digit .strip { display: flex; flex-direction: column; transition: transform .6s cubic-bezier(.34,1.56,.64,1); }
+  .digit .strip > span { display: block; height: 1em; line-height: 1; }
+  .digit-static { display: inline-block; }
+
+  /* CTA card */
+  .pr-cta-card { margin: 60px auto 0; max-width: 820px; text-align: center; background: ${C.black}; color: #fff; border-radius: 24px; padding: 56px 32px; }
+  .pr-cta-card h2 { color: #fff; font-size: clamp(30px, 4.5vw, 44px); }
+  .pr-cta-card p { color: rgba(255,255,255,0.75); font-size: 16px; margin-top: 14px; }
+  .pr-cta-card .btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding: 16px 30px; border-radius: 100px; background: ${C.red}; color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; transition: background .2s, transform .2s; }
+  .pr-cta-card .btn:hover { background: ${C.redDark}; transform: translateY(-2px); }
+
+  /* Reveal (bidirectional) */
+  .reveal { opacity: 0; transform: translateY(40px) scale(.94); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.34,1.56,.64,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .pr-table-row { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .digit .strip { transition: none !important; }
+  }
+
+  html, body, #root { max-width: 100%; overflow-x: hidden; }
+`;
+
+/* --------------------------- Digit Roller --------------------------- */
+
+function DigitRoll({ value }: { value: string }) {
+  // Renders a string like "₹90,000" — digits animate, non-digits static
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {dots.map((d) => (
-        <span
-          key={d.i}
-          className="fyn-sparkle"
-          style={{
-            left: `${d.left}%`,
-            top: `${d.top}%`,
-            width: d.size,
-            height: d.size,
-            animationDuration: `${d.dur}s`,
-            animationDelay: `-${d.delay}s`,
-          }}
-        />
-      ))}
-    </div>
+    <span className="digits">
+      {Array.from(value).map((ch, i) => {
+        if (/\d/.test(ch)) {
+          const d = parseInt(ch, 10);
+          return (
+            <span className="digit" key={i}>
+              <span className="strip" style={{ transform: `translateY(-${d}em)` }}>
+                {Array.from({ length: 10 }).map((_, j) => (
+                  <span key={j}>{j}</span>
+                ))}
+              </span>
+            </span>
+          );
+        }
+        return <span className="digit-static" key={i}>{ch}</span>;
+      })}
+    </span>
   );
 }
 
-function Counter({ to, prefix = "", suffix = "" }: { to: number; prefix?: string; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-50px" });
-  const mv = useMotionValue(0);
-  const rounded = useTransform(mv, (v) => `${prefix}${Math.round(v).toLocaleString("en-IN")}${suffix}`);
-  const [text, setText] = useState(`${prefix}0${suffix}`);
-
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(mv, to, { duration: 1.6, ease: [0.22, 1, 0.36, 1] });
-    const unsub = rounded.on("change", (v) => setText(v));
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [inView, to, mv, rounded]);
-
-  return <span ref={ref}>{text}</span>;
-}
-
-/* ============================ Page ============================ */
+/* --------------------------- Page --------------------------- */
 
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [email, setEmail] = useState("");
-  const [isAnnual, setIsAnnual] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(true);
   const [clientCount, setClientCount] = useState(35);
   const [searchParams] = useSearchParams();
 
-  // Pre-select the CA section when the URL includes ?tab=ca.
-  // The page has no separate business/CA tab state — the CA section lives
-  // further down the page — so we scroll it into view on mount.
   useEffect(() => {
     const tab = searchParams.get("tab");
     if (tab === "ca") {
       const el = document.getElementById("ca-firm-plan");
-      if (el) {
-        // Defer so layout is ready
-        setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-      }
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   }, [searchParams]);
+
+  // Bidirectional scroll reveal (matches HomePage pattern)
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root) return;
+    const sel = ".pr-plan, .pr-section h2, .pr-section .lead, .pr-ca-card, .pr-cost-col, .pr-faq-item, .pr-cta-card, .pr-table-row";
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(sel));
+    targets.forEach((el, i) => {
+      if (el.classList.contains("pr-table-row")) return;
+      el.classList.add("reveal");
+      const idx = Array.from(el.parentElement?.children || []).indexOf(el);
+      el.style.transitionDelay = `${Math.min(idx, 8) * 70}ms`;
+    });
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.target.classList.toggle("in", e.isIntersecting)),
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+    );
+    targets.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // Price digit-roll display for pro plan (annual vs monthly variant)
+  const proAnnual = "90,000";
+  const proMonthly = "7,500";
+  const proValue = isAnnual ? proAnnual : proMonthly;
+  const proSuffix = isAnnual ? "/year" : "/month";
+
+  const starterAnnual = "30,000";
+  const starterMonthly = "2,500";
+  const starterValue = isAnnual ? starterAnnual : starterMonthly;
 
   const baseMonthly = isAnnual ? 3999 : 4999;
   const extraClients = Math.max(0, clientCount - 20);
@@ -197,311 +340,197 @@ export default function PricingPage() {
   const totalMonthly = baseMonthly + extraCost;
   const perClientCost = Math.round(totalMonthly / clientCount);
 
+  // Comparison rows built from plan data
+  const compareRows = useMemo(
+    () => [
+      ["AI CFO queries", "8 / month", "Unlimited", "Unlimited"],
+      ["Cash flow tracking", "yes", "yes", "yes"],
+      ["Receivables & payables", "yes", "yes", "yes"],
+      ["GST & TDS compliance", "yes", "yes", "yes"],
+      ["Cost & market intelligence", "no", "yes", "yes"],
+      ["Decision simulator", "no", "yes", "yes"],
+      ["User accounts", "1", "5", "Unlimited"],
+      ["Custom integrations", "no", "no", "yes"],
+      ["Dedicated success manager", "no", "no", "yes"],
+      ["SLA guarantees", "no", "no", "yes"],
+    ],
+    []
+  );
 
   return (
     <Layout>
-      {/* Local styles, sparkles, gradient bg, accents */}
-      <style>{`
-        .fyn-bg-anim {
-          background: linear-gradient(145deg, #F4EDDA 0%, #E8DCC4 30%, #F4EDDA 60%, #D4C4A8 100%);
-          background-size: 200% 200%;
-          animation: fynBgShift 22s ease-in-out infinite alternate;
-        }
-        @keyframes fynBgShift {
-          0% { background-position: 0% 0%; }
-          100% { background-position: 100% 100%; }
-        }
-        .fyn-sparkle {
-          position: absolute;
-          border-radius: 9999px;
-          background: radial-gradient(circle, rgba(139,105,20,0.55) 0%, rgba(139,105,20,0) 70%);
-          opacity: 0.55;
-          animation-name: fynFloat;
-          animation-iteration-count: infinite;
-          animation-timing-function: ease-in-out;
-        }
-        @keyframes fynFloat {
-          0% { transform: translate(0,0) scale(1); opacity: 0.15; }
-          50% { opacity: 0.55; }
-          100% { transform: translate(40px,-120px) scale(1.2); opacity: 0; }
-        }
-        .fyn-blob {
-          position: absolute;
-          border-radius: 9999px;
-          filter: blur(50px);
-          animation: fynBlob 14s ease-in-out infinite;
-        }
-        @keyframes fynBlob {
-          0%, 100% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(20px,-15px) scale(1.15); }
-        }
-        .fyn-pulse-soft {
-          animation: fynPulseSoft 2.4s ease-in-out infinite;
-        }
-        @keyframes fynPulseSoft {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.06); }
-        }
-        .fyn-underline-gold {
-          background-image: linear-gradient(90deg, #8B6914 0%, #A67C1A 100%);
-          background-repeat: no-repeat;
-          background-size: 100% 2px;
-          background-position: 0 100%;
-          padding-bottom: 2px;
-        }
-        .fyn-glass {
-          background: rgba(255,255,255,0.72);
-          backdrop-filter: blur(20px) saturate(110%);
-          -webkit-backdrop-filter: blur(20px) saturate(110%);
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .fyn-bg-anim, .fyn-sparkle, .fyn-blob, .fyn-pulse-soft { animation: none !important; }
-        }
-      `}</style>
+      <div ref={pageRef} className="pr-page">
+        <style>{STYLES}</style>
 
-      {/* ========================= HERO + CARDS ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden pt-20 pb-24 px-6">
-        <Sparkles />
+        {/* HERO */}
+        <section className="pr-hero">
+          <div className="pr-container">
+            <h1>Simple pricing.<br />Powerful insights.</h1>
+            <p>All plans include enterprise-grade security and the financial insights you need to make better decisions.</p>
 
-        <div className="relative z-10 max-w-[900px] mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display font-bold text-[32px] md:text-[38px] lg:text-[52px] leading-[1.2] text-fyn-ink mb-5"
-            style={{ letterSpacing: "-0.5px", color: "#1A1008" }}
-          >
-            Simple pricing. Powerful insights.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-subheading text-base md:text-[18px] lg:text-[20px] mx-auto"
-            style={{
-              color: "#8B6914",
-              lineHeight: 1.6,
-              letterSpacing: "0.3px",
-              maxWidth: "900px",
-              marginBottom: "60px",
-            }}
-          >
-            All plans include enterprise-grade security and the financial insights you need to make better decisions.
-          </motion.p>
-        </div>
-
-        <EngagementPopup />
-
-        <div className="relative z-10 max-w-6xl mx-auto mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {plans.map((p, idx) => {
-            const isPro = p.highlight;
-            return (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.55, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -10, scale: 1.015 }}
-                className={`fyn-glass relative flex flex-col p-10 rounded-[32px] transition-shadow duration-300 ${
-                  isPro
-                    ? "border-2 border-fyn-red shadow-[0_30px_80px_rgba(196,30,30,0.18)]"
-                    : "border border-fyn-gold/20 shadow-[0_20px_60px_rgba(26,16,8,0.06)] hover:shadow-[0_30px_80px_rgba(26,16,8,0.12)]"
-                }`}
-              >
-                {p.badge && (
-                  <span
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 font-button font-bold text-[12px] uppercase tracking-[1px] text-white px-6 py-2 rounded-full shadow-[0_4px_16px_rgba(196,30,30,0.35)]"
-                    style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
-                  >
-                    {p.badge}
-                  </span>
-                )}
-
-                <div className="font-subheading font-semibold text-sm uppercase tracking-[1px] text-fyn-gold mb-3">
-                  {p.name}
-                </div>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-display font-bold text-[52px] leading-none text-fyn-ink">
-                    {p.price}
-                  </span>
-                  {p.priceSuffix && (
-                    <span className="font-body text-sm text-fyn-ink/60">{p.priceSuffix}</span>
-                  )}
-                </div>
-                <p className="font-body text-sm text-fyn-ink/70 mb-6">{p.subline}</p>
-
-                <ul className="space-y-4 mb-10 flex-1">
-                  {p.features.map((f, i) => (
-                    <motion.li
-                      key={f}
-                      initial={{ opacity: 0, x: -8 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.35, delay: 0.1 + i * 0.04 }}
-                      className="flex items-start gap-3"
-                    >
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fyn-gold text-white">
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      </span>
-                      <span
-                        className={`font-body text-[15px] leading-relaxed ${
-                          f.endsWith(":") ? "font-semibold text-fyn-ink" : "text-fyn-ink/85"
-                        }`}
-                      >
-                        {f}
-                      </span>
-                    </motion.li>
-                  ))}
-                </ul>
-
-                <CTAButton plan={p} />
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ========================= CA FIRM PLAN ========================= */}
-      <section id="ca-firm-plan" className="fyn-bg-anim relative overflow-hidden px-6 py-24">
-        <Sparkles />
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="font-subheading font-semibold text-xs uppercase tracking-[2px] text-fyn-gold mb-4">
-              For Chartered Accountants
-            </div>
-            <h2
-              className="font-display font-bold text-[32px] md:text-[42px] lg:text-[52px] leading-[1.2] text-fyn-ink mb-4"
-              style={{ letterSpacing: "-0.5px" }}
-            >
-              One plan. Every CA firm.
-            </h2>
-            <p className="font-body text-base md:text-lg text-fyn-ink/70 max-w-2xl mx-auto">
-              20 client seats included. Add more as you grow.
-            </p>
-
-            {/* Billing toggle */}
-            <div className="mt-8 inline-flex items-center gap-4 fyn-glass rounded-full px-2 py-2 border border-fyn-gold/20">
+            {/* Annual / Monthly toggle */}
+            <div className="pr-toggle" role="tablist" aria-label="Billing cadence">
               <button
                 type="button"
+                className={!isAnnual ? "active" : ""}
                 onClick={() => setIsAnnual(false)}
-                className={`font-button font-semibold text-sm px-5 py-2 rounded-full transition-all ${
-                  !isAnnual ? "bg-fyn-ink text-fyn-beige" : "text-fyn-ink/60 hover:text-fyn-ink"
-                }`}
+                aria-pressed={!isAnnual}
               >
                 Monthly
               </button>
               <button
                 type="button"
+                className={isAnnual ? "active" : ""}
                 onClick={() => setIsAnnual(true)}
-                className={`font-button font-semibold text-sm px-5 py-2 rounded-full transition-all inline-flex items-center gap-2 ${
-                  isAnnual ? "bg-fyn-ink text-fyn-beige" : "text-fyn-ink/60 hover:text-fyn-ink"
-                }`}
+                aria-pressed={isAnnual}
               >
-                Annual
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                  style={{ background: "#10B981", color: "#FFFFFF" }}
-                >
-                  Save 20%
-                </span>
+                Annual <span className="save">SAVE 20%</span>
               </button>
             </div>
           </div>
+        </section>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="fyn-glass relative rounded-[32px] p-10 border-2 border-fyn-gold shadow-[0_30px_80px_rgba(139,105,20,0.18)]"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* Left column: price + CTAs */}
-              <div className="flex flex-col">
-                <div className="font-subheading font-semibold text-sm uppercase tracking-[1px] text-fyn-gold mb-3">
+        {/* PLAN CARDS */}
+        <section className="pr-section" style={{ paddingTop: 20 }}>
+          <div className="pr-container">
+            <EngagementPopup />
+            <div className="pr-plans">
+              {plans.map((p) => {
+                const isPro = p.highlight;
+                let displayPrice: React.ReactNode = p.price;
+                let displaySuffix = p.priceSuffix;
+
+                if (p.id === "pro") {
+                  displayPrice = <><span>₹</span><DigitRoll value={proValue} /></>;
+                  displaySuffix = proSuffix;
+                } else if (p.id === "starter") {
+                  // Starter's price stays "FREE" but show the post-trial line via subline
+                  displayPrice = p.price;
+                }
+
+                return (
+                  <div key={p.id} className={`pr-plan${isPro ? " pro" : ""}`}>
+                    {p.badge && <span className="badge">{p.badge}</span>}
+                    <div className="name">{p.name}</div>
+                    <div className="price-wrap">
+                      <span className="price num">{displayPrice}</span>
+                      {displaySuffix && <span className="suffix">{displaySuffix}</span>}
+                    </div>
+                    <div className="subline">
+                      {p.id === "starter"
+                        ? isAnnual
+                          ? `Then ₹${starterAnnual}/year · Waitlist only`
+                          : `Then ₹${starterMonthly}/month · Waitlist only`
+                        : p.subline}
+                    </div>
+                    <ul>
+                      {p.features.map((f) => (
+                        <li key={f} className={`feat${f.endsWith(":") ? " section" : ""}`}>
+                          {!f.endsWith(":") && (
+                            <span className="ck"><Check size={11} strokeWidth={3} /></span>
+                          )}
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <PlanCTA plan={p} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* COMPARISON TABLE */}
+        <section className="pr-section">
+          <div className="pr-container">
+            <h2>Compare features</h2>
+            <p className="lead">Every plan, side by side.</p>
+            <div className="pr-table-wrap">
+              <table className="pr-table">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Starter</th>
+                    <th>Pro</th>
+                    <th>Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {compareRows.map((row, i) => (
+                    <TableRow key={i} row={row as string[]} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* CA FIRM PLAN */}
+        <section id="ca-firm-plan" className="pr-section">
+          <div className="pr-container">
+            <h2>One plan. Every CA firm.</h2>
+            <p className="lead">20 client seats included. Add more as you grow.</p>
+
+            <div className="pr-ca-card">
+              <div>
+                <div className="name" style={{ fontFamily: "'Satoshi', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: C.muted, textTransform: "uppercase" }}>
                   CA Partner Plan
                 </div>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="font-display font-bold text-[52px] leading-none text-fyn-ink">
-                    ₹{isAnnual ? "3,999" : "4,999"}
+                <div className="price-row">
+                  <span className="price-big num">
+                    ₹<DigitRoll value={isAnnual ? "3,999" : "4,999"} />
                   </span>
-                  <span className="font-body text-sm text-fyn-ink/60">
-                    {isAnnual ? "/month, billed annually" : "/month"}
-                  </span>
+                  <span className="price-sfx">{isAnnual ? "/month, billed annually" : "/month"}</span>
                 </div>
                 {isAnnual && (
-                  <p className="font-body text-sm text-fyn-gold mb-2">
+                  <p style={{ color: C.red, fontSize: 14, marginTop: 8, fontWeight: 600 }}>
                     ₹47,988/year — save ₹11,988
                   </p>
                 )}
-                <div className="mt-4 mb-3">
-                  <span
-                    className="inline-block font-button font-semibold text-sm px-4 py-2 rounded-full"
-                    style={{ background: "rgba(139,105,20,0.15)", color: "#8B6914" }}
-                  >
-                    Includes 20 client seats free
-                  </span>
-                </div>
-                <p className="font-body text-sm text-fyn-ink/60 mb-8">
-                  ₹99 per additional client per month
+                <p style={{ color: C.body, fontSize: 14, marginTop: 12 }}>
+                  Includes 20 client seats free · ₹99/additional client/month
                 </p>
 
-                <div className="mt-auto space-y-3">
+                <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
                   <Link
                     to="/waitlist"
-                    className="block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)] transition-all"
-                    style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
+                    style={{
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      padding: "14px 22px", borderRadius: 100, background: C.red, color: "#fff",
+                      textDecoration: "none", fontWeight: 700, fontSize: 14.5, fontFamily: "'Satoshi', sans-serif",
+                    }}
                   >
                     Join CA Waitlist
                   </Link>
                   <Link
                     to="/ca/register"
-                    className="block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5 transition-all"
+                    style={{
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      padding: "14px 22px", borderRadius: 100, background: "transparent",
+                      border: `1.5px solid ${C.ink}`, color: C.ink, textDecoration: "none",
+                      fontWeight: 700, fontSize: 14.5, fontFamily: "'Satoshi', sans-serif",
+                    }}
                   >
                     Register as CA Partner →
                   </Link>
-                  <p className="font-body text-xs text-fyn-ink/60 text-center pt-2">
-                    Early access CA firms: 30 days free on sign-up. No credit card required.
-                  </p>
                 </div>
               </div>
 
-              {/* Right column: features + calculator */}
-              <div className="flex flex-col">
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8">
-                  {[
-                    "Client portfolio dashboard",
-                    "White-label reports",
-                    "GST filing calendar",
-                    "Portfolio health AI",
-                    "ITC reconciliation",
-                    "Compliance risk alerts",
-                    "Bulk GST filing",
-                    "TDS tracker",
-                    "5 CA team seats",
-                    "Priority support",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fyn-gold text-white">
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      </span>
-                      <span className="font-body text-[14px] leading-relaxed text-fyn-ink/85">
-                        {f}
-                      </span>
+              <div>
+                <ul>
+                  {["Client portfolio dashboard","White-label reports","GST filing calendar","Portfolio health AI","ITC reconciliation","Compliance risk alerts","Bulk GST filing","TDS tracker","5 CA team seats","Priority support"].map((f) => (
+                    <li key={f}>
+                      <Check size={16} strokeWidth={2.5} />
+                      <span>{f}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="pt-6 border-t border-fyn-gold/20">
-                  <div className="font-subheading font-semibold text-sm text-fyn-ink mb-4">
-                    Estimate your cost
-                  </div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="font-body text-sm text-fyn-ink/70">Number of clients</label>
-                    <span className="font-button font-bold text-lg text-fyn-ink tabular-nums">
-                      {clientCount}
-                    </span>
+                <div style={{ marginTop: 24, padding: 18, background: C.panel, border: `1px solid ${C.panelBorder}`, borderRadius: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: C.body, fontWeight: 500 }}>Number of clients</span>
+                    <span className="num" style={{ fontFamily: "'Clash Display', sans-serif", fontSize: 20, fontWeight: 600, color: C.ink }}>{clientCount}</span>
                   </div>
                   <input
                     type="range"
@@ -510,490 +539,161 @@ export default function PricingPage() {
                     step={1}
                     value={clientCount}
                     onChange={(e) => setClientCount(Number(e.target.value))}
-                    className="w-full accent-fyn-gold"
+                    style={{ width: "100%", accentColor: C.red }}
                   />
-
-                  <div
-                    className="mt-5 rounded-2xl p-5 space-y-3"
-                    style={{ background: "rgba(232,220,196,0.5)" }}
-                  >
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-body text-fyn-ink/75">
-                        Base plan (20 clients included)
-                      </span>
-                      <span className="font-button font-semibold text-fyn-ink tabular-nums">
-                        ₹{baseMonthly.toLocaleString("en-IN")}/mo
-                      </span>
-                    </div>
-                    {extraClients > 0 ? (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-body text-fyn-ink/75">
-                          {extraClients} additional clients × ₹99
-                        </span>
-                        <span className="font-button font-semibold text-fyn-ink tabular-nums">
-                          ₹{extraCost.toLocaleString("en-IN")}/mo
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-body text-fyn-ink/75">
-                          {20 - clientCount} free seats still available
-                        </span>
-                        <span
-                          className="font-button font-semibold tabular-nums"
-                          style={{ color: "#10B981" }}
-                        >
-                          ₹0
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between pt-3 border-t border-fyn-ink/10">
-                      <span className="font-subheading font-bold text-fyn-ink">Total per month</span>
-                      <span className="font-button font-bold text-fyn-ink tabular-nums">
-                        ₹{totalMonthly.toLocaleString("en-IN")}/mo · ₹{perClientCost}/client
-                      </span>
-                    </div>
+                  <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", fontSize: 13, color: C.body }}>
+                    <span>Base + {extraClients} extra × ₹99</span>
+                    <span className="num" style={{ fontWeight: 700, color: C.ink }}>
+                      ₹{totalMonthly.toLocaleString("en-IN")}/mo · ₹{perClientCost}/client
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </div>
+        </section>
 
+        {/* COST COMPARISON */}
+        <section className="pr-section">
+          <div className="pr-container">
+            <h2>FynHelp vs. hiring a team</h2>
+            <p className="lead">See how much you save by choosing AI-powered financial intelligence over traditional hiring.</p>
 
-      {/* ========================= WAITLIST WIDGET ========================= */}
-      <section
-        className="relative overflow-hidden px-6 py-28 md:py-32"
-        style={{
-          background:
-            "linear-gradient(145deg, #1A1008 0%, rgba(26,16,8,0.92) 40%, rgba(139,105,20,0.25) 70%, rgba(196,30,30,0.20) 100%)",
-        }}
-      >
-        {/* floating gradient blobs */}
-        <span
-          className="fyn-blob"
-          style={{ width: 280, height: 280, left: "8%", top: "15%", background: "rgba(196,30,30,0.35)" }}
-        />
-        <span
-          className="fyn-blob"
-          style={{
-            width: 220,
-            height: 220,
-            right: "10%",
-            top: "20%",
-            background: "rgba(139,105,20,0.45)",
-            animationDelay: "-4s",
-          }}
-        />
-        <span
-          className="fyn-blob"
-          style={{
-            width: 180,
-            height: 180,
-            left: "20%",
-            bottom: "10%",
-            background: "rgba(244,237,218,0.18)",
-            animationDelay: "-7s",
-          }}
-        />
-
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display font-bold text-[32px] md:text-[38px] lg:text-[52px] mx-auto"
-            style={{
-              color: "#FFFFFF",
-              lineHeight: 1.25,
-              letterSpacing: "-0.5px",
-              textShadow: "0 3px 12px rgba(0,0,0,0.3)",
-              maxWidth: 1100,
-              marginBottom: 28,
-            }}
-          >
-            Ready for financial insights that work around the clock?
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-subheading mx-auto"
-            style={{
-              fontWeight: 400,
-              fontSize: "clamp(16px, 1.5vw, 20px)",
-              color: "rgba(244,237,218,0.95)",
-              lineHeight: 1.65,
-              letterSpacing: "0.3px",
-              maxWidth: 900,
-              marginBottom: 24,
-            }}
-          >
-            Built for Indian startups, SMEs, and CA firms who want real financial intelligence — not just accounting software.
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="font-button font-semibold text-base md:text-lg mb-10 text-primary-foreground"
-            style={{
-              fontSize: "clamp(16px, 1.4vw, 18px)",
-            }}
-          >
-            Start your{" "}
-            <span
-              style={{
-                color: "#8B6914",
-                textDecoration: "underline",
-                textDecorationColor: "#8B6914",
-                textDecorationThickness: "2px",
-                textUnderlineOffset: "4px",
-              }}
-            >
-              30 days free
-            </span>{" "}
-            today, no credit card required.
-          </motion.p>
-
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              const url = `/waitlist${email ? `?email=${encodeURIComponent(email)}` : ""}`;
-              window.location.href = url;
-            }}
-            className="relative z-10 mx-auto flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 max-w-2xl"
-          >
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="flex-1 outline-none font-body"
-              style={{
-                background: "rgba(244,237,218,0.12)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "2px solid rgba(244,237,218,0.25)",
-                borderRadius: 24,
-                padding: "20px 28px",
-                fontFamily: "'Roboto', sans-serif",
-                fontWeight: 400,
-                fontSize: 16,
-                color: "#F4EDDA",
-              }}
-            />
-            <motion.button
-              whileHover={{ y: -2, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="font-button"
-              style={{
-                background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)",
-                color: "#FFFFFF",
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: 16,
-                textTransform: "uppercase",
-                letterSpacing: "1.2px",
-                padding: "20px 48px",
-                borderRadius: 24,
-                border: "none",
-                boxShadow: "0 8px 24px rgba(196,30,30,0.4)",
-                cursor: "pointer",
-              }}
-            >
-              Join Waitlist
-            </motion.button>
-          </motion.form>
-        </div>
-      </section>
-
-      {/* ========================= COST COMPARISON ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden px-6 py-28">
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6 }}
-            className="font-display font-bold text-[36px] md:text-[48px] text-fyn-ink text-center mb-4 tracking-tight"
-          >
-            FYNHelp AI vs. Hiring a Team
-          </motion.h2>
-          <p className="font-subheading text-lg text-fyn-ink/70 text-center max-w-2xl mx-auto mb-16">
-            See how much you save by choosing AI-powered financial intelligence over traditional hiring.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Human team column */}
-            <motion.div
-              initial={{ opacity: 0, x: -24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="fyn-glass rounded-[32px] overflow-hidden shadow-[0_20px_60px_rgba(26,16,8,0.08)]"
-            >
-              <div
-                className="px-8 py-8 flex items-center justify-center gap-3 text-fyn-beige"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(26,16,8,0.92) 0%, rgba(26,16,8,1) 100%)",
-                }}
-              >
-                <Users className="h-7 w-7" />
-                <span className="font-subheading font-semibold text-2xl">Human Team</span>
-              </div>
-              <ul>
+            <div className="pr-cost">
+              <div className="pr-cost-col">
+                <div className="head">Human Team</div>
                 {roles.map((r) => (
-                  <li
-                    key={r.role}
-                    className="px-8 py-6 border-b border-fyn-ink/10 transition-colors hover:bg-fyn-gold/5"
-                  >
-                    <div className="font-subheading font-semibold text-fyn-ink text-lg mb-1">
-                      {r.role}
-                    </div>
-                    <div className="font-button font-medium text-fyn-red text-base">{r.human}</div>
-                  </li>
+                  <div key={r.role} className="row">
+                    <div className="rl">{r.role}</div>
+                    <div className="rv num">{r.human}</div>
+                  </div>
                 ))}
-                <li className="px-8 py-8 bg-fyn-beige/60">
-                  <div className="font-subheading text-sm text-fyn-ink/70 mb-1">
-                    Total Annual Cost
-                  </div>
-                  <div className="font-display font-bold text-[32px] text-fyn-red leading-none">
-                    ₹57–92L<span className="text-base font-body text-fyn-ink/60">/year</span>
-                  </div>
-                </li>
-              </ul>
-            </motion.div>
-
-            {/* FYNHelp column */}
-            <motion.div
-              initial={{ opacity: 0, x: 24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="fyn-glass relative rounded-[32px] overflow-hidden shadow-[0_20px_60px_rgba(196,30,30,0.15)]"
-            >
-              <div
-                className="relative px-8 py-8 flex items-center justify-center gap-3 text-white"
-                style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
-              >
-                <Bot className="h-7 w-7" />
-                <span className="font-subheading font-semibold text-2xl">FYNHelp AI</span>
-                <span className="fyn-pulse-soft absolute top-4 right-4 font-button font-bold text-xs uppercase tracking-wide bg-fyn-gold text-white px-3 py-1.5 rounded-xl">
-                  Save 92%
-                </span>
+                <div className="total">
+                  <div className="lbl">Total annual cost</div>
+                  <div className="val num">₹57–92L<span style={{ fontSize: 14, color: C.muted, fontWeight: 400, fontFamily: "'Satoshi',sans-serif", marginLeft: 6 }}>/year</span></div>
+                </div>
               </div>
-              <ul>
+
+              <div className="pr-cost-col fyn">
+                <div className="head">FynHelp AI</div>
                 {roles.map((r) => (
-                  <li
-                    key={r.role}
-                    className="px-8 py-6 border-b border-fyn-ink/10 transition-colors hover:bg-fyn-gold/5"
-                  >
-                    <div className="font-subheading font-semibold text-fyn-ink text-lg mb-1">
-                      {r.role}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-button font-semibold text-fyn-gold text-base">
-                        Included
+                  <div key={r.role} className="row">
+                    <div className="rl">{r.role}</div>
+                    <div className="rv num">Included · {r.fyn}</div>
+                  </div>
+                ))}
+                <div className="total">
+                  <div className="lbl">FynHelp Pro plan</div>
+                  <div className="val num">₹90,000<span style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", fontWeight: 400, fontFamily: "'Satoshi',sans-serif", marginLeft: 6 }}>/year</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ ACCORDION */}
+        <section className="pr-section">
+          <div className="pr-container">
+            <h2>Frequently asked questions</h2>
+            <div className="pr-faq">
+              {faqs.map((f, i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={f.q} className={`pr-faq-item${open ? " open" : ""}`}>
+                    <button
+                      type="button"
+                      className="pr-faq-btn"
+                      aria-expanded={open}
+                      onClick={() => setOpenFaq(open ? null : i)}
+                    >
+                      <span>{f.q}</span>
+                      <span className="pr-faq-icon" aria-hidden>
+                        {open ? <XIcon size={16} /> : <Plus size={16} />}
                       </span>
-                      <Check className="h-4 w-4 text-fyn-gold" strokeWidth={3} />
+                    </button>
+                    <div className="pr-faq-body">
+                      <div style={{ paddingTop: 4 }}>{f.a}</div>
                     </div>
-                    <div className="font-body text-[13px] text-fyn-ink/60 mt-0.5">{r.fyn}</div>
-                  </li>
-                ))}
-                <li className="px-8 py-8 bg-fyn-beige/60">
-                  <div className="font-subheading text-sm text-fyn-ink/70 mb-1">
-                    FYNHelp Pro Plan
                   </div>
-                  <div className="font-display font-bold text-[32px] text-fyn-gold leading-none">
-                    ₹<Counter to={90000} />
-                    <span className="text-base font-body text-fyn-ink/60">/year</span>
-                  </div>
-                </li>
-              </ul>
-            </motion.div>
-          </div>
+                );
+              })}
+            </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 mx-auto flex items-center justify-center gap-3 flex-wrap"
-            style={{
-              width: "100%",
-              maxWidth: 1200,
-              padding: "28px 48px",
-              borderRadius: 24,
-              background: "linear-gradient(135deg, #8B6914 0%, rgba(139,105,20,0.85) 100%)",
-              boxShadow: "0 12px 40px rgba(139,105,20,0.35)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              textAlign: "center",
-            }}
-          >
-            <Coins className="h-7 w-7 shrink-0" style={{ color: "#FFFFFF" }} />
-            <span
-              className="font-semibold text-lg font-sans md:text-4xl"
-              style={{
-                color: "#FFFFFF",
-                lineHeight: 1.4,
-                letterSpacing: "0.3px",
-                textShadow: "0 2px 8px rgba(26,16,8,0.2)",
-              }}
-            >
-              Save{" "}
-              <span
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(18px, 1.9vw, 26px)",
-                  color: "#FFFFFF",
+            {/* CTA card */}
+            <div className="pr-cta-card">
+              <h2>Ready for financial insights that work around the clock?</h2>
+              <p>Built for Indian startups, SMEs, and CA firms who want real financial intelligence — not just accounting software.</p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const url = `/waitlist${email ? `?email=${encodeURIComponent(email)}` : ""}`;
+                  window.location.href = url;
                 }}
+                style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "24px auto 0" }}
               >
-                ₹56–91L
-              </span>{" "}
-              annually by choosing FYNHelp over hiring a full team
-            </span>
-          </motion.div>
-        </div>
-      </section>
-
-
-      {/* ========================= FAQ ========================= */}
-      <section className="fyn-bg-anim relative overflow-hidden px-6 pt-12 pb-28">
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6 }}
-            className="font-display font-bold text-[36px] md:text-[42px] text-fyn-ink text-center mb-14 tracking-tight"
-          >
-            Frequently Asked Questions
-          </motion.h2>
-
-          <div className="space-y-5">
-            {faqs.map((f, i) => {
-              const open = openFaq === i;
-              return (
-                <motion.div
-                  key={f.q}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="fyn-glass rounded-[20px] border border-fyn-gold/15 px-7 py-6 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,16,8,0.08)]"
-                  onClick={() => setOpenFaq(open ? null : i)}
-                >
-                  <button
-                    type="button"
-                    aria-expanded={open}
-                    className="w-full flex items-center justify-between gap-4 text-left"
-                  >
-                    <span className="font-subheading font-semibold text-base md:text-lg text-fyn-ink">
-                      {f.q}
-                    </span>
-                    <ChevronDown
-                      className={`h-6 w-6 text-fyn-gold shrink-0 transition-transform duration-300 ${
-                        open ? "rotate-180" : "rotate-0"
-                      }`}
-                    />
-                  </button>
-                  <motion.div
-                    initial={false}
-                    animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="overflow-hidden"
-                  >
-                    <p className="font-body text-fyn-ink/80 leading-relaxed pt-5 mt-5 border-t border-fyn-gold/15 text-[15px]">
-                      {f.a}
-                    </p>
-                  </motion.div>
-                </motion.div>
-              );
-            })}
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  style={{
+                    padding: "14px 20px", borderRadius: 100, border: "1px solid rgba(255,255,255,0.18)",
+                    background: "rgba(255,255,255,0.06)", color: "#fff", fontFamily: "'Satoshi',sans-serif",
+                    fontSize: 14.5, outline: "none",
+                  }}
+                />
+                <button type="submit" className="btn" style={{ border: "none", cursor: "pointer" }}>
+                  Join the waitlist →
+                </button>
+              </form>
+            </div>
           </div>
-
-          <div className="text-center mt-14">
-            <Link
-              to="/waitlist"
-              className="inline-block font-button font-bold uppercase tracking-wide text-white px-14 py-5 rounded-[18px] shadow-[0_8px_24px_rgba(196,30,30,0.4)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.5)] transition-all"
-              style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
-            >
-              Join the Waitlist →
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </Layout>
   );
 }
 
-/* ----------------------- helpers ----------------------- */
+/* --------------------------- helpers --------------------------- */
 
-function CTAButton({ plan }: { plan: Plan }) {
-  const base =
-    "block text-center w-full font-button font-bold text-base uppercase tracking-[0.5px] py-4 rounded-[16px] transition-all duration-300";
-  if (plan.ctaStyle === "gradient") {
-    return plan.cta.external ? (
-      <a
-        href={plan.cta.href}
-        className={`${base} text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)]`}
-        style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
-      >
-        {plan.cta.label}
-      </a>
-    ) : (
-      <Link
-        to={plan.cta.href}
-        className={`${base} text-white shadow-[0_8px_24px_rgba(196,30,30,0.35)] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(196,30,30,0.45)]`}
-        style={{ background: "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" }}
-      >
-        {plan.cta.label}
-      </Link>
+function TableRow({ row }: { row: string[] }) {
+  const rowRef = useRef<HTMLTableRowElement>(null);
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    el.classList.add("pr-table-row");
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.target.classList.toggle("in", e.isIntersecting)),
+      { threshold: 0.2 }
     );
-  }
-  if (plan.ctaStyle === "outline-ink") {
-    return plan.cta.external ? (
-      <a
-        href={plan.cta.href}
-        className={`${base} border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5`}
-      >
-        {plan.cta.label}
-      </a>
-    ) : (
-      <Link
-        to={plan.cta.href}
-        className={`${base} border-2 border-fyn-ink text-fyn-ink hover:bg-fyn-ink hover:text-fyn-beige hover:-translate-y-0.5`}
-      >
-        {plan.cta.label}
-      </Link>
-    );
-  }
-  // outline-red
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const cell = (v: string) => {
+    if (v === "yes") return <span className="yes" aria-label="Included">✓</span>;
+    if (v === "no") return <span className="no" aria-label="Not included">—</span>;
+    return v;
+  };
   return (
-    <Link
-      to={plan.cta.href}
-      className={`${base} border-2 border-fyn-red text-fyn-red hover:bg-fyn-red hover:text-white hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(196,30,30,0.3)]`}
-    >
-      {plan.cta.label}
-    </Link>
+    <tr ref={rowRef}>
+      <td>{row[0]}</td>
+      <td>{cell(row[1])}</td>
+      <td>{cell(row[2])}</td>
+      <td>{cell(row[3])}</td>
+    </tr>
   );
 }
 
-/* ====================== Engagement Popup ====================== */
+function PlanCTA({ plan }: { plan: Plan }) {
+  const cls = `cta ${plan.ctaStyle}`;
+  if (plan.cta.external) {
+    return <a href={plan.cta.href} className={cls}>{plan.cta.label}</a>;
+  }
+  return <Link to={plan.cta.href} className={cls}>{plan.cta.label}</Link>;
+}
+
+/* ====================== Engagement Popup (preserved logic) ====================== */
 
 function EngagementPopup() {
   const [open, setOpen] = useState(false);
@@ -1005,7 +705,6 @@ function EngagementPopup() {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
 
-  // 3-minute trigger, once per session, skip if very small screens
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem("pricing_popup_shown")) return;
@@ -1017,12 +716,9 @@ function EngagementPopup() {
     return () => clearTimeout(t);
   }, []);
 
-  // ESC + body scroll lock + focus
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
     closeBtnRef.current?.focus();
     const prev = document.body.style.overflow;
@@ -1033,7 +729,6 @@ function EngagementPopup() {
     };
   }, [open]);
 
-  // Auto-close 3s after success
   useEffect(() => {
     if (!done) return;
     const t = setTimeout(() => setOpen(false), 3000);
@@ -1087,238 +782,74 @@ function EngagementPopup() {
 
   return (
     <>
-      <style>{`
-        @keyframes fynPopupBackdrop { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fynPopupIn {
-          from { opacity: 0; transform: translate(-50%, calc(-50% + 24px)); }
-          to   { opacity: 1; transform: translate(-50%, -50%); }
-        }
-        .fyn-popup-backdrop {
-          position: fixed; inset: 0; z-index: 9999;
-          background: rgba(26,16,8,0.7);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          animation: fynPopupBackdrop 300ms ease-out;
-        }
-        .fyn-popup {
-          position: fixed; top: 50%; left: 50%;
-          transform: translate(-50%, -50%);
-          width: min(900px, 95vw);
-          max-height: 92vh;
-          overflow-y: auto;
-          background:
-            linear-gradient(135deg,
-              #1A1008 0%,
-              rgba(26,16,8,0.95) 40%,
-              rgba(196,30,30,0.30) 70%,
-              rgba(139,105,20,0.30) 100%);
-          border-radius: 28px;
-          box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(244,237,218,0.08);
-          animation: fynPopupIn 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
-          z-index: 10000;
-        }
-        .fyn-popup-close {
-          position: absolute; top: 20px; right: 20px;
-          width: 44px; height: 44px;
-          background: rgba(255,255,255,0.10);
-          border: 1px solid rgba(244,237,218,0.18);
-          border-radius: 50%;
-          color: #FFFFFF;
-          font-size: 22px; line-height: 1;
-          cursor: pointer; z-index: 10;
-          display: inline-flex; align-items: center; justify-content: center;
-          transition: background 0.25s ease, transform 0.3s ease;
-        }
-        .fyn-popup-close:hover {
-          background: rgba(196,30,30,0.85);
-          transform: rotate(90deg);
-        }
-        .fyn-popup-grid {
-          display: grid;
-          grid-template-columns: 1.2fr 1fr;
-          gap: 40px;
-          padding: 48px 56px;
-        }
-        .fyn-popup-input {
-          flex: 1 1 240px;
-          min-width: 0;
-          height: 54px;
-          background: rgba(255,255,255,0.12);
-          border: 1px solid rgba(244,237,218,0.30);
-          border-radius: 12px;
-          padding: 0 20px;
-          font-family: 'Roboto', sans-serif;
-          font-size: 16px;
-          color: #FFFFFF;
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .fyn-popup-input::placeholder { color: rgba(244,237,218,0.5); }
-        .fyn-popup-input:focus {
-          border: 2px solid #8B6914;
-          background: rgba(255,255,255,0.16);
-          box-shadow: 0 0 0 4px rgba(139,105,20,0.15);
-          padding: 0 19px;
-        }
-        .fyn-popup-cta {
-          height: 54px;
-          padding: 0 36px;
-          background: linear-gradient(135deg, #C41E1E 0%, #8B6914 100%);
-          color: #FFFFFF;
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 700;
-          font-size: 16px;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          box-shadow: 0 8px 24px rgba(196,30,30,0.4);
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          white-space: nowrap;
-        }
-        .fyn-popup-cta:hover:not(:disabled) {
-          background: linear-gradient(135deg, #991B1B 0%, #6B4E10 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(196,30,30,0.55);
-        }
-        .fyn-popup-cta:disabled { opacity: 0.7; cursor: not-allowed; }
-        .fyn-stat-card {
-          background: rgba(255,255,255,0.10);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(244,237,218,0.12);
-          border-radius: 16px;
-          padding: 14px 18px;
-          display: flex; align-items: center; gap: 14px;
-        }
-        .fyn-stat-icon {
-          width: 40px; height: 40px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, rgba(139,105,20,0.35), rgba(196,30,30,0.25));
-          display: inline-flex; align-items: center; justify-content: center;
-          color: #F4EDDA;
-          flex-shrink: 0;
-        }
-        @media (max-width: 768px) {
-          .fyn-popup-grid {
-            grid-template-columns: 1fr;
-            gap: 28px;
-            padding: 36px 28px;
-          }
-          .fyn-popup-headline { font-size: 32px !important; }
-          .fyn-popup-form { flex-direction: column !important; }
-          .fyn-popup-cta, .fyn-popup-input { width: 100% !important; }
-          .fyn-popup-right { order: 2; }
-        }
-      `}</style>
-
       <div
-        className="fyn-popup-backdrop"
         onClick={() => setOpen(false)}
         aria-hidden
+        style={{
+          position: "fixed", inset: 0, zIndex: 9999,
+          background: "rgba(14,14,14,0.7)",
+          backdropFilter: "blur(8px)",
+        }}
       />
       <div
-        className="fyn-popup"
         role="dialog"
         aria-modal="true"
         aria-labelledby="fyn-popup-title"
-        aria-describedby="fyn-popup-desc"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+          width: "min(760px, 95vw)", maxHeight: "92vh", overflowY: "auto",
+          background: C.card, borderRadius: 24, border: `1px solid ${C.border}`,
+          boxShadow: "0 40px 90px rgba(0,0,0,0.35)", zIndex: 10000, padding: 40,
+          fontFamily: "'Satoshi', sans-serif", color: C.ink,
+        }}
       >
         <button
           ref={closeBtnRef}
           type="button"
-          className="fyn-popup-close"
-          aria-label="Close"
           onClick={() => setOpen(false)}
+          aria-label="Close"
+          style={{
+            position: "absolute", top: 16, right: 16, width: 36, height: 36,
+            borderRadius: "50%", border: `1px solid ${C.border}`, background: C.panel,
+            color: C.ink, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
+          }}
         >
-          ✕
+          <XIcon size={16} />
         </button>
 
-        <div className="fyn-popup-grid">
-          {/* LEFT, text + form */}
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <h2
-              id="fyn-popup-title"
-              className="fyn-popup-headline"
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: 42,
-                lineHeight: 1.15,
-                letterSpacing: "-0.5px",
-                color: "#FFFFFF",
-                marginBottom: 16,
-                textShadow: "0 2px 12px rgba(0,0,0,0.3)",
-              }}
-            >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}>
+          <div>
+            <h2 id="fyn-popup-title" style={{ fontFamily: "'Clash Display',sans-serif", fontSize: 32, fontWeight: 600, letterSpacing: "-0.035em", lineHeight: 1.1 }}>
               Need help choosing the right plan?
             </h2>
-            <p
-              id="fyn-popup-desc"
-              style={{
-                fontFamily: "'Raleway', sans-serif",
-                fontWeight: 400,
-                fontSize: 18,
-                lineHeight: 1.6,
-                color: "rgba(244,237,218,0.95)",
-                marginBottom: 12,
-              }}
-            >
-              Quick 15-minute call with <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>Tarun or Fynny</strong>, real founders, not sales reps. Honest advice on what'll work for your business.
-            </p>
-            <p
-              style={{
-                fontFamily: "'Roboto', sans-serif",
-                fontWeight: 500,
-                fontSize: 15,
-                color: "#D6A93B",
-                marginBottom: 28,
-                display: "flex", alignItems: "center", gap: 8,
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  width: 22, height: 22, borderRadius: "50%",
-                  background: "rgba(139,105,20,0.25)", color: "#F4EDDA",
-                  fontSize: 13, fontWeight: 700,
-                }}
-              >✓</span>
-              Talk to our founders before you commit.
+            <p style={{ marginTop: 12, fontSize: 15.5, color: C.body, lineHeight: 1.6 }}>
+              Quick 15-minute call with <strong style={{ color: C.ink }}>Tarun or Fynny</strong>, real founders, not sales reps.
             </p>
 
             {done ? (
-              <div
-                role="status"
-                style={{
-                  background: "rgba(244,237,218,0.10)",
-                  border: "1px solid rgba(139,105,20,0.5)",
-                  borderRadius: 14,
-                  padding: "20px 22px",
-                  color: "#F4EDDA",
-                  fontFamily: "'Raleway', sans-serif",
-                  fontSize: 16,
-                  lineHeight: 1.5,
-                  animation: "fade-in 300ms ease-out",
-                }}
-              >
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, marginBottom: 6, color: "#FFFFFF" }}>
-                  ✓ Got it!
-                </div>
+              <div role="status" style={{
+                marginTop: 20, padding: "16px 20px", background: "rgba(16,185,129,0.1)",
+                border: `1px solid ${C.green}`, borderRadius: 12, color: C.ink,
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>✓ Got it!</div>
                 We'll call you at <strong>{done}</strong> within 2 hours.
               </div>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="fyn-popup-form"
-                style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "stretch" }}
-              >
+              <form onSubmit={handleSubmit} style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+                <input
+                  type="text"
+                  placeholder="Your name (optional)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={100}
+                  style={{
+                    padding: "12px 18px", borderRadius: 100, border: `1px solid ${C.border}`,
+                    background: "#fff", fontSize: 14.5, fontFamily: "'Satoshi',sans-serif", outline: "none", color: C.ink,
+                  }}
+                />
                 <input
                   ref={phoneInputRef}
-                  className="fyn-popup-input"
                   type="tel"
                   inputMode="numeric"
                   autoComplete="tel"
@@ -1328,12 +859,19 @@ function EngagementPopup() {
                   aria-label="Phone number"
                   value={phone}
                   onChange={(e) => { setPhone(e.target.value); if (error) setError(null); }}
-                  style={{ width: 240 }}
+                  style={{
+                    padding: "12px 18px", borderRadius: 100, border: `1px solid ${C.border}`,
+                    background: "#fff", fontSize: 14.5, fontFamily: "'Satoshi',sans-serif", outline: "none", color: C.ink,
+                  }}
                 />
                 <button
                   type="submit"
-                  className="fyn-popup-cta"
                   disabled={submitting}
+                  style={{
+                    marginTop: 4, padding: "14px 22px", borderRadius: 100, background: C.red, color: "#fff",
+                    border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.7 : 1,
+                    fontWeight: 700, fontSize: 14.5, fontFamily: "'Satoshi',sans-serif",
+                  }}
                 >
                   {submitting ? "Scheduling…" : "Call me back"}
                 </button>
@@ -1341,66 +879,16 @@ function EngagementPopup() {
             )}
 
             {error && !done && (
-              <p
-                role="alert"
-                style={{
-                  marginTop: 12,
-                  fontFamily: "'Roboto', sans-serif",
-                  fontSize: 14,
-                  color: "#FCA5A5",
-                }}
-              >
-                {error}
-              </p>
+              <p role="alert" style={{ marginTop: 12, color: C.red, fontSize: 13.5 }}>{error}</p>
             )}
-
             {!done && (
-              <p
-                style={{
-                  marginTop: 16,
-                  fontFamily: "'Roboto', sans-serif",
-                  fontSize: 13,
-                  color: "rgba(244,237,218,0.7)",
-                  lineHeight: 1.5,
-                }}
-              >
+              <p style={{ marginTop: 12, fontSize: 12.5, color: C.muted }}>
                 We'll call you within 2 hours during business hours (9 AM – 7 PM IST).
               </p>
             )}
-          </div>
 
-          {/* RIGHT, stats panel */}
-          <div
-            className="fyn-popup-right"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              gap: 12,
-            }}
-          >
-            {/* Trust stats: only kept honest ones */}
-
-            <div className="fyn-stat-card">
-              <span className="fyn-stat-icon" aria-hidden>
-                {/* Mini India outline */}
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
-                  <path d="M7 3 L17 4 L19 9 L17 12 L19 15 L15 18 L13 22 L11 18 L9 17 L6 14 L8 11 L5 8 Z" />
-                </svg>
-              </span>
-              <div>
-                <div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: 24, color: "#FFFFFF", lineHeight: 1.1 }}>
-                  100%
-                </div>
-                <div style={{ fontFamily: "'Roboto', sans-serif", fontSize: 13, color: "rgba(244,237,218,0.75)", marginTop: 2 }}>
-                  India-based founders, not a call centre
-                </div>
-              </div>
-            </div>
-
-            {/* Subtle FYN callback icon as bottom anchor */}
-            <div style={{ display: "flex", justifyContent: "center", marginTop: 8, opacity: 0.85 }}>
-              <FYNIcon name="callback" size={56} animated={false} title="Callback" />
+            <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.85 }}>
+              <FYNIcon name="callback" size={48} animated={false} title="Callback" />
             </div>
           </div>
         </div>
@@ -1408,4 +896,3 @@ function EngagementPopup() {
     </>
   );
 }
-
