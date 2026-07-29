@@ -79,8 +79,8 @@ const STYLES = `
 
   /* Timeline */
   .ab-timeline { position: relative; max-width: 780px; margin: 56px auto 0; padding-left: 56px; }
-  .ab-timeline-track { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-  .ab-timeline-track > i { display: block; width: 100%; background: ${C.red}; height: 0; transition: height .1s linear; box-shadow: 0 0 12px ${C.red}; }
+  .ab-timeline-track { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .ab-timeline-track > i { display: block; position: absolute; left: 0; right: 0; top: 0; background: ${C.red}; height: 0; will-change: height, top; box-shadow: 0 0 12px ${C.red}; border-radius: 2px; }
   .ab-tl-item { position: relative; padding: 22px 0 22px 8px; }
   .ab-tl-item + .ab-tl-item { border-top: 1px solid rgba(255,255,255,0.06); }
   .ab-tl-dot { position: absolute; left: -44px; top: 26px; width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); transition: background .3s, border-color .3s, box-shadow .3s; }
@@ -208,25 +208,34 @@ export default function AboutPage() {
     const fill = trackFillRef.current;
     if (!container || !fill) return;
     const items = Array.from(container.querySelectorAll<HTMLElement>(".ab-tl-item"));
+    if (!items.length) return;
 
     let rafId = 0;
     const compute = () => {
       const rect = container.getBoundingClientRect();
       const vh = window.innerHeight;
-      const start = vh * 0.75;
-      const end = vh * 0.25;
-      const distance = rect.height + (start - end);
-      const traveled = start - rect.top;
-      const progress = Math.max(0, Math.min(1, traveled / distance));
-      fill.style.height = `${progress * 100}%`;
+      // Anchor progress to the viewport line at 55% down — feels like a natural
+      // "read line". Fill begins when the container's top crosses that line and
+      // completes when the LAST dot crosses it.
+      const anchorY = vh * 0.55;
+      // Dot center = item.top + 26(dot top offset) + 8(half of 16px dot)
+      const dotOffset = 34;
+      const firstDotY = items[0].getBoundingClientRect().top + dotOffset - rect.top;
+      const lastDotY = items[items.length - 1].getBoundingClientRect().top + dotOffset - rect.top;
+      const span = Math.max(1, lastDotY - firstDotY);
+      const traveled = anchorY - (rect.top + firstDotY);
+      const progress = Math.max(0, Math.min(1, traveled / span));
+      // Draw the line from the first dot down to the last dot (not full container).
+      const trackTopPct = (firstDotY / rect.height) * 100;
+      const trackSpanPct = (span / rect.height) * 100;
+      fill.style.top = `${trackTopPct}%`;
+      fill.style.height = `${trackSpanPct * progress}%`;
 
-      // Activate dots when the item is within the drawn portion
-      const drawnBottomY = rect.top + progress * rect.height;
+      // Activate a dot once it has passed the read-line anchor.
       let lastActive = -1;
       items.forEach((el, i) => {
-        const irect = el.getBoundingClientRect();
-        const dotY = irect.top + 26;
-        if (dotY <= drawnBottomY + 4) {
+        const dotY = el.getBoundingClientRect().top + dotOffset;
+        if (dotY <= anchorY + 6) {
           el.classList.add("on");
           lastActive = i;
         } else {
