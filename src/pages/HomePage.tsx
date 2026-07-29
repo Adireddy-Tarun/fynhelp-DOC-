@@ -1531,10 +1531,8 @@ export default function HomePage() {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            io.unobserve(e.target);
-          }
+          if (e.isIntersecting) e.target.classList.add("in");
+          else e.target.classList.remove("in");
         });
       },
       { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
@@ -1542,6 +1540,7 @@ export default function HomePage() {
     targets.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
+
 
 
   return (
