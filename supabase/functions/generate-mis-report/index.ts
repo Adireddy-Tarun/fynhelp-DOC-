@@ -470,13 +470,19 @@ Deno.serve(async (req) => {
       y -= 16;
     } else {
       const cols = [LEFT, 200, 320, 440];
-      txt(page, "Event", cols[0], y, 8, bold, GRAY);
-      txt(page, "Period", cols[1], y, 8, bold, GRAY);
-      txt(page, "Due date", cols[2], y, 8, bold, GRAY);
-      txt(page, "Status", cols[3], y, 8, bold, GRAY);
-      y -= 14;
+      const colHeader = () => {
+        txt(page, "Event", cols[0], y, 8, bold, GRAY);
+        txt(page, "Period", cols[1], y, 8, bold, GRAY);
+        txt(page, "Due date", cols[2], y, 8, bold, GRAY);
+        txt(page, "Status", cols[3], y, 8, bold, GRAY);
+        y -= 14;
+      };
+      colHeader();
       for (const e of compliance.slice(0, 30)) {
-        ensure(16);
+        if (y - 16 < 80) {
+          newPage();
+          colHeader();
+        }
         txt(page, String(e.event_type ?? "—").slice(0, 28), cols[0], y, 9, helv, DARK);
         txt(page, String(e.filing_period ?? "—").slice(0, 20), cols[1], y, 9, helv, DARK);
         txt(page, String(e.due_date ?? "—").slice(0, 10), cols[2], y, 9, helv, DARK);
