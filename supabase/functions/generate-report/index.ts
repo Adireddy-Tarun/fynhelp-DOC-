@@ -355,7 +355,16 @@ Deno.serve(async (req) => {
       return json({ success: false, error: "Missing authorization header" }, 401);
     }
     const token = authHeader.slice(7);
-    const isServiceCall = token === SERVICE_KEY;
+    const isServiceRoleToken = (t: string) => {
+      if (t === SERVICE_KEY) return true;
+      try {
+        const payload = JSON.parse(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+        return payload?.role === "service_role";
+      } catch {
+        return false;
+      }
+    };
+    const isServiceCall = isServiceRoleToken(token);
 
     let uid: string | null = null;
     if (!isServiceCall) {
