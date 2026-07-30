@@ -834,6 +834,32 @@ export default function ImportPage() {
 
   const headers = rawRows.length > 0 ? rawRows[0] : [];
 
+  // Live "Parsed amount" preview for the column mapper: shows the raw cell and
+  // the signed value that will actually be stored (red = debit, green = credit).
+  const mapperPreview = useMemo(() => {
+    if (isXMLFile || rawRows.length < 2) return [] as Array<{ raw: string; parsed: number }>;
+    const idx = (name: string) => (name ? headers.indexOf(name) : -1);
+    const dIdx = idx(tallyColumnMap.debitCol);
+    const cIdx = idx(tallyColumnMap.creditCol);
+    const aIdx = idx(tallyColumnMap.amountCol);
+    const tIdx = idx(tallyColumnMap.directionCol);
+    if (dIdx === -1 && cIdx === -1 && aIdx === -1) return [];
+    return rawRows.slice(1, 6).map((r) => {
+      const rawDebit = dIdx !== -1 ? r[dIdx] ?? "" : "";
+      const rawCredit = cIdx !== -1 ? r[cIdx] ?? "" : "";
+      const rawAmt = aIdx !== -1 ? r[aIdx] ?? "" : "";
+      const rawDir = tIdx !== -1 ? r[tIdx] ?? "" : "";
+      let parsed = normaliseAmount(rawAmt, rawDir, rawDebit, rawCredit);
+      if (parsed !== 0 && rawDir && signFromType(rawDir) === 0 && dIdx === -1 && cIdx === -1) {
+        parsed = classifyTallyVoucherType(rawDir, String(rawAmt)) === "out" ? -Math.abs(parsed) : Math.abs(parsed);
+      }
+      const raw = [rawDebit && `Dr ${rawDebit}`, rawCredit && `Cr ${rawCredit}`, rawAmt, rawDir]
+        .filter(Boolean).join("  ·  ");
+      return { raw, parsed };
+    });
+  }, [rawRows, headers, tallyColumnMap, isXMLFile]);
+
+
   return (
     <div className="min-h-screen bg-fyn-beige px-6 py-8">
       <div className="max-w-5xl mx-auto">
