@@ -215,6 +215,7 @@ export default function CAClientDetailPage() {
     const period_end = now.toISOString().slice(0, 10);
 
     setGenerating(true);
+    const loadingId = toast.loading("Generating PDF report...");
     const { data, error } = await supabase.functions.invoke("generate-mis-report", {
       body: {
         ca_firm_id: firmId,
@@ -225,14 +226,15 @@ export default function CAClientDetailPage() {
       },
     });
     setGenerating(false);
+    toast.dismiss(loadingId);
 
     if (error) return toast.error(`Report generation failed: ${error.message}`);
     if (!data?.success) return toast.error(data?.error ?? "Report generation failed");
 
     await loadReports();
-    toast.success("MIS report generated successfully. Click to download.", {
+    toast.success("MIS PDF report generated successfully.", {
       action: data.file_url
-        ? { label: "Download", onClick: () => window.open(data.file_url, "_blank", "noopener") }
+        ? { label: "Download PDF", onClick: () => window.open(data.file_url, "_blank", "noopener") }
         : undefined,
     });
   };
