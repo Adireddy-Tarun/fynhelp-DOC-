@@ -5,6 +5,21 @@ import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2, Info } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
+import { supabaseExternal } from "@/integrations/supabase/external";
+import {
+  normaliseAmount,
+  signFromType,
+  directionFromSigned,
+  detectAmountPattern,
+  logParsePattern,
+  isDebitHeader,
+  isCreditHeader,
+  isAmountHeader,
+  isTypeHeader,
+  findHeaderIndex,
+  type DetectedColumns,
+} from "@/lib/bankAmount";
+
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
 
