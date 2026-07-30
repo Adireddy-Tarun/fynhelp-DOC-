@@ -280,9 +280,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
           if (x === null) { skipped++; return false; }
           return true;
         });
+        logParsePattern("bank-csv", bankDetected, records);
         if (records.length === 0) {
           throw new Error("No parseable rows found. Please check your column headers (Date, Debit/Withdrawal, Credit/Deposit or Amount).");
         }
+
         const { error } = await supabase.from("transactions").insert(records);
         if (error) throw error;
         if (skipped > 0) {
