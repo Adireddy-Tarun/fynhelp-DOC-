@@ -96,40 +96,149 @@ export default function CAClientsPage() {
   };
 
   const exportCsv = async () => {
+    if (selectedIds.length === 0) {
+      toast.warning("Select at least one client to export");
+      return;
+    }
     setBusy(true);
     const chosen = rows.filter((r) => selectedIds.includes(r.id));
-    const enriched = await Promise.all(
-      chosen.map(async (c) => {
-        let health = "", cash = "";
-        if (c.business_id) {
-          try {
-            const { data } = await supabaseExternal
-              .from("liquidity_metrics")
-              .select("cash_position, health_status")
-              .eq("business_id", c.business_id)
-              .order("recorded_at", { ascending: false })
-              .limit(1)
-              .maybeSingle();
-            health = data?.health_status ?? "";
-            cash = data?.cash_position != null ? String(data.cash_position) : "";
-          } catch { /* empty state */ }
-        }
-        return [c.client_name, c.client_email ?? "", c.gstin ?? "", c.client_status ?? "", health, cash];
-      }),
-    );
-    const header = ["Client name", "Email", "GSTIN", "Status", "Health status", "Cash position"];
-    const csv = [header, ...enriched]
-      .map((r) => r.map((v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))).join(","))
-      .join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ca-clients-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setBusy(false);
-    toast.success("CSV exported");
+    const loadingId = toast.loading(`Preparing export for ${chosen.length} client${chosen.length === 1 ? "" : "s"}...`);
+    const fmtDate = (v: string | null | undefined) => {
+      if (!v) return "";
+      const d = new Date(v);
+      if (Number.isNaN(d.getTime())) return "";
+      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    };
+    const num = (v: unknown) => (v === null || v === undefined || v === "" ? "" : String(Number(v)));
+
+    try {
+      const enriched = await Promise.all(
+        chosen.map(async (c) => {
+          let health = "", cash = "", runway = "", burn = "", gstDue = "", gstType = "";
+          let itcTotal = "", itcMatched = "", itcMismatched = "", tdsTotal = "", overdue = "", eventsTotal = "";
+
+          if (c.business_id) {
+            const bid = c.business_id;
+            const [liq, gst, itc, events, tds] = await Promise.all([
+              supabaseExternal
+                .from("liquidity_metrics")
+                .select("cash_position, health_status, runway_months, burn_rate_current")
+                .eq("business_id", bid)
+                .order("recorded_at", { ascending: false })
+                .limit(1)
+                .maybeSingle()
+                .then((r) => r, () => ({ data: null })),
+              supabaseExternal
+                .from("gst_filings")
+                .select("due_date, return_type, status")
+                .eq("business_id", bid)
+                .neq("status", "filed")
+                .order("due_date", { ascending: true })
+                .limit(1)
+                .maybeSingle()
+                .then((r) => r, () => ({ data: null })),
+              supabase
+                .from("ca_itc_records")
+                .select("total_itc, match_status")
+                .eq("business_id", bid)
+                .then((r) => r, () => ({ data: null })),
+              supabase
+                .from("ca_compliance_events")
+                .select("due_date, status")
+                .eq("business_id", bid)
+                .then((r) => r, () => ({ data: null })),
+              supabase
+                .from("ca_tds_records")
+                .select("tds_amount")
+                .eq("business_id", bid)
+                .then((r) => r, () => ({ data: null })),
+            ]);
+
+            const l = (liq as { data: Record<string, unknown> | null }).data;
+            if (l) {
+              health = (l.health_status as string) ?? "";
+              cash = num(l.cash_position);
+              runway = num(l.runway_months);
+              burn = num(l.burn_rate_current);
+            }
+            const g = (gst as { data: Record<string, unknown> | null }).data;
+            if (g) {
+              gstDue = fmtDate(g.due_date as string);
+              gstType = (g.return_type as string) ?? "";
+            }
+            const itcRows = (itc as { data: { total_itc: number | null; match_status: string | null }[] | null }).data;
+            if (itcRows) {
+              itcTotal = String(itcRows.reduce((s, r) => s + Number(r.total_itc ?? 0), 0));
+              itcMatched = String(itcRows.filter((r) => r.match_status === "matched").length);
+              itcMismatched = String(itcRows.filter((r) => r.match_status && r.match_status !== "matched").length);
+            }
+            const evRows = (events as { data: { due_date: string | null; status: string | null }[] | null }).data;
+            if (evRows) {
+              const now = Date.now();
+              eventsTotal = String(evRows.length);
+              overdue = String(
+                evRows.filter((r) => r.status !== "filed" && r.due_date && new Date(r.due_date).getTime() < now).length,
+              );
+            }
+            const tdsRows = (tds as { data: { tds_amount: number | null }[] | null }).data;
+            if (tdsRows) tdsTotal = String(tdsRows.reduce((s, r) => s + Number(r.tds_amount ?? 0), 0));
+          }
+
+          return [
+            c.client_name ?? "",
+            c.client_email ?? "",
+            c.gstin ?? "",
+            (c as ClientRow).pan ?? "",
+            (c as ClientRow).client_phone ?? "",
+            c.client_status ?? "",
+            fmtDate(c.onboarded_at),
+            health,
+            cash,
+            runway,
+            burn,
+            gstDue,
+            gstType,
+            itcTotal,
+            itcMatched,
+            itcMismatched,
+            tdsTotal,
+            overdue,
+            eventsTotal,
+            fmtDate(c.last_activity_at),
+          ];
+        }),
+      );
+
+      const header = [
+        "Client Name", "Email", "GSTIN", "PAN", "Phone", "Status", "Onboarded Date", "Health Status",
+        "Cash Position (INR)", "Runway (months)", "Burn Rate (INR/month)", "Next GST Due", "Next GST Return Type",
+        "Total ITC Claimed (INR)", "ITC Matched", "ITC Mismatched", "Total TDS Deducted (INR)",
+        "Overdue Compliance Events", "Total Compliance Events", "Last Activity",
+      ];
+      const csv = [header, ...enriched]
+        .map((r) => r.map((v) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))).join(","))
+        .join("\n");
+
+      const today = new Date();
+      const stamp = `${String(today.getDate()).padStart(2, "0")}-${String(today.getMonth() + 1).padStart(2, "0")}-${today.getFullYear()}`;
+      const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `FynHelp_Clients_Export_${stamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.dismiss(loadingId);
+      toast.success(`Export ready. ${chosen.length} client${chosen.length === 1 ? "" : "s"} exported.`);
+    } catch {
+      toast.dismiss(loadingId);
+      toast.error("Export failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
+
 
   return (
     <div>
