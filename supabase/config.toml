@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.send-trial-reminder-emails]
 verify_jwt = false
+
+[functions.compute-revenue]
+verify_jwt = true
