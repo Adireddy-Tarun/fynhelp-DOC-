@@ -179,20 +179,33 @@ export default function CAClientDetailPage() {
     if (!businessId || !firmId) return;
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const { error } = await supabase.from("ca_reports_log").insert({
-      ca_firm_id: firmId,
-      business_id: businessId,
-      report_type: "MIS",
-      period: now.toLocaleDateString("en-IN", { month: "long", year: "numeric" }),
-      period_start: start.toISOString().slice(0, 10),
-      period_end: now.toISOString().slice(0, 10),
-      status: "pending",
-      generated_by_user_id: userId,
+    const period_start = start.toISOString().slice(0, 10);
+    const period_end = now.toISOString().slice(0, 10);
+
+    setGenerating(true);
+    const { data, error } = await supabase.functions.invoke("generate-mis-report", {
+      body: {
+        ca_firm_id: firmId,
+        business_id: businessId,
+        period_start,
+        period_end,
+        generated_by_user_id: userId,
+      },
     });
-    if (error) return toast.error(error.message);
-    toast.success("Report generation queued. It will appear here when ready.");
-    loadReports();
+    setGenerating(false);
+
+    if (error) return toast.error(`Report generation failed: ${error.message}`);
+    if (!data?.success) return toast.error(data?.error ?? "Report generation failed");
+
+    await loadReports();
+    toast.success("MIS report generated successfully. Click to download.", {
+      action: data.file_url
+        ? { label: "Download", onClick: () => window.open(data.file_url, "_blank", "noopener") }
+        : undefined,
+    });
   };
+
+
 
   const itcTotals = useMemo(() => {
     const sum = (f: (r: any) => number) => itc.reduce((s, r) => s + (Number(f(r)) || 0), 0);
