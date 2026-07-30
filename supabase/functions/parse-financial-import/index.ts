@@ -44,17 +44,18 @@ function isLikelyDateHeader(h: string) {
 }
 function isAmountHeader(h: string) {
   const s = h.toLowerCase();
-  return /amount|amt|value/.test(s) && !/balance/.test(s);
+  return /^amount|transaction amount|txn amount|net amount|amount$/.test(s.trim()) && !/balance/.test(s);
 }
 function isDebitHeader(h: string) {
-  return /debit|withdrawal|dr\b|paid out|out/i.test(h);
+  return /debit amount|debit amt|^debit$|withdrawal amt|withdrawal amount|^withdrawal$|dr amount|dr amt|paid out|money out/i.test(h.trim());
 }
 function isCreditHeader(h: string) {
-  return /credit|deposit|cr\b|paid in|in\b/i.test(h);
+  return /credit amount|credit amt|^credit$|deposit amt|deposit amount|^deposit$|cr amount|cr amt|paid in|money in/i.test(h.trim());
 }
 function isBalanceHeader(h: string) {
   return /balance|bal\b/i.test(h);
 }
+
 function isDescriptionHeader(h: string) {
   return /description|narration|particulars|details|remarks|memo/i.test(h);
 }
