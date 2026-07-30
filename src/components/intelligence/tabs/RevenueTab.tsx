@@ -146,6 +146,8 @@ export default function RevenueTab() {
         </IntelCard>
       )}
 
+      {mode === "live" && <CohortChurnSection />}
+
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="NRR" value={Number.isFinite(m.nrr) ? fmtPct(m.nrr, 0) : EMPTY} isEmpty={!Number.isFinite(m.nrr)} delta={Number.isFinite(m.nrr) ? "+3.2% QoQ" : undefined} deltaTone="up" tone={Number.isFinite(m.nrr) && m.nrr >= 110 ? "healthy" : "neutral"} />
