@@ -1107,11 +1107,44 @@ export default function ImportPage() {
                 </div>
               ))}
             </div>
+            {mapperPreview.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "#92400e", marginBottom: 6 }}>
+                  Preview — confirm debits are negative before importing
+                </div>
+                <div style={{ overflowX: "auto", background: "white", border: "1px solid rgba(146,64,14,0.25)", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Inter, sans-serif", fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: "#FFF7ED", color: "#92400e" }}>
+                        <th style={{ textAlign: "left", padding: "7px 10px", fontWeight: 600 }}>Raw value</th>
+                        <th style={{ textAlign: "right", padding: "7px 10px", fontWeight: 600 }}>Parsed amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mapperPreview.map((p, i) => (
+                        <tr key={i} style={{ borderTop: "1px solid rgba(146,64,14,0.12)" }}>
+                          <td style={{ padding: "7px 10px", color: "#1A1008", whiteSpace: "nowrap" }}>{p.raw || "—"}</td>
+                          <td style={{
+                            padding: "7px 10px", textAlign: "right",
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: p.parsed < 0 ? "#C41E1E" : "#10B981",
+                          }}>
+                            {p.parsed < 0 ? "−" : "+"}{Math.abs(p.parsed).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {!isTallyMapperReady && (
               <div style={{ marginTop: 12, fontFamily: "Inter, sans-serif", fontSize: 12, color: "#92400e" }}>
                 Map the Date column and at least one Amount or Debit column to enable the import button.
               </div>
             )}
+
           </div>
         )}
 
