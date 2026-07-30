@@ -74,6 +74,7 @@ export default function CostTab() {
 
   return (
     <div className="space-y-6">
+      <CostAnomaliesSection />
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI href="/dashboard/expenses" label="Total OPEX" value={fmtCompact(m.totalOpex)} />
