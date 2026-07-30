@@ -242,11 +242,14 @@ const App = () => (
             <Route path="/ca/register" element={<CARegisterPage />} />
             <Route path="/ca/onboarding" element={<CAOnboardingPage />} />
             <Route path="/ca/verification-pending" element={<CAVerificationPendingPage />} />
-            <Route path="/ca" element={<CALayout />}>
+            <Route path="/ca/invite/accept" element={<CAInviteAcceptPage />} />
+            <Route path="/ca" element={<CAPortalLayout />}>
               <Route path="dashboard" element={<CADashboardPage />} />
               <Route path="clients" element={<CAClientsPage />} />
               <Route path="clients/add" element={<CAAddClientPage />} />
-              <Route path="client/:id" element={<CAClientDetailPage />} />
+              <Route path="clients/:clientId" element={<CAClientDetailPage />} />
+              <Route path="client/:clientId" element={<CAClientDetailPage />} />
+
               <Route path="filing-calendar" element={<CAFilingCalendarPage />} />
               <Route path="gst-portfolio" element={<CAGstPortfolioPage />} />
               <Route path="tds-tracker" element={<CATdsTrackerPage />} />
