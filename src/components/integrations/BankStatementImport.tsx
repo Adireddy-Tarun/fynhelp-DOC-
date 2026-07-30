@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = ".csv,.xlsx,.xls";
