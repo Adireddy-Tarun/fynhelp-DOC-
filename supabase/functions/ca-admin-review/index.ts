@@ -15,12 +15,39 @@ const cors = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Content-Type": "application/json",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: cors });
 
 type Action = "approve" | "reject" | "suspend" | "reactivate";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Strip HTML tags and clamp length.
+const sanitize = (v: unknown) =>
+  String(v ?? "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, 500);
+
+// In-memory rate limiter: max 30 requests per caller email per minute.
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 60_000;
+const hits = new Map<string, number[]>();
+
+function rateLimited(key: string): boolean {
+  const now = Date.now();
+  const arr = (hits.get(key) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+  arr.push(now);
+  hits.set(key, arr);
+  return arr.length > RATE_LIMIT;
+}
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
