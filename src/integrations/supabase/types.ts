@@ -1018,6 +1018,54 @@ export type Database = {
           },
         ]
       }
+      ca_client_invitations: {
+        Row: {
+          accepted_at: string | null
+          access_level: string | null
+          business_id: string | null
+          ca_firm_id: string
+          client_name: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          invited_email: string
+          notes: string | null
+          sent_by: string | null
+          status: string | null
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          access_level?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          client_name?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invited_email: string
+          notes?: string | null
+          sent_by?: string | null
+          status?: string | null
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          access_level?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          client_name?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          invited_email?: string
+          notes?: string | null
+          sent_by?: string | null
+          status?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
       ca_client_messages: {
         Row: {
           business_id: string
@@ -1065,6 +1113,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ca_clients: {
+        Row: {
+          assigned_to: string | null
+          business_id: string | null
+          ca_firm_id: string
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          client_status: string | null
+          created_at: string | null
+          gstin: string | null
+          id: string
+          is_demo: boolean | null
+          last_activity_at: string | null
+          notes: string | null
+          onboarded_at: string | null
+          pan: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          client_status?: string | null
+          created_at?: string | null
+          gstin?: string | null
+          id?: string
+          is_demo?: boolean | null
+          last_activity_at?: string | null
+          notes?: string | null
+          onboarded_at?: string | null
+          pan?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          client_status?: string | null
+          created_at?: string | null
+          gstin?: string | null
+          id?: string
+          is_demo?: boolean | null
+          last_activity_at?: string | null
+          notes?: string | null
+          onboarded_at?: string | null
+          pan?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       ca_compliance_events: {
         Row: {
@@ -5226,6 +5331,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_ca_invitation: { Args: { _token: string }; Returns: string }
       bytea_to_text: { Args: { data: string }; Returns: string }
       ca_firm_has_all_client_access: {
         Args: { _business_ids: string[]; _firm_id: string }
@@ -5257,6 +5363,7 @@ export type Database = {
         Args: { p_business_id: string; p_ca_firm_id: string }
         Returns: Json
       }
+      decline_ca_invitation: { Args: { _token: string }; Returns: string }
       generate_compliance_calendar: {
         Args: {
           p_business_id: string
@@ -5264,6 +5371,17 @@ export type Database = {
           p_financial_year?: string
         }
         Returns: number
+      }
+      get_ca_invitation: {
+        Args: { _token: string }
+        Returns: {
+          access_level: string
+          client_name: string
+          expires_at: string
+          firm_name: string
+          invited_email: string
+          status: string
+        }[]
       }
       get_latest_demo_insight: {
         Args: { p_org_id: string }
