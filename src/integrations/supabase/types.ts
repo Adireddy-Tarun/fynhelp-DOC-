@@ -770,7 +770,7 @@ export type Database = {
       ca_approval_log: {
         Row: {
           action: string
-          ca_firm_id: string
+          ca_firm_id: string | null
           created_at: string | null
           id: string
           reason: string | null
@@ -778,7 +778,7 @@ export type Database = {
         }
         Insert: {
           action: string
-          ca_firm_id: string
+          ca_firm_id?: string | null
           created_at?: string | null
           id?: string
           reason?: string | null
@@ -786,7 +786,7 @@ export type Database = {
         }
         Update: {
           action?: string
-          ca_firm_id?: string
+          ca_firm_id?: string | null
           created_at?: string | null
           id?: string
           reason?: string | null
