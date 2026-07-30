@@ -88,6 +88,19 @@ const fmtDateTime = (v?: string | null) =>
       })
     : "—";
 
+const isExpiredSession = (error: unknown, data: unknown) => {
+  const status = (error as { status?: number; context?: { status?: number } } | null)?.status
+    ?? (error as { context?: { status?: number } } | null)?.context?.status;
+  const msg = String((error as { message?: string } | null)?.message ?? (data as { error?: string } | null)?.error ?? "");
+  return status === 401 || /jwt|unauthor/i.test(msg);
+};
+
+async function handleExpiredSession() {
+  toast.error("Your session has expired. Please sign in again.");
+  await supabase.auth.signOut();
+  window.location.assign("/");
+}
+
 export default function CAApprovalsPage() {
   const [firms, setFirms] = useState<Firm[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,6 +128,7 @@ export default function CAApprovalsPage() {
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("ca-admin-review", { body: { op: "list" } });
     setLoading(false);
+    if (isExpiredSession(error, data)) { await handleExpiredSession(); return; }
     if (error || !data?.success) {
       toast.error(data?.error ?? error?.message ?? "Could not load CA firms");
       setFirms([]);
@@ -150,6 +164,7 @@ export default function CAApprovalsPage() {
       body: { op: "review", firm_id: firm.id, action, reason: reason.trim() || undefined },
     });
     setBusyId(null);
+    if (isExpiredSession(error, data)) { await handleExpiredSession(); return; }
     if (error || !data?.success) {
       toast.error(data?.error ?? error?.message ?? "Action failed");
       return;
@@ -189,6 +204,7 @@ export default function CAApprovalsPage() {
       body: { op: "audit", firm_id: firm.id },
     });
     setAuditLoading(false);
+    if (isExpiredSession(error, data)) { await handleExpiredSession(); return; }
     if (error || !data?.success) {
       toast.error(data?.error ?? error?.message ?? "Could not load audit history");
       return;
