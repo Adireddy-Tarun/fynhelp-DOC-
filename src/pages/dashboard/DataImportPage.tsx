@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
+import { normaliseAmount, directionFromSigned, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
