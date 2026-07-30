@@ -169,11 +169,6 @@ Deno.serve(async (req) => {
   const { error: updErr } = await admin.from("ca_firms").update(patch).eq("id", firm_id);
   if (updErr) return json({ success: false, error: updErr.message }, 500);
 
-  const logAction =
-    action === "approve" ? "approved"
-    : action === "reject" ? "rejected"
-    : action === "suspend" ? "suspended"
-    : "reactivated";
 
   const { error: logErr } = await admin.from("ca_approval_log").insert({
     ca_firm_id: firm_id,
