@@ -661,7 +661,12 @@ async function insertAndCompute(
   const { data: compData, error: compErr } = await supabase.functions.invoke("compute-liquidity", {
     body: { business_id: businessId },
   });
+
+  // Refresh the pre-computed liquidity + cost metrics the dashboards read from.
+  await recomputeIntelligence(businessId);
+
   if (compErr) return { error: `Imported ${txns.length} rows but intelligence computation failed: ${compErr.message}` };
+
 
   return {
     cash_position: compData?.cash_position ?? 0,
