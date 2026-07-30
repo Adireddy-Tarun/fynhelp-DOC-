@@ -158,28 +158,52 @@ export default function CAClientDetailPage() {
     console.log("[fyn:ca] tab.reports", businessId, data?.length ?? 0);
   }, [businessId, firmId]);
 
+  const loadGstrUploads = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_gstr2b_uploads").select("*")
+      .eq("ca_firm_id", firmId).eq("business_id", businessId)
+      .order("created_at", { ascending: false });
+    if (error) console.warn("[fyn:ca] ca_gstr2b_uploads", error);
+    setGstrUploads(data ?? []);
+  }, [businessId, firmId]);
+
   useEffect(() => {
     if (!businessId) return;
-    loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0);
-  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns]);
+    loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0); loadGstrUploads();
+  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
 
   // ---- Actions ----
   const uploadGstr2b = async (file: File) => {
-    if (!businessId || !firmId || !userId) return;
-    toast.info(`Processing ${file.name}…`);
-    const now = new Date();
-    const { error } = await supabase.from("ca_gstr2b_uploads").insert({
-      ca_firm_id: firmId,
-      business_id: businessId,
-      file_name: file.name,
-      file_size_bytes: file.size,
-      filing_period: now.toLocaleDateString("en-IN", { month: "short", year: "numeric" }),
-      processing_status: "pending",
-      uploaded_by: userId,
-    });
-    if (error) toast.error(`Upload not recorded: ${error.message}`);
-    else toast.success("GSTR-2B upload recorded. Matching runs in the background.");
+    if (!businessId || !firmId) return;
+    const m = gstrPeriod.match(/^(\d{4})-(\d{2})$/);
+    if (!m) return toast.error("Pick a filing period first");
+    const filingPeriod = `${m[2]}${m[1]}`; // MMYYYY
+
+    setUploadingGstr(true);
+    const toastId = toast.loading("Processing GSTR-2B file…");
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("ca_firm_id", firmId);
+    form.append("business_id", businessId);
+    form.append("filing_period", filingPeriod);
+
+    const { data, error } = await supabase.functions.invoke("parse-gstr2b", { body: form });
+    setUploadingGstr(false);
+
+    if (error || !data?.success) {
+      toast.error(data?.error ?? error?.message ?? "GSTR-2B processing failed", { id: toastId });
+    } else {
+      toast.success(
+        `GSTR-2B processed. ${data.records_matched} records matched, ${data.records_mismatched} mismatched, ${data.records_new} new records added.`,
+        { id: toastId },
+      );
+    }
+    loadItc();
+    loadGstrUploads();
   };
+
 
 
   const generateReport = async () => {
