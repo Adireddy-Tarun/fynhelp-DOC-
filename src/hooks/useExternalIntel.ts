@@ -313,3 +313,110 @@ export function useGeneratedAlerts(): LiveAlert[] {
 
   return alerts;
 }
+
+/* ────────────────────────────────────────────────────────────────────────
+ * Cohort analysis + churn signals (revenue intelligence, external store)
+ * ──────────────────────────────────────────────────────────────────────── */
+
+export type CohortRow = {
+  id: string;
+  business_id: string;
+  cohort_month: string;
+  cohort_size: number;
+  retained_m1: number | null;
+  retained_m2: number | null;
+  retained_m3: number | null;
+  retained_m4: number | null;
+  retained_m5: number | null;
+  retained_m6: number | null;
+  revenue_m1: number | null;
+  revenue_m2: number | null;
+  revenue_m3: number | null;
+  revenue_m4: number | null;
+  revenue_m5: number | null;
+  revenue_m6: number | null;
+  created_at: string;
+};
+
+export type ChurnSignal = {
+  id: string;
+  business_id: string;
+  customer_id: string;
+  customer_name: string | null;
+  last_invoice_date: string | null;
+  days_since_invoice: number;
+  signal_type: string;
+  severity: "warning" | "critical" | string;
+  detected_at: string;
+  is_acknowledged: boolean;
+};
+
+export function useCohortAnalysis() {
+  const businessId = useLiveBusinessId();
+  return useQuery({
+    queryKey: ["ext", "cohort_analysis", businessId],
+    enabled: !!businessId,
+    ...QUERY_OPTS,
+    queryFn: async (): Promise<CohortRow[]> => {
+      try {
+        const { data, error } = await supabaseExternal
+          .from("cohort_analysis")
+          .select("*")
+          .eq("business_id", businessId)
+          .order("cohort_month", { ascending: true });
+        if (error) throw error;
+        logMount("cohort_analysis", businessId, data);
+        return (data as CohortRow[]) ?? [];
+      } catch (e) {
+        console.warn("[fyn:external] cohort_analysis unavailable", e);
+        return [];
+      }
+    },
+  });
+}
+
+export function useChurnSignals() {
+  const businessId = useLiveBusinessId();
+  return useQuery({
+    queryKey: ["ext", "churn_signals", businessId],
+    enabled: !!businessId,
+    ...QUERY_OPTS,
+    queryFn: async (): Promise<ChurnSignal[]> => {
+      try {
+        const { data, error } = await supabaseExternal
+          .from("churn_signals")
+          .select("*")
+          .eq("business_id", businessId)
+          .eq("is_acknowledged", false)
+          .order("days_since_invoice", { ascending: false });
+        if (error) throw error;
+        logMount("churn_signals", businessId, data);
+        return (data as ChurnSignal[]) ?? [];
+      } catch (e) {
+        console.warn("[fyn:external] churn_signals unavailable", e);
+        return [];
+      }
+    },
+  });
+}
+
+/** Acknowledge a churn signal in the external store and drop it from cache. */
+export function useAcknowledgeChurnSignal() {
+  const businessId = useLiveBusinessId();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabaseExternal
+        .from("churn_signals")
+        .update({ is_acknowledged: true })
+        .eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: (id) => {
+      qc.setQueryData<ChurnSignal[]>(["ext", "churn_signals", businessId], (prev) =>
+        (prev ?? []).filter((s) => s.id !== id)
+      );
+    },
+  });
+}
