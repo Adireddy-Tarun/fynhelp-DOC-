@@ -28,6 +28,9 @@ import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
 import CAVerificationPage from "./pages/admin/CAVerificationPage.tsx";
+import CAApprovalsPage from "./pages/admin/CAApprovalsPage.tsx";
+import AdminGuard from "@/components/admin/AdminGuard";
+
 import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
 import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
 import { BlogAdminProvider } from "./contexts/BlogAdminContext.tsx";
