@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = ".csv,.xlsx,.xls";
@@ -178,10 +180,14 @@ export default function BankStatementImport() {
       }
 
       if (result?.success) {
-        toast.success(`Imported ${result.rowsImported} transactions`);
+        await recomputeIntelligence(businessId);
+        toast.success(
+          `Import complete. ${result.rowsImported} transaction${result.rowsImported === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+        );
         qc.invalidateQueries({ queryKey: ["bank_transactions"] });
         qc.invalidateQueries({ queryKey: ["liquidity"] });
         qc.invalidateQueries({ queryKey: ["dashboard"] });
+
       } else {
         toast.error(result?.reason || "Import failed — please try again");
       }

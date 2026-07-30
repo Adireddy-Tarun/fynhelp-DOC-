@@ -5,6 +5,24 @@ import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2, Info } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
+import { toast } from "sonner";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
+
+import {
+  normaliseAmount,
+  signFromType,
+  directionFromSigned,
+  detectAmountPattern,
+  logParsePattern,
+  isDebitHeader,
+  isCreditHeader,
+  isAmountHeader,
+  isTypeHeader,
+  findHeaderIndex,
+  type DetectedColumns,
+} from "@/lib/bankAmount";
+
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -326,6 +344,17 @@ function mapRows(
     dirIdx = bank.direction ? pick(headers, bank.direction) : -1;
   }
 
+  // Universal fallback: whatever the bank profile could not resolve, resolve it
+  // from the generic header dictionaries (works for any bank in the world).
+  const detected: DetectedColumns = detectAmountPattern(headers, rows.slice(1));
+  if (debitIdx === -1) debitIdx = detected.debitIdx;
+  if (creditIdx === -1) creditIdx = detected.creditIdx;
+  if (amountIdx === -1) amountIdx = detected.amountIdx;
+  if (dirIdx === -1) dirIdx = detected.typeIdx;
+  // Never let one physical column serve two roles.
+  if (amountIdx !== -1 && (amountIdx === debitIdx || amountIdx === creditIdx)) amountIdx = -1;
+
+
   if (dateIdx === -1) {
     return {
       txns: [],
@@ -362,38 +391,29 @@ function mapRows(
       continue;
     }
 
-    let amt = 0;
-    let dir: "in" | "out" = "out";
+    const rawDebit = debitIdx !== -1 ? r[debitIdx] ?? "" : "";
+    const rawCredit = creditIdx !== -1 ? r[creditIdx] ?? "" : "";
+    const rawAmt = amountIdx !== -1 ? r[amountIdx] ?? "" : "";
+    const rawDir = dirIdx !== -1 ? (r[dirIdx] || "").trim() : "";
 
-    if (debitIdx !== -1 || creditIdx !== -1) {
-      const d = debitIdx !== -1 ? Math.abs(toNumber(r[debitIdx] || "")) : 0;
-      const c = creditIdx !== -1 ? Math.abs(toNumber(r[creditIdx] || "")) : 0;
-      if (c > 0) { amt = c; dir = "in"; }
-      else if (d > 0) { amt = d; dir = "out"; }
-      else {
-        skipped++;
-        if (skipReasons.length < 5) skipReasons.push(`Row ${i + 1}: both debit and credit are zero`);
-        continue;
-      }
-    } else if (amountIdx !== -1) {
-      const rawAmt = r[amountIdx] || "";
-      const n = toNumber(rawAmt);
-      if (n === 0) {
-        skipped++;
-        if (skipReasons.length < 5) skipReasons.push(`Row ${i + 1}: amount is zero`);
-        continue;
-      }
-      amt = Math.abs(n);
-      if (dirIdx !== -1) {
-        const rawDir = (r[dirIdx] || "").trim();
-        dir = classifyTallyVoucherType(rawDir, rawAmt);
-      } else {
-        dir = n >= 0 ? "in" : "out";
-      }
-    } else {
+    // Universal signed normalisation: negative = debit, positive = credit
+    let signed = normaliseAmount(rawAmt, rawDir, rawDebit, rawCredit);
+
+    // Tally/Busy voucher types are richer than plain debit/credit words —
+    // when a voucher type is present and the generic normaliser could not
+    // resolve a direction from it, fall back to voucher classification.
+    if (signed !== 0 && rawDir && signFromType(rawDir) === 0 && debitIdx === -1 && creditIdx === -1) {
+      const vdir = classifyTallyVoucherType(rawDir, String(rawAmt));
+      signed = vdir === "out" ? -Math.abs(signed) : Math.abs(signed);
+    }
+
+    if (signed === 0) {
       skipped++;
+      if (skipReasons.length < 5) skipReasons.push(`Row ${i + 1}: amount is zero or unreadable`);
       continue;
     }
+
+    const dir: "in" | "out" = directionFromSigned(signed);
 
     const bal = balIdx !== -1 ? toNumber(r[balIdx] || "") : NaN;
     const desc = (descIdx !== -1 ? r[descIdx] : "").trim().slice(0, 500) || "No description";
@@ -402,12 +422,19 @@ function mapRows(
       business_id: businessId,
       date: iso,
       transaction_date: iso,
-      amount: amt,
+      amount: signed,
       direction: dir,
       description: desc,
       balance_after: isFinite(bal) && bal !== 0 ? bal : null,
     });
   }
+
+  logParsePattern(
+    `${bank.id}-csv`,
+    { ...detected, debitIdx, creditIdx, amountIdx, typeIdx: dirIdx },
+    out
+  );
+
 
   if (!out.length) {
     return {
@@ -610,7 +637,7 @@ function extractTallyVoucher(v: Element, businessId: string): ParsedTxn | null {
     business_id: businessId,
     date: iso,
     transaction_date: iso,
-    amount: Math.abs(numericAmt),
+    amount: dir === "out" ? -Math.abs(numericAmt) : Math.abs(numericAmt),
     direction: dir,
     description: narration.slice(0, 500),
     balance_after: bal && isFinite(bal) ? bal : null,
@@ -637,7 +664,12 @@ async function insertAndCompute(
   const { data: compData, error: compErr } = await supabase.functions.invoke("compute-liquidity", {
     body: { business_id: businessId },
   });
+
+  // Refresh the pre-computed liquidity + cost metrics the dashboards read from.
+  await recomputeIntelligence(businessId);
+
   if (compErr) return { error: `Imported ${txns.length} rows but intelligence computation failed: ${compErr.message}` };
+
 
   return {
     cash_position: compData?.cash_position ?? 0,
@@ -782,6 +814,10 @@ export default function ImportPage() {
       }
 
       setResult({ rows: txns.length, ...compResult });
+      toast.success(
+        `Import complete. ${txns.length} transaction${txns.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+      );
+
       track("csv_import_completed", { records: txns.length, skipped, bank: bank.id });
 
     } catch (e) {
@@ -797,6 +833,32 @@ export default function ImportPage() {
   const disabled = !bank || !file || busy || !businessId || (bankId === "tally" && columnMapperNeeded && !isTallyMapperReady && !isXMLFile);
 
   const headers = rawRows.length > 0 ? rawRows[0] : [];
+
+  // Live "Parsed amount" preview for the column mapper: shows the raw cell and
+  // the signed value that will actually be stored (red = debit, green = credit).
+  const mapperPreview = useMemo(() => {
+    if (isXMLFile || rawRows.length < 2) return [] as Array<{ raw: string; parsed: number }>;
+    const idx = (name: string) => (name ? headers.indexOf(name) : -1);
+    const dIdx = idx(tallyColumnMap.debitCol);
+    const cIdx = idx(tallyColumnMap.creditCol);
+    const aIdx = idx(tallyColumnMap.amountCol);
+    const tIdx = idx(tallyColumnMap.directionCol);
+    if (dIdx === -1 && cIdx === -1 && aIdx === -1) return [];
+    return rawRows.slice(1, 6).map((r) => {
+      const rawDebit = dIdx !== -1 ? r[dIdx] ?? "" : "";
+      const rawCredit = cIdx !== -1 ? r[cIdx] ?? "" : "";
+      const rawAmt = aIdx !== -1 ? r[aIdx] ?? "" : "";
+      const rawDir = tIdx !== -1 ? r[tIdx] ?? "" : "";
+      let parsed = normaliseAmount(rawAmt, rawDir, rawDebit, rawCredit);
+      if (parsed !== 0 && rawDir && signFromType(rawDir) === 0 && dIdx === -1 && cIdx === -1) {
+        parsed = classifyTallyVoucherType(rawDir, String(rawAmt)) === "out" ? -Math.abs(parsed) : Math.abs(parsed);
+      }
+      const raw = [rawDebit && `Dr ${rawDebit}`, rawCredit && `Cr ${rawCredit}`, rawAmt, rawDir]
+        .filter(Boolean).join("  ·  ");
+      return { raw, parsed };
+    });
+  }, [rawRows, headers, tallyColumnMap, isXMLFile]);
+
 
   return (
     <div className="min-h-screen bg-fyn-beige px-6 py-8">
@@ -1071,11 +1133,44 @@ export default function ImportPage() {
                 </div>
               ))}
             </div>
+            {mapperPreview.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, color: "#92400e", marginBottom: 6 }}>
+                  Preview — confirm debits are negative before importing
+                </div>
+                <div style={{ overflowX: "auto", background: "white", border: "1px solid rgba(146,64,14,0.25)", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Inter, sans-serif", fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: "#FFF7ED", color: "#92400e" }}>
+                        <th style={{ textAlign: "left", padding: "7px 10px", fontWeight: 600 }}>Raw value</th>
+                        <th style={{ textAlign: "right", padding: "7px 10px", fontWeight: 600 }}>Parsed amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mapperPreview.map((p, i) => (
+                        <tr key={i} style={{ borderTop: "1px solid rgba(146,64,14,0.12)" }}>
+                          <td style={{ padding: "7px 10px", color: "#1A1008", whiteSpace: "nowrap" }}>{p.raw || "—"}</td>
+                          <td style={{
+                            padding: "7px 10px", textAlign: "right",
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: p.parsed < 0 ? "#C41E1E" : "#10B981",
+                          }}>
+                            {p.parsed < 0 ? "−" : "+"}{Math.abs(p.parsed).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {!isTallyMapperReady && (
               <div style={{ marginTop: 12, fontFamily: "Inter, sans-serif", fontSize: 12, color: "#92400e" }}>
                 Map the Date column and at least one Amount or Debit column to enable the import button.
               </div>
             )}
+
           </div>
         )}
 

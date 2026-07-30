@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
+import { normaliseAmount, directionFromSigned, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
@@ -249,13 +252,20 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     try {
       if (type === "bank") {
         let skipped = 0;
+        const bankHeaders = Object.keys(rows[0] ?? {});
+        const bankDetected = detectAmountPattern(
+          bankHeaders,
+          rows.map(r => bankHeaders.map(h => r[h]))
+        );
         const records = rows.map(r => {
-          const debit = num(pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]));
-          const credit = num(pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]));
-          const rawAmt = num(pick(r, ["Amount", "Transaction Amount", "Txn Amount"]));
-          const amount = debit > 0 ? debit : credit > 0 ? credit : Math.abs(rawAmt);
-          const direction = debit > 0 ? "out" : credit > 0 ? "in" : (rawAmt < 0 ? "out" : "in");
+          const rawDebit = pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]);
+          const rawCredit = pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]);
+          const rawAmt = pick(r, ["Amount", "Transaction Amount", "Txn Amount"]);
+          const rawType = pick(r, ["Type", "Transaction Type", "Txn Type", "Dr/Cr", "Cr/Dr", "Mode"]);
+          // Signed: negative = debit / money out, positive = credit / money in
+          const amount = normaliseAmount(rawAmt, rawType, rawDebit, rawCredit);
           if (amount === 0) return null;
+          const direction = directionFromSigned(amount);
           return {
             business_id: businessId,
             date: toDate(pick(r, ["Date", "Transaction Date", "Txn Date", "Value Date"])),
@@ -266,12 +276,15 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             category: pick(r, ["Category"]) || null,
           };
         }).filter((x): x is NonNullable<typeof x> => {
+
           if (x === null) { skipped++; return false; }
           return true;
         });
+        logParsePattern("bank-csv", bankDetected, records);
         if (records.length === 0) {
           throw new Error("No parseable rows found. Please check your column headers (Date, Debit/Withdrawal, Credit/Deposit or Amount).");
         }
+
         const { error } = await supabase.from("transactions").insert(records);
         if (error) throw error;
         if (skipped > 0) {
@@ -327,8 +340,13 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
+      // Refresh pre-computed liquidity + cost metrics so dashboards update now.
+      await recomputeIntelligence(businessId);
       track("csv_import_completed", { records_inserted: rows.length });
-      toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
+      toast.success(
+        `Import complete. ${rows.length} transaction${rows.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+      );
+
       onSuccess();
       setTimeout(() => {
         setFile(null);

@@ -44,17 +44,18 @@ function isLikelyDateHeader(h: string) {
 }
 function isAmountHeader(h: string) {
   const s = h.toLowerCase();
-  return /amount|amt|value/.test(s) && !/balance/.test(s);
+  return /^amount|transaction amount|txn amount|net amount|amount$/.test(s.trim()) && !/balance/.test(s);
 }
 function isDebitHeader(h: string) {
-  return /debit|withdrawal|dr\b|paid out|out/i.test(h);
+  return /debit amount|debit amt|^debit$|withdrawal amt|withdrawal amount|^withdrawal$|dr amount|dr amt|paid out|money out/i.test(h.trim());
 }
 function isCreditHeader(h: string) {
-  return /credit|deposit|cr\b|paid in|in\b/i.test(h);
+  return /credit amount|credit amt|^credit$|deposit amt|deposit amount|^deposit$|cr amount|cr amt|paid in|money in/i.test(h.trim());
 }
 function isBalanceHeader(h: string) {
   return /balance|bal\b/i.test(h);
 }
+
 function isDescriptionHeader(h: string) {
   return /description|narration|particulars|details|remarks|memo/i.test(h);
 }
@@ -87,13 +88,25 @@ function parseDate(v: any): string | null {
 function parseNum(v: any): number | null {
   if (v == null || v === "") return null;
   if (typeof v === "number") return v;
-  const s = String(v).replace(/[, ]/g, "").replace(/[₹$€£]/g, "").trim();
-  if (!s) return null;
-  // (123) negative
+  let s = String(v).trim();
+  let sign = 0;
+  // DR / CR suffix or prefix inside the amount cell (Pattern 5)
+  const suffix = s.match(/(^|[\s(])(dr|cr|debit|credit)\.?\s*$/i);
+  if (suffix) { sign = /^c/i.test(suffix[2]) ? 1 : -1; s = s.slice(suffix.index).length ? s.slice(0, suffix.index).trim() : s; }
+  else {
+    const prefix = s.match(/^(dr|cr|debit|credit)\.?[\s:]+/i);
+    if (prefix) { sign = /^c/i.test(prefix[1]) ? 1 : -1; s = s.slice(prefix[0].length).trim(); }
+  }
   const neg = /^\(.*\)$/.test(s);
-  const n = Number(neg ? s.slice(1, -1) : s);
+  if (neg) s = s.slice(1, -1).trim();
+  if (/-\s*$/.test(s)) { sign = -1; s = s.replace(/-\s*$/, "").trim(); }
+  s = s.replace(/(?:^|\s)(rs\.?|inr|usd|eur|gbp)(?=[\s\d.]|$)/gi, " ").replace(/[₹$€£¥]/g, "").replace(/[, ']/g, "").trim();
+  if (!s || s === "-" || s === ".") return null;
+  const n = Number(s);
   if (isNaN(n)) return null;
-  return neg ? -n : n;
+  if (neg) return -Math.abs(n);
+  if (sign !== 0) return sign * Math.abs(n);
+  return n;
 }
 
 type ParsedRow = {
@@ -104,6 +117,7 @@ type ParsedRow = {
   balance: number | null;
   category: string | null;
 };
+
 
 function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
   if (!aoa.length) return { rows: [], reason: "File is empty" };
@@ -130,7 +144,18 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
   const amountIdx = headers.findIndex(isAmountHeader);
   const balanceIdx = headers.findIndex(isBalanceHeader);
   const descIdx = headers.findIndex(isDescriptionHeader);
-  const typeIdx = headers.findIndex((h) => /^type$|dr\/cr|dr.cr/i.test(h));
+  const typeIdx = headers.findIndex((h) => /^type$|transaction type|txn type|dr\/cr|cr\/dr|dr.cr|^mode$/i.test(h));
+
+  // Pattern detection (1-5) purely for observability in the function logs.
+  const pattern =
+    debitIdx !== -1 && creditIdx !== -1
+      ? (/(withdraw|deposit|paid (in|out)|money (in|out))/i.test(headers[debitIdx] + headers[creditIdx]) ? 4 : 2)
+      : amountIdx !== -1
+        ? (aoa.slice(headerIdx + 1, headerIdx + 21).some((r) => /\b(dr|cr)\.?\s*$/i.test(String(r?.[amountIdx] ?? "")))
+            ? 5
+            : typeIdx !== -1 ? 1 : 3)
+        : null;
+  console.log(`[parse-financial-import] detected pattern ${pattern}`, { dateIdx, debitIdx, creditIdx, amountIdx, typeIdx });
 
   const out: ParsedRow[] = [];
   for (let i = headerIdx + 1; i < aoa.length; i++) {
@@ -138,27 +163,30 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
     const date = parseDate(r[dateIdx]);
     if (!date) continue;
 
-    let amount: number | null = null;
-    let kind: "credit" | "debit" = "debit";
+    // Signed amount: negative = debit / money out, positive = credit / money in
+    let signed = 0;
 
-    if (debitIdx !== -1 || creditIdx !== -1) {
-      const d = debitIdx !== -1 ? parseNum(r[debitIdx]) : null;
-      const c = creditIdx !== -1 ? parseNum(r[creditIdx]) : null;
-      if (c != null && c !== 0) { amount = Math.abs(c); kind = "credit"; }
-      else if (d != null && d !== 0) { amount = Math.abs(d); kind = "debit"; }
+    const d = debitIdx !== -1 ? parseNum(r[debitIdx]) : null;
+    const c = creditIdx !== -1 ? parseNum(r[creditIdx]) : null;
+    if (d != null && d !== 0 && (c == null || c === 0)) signed = -Math.abs(d);
+    else if (c != null && c !== 0 && (d == null || d === 0)) signed = Math.abs(c);
+    else if (d != null && d !== 0 && c != null && c !== 0) {
+      signed = Math.abs(d) >= Math.abs(c) ? -Math.abs(d) : Math.abs(c);
     } else if (amountIdx !== -1) {
       const n = parseNum(r[amountIdx]);
-      if (n != null) {
-        amount = Math.abs(n);
+      if (n != null && n !== 0) {
         if (typeIdx !== -1) {
           const t = String(r[typeIdx] || "").toLowerCase();
-          kind = /cr|credit|deposit/.test(t) ? "credit" : "debit";
+          const isCredit = /\bcr\b|credit|deposit|money in|paid in|inflow|receipt/.test(t);
+          const isDebit = /\bdr\b|debit|withdraw|money out|paid out|outflow|payment/.test(t);
+          signed = isCredit ? Math.abs(n) : isDebit ? -Math.abs(n) : n;
         } else {
-          kind = n >= 0 ? "credit" : "debit";
+          signed = n;
         }
       }
     }
-    if (amount == null || amount === 0) continue;
+
+    if (signed === 0) continue;
 
     const balance = balanceIdx !== -1 ? parseNum(r[balanceIdx]) : null;
     const description = descIdx !== -1 ? String(r[descIdx] ?? "").trim() : "";
@@ -166,15 +194,17 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
     out.push({
       date,
       description: description.slice(0, 500),
-      amount,
-      type: kind,
+      amount: signed,
+      type: signed < 0 ? "debit" : "credit",
       balance,
       category: null,
     });
   }
   if (!out.length) return { rows: [], reason: "No valid transaction rows found" };
+  console.log("[parse-financial-import] first 5 parsed rows:", out.slice(0, 5));
   return { rows: out };
 }
+
 
 function csvToAOA(text: string): any[][] {
   // Minimal RFC4180-ish CSV parser supporting quoted fields and commas/semicolons.
