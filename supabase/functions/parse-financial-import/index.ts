@@ -87,13 +87,25 @@ function parseDate(v: any): string | null {
 function parseNum(v: any): number | null {
   if (v == null || v === "") return null;
   if (typeof v === "number") return v;
-  const s = String(v).replace(/[, ]/g, "").replace(/[₹$€£]/g, "").trim();
-  if (!s) return null;
-  // (123) negative
+  let s = String(v).trim();
+  let sign = 0;
+  // DR / CR suffix or prefix inside the amount cell (Pattern 5)
+  const suffix = s.match(/(^|[\s(])(dr|cr|debit|credit)\.?\s*$/i);
+  if (suffix) { sign = /^c/i.test(suffix[2]) ? 1 : -1; s = s.slice(suffix.index).length ? s.slice(0, suffix.index).trim() : s; }
+  else {
+    const prefix = s.match(/^(dr|cr|debit|credit)\.?[\s:]+/i);
+    if (prefix) { sign = /^c/i.test(prefix[1]) ? 1 : -1; s = s.slice(prefix[0].length).trim(); }
+  }
   const neg = /^\(.*\)$/.test(s);
-  const n = Number(neg ? s.slice(1, -1) : s);
+  if (neg) s = s.slice(1, -1).trim();
+  if (/-\s*$/.test(s)) { sign = -1; s = s.replace(/-\s*$/, "").trim(); }
+  s = s.replace(/(?:^|\s)(rs\.?|inr|usd|eur|gbp)(?=[\s\d.]|$)/gi, " ").replace(/[₹$€£¥]/g, "").replace(/[, ']/g, "").trim();
+  if (!s || s === "-" || s === ".") return null;
+  const n = Number(s);
   if (isNaN(n)) return null;
-  return neg ? -n : n;
+  if (neg) return -Math.abs(n);
+  if (sign !== 0) return sign * Math.abs(n);
+  return n;
 }
 
 type ParsedRow = {
@@ -104,6 +116,7 @@ type ParsedRow = {
   balance: number | null;
   category: string | null;
 };
+
 
 function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
   if (!aoa.length) return { rows: [], reason: "File is empty" };
