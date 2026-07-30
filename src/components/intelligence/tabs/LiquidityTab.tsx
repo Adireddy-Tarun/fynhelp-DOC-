@@ -141,7 +141,7 @@ export default function LiquidityTab() {
 
   return (
     <div className="space-y-6 fyn-stagger">
-      {isLive && <LiveAlerts />}
+      
 
       {isLive && (
         <IntelCard
