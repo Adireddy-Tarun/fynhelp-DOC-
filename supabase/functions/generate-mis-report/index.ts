@@ -310,7 +310,7 @@ Deno.serve(async (req) => {
           const img = lower.includes(".jpg") || lower.includes(".jpeg")
             ? await pdfDoc.embedJpg(imgBytes)
             : await pdfDoc.embedPng(imgBytes);
-          page.drawImage(img, { x: LEFT, y: 800 - 60 + 60 - 60, width: 60, height: 60 });
+          
           page.drawImage(img, { x: LEFT, y: 800 - 60, width: 60, height: 60 });
           logoDrawn = true;
         }
