@@ -396,8 +396,9 @@ Deno.serve(async (req) => {
       status: "ready",
       file_url,
       file_size: bytes.length,
+      file_path: filePath,
+      report_name: `MIS report — ${clientName} — ${periodLabel}`,
       generated_by_user_id: uid,
-      report_data: report,
     };
 
     const { data: existing } = await admin
