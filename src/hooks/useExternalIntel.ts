@@ -13,7 +13,7 @@
  *  - Each hook console.logs the business_id + payload on resolve so the wiring
  *    can be verified in browser dev tools.
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseExternal } from "@/integrations/supabase/external";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMode } from "@/components/intelligence/DataSource";
