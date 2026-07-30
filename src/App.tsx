@@ -237,7 +237,7 @@ const App = () => (
               <Route path="media" element={<AdminMediaLibraryPage />} />
               <Route path="blog" element={<AdminBlogPage />} />
               <Route path="ca-verification" element={<CAVerificationPage />} />
-              <Route path="ca-approvals" element={<AdminGuard><CAApprovalsPage /></AdminGuard>} />
+              
 
             </Route>
             
