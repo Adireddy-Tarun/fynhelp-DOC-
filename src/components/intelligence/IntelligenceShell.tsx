@@ -69,9 +69,13 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
         </div>
       </div>
 
+      {/* Alerts generated from real runway / GST / cost-anomaly data (live only) */}
+      <LiveAlerts />
+
       <div key={active}>
         <Active />
       </div>
+
 
       {mode === "demo" && (
         <footer
