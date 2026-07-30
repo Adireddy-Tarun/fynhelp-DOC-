@@ -340,8 +340,13 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
+      // Refresh pre-computed liquidity + cost metrics so dashboards update now.
+      await recomputeIntelligence(businessId);
       track("csv_import_completed", { records_inserted: rows.length });
-      toast.success(`Imported ${rows.length} record${rows.length === 1 ? "" : "s"} from ${file.name}`);
+      toast.success(
+        `Import complete. ${rows.length} transaction${rows.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+      );
+
       onSuccess();
       setTimeout(() => {
         setFile(null);
