@@ -5,8 +5,9 @@ import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2, Info } from "lu
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { toast } from "sonner";
 import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 
 import {
   normaliseAmount,
