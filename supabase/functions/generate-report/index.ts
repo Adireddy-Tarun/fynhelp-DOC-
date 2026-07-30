@@ -1380,7 +1380,9 @@ Deno.serve(async (req) => {
   } catch (e) {
     console.error("[report] unhandled", e);
     if (reportRowId) {
-      await admin.from("generated_reports").update({ status: "failed" }).eq("id", reportRowId).catch?.(() => {});
+      try {
+        await admin.from("generated_reports").update({ status: "failed" }).eq("id", reportRowId);
+      } catch (_) { /* ignore */ }
     }
     return json({ success: false, error: e instanceof Error ? e.message : "Unexpected error" }, 500);
   }
