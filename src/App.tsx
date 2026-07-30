@@ -28,6 +28,11 @@ import AdminInternalAccessPage from "./pages/admin/AdminInternalAccessPage.tsx";
 import AdminMediaLibraryPage from "./pages/admin/AdminMediaLibraryPage.tsx";
 import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
 import CAVerificationPage from "./pages/admin/CAVerificationPage.tsx";
+import CAApprovalsPage from "./pages/admin/CAApprovalsPage.tsx";
+import AdminGuard from "@/components/admin/AdminGuard";
+import InternalAdminLayout from "@/components/admin/InternalAdminLayout";
+
+
 import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
 import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
 import { BlogAdminProvider } from "./contexts/BlogAdminContext.tsx";
@@ -209,7 +214,13 @@ const App = () => (
           <WaitlistPopup />
 
         <Routes>
+          {/* ===== INTERNAL ADMIN (email allowlist) ===== */}
+          <Route path="/admin" element={<AdminGuard><InternalAdminLayout /></AdminGuard>}>
+            <Route path="ca-approvals" element={<CAApprovalsPage />} />
+          </Route>
+
           {/* ===== ADMIN TREE: only mounts AdminAuthProvider ===== */}
+
           <Route element={<AdminAppProviders />}>
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
@@ -234,6 +245,8 @@ const App = () => (
               <Route path="media" element={<AdminMediaLibraryPage />} />
               <Route path="blog" element={<AdminBlogPage />} />
               <Route path="ca-verification" element={<CAVerificationPage />} />
+              
+
             </Route>
             
           </Route>

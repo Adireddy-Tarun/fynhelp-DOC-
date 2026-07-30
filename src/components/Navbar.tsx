@@ -21,6 +21,9 @@ import {
   Tag,
 } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import { supabase } from "@/integrations/supabase/client";
+import { isAdminEmail } from "@/lib/adminEmails";
+
 
 /* ────────────────────────────────────────────────────────────────
    Data
@@ -177,7 +180,17 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setIsAdmin(isAdminEmail(data.user?.email));
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   const isActive = (href: string) => location.pathname === href;
+
 
   // Top-level trigger button
   const Trigger = ({
@@ -536,6 +549,15 @@ const Navbar = () => {
 
           {/* Right cluster */}
           <div className="hidden lg:flex items-center gap-4 shrink-0">
+            {isAdmin && (
+              <Link
+                to="/admin/ca-approvals"
+                className="text-[15px] font-semibold text-white/85 hover:text-white transition-colors py-2"
+              >
+                Admin
+              </Link>
+            )}
+
             <div className="relative">
               <button
                 onMouseEnter={() => openNow("signin")}
