@@ -11,6 +11,7 @@ import RevenueQualitySection from "../sections/RevenueQualitySection";
 import ConversionFunnelSection from "../sections/ConversionFunnelSection";
 import RevenueAlertsSection from "../sections/RevenueAlertsSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
+import CohortChurnSection from "../sections/CohortChurnSection";
 
 export default function RevenueTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "revenue" }); }, []);
