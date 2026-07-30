@@ -158,19 +158,22 @@ export default function CAClientDetailPage() {
 
   // ---- Actions ----
   const uploadGstr2b = async (file: File) => {
-    if (!businessId || !firmId) return;
+    if (!businessId || !firmId || !userId) return;
     toast.info(`Processing ${file.name}…`);
+    const now = new Date();
     const { error } = await supabase.from("ca_gstr2b_uploads").insert({
       ca_firm_id: firmId,
       business_id: businessId,
       file_name: file.name,
-      file_size: file.size,
-      status: "pending",
+      file_size_bytes: file.size,
+      filing_period: now.toLocaleDateString("en-IN", { month: "short", year: "numeric" }),
+      processing_status: "pending",
       uploaded_by: userId,
     });
     if (error) toast.error(`Upload not recorded: ${error.message}`);
     else toast.success("GSTR-2B upload recorded. Matching runs in the background.");
   };
+
 
   const generateReport = async () => {
     if (!businessId || !firmId) return;
