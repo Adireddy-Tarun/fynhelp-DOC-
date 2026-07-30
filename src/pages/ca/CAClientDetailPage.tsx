@@ -383,7 +383,34 @@ export default function CAClientDetailPage() {
                 </table>
               )}
             </CACard>
+
+            <CAHeading style={{ marginTop: 26, fontSize: 16 }}>GSTR-2B upload history</CAHeading>
+            <CACard style={{ marginTop: 10, overflow: "hidden" }}>
+              {gstrUploads.length === 0 ? <CAEmpty title="No GSTR-2B uploads yet" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>File</th><th style={caTh}>Period</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Parsed</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Matched</th>
+                    <th style={caTh}>Status</th><th style={caTh}>Uploaded</th>
+                  </tr></thead>
+                  <tbody>
+                    {gstrUploads.map((u) => (
+                      <tr key={u.id}>
+                        <td style={caTd}>{u.file_name}</td>
+                        <td style={caTd}>{u.filing_period}</td>
+                        <td style={caNum}>{u.records_parsed ?? u.record_count ?? 0}</td>
+                        <td style={caNum}>{u.records_matched ?? 0}</td>
+                        <td style={caTd}><CABadge tone={statusTone(u.processing_status)}>{u.processing_status}</CABadge></td>
+                        <td style={caTd}>{dateIN(u.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
           </>
+
         )}
 
         {tab === "TDS" && (
