@@ -634,7 +634,7 @@ function extractTallyVoucher(v: Element, businessId: string): ParsedTxn | null {
     business_id: businessId,
     date: iso,
     transaction_date: iso,
-    amount: Math.abs(numericAmt),
+    amount: dir === "out" ? -Math.abs(numericAmt) : Math.abs(numericAmt),
     direction: dir,
     description: narration.slice(0, 500),
     balance_after: bal && isFinite(bal) ? bal : null,
