@@ -200,7 +200,12 @@ export default function AskFynnyTab() {
     try {
       track("ai_cfo_query_sent", { query_length: q.length });
       const { data, error } = await supabase.functions.invoke("fynny-chat", {
-        body: { org_id: mode === "demo" ? DEMO_BIZ : "live", message: q, context },
+        body: {
+          org_id: mode === "demo" ? DEMO_BIZ : "live",
+          message: q,
+          context,
+          system_context: systemContext ?? undefined,
+        },
       });
       const reply = (data as any)?.response;
       if (error || !reply) throw error || new Error("No response");
