@@ -177,7 +177,17 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setIsAdmin(isAdminEmail(data.user?.email));
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   const isActive = (href: string) => location.pathname === href;
+
 
   // Top-level trigger button
   const Trigger = ({
