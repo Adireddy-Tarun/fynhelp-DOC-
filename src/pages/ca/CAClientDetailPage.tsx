@@ -468,7 +468,9 @@ export default function CAClientDetailPage() {
 
         {tab === "Reports" && (
           <>
-            <CAButton onClick={generateReport} disabled={!businessId}>Generate MIS report</CAButton>
+            <CAButton onClick={generateReport} disabled={!businessId || generating}>
+              {generating ? "Generating…" : "Generate MIS report"}
+            </CAButton>
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
