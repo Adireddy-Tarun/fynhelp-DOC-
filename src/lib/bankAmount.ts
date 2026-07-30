@@ -134,7 +134,7 @@ export function parseMoneyCell(raw: unknown): { value: number; sign: -1 | 0 | 1 
 
   // Currency symbols / codes / thousand separators (incl. Indian lakh grouping)
   s = s
-    .replace(/(?:^|\s)(rs\.?|inr|usd|eur|gbp)\b/gi, " ")
+    .replace(/(?:^|\s)(rs\.?|inr|usd|eur|gbp)(?=[\s\d.]|$)/gi, " ")
     .replace(/[₹$€£¥]/g, "")
     .replace(/[,\s'_]/g, "");
 
