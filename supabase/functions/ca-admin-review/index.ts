@@ -15,12 +15,39 @@ const cors = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Content-Type": "application/json",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: cors });
 
 type Action = "approve" | "reject" | "suspend" | "reactivate";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Strip HTML tags and clamp length.
+const sanitize = (v: unknown) =>
+  String(v ?? "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, 500);
+
+// In-memory rate limiter: max 30 requests per caller email per minute.
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 60_000;
+const hits = new Map<string, number[]>();
+
+function rateLimited(key: string): boolean {
+  const now = Date.now();
+  const arr = (hits.get(key) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+  arr.push(now);
+  hits.set(key, arr);
+  return arr.length > RATE_LIMIT;
+}
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
@@ -35,7 +62,11 @@ Deno.serve(async (req) => {
     return json({ success: false, error: "Forbidden" }, 403);
   }
 
-  let body: { op?: "list" | "review"; firm_id?: string; action?: Action; reason?: string };
+  if (rateLimited(email)) {
+    return json({ success: false, error: "Rate limit exceeded" }, 429);
+  }
+
+  let body: { op?: "list" | "review" | "audit"; firm_id?: string; action?: Action; reason?: string };
   try {
     body = await req.json();
   } catch {
@@ -53,12 +84,24 @@ Deno.serve(async (req) => {
       .eq("is_demo", false)
       .order("verification_submitted_at", { ascending: false, nullsFirst: false });
     if (error) return json({ success: false, error: error.message }, 500);
+
+    // Access audit trail: record who queried the admin list.
+    const { error: accessLogErr } = await admin.from("ca_approval_log").insert({
+      ca_firm_id: null,
+      reviewed_by_email: email,
+      action: "list_query",
+      reason: null,
+    });
+    if (accessLogErr) console.error("list_query audit insert failed", accessLogErr);
+
     return json({ success: true, firms: data ?? [] });
   }
 
   if (op === "audit") {
     const firm_id = body.firm_id;
-    if (!firm_id) return json({ success: false, error: "firm_id required" }, 400);
+    if (!firm_id || !UUID_RE.test(firm_id)) {
+      return json({ success: false, error: "A valid firm_id is required" }, 400);
+    }
     const { data, error } = await admin
       .from("ca_approval_log")
       .select("id, ca_firm_id, reviewed_by_email, action, reason, created_at")
@@ -68,15 +111,38 @@ Deno.serve(async (req) => {
     return json({ success: true, log: data ?? [] });
   }
 
-
-
   const { firm_id, action } = body;
-  const reason = (body.reason ?? "").trim();
-  if (!firm_id || !action || !["approve", "reject", "suspend", "reactivate"].includes(action)) {
-    return json({ success: false, error: "firm_id and a valid action are required" }, 400);
+  const reason = sanitize(body.reason);
+  if (!firm_id || !UUID_RE.test(firm_id)) {
+    return json({ success: false, error: "A valid firm_id is required" }, 400);
+  }
+  if (!action || !["approve", "reject", "suspend", "reactivate"].includes(action)) {
+    return json({ success: false, error: "A valid action is required" }, 400);
   }
   if ((action === "reject" || action === "suspend") && !reason) {
     return json({ success: false, error: "A reason is required for this action" }, 400);
+  }
+
+  const logAction =
+    action === "approve" ? "approved"
+    : action === "reject" ? "rejected"
+    : action === "suspend" ? "suspended"
+    : "reactivated";
+
+  // Idempotency / double-submit guard: same firm + same action within 60s.
+  const cutoff = new Date(Date.now() - 60_000).toISOString();
+  const { data: recent } = await admin
+    .from("ca_approval_log")
+    .select("id")
+    .eq("ca_firm_id", firm_id)
+    .eq("action", logAction)
+    .gte("created_at", cutoff)
+    .limit(1);
+  if (recent && recent.length > 0) {
+    return json({
+      success: false,
+      error: "This action was already performed recently. Please wait before retrying.",
+    }, 409);
   }
 
   const { data: firm, error: firmErr } = await admin
@@ -90,6 +156,7 @@ Deno.serve(async (req) => {
   const now = new Date().toISOString();
   const positive = action === "approve" || action === "reactivate";
 
+
   const patch: Record<string, unknown> = {
     verification_status: positive ? "approved" : "rejected",
     is_verified: positive,
@@ -102,11 +169,6 @@ Deno.serve(async (req) => {
   const { error: updErr } = await admin.from("ca_firms").update(patch).eq("id", firm_id);
   if (updErr) return json({ success: false, error: updErr.message }, 500);
 
-  const logAction =
-    action === "approve" ? "approved"
-    : action === "reject" ? "rejected"
-    : action === "suspend" ? "suspended"
-    : "reactivated";
 
   const { error: logErr } = await admin.from("ca_approval_log").insert({
     ca_firm_id: firm_id,

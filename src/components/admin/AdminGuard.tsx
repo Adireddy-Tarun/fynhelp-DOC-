@@ -16,8 +16,13 @@ export default function AdminGuard({ children }: { children?: ReactNode }) {
       if (cancelled) return;
       setState(isAdminEmail(data.user?.email) ? "allowed" : "denied");
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (cancelled) return;
+      if (event === "SIGNED_OUT") setState("denied");
+    });
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
   }, []);
 
