@@ -53,6 +53,12 @@ export default function CAClientDetailPage() {
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [gstrUploads, setGstrUploads] = useState<any[]>([]);
+  const [uploadingGstr, setUploadingGstr] = useState(false);
+  const [gstrPeriod, setGstrPeriod] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
 
   const businessId = client?.business_id ?? null;
 
@@ -152,28 +158,52 @@ export default function CAClientDetailPage() {
     console.log("[fyn:ca] tab.reports", businessId, data?.length ?? 0);
   }, [businessId, firmId]);
 
+  const loadGstrUploads = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_gstr2b_uploads").select("*")
+      .eq("ca_firm_id", firmId).eq("business_id", businessId)
+      .order("created_at", { ascending: false });
+    if (error) console.warn("[fyn:ca] ca_gstr2b_uploads", error);
+    setGstrUploads(data ?? []);
+  }, [businessId, firmId]);
+
   useEffect(() => {
     if (!businessId) return;
-    loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0);
-  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns]);
+    loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0); loadGstrUploads();
+  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
 
   // ---- Actions ----
   const uploadGstr2b = async (file: File) => {
-    if (!businessId || !firmId || !userId) return;
-    toast.info(`Processing ${file.name}…`);
-    const now = new Date();
-    const { error } = await supabase.from("ca_gstr2b_uploads").insert({
-      ca_firm_id: firmId,
-      business_id: businessId,
-      file_name: file.name,
-      file_size_bytes: file.size,
-      filing_period: now.toLocaleDateString("en-IN", { month: "short", year: "numeric" }),
-      processing_status: "pending",
-      uploaded_by: userId,
-    });
-    if (error) toast.error(`Upload not recorded: ${error.message}`);
-    else toast.success("GSTR-2B upload recorded. Matching runs in the background.");
+    if (!businessId || !firmId) return;
+    const m = gstrPeriod.match(/^(\d{4})-(\d{2})$/);
+    if (!m) return toast.error("Pick a filing period first");
+    const filingPeriod = `${m[2]}${m[1]}`; // MMYYYY
+
+    setUploadingGstr(true);
+    const toastId = toast.loading("Processing GSTR-2B file…");
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("ca_firm_id", firmId);
+    form.append("business_id", businessId);
+    form.append("filing_period", filingPeriod);
+
+    const { data, error } = await supabase.functions.invoke("parse-gstr2b", { body: form });
+    setUploadingGstr(false);
+
+    if (error || !data?.success) {
+      toast.error(data?.error ?? error?.message ?? "GSTR-2B processing failed", { id: toastId });
+    } else {
+      toast.success(
+        `GSTR-2B processed. ${data.records_matched} records matched, ${data.records_mismatched} mismatched, ${data.records_new} new records added.`,
+        { id: toastId },
+      );
+    }
+    loadItc();
+    loadGstrUploads();
   };
+
 
 
   const generateReport = async () => {
@@ -305,18 +335,31 @@ export default function CAClientDetailPage() {
               <Metric label="Mismatched" value={inr(itcTotals.mismatched)} />
               <Metric label="Pending" value={inr(itcTotals.pending)} />
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 16, display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+              <CAField label="Filing period">
+                <input
+                  type="month"
+                  value={gstrPeriod}
+                  onChange={(e) => setGstrPeriod(e.target.value)}
+                  style={caInputStyle}
+                />
+              </CAField>
               <label>
-                <input type="file" accept=".json,.zip,.xlsx,.csv" style={{ display: "none" }}
+                <input type="file" accept=".json,.csv" style={{ display: "none" }} disabled={uploadingGstr}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGstr2b(f); e.currentTarget.value = ""; }} />
                 <span style={{
                   display: "inline-block", fontFamily: CA.sans, fontSize: 13, fontWeight: 600,
-                  background: CA.teal, color: "#fff", padding: "9px 16px", borderRadius: 9, cursor: "pointer",
+                  background: uploadingGstr ? CA.faint : CA.teal, color: "#fff", padding: "9px 16px",
+                  borderRadius: 9, cursor: uploadingGstr ? "not-allowed" : "pointer",
                 }}>
-                  Upload GSTR-2B
+                  {uploadingGstr ? "Processing…" : "Upload GSTR-2B"}
                 </span>
               </label>
+              <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, paddingBottom: 10 }}>
+                GST portal JSON or a simple CSV
+              </div>
             </div>
+
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {itc.length === 0 ? <CAEmpty title="No ITC records" /> : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -340,7 +383,34 @@ export default function CAClientDetailPage() {
                 </table>
               )}
             </CACard>
+
+            <CAHeading style={{ marginTop: 26, fontSize: 16 }}>GSTR-2B upload history</CAHeading>
+            <CACard style={{ marginTop: 10, overflow: "hidden" }}>
+              {gstrUploads.length === 0 ? <CAEmpty title="No GSTR-2B uploads yet" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>File</th><th style={caTh}>Period</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Parsed</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Matched</th>
+                    <th style={caTh}>Status</th><th style={caTh}>Uploaded</th>
+                  </tr></thead>
+                  <tbody>
+                    {gstrUploads.map((u) => (
+                      <tr key={u.id}>
+                        <td style={caTd}>{u.file_name}</td>
+                        <td style={caTd}>{u.filing_period}</td>
+                        <td style={caNum}>{u.records_parsed ?? u.record_count ?? 0}</td>
+                        <td style={caNum}>{u.records_matched ?? 0}</td>
+                        <td style={caTd}><CABadge tone={statusTone(u.processing_status)}>{u.processing_status}</CABadge></td>
+                        <td style={caTd}>{dateIN(u.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
           </>
+
         )}
 
         {tab === "TDS" && (

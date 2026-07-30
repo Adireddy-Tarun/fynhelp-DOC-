@@ -1397,6 +1397,10 @@ export type Database = {
           processing_status: string
           raw_data: Json | null
           record_count: number | null
+          records_matched: number
+          records_mismatched: number
+          records_new: number
+          records_parsed: number
           uploaded_by: string
         }
         Insert: {
@@ -1412,6 +1416,10 @@ export type Database = {
           processing_status?: string
           raw_data?: Json | null
           record_count?: number | null
+          records_matched?: number
+          records_mismatched?: number
+          records_new?: number
+          records_parsed?: number
           uploaded_by: string
         }
         Update: {
@@ -1427,6 +1435,10 @@ export type Database = {
           processing_status?: string
           raw_data?: Json | null
           record_count?: number | null
+          records_matched?: number
+          records_mismatched?: number
+          records_new?: number
+          records_parsed?: number
           uploaded_by?: string
         }
         Relationships: [
