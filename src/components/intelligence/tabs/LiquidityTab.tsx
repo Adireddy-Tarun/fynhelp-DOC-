@@ -121,8 +121,57 @@ export default function LiquidityTab() {
   
   const openDrawer = useOpenDrawer();
 
+  /* ── Real computed liquidity metrics (external intelligence store) ── */
+  const liveBizId = useLiveBusinessId();
+  const { data: liq, isLoading: liqL } = useLiquidityMetrics();
+  useEffect(() => {
+    if (isLive) console.log("[fyn:liquidity] mount", { business_id: liveBizId, liquidity_metrics: liq ?? null });
+  }, [isLive, liveBizId, liq]);
+
+  const lm = {
+    cash: Number(liq?.cash_position ?? 0),
+    runwayMonths: Number(liq?.runway_months ?? 0),
+    runwayDays: Number(liq?.runway_days ?? 0),
+    burn: Number(liq?.burn_rate_current ?? 0),
+    score: Math.max(0, Math.min(100, Number(liq?.health_score ?? 0))),
+    status: liq?.health_status ?? "—",
+  };
+  const scoreTone: "green" | "amber" | "red" = lm.score >= 70 ? "green" : lm.score >= 40 ? "amber" : "red";
+  const scoreColor = scoreTone === "green" ? ACCENT.green : scoreTone === "amber" ? ACCENT.amber : ACCENT.red;
+
   return (
     <div className="space-y-6 fyn-stagger">
+      {isLive && <LiveAlerts />}
+
+      {isLive && (
+        <IntelCard
+          title="Liquidity Position"
+          sub={liq ? `Computed ${new Date(liq.recorded_at).toLocaleString("en-IN")}` : "Awaiting your first data import"}
+          action={<Badge tone={scoreTone}>{String(lm.status).toUpperCase()}</Badge>}
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <KPI label="Cash Position" value={fmtINR(lm.cash)} tone={lm.cash > 0 ? "healthy" : "neutral"} />
+              <KPI label="Runway" value={`${lm.runwayMonths.toFixed(1)} mo`} sub={`${lm.runwayDays.toFixed(0)} days`} tone={lm.runwayMonths < 3 ? "critical" : lm.runwayMonths < 6 ? "warning" : "healthy"} />
+              <KPI label="Burn Rate" value={`${fmtINR(lm.burn)}/mo`} />
+              <KPI label="Health Score" value={`${lm.score.toFixed(0)}/100`} />
+            </div>
+            <div>
+              <div className="flex items-center justify-between text-xs text-fyn-ink/60 mb-1">
+                <span>Financial health</span>
+                <span className="font-mono tabular-nums">{lm.score.toFixed(0)}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-valuenow={lm.score} aria-valuemin={0} aria-valuemax={100}>
+                <div className="h-full transition-all duration-700" style={{ width: `${lm.score}%`, background: scoreColor }} />
+              </div>
+            </div>
+            {!liqL && !liq && (
+              <NoDataPrompt text="Upload your bank statement to see your liquidity metrics." />
+            )}
+          </div>
+        </IntelCard>
+      )}
+
       {liveEmpty && (
         <div className="bg-white rounded-md px-5 py-4 flex items-center gap-4" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: "4px solid #C41E1E" }}>
           <Upload className="w-5 h-5 flex-shrink-0" style={{ color: "#C41E1E" }} />
