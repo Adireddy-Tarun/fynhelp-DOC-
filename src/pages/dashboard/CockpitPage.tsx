@@ -396,15 +396,11 @@ const CockpitPage = () => {
         </div>
       </div>
 
-      {/* Alerts generated from real liquidity / GST / cost-anomaly data */}
-      <div className="mb-fyn-lg">
-        <LiveAlerts />
-      </div>
-
       {/* Live data panel — wired to seeded customers/invoices/expenses/etc. */}
       <div className="mb-fyn-lg">
         <LiveCockpitPanel />
       </div>
+
 
 
       {/* Onboarding banner */}
