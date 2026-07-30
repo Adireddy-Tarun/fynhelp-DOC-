@@ -1,679 +1,617 @@
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, AlertTriangle, FileText, Upload, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { COLORS, MetricCard, Card, Chip, PrimaryBtn, SecondaryBtn, GhostLink, HealthScoreBadge } from "@/components/ca/ui";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useCAAuth } from "@/contexts/CAAuthContext";
-import { formatIndianCurrency, formatIndianDate } from "@/utils/formatters";
+import { supabaseExternal } from "@/integrations/supabase/external";
+import { useCAPortal } from "@/hooks/useCAPortal";
+import { toast } from "sonner";
+import {
+  CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
+  inr, dateIN, caTh, caTd, caNum, CAEmpty,
+} from "@/components/ca/portalUi";
 
-const TABS = [
-  "Overview",
-  "Cash & Liquidity",
-  "GST & ITC",
-  "Compliance",
-  "Receivables",
-  "Payables",
-  "HR & Payroll",
-  "Documents",
-  "Activity Log",
-];
-
-type Business = {
+interface Client {
   id: string;
-  business_name: string;
+  business_id: string | null;
+  client_name: string;
+  client_email: string | null;
+  client_phone: string | null;
   gstin: string | null;
-  industry: string | null;
-  state: string | null;
-  turnover_range: string | null;
-};
+  pan: string | null;
+  client_status: string | null;
+  onboarded_at: string | null;
+}
 
-type Tx = { id: string; date: string; amount: number; direction: string; counterparty: string | null; category: string | null };
-type ItcLine = { id: string; period: string; vendor_gstin: string | null; itc_safe: number | null; itc_at_risk: number | null; mismatch_count: number | null; status: string | null };
-type Compliance = { id: string; filing_name: string; filing_type: string; due_date: string; status: string | null; urgency: string | null };
-type Receivable = { id: string; customer_name: string; invoice_number: string | null; amount: number; outstanding: number | null; due_date: string | null; risk_score: number | null; status: string | null };
-type Payable = { id: string; vendor_name: string; invoice_number: string | null; amount: number; outstanding: number | null; due_date: string | null; status: string | null };
-type Payroll = { id: string; month: string; headcount: number | null; total_payroll: number | null; pf_due: number | null; esic_due: number | null; next_payroll_date: string | null };
-type Activity = { id: string; action_type: string; description: string | null; created_at: string };
-type Risk = { score: number; factors: any; computed_at: string };
+const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "Reports"] as const;
+type Tab = typeof TABS[number];
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <CACard style={{ padding: "14px 16px" }}>
+      <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>{label}</div>
+      <div style={{ fontFamily: CA.mono, fontSize: 19, fontWeight: 600, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{value}</div>
+    </CACard>
+  );
+}
 
 export default function CAClientDetailPage() {
-  const { id: businessId } = useParams();
+  const { clientId } = useParams();
   const navigate = useNavigate();
-  const { caFirm, user } = useCAAuth();
-  const [search, setSearch] = useSearchParams();
-  const tab = search.get("tab") || "Overview";
-  const setTab = (t: string) => setSearch({ tab: t });
-
+  const { firmId, userId } = useCAPortal();
+  const [client, setClient] = useState<Client | null>(null);
+  const [tab, setTab] = useState<Tab>("Overview");
   const [loading, setLoading] = useState(true);
-  const [accessDenied, setAccessDenied] = useState(false);
-  const [business, setBusiness] = useState<Business | null>(null);
-  const [txs, setTxs] = useState<Tx[]>([]);
-  const [itcLines, setItcLines] = useState<ItcLine[]>([]);
-  const [risk, setRisk] = useState<Risk | null>(null);
-  const [compliance, setCompliance] = useState<Compliance[]>([]);
-  const [receivables, setReceivables] = useState<Receivable[]>([]);
-  const [payables, setPayables] = useState<Payable[]>([]);
-  const [payroll, setPayroll] = useState<Payroll[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [bankBalance, setBankBalance] = useState<number>(0);
-  const [bankCount, setBankCount] = useState<number>(0);
-  const [note, setNote] = useState("");
 
-  // Load all data + access check
+  // Tab data
+  const [liquidity, setLiquidity] = useState<any>(null);
+  const [revenue, setRevenue] = useState<any>(null);
+  const [itc, setItc] = useState<any[]>([]);
+  const [tds, setTds] = useState<any[]>([]);
+  const [compliance, setCompliance] = useState<any[]>([]);
+  const [txns, setTxns] = useState<any[]>([]);
+  const [txnPage, setTxnPage] = useState(0);
+  const [reports, setReports] = useState<any[]>([]);
+  const [showTdsForm, setShowTdsForm] = useState(false);
+  const [showComplianceForm, setShowComplianceForm] = useState(false);
+
+  const businessId = client?.business_id ?? null;
+
   useEffect(() => {
-    if (!businessId || !caFirm) return;
-    let cancelled = false;
-
+    if (!clientId || !firmId) return;
     (async () => {
       setLoading(true);
-
-      // Access guard
-      const { data: access } = await supabase
-        .from("ca_client_access")
-        .select("id")
-        .eq("ca_firm_id", caFirm.id)
-        .eq("business_id", businessId)
-        .eq("is_active", true)
+      const { data, error } = await supabase
+        .from("ca_clients")
+        .select("id, business_id, client_name, client_email, client_phone, gstin, pan, client_status, onboarded_at")
+        .eq("id", clientId)
         .maybeSingle();
-
-      if (cancelled) return;
-      if (!access) {
-        setAccessDenied(true);
-        setLoading(false);
-        return;
-      }
-
-      const [
-        biz,
-        bankRows,
-        txRows,
-        itcRows,
-        riskRow,
-        compRows,
-        recvRows,
-        payRows,
-        prRows,
-        actRows,
-      ] = await Promise.all([
-        supabase.from("businesses").select("id,business_name,gstin,industry,state,turnover_range").eq("id", businessId).maybeSingle(),
-        supabase.from("bank_accounts").select("balance").eq("business_id", businessId),
-        supabase.from("transactions").select("id,date,amount,direction,counterparty,category").eq("business_id", businessId).order("date", { ascending: false }).limit(200),
-        supabase.from("gst_itc_lines").select("id,period,vendor_gstin,itc_safe,itc_at_risk,mismatch_count,status").eq("business_id", businessId).order("period", { ascending: false }).limit(50),
-        supabase.from("gst_notice_risk_scores").select("score,factors,computed_at").eq("business_id", businessId).order("computed_at", { ascending: false }).limit(1).maybeSingle(),
-        supabase.from("compliance_events").select("id,filing_name,filing_type,due_date,status,urgency").eq("business_id", businessId).order("due_date").limit(30),
-        supabase.from("receivables").select("id,customer_name,invoice_number,amount,outstanding,due_date,risk_score,status").eq("business_id", businessId).order("due_date").limit(50),
-        supabase.from("payables").select("id,vendor_name,invoice_number,amount,outstanding,due_date,status").eq("business_id", businessId).order("due_date").limit(50),
-        supabase.from("payroll_records").select("id,month,headcount,total_payroll,pf_due,esic_due,next_payroll_date").eq("business_id", businessId).order("month", { ascending: false }).limit(12),
-        supabase.from("ca_activity_log").select("id,action_type,description,created_at").eq("business_id", businessId).eq("ca_firm_id", caFirm.id).order("created_at", { ascending: false }).limit(50),
-      ]);
-
-      if (cancelled) return;
-
-      setBusiness(biz.data as Business | null);
-      const banks = bankRows.data || [];
-      setBankCount(banks.length);
-      setBankBalance(banks.reduce((s, b: any) => s + Number(b.balance || 0), 0));
-      setTxs((txRows.data as Tx[]) || []);
-      setItcLines((itcRows.data as ItcLine[]) || []);
-      setRisk((riskRow.data as Risk | null) ?? null);
-      setCompliance((compRows.data as Compliance[]) || []);
-      setReceivables((recvRows.data as Receivable[]) || []);
-      setPayables((payRows.data as Payable[]) || []);
-      setPayroll((prRows.data as Payroll[]) || []);
-      setActivities((actRows.data as Activity[]) || []);
+      if (error) toast.error(error.message);
+      setClient((data as Client) ?? null);
       setLoading(false);
-
-      // Log activity (fire-and-forget)
-      supabase.from("ca_activity_log").insert({
-        ca_firm_id: caFirm.id,
-        business_id: businessId,
-        action_type: "client_view",
-        description: `Viewed ${biz.data?.business_name || "client"}, ${tab} tab`,
-      });
+      console.log("[fyn:ca] client detail mount", { clientId, business_id: (data as Client)?.business_id ?? null });
     })();
+  }, [clientId, firmId]);
 
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [businessId, caFirm?.id]);
+  // Overview (external)
+  useEffect(() => {
+    if (!businessId) return;
+    (async () => {
+      try {
+        const { data } = await supabaseExternal
+          .from("liquidity_metrics").select("*").eq("business_id", businessId)
+          .order("recorded_at", { ascending: false }).limit(1).maybeSingle();
+        setLiquidity(data ?? null);
+        console.log("[fyn:ca] overview.liquidity_metrics", businessId, data);
+      } catch (e) { console.warn("[fyn:ca] liquidity_metrics", e); }
+      try {
+        const { data } = await supabaseExternal
+          .from("revenue_metrics").select("*").eq("org_id", businessId)
+          .order("created_at", { ascending: false }).limit(1).maybeSingle();
+        setRevenue(data ?? null);
+        console.log("[fyn:ca] overview.revenue_metrics", businessId, data);
+      } catch (e) { console.warn("[fyn:ca] revenue_metrics", e); }
+    })();
+  }, [businessId]);
 
-  // Derived metrics
-  const burnRate = useMemo(() => {
-    const out = txs.filter(t => t.direction === "out").reduce((s, t) => s + Number(t.amount), 0);
-    const days = Math.max(1, txs.length ? Math.min(90, txs.length) : 30);
-    return out / days;
-  }, [txs]);
+  const loadItc = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_itc_records").select("*")
+      .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
+      .order("invoice_date", { ascending: false });
+    if (error) console.warn("[fyn:ca] ca_itc_records", error);
+    setItc(data ?? []);
+    console.log("[fyn:ca] tab.itc", businessId, data?.length ?? 0);
+  }, [businessId, firmId]);
 
-  const runwayDays = useMemo(() => {
-    if (!burnRate || burnRate <= 0) return 999;
-    return Math.floor(bankBalance / burnRate);
-  }, [bankBalance, burnRate]);
+  const loadTds = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_tds_records").select("*")
+      .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
+      .order("payment_date", { ascending: false });
+    if (error) console.warn("[fyn:ca] ca_tds_records", error);
+    setTds(data ?? []);
+    console.log("[fyn:ca] tab.tds", businessId, data?.length ?? 0);
+  }, [businessId, firmId]);
 
-  const runwayColor = runwayDays > 90 ? COLORS.greenSoft : runwayDays >= 30 ? COLORS.amberSoft : COLORS.redSoft;
+  const loadCompliance = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_compliance_events").select("*")
+      .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
+      .order("due_date", { ascending: true });
+    if (error) console.warn("[fyn:ca] ca_compliance_events", error);
+    setCompliance(data ?? []);
+    console.log("[fyn:ca] tab.compliance", businessId, data?.length ?? 0);
+  }, [businessId, firmId]);
 
-  const itcSafe = itcLines.reduce((s, l) => s + Number(l.itc_safe || 0), 0);
-  const itcAtRisk = itcLines.reduce((s, l) => s + Number(l.itc_at_risk || 0), 0);
-  const mismatchCount = itcLines.reduce((s, l) => s + Number(l.mismatch_count || 0), 0);
+  const loadTxns = useCallback(async (page: number) => {
+    if (!businessId) return;
+    try {
+      const { data, error } = await supabaseExternal
+        .from("bank_transactions")
+        .select("id, date, description, category, amount, balance, type")
+        .eq("business_id", businessId)
+        .order("date", { ascending: false })
+        .range(page * 100, page * 100 + 99);
+      if (error) throw error;
+      setTxns((prev) => (page === 0 ? data ?? [] : [...prev, ...(data ?? [])]));
+      console.log("[fyn:ca] tab.bank_transactions", businessId, data?.length ?? 0);
+    } catch (e) { console.warn("[fyn:ca] bank_transactions", e); }
+  }, [businessId]);
 
-  const totalReceivables = receivables.reduce((s, r) => s + Number(r.outstanding || r.amount), 0);
-  const overdueReceivables = receivables.filter(r => r.due_date && new Date(r.due_date) < new Date())
-    .reduce((s, r) => s + Number(r.outstanding || r.amount), 0);
+  const loadReports = useCallback(async () => {
+    if (!businessId || !firmId) return;
+    const { data, error } = await supabase
+      .from("ca_reports_log").select("*")
+      .eq("ca_firm_id", firmId).eq("business_id", businessId)
+      .order("created_at", { ascending: false });
+    if (error) console.warn("[fyn:ca] ca_reports_log", error);
+    setReports(data ?? []);
+    console.log("[fyn:ca] tab.reports", businessId, data?.length ?? 0);
+  }, [businessId, firmId]);
 
-  const totalPayables = payables.reduce((s, p) => s + Number(p.outstanding || p.amount), 0);
-  const dueThisWeekPayables = payables.filter(p => {
-    if (!p.due_date) return false;
-    const d = new Date(p.due_date).getTime() - Date.now();
-    return d >= 0 && d <= 7 * 86400000;
-  }).reduce((s, p) => s + Number(p.outstanding || p.amount), 0);
+  useEffect(() => {
+    if (!businessId) return;
+    loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0);
+  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns]);
 
-  const latestPayroll = payroll[0];
-
-  const cashSeries = useMemo(() => {
-    // Build daily net cash for last 30 days
-    const byDay: Record<string, number> = {};
-    txs.forEach(t => {
-      const d = t.date.slice(0, 10);
-      const amt = Number(t.amount) * (t.direction === "in" ? 1 : -1);
-      byDay[d] = (byDay[d] || 0) + amt;
+  // ---- Actions ----
+  const uploadGstr2b = async (file: File) => {
+    if (!businessId || !firmId) return;
+    toast.info(`Processing ${file.name}…`);
+    const { error } = await supabase.from("ca_gstr2b_uploads").insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      file_name: file.name,
+      file_size: file.size,
+      status: "pending",
+      uploaded_by: userId,
     });
-    return Object.entries(byDay).slice(0, 30).reverse().map(([d, v]) => ({ d: d.slice(5), net: v }));
-  }, [txs]);
+    if (error) toast.error(`Upload not recorded: ${error.message}`);
+    else toast.success("GSTR-2B upload recorded. Matching runs in the background.");
+  };
 
-  const upcomingFilings = compliance.filter(c => c.status !== "filed").slice(0, 5);
-  const nextFiling = upcomingFilings[0];
+  const generateReport = async () => {
+    if (!businessId || !firmId) return;
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const { error } = await supabase.from("ca_reports_log").insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      report_type: "MIS",
+      period: now.toLocaleDateString("en-IN", { month: "long", year: "numeric" }),
+      period_start: start.toISOString().slice(0, 10),
+      period_end: now.toISOString().slice(0, 10),
+      status: "pending",
+      generated_by_user_id: userId,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Report generation queued. It will appear here when ready.");
+    loadReports();
+  };
 
-  const filingsDue7d = upcomingFilings.filter(c => {
-    const d = new Date(c.due_date).getTime() - Date.now();
-    return d >= 0 && d <= 7 * 86400000;
-  }).length;
+  const itcTotals = useMemo(() => {
+    const sum = (f: (r: any) => number) => itc.reduce((s, r) => s + (Number(f(r)) || 0), 0);
+    return {
+      claimed: sum((r) => r.total_itc),
+      matched: sum((r) => (r.match_status === "matched" ? r.total_itc : 0)),
+      mismatched: sum((r) => (r.match_status === "mismatched" ? r.total_itc : 0)),
+      pending: sum((r) => (r.match_status !== "matched" && r.match_status !== "mismatched" ? r.total_itc : 0)),
+    };
+  }, [itc]);
 
-  // Render
-  if (!businessId) return null;
+  const tdsTotals = useMemo(() => {
+    const deducted = tds.reduce((s, r) => s + (Number(r.tds_amount) || 0), 0);
+    const deposited = tds.reduce((s, r) => s + (Number(r.deposited_amount) || 0), 0);
+    return { deducted, deposited, outstanding: deducted - deposited };
+  }, [tds]);
 
-  if (accessDenied) {
-    return (
-      <div className="px-8 py-16 text-center font-sans">
-        <AlertTriangle size={48} className="mx-auto mb-4" style={{ color: COLORS.red }} />
-        <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.ink }}>Access denied</h2>
-        <p className="mb-6 text-sm" style={{ color: "rgba(26,16,8,0.65)" }}>
-          You don't have access to this client. Request access from the client or your firm admin.
-        </p>
-        <PrimaryBtn onClick={() => navigate("/ca/clients")}>Back to clients</PrimaryBtn>
-      </div>
-    );
-  }
+  const groupedCompliance = useMemo(() => {
+    const now = new Date();
+    const isOverdue = (e: any) => e.status !== "filed" && e.due_date && new Date(e.due_date) < now;
+    return [
+      ...compliance.filter(isOverdue),
+      ...compliance.filter((e) => e.status !== "filed" && !isOverdue(e)),
+      ...compliance.filter((e) => e.status === "filed"),
+    ];
+  }, [compliance]);
 
-  if (loading) {
-    return <div className="px-8 py-16 text-sm font-sans" style={{ color: COLORS.ink }}>Loading client…</div>;
-  }
-
-  if (!business) {
-    return (
-      <div className="px-8 py-16 text-center font-sans">
-        <h2 className="text-xl font-semibold mb-2">Client not found</h2>
-        <PrimaryBtn onClick={() => navigate("/ca/clients")}>Back to clients</PrimaryBtn>
-      </div>
-    );
-  }
-
-  const healthScore = risk?.score ? Math.max(0, 100 - Number(risk.score)) : 50;
+  if (loading) return <CAEmpty title="Loading client…" />;
+  if (!client) return <CAEmpty title="Client not found" hint="This client may have been removed." />;
 
   return (
-    <div className="font-sans" style={{ color: COLORS.ink }}>
-      {/* Context bar */}
-      <div className="px-8 py-4" style={{ background: COLORS.ink }}>
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => navigate("/ca/clients")} className="text-white text-[13px] flex items-center gap-1.5 hover:opacity-80">
-            <ArrowLeft size={14} /> Back to Clients
+    <div>
+      <button onClick={() => navigate("/ca/clients")} style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.teal, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+        ← All clients
+      </button>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginTop: 10, gap: 16 }}>
+        <div>
+          <CAHeading>{client.client_name}</CAHeading>
+          <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 6, display: "flex", gap: 14, flexWrap: "wrap" }}>
+            <span>GSTIN <b style={{ fontFamily: CA.mono }}>{client.gstin ?? "—"}</b></span>
+            <span>PAN <b style={{ fontFamily: CA.mono }}>{client.pan ?? "—"}</b></span>
+            <span>{client.client_email ?? "—"}</span>
+            <span>{client.client_phone ?? "—"}</span>
+            <span>Onboarded {dateIN(client.onboarded_at)}</span>
+          </div>
+        </div>
+        <CABadge tone={statusTone(client.client_status)}>{client.client_status ?? "—"}</CABadge>
+      </div>
+
+      <div style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
+        {TABS.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            style={{
+              fontFamily: CA.sans, fontSize: 13, fontWeight: tab === t ? 700 : 500,
+              color: tab === t ? CA.teal : CA.muted, background: "none", border: "none",
+              padding: "10px 14px", cursor: "pointer",
+              borderBottom: tab === t ? `2px solid ${CA.teal}` : "2px solid transparent",
+            }}
+          >
+            {t}
           </button>
-          <span className="text-[12px]" style={{ color: "rgba(255,255,255,0.45)" }}>
-            Dashboard / Clients / {business.business_name}
-          </span>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-white font-bold text-[26px]" style={{ fontFamily: "'Playfair Display', serif" }}>
-            {business.business_name}
-          </span>
-          {business.gstin && (
-            <span className="text-[12px] px-2 py-0.5 rounded font-mono" style={{ background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)" }}>
-              {business.gstin}
-            </span>
-          )}
-          {business.industry && (
-            <span className="text-[11px] font-medium px-2 py-0.5 rounded" style={{ background: "rgba(139,105,20,0.20)", color: "#FCD34D" }}>
-              {business.industry}
-            </span>
-          )}
-          <div className="flex items-center gap-2 ml-auto">
-            <HealthScoreBadge score={healthScore} size={36} />
-            <SecondaryBtn size="sm" onClick={() => navigate(`/ca/reports?client=${businessId}`)}>Generate Report</SecondaryBtn>
-            <PrimaryBtn size="sm" onClick={() => navigate(`/ca/gst-portfolio?client=${businessId}`)}>File GST Returns</PrimaryBtn>
-          </div>
-        </div>
-
-        {/* Quick metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-          <QuickMetric label="Cash Balance" value={formatIndianCurrency(bankBalance)} sub={`${bankCount} account${bankCount === 1 ? "" : "s"}`} />
-          <QuickMetric label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays} days`} valueColor={runwayColor} />
-          <QuickMetric label="Critical Alerts" value={String(mismatchCount + filingsDue7d)} valueColor={(mismatchCount + filingsDue7d) > 0 ? COLORS.redSoft : "#FFFFFF"} />
-          <QuickMetric label="Next Filing" value={nextFiling?.filing_name || "-"} sub={nextFiling ? formatIndianDate(nextFiling.due_date) : ""} />
-        </div>
+        ))}
       </div>
 
-      {/* Tabs */}
-      <div className="px-8 bg-white sticky top-14 z-20 flex items-center gap-1 overflow-x-auto" style={{ borderBottom: `2px solid ${COLORS.divider}` }}>
-        {TABS.map((t) => {
-          const active = tab === t;
-          return (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className="px-5 py-4 text-[13px] font-medium whitespace-nowrap transition-colors"
-              style={active
-                ? { color: COLORS.red, borderBottom: `3px solid ${COLORS.red}`, marginBottom: "-2px" }
-                : { color: "rgba(26,16,8,0.65)" }}
-            >
-              {t}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="px-8 py-6 space-y-4">
-        {tab === "Overview" && (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div className="lg:col-span-3 space-y-4">
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-4">Financial Summary</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <Stat label="Cash Balance" value={formatIndianCurrency(bankBalance)} />
-                  <Stat label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays} d`} color={runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red} />
-                  <Stat label="Daily Burn" value={formatIndianCurrency(burnRate)} />
-                </div>
-              </Card>
-
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-3">Cash Flow, last 30 days</h3>
-                {cashSeries.length === 0 ? (
-                  <EmptyHint text="No transactions yet for this client." />
-                ) : (
-                  <ResponsiveContainer width="100%" height={240}>
-                    <AreaChart data={cashSeries}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
-                      <XAxis dataKey="d" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} />
-                      <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} tickFormatter={(v) => formatIndianCurrency(Number(v))} />
-                      <Tooltip formatter={(v: any) => formatIndianCurrency(Number(v))} />
-                      <Area type="monotone" dataKey="net" stroke={COLORS.blue} fill={COLORS.blue} fillOpacity={0.15} strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </Card>
-
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-3">Top issues requiring attention</h3>
-                <ul className="space-y-3">
-                  {buildTopIssues({ runwayDays, itcAtRisk, overdueReceivables, mismatchCount, nextFiling }).map((it, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ background: it.color }} />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">{it.title}</div>
-                        <div className="text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{it.body}</div>
-                      </div>
-                      <GhostLink onClick={() => setTab(it.tab)}>View →</GhostLink>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            </div>
-
-            <div className="lg:col-span-2 space-y-4">
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-3">Upcoming filings</h3>
-                {upcomingFilings.length === 0 ? <EmptyHint text="All clear." /> : (
-                  <ul className="space-y-2.5">
-                    {upcomingFilings.map(f => {
-                      const days = Math.ceil((new Date(f.due_date).getTime() - Date.now()) / 86400000);
-                      const dot = days < 3 ? COLORS.red : days < 7 ? COLORS.amber : COLORS.gold;
-                      return (
-                        <li key={f.id} className="flex items-center gap-2.5 text-sm">
-                          <span className="w-2 h-2 rounded-full" style={{ background: dot }} />
-                          <div className="flex-1">
-                            <div className="font-medium">{f.filing_name}</div>
-                            <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>{formatIndianDate(f.due_date)} · {days}d</div>
-                          </div>
-                          <GhostLink onClick={() => setTab("Compliance")}>File →</GhostLink>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </Card>
-
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-3">ITC Health</h3>
-                <div className="space-y-2 text-sm">
-                  <ItcRow label="ITC Safe" value={formatIndianCurrency(itcSafe)} bg="#DCFCE7" color="#166534" />
-                  <ItcRow label="ITC At Risk" value={formatIndianCurrency(itcAtRisk)} bg="#FEE2E2" color="#991B1B" />
-                  <ItcRow label="Notice Risk Score" value={`${risk?.score ?? "-"}/100`} bg="#FEF3C7" color="#92400E" />
-                </div>
-              </Card>
-
-              <Card>
-                <h3 className="text-[15px] font-semibold mb-3">Recent CA activity</h3>
-                {activities.length === 0 ? <EmptyHint text="No activity yet." /> : (
-                  <ul className="space-y-2 text-[13px]">
-                    {activities.slice(0, 5).map(a => (
-                      <li key={a.id}>
-                        <div style={{ color: "rgba(26,16,8,0.45)" }} className="text-[11px]">{timeAgo(a.created_at)}</div>
-                        <div style={{ color: "rgba(26,16,8,0.75)" }}>{a.description || a.action_type}</div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Card>
-            </div>
-          </div>
+      <div style={{ marginTop: 20 }}>
+        {!businessId && tab !== "Reports" && (
+          <CACard style={{ marginBottom: 16 }}>
+            <CAEmpty title="Client has not linked their business yet" hint="Financial data appears once the client accepts the access invitation." />
+          </CACard>
         )}
 
-        {tab === "Cash & Liquidity" && (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard label="Cash Balance" value={formatIndianCurrency(bankBalance)} sub={`${bankCount} accounts`} />
-              <MetricCard label="Runway" value={`${runwayDays > 365 ? "-" : runwayDays}d`} valueColor={runwayColor} sub={runwayDays < 30 ? "Critical" : runwayDays < 90 ? "Watch" : "Healthy"} />
-              <MetricCard label="Daily Burn" value={formatIndianCurrency(burnRate)} sub="Avg last 30d" />
-              <MetricCard label="Tx (90d)" value={String(txs.length)} sub="Bank transactions" />
-            </div>
-            <Card>
-              <h3 className="text-[15px] font-semibold mb-3">Cash movement</h3>
-              {cashSeries.length === 0 ? <EmptyHint text="No transactions." /> : (
-                <ResponsiveContainer width="100%" height={280}>
-                  <AreaChart data={cashSeries}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
-                    <XAxis dataKey="d" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => formatIndianCurrency(Number(v))} />
-                    <Tooltip formatter={(v: any) => formatIndianCurrency(Number(v))} />
-                    <Area type="monotone" dataKey="net" stroke={COLORS.blue} fill={COLORS.blue} fillOpacity={0.18} strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
-            </Card>
-            <Card>
-              <h3 className="text-[15px] font-semibold mb-3">Recent transactions</h3>
-              <SimpleTable
-                headers={["Date", "Counterparty", "Category", "Direction", "Amount"]}
-                rows={txs.slice(0, 20).map(t => [
-                  formatIndianDate(t.date),
-                  t.counterparty || "-",
-                  t.category || "-",
-                  <Chip key="dir" tone={t.direction === "in" ? "green" : "red"}>{t.direction}</Chip>,
-                  formatIndianCurrency(Number(t.amount)),
-                ])}
-                empty="No transactions."
-              />
-            </Card>
-          </>
+        {tab === "Overview" && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+            <Metric label="Cash position" value={inr(liquidity?.cash_position)} />
+            <Metric label="Runway (months)" value={liquidity?.runway_months != null ? String(liquidity.runway_months) : "—"} />
+            <Metric label="Monthly burn" value={inr(liquidity?.burn_rate_current)} />
+            <CACard style={{ padding: "14px 16px" }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>Health</div>
+              <div style={{ marginTop: 8 }}><CABadge tone={healthTone(liquidity?.health_status)}>{liquidity?.health_status ?? "no data"}</CABadge></div>
+            </CACard>
+            <Metric label="MRR" value={inr(revenue?.mrr)} />
+            <Metric label="ARR" value={inr(revenue?.arr)} />
+            <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
+            <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
+          </div>
         )}
 
         {tab === "GST & ITC" && (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard label="ITC Safe" value={formatIndianCurrency(itcSafe)} valueColor={COLORS.greenSoft} />
-              <MetricCard label="ITC At Risk" value={formatIndianCurrency(itcAtRisk)} valueColor={COLORS.redSoft} />
-              <MetricCard label="Notice Risk" value={`${risk?.score ?? "-"}/100`} valueColor={COLORS.amberSoft} />
-              <MetricCard label="Pending Filings" value={String(upcomingFilings.filter(f => f.filing_type?.toLowerCase().includes("gst")).length)} />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+              <Metric label="Total ITC claimed" value={inr(itcTotals.claimed)} />
+              <Metric label="Matched" value={inr(itcTotals.matched)} />
+              <Metric label="Mismatched" value={inr(itcTotals.mismatched)} />
+              <Metric label="Pending" value={inr(itcTotals.pending)} />
             </div>
-            <Card>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-[15px] font-semibold">ITC Reconciliation lines</h3>
-                <div className="flex gap-2">
-                  <SecondaryBtn size="sm">Download GSTR-2A</SecondaryBtn>
-                  <SecondaryBtn size="sm">Export Mismatches</SecondaryBtn>
-                  <PrimaryBtn size="sm">Run ITC Reconciliation</PrimaryBtn>
-                </div>
-              </div>
-              <SimpleTable
-                headers={["Period", "Vendor GSTIN", "Safe", "At Risk", "Mismatches", "Status"]}
-                rows={itcLines.map(l => [
-                  l.period,
-                  <span key="g" className="font-mono text-[12px]">{l.vendor_gstin || "-"}</span>,
-                  formatIndianCurrency(Number(l.itc_safe || 0)),
-                  <span key="r" style={{ color: Number(l.itc_at_risk) > 0 ? COLORS.red : "inherit", fontWeight: Number(l.itc_at_risk) > 0 ? 600 : 400 }}>
-                    {formatIndianCurrency(Number(l.itc_at_risk || 0))}
-                  </span>,
-                  l.mismatch_count || 0,
-                  <Chip key="s" tone={l.status === "reconciled" ? "green" : "amber"}>{l.status || "pending"}</Chip>,
-                ])}
-                empty="No ITC lines yet. Run reconciliation to populate."
+            <div style={{ marginTop: 16 }}>
+              <label>
+                <input type="file" accept=".json,.zip,.xlsx,.csv" style={{ display: "none" }}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGstr2b(f); e.currentTarget.value = ""; }} />
+                <span style={{
+                  display: "inline-block", fontFamily: CA.sans, fontSize: 13, fontWeight: 600,
+                  background: CA.teal, color: "#fff", padding: "9px 16px", borderRadius: 9, cursor: "pointer",
+                }}>
+                  Upload GSTR-2B
+                </span>
+              </label>
+            </div>
+            <CACard style={{ marginTop: 16, overflow: "hidden" }}>
+              {itc.length === 0 ? <CAEmpty title="No ITC records" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>Period</th><th style={caTh}>Supplier</th><th style={caTh}>Invoice</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Total ITC</th><th style={caTh}>Match</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Mismatch</th>
+                  </tr></thead>
+                  <tbody>
+                    {itc.map((r) => (
+                      <tr key={r.id}>
+                        <td style={caTd}>{r.filing_period ?? "—"}</td>
+                        <td style={caTd}>{r.supplier_name ?? "—"}</td>
+                        <td style={{ ...caTd, fontFamily: CA.mono }}>{r.invoice_number ?? "—"}</td>
+                        <td style={caNum}>{inr(r.total_itc)}</td>
+                        <td style={caTd}><CABadge tone={statusTone(r.match_status)}>{r.match_status ?? "pending"}</CABadge></td>
+                        <td style={caNum}>{inr(r.mismatch_amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
+          </>
+        )}
+
+        {tab === "TDS" && (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+              <Metric label="TDS deducted" value={inr(tdsTotals.deducted)} />
+              <Metric label="Deposited" value={inr(tdsTotals.deposited)} />
+              <Metric label="Outstanding" value={inr(tdsTotals.outstanding)} />
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <CAButton onClick={() => setShowTdsForm((s) => !s)}>{showTdsForm ? "Close form" : "New TDS record"}</CAButton>
+            </div>
+            {showTdsForm && businessId && firmId && (
+              <TdsForm
+                businessId={businessId}
+                firmId={firmId}
+                onSaved={() => { setShowTdsForm(false); loadTds(); }}
               />
-            </Card>
+            )}
+            <CACard style={{ marginTop: 16, overflow: "hidden" }}>
+              {tds.length === 0 ? <CAEmpty title="No TDS records" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>Qtr</th><th style={caTh}>FY</th><th style={caTh}>Section</th><th style={caTh}>Deductee</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Payment</th><th style={{ ...caTh, textAlign: "right" }}>TDS</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Deposited</th><th style={caTh}>Status</th><th style={caTh}>Return</th>
+                  </tr></thead>
+                  <tbody>
+                    {tds.map((r) => (
+                      <tr key={r.id}>
+                        <td style={caTd}>{r.quarter ?? "—"}</td>
+                        <td style={caTd}>{r.financial_year ?? "—"}</td>
+                        <td style={{ ...caTd, fontFamily: CA.mono }}>{r.section_code ?? "—"}</td>
+                        <td style={caTd}>{r.deductee_name ?? "—"}</td>
+                        <td style={caNum}>{inr(r.payment_amount)}</td>
+                        <td style={caNum}>{inr(r.tds_amount)}</td>
+                        <td style={caNum}>{inr(r.deposited_amount)}</td>
+                        <td style={caTd}><CABadge tone={statusTone(r.status)}>{r.status ?? "—"}</CABadge></td>
+                        <td style={caTd}><CABadge tone={r.return_filed ? "green" : "amber"}>{r.return_filed ? "filed" : "not filed"}</CABadge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
           </>
         )}
 
         {tab === "Compliance" && (
           <>
-            <Card>
-              <div className="flex items-baseline justify-between mb-4">
-                <h3 className="text-[15px] font-semibold">Compliance matrix</h3>
-                <div className="text-[28px] font-bold" style={{ fontFamily: "'Playfair Display', serif", color: healthScore >= 70 ? COLORS.green : healthScore >= 40 ? COLORS.amber : COLORS.red }}>
-                  {healthScore}/100
+            <CAButton onClick={() => setShowComplianceForm((s) => !s)}>
+              {showComplianceForm ? "Close form" : "New compliance event"}
+            </CAButton>
+            {showComplianceForm && businessId && firmId && (
+              <ComplianceForm
+                businessId={businessId}
+                firmId={firmId}
+                onSaved={() => { setShowComplianceForm(false); loadCompliance(); }}
+              />
+            )}
+            <CACard style={{ marginTop: 16, overflow: "hidden" }}>
+              {groupedCompliance.length === 0 ? <CAEmpty title="No compliance events" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>Event</th><th style={caTh}>Period</th><th style={caTh}>Due</th>
+                    <th style={caTh}>Status</th><th style={{ ...caTh, textAlign: "right" }}>Penalty</th>
+                  </tr></thead>
+                  <tbody>
+                    {groupedCompliance.map((e) => {
+                      const overdue = e.status !== "filed" && e.due_date && new Date(e.due_date) < new Date();
+                      return (
+                        <tr key={e.id}>
+                          <td style={caTd}>{e.event_type ?? "—"}</td>
+                          <td style={caTd}>{e.filing_period ?? "—"}</td>
+                          <td style={caTd}>{dateIN(e.due_date)}</td>
+                          <td style={caTd}>
+                            <CABadge tone={e.status === "filed" ? "green" : overdue ? "red" : "amber"}>
+                              {e.status === "filed" ? "filed" : overdue ? "overdue" : e.status ?? "pending"}
+                            </CABadge>
+                          </td>
+                          <td style={caNum}>{inr(e.penalty_amount)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
+          </>
+        )}
+
+        {tab === "Bank" && (
+          <CACard style={{ overflow: "hidden" }}>
+            {txns.length === 0 ? <CAEmpty title="No bank transactions" /> : (
+              <>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>Date</th><th style={caTh}>Description</th><th style={caTh}>Category</th>
+                    <th style={{ ...caTh, textAlign: "right" }}>Amount</th><th style={{ ...caTh, textAlign: "right" }}>Balance</th>
+                  </tr></thead>
+                  <tbody>
+                    {txns.map((t) => {
+                      const signed = t.type === "debit" ? -Math.abs(Number(t.amount)) : Number(t.amount);
+                      return (
+                        <tr key={t.id}>
+                          <td style={caTd}>{dateIN(t.date)}</td>
+                          <td style={caTd}>{t.description ?? "—"}</td>
+                          <td style={caTd}>{t.category ?? "—"}</td>
+                          <td style={{ ...caNum, color: signed < 0 ? CA.red : CA.green }}>{inr(signed)}</td>
+                          <td style={caNum}>{inr(t.balance)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div style={{ padding: 14 }}>
+                  <CAButton variant="ghost" onClick={() => { const p = txnPage + 1; setTxnPage(p); loadTxns(p); }}>
+                    Show more
+                  </CAButton>
                 </div>
-              </div>
-              <SimpleTable
-                headers={["Filing", "Type", "Due Date", "Days Left", "Status"]}
-                rows={compliance.map(c => {
-                  const days = Math.ceil((new Date(c.due_date).getTime() - Date.now()) / 86400000);
-                  return [
-                    c.filing_name,
-                    c.filing_type,
-                    formatIndianDate(c.due_date),
-                    <span key="d" style={{ color: days < 0 ? COLORS.red : days < 7 ? COLORS.amber : COLORS.green, fontWeight: 600 }}>
-                      {days < 0 ? `${Math.abs(days)}d overdue` : `${days}d`}
-                    </span>,
-                    <Chip key="s" tone={c.status === "filed" ? "green" : days < 0 ? "red" : "amber"}>{c.status || "pending"}</Chip>,
-                  ];
-                })}
-                empty="No compliance events scheduled."
-              />
-            </Card>
-          </>
+              </>
+            )}
+          </CACard>
         )}
 
-        {tab === "Receivables" && (
+        {tab === "Reports" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MetricCard label="Total Outstanding" value={formatIndianCurrency(totalReceivables)} />
-              <MetricCard label="Overdue" value={formatIndianCurrency(overdueReceivables)} valueColor={overdueReceivables > 0 ? COLORS.redSoft : "#FFFFFF"} />
-              <MetricCard label="Open Invoices" value={String(receivables.length)} />
-            </div>
-            <Card>
-              <h3 className="text-[15px] font-semibold mb-3">All receivables</h3>
-              <SimpleTable
-                headers={["Customer", "Invoice", "Due", "Amount", "Outstanding", "Risk", "Actions"]}
-                rows={receivables.map(r => {
-                  const overdue = r.due_date && new Date(r.due_date) < new Date();
-                  return [
-                    r.customer_name,
-                    r.invoice_number || "-",
-                    <span key="d" style={{ color: overdue ? COLORS.red : "inherit" }}>{r.due_date ? formatIndianDate(r.due_date) : "-"}</span>,
-                    formatIndianCurrency(Number(r.amount)),
-                    formatIndianCurrency(Number(r.outstanding || r.amount)),
-                    <Chip key="r" tone={Number(r.risk_score) > 70 ? "red" : Number(r.risk_score) > 40 ? "amber" : "green"}>{r.risk_score ?? "-"}</Chip>,
-                    <GhostLink key="a">Chase →</GhostLink>,
-                  ];
-                })}
-                empty="No receivables."
-              />
-            </Card>
+            <CAButton onClick={generateReport} disabled={!businessId}>Generate MIS report</CAButton>
+            <CACard style={{ marginTop: 16, overflow: "hidden" }}>
+              {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead><tr>
+                    <th style={caTh}>Type</th><th style={caTh}>Period</th><th style={caTh}>Status</th>
+                    <th style={caTh}>Created</th><th style={caTh} />
+                  </tr></thead>
+                  <tbody>
+                    {reports.map((r) => (
+                      <tr key={r.id}>
+                        <td style={caTd}>{r.report_type ?? "—"}</td>
+                        <td style={caTd}>{r.period ?? "—"}</td>
+                        <td style={caTd}><CABadge tone={statusTone(r.status)}>{r.status ?? "—"}</CABadge></td>
+                        <td style={caTd}>{dateIN(r.created_at)}</td>
+                        <td style={{ ...caTd, textAlign: "right" }}>
+                          {r.file_url ? (
+                            <a href={r.file_url} target="_blank" rel="noreferrer" style={{ color: CA.teal, fontWeight: 600, fontSize: 12.5 }}>Download</a>
+                          ) : (
+                            <span style={{ color: CA.faint, fontSize: 12.5 }}>Not ready</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CACard>
           </>
-        )}
-
-        {tab === "Payables" && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MetricCard label="Total Payables" value={formatIndianCurrency(totalPayables)} />
-              <MetricCard label="Due This Week" value={formatIndianCurrency(dueThisWeekPayables)} valueColor={dueThisWeekPayables > 0 ? COLORS.amberSoft : "#FFFFFF"} />
-              <MetricCard label="Open Bills" value={String(payables.length)} />
-            </div>
-            <Card>
-              <h3 className="text-[15px] font-semibold mb-3">All payables</h3>
-              <SimpleTable
-                headers={["Vendor", "Bill", "Due", "Amount", "Outstanding", "Status", "Actions"]}
-                rows={payables.map(p => [
-                  p.vendor_name,
-                  p.invoice_number || "-",
-                  p.due_date ? formatIndianDate(p.due_date) : "-",
-                  formatIndianCurrency(Number(p.amount)),
-                  formatIndianCurrency(Number(p.outstanding || p.amount)),
-                  <Chip key="s" tone={p.status === "paid" ? "green" : "amber"}>{p.status || "pending"}</Chip>,
-                  <GhostLink key="a">Pay →</GhostLink>,
-                ])}
-                empty="No payables."
-              />
-            </Card>
-          </>
-        )}
-
-        {tab === "HR & Payroll" && (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard label="Headcount" value={String(latestPayroll?.headcount ?? "-")} />
-              <MetricCard label="Monthly Payroll" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.total_payroll || 0)) : "-"} />
-              <MetricCard label="PF Due" value={latestPayroll ? formatIndianCurrency(Number(latestPayroll.pf_due || 0)) : "-"} />
-              <MetricCard label="Next Payroll" value={latestPayroll?.next_payroll_date ? formatIndianDate(latestPayroll.next_payroll_date) : "-"} />
-            </div>
-            <Card>
-              <h3 className="text-[15px] font-semibold mb-3">Payroll history</h3>
-              <SimpleTable
-                headers={["Month", "Headcount", "Total Payroll", "PF Due", "ESIC Due"]}
-                rows={payroll.map(p => [
-                  formatIndianDate(p.month),
-                  p.headcount ?? "-",
-                  formatIndianCurrency(Number(p.total_payroll || 0)),
-                  formatIndianCurrency(Number(p.pf_due || 0)),
-                  formatIndianCurrency(Number(p.esic_due || 0)),
-                ])}
-                empty="No payroll records."
-              />
-            </Card>
-          </>
-        )}
-
-        {tab === "Documents" && (
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[15px] font-semibold">Documents</h3>
-              <PrimaryBtn size="sm"><span className="inline-flex items-center gap-1.5"><Upload size={14} /> Upload Document</span></PrimaryBtn>
-            </div>
-            <div className="border-2 border-dashed rounded p-12 text-center" style={{ borderColor: COLORS.caBorder }}>
-              <FileText size={32} className="mx-auto mb-3" style={{ color: COLORS.caBorder }} />
-              <div className="text-sm font-medium mb-1">Document storage coming soon</div>
-              <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>
-                A document manager (PDF, Excel, Word, JPG, PNG · max 50MB) will appear here once enabled for your firm.
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {tab === "Activity Log" && (
-          <Card>
-            <h3 className="text-[15px] font-semibold mb-3">Activity on this client</h3>
-            <SimpleTable
-              headers={["Timestamp", "Action", "Details"]}
-              rows={activities.map(a => [
-                <span key="t" className="text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.60)" }}>{new Date(a.created_at).toLocaleString("en-IN")}</span>,
-                <Chip key="a" tone={actionTone(a.action_type)}>{a.action_type}</Chip>,
-                a.description || "-",
-              ])}
-              empty="No activity yet."
-            />
-          </Card>
         )}
       </div>
     </div>
   );
 }
 
-// --- Sub-components ---
+function TdsForm({ businessId, firmId, onSaved }: { businessId: string; firmId: string; onSaved: () => void }) {
+  const [f, setF] = useState({
+    financial_year: "", quarter: "Q1", section_code: "", deductee_name: "", deductee_pan: "",
+    payment_date: "", payment_amount: "", tds_rate: "", tds_amount: "", deposited_amount: "",
+    challan_number: "", status: "pending", return_filed: false,
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k: string) => (e: any) => setF((s) => ({ ...s, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
-function QuickMetric({ label, value, sub, valueColor = "#FFFFFF" }: { label: string; value: string; sub?: string; valueColor?: string }) {
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const { error } = await supabase.from("ca_tds_records").insert({
+      business_id: businessId,
+      ca_firm_id: firmId,
+      financial_year: f.financial_year || null,
+      quarter: f.quarter,
+      section_code: f.section_code || null,
+      deductee_name: f.deductee_name || null,
+      deductee_pan: f.deductee_pan ? f.deductee_pan.toUpperCase() : null,
+      payment_date: f.payment_date || null,
+      payment_amount: f.payment_amount ? Number(f.payment_amount) : null,
+      tds_rate: f.tds_rate ? Number(f.tds_rate) : null,
+      tds_amount: f.tds_amount ? Number(f.tds_amount) : null,
+      deposited_amount: f.deposited_amount ? Number(f.deposited_amount) : 0,
+      challan_number: f.challan_number || null,
+      status: f.status,
+      return_filed: f.return_filed,
+      is_demo: false,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("TDS record saved");
+    onSaved();
+  };
+
   return (
-    <div className="rounded-md p-3" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}>
-      <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "rgba(255,255,255,0.50)" }}>{label}</div>
-      <div className="text-[18px] font-bold leading-tight" style={{ color: valueColor, fontVariantNumeric: "tabular-nums" }}>{value}</div>
-      {sub && <div className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>{sub}</div>}
-    </div>
+    <CACard style={{ padding: 20, marginTop: 16 }}>
+      <form onSubmit={save} style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <CAField label="Financial year"><input style={caInputStyle} value={f.financial_year} onChange={set("financial_year")} placeholder="2025-26" /></CAField>
+        <CAField label="Quarter">
+          <select style={caInputStyle as any} value={f.quarter} onChange={set("quarter")}>
+            {["Q1", "Q2", "Q3", "Q4"].map((q) => <option key={q} value={q}>{q}</option>)}
+          </select>
+        </CAField>
+        <CAField label="Section code"><input style={caInputStyle} value={f.section_code} onChange={set("section_code")} placeholder="194C" /></CAField>
+        <CAField label="Deductee name"><input style={caInputStyle} value={f.deductee_name} onChange={set("deductee_name")} /></CAField>
+        <CAField label="Deductee PAN"><input style={caInputStyle} value={f.deductee_pan} onChange={set("deductee_pan")} placeholder="ABCDE1234F" /></CAField>
+        <CAField label="Payment date"><input style={caInputStyle} type="date" value={f.payment_date} onChange={set("payment_date")} /></CAField>
+        <CAField label="Payment amount"><input style={caInputStyle} type="number" value={f.payment_amount} onChange={set("payment_amount")} /></CAField>
+        <CAField label="TDS rate (%)"><input style={caInputStyle} type="number" step="0.01" value={f.tds_rate} onChange={set("tds_rate")} /></CAField>
+        <CAField label="TDS amount"><input style={caInputStyle} type="number" value={f.tds_amount} onChange={set("tds_amount")} /></CAField>
+        <CAField label="Deposited amount"><input style={caInputStyle} type="number" value={f.deposited_amount} onChange={set("deposited_amount")} /></CAField>
+        <CAField label="Challan number"><input style={caInputStyle} value={f.challan_number} onChange={set("challan_number")} /></CAField>
+        <CAField label="Status">
+          <select style={caInputStyle as any} value={f.status} onChange={set("status")}>
+            <option value="pending">Pending</option>
+            <option value="deposited">Deposited</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </CAField>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: CA.sans, fontSize: 13 }}>
+          <input type="checkbox" checked={f.return_filed} onChange={set("return_filed")} /> Return filed
+        </label>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <CAButton type="submit" disabled={saving}>{saving ? "Saving…" : "Save TDS record"}</CAButton>
+        </div>
+      </form>
+    </CACard>
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
+function ComplianceForm({ businessId, firmId, onSaved }: { businessId: string; firmId: string; onSaved: () => void }) {
+  const [f, setF] = useState({
+    event_type: "GSTR-3B", filing_period: "", due_date: "", filing_date: "",
+    status: "pending", penalty_amount: "", late_fee_amount: "", notes: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k: string) => (e: any) => setF((s) => ({ ...s, [k]: e.target.value }));
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const { error } = await supabase.from("ca_compliance_events").insert({
+      business_id: businessId,
+      ca_firm_id: firmId,
+      event_type: f.event_type,
+      filing_period: f.filing_period || null,
+      due_date: f.due_date || null,
+      filing_date: f.filing_date || null,
+      status: f.status,
+      penalty_amount: f.penalty_amount ? Number(f.penalty_amount) : 0,
+      late_fee_amount: f.late_fee_amount ? Number(f.late_fee_amount) : 0,
+      notes: f.notes || null,
+      is_demo: false,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Compliance event saved");
+    onSaved();
+  };
+
   return (
-    <div>
-      <div className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "rgba(26,16,8,0.55)" }}>{label}</div>
-      <div className="text-[26px] font-bold" style={{ color: color || COLORS.ink, fontFamily: "'Playfair Display', serif", fontVariantNumeric: "tabular-nums" }}>{value}</div>
-    </div>
+    <CACard style={{ padding: 20, marginTop: 16 }}>
+      <form onSubmit={save} style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <CAField label="Event type">
+          <select style={caInputStyle as any} value={f.event_type} onChange={set("event_type")}>
+            {["GSTR-1", "GSTR-3B", "GSTR-9", "TDS Return", "ITR", "ROC Filing", "Advance Tax"].map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </CAField>
+        <CAField label="Filing period"><input style={caInputStyle} value={f.filing_period} onChange={set("filing_period")} placeholder="Jul 2026" /></CAField>
+        <CAField label="Due date"><input style={caInputStyle} type="date" value={f.due_date} onChange={set("due_date")} /></CAField>
+        <CAField label="Filing date"><input style={caInputStyle} type="date" value={f.filing_date} onChange={set("filing_date")} /></CAField>
+        <CAField label="Status">
+          <select style={caInputStyle as any} value={f.status} onChange={set("status")}>
+            <option value="pending">Pending</option>
+            <option value="filed">Filed</option>
+          </select>
+        </CAField>
+        <CAField label="Penalty amount"><input style={caInputStyle} type="number" value={f.penalty_amount} onChange={set("penalty_amount")} /></CAField>
+        <CAField label="Late fee"><input style={caInputStyle} type="number" value={f.late_fee_amount} onChange={set("late_fee_amount")} /></CAField>
+        <CAField label="Notes"><input style={caInputStyle} value={f.notes} onChange={set("notes")} /></CAField>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <CAButton type="submit" disabled={saving}>{saving ? "Saving…" : "Save event"}</CAButton>
+        </div>
+      </form>
+    </CACard>
   );
-}
-
-function ItcRow({ label, value, bg, color }: { label: string; value: string; bg: string; color: string }) {
-  return (
-    <div className="flex items-center justify-between rounded px-3 py-2" style={{ background: bg }}>
-      <span className="text-[13px] font-medium" style={{ color }}>{label}</span>
-      <span className="text-[14px] font-bold" style={{ color, fontVariantNumeric: "tabular-nums" }}>{value}</span>
-    </div>
-  );
-}
-
-function SimpleTable({ headers, rows, empty }: { headers: string[]; rows: any[][]; empty: string }) {
-  if (!rows.length) return <EmptyHint text={empty} />;
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.55)" }}>
-            {headers.map(h => <th key={h} className="py-2 pr-4">{h}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={i} style={{ borderTop: `1px solid ${COLORS.divider}` }}>
-              {r.map((c, j) => <td key={j} className="py-3 pr-4 align-middle">{c}</td>)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EmptyHint({ text }: { text: string }) {
-  return <div className="text-[13px] py-6 text-center" style={{ color: "rgba(26,16,8,0.45)" }}>{text}</div>;
-}
-
-function buildTopIssues({ runwayDays, itcAtRisk, overdueReceivables, mismatchCount, nextFiling }: any) {
-  const issues: { title: string; body: string; color: string; tab: string }[] = [];
-  if (runwayDays < 30) issues.push({ title: "Critical runway", body: `Cash will last only ${runwayDays} days at current burn.`, color: COLORS.red, tab: "Cash & Liquidity" });
-  if (itcAtRisk > 0) issues.push({ title: "ITC at risk", body: `${formatIndianCurrency(itcAtRisk)} of ITC flagged across ${mismatchCount} mismatches.`, color: COLORS.red, tab: "GST & ITC" });
-  if (overdueReceivables > 0) issues.push({ title: "Overdue receivables", body: `${formatIndianCurrency(overdueReceivables)} past due, chase customers.`, color: COLORS.amber, tab: "Receivables" });
-  if (nextFiling) {
-    const days = Math.ceil((new Date(nextFiling.due_date).getTime() - Date.now()) / 86400000);
-    if (days <= 7) issues.push({ title: `${nextFiling.filing_name} due soon`, body: `Due in ${days} days (${formatIndianDate(nextFiling.due_date)}).`, color: days < 3 ? COLORS.red : COLORS.amber, tab: "Compliance" });
-  }
-  if (!issues.length) issues.push({ title: "All clear", body: "No critical issues detected for this client.", color: COLORS.green, tab: "Overview" });
-  return issues.slice(0, 5);
-}
-
-function actionTone(t: string): "green" | "amber" | "red" | "blue" | "gold" | "gray" {
-  if (t.includes("file") || t.includes("upload")) return "green";
-  if (t.includes("delete")) return "red";
-  if (t.includes("modif") || t.includes("edit")) return "amber";
-  if (t.includes("view")) return "blue";
-  return "gray";
-}
-
-function timeAgo(iso: string): string {
-  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 60) return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  return `${Math.floor(s / 86400)}d ago`;
 }
