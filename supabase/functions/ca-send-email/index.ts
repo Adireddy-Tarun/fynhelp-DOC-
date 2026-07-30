@@ -42,22 +42,56 @@ Deno.serve(async (req) => {
   if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
 
   let body: {
-    kind: "client_invite" | "team_invite";
-    ca_firm_id: string;
+    kind?: "client_invite" | "team_invite";
+    ca_firm_id?: string;
     to: string;
     client_name?: string;
     access_level?: string;
     accept_url?: string;
     role?: string;
+    subject?: string;
+    body?: string;
   };
   try { body = await req.json(); } catch {
-    return new Response(JSON.stringify({ error: "Invalid body" }), { status: 400, headers: cors });
+    return new Response(JSON.stringify({ success: false, error: "Invalid body" }), { status: 400, headers: cors });
+  }
+
+  const ADMIN_EMAILS = ["adireddytarun@fynhelp.com", "nidhi@fynhelp.com", "support@fynhelp.com"];
+  const callerEmail = user.email?.toLowerCase().trim() ?? "";
+
+  // Generic admin-authored email: { to, subject, body }
+  if (!body.kind && body.subject && body.body) {
+    if (!ADMIN_EMAILS.includes(callerEmail)) {
+      return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: cors });
+    }
+    if (!body.to) {
+      return new Response(JSON.stringify({ success: false, error: "to is required" }), { status: 400, headers: cors });
+    }
+    if (!RESEND_API_KEY) {
+      return new Response(JSON.stringify({ success: false, error: "Email service not configured" }), { status: 500, headers: cors });
+    }
+    const genericHtml = shell(
+      esc(body.subject),
+      `<p style="font-size:14px;color:rgba(26,26,26,0.72);line-height:1.7;margin:0;white-space:pre-line">${esc(body.body)}</p>`,
+    );
+    const genericRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: FROM_EMAIL, to: [body.to], subject: body.subject, html: genericHtml }),
+    });
+    const genericPayload = await genericRes.json().catch(() => ({}));
+    if (!genericRes.ok) {
+      console.error("resend error", genericPayload);
+      return new Response(JSON.stringify({ success: false, error: "Email send failed", detail: genericPayload }), { status: 502, headers: cors });
+    }
+    return new Response(JSON.stringify({ success: true, id: genericPayload?.id ?? null }), { headers: cors });
   }
 
   const { kind, ca_firm_id, to } = body;
   if (!kind || !ca_firm_id || !to) {
-    return new Response(JSON.stringify({ error: "kind, ca_firm_id and to are required" }), { status: 400, headers: cors });
+    return new Response(JSON.stringify({ success: false, error: "kind, ca_firm_id and to are required" }), { status: 400, headers: cors });
   }
+
 
   // Caller must belong to the firm they are emailing on behalf of.
   const [{ data: firm }, { data: member }] = await Promise.all([
