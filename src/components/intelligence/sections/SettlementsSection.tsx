@@ -12,7 +12,11 @@ export default function SettlementsSection() {
     const rzpPending = rows.filter(r => r.gateway === "razorpay" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
     const expectedToday = rows.filter(r => r.expected_date === today).reduce((s, r) => s + Number(r.amount), 0);
     const upiFloat = rows.filter(r => r.gateway === "upi" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
-    return { rzpPending, expectedToday, upiFloat };
+    const in7 = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    const next7 = rows
+      .filter(r => r.status === "pending" && r.expected_date && r.expected_date >= today && r.expected_date <= in7)
+      .reduce((s, r) => s + Number(r.amount), 0);
+    return { rzpPending, expectedToday, upiFloat, next7 };
   }, [rows]);
 
   const liveEmpty = mode === "live" && rows.length === 0 && !isLoading;
