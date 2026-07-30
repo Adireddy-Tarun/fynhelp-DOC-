@@ -212,7 +212,13 @@ const App = () => (
           <WaitlistPopup />
 
         <Routes>
+          {/* ===== INTERNAL ADMIN (email allowlist) ===== */}
+          <Route path="/admin" element={<AdminGuard><InternalAdminLayout /></AdminGuard>}>
+            <Route path="ca-approvals" element={<CAApprovalsPage />} />
+          </Route>
+
           {/* ===== ADMIN TREE: only mounts AdminAuthProvider ===== */}
+
           <Route element={<AdminAppProviders />}>
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminProtected><AdminLayout /></AdminProtected>}>
