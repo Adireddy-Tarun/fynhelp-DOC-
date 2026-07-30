@@ -8,6 +8,7 @@ import TdsIntelligenceSection from "../sections/TdsIntelligenceSection";
 import AdvanceTaxSection from "../sections/AdvanceTaxSection";
 import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
+import GstFilingsSection from "../sections/GstFilingsSection";
 
 export default function GstTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "gst" }); }, []);
