@@ -27,3 +27,28 @@ export const supabaseExternal = createClient(
     },
   }
 );
+
+/**
+ * Secure server-side proxy for external financial data.
+ * Validates the caller's business access before querying the external project
+ * with a service key. Prefer this over direct supabaseExternal reads.
+ */
+export async function proxyExternalQuery(params: {
+  table: string;
+  business_id: string;
+  select?: string;
+  filters?: Record<string, string>;
+  limit?: number;
+  order?: { column: string; ascending: boolean };
+}): Promise<{ data: any[] | null; error: string | null }> {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.access_token) {
+    return { data: null, error: "Not authenticated" };
+  }
+  const result = await supabase.functions.invoke("external-data-proxy", {
+    body: params,
+  });
+  if (result.error) return { data: null, error: result.error.message };
+  if (!result.data?.success) return { data: null, error: result.data?.error ?? "Unknown error" };
+  return { data: result.data.data, error: null };
+}
