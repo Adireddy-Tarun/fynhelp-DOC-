@@ -121,7 +121,28 @@ Deno.serve(async (req) => {
   }
   if ((action === "reject" || action === "suspend") && !reason) {
     return json({ success: false, error: "A reason is required for this action" }, 400);
+  }
 
+  const logAction =
+    action === "approve" ? "approved"
+    : action === "reject" ? "rejected"
+    : action === "suspend" ? "suspended"
+    : "reactivated";
+
+  // Idempotency / double-submit guard: same firm + same action within 60s.
+  const cutoff = new Date(Date.now() - 60_000).toISOString();
+  const { data: recent } = await admin
+    .from("ca_approval_log")
+    .select("id")
+    .eq("ca_firm_id", firm_id)
+    .eq("action", logAction)
+    .gte("created_at", cutoff)
+    .limit(1);
+  if (recent && recent.length > 0) {
+    return json({
+      success: false,
+      error: "This action was already performed recently. Please wait before retrying.",
+    }, 409);
   }
 
   const { data: firm, error: firmErr } = await admin
@@ -134,6 +155,7 @@ Deno.serve(async (req) => {
 
   const now = new Date().toISOString();
   const positive = action === "approve" || action === "reactivate";
+
 
   const patch: Record<string, unknown> = {
     verification_status: positive ? "approved" : "rejected",
