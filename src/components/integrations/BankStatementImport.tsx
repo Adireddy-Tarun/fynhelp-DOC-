@@ -178,10 +178,14 @@ export default function BankStatementImport() {
       }
 
       if (result?.success) {
-        toast.success(`Imported ${result.rowsImported} transactions`);
+        await recomputeIntelligence(businessId);
+        toast.success(
+          `Import complete. ${result.rowsImported} transaction${result.rowsImported === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+        );
         qc.invalidateQueries({ queryKey: ["bank_transactions"] });
         qc.invalidateQueries({ queryKey: ["liquidity"] });
         qc.invalidateQueries({ queryKey: ["dashboard"] });
+
       } else {
         toast.error(result?.reason || "Import failed — please try again");
       }
