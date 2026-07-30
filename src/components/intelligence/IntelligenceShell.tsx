@@ -17,6 +17,7 @@ import AskFynnyTab from "./tabs/AskFynnyTab";
 import { IntelPage, ModeBanner, ACCENT, LiveTimestamp, ChartGradients } from "./_primitives";
 import { useMode } from "./DataSource";
 import { HeaderToolbar } from "./actions";
+import LiveAlerts from "./LiveAlerts";
 
 const TABS = [
   { id: "liquidity",  label: "Liquidity",      icon: Droplets,       Comp: LiquidityTab },
