@@ -19,6 +19,7 @@ import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
 import LiveCockpitPanel from "@/components/dashboard/LiveCockpitPanel";
+import LiveAlerts from "@/components/intelligence/LiveAlerts";
 
 const REFETCH_MS = 30000;
 
