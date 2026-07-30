@@ -14,9 +14,37 @@ const cors = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 
+const log = (level: "INFO" | "WARN" | "ERROR", event: string, data?: Record<string, unknown>) =>
+  console.log(JSON.stringify({ ts: new Date().toISOString(), level, event, ...data }));
+
 const fmtDate = (d: string | null) => (d ? new Date(d).toISOString().slice(0, 10) : "—");
 const daysOverdue = (d: string) =>
   Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 86400000));
+
+type AlertedEvent = {
+  event_id: string;
+  event_type: string;
+  filing_period: string;
+  due_date: string;
+  days_overdue: number;
+  business_id: string;
+};
+
+type AlertedFirm = {
+  firm_id: string;
+  firm_name: string;
+  firm_email: string;
+  events_count: number;
+  events: AlertedEvent[];
+  email_sent: boolean;
+  email_error: string | null;
+};
+
+type SkippedEvent = {
+  event_id: string;
+  firm_id: string;
+  reason: "duplicate_within_24h" | "firm_no_email";
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
@@ -25,6 +53,8 @@ Deno.serve(async (req) => {
   }
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const startedAt = Date.now();
+  const runAt = new Date().toISOString();
 
   try {
     const nowIso = new Date().toISOString();
@@ -37,6 +67,7 @@ Deno.serve(async (req) => {
       .order("due_date", { ascending: true });
 
     if (error) {
+      log("ERROR", "query_failed", { error: error.message });
       return new Response(JSON.stringify({ success: false, error: error.message }), { status: 400, headers: cors });
     }
 
@@ -48,10 +79,19 @@ Deno.serve(async (req) => {
       byFirm.set(e.ca_firm_id, list as typeof events);
     }
 
+    log("INFO", "run_start", {
+      total_overdue_events: events?.length ?? 0,
+      distinct_firms: byFirm.size,
+    });
+
     const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
     let firmsAlerted = 0;
     let eventsProcessed = 0;
     let skipped = 0;
+    let eventsSkippedDuplicate = 0;
+    let firmsSkippedNoEmail = 0;
+    const alertedFirms: AlertedFirm[] = [];
+    const skippedEvents: SkippedEvent[] = [];
 
     for (const [firmId, firmEvents] of byFirm.entries()) {
       const { data: firm } = await admin
@@ -61,6 +101,11 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (!firm?.email) {
         skipped += firmEvents!.length;
+        firmsSkippedNoEmail++;
+        for (const ev of firmEvents!) {
+          skippedEvents.push({ event_id: ev.id, firm_id: firmId, reason: "firm_no_email" });
+        }
+        log("WARN", "firm_skip_no_email", { firm_id: firmId, firm_name: firm?.firm_name ?? null });
         continue;
       }
 
@@ -76,6 +121,14 @@ Deno.serve(async (req) => {
           .limit(1);
         if (existing && existing.length > 0) {
           skipped++;
+          eventsSkippedDuplicate++;
+          skippedEvents.push({ event_id: ev.id, firm_id: firmId, reason: "duplicate_within_24h" });
+          log("INFO", "event_skip_duplicate", {
+            firm_id: firmId,
+            event_id: ev.id,
+            event_type: ev.event_type,
+            filing_period: ev.filing_period,
+          });
           continue;
         }
         fresh.push(ev);
@@ -95,6 +148,13 @@ Deno.serve(async (req) => {
           is_demo: false,
         });
         eventsProcessed++;
+        log("INFO", "notification_inserted", {
+          firm_id: firmId,
+          event_id: ev.id,
+          event_type: ev.event_type,
+          filing_period: ev.filing_period,
+          days_overdue: daysOverdue(ev.due_date),
+        });
       }
 
       const lines = fresh
@@ -112,6 +172,9 @@ ${lines}
 
 Please review and file these at the earliest to avoid penalties.`;
 
+      let emailSent = false;
+      let emailError: string | null = null;
+
       try {
         const res = await fetch(`${SUPABASE_URL}/functions/v1/ca-send-email`, {
           method: "POST",
@@ -126,22 +189,69 @@ Please review and file these at the earliest to avoid penalties.`;
             body: emailBody,
           }),
         });
-        if (!res.ok) console.error("ca-send-email failed", firmId, await res.text());
+        if (!res.ok) {
+          emailError = await res.text();
+          console.error("ca-send-email failed", firmId, emailError);
+          log("ERROR", "email_failed", { firm_id: firmId, firm_email: firm.email, error: emailError });
+        } else {
+          emailSent = true;
+          log("INFO", "email_sent", { firm_id: firmId, firm_email: firm.email, events_count: fresh.length });
+        }
       } catch (e) {
+        emailError = e instanceof Error ? e.message : String(e);
         console.error("ca-send-email error", firmId, e);
+        log("ERROR", "email_failed", { firm_id: firmId, firm_email: firm.email, error: emailError });
       }
+
+      alertedFirms.push({
+        firm_id: firmId,
+        firm_name: firm.firm_name ?? firm.ca_name ?? "",
+        firm_email: firm.email,
+        events_count: fresh.length,
+        events: fresh.map((ev) => ({
+          event_id: ev.id,
+          event_type: ev.event_type,
+          filing_period: ev.filing_period,
+          due_date: ev.due_date,
+          days_overdue: daysOverdue(ev.due_date),
+          business_id: ev.business_id,
+        })),
+        email_sent: emailSent,
+        email_error: emailError,
+      });
 
       firmsAlerted++;
     }
 
+    const durationMs = Date.now() - startedAt;
+    log("INFO", "run_complete", {
+      firms_alerted: firmsAlerted,
+      events_processed: eventsProcessed,
+      skipped,
+      duration_ms: durationMs,
+    });
+
     return new Response(
-      JSON.stringify({ success: true, firms_alerted: firmsAlerted, events_processed: eventsProcessed, skipped }),
+      JSON.stringify({
+        success: true,
+        run_at: runAt,
+        duration_ms: durationMs,
+        summary: {
+          total_overdue_events: events?.length ?? 0,
+          distinct_firms_with_overdue: byFirm.size,
+          firms_alerted: firmsAlerted,
+          events_processed: eventsProcessed,
+          events_skipped_duplicate: eventsSkippedDuplicate,
+          firms_skipped_no_email: firmsSkippedNoEmail,
+        },
+        alerted_firms: alertedFirms,
+        skipped_events: skippedEvents,
+      }),
       { headers: cors },
     );
   } catch (e) {
-    return new Response(
-      JSON.stringify({ success: false, error: e instanceof Error ? e.message : "Unexpected error" }),
-      { status: 500, headers: cors },
-    );
+    const msg = e instanceof Error ? e.message : "Unexpected error";
+    log("ERROR", "run_failed", { error: msg, duration_ms: Date.now() - startedAt });
+    return new Response(JSON.stringify({ success: false, error: msg }), { status: 500, headers: cors });
   }
 });
