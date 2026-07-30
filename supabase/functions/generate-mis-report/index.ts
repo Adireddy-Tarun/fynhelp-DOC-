@@ -309,7 +309,10 @@ Deno.serve(async (req) => {
 
     const rightTxt = (
       p: any, s: string, xRight: number, y: number, size: number, font: any, color: any,
-    ) => p.drawText(s, { x: xRight - font.widthOfTextAtSize(s, size), y, size, font, color });
+    ) => {
+      const v = enc(s);
+      p.drawText(v, { x: xRight - font.widthOfTextAtSize(v, size), y, size, font, color });
+    };
 
     const rule = (p: any, y: number, thickness = 0.5) =>
       p.drawLine({ start: { x: LEFT, y }, end: { x: RIGHT, y }, thickness, color: LINE });
