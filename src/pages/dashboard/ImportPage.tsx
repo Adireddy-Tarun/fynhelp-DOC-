@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 import { supabaseExternal } from "@/integrations/supabase/external";
+import { recomputeIntelligence } from "@/lib/postImportCompute";
+
 import {
   normaliseAmount,
   signFromType,
