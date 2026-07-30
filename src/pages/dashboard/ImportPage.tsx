@@ -814,6 +814,10 @@ export default function ImportPage() {
       }
 
       setResult({ rows: txns.length, ...compResult });
+      toast.success(
+        `Import complete. ${txns.length} transaction${txns.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
+      );
+
       track("csv_import_completed", { records: txns.length, skipped, bank: bank.id });
 
     } catch (e) {
