@@ -143,7 +143,18 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
   const amountIdx = headers.findIndex(isAmountHeader);
   const balanceIdx = headers.findIndex(isBalanceHeader);
   const descIdx = headers.findIndex(isDescriptionHeader);
-  const typeIdx = headers.findIndex((h) => /^type$|dr\/cr|dr.cr/i.test(h));
+  const typeIdx = headers.findIndex((h) => /^type$|transaction type|txn type|dr\/cr|cr\/dr|dr.cr|^mode$/i.test(h));
+
+  // Pattern detection (1-5) purely for observability in the function logs.
+  const pattern =
+    debitIdx !== -1 && creditIdx !== -1
+      ? (/(withdraw|deposit|paid (in|out)|money (in|out))/i.test(headers[debitIdx] + headers[creditIdx]) ? 4 : 2)
+      : amountIdx !== -1
+        ? (aoa.slice(headerIdx + 1, headerIdx + 21).some((r) => /\b(dr|cr)\.?\s*$/i.test(String(r?.[amountIdx] ?? "")))
+            ? 5
+            : typeIdx !== -1 ? 1 : 3)
+        : null;
+  console.log(`[parse-financial-import] detected pattern ${pattern}`, { dateIdx, debitIdx, creditIdx, amountIdx, typeIdx });
 
   const out: ParsedRow[] = [];
   for (let i = headerIdx + 1; i < aoa.length; i++) {
@@ -151,27 +162,30 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
     const date = parseDate(r[dateIdx]);
     if (!date) continue;
 
-    let amount: number | null = null;
-    let kind: "credit" | "debit" = "debit";
+    // Signed amount: negative = debit / money out, positive = credit / money in
+    let signed = 0;
 
-    if (debitIdx !== -1 || creditIdx !== -1) {
-      const d = debitIdx !== -1 ? parseNum(r[debitIdx]) : null;
-      const c = creditIdx !== -1 ? parseNum(r[creditIdx]) : null;
-      if (c != null && c !== 0) { amount = Math.abs(c); kind = "credit"; }
-      else if (d != null && d !== 0) { amount = Math.abs(d); kind = "debit"; }
+    const d = debitIdx !== -1 ? parseNum(r[debitIdx]) : null;
+    const c = creditIdx !== -1 ? parseNum(r[creditIdx]) : null;
+    if (d != null && d !== 0 && (c == null || c === 0)) signed = -Math.abs(d);
+    else if (c != null && c !== 0 && (d == null || d === 0)) signed = Math.abs(c);
+    else if (d != null && d !== 0 && c != null && c !== 0) {
+      signed = Math.abs(d) >= Math.abs(c) ? -Math.abs(d) : Math.abs(c);
     } else if (amountIdx !== -1) {
       const n = parseNum(r[amountIdx]);
-      if (n != null) {
-        amount = Math.abs(n);
+      if (n != null && n !== 0) {
         if (typeIdx !== -1) {
           const t = String(r[typeIdx] || "").toLowerCase();
-          kind = /cr|credit|deposit/.test(t) ? "credit" : "debit";
+          const isCredit = /\bcr\b|credit|deposit|money in|paid in|inflow|receipt/.test(t);
+          const isDebit = /\bdr\b|debit|withdraw|money out|paid out|outflow|payment/.test(t);
+          signed = isCredit ? Math.abs(n) : isDebit ? -Math.abs(n) : n;
         } else {
-          kind = n >= 0 ? "credit" : "debit";
+          signed = n;
         }
       }
     }
-    if (amount == null || amount === 0) continue;
+
+    if (signed === 0) continue;
 
     const balance = balanceIdx !== -1 ? parseNum(r[balanceIdx]) : null;
     const description = descIdx !== -1 ? String(r[descIdx] ?? "").trim() : "";
@@ -179,15 +193,17 @@ function rowsFromAOA(aoa: any[][]): { rows: ParsedRow[]; reason?: string } {
     out.push({
       date,
       description: description.slice(0, 500),
-      amount,
-      type: kind,
+      amount: signed,
+      type: signed < 0 ? "debit" : "credit",
       balance,
       category: null,
     });
   }
   if (!out.length) return { rows: [], reason: "No valid transaction rows found" };
+  console.log("[parse-financial-import] first 5 parsed rows:", out.slice(0, 5));
   return { rows: out };
 }
+
 
 function csvToAOA(text: string): any[][] {
   // Minimal RFC4180-ish CSV parser supporting quoted fields and commas/semicolons.
