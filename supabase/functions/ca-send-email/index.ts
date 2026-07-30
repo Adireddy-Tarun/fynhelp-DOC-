@@ -36,13 +36,20 @@ const shell = (title: string, bodyHtml: string, cta?: { label: string; href: str
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
+  const internalService = req.headers.get("X-Internal-Service");
+  const isInternalCall = internalService === "ca-compliance-alerts";
+
   const authHeader = req.headers.get("Authorization") ?? "";
   if (!authHeader) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-  const { data: userRes } = await admin.auth.getUser(authHeader.replace("Bearer ", ""));
-  const user = userRes?.user;
-  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+  let user: { id: string; email?: string } | null = null;
+  if (!isInternalCall) {
+    const { data: userRes } = await admin.auth.getUser(authHeader.replace("Bearer ", ""));
+    user = userRes?.user ?? null;
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+  }
+
 
   let body: {
     kind?: "client_invite" | "team_invite";
