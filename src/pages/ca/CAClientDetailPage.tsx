@@ -557,7 +557,10 @@ export default function CAClientDetailPage() {
                         <td style={caTd}>{dateIN(r.created_at)}</td>
                         <td style={{ ...caTd, textAlign: "right" }}>
                           {r.file_url ? (
-                            <a href={r.file_url} target="_blank" rel="noreferrer" style={{ color: CA.teal, fontWeight: 600, fontSize: 12.5 }}>Download</a>
+                            <a href={r.file_url} target="_blank" rel="noreferrer" style={{ color: CA.teal, fontWeight: 600, fontSize: 12.5, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                              <FileText size={14} strokeWidth={2} aria-hidden="true" />
+                              Download PDF
+                            </a>
                           ) : (
                             <span style={{ color: CA.faint, fontSize: 12.5 }}>Not ready</span>
                           )}
