@@ -1,505 +1,222 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCAAuth } from "@/contexts/CAAuthContext";
-import { useCAClients } from "@/hooks/useCAClients";
 import { supabase } from "@/integrations/supabase/client";
+import { supabaseExternal } from "@/integrations/supabase/external";
+import { useCAPortal } from "@/hooks/useCAPortal";
 import {
-  Plus, Upload, RefreshCw, FileText, X, Bell,
-  AlertTriangle, AlertCircle, Info, ChevronLeft, ChevronRight,
-} from "lucide-react";
+  CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
+} from "@/components/ca/portalUi";
 
-const COLORS = {
-  ink: "#1A1008",
-  red: "#C41E1E",
-  beige: "#EDE4CB",
-  beigeBorder: "#D4C9A8",
-  beigeRow: "#FAF7F0",
-  amber: "#F59E0B",
-  green: "#1A6B3C",
-  blue: "#1A4A8B",
-  redLight: "#F9EDED",
-};
-
-interface CANotification {
+interface ClientRow {
   id: string;
-  title: string;
-  message: string;
+  business_id: string | null;
+  client_name: string;
+  client_status: string | null;
+}
+
+interface Enriched extends ClientRow {
+  cash_position: number | null;
+  health_status: string | null;
+  runway_months: number | null;
+  burn_rate_current: number | null;
+  next_gst_due: string | null;
+  next_gst_type: string | null;
+}
+
+interface Notification {
+  id: string;
+  title: string | null;
+  message: string | null;
   severity: string | null;
   is_read: boolean | null;
   created_at: string | null;
-  business_id: string | null;
-  businesses?: { business_name: string } | null;
 }
 
-const greeting = () => {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
-};
-
-const timeAgo = (iso: string | null): string => {
-  if (!iso) return "";
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
-  const d = Math.floor(hr / 24);
-  return `${d}d ago`;
-};
-
-const ROWS_PER_PAGE = 10;
+const sevTone = (s?: string | null) =>
+  s === "critical" ? "red" : s === "warning" ? "amber" : s === "success" ? "green" : "teal";
 
 export default function CADashboardPage() {
-  const { caFirm, isDemoCA } = useCAAuth();
+  const { firmId } = useCAPortal();
   const navigate = useNavigate();
-  const { clients, loading: clientsLoading } = useCAClients();
-  const [notifications, setNotifications] = useState<CANotification[]>([]);
-  const [notifLoading, setNotifLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "critical" | "filings">("all");
-  const [sort, setSort] = useState<"name" | "recent" | "alerts">("alerts");
-  const [page, setPage] = useState(1);
-  const [fabOpen, setFabOpen] = useState(false);
+  const [clients, setClients] = useState<Enriched[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch notifications
   useEffect(() => {
-    if (!caFirm?.id) return;
+    if (!firmId) return;
     let cancelled = false;
+
     (async () => {
-      setNotifLoading(true);
-      const { data } = await supabase
+      setLoading(true);
+      const { data: rows, error } = await supabase
+        .from("ca_clients")
+        .select("id, business_id, client_name, client_status")
+        .eq("ca_firm_id", firmId)
+        .eq("is_demo", false)
+        .order("created_at", { ascending: false });
+      if (error) console.warn("[fyn:ca] ca_clients", error);
+
+      const base = (rows as ClientRow[]) ?? [];
+      const enriched: Enriched[] = await Promise.all(
+        base.map(async (c) => {
+          let metrics: any = null;
+          let gst: any = null;
+          if (c.business_id) {
+            try {
+              const { data } = await supabaseExternal
+                .from("liquidity_metrics")
+                .select("cash_position, health_status, runway_months, burn_rate_current")
+                .eq("business_id", c.business_id)
+                .order("recorded_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+              metrics = data;
+            } catch (e) { console.warn("[fyn:ca] liquidity_metrics", c.business_id, e); }
+            try {
+              const { data } = await supabaseExternal
+                .from("gst_filings")
+                .select("due_date, return_type, status")
+                .eq("business_id", c.business_id)
+                .neq("status", "filed")
+                .order("due_date", { ascending: true })
+                .limit(1)
+                .maybeSingle();
+              gst = data;
+            } catch (e) { console.warn("[fyn:ca] gst_filings", c.business_id, e); }
+          }
+          return {
+            ...c,
+            cash_position: metrics?.cash_position ?? null,
+            health_status: metrics?.health_status ?? null,
+            runway_months: metrics?.runway_months ?? null,
+            burn_rate_current: metrics?.burn_rate_current ?? null,
+            next_gst_due: gst?.due_date ?? null,
+            next_gst_type: gst?.return_type ?? null,
+          };
+        }),
+      );
+
+      const { data: notes } = await supabase
         .from("ca_notifications")
-        .select("id, title, message, severity, is_read, created_at, business_id, businesses(business_name)")
-        .eq("ca_firm_id", caFirm.id)
+        .select("id, title, message, severity, is_read, created_at")
+        .eq("ca_firm_id", firmId)
+        .eq("is_demo", false)
         .order("created_at", { ascending: false })
-        .limit(5);
-      if (!cancelled) {
-        setNotifications((data as any) || []);
-        setNotifLoading(false);
-      }
+        .limit(10);
+
+      if (cancelled) return;
+      setClients(enriched);
+      setNotifications((notes as Notification[]) ?? []);
+      setLoading(false);
+
+      console.log("[fyn:ca] portfolio mount", {
+        firmId,
+        clientCount: enriched.length,
+        clients: enriched.map((c) => ({
+          name: c.client_name, business_id: c.business_id, health_status: c.health_status,
+        })),
+      });
     })();
+
     return () => { cancelled = true; };
-  }, [caFirm?.id]);
+  }, [firmId]);
 
-  // Derived metrics
-  const metrics = useMemo(() => {
-    const activeClients = clients.length;
-    const filingsThisWeek = clients.filter((c) => c.filing <= 7).length;
-    const gstr3b = Math.ceil(filingsThisWeek * 0.6);
-    const gstr1 = filingsThisWeek - gstr3b;
-    const criticalAlerts = clients.filter((c) => c.cash === "Critical" || c.health < 40).length;
-    const itcRiskClients = clients.filter((c) => c.cash !== "Safe").length;
-    const itcAtRisk = clients.reduce((sum, c) => sum + (c.itcAtRisk ?? 0), 0) / 100000;
-    return {
-      activeClients,
-      filingsThisWeek,
-      gstr3b,
-      gstr1,
-      criticalAlerts,
-      itcAtRisk,
-      itcRiskClients,
-    };
-  }, [clients]);
+  const total = clients.length;
+  const active = clients.filter((c) => (c.client_status ?? "").toLowerCase() === "active").length;
+  const pending = clients.filter((c) => (c.client_status ?? "").toLowerCase() === "pending").length;
+  const portfolioCash = clients.reduce((s, c) => s + (c.cash_position ?? 0), 0);
 
-  // Filter + sort + paginate
-  const filtered = useMemo(() => {
-    let rows = [...clients];
-    if (filter === "critical") rows = rows.filter((c) => c.cash === "Critical" || c.health < 40);
-    if (filter === "filings") rows = rows.filter((c) => c.filing <= 7);
-    if (sort === "name") rows.sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "recent") rows.sort((a, b) => (b.granted_at || "").localeCompare(a.granted_at || ""));
-    if (sort === "alerts") rows.sort((a, b) => {
-      const sev = (c: typeof a) => (c.cash === "Critical" ? 3 : c.health < 40 ? 2 : c.filing < 7 ? 1 : 0);
-      return sev(b) - sev(a);
-    });
-    return rows;
-  }, [clients, filter, sort]);
+  const markRead = async (id: string) => {
+    setNotifications((n) => n.map((x) => (x.id === id ? { ...x, is_read: true } : x)));
+    await supabase.from("ca_notifications").update({ is_read: true }).eq("id", id);
+  };
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
-  const pageRows = filtered.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
-  useEffect(() => { if (page > totalPages) setPage(1); }, [filtered, totalPages, page]);
-
-  const today = new Date().toLocaleDateString("en-IN", {
-    weekday: "long", day: "numeric", month: "long", year: "numeric",
-  });
+  const summary = [
+    { label: "Total clients", value: String(total) },
+    { label: "Active", value: String(active) },
+    { label: "Pending", value: String(pending) },
+    { label: "Portfolio cash", value: inr(portfolioCash) },
+  ];
 
   return (
-    <div className="font-sans" style={{ background: COLORS.beige, minHeight: "calc(100vh - 56px)" }}>
-      {isDemoCA && (
-        <div style={{ background: "rgba(245,158,11,0.12)", borderBottom: "1px solid rgba(245,158,11,0.25)", padding: "10px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#92400E" }}>
-            You are viewing the CA Partner Demo. Data is illustrative. No changes are saved.
-          </span>
-          <button
-            onClick={() => { sessionStorage.clear(); window.location.href = "/"; }}
-            style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "#92400E", background: "transparent", border: "1px solid rgba(146,64,14,0.3)", borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}
-          >
-            Exit demo
-          </button>
-        </div>
-      )}
-      <div className="px-8 py-8">
-      {/* 1. Welcome */}
-      <div className="mb-8">
-        <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "28px", color: COLORS.ink, lineHeight: 1.2 }}>
-          {greeting()}, {caFirm?.firm_name || "Partner"}
-        </h1>
-        <p className="mt-1.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "15px", color: "rgba(26,16,8,0.65)" }}>
-          You're managing {metrics.activeClients} active client{metrics.activeClients === 1 ? "" : "s"}
-        </p>
-        <p className="mt-1" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.45)" }}>
-          {today}
-        </p>
-      </div>
+    <div>
+      <CAHeading>Portfolio</CAHeading>
 
-      {/* 2. Portfolio metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <MetricCard
-          label="Active Clients"
-          value={clientsLoading ? "-" : String(metrics.activeClients)}
-          sub={`↑ ${Math.min(3, metrics.activeClients)} new this month`}
-        />
-        <MetricCard
-          label="Filings Due This Week"
-          value={clientsLoading ? "-" : String(metrics.filingsThisWeek)}
-          valueColor={metrics.filingsThisWeek > 20 ? COLORS.red : metrics.filingsThisWeek > 10 ? COLORS.amber : "#fff"}
-          sub={`GSTR-3B: ${metrics.gstr3b}, GSTR-1: ${metrics.gstr1}`}
-        />
-        <MetricCard
-          label="Critical Alerts"
-          value={clientsLoading ? "-" : String(metrics.criticalAlerts)}
-          valueColor={metrics.criticalAlerts > 0 ? COLORS.amber : "#fff"}
-          sub={<button onClick={() => navigate("/ca/notifications")} className="hover:underline">View all →</button>}
-        />
-        <MetricCard
-          label="Total ITC at Risk"
-          value={clientsLoading ? "-" : `₹${metrics.itcAtRisk.toFixed(1)}L`}
-          valueColor={COLORS.amber}
-          sub={`Across ${metrics.itcRiskClients} client${metrics.itcRiskClients === 1 ? "" : "s"}`}
-        />
-      </div>
-
-      {/* 3. Recent notifications */}
-      <div className="bg-white rounded-lg p-6 mb-6" style={{ border: `1px solid ${COLORS.beigeBorder}` }}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "16px", color: COLORS.ink }}>
-            Recent Notifications
-          </h3>
-          <Bell size={16} style={{ color: "rgba(26,16,8,0.4)" }} />
-        </div>
-
-        {notifLoading ? (
-          <div className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</div>
-        ) : notifications.length === 0 ? (
-          <div className="py-8 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
-            No recent notifications
-          </div>
-        ) : (
-          <div>
-            {notifications.map((n, i) => (
-              <NotificationRow
-                key={n.id}
-                notif={n}
-                isLast={i === notifications.length - 1}
-                onView={() => navigate("/ca/notifications")}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="text-right mt-4">
-          <button onClick={() => navigate("/ca/notifications")}
-            className="hover:underline"
-            style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
-            View all notifications →
-          </button>
-        </div>
-      </div>
-
-      {/* 4. Client list */}
-      <div className="bg-white rounded-lg p-6" style={{ border: `1px solid ${COLORS.beigeBorder}` }}>
-        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
-          <h3 style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "16px", color: COLORS.ink }}>
-            Your Clients ({metrics.activeClients} active)
-          </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Select value={filter} onChange={(v) => setFilter(v as any)}
-              options={[
-                { value: "all", label: "All clients" },
-                { value: "critical", label: "Critical alerts" },
-                { value: "filings", label: "Filings due" },
-              ]} />
-            <Select value={sort} onChange={(v) => setSort(v as any)}
-              options={[
-                { value: "alerts", label: "Sort: Alert count" },
-                { value: "name", label: "Sort: Name A–Z" },
-                { value: "recent", label: "Sort: Recent activity" },
-              ]} />
-            <button onClick={() => navigate("/ca/clients/add")}
-              className="rounded-lg flex items-center gap-1.5 hover:brightness-90 transition"
-              style={{
-                background: COLORS.red, color: "#fff", padding: "8px 16px",
-                fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px",
-              }}>
-              <Plus size={14} /> Add new client
-            </button>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto -mx-2">
-          <table className="w-full" style={{ borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: `1px solid ${COLORS.beigeBorder}` }}>
-                {["Client", "Industry", "Cash Runway", "Critical Alerts", "Next Filing", "Last Activity", "Actions"].map((h) => (
-                  <th key={h} className="px-3 py-3 text-left"
-                    style={{
-                      fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "11px",
-                      color: "rgba(26,16,8,0.65)", textTransform: "uppercase", letterSpacing: "0.05em",
-                    }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {clientsLoading && (
-                <tr><td colSpan={7} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.5)" }}>Loading clients…</td></tr>
-              )}
-              {!clientsLoading && pageRows.length === 0 && (
-                <tr><td colSpan={7} className="py-10 text-center text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
-                  No clients match. <button onClick={() => navigate("/ca/clients/add")} className="font-medium underline" style={{ color: COLORS.red }}>Add your first client</button>
-                </td></tr>
-              )}
-              {!clientsLoading && pageRows.map((c) => {
-                const runwayDays = c.cash === "Safe" ? 120 : c.cash === "Watch" ? 60 : 18;
-                const runwayColor = runwayDays > 90 ? COLORS.green : runwayDays >= 30 ? COLORS.amber : COLORS.red;
-                const alertCount = (c.cash === "Critical" ? 2 : 0) + (c.health < 40 ? 1 : 0) + (c.filing < 3 ? 1 : 0);
-                const dueDate = c.nextFilingDate
-                  ? new Date(c.nextFilingDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })
-                  : "No filings";
-                const urgencyColor = c.filing < 3 ? COLORS.red : c.filing <= 7 ? COLORS.amber : "transparent";
-                return (
-                  <tr key={c.id}
-                    className="cursor-pointer transition-colors"
-                    style={{ borderBottom: `1px solid ${COLORS.beigeRow}` }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = COLORS.beigeRow)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    onClick={() => navigate(`/ca/client/${c.business_id}`)}>
-                    <td className="px-3 py-3.5">
-                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "14px", color: COLORS.ink }}>
-                        {c.name}
-                      </div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.45)" }}>
-                        {c.gstin || "GSTIN pending"}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.65)" }}>
-                      {c.industry}
-                    </td>
-                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "14px", color: runwayColor }}>
-                      {runwayDays}d
-                    </td>
-                    <td className="px-3 py-3.5">
-                      {alertCount > 0 ? (
-                        <span className="inline-flex items-center justify-center rounded-full text-white"
-                          style={{
-                            background: COLORS.red, padding: "4px 10px",
-                            fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px", minWidth: "28px",
-                          }}>
-                          {alertCount}
-                        </span>
-                      ) : (
-                        <span style={{ color: "rgba(26,16,8,0.35)", fontSize: "13px" }}>-</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: urgencyColor }} />
-                        <div>
-                          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.ink }}>
-                            {c.nextFilingType === "-" ? "No pending" : c.nextFilingType}
-                          </div>
-                          <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.55)" }}>
-                            Due {dueDate}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.55)" }}>
-                      {c.report}
-                    </td>
-                    <td className="px-3 py-3.5">
-                      <span className="hover:underline"
-                        style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
-                        View →
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {filtered.length > 0 && (
-          <div className="flex items-center justify-between mt-5 pt-4" style={{ borderTop: `1px solid ${COLORS.beigeRow}` }}>
-            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "13px", color: "rgba(26,16,8,0.55)" }}>
-              Showing {(page - 1) * ROWS_PER_PAGE + 1}–{Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length} client{filtered.length === 1 ? "" : "s"}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 18 }}>
+        {summary.map((s) => (
+          <CACard key={s.label} style={{ padding: "16px 18px" }}>
+            <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: CA.faint }}>
+              {s.label}
             </div>
-            <div className="flex items-center gap-1">
-              <PageBtn disabled={page === 1} onClick={() => setPage((p) => p - 1)}><ChevronLeft size={14} /></PageBtn>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <PageBtn key={p} active={p === page} onClick={() => setPage(p)}>{p}</PageBtn>
+            <div style={{ fontFamily: CA.mono, fontSize: 22, fontWeight: 600, color: CA.ink, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>
+              {s.value}
+            </div>
+          </CACard>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 320px", gap: 20, marginTop: 22, alignItems: "start" }}>
+        <div>
+          <div style={{ ...caTh, padding: "0 0 10px", border: "none" }}>Clients</div>
+          {loading ? (
+            <CACard><CAEmpty title="Loading portfolio…" /></CACard>
+          ) : clients.length === 0 ? (
+            <CACard><CAEmpty title="No clients yet" hint="Add your first client to start tracking their financial health." /></CACard>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
+              {clients.map((c) => (
+                <CACard
+                  key={c.id}
+                  style={{ padding: 18, cursor: "pointer" }}
+                  className="hover:shadow-sm transition-shadow"
+                >
+                  <div onClick={() => navigate(`/ca/clients/${c.id}`)}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 8 }}>
+                      <div style={{ fontFamily: CA.serif, fontSize: 15.5, fontWeight: 700, color: CA.ink }}>{c.client_name}</div>
+                      <CABadge tone={healthTone(c.health_status)}>{c.health_status ?? "no data"}</CABadge>
+                    </div>
+                    <div style={{ fontFamily: CA.mono, fontSize: 19, fontWeight: 600, color: CA.ink, marginTop: 12, fontVariantNumeric: "tabular-nums" }}>
+                      {c.cash_position === null ? "—" : inr(c.cash_position)}
+                    </div>
+                    <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>Cash position</div>
+                    <div style={{ marginTop: 12, fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                      Next GST due: {c.next_gst_due ? `${dateIN(c.next_gst_due)}${c.next_gst_type ? ` · ${c.next_gst_type}` : ""}` : "—"}
+                    </div>
+                  </div>
+                </CACard>
               ))}
-              <PageBtn disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}><ChevronRight size={14} /></PageBtn>
             </div>
+          )}
+        </div>
+
+        <CACard style={{ overflow: "hidden" }}>
+          <div style={{ padding: "14px 18px", borderBottom: `0.5px solid ${CA.line}`, fontFamily: CA.serif, fontSize: 15, fontWeight: 700 }}>
+            Notifications
           </div>
-        )}
+          {notifications.length === 0 ? (
+            <CAEmpty title="Nothing new" />
+          ) : (
+            notifications.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => markRead(n.id)}
+                style={{
+                  display: "block", width: "100%", textAlign: "left", padding: "12px 18px",
+                  borderBottom: `0.5px solid ${CA.line}`, background: n.is_read ? "transparent" : CA.tealSoft,
+                  border: "none", borderBottomWidth: "0.5px", borderBottomStyle: "solid", cursor: "pointer",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                  <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink }}>{n.title ?? "Notification"}</span>
+                  <CABadge tone={sevTone(n.severity) as any}>{n.severity ?? "info"}</CABadge>
+                </div>
+                <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>{n.message}</div>
+                <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, marginTop: 4 }}>{dateIN(n.created_at)}</div>
+              </button>
+            ))
+          )}
+        </CACard>
       </div>
-
-      {/* 5. Quick Actions FAB */}
-      <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3">
-        {fabOpen && (
-          <>
-            <FabMini icon={<Upload size={18} />} label="File GST" onClick={() => { setFabOpen(false); navigate("/ca/gst-portfolio"); }} />
-            <FabMini icon={<RefreshCw size={18} />} label="Run ITC Recon" onClick={() => { setFabOpen(false); navigate("/ca/itc-recon"); }} />
-            <FabMini icon={<FileText size={18} />} label="Generate Report" onClick={() => { setFabOpen(false); navigate("/ca/reports"); }} />
-            <FabMini icon={<Plus size={18} />} label="Add Client" onClick={() => { setFabOpen(false); navigate("/ca/clients/add"); }} />
-          </>
-        )}
-        <button
-          onClick={() => setFabOpen((o) => !o)}
-          aria-label="Quick actions"
-          className="rounded-full flex items-center justify-center transition-transform hover:scale-105"
-          style={{
-            width: "56px", height: "56px", background: COLORS.red,
-            boxShadow: "0 10px 30px -8px rgba(196,30,30,0.5)",
-            transform: fabOpen ? "rotate(45deg)" : "rotate(0)",
-          }}
-        >
-          {fabOpen ? <X size={22} color="#fff" /> : <Plus size={24} color="#fff" />}
-        </button>
-      </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Sub-components ---------- */
-
-function MetricCard({ label, value, valueColor = "#fff", sub }: {
-  label: string; value: string; valueColor?: string; sub?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-lg p-6" style={{ background: COLORS.ink }}>
-      <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
-        {label}
-      </div>
-      <div className="mt-3" style={{
-        fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "42px", lineHeight: 1, color: valueColor,
-      }}>
-        {value}
-      </div>
-      {sub != null && (
-        <div className="mt-2.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
-          {sub}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NotificationRow({ notif, isLast, onView }: { notif: CANotification; isLast: boolean; onView: () => void }) {
-  const sev = (notif.severity || "info").toLowerCase();
-  const meta = sev === "critical"
-    ? { color: COLORS.red, Icon: AlertCircle }
-    : sev === "warning"
-    ? { color: COLORS.amber, Icon: AlertTriangle }
-    : { color: COLORS.blue, Icon: Info };
-  return (
-    <div className="flex items-start gap-3 py-3.5"
-      style={isLast ? {} : { borderBottom: `1px solid ${COLORS.beige}` }}>
-      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-        style={{ background: `${meta.color}1A` }}>
-        <meta.Icon size={16} style={{ color: meta.color }} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "14px", color: COLORS.ink }}>
-          {notif.title}
-        </div>
-        <div className="mt-0.5" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "13px", color: "rgba(26,16,8,0.65)", lineHeight: 1.45 }}>
-          {notif.message}
-        </div>
-        <div className="mt-1" style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(26,16,8,0.45)" }}>
-          {notif.businesses?.business_name && <>{notif.businesses.business_name} · </>}
-          {timeAgo(notif.created_at)}
-        </div>
-      </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {!notif.is_read && <span className="w-2 h-2 rounded-full" style={{ background: meta.color }} />}
-        <button onClick={onView}
-          className="hover:underline"
-          style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.red }}>
-          View →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Select({ value, onChange, options }: {
-  value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-}) {
-  return (
-    <select value={value} onChange={(e) => onChange(e.target.value)}
-      className="rounded-lg bg-white cursor-pointer focus:outline-none"
-      style={{
-        border: `1px solid ${COLORS.beigeBorder}`, padding: "8px 12px",
-        fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px", color: COLORS.ink,
-      }}>
-      {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-    </select>
-  );
-}
-
-function PageBtn({ children, onClick, disabled, active }: {
-  children: React.ReactNode; onClick?: () => void; disabled?: boolean; active?: boolean;
-}) {
-  return (
-    <button onClick={onClick} disabled={disabled}
-      className="min-w-[32px] h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-      style={{
-        background: active ? COLORS.red : "transparent",
-        color: active ? "#fff" : COLORS.ink,
-        border: active ? "none" : `1px solid ${COLORS.beigeBorder}`,
-        padding: "0 8px",
-        fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "13px",
-      }}>
-      {children}
-    </button>
-  );
-}
-
-function FabMini({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <div className="flex items-center gap-3 group">
-      <span className="bg-white px-3 py-1.5 rounded-md shadow opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 500, color: COLORS.ink, border: `1px solid ${COLORS.beigeBorder}` }}>
-        {label}
-      </span>
-      <button onClick={onClick} aria-label={label}
-        className="rounded-full bg-white flex items-center justify-center transition-transform hover:scale-110"
-        style={{
-          width: "48px", height: "48px",
-          border: `2px solid ${COLORS.red}`, color: COLORS.red,
-          boxShadow: "0 6px 16px -4px rgba(0,0,0,0.15)",
-        }}>
-        {icon}
-      </button>
     </div>
   );
 }
