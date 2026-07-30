@@ -294,9 +294,18 @@ Deno.serve(async (req) => {
     let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
     pages.push(page);
 
+    // StandardFonts are WinAnsi-encoded — strip anything they cannot draw.
+    const enc = (s: string) =>
+      String(s ?? "")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/[\u2013\u2014]/g, "-")
+        .replace(/\u20B9/g, "Rs.")
+        .replace(/[^\x20-\x7E\xA0-\xFF]/g, "");
+
     const txt = (
       p: any, s: string, x: number, y: number, size: number, font: any, color: any,
-    ) => p.drawText(s, { x, y, size, font, color });
+    ) => p.drawText(enc(s), { x, y, size, font, color });
 
     const rightTxt = (
       p: any, s: string, xRight: number, y: number, size: number, font: any, color: any,
