@@ -52,6 +52,7 @@ export default function CAClientDetailPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   const businessId = client?.business_id ?? null;
 
