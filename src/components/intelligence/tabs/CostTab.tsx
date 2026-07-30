@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
-import { useExpenses, useVendors, useInvoices, useEmployees } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtPct, ACCENT } from "../_primitives";
+import { useExpenses, useVendors, useInvoices, useEmployees, useMode } from "../DataSource";
+import { IntelCard, KPI, Badge, WithData, fmtCompact, fmtINR, fmtPct, ACCENT } from "../_primitives";
 import { SubscriptionAuditSection, ContractRenewalsSection } from "./sections/NewSections";
 import { SpendControlsDialog, ViewAllLink, useOpenDrawer } from "../actions";
 import PeopleEfficiencySection from "../sections/PeopleEfficiencySection";
 import ProjectEconomicsSection from "../sections/ProjectEconomicsSection";
 import SupportIntelligenceSection from "../sections/SupportIntelligenceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
+import CostAnomaliesSection from "../sections/CostAnomaliesSection";
 
 export default function CostTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "cost" }); }, []);
