@@ -341,6 +341,17 @@ function mapRows(
     dirIdx = bank.direction ? pick(headers, bank.direction) : -1;
   }
 
+  // Universal fallback: whatever the bank profile could not resolve, resolve it
+  // from the generic header dictionaries (works for any bank in the world).
+  const detected: DetectedColumns = detectAmountPattern(headers, rows.slice(1));
+  if (debitIdx === -1) debitIdx = detected.debitIdx;
+  if (creditIdx === -1) creditIdx = detected.creditIdx;
+  if (amountIdx === -1) amountIdx = detected.amountIdx;
+  if (dirIdx === -1) dirIdx = detected.typeIdx;
+  // Never let one physical column serve two roles.
+  if (amountIdx !== -1 && (amountIdx === debitIdx || amountIdx === creditIdx)) amountIdx = -1;
+
+
   if (dateIdx === -1) {
     return {
       txns: [],
