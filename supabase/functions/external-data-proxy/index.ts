@@ -86,11 +86,10 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await admin
       .from("profiles")
-      .select("business_id, org_id")
+      .select("business_id")
       .eq("user_id", userId)
       .maybeSingle();
     if (profile?.business_id) allowed.add(profile.business_id as string);
-    if (profile?.org_id) allowed.add(profile.org_id as string);
 
     // CA access: grants created by this user
     const { data: grantedRows } = await admin
