@@ -382,7 +382,10 @@ Deno.serve(async (req) => {
     };
 
     const drawSection = (title: string, rows: [string, string][]) => {
-      ensure(40);
+      // Keep a whole section together when it can fit on a fresh page.
+      const blockHeight = 20 + rows.length * 16;
+      if (blockHeight <= 700) ensure(blockHeight);
+      else ensure(40);
       txt(page, title, LEFT, y, 10, bold, TEAL);
       y -= 6;
       rule(page, y, 0.4);
