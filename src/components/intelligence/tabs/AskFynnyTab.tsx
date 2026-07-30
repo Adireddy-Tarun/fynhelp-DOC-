@@ -8,6 +8,7 @@ import {
   useBankTxns, useInvoices, useExpenses, useCustomers, useVendors,
   useGstFilings, useEmployees, useCAC, useSalesPipeline,
 } from "../DataSource";
+import { useLiquidityMetrics, useRevenueMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
 
 const QUICK_PROMPTS = [
   "What's my runway?",
@@ -129,6 +130,33 @@ export default function AskFynnyTab() {
     };
   }, [bank, invoices, expenses, customers, vendors, gst, emps, cac, pipeline]);
 
+  /* ── Task 7: real financial context injected ahead of every message ── */
+  const liveBizId = useLiveBusinessId();
+  const { data: liq } = useLiquidityMetrics();
+  const { data: rev } = useRevenueMetrics();
+
+  const systemContext = useMemo(() => {
+    if (mode !== "live" || (!liq && !rev)) return null;
+    const asOf = liq?.recorded_at ? new Date(liq.recorded_at).toISOString() : new Date().toISOString();
+    return (
+      `Business financial context as of ${asOf}: ` +
+      `Cash position ${inr(Number(liq?.cash_position ?? 0))}, ` +
+      `Runway ${Number(liq?.runway_months ?? 0)} months, ` +
+      `Burn rate ${inr(Number(liq?.burn_rate_current ?? 0))} per month, ` +
+      `Health status ${liq?.health_status ?? "unknown"}, ` +
+      `MRR ${inr(Number(rev?.mrr ?? 0))}, ` +
+      `ARR ${inr(Number(rev?.arr ?? 0))}, ` +
+      `Revenue growth ${Number(rev?.revenue_growth_rate ?? 0)}%, ` +
+      `Customers ${Number(rev?.customer_count ?? 0)}. ` +
+      `Answer all questions using this data.`
+    );
+  }, [mode, liq, rev]);
+
+  useEffect(() => {
+    if (mode === "live") console.log("[fyn:fynny] context", { business_id: liveBizId, system_context: systemContext });
+  }, [mode, liveBizId, systemContext]);
+
+
   // Lightweight on-device fallback used when the edge function is unavailable.
   function offlineAnswer(q: string): string {
     const t = q.toLowerCase();
@@ -172,7 +200,12 @@ export default function AskFynnyTab() {
     try {
       track("ai_cfo_query_sent", { query_length: q.length });
       const { data, error } = await supabase.functions.invoke("fynny-chat", {
-        body: { org_id: mode === "demo" ? DEMO_BIZ : "live", message: q, context },
+        body: {
+          org_id: mode === "demo" ? DEMO_BIZ : "live",
+          message: q,
+          context,
+          system_context: systemContext ?? undefined,
+        },
       });
       const reply = (data as any)?.response;
       if (error || !reply) throw error || new Error("No response");

@@ -17,6 +17,7 @@ import AskFynnyTab from "./tabs/AskFynnyTab";
 import { IntelPage, ModeBanner, ACCENT, LiveTimestamp, ChartGradients } from "./_primitives";
 import { useMode } from "./DataSource";
 import { HeaderToolbar } from "./actions";
+import LiveAlerts from "./LiveAlerts";
 
 const TABS = [
   { id: "liquidity",  label: "Liquidity",      icon: Droplets,       Comp: LiquidityTab },
@@ -69,9 +70,13 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
         </div>
       </div>
 
+      {/* Alerts generated from real runway / GST / cost-anomaly data (live only) */}
+      <LiveAlerts />
+
       <div key={active}>
         <Active />
       </div>
+
 
       {mode === "demo" && (
         <footer

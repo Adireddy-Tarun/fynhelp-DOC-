@@ -400,6 +400,8 @@ const CockpitPage = () => {
         <LiveCockpitPanel />
       </div>
 
+
+
       {/* Onboarding banner */}
       {!onboardingDone && !demoMode && (
         <motion.div

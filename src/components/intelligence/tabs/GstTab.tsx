@@ -8,6 +8,7 @@ import TdsIntelligenceSection from "../sections/TdsIntelligenceSection";
 import AdvanceTaxSection from "../sections/AdvanceTaxSection";
 import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
+import GstFilingsSection from "../sections/GstFilingsSection";
 
 export default function GstTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "gst" }); }, []);
@@ -58,6 +59,8 @@ export default function GstTab() {
 
   return (
     <div className="space-y-6">
+      <GstFilingsSection />
+
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="Output GST" value={fmtCompact(m.outputGst)} sub="Collected" />

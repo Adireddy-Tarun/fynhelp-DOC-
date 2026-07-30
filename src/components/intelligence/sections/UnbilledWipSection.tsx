@@ -25,7 +25,7 @@ export default function UnbilledWipSection() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
       <KPI label="Unbilled WIP" count={m.wip} format={fmtCompact} sub="Work delivered, not invoiced" tone={m.wip > 0 ? "warning" : "neutral"} />
       <KPI label="Deferred Revenue" count={m.deferred} format={fmtCompact} sub="Invoiced, not recognised" />
-      <KPI label="Expected Next 30 Days" value="₹18.5L" sub="Pipeline conversion" tone="healthy" />
+      <KPI label="Total Unrecognised" count={m.wip + m.deferred} format={fmtCompact} sub="WIP + deferred balance" tone="healthy" />
     </div>
   );
 }

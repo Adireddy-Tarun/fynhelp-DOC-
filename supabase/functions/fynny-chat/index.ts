@@ -137,15 +137,21 @@ Deno.serve(async (req) => {
         });
       }
       const ctx = body.context || {};
-      const systemPrompt = `You are FYNNY, an AI CFO assistant for Indian SMEs in a DEMO environment.
-Answer the user's question conversationally with specific numbers from the demo financial data below.
+      // Task 7: caller-supplied real financial context, injected ahead of the
+      // rest of the system prompt so the model answers from live metrics.
+      const injected = typeof body.system_context === "string"
+        ? String(body.system_context).slice(0, 2000) + "\n\n"
+        : "";
+      const systemPrompt = `${injected}You are FYNNY, an AI CFO assistant for Indian SMEs.
+Answer the user's question conversationally with specific numbers from the financial data below.
 Use Indian currency formatting (₹, lakhs, crores). Be concise, professional, and CFO-grade.
 If a metric is missing or zero, say so honestly — never invent numbers.
 
-DEMO FINANCIAL DATA:
+FINANCIAL DATA:
 ${ctxStr}
 
 Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Keep responses under 200 words.`;
+
 
       const aiResp = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",

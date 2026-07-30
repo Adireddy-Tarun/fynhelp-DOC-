@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useInvoices, useCustomers, useMode } from "../DataSource";
-import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+import { IntelCard, KPI, Badge, WithData, AnimatedBar, fmtCompact, fmtINR, fmtPct, ACCENT, CHART, ChartGradients, EMPTY } from "../_primitives";
+import NoDataPrompt from "../NoDataPrompt";
+import { useRevenueMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
 import { CustomerAcquisitionSection, CohortRetentionSection, SalesPipelineSection, RevenueBreakdownSection, DeferredRevenueSection } from "./sections/NewSections";
 import { GenerateReportButton, ViewAllLink } from "../actions";
 import RevenueQualitySection from "../sections/RevenueQualitySection";
@@ -98,8 +100,51 @@ export default function RevenueTab() {
 
   const liveEmpty = mode === "live" && (invoices?.length ?? 0) === 0;
 
+  /* ── Real computed revenue metrics (external intelligence store) ── */
+  const liveBizId = useLiveBusinessId();
+  const { data: rev, isLoading: revL } = useRevenueMetrics();
+  useEffect(() => {
+    if (mode === "live") console.log("[fyn:revenue] mount", { business_id: liveBizId, revenue_metrics: rev ?? null });
+  }, [mode, liveBizId, rev]);
+
+  const rm = {
+    mrr: Number(rev?.mrr ?? 0),
+    arr: Number(rev?.arr ?? 0),
+    net: Number(rev?.net_revenue ?? 0),
+    customers: Number(rev?.customer_count ?? 0),
+    arpu: Number(rev?.arpu ?? 0),
+    growth: Number(rev?.revenue_growth_rate ?? 0),
+    period: rev?.period_start ? new Date(rev.period_start).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "No period",
+  };
+  const growthUp = rm.growth >= 0;
+
   return (
     <div className="space-y-6">
+      {mode === "live" && (
+        <IntelCard
+          title="Revenue Position"
+          sub={`Reporting period · ${rm.period}`}
+          action={
+            <Badge tone={growthUp ? "green" : "red"}>
+              {growthUp ? "▲" : "▼"} {Math.abs(rm.growth).toFixed(1)}%
+            </Badge>
+          }
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <KPI label="MRR" value={fmtINR(rm.mrr)} tone={rm.mrr > 0 ? "healthy" : "neutral"} />
+              <KPI label="ARR" value={fmtINR(rm.arr)} />
+              <KPI label="Net Revenue" value={fmtINR(rm.net)} />
+              <KPI label="Customers" value={String(rm.customers)} />
+              <KPI label="ARPU" value={fmtINR(rm.arpu)} />
+            </div>
+            {!revL && !rev && (
+              <NoDataPrompt text="Upload your sales data or connect your accounting software to see your revenue metrics." />
+            )}
+          </div>
+        </IntelCard>
+      )}
+
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPI label="NRR" value={Number.isFinite(m.nrr) ? fmtPct(m.nrr, 0) : EMPTY} isEmpty={!Number.isFinite(m.nrr)} delta={Number.isFinite(m.nrr) ? "+3.2% QoQ" : undefined} deltaTone="up" tone={Number.isFinite(m.nrr) && m.nrr >= 110 ? "healthy" : "neutral"} />

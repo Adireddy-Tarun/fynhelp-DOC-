@@ -12,7 +12,11 @@ export default function SettlementsSection() {
     const rzpPending = rows.filter(r => r.gateway === "razorpay" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
     const expectedToday = rows.filter(r => r.expected_date === today).reduce((s, r) => s + Number(r.amount), 0);
     const upiFloat = rows.filter(r => r.gateway === "upi" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
-    return { rzpPending, expectedToday, upiFloat };
+    const in7 = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    const next7 = rows
+      .filter(r => r.status === "pending" && r.expected_date && r.expected_date >= today && r.expected_date <= in7)
+      .reduce((s, r) => s + Number(r.amount), 0);
+    return { rzpPending, expectedToday, upiFloat, next7 };
   }, [rows]);
 
   const liveEmpty = mode === "live" && rows.length === 0 && !isLoading;
@@ -30,7 +34,7 @@ export default function SettlementsSection() {
       <KPI label="Razorpay Pending" count={m.rzpPending} format={fmtCompact} sub="Awaiting settlement" tone="warning" />
       <KPI label="Expected Today" count={m.expectedToday} format={fmtCompact} sub="Hits bank today" />
       <KPI label="UPI Float" count={m.upiFloat} format={fmtCompact} sub="In-transit UPI" />
-      <KPI label="Next 7 Days" value="₹4.82L" sub="Forecast inflow" tone="healthy" />
+      <KPI label="Next 7 Days" count={m.next7} format={fmtCompact} sub="Forecast inflow" tone="healthy" />
     </div>
   );
 }
