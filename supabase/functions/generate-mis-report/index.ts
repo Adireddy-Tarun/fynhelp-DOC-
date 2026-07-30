@@ -103,6 +103,11 @@ Deno.serve(async (req) => {
       .eq("ca_firm_id", ca_firm_id)
       .eq("business_id", business_id)
       .maybeSingle();
+    const { data: firmRow } = await admin
+      .from("ca_firms")
+      .select("firm_name, ca_name, icai_membership_number, email, phone, city, state, logo_url")
+      .eq("id", ca_firm_id)
+      .maybeSingle();
     if (!accessRow && !clientRow) {
       return json({ success: false, error: "This client is not linked to your firm" }, 403);
     }
