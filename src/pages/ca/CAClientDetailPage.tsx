@@ -335,18 +335,31 @@ export default function CAClientDetailPage() {
               <Metric label="Mismatched" value={inr(itcTotals.mismatched)} />
               <Metric label="Pending" value={inr(itcTotals.pending)} />
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 16, display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+              <CAField label="Filing period">
+                <input
+                  type="month"
+                  value={gstrPeriod}
+                  onChange={(e) => setGstrPeriod(e.target.value)}
+                  style={caInputStyle}
+                />
+              </CAField>
               <label>
-                <input type="file" accept=".json,.zip,.xlsx,.csv" style={{ display: "none" }}
+                <input type="file" accept=".json,.csv" style={{ display: "none" }} disabled={uploadingGstr}
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadGstr2b(f); e.currentTarget.value = ""; }} />
                 <span style={{
                   display: "inline-block", fontFamily: CA.sans, fontSize: 13, fontWeight: 600,
-                  background: CA.teal, color: "#fff", padding: "9px 16px", borderRadius: 9, cursor: "pointer",
+                  background: uploadingGstr ? CA.faint : CA.teal, color: "#fff", padding: "9px 16px",
+                  borderRadius: 9, cursor: uploadingGstr ? "not-allowed" : "pointer",
                 }}>
-                  Upload GSTR-2B
+                  {uploadingGstr ? "Processing…" : "Upload GSTR-2B"}
                 </span>
               </label>
+              <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, paddingBottom: 10 }}>
+                GST portal JSON or a simple CSV
+              </div>
             </div>
+
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {itc.length === 0 ? <CAEmpty title="No ITC records" /> : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
