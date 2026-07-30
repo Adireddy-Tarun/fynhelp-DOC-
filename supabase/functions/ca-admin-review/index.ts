@@ -56,6 +56,20 @@ Deno.serve(async (req) => {
     return json({ success: true, firms: data ?? [] });
   }
 
+  if (op === "audit") {
+    const firm_id = body.firm_id;
+    if (!firm_id) return json({ success: false, error: "firm_id required" }, 400);
+    const { data, error } = await admin
+      .from("ca_approval_log")
+      .select("id, ca_firm_id, reviewed_by_email, action, reason, created_at")
+      .eq("ca_firm_id", firm_id)
+      .order("created_at", { ascending: false });
+    if (error) return json({ success: false, error: error.message }, 500);
+    return json({ success: true, log: data ?? [] });
+  }
+
+
+
   const { firm_id, action } = body;
   const reason = (body.reason ?? "").trim();
   if (!firm_id || !action || !["approve", "reject", "suspend", "reactivate"].includes(action)) {
