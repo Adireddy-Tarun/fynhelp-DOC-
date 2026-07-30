@@ -249,13 +249,20 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     try {
       if (type === "bank") {
         let skipped = 0;
+        const bankHeaders = Object.keys(rows[0] ?? {});
+        const bankDetected = detectAmountPattern(
+          bankHeaders,
+          rows.map(r => bankHeaders.map(h => r[h]))
+        );
         const records = rows.map(r => {
-          const debit = num(pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]));
-          const credit = num(pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]));
-          const rawAmt = num(pick(r, ["Amount", "Transaction Amount", "Txn Amount"]));
-          const amount = debit > 0 ? debit : credit > 0 ? credit : Math.abs(rawAmt);
-          const direction = debit > 0 ? "out" : credit > 0 ? "in" : (rawAmt < 0 ? "out" : "in");
+          const rawDebit = pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]);
+          const rawCredit = pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]);
+          const rawAmt = pick(r, ["Amount", "Transaction Amount", "Txn Amount"]);
+          const rawType = pick(r, ["Type", "Transaction Type", "Txn Type", "Dr/Cr", "Cr/Dr", "Mode"]);
+          // Signed: negative = debit / money out, positive = credit / money in
+          const amount = normaliseAmount(rawAmt, rawType, rawDebit, rawCredit);
           if (amount === 0) return null;
+          const direction = directionFromSigned(amount);
           return {
             business_id: businessId,
             date: toDate(pick(r, ["Date", "Transaction Date", "Txn Date", "Value Date"])),
@@ -266,6 +273,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             category: pick(r, ["Category"]) || null,
           };
         }).filter((x): x is NonNullable<typeof x> => {
+
           if (x === null) { skipped++; return false; }
           return true;
         });
