@@ -14,6 +14,8 @@ interface ClientRow {
   client_name: string;
   client_email: string | null;
   gstin: string | null;
+  pan: string | null;
+  client_phone: string | null;
   client_status: string | null;
   onboarded_at: string | null;
   last_activity_at: string | null;
