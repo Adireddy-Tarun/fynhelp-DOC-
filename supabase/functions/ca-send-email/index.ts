@@ -98,7 +98,10 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ success: true, id: genericPayload?.id ?? null }), { headers: cors });
   }
 
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+
   const { kind, ca_firm_id, to } = body;
+
   if (!kind || !ca_firm_id || !to) {
     return new Response(JSON.stringify({ success: false, error: "kind, ca_firm_id and to are required" }), { status: 400, headers: cors });
   }
