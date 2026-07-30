@@ -43,7 +43,9 @@ export function useGenerateReport(businessId: string | null) {
       parameters?: Record<string, unknown>;
     }) => {
       if (!businessId) throw new Error("No business selected");
-      const { data, error } = await (supabase as any)
+
+      // 1. Insert the generating row
+      const { data: newRow, error: insertError } = await (supabase as any)
         .from("generated_reports")
         .insert({
           business_id: businessId,
@@ -55,21 +57,49 @@ export function useGenerateReport(businessId: string | null) {
         })
         .select()
         .single();
-      if (error) throw error;
-      const newRow = data as GeneratedReport;
+      if (insertError) throw insertError;
 
-      // Simulate processing
-      await new Promise((r) => setTimeout(r, 2000));
+      const markFailed = async () => {
+        await (supabase as any)
+          .from("generated_reports")
+          .update({ status: "failed" })
+          .eq("id", newRow.id);
+      };
 
+      // 2. Call the real generator
+      const { data: result, error: fnError } = await supabase.functions.invoke("generate-report", {
+        body: {
+          report_type: args.report_type,
+          business_id: businessId,
+          format: (args.parameters as any)?.format ?? "pdf",
+          parameters: args.parameters ?? {},
+          report_row_id: newRow.id,
+        },
+      });
+      if (fnError) {
+        await markFailed();
+        throw fnError;
+      }
+      if (!result?.success) {
+        await markFailed();
+        throw new Error(result?.error ?? "Report generation failed");
+      }
+
+      // 3. Persist the file location
       await (supabase as any)
         .from("generated_reports")
-        .update({ status: "completed", file_size: Math.floor(150000 + Math.random() * 300000) })
+        .update({
+          status: "completed",
+          file_url: result.file_url,
+          file_size: result.file_size,
+        })
         .eq("id", newRow.id);
 
-      return newRow;
+      return { ...(newRow as GeneratedReport), status: "completed", file_url: result.file_url };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reports", "generated", businessId] });
     },
   });
 }
+
