@@ -21,6 +21,9 @@ import {
   Tag,
 } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import { supabase } from "@/integrations/supabase/client";
+import { isAdminEmail } from "@/lib/adminEmails";
+
 
 /* ────────────────────────────────────────────────────────────────
    Data
