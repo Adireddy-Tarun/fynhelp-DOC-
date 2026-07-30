@@ -30,6 +30,8 @@ import AdminBlogPage from "./pages/admin/AdminBlogPage.tsx";
 import CAVerificationPage from "./pages/admin/CAVerificationPage.tsx";
 import CAApprovalsPage from "./pages/admin/CAApprovalsPage.tsx";
 import AdminGuard from "@/components/admin/AdminGuard";
+import InternalAdminLayout from "@/components/admin/InternalAdminLayout";
+
 
 import BlogAdminLoginPage from "./pages/admin/BlogAdminLoginPage.tsx";
 import BlogAdminEditorPage from "./pages/admin/BlogAdminEditorPage.tsx";
