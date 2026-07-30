@@ -53,6 +53,12 @@ export default function CAClientDetailPage() {
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [gstrUploads, setGstrUploads] = useState<any[]>([]);
+  const [uploadingGstr, setUploadingGstr] = useState(false);
+  const [gstrPeriod, setGstrPeriod] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
 
   const businessId = client?.business_id ?? null;
 
