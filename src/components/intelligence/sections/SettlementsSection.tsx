@@ -34,7 +34,7 @@ export default function SettlementsSection() {
       <KPI label="Razorpay Pending" count={m.rzpPending} format={fmtCompact} sub="Awaiting settlement" tone="warning" />
       <KPI label="Expected Today" count={m.expectedToday} format={fmtCompact} sub="Hits bank today" />
       <KPI label="UPI Float" count={m.upiFloat} format={fmtCompact} sub="In-transit UPI" />
-      <KPI label="Next 7 Days" value="₹4.82L" sub="Forecast inflow" tone="healthy" />
+      <KPI label="Next 7 Days" count={m.next7} format={fmtCompact} sub="Forecast inflow" tone="healthy" />
     </div>
   );
 }
