@@ -131,6 +131,8 @@ import {
 import DashboardLayout from "./components/DashboardLayout.tsx";
 import { CAAuthProvider } from "@/contexts/CAAuthContext";
 import CALayout from "@/components/ca/CALayout";
+import CAPortalLayout from "@/components/ca/CAPortalLayout";
+import CAInviteAcceptPage from "./pages/ca/CAInviteAcceptPage";
 import CALoginPage from "./pages/ca/CALoginPage";
 import CARegisterPage from "./pages/ca/CARegisterPage";
 import CAOnboardingPage from "./pages/ca/CAOnboardingPage.tsx";
