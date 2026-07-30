@@ -767,6 +767,33 @@ export type Database = {
           },
         ]
       }
+      ca_approval_log: {
+        Row: {
+          action: string
+          ca_firm_id: string
+          created_at: string | null
+          id: string
+          reason: string | null
+          reviewed_by_email: string
+        }
+        Insert: {
+          action: string
+          ca_firm_id: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          reviewed_by_email: string
+        }
+        Update: {
+          action?: string
+          ca_firm_id?: string
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          reviewed_by_email?: string
+        }
+        Relationships: []
+      }
       ca_bulk_filing_jobs: {
         Row: {
           ca_firm_id: string
