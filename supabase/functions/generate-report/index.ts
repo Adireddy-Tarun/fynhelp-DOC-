@@ -278,7 +278,7 @@ async function buildPdf(opts: {
   }
 
   // disclaimer on last page
-  if (y - 40 < 80) newPage();
+  if (y - 26 < 58) newPage();
   y -= 4;
   rule(y, 0.4);
   y -= 12;
