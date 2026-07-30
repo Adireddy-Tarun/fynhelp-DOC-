@@ -62,7 +62,11 @@ Deno.serve(async (req) => {
     return json({ success: false, error: "Forbidden" }, 403);
   }
 
-  let body: { op?: "list" | "review"; firm_id?: string; action?: Action; reason?: string };
+  if (rateLimited(email)) {
+    return json({ success: false, error: "Rate limit exceeded" }, 429);
+  }
+
+  let body: { op?: "list" | "review" | "audit"; firm_id?: string; action?: Action; reason?: string };
   try {
     body = await req.json();
   } catch {
@@ -80,12 +84,24 @@ Deno.serve(async (req) => {
       .eq("is_demo", false)
       .order("verification_submitted_at", { ascending: false, nullsFirst: false });
     if (error) return json({ success: false, error: error.message }, 500);
+
+    // Access audit trail: record who queried the admin list.
+    const { error: accessLogErr } = await admin.from("ca_approval_log").insert({
+      ca_firm_id: null,
+      reviewed_by_email: email,
+      action: "list_query",
+      reason: null,
+    });
+    if (accessLogErr) console.error("list_query audit insert failed", accessLogErr);
+
     return json({ success: true, firms: data ?? [] });
   }
 
   if (op === "audit") {
     const firm_id = body.firm_id;
-    if (!firm_id) return json({ success: false, error: "firm_id required" }, 400);
+    if (!firm_id || !UUID_RE.test(firm_id)) {
+      return json({ success: false, error: "A valid firm_id is required" }, 400);
+    }
     const { data, error } = await admin
       .from("ca_approval_log")
       .select("id, ca_firm_id, reviewed_by_email, action, reason, created_at")
@@ -95,15 +111,17 @@ Deno.serve(async (req) => {
     return json({ success: true, log: data ?? [] });
   }
 
-
-
   const { firm_id, action } = body;
-  const reason = (body.reason ?? "").trim();
-  if (!firm_id || !action || !["approve", "reject", "suspend", "reactivate"].includes(action)) {
-    return json({ success: false, error: "firm_id and a valid action are required" }, 400);
+  const reason = sanitize(body.reason);
+  if (!firm_id || !UUID_RE.test(firm_id)) {
+    return json({ success: false, error: "A valid firm_id is required" }, 400);
+  }
+  if (!action || !["approve", "reject", "suspend", "reactivate"].includes(action)) {
+    return json({ success: false, error: "A valid action is required" }, 400);
   }
   if ((action === "reject" || action === "suspend") && !reason) {
     return json({ success: false, error: "A reason is required for this action" }, 400);
+
   }
 
   const { data: firm, error: firmErr } = await admin
