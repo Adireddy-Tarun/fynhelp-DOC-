@@ -8,6 +8,7 @@ import {
   useBankTxns, useInvoices, useExpenses, useCustomers, useVendors,
   useGstFilings, useEmployees, useCAC, useSalesPipeline,
 } from "../DataSource";
+import { useLiquidityMetrics, useRevenueMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
 
 const QUICK_PROMPTS = [
   "What's my runway?",
