@@ -36,13 +36,20 @@ const shell = (title: string, bodyHtml: string, cta?: { label: string; href: str
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
+  const internalService = req.headers.get("X-Internal-Service");
+  const isInternalCall = internalService === "ca-compliance-alerts";
+
   const authHeader = req.headers.get("Authorization") ?? "";
   if (!authHeader) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-  const { data: userRes } = await admin.auth.getUser(authHeader.replace("Bearer ", ""));
-  const user = userRes?.user;
-  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+  let user: { id: string; email?: string } | null = null;
+  if (!isInternalCall) {
+    const { data: userRes } = await admin.auth.getUser(authHeader.replace("Bearer ", ""));
+    user = userRes?.user ?? null;
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+  }
+
 
   let body: {
     kind?: "client_invite" | "team_invite";
@@ -60,13 +67,14 @@ Deno.serve(async (req) => {
   }
 
   const ADMIN_EMAILS = ["adireddytarun@fynhelp.com", "nidhi@fynhelp.com", "support@fynhelp.com"];
-  const callerEmail = user.email?.toLowerCase().trim() ?? "";
+  const callerEmail = user?.email?.toLowerCase().trim() ?? "";
 
   // Generic admin-authored email: { to, subject, body }
   if (!body.kind && body.subject && body.body) {
-    if (!ADMIN_EMAILS.includes(callerEmail)) {
+    if (!isInternalCall && !ADMIN_EMAILS.includes(callerEmail)) {
       return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: cors });
     }
+
     if (!body.to) {
       return new Response(JSON.stringify({ success: false, error: "to is required" }), { status: 400, headers: cors });
     }
@@ -90,7 +98,10 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ success: true, id: genericPayload?.id ?? null }), { headers: cors });
   }
 
+  if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
+
   const { kind, ca_firm_id, to } = body;
+
   if (!kind || !ca_firm_id || !to) {
     return new Response(JSON.stringify({ success: false, error: "kind, ca_firm_id and to are required" }), { status: 400, headers: cors });
   }

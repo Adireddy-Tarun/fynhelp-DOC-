@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { proxyExternalQuery } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
@@ -84,17 +84,19 @@ export default function CAClientDetailPage() {
     if (!businessId) return;
     (async () => {
       try {
-        const { data } = await supabaseExternal
-          .from("liquidity_metrics").select("*").eq("business_id", businessId)
-          .order("recorded_at", { ascending: false }).limit(1).maybeSingle();
-        setLiquidity(data ?? null);
+        const { data } = await proxyExternalQuery({
+          table: "liquidity_metrics", business_id: businessId,
+          order: { column: "recorded_at", ascending: false }, limit: 1,
+        });
+        setLiquidity(data?.[0] ?? null);
         console.log("[fyn:ca] overview.liquidity_metrics", businessId, data);
       } catch (e) { console.warn("[fyn:ca] liquidity_metrics", e); }
       try {
-        const { data } = await supabaseExternal
-          .from("revenue_metrics").select("*").eq("org_id", businessId)
-          .order("created_at", { ascending: false }).limit(1).maybeSingle();
-        setRevenue(data ?? null);
+        const { data } = await proxyExternalQuery({
+          table: "revenue_metrics", business_id: businessId,
+          order: { column: "created_at", ascending: false }, limit: 1,
+        });
+        setRevenue(data?.[0] ?? null);
         console.log("[fyn:ca] overview.revenue_metrics", businessId, data);
       } catch (e) { console.warn("[fyn:ca] revenue_metrics", e); }
     })();
@@ -136,15 +138,17 @@ export default function CAClientDetailPage() {
   const loadTxns = useCallback(async (page: number) => {
     if (!businessId) return;
     try {
-      const { data, error } = await supabaseExternal
-        .from("bank_transactions")
-        .select("id, date, description, category, amount, balance, type")
-        .eq("business_id", businessId)
-        .order("date", { ascending: false })
-        .range(page * 100, page * 100 + 99);
-      if (error) throw error;
-      setTxns((prev) => (page === 0 ? data ?? [] : [...prev, ...(data ?? [])]));
-      console.log("[fyn:ca] tab.bank_transactions", businessId, data?.length ?? 0);
+      const { data, error } = await proxyExternalQuery({
+        table: "bank_transactions",
+        business_id: businessId,
+        select: "id, date, description, category, amount, balance, type",
+        order: { column: "date", ascending: false },
+        limit: (page + 1) * 100,
+      });
+      if (error) throw new Error(error);
+      const pageRows = (data ?? []).slice(page * 100, page * 100 + 100);
+      setTxns((prev) => (page === 0 ? pageRows : [...prev, ...pageRows]));
+      console.log("[fyn:ca] tab.bank_transactions", businessId, pageRows.length);
     } catch (e) { console.warn("[fyn:ca] bank_transactions", e); }
   }, [businessId]);
 

@@ -14,7 +14,7 @@
  *    can be verified in browser dev tools.
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { supabaseExternal, proxyExternalQuery } from "@/integrations/supabase/external";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMode } from "@/components/intelligence/DataSource";
 
@@ -117,16 +117,15 @@ export function useLiquidityMetrics() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<LiquidityMetrics | null> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("liquidity_metrics")
-          .select("*")
-          .eq("business_id", businessId)
-          .order("recorded_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "liquidity_metrics",
+          business_id: businessId!,
+          order: { column: "recorded_at", ascending: false },
+          limit: 1,
+        });
+        if (error) throw new Error(error);
         logMount("liquidity_metrics", businessId, data);
-        return (data as LiquidityMetrics) ?? null;
+        return ((data?.[0] as LiquidityMetrics) ?? null);
       } catch (e) {
         console.warn("[fyn:external] liquidity_metrics unavailable", e);
         return null;
@@ -143,16 +142,15 @@ export function useRevenueMetrics() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<RevenueMetrics | null> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("revenue_metrics")
-          .select("*")
-          .eq("org_id", businessId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "revenue_metrics",
+          business_id: businessId!,
+          order: { column: "created_at", ascending: false },
+          limit: 1,
+        });
+        if (error) throw new Error(error);
         logMount("revenue_metrics", businessId, data);
-        return (data as RevenueMetrics) ?? null;
+        return ((data?.[0] as RevenueMetrics) ?? null);
       } catch (e) {
         console.warn("[fyn:external] revenue_metrics unavailable", e);
         return null;
@@ -169,12 +167,12 @@ export function useCostAnomalies() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<CostAnomaly[]> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("cost_anomalies")
-          .select("*")
-          .eq("org_id", businessId)
-          .order("detected_at", { ascending: false });
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "cost_anomalies",
+          business_id: businessId!,
+          order: { column: "detected_at", ascending: false },
+        });
+        if (error) throw new Error(error);
         logMount("cost_anomalies", businessId, data);
         return (data as CostAnomaly[]) ?? [];
       } catch (e) {
@@ -211,12 +209,12 @@ export function useExternalGstFilings() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<ExternalGstFiling[]> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("gst_filings")
-          .select("*")
-          .eq("business_id", businessId)
-          .order("due_date", { ascending: true });
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "gst_filings",
+          business_id: businessId!,
+          order: { column: "due_date", ascending: true },
+        });
+        if (error) throw new Error(error);
         logMount("gst_filings", businessId, data);
         return (data as ExternalGstFiling[]) ?? [];
       } catch (e) {
@@ -235,13 +233,13 @@ export function useExternalBankTxns() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<ExternalBankTxn[]> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("bank_transactions")
-          .select("*")
-          .eq("business_id", businessId)
-          .order("date", { ascending: false })
-          .limit(500);
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "bank_transactions",
+          business_id: businessId!,
+          order: { column: "date", ascending: false },
+          limit: 500,
+        });
+        if (error) throw new Error(error);
         logMount("bank_transactions", businessId, data);
         return (data as ExternalBankTxn[]) ?? [];
       } catch (e) {
@@ -359,12 +357,12 @@ export function useCohortAnalysis() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<CohortRow[]> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("cohort_analysis")
-          .select("*")
-          .eq("business_id", businessId)
-          .order("cohort_month", { ascending: true });
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "cohort_analysis",
+          business_id: businessId!,
+          order: { column: "cohort_month", ascending: true },
+        });
+        if (error) throw new Error(error);
         logMount("cohort_analysis", businessId, data);
         return (data as CohortRow[]) ?? [];
       } catch (e) {
@@ -383,13 +381,13 @@ export function useChurnSignals() {
     ...QUERY_OPTS,
     queryFn: async (): Promise<ChurnSignal[]> => {
       try {
-        const { data, error } = await supabaseExternal
-          .from("churn_signals")
-          .select("*")
-          .eq("business_id", businessId)
-          .eq("is_acknowledged", false)
-          .order("days_since_invoice", { ascending: false });
-        if (error) throw error;
+        const { data, error } = await proxyExternalQuery({
+          table: "churn_signals",
+          business_id: businessId!,
+          filters: { is_acknowledged: "false" },
+          order: { column: "days_since_invoice", ascending: false },
+        });
+        if (error) throw new Error(error);
         logMount("churn_signals", businessId, data);
         return (data as ChurnSignal[]) ?? [];
       } catch (e) {
