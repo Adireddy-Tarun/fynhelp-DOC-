@@ -39,7 +39,7 @@ export default function CAClientsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("ca_clients")
-      .select("id, business_id, client_name, client_email, gstin, client_status, onboarded_at, last_activity_at")
+      .select("id, business_id, client_name, client_email, gstin, pan, client_phone, client_status, onboarded_at, last_activity_at")
       .eq("ca_firm_id", firmId)
       .eq("is_demo", false)
       .order("created_at", { ascending: false });
