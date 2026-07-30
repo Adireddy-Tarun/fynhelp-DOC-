@@ -67,13 +67,14 @@ Deno.serve(async (req) => {
   }
 
   const ADMIN_EMAILS = ["adireddytarun@fynhelp.com", "nidhi@fynhelp.com", "support@fynhelp.com"];
-  const callerEmail = user.email?.toLowerCase().trim() ?? "";
+  const callerEmail = user?.email?.toLowerCase().trim() ?? "";
 
   // Generic admin-authored email: { to, subject, body }
   if (!body.kind && body.subject && body.body) {
-    if (!ADMIN_EMAILS.includes(callerEmail)) {
+    if (!isInternalCall && !ADMIN_EMAILS.includes(callerEmail)) {
       return new Response(JSON.stringify({ success: false, error: "Forbidden" }), { status: 403, headers: cors });
     }
+
     if (!body.to) {
       return new Response(JSON.stringify({ success: false, error: "to is required" }), { status: 400, headers: cors });
     }
