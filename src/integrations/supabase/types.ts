@@ -2568,6 +2568,7 @@ export type Database = {
       }
       employees: {
         Row: {
+          business_id: string
           created_at: string
           ctc_annual: number | null
           date_of_exit: string | null
@@ -2579,13 +2580,13 @@ export type Database = {
           id: string
           metadata: Json | null
           name: string
-          org_id: string
           pf_number: string | null
           salary_monthly: number | null
           status: string
           updated_at: string
         }
         Insert: {
+          business_id: string
           created_at?: string
           ctc_annual?: number | null
           date_of_exit?: string | null
@@ -2597,13 +2598,13 @@ export type Database = {
           id?: string
           metadata?: Json | null
           name: string
-          org_id: string
           pf_number?: string | null
           salary_monthly?: number | null
           status?: string
           updated_at?: string
         }
         Update: {
+          business_id?: string
           created_at?: string
           ctc_annual?: number | null
           date_of_exit?: string | null
@@ -2615,7 +2616,6 @@ export type Database = {
           id?: string
           metadata?: Json | null
           name?: string
-          org_id?: string
           pf_number?: string | null
           salary_monthly?: number | null
           status?: string
