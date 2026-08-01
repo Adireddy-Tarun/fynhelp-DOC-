@@ -47,7 +47,7 @@ const HRPage = () => {
       const { data } = await supabase
         .from("employees" as never)
         .select("*")
-        .eq("org_id", businessId)
+        .eq("business_id", businessId)
         .order("created_at", { ascending: false });
       return ((data as unknown) as Employee[]) || [];
     },
