@@ -70,8 +70,15 @@ const TOP_H = 70;
 export default function AdminLayout() {
   const { user, signOut, primaryRole, hasRole } = useAdminAuth();
   const isSuperAdmin = hasRole("super_admin");
+  const isSupport = user?.email === SUPPORT_EMAIL;
   const location = useLocation();
   const nav = useNavigate();
+
+  useEffect(() => {
+    if (isSupport && !SUPPORT_ALLOWED_PATHS.some((p) => location.pathname.startsWith(p))) {
+      nav("/admin/content", { replace: true });
+    }
+  }, [isSupport, location.pathname, nav]);
 
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1280
