@@ -247,8 +247,8 @@ export default function AdminBlogEditorPage() {
     }
 
     const { error } = postId
-      ? await supabase.from("blog_posts").update(payload).eq("id", postId)
-      : await supabase.from("blog_posts").insert({ ...payload, views: 0 });
+      ? await supabase.from("blog_posts").update(payload as never).eq("id", postId)
+      : await supabase.from("blog_posts").insert({ ...payload, views: 0 } as never);
 
     setSaving(false);
     if (error) {
