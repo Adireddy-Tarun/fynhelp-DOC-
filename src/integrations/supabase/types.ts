@@ -504,8 +504,12 @@ export type Database = {
           excerpt: string | null
           featured_image: string | null
           id: string
+          is_featured: boolean
+          og_image: string | null
           published_at: string | null
           reading_time_minutes: number
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           status: string
           tags: string[] | null
@@ -525,8 +529,12 @@ export type Database = {
           excerpt?: string | null
           featured_image?: string | null
           id?: string
+          is_featured?: boolean
+          og_image?: string | null
           published_at?: string | null
           reading_time_minutes?: number
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           tags?: string[] | null
@@ -546,8 +554,12 @@ export type Database = {
           excerpt?: string | null
           featured_image?: string | null
           id?: string
+          is_featured?: boolean
+          og_image?: string | null
           published_at?: string | null
           reading_time_minutes?: number
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           tags?: string[] | null
