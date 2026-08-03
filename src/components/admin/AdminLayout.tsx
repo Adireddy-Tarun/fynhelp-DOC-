@@ -38,6 +38,9 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst"] },
 ];
 
+const SUPPORT_EMAIL = "support@fynhelp.com";
+const SUPPORT_ALLOWED_PATHS = ["/admin/content", "/admin/media", "/admin/communications"];
+
 const ROLE_LABEL: Record<AdminRole, string> = {
   super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",
   support_agent: "Support Agent", analyst: "Analyst", user: "User",
@@ -67,8 +70,15 @@ const TOP_H = 70;
 export default function AdminLayout() {
   const { user, signOut, primaryRole, hasRole } = useAdminAuth();
   const isSuperAdmin = hasRole("super_admin");
+  const isSupport = user?.email === SUPPORT_EMAIL;
   const location = useLocation();
   const nav = useNavigate();
+
+  useEffect(() => {
+    if (isSupport && !SUPPORT_ALLOWED_PATHS.some((p) => location.pathname.startsWith(p))) {
+      nav("/admin/content", { replace: true });
+    }
+  }, [isSupport, location.pathname, nav]);
 
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1280
@@ -119,9 +129,10 @@ export default function AdminLayout() {
 
   // Auth disabled during design, show all items EXCEPT super_admin-only ones.
   const visible = NAV_ITEMS.filter((i) => {
-    if ("divider" in i && i.divider) return true;
+    if ("divider" in i && i.divider) return !isSupport;
     const it = i as Extract<NavItem, { to: string }>;
-    if (it.roles.length === 1 && it.roles[0] === "super_admin") return isSuperAdmin;
+    if (it.roles.length === 1 && it.roles[0] === "super_admin" && !isSuperAdmin) return false;
+    if (isSupport) return SUPPORT_ALLOWED_PATHS.includes(it.to);
     return true;
   });
 
@@ -193,7 +204,7 @@ export default function AdminLayout() {
           >
             <FynLogo variant="light" showTagline={false} size="sm" className="" />
             <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, color: "hsl(var(--fyn-gold))", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
-              Admin
+              {isSupport ? "Content Admin" : "Admin"}
             </span>
           </button>
         </div>
