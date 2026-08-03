@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -10,6 +10,8 @@ import {
   RotateCcw,
   Image as ImageIcon,
   Star,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -29,10 +31,29 @@ const PER_PAGE = 5;
 type Tab = "blog" | "resources" | "glossary";
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
 
-const RESOURCES: { id: string; title: string; type: string; category: string; date: string }[] = [];
-const GLOSSARY: { id: string; term: string; definition: string; category: string; date: string }[] = [];
+const RESOURCE_FORMATS = ["Template", "Guide", "Checklist", "Video", "Article", "Tool"];
+const GLOSSARY_CATEGORIES = ["General", "Tax", "Compliance", "Finance", "Banking", "GST"];
 
-const TYPE_COLORS: Record<string, string> = { Video: "#9333EA", Template: "#3B82F6", Article: "#10B981" };
+export type ResourceRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  format: string | null;
+  external_url: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GlossaryRow = {
+  id: string;
+  term: string;
+  definition: string;
+  category: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 const SELECT_COLS =
   "id, slug, title, excerpt, category, tags, status, author_name, reading_time_minutes, cover_image_url, is_featured, published_at, archived_at, created_at, views";
@@ -48,9 +69,144 @@ const controlStyle: React.CSSProperties = {
   padding: "0 10px",
 };
 
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  border: `0.5px solid ${BORDER}`,
+  borderRadius: 8,
+  fontFamily: BODY,
+  fontSize: 13,
+  background: "#FFFFFF",
+  color: INK,
+  padding: "8px 10px",
+};
+
 export default function AdminContentPage() {
   const [tab, setTab] = useState<Tab>("blog");
-  const [editorOpen, setEditorOpen] = useState(false);
+
+  /* ------------------------------ resources ------------------------------ */
+  const [resources, setResources] = useState<ResourceRow[]>([]);
+  const [resLoading, setResLoading] = useState(true);
+  const [resSearch, setResSearch] = useState("");
+  const [resModal, setResModal] = useState<null | "add" | ResourceRow>(null);
+  const [resDelTarget, setResDelTarget] = useState<null | ResourceRow>(null);
+  const [lastResRefreshed, setLastResRefreshed] = useState<Date | null>(null);
+
+  /* ------------------------------ glossary ------------------------------- */
+  const [glossary, setGlossary] = useState<GlossaryRow[]>([]);
+  const [glossLoading, setGlossLoading] = useState(true);
+  const [glossSearch, setGlossSearch] = useState("");
+  const [glossModal, setGlossModal] = useState<null | "add" | GlossaryRow>(null);
+  const [glossDelTarget, setGlossDelTarget] = useState<null | GlossaryRow>(null);
+  const [lastGlossRefreshed, setLastGlossRefreshed] = useState<Date | null>(null);
+
+  const loadResourcesRef = useRef<() => void>(() => {});
+  const loadGlossaryRef = useRef<() => void>(() => {});
+
+  const loadResources = async () => {
+    setResLoading(true);
+    const { data, error } = await (supabase as never as typeof supabase)
+      .from("resources")
+      .select("id, title, description, format, external_url, is_published, created_at, updated_at")
+      .order("created_at", { ascending: false });
+    if (error) toast.error(error.message);
+    else setLastResRefreshed(new Date());
+    setResources(((data ?? []) as unknown) as ResourceRow[]);
+    setResLoading(false);
+  };
+  loadResourcesRef.current = loadResources;
+
+  const loadGlossary = async () => {
+    setGlossLoading(true);
+    const { data, error } = await (supabase as never as typeof supabase)
+      .from("glossary_terms")
+      .select("id, term, definition, category, is_published, created_at, updated_at")
+      .order("created_at", { ascending: false });
+    if (error) toast.error(error.message);
+    else setLastGlossRefreshed(new Date());
+    setGlossary(((data ?? []) as unknown) as GlossaryRow[]);
+    setGlossLoading(false);
+  };
+  loadGlossaryRef.current = loadGlossary;
+
+  useEffect(() => {
+    loadResources();
+    loadGlossary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("resources_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "resources" }, () => loadResourcesRef.current())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "resources" }, () => loadResourcesRef.current())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "resources" }, () => loadResourcesRef.current())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("glossary_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const filteredResources = useMemo(() => {
+    const q = resSearch.trim().toLowerCase();
+    if (!q) return resources;
+    return resources.filter((r) => r.title.toLowerCase().includes(q));
+  }, [resources, resSearch]);
+
+  const filteredGlossary = useMemo(() => {
+    const q = glossSearch.trim().toLowerCase();
+    if (!q) return glossary;
+    return glossary.filter(
+      (g) => g.term.toLowerCase().includes(q) || g.definition.toLowerCase().includes(q),
+    );
+  }, [glossary, glossSearch]);
+
+  const toggleResourcePublish = async (row: ResourceRow) => {
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resources")
+      .update({ is_published: !row.is_published } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(row.is_published ? "Unpublished" : "Published");
+    loadResources();
+  };
+
+  const deleteResource = async (row: ResourceRow) => {
+    const { error } = await (supabase as never as typeof supabase).from("resources").delete().eq("id", row.id);
+    setResDelTarget(null);
+    if (error) return toast.error(error.message);
+    toast.success("Resource deleted");
+    loadResources();
+  };
+
+  const toggleGlossaryPublish = async (row: GlossaryRow) => {
+    const { error } = await (supabase as never as typeof supabase)
+      .from("glossary_terms")
+      .update({ is_published: !row.is_published } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(row.is_published ? "Unpublished" : "Published");
+    loadGlossary();
+  };
+
+  const deleteGlossary = async (row: GlossaryRow) => {
+    const { error } = await (supabase as never as typeof supabase).from("glossary_terms").delete().eq("id", row.id);
+    setGlossDelTarget(null);
+    if (error) return toast.error(error.message);
+    toast.success("Term deleted");
+    loadGlossary();
+  };
 
   return (
     <div>
@@ -95,7 +251,7 @@ export default function AdminContentPage() {
           </Link>
         ) : (
           <button
-            onClick={() => setEditorOpen(true)}
+            onClick={() => (tab === "resources" ? setResModal("add") : setGlossModal("add"))}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-white"
             style={{
               background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
@@ -112,54 +268,153 @@ export default function AdminContentPage() {
       {tab === "blog" && <BlogSection />}
 
       {tab === "resources" && (
-        <Card>
-          <Table headers={["Title", "Type", "Category", "Last Updated", ""]}>
-            {RESOURCES.length === 0 && (
-              <tr>
-                <td colSpan={5} style={{ padding: 24, textAlign: "center", fontFamily: "Roboto, sans-serif", color: "rgba(26,16,8,0.5)" }}>
-                  No resources yet.
-                </td>
-              </tr>
-            )}
-            {RESOURCES.map((r) => (
-              <tr key={r.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
-                <td className="py-3 px-2" style={{ color: INK, fontWeight: 500 }}>{r.title}</td>
-                <td className="py-3 px-2">
-                  <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: `${TYPE_COLORS[r.type] ?? GOLD}20`, color: TYPE_COLORS[r.type] ?? GOLD }}>{r.type}</span>
-                </td>
-                <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.category}</td>
-                <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)" }}>{r.date}</td>
-                <td className="py-3 px-2"><RowActionsStub /></td>
-              </tr>
-            ))}
-          </Table>
-        </Card>
+        <div className="flex flex-col gap-4">
+          <LiveDot />
+          <div className="grid grid-cols-2 gap-3">
+            <Stat label="Total resources" value={String(resources.length)} />
+            <Stat label="Published" value={String(resources.filter((r) => r.is_published).length)} />
+          </div>
+          {lastResRefreshed && (
+            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+              Last updated: {lastResRefreshed.toLocaleTimeString()}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={resSearch}
+              onChange={(e) => setResSearch(e.target.value)}
+              placeholder="Search title"
+              style={{ ...controlStyle, width: 220 }}
+            />
+            <button
+              onClick={() => setResModal("add")}
+              className="inline-flex items-center gap-2 px-3 ml-auto"
+              style={{ height: 32, background: RED, color: "#FFFFFF", borderRadius: 8, fontFamily: BODY, fontSize: 12, fontWeight: 700 }}
+            >
+              <Plus size={14} /> Add Resource
+            </button>
+          </div>
+
+          <Card>
+            <Table headers={["Title", "Format", "Status", "Created", "Actions"]}>
+              {resLoading && (
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+              )}
+              {!resLoading && filteredResources.length === 0 && (
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
+              )}
+              {!resLoading && filteredResources.map((r) => (
+                <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+                  <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.format ?? "—"}</td>
+                  <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
+                  <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)", fontFamily: "monospace", fontSize: 11 }}>
+                    {new Date(r.created_at).toLocaleDateString("en-IN")}
+                  </td>
+                  <td className="py-3 px-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <RowBtn onClick={() => setResModal(r)}><Edit2 size={12} /> Edit</RowBtn>
+                      <RowBtn onClick={() => toggleResourcePublish(r)}>
+                        {r.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                      </RowBtn>
+                      <RowBtn onClick={() => setResDelTarget(r)}><Trash2 size={12} /> Delete</RowBtn>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          </Card>
+        </div>
       )}
 
       {tab === "glossary" && (
-        <Card>
-          <Table headers={["Term", "Definition", "Category", "Updated", ""]}>
-            {GLOSSARY.length === 0 && (
-              <tr>
-                <td colSpan={5} style={{ padding: 24, textAlign: "center", fontFamily: "Roboto, sans-serif", color: "rgba(26,16,8,0.5)" }}>
-                  No glossary terms yet.
-                </td>
-              </tr>
-            )}
-            {GLOSSARY.map((g) => (
-              <tr key={g.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
-                <td className="py-3 px-2" style={{ color: INK, fontWeight: 600, fontFamily: "Oswald, sans-serif" }}>{g.term}</td>
-                <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.8)" }}>{g.definition}</td>
-                <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{g.category}</td>
-                <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)" }}>{g.date}</td>
-                <td className="py-3 px-2"><RowActionsStub /></td>
-              </tr>
-            ))}
-          </Table>
-        </Card>
+        <div className="flex flex-col gap-4">
+          <LiveDot />
+          <div className="grid grid-cols-2 gap-3">
+            <Stat label="Total terms" value={String(glossary.length)} />
+            <Stat label="Published" value={String(glossary.filter((g) => g.is_published).length)} />
+          </div>
+          {lastGlossRefreshed && (
+            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+              Last updated: {lastGlossRefreshed.toLocaleTimeString()}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={glossSearch}
+              onChange={(e) => setGlossSearch(e.target.value)}
+              placeholder="Search term or definition"
+              style={{ ...controlStyle, width: 240 }}
+            />
+            <button
+              onClick={() => setGlossModal("add")}
+              className="inline-flex items-center gap-2 px-3 ml-auto"
+              style={{ height: 32, background: RED, color: "#FFFFFF", borderRadius: 8, fontFamily: BODY, fontSize: 12, fontWeight: 700 }}
+            >
+              <Plus size={14} /> Add Term
+            </button>
+          </div>
+
+          <Card>
+            <Table headers={["Term", "Definition", "Category", "Status", "Actions"]}>
+              {glossLoading && (
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+              )}
+              {!glossLoading && filteredGlossary.length === 0 && (
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No glossary terms yet.</td></tr>
+              )}
+              {!glossLoading && filteredGlossary.map((g) => (
+                <tr key={g.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+                  <td className="py-3 px-2" style={{ color: INK, fontWeight: 700 }}>{g.term}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.8)" }}>
+                    {g.definition.length > 80 ? `${g.definition.slice(0, 80)}…` : g.definition}
+                  </td>
+                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{g.category}</td>
+                  <td className="py-3 px-2"><PubBadge published={g.is_published} /></td>
+                  <td className="py-3 px-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <RowBtn onClick={() => setGlossModal(g)}><Edit2 size={12} /> Edit</RowBtn>
+                      <RowBtn onClick={() => toggleGlossaryPublish(g)}>
+                        {g.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                      </RowBtn>
+                      <RowBtn onClick={() => setGlossDelTarget(g)}><Trash2 size={12} /> Delete</RowBtn>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </Table>
+          </Card>
+        </div>
       )}
 
-      {editorOpen && tab !== "blog" && <SimpleEditorStub tab={tab} onClose={() => setEditorOpen(false)} />}
+      {resModal && (
+        <ResourceModal
+          row={resModal === "add" ? null : resModal}
+          onClose={() => setResModal(null)}
+          onSaved={() => {
+            setResModal(null);
+            loadResources();
+          }}
+        />
+      )}
+      {glossModal && (
+        <GlossaryModal
+          row={glossModal === "add" ? null : glossModal}
+          onClose={() => setGlossModal(null)}
+          onSaved={() => {
+            setGlossModal(null);
+            loadGlossary();
+          }}
+        />
+      )}
+      {resDelTarget && (
+        <ConfirmDelete label="resource" onCancel={() => setResDelTarget(null)} onConfirm={() => deleteResource(resDelTarget)} />
+      )}
+      {glossDelTarget && (
+        <ConfirmDelete label="term" onCancel={() => setGlossDelTarget(null)} onConfirm={() => deleteGlossary(glossDelTarget)} />
+      )}
     </div>
   );
 }
@@ -275,13 +530,7 @@ function BlogSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: BODY, fontSize: 10, color: "#10B981", fontWeight: 700 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10B981", animation: "fyn-blog-live-pulse 1.6s ease-out infinite" }} />
-          Live
-          <style>{`@keyframes fyn-blog-live-pulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.55)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }`}</style>
-        </span>
-      </div>
+      <LiveDot />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Total views" value={analytics.totalViews.toLocaleString("en-IN")} />
         <Stat label="Published" value={String(analytics.published)} />
@@ -488,6 +737,197 @@ function BlogSection() {
   );
 }
 
+/* --------------------------------- Modals --------------------------------- */
+
+function ResourceModal({
+  row,
+  onClose,
+  onSaved,
+}: {
+  row: ResourceRow | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [title, setTitle] = useState(row?.title ?? "");
+  const [description, setDescription] = useState(row?.description ?? "");
+  const [format, setFormat] = useState(row?.format ?? "Template");
+  const [externalUrl, setExternalUrl] = useState(row?.external_url ?? "");
+  const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (!title.trim()) return toast.error("Title is required");
+    setSaving(true);
+    const payload = {
+      title: title.trim(),
+      description: description.trim(),
+      format,
+      external_url: externalUrl.trim() || null,
+      is_published: isPublished,
+      updated_at: new Date().toISOString(),
+    };
+    let error;
+    if (row) {
+      ({ error } = await (supabase as never as typeof supabase)
+        .from("resources")
+        .update(payload as never)
+        .eq("id", row.id));
+    } else {
+      const id = `${title
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 48) || "resource"}-${Math.random().toString(36).slice(2, 7)}`;
+      ({ error } = await (supabase as never as typeof supabase)
+        .from("resources")
+        .insert({ id, ...payload } as never));
+    }
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(row ? "Resource updated" : "Resource created");
+    onSaved();
+  };
+
+  return (
+    <AdminModal title={row ? "Edit Resource" : "Add Resource"} onClose={onClose}>
+      <Field label="Title *">
+        <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} placeholder="Resource title" />
+      </Field>
+      <Field label="Description">
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
+      </Field>
+      <Field label="Format">
+        <select value={format} onChange={(e) => setFormat(e.target.value)} style={inputStyle}>
+          {RESOURCE_FORMATS.map((f) => <option key={f} value={f}>{f}</option>)}
+        </select>
+      </Field>
+      <Field label="External URL">
+        <input value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} style={inputStyle} placeholder="https://…" />
+      </Field>
+      <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
+        <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
+        Published
+      </label>
+      <ModalActions saving={saving} onCancel={onClose} onSave={save} />
+    </AdminModal>
+  );
+}
+
+function GlossaryModal({
+  row,
+  onClose,
+  onSaved,
+}: {
+  row: GlossaryRow | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [term, setTerm] = useState(row?.term ?? "");
+  const [definition, setDefinition] = useState(row?.definition ?? "");
+  const [category, setCategory] = useState(row?.category ?? "General");
+  const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (!term.trim()) return toast.error("Term is required");
+    if (!definition.trim()) return toast.error("Definition is required");
+    setSaving(true);
+    const payload = {
+      term: term.trim(),
+      definition: definition.trim(),
+      category,
+      is_published: isPublished,
+    };
+    let error;
+    if (row) {
+      ({ error } = await (supabase as never as typeof supabase)
+        .from("glossary_terms")
+        .update(payload as never)
+        .eq("id", row.id));
+    } else {
+      ({ error } = await (supabase as never as typeof supabase)
+        .from("glossary_terms")
+        .insert(payload as never));
+    }
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(row ? "Term updated" : "Term created");
+    onSaved();
+  };
+
+  return (
+    <AdminModal title={row ? "Edit Term" : "Add Term"} onClose={onClose}>
+      <Field label="Term *">
+        <input value={term} onChange={(e) => setTerm(e.target.value)} style={inputStyle} placeholder="e.g. Input Tax Credit" />
+      </Field>
+      <Field label="Definition *">
+        <textarea value={definition} onChange={(e) => setDefinition(e.target.value)} rows={4} style={{ ...inputStyle, resize: "vertical" }} />
+      </Field>
+      <Field label="Category">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} style={inputStyle}>
+          {GLOSSARY_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </Field>
+      <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
+        <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
+        Published
+      </label>
+      <ModalActions saving={saving} onCancel={onClose} onSave={save} />
+    </AdminModal>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: GOLD }}>
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function ModalActions({ saving, onCancel, onSave }: { saving: boolean; onCancel: () => void; onSave: () => void }) {
+  return (
+    <div className="flex justify-end gap-2 pt-2">
+      <button onClick={onCancel} style={{ ...rowBtnStyle, height: 34, padding: "0 14px" }}>Cancel</button>
+      <button
+        onClick={onSave}
+        disabled={saving}
+        style={{
+          height: 34,
+          padding: "0 16px",
+          borderRadius: 8,
+          background: RED,
+          color: "#FFFFFF",
+          fontFamily: BODY,
+          fontSize: 12,
+          fontWeight: 700,
+          opacity: saving ? 0.6 : 1,
+        }}
+      >
+        {saving ? "Saving…" : "Save"}
+      </button>
+    </div>
+  );
+}
+
+/* --------------------------------- Shared --------------------------------- */
+
+function LiveDot() {
+  return (
+    <div className="flex items-center justify-end">
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: BODY, fontSize: 10, color: "#10B981", fontWeight: 700 }}>
+        <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10B981", animation: "fyn-blog-live-pulse 1.6s ease-out infinite" }} />
+        Live
+        <style>{`@keyframes fyn-blog-live-pulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.55)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }`}</style>
+      </span>
+    </div>
+  );
+}
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ background: "#FFFFFF", border: `0.5px solid ${BORDER}`, borderRadius: 8, padding: "14px 16px" }}>
@@ -496,6 +936,15 @@ function Stat({ label, value }: { label: string; value: string }) {
       </div>
       <div style={{ fontFamily: HEADING, fontSize: 24, fontWeight: 700, color: INK, marginTop: 4 }}>{value}</div>
     </div>
+  );
+}
+
+function PubBadge({ published }: { published: boolean }) {
+  const s: React.CSSProperties = { fontSize: 10, fontWeight: 700, textTransform: "uppercase", padding: "2px 8px", borderRadius: 99 };
+  return published ? (
+    <span style={{ ...s, background: "rgba(16,185,129,0.12)", color: "#0B7A5A" }}>Published</span>
+  ) : (
+    <span style={{ ...s, background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.45)" }}>Draft</span>
   );
 }
 
@@ -559,8 +1008,6 @@ function Td({ children }: { children?: React.ReactNode }) {
   return <td className="py-2.5 px-2 align-middle">{children}</td>;
 }
 
-/* ------------------------- Resources / Glossary --------------------------- */
-
 function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
   return (
     <div className="overflow-x-auto">
@@ -579,32 +1026,52 @@ function Table({ headers, children }: { headers: string[]; children: React.React
   );
 }
 
-function RowActionsStub() {
+function AdminModal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-1">
-      <button onClick={() => toast.info("Resource/glossary CRUD coming soon")} className="p-1.5 rounded-lg hover:bg-[rgba(26,16,8,0.06)]"><Edit2 size={14} color="rgba(26,16,8,0.6)" /></button>
-      <button onClick={() => toast.info("Resource/glossary CRUD coming soon")} className="p-1.5 rounded-lg hover:bg-[rgba(196,30,30,0.08)]"><Trash2 size={14} color={RED} /></button>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-3 max-h-[90vh] overflow-y-auto"
+        style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
+      >
+        <div className="flex items-center justify-between">
+          <h3 style={{ fontFamily: HEADING, fontWeight: 700, fontSize: 20, color: INK }}>{title}</h3>
+          <button onClick={onClose} aria-label="Close"><X size={18} color={INK} /></button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
 
-function SimpleEditorStub({ tab, onClose }: { tab: Exclude<Tab, "blog">; onClose: () => void }) {
+function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl p-6"
-        style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: INK }}>
-            {tab === "resources" ? "Add Resource" : "Add Glossary Term"}
-          </h3>
-          <button onClick={onClose}><X size={18} /></button>
-        </div>
-        <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)" }}>
-          {tab === "resources" ? "Resource" : "Glossary"} CRUD wiring is coming soon.
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }}
+      onClick={onCancel}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm rounded-2xl p-5"
+        style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
+      >
+        <h4 style={{ fontFamily: HEADING, fontWeight: 700, fontSize: 17, color: INK }}>Delete this {label}?</h4>
+        <p style={{ fontFamily: BODY, fontSize: 13, color: "rgba(26,16,8,0.65)", marginTop: 6 }}>
+          This cannot be undone.
         </p>
-        <div className="flex justify-end mt-4">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-white"
-            style={{ background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13 }}>Close</button>
+        <div className="flex justify-end gap-2 mt-5">
+          <button onClick={onCancel} style={{ ...rowBtnStyle, height: 34, padding: "0 14px" }}>Cancel</button>
+          <button
+            onClick={onConfirm}
+            style={{ height: 34, padding: "0 16px", borderRadius: 8, background: RED, color: "#FFFFFF", fontFamily: BODY, fontSize: 12, fontWeight: 700 }}
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
