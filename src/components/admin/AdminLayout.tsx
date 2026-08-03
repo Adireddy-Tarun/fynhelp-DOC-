@@ -38,6 +38,9 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/audit-logs", label: "Audit Logs", icon: ClipboardList, roles: ["super_admin","ops_admin","support_agent","analyst"] },
 ];
 
+const SUPPORT_EMAIL = "support@fynhelp.com";
+const SUPPORT_ALLOWED_PATHS = ["/admin/content", "/admin/media", "/admin/communications"];
+
 const ROLE_LABEL: Record<AdminRole, string> = {
   super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",
   support_agent: "Support Agent", analyst: "Analyst", user: "User",
