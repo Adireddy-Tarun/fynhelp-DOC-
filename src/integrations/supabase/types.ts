@@ -5580,6 +5580,7 @@ export type Database = {
       increment_blog_views: { Args: { p_slug: string }; Returns: undefined }
       is_admin_user: { Args: never; Returns: boolean }
       is_blog_admin: { Args: never; Returns: boolean }
+      is_blog_editor: { Args: never; Returns: boolean }
       is_ca_firm_privileged: { Args: { _firm_id: string }; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
       lookup_client_by_reference: {
@@ -5614,6 +5615,7 @@ export type Database = {
               error: true
             } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
           }
+      user_in_ca_firm: { Args: { _firm_id: string }; Returns: boolean }
       zoho_exchange_code: {
         Args: { p_code: string; p_state: string }
         Returns: Json
