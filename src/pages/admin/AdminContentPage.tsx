@@ -177,6 +177,7 @@ function BlogSection() {
   const [blogPage, setBlogPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -185,12 +186,25 @@ function BlogSection() {
       .select(SELECT_COLS)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
+    else setLastRefreshed(new Date());
     setPosts(((data ?? []) as unknown) as BlogPost[]);
     setLoading(false);
   };
 
   useEffect(() => {
     load();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("blog_posts_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "blog_posts" }, () => load())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "blog_posts" }, () => load())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "blog_posts" }, () => load())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -261,12 +275,24 @@ function BlogSection() {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-end">
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: BODY, fontSize: 10, color: "#10B981", fontWeight: 700 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10B981", animation: "fyn-blog-live-pulse 1.6s ease-out infinite" }} />
+          Live
+          <style>{`@keyframes fyn-blog-live-pulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.55)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }`}</style>
+        </span>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Total views" value={analytics.totalViews.toLocaleString("en-IN")} />
         <Stat label="Published" value={String(analytics.published)} />
         <Stat label="Top post views" value={analytics.topViews.toLocaleString("en-IN")} />
         <Stat label="Avg read time" value={`${analytics.avgRead} min`} />
       </div>
+      {lastRefreshed && (
+        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+          Last updated: {lastRefreshed.toLocaleTimeString()}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2">
         <input
