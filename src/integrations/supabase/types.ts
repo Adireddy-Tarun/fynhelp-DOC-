@@ -2981,6 +2981,39 @@ export type Database = {
         }
         Relationships: []
       }
+      glossary_terms: {
+        Row: {
+          category: string
+          created_at: string
+          definition: string
+          id: string
+          is_published: boolean
+          sort_order: number
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          definition: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          definition?: string
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gst_filings: {
         Row: {
           acknowledgement_number: string | null
