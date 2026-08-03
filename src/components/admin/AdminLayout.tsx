@@ -129,9 +129,10 @@ export default function AdminLayout() {
 
   // Auth disabled during design, show all items EXCEPT super_admin-only ones.
   const visible = NAV_ITEMS.filter((i) => {
-    if ("divider" in i && i.divider) return true;
+    if ("divider" in i && i.divider) return !isSupport;
     const it = i as Extract<NavItem, { to: string }>;
-    if (it.roles.length === 1 && it.roles[0] === "super_admin") return isSuperAdmin;
+    if (it.roles.length === 1 && it.roles[0] === "super_admin" && !isSuperAdmin) return false;
+    if (isSupport) return SUPPORT_ALLOWED_PATHS.includes(it.to);
     return true;
   });
 
