@@ -39,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const SUPPORT_EMAIL = "support@fynhelp.com";
-const SUPPORT_ALLOWED_PATHS = ["/admin/content", "/admin/media", "/admin/communications"];
+const SUPPORT_ALLOWED_PATHS = ["/admin/content", "/admin/media", "/admin/communications", "/admin/blog/new", "/admin/blog/"];
 
 const ROLE_LABEL: Record<AdminRole, string> = {
   super_admin: "Super Admin", admin: "Admin", ops_admin: "Ops Admin",

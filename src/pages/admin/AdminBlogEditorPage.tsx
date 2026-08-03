@@ -276,7 +276,7 @@ export default function AdminBlogEditorPage() {
     <div style={{ fontFamily: BODY, color: INK }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => navigate("/admin/blog")} style={{ ...field, width: "auto", cursor: "pointer" }}>Back to posts</button>
+          <button onClick={() => navigate("/admin/content")} style={{ ...field, width: "auto", cursor: "pointer" }}>Back to posts</button>
           <span style={{ fontSize: 11, color: "rgba(26,16,8,0.55)", display: "inline-flex", alignItems: "center", gap: 5 }}>
             {autosaveState === "saving" ? (
               <>
