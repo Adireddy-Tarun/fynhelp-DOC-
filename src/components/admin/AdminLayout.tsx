@@ -204,7 +204,7 @@ export default function AdminLayout() {
           >
             <FynLogo variant="light" showTagline={false} size="sm" className="" />
             <span style={{ fontFamily: "Raleway, sans-serif", fontSize: 11, color: "hsl(var(--fyn-gold))", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase" }}>
-              Admin
+              {isSupport ? "Content Admin" : "Admin"}
             </span>
           </button>
         </div>
