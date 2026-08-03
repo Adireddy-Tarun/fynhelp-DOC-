@@ -177,6 +177,7 @@ function BlogSection() {
   const [blogPage, setBlogPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -185,12 +186,25 @@ function BlogSection() {
       .select(SELECT_COLS)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
+    else setLastRefreshed(new Date());
     setPosts(((data ?? []) as unknown) as BlogPost[]);
     setLoading(false);
   };
 
   useEffect(() => {
     load();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("blog_posts_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "blog_posts" }, () => load())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "blog_posts" }, () => load())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "blog_posts" }, () => load())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
