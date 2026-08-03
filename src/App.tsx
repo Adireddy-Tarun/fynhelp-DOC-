@@ -244,7 +244,9 @@ const App = () => (
               <Route path="system-health" element={<AdminSystemHealthPage />} />
               <Route path="internal-access" element={<AdminInternalAccessPage />} />
               <Route path="media" element={<AdminMediaLibraryPage />} />
-              <Route path="blog" element={<AdminBlogPage />} />
+              <Route path="blog" element={<AdminBlogListPage />} />
+              <Route path="blog/new" element={<AdminBlogEditorPage />} />
+              <Route path="blog/:postId/edit" element={<AdminBlogEditorPage />} />
               <Route path="ca-verification" element={<CAVerificationPage />} />
               
 
