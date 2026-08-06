@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import WaitlistForm from "@/components/WaitlistForm";
@@ -14,6 +15,7 @@ import {
   Video,
   Users,
   LogIn,
+  Mail,
 } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/shamiksha-s-meetings";
@@ -22,8 +24,7 @@ import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 export default function WaitlistPage() {
   useAuthRedirect("public-only");
-  const openCalendly = () =>
-    window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+  const [submitted, setSubmitted] = useState(false);
 
   return (
     <Layout>
@@ -34,6 +35,7 @@ export default function WaitlistPage() {
             "linear-gradient(180deg, #F9F7F4 0%, #FFFFFF 60%, #F9F7F4 100%)",
         }}
       >
+        {!submitted && (
         <div className="mx-auto mb-8" style={{ maxWidth: 600 }}>
           <div className="bg-white rounded-xl border border-fyn-ink/10 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
@@ -58,29 +60,112 @@ export default function WaitlistPage() {
             </Link>
           </div>
         </div>
+        )}
 
-        <div className="mx-auto" style={{ maxWidth: 600 }}>
-          <header className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-fyn-red/10 text-fyn-red mb-6">
-              <Rocket className="w-8 h-8" />
-            </div>
-            <h1
-              className="font-serif font-bold text-fyn-ink mb-3"
-              style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", lineHeight: 1.15 }}
+        {submitted ? (
+          <section className="mx-auto" style={{ maxWidth: 720 }}>
+            <div
+              className="relative overflow-hidden rounded-3xl border border-fyn-ink/10 bg-white shadow-[0_20px_60px_rgba(26,16,8,0.10)] p-8 md:p-12 text-center"
             >
-              Be first in line when we launch
-            </h1>
-            <p className="text-fyn-ink/70 text-base md:text-lg">
-              New here? Join the list below — first 100 users get FynHelp free for 30 days.
-            </p>
-          </header>
+              <div
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-1.5"
+                style={{ background: "linear-gradient(90deg,#A93838,#8B6914,#A93838)" }}
+              />
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-500/10 text-emerald-600 mb-6">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <p className="font-sans text-[12px] uppercase tracking-[0.18em] text-fyn-gold font-semibold mb-3">
+                Application received
+              </p>
+              <h1
+                className="font-serif font-bold text-fyn-ink mb-4"
+                style={{ fontSize: "clamp(1.9rem, 4vw, 2.6rem)", lineHeight: 1.15, fontFamily: "Georgia, serif" }}
+              >
+                Thank you — you're on the list
+              </h1>
+              <p className="text-fyn-ink/65 text-base leading-relaxed max-w-lg mx-auto mb-8">
+                We review applications on a rolling basis and will email you within{" "}
+                <span className="text-fyn-ink font-semibold">24–48 hours</span>. Want to move faster? Book a
+                30-minute call with our founders and get priority access.
+              </p>
 
-          <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8">
-            <WaitlistForm />
-          </div>
-        </div>
+              <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-8">
+                {[
+                  { Icon: Calendar, label: "Duration", value: "30 min" },
+                  { Icon: Video, label: "Platform", value: "Google Meet" },
+                  { Icon: Users, label: "With", value: "Founders" },
+                ].map(({ Icon, label, value }) => (
+                  <div
+                    key={label}
+                    className="flex flex-col items-center gap-1 rounded-xl border border-fyn-ink/10 bg-fyn-beige-dark/40 py-3"
+                  >
+                    <Icon size={16} className="text-fyn-ink/50" />
+                    <span className="font-sans text-[11px] text-fyn-ink/50">{label}</span>
+                    <span className="font-sans font-semibold text-[13px] text-fyn-ink">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Book your priority access call with FynHelp founders"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#C41E1E] text-white font-sans font-bold text-base px-10 py-4 rounded-xl transition-transform duration-300 hover:-translate-y-0.5"
+                style={{ boxShadow: "0 4px 0 rgba(160,25,25,1), 0 8px 24px rgba(196,30,30,0.35)" }}
+              >
+                Book Your Priority Call
+                <ArrowRight size={20} />
+              </a>
+
+              <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-4 text-[13px] text-fyn-ink/55">
+                <span className="inline-flex items-center gap-1.5">
+                  <Shield size={16} /> No commitment • Free consultation
+                </span>
+                <span className="hidden sm:inline text-fyn-ink/20">|</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Mail size={16} /> Check your inbox and spam folder
+                </span>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-fyn-ink/10">
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-fyn-ink/60 hover:text-fyn-ink transition-colors"
+                >
+                  Back to home
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            <div className="mx-auto" style={{ maxWidth: 600 }}>
+              <header className="text-center mb-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-fyn-red/10 text-fyn-red mb-6">
+                  <Rocket className="w-8 h-8" />
+                </div>
+                <h1
+                  className="font-serif font-bold text-fyn-ink mb-3"
+                  style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)", lineHeight: 1.15 }}
+                >
+                  Be first in line when we launch
+                </h1>
+                <p className="text-fyn-ink/70 text-base md:text-lg">
+                  New here? Join the list below — first 100 users get FynHelp free for 30 days.
+                </p>
+              </header>
+
+              <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8">
+                <WaitlistForm onSuccess={() => setSubmitted(true)} />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Two-path choice section */}
+        {!submitted && (
         <section className="max-w-5xl mx-auto px-6 mt-20">
           {/* OR divider */}
           <div className="relative my-10">
@@ -190,6 +275,7 @@ export default function WaitlistPage() {
             </article>
           </div>
         </section>
+        )}
       </main>
     </Layout>
   );
