@@ -35,6 +35,7 @@ export default function WaitlistPage() {
             "linear-gradient(180deg, #F9F7F4 0%, #FFFFFF 60%, #F9F7F4 100%)",
         }}
       >
+        {!submitted && (
         <div className="mx-auto mb-8" style={{ maxWidth: 600 }}>
           <div className="bg-white rounded-xl border border-fyn-ink/10 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
