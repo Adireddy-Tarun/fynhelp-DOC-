@@ -60,6 +60,7 @@ export default function WaitlistPage() {
             </Link>
           </div>
         </div>
+        )}
 
         {submitted ? (
           <section className="mx-auto" style={{ maxWidth: 720 }}>
