@@ -16,7 +16,7 @@ import {
   LogIn,
 } from "lucide-react";
 
-const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/30min";
+const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/shamiksha-s-meetings";
 
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
