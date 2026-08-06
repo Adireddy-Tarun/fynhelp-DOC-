@@ -163,6 +163,7 @@ export default function WaitlistPage() {
         )}
 
         {/* Two-path choice section */}
+        {!submitted && (
         <section className="max-w-5xl mx-auto px-6 mt-20">
           {/* OR divider */}
           <div className="relative my-10">
