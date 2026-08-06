@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import WaitlistForm from "@/components/WaitlistForm";
@@ -14,6 +15,7 @@ import {
   Video,
   Users,
   LogIn,
+  Mail,
 } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/nidhi-fynhelp/shamiksha-s-meetings";
@@ -22,8 +24,7 @@ import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 export default function WaitlistPage() {
   useAuthRedirect("public-only");
-  const openCalendly = () =>
-    window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+  const [submitted, setSubmitted] = useState(false);
 
   return (
     <Layout>
