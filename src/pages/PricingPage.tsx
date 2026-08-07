@@ -404,14 +404,30 @@ export default function PricingPage() {
                   displayPrice = <><span>₹</span><DigitRoll value={proValue} /></>;
                   displaySuffix = proSuffix;
                 } else if (p.id === "starter") {
-                  // Starter's price stays "FREE" but show the post-trial line via subline
-                  displayPrice = p.price;
+                  displayPrice = <><span>₹</span><DigitRoll value={isAnnual ? starterAnnual : starterMonthly} /></>;
+                  displaySuffix = isAnnual ? "/year" : "/month";
                 }
 
                 return (
                   <div key={p.id} className={`pr-plan${isPro ? " pro" : ""}`}>
                     {p.badge && <span className="badge">{p.badge}</span>}
                     <div className="name">{p.name}</div>
+                    {p.id === "starter" && (
+                      <span
+                        style={{
+                          background: "rgba(16,185,129,0.12)",
+                          color: "#0B7A5A",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          padding: "4px 12px",
+                          borderRadius: 99,
+                          display: "inline-block",
+                          marginBottom: 8,
+                        }}
+                      >
+                        FREE for 30 days
+                      </span>
+                    )}
                     <div className="price-wrap">
                       <span className="price num">{displayPrice}</span>
                       {displaySuffix && <span className="suffix">{displaySuffix}</span>}
