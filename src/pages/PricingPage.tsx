@@ -45,7 +45,6 @@ const plans: Plan[] = [
     id: "starter",
     name: "Starter",
     price: "FREE",
-    priceSuffix: "for 30 days",
     subline: "Then ₹30,000/year · Waitlist only",
     features: [
       "8 AI CFO queries per month",
@@ -56,7 +55,7 @@ const plans: Plan[] = [
       "Email support",
       "1 user account",
     ],
-    cta: { label: "Join Waitlist", href: "/waitlist" },
+    cta: { label: "Try 30 Days Free", href: "/waitlist" },
     ctaStyle: "outline-red",
   },
   {
@@ -155,6 +154,7 @@ const STYLES = `
   .pr-plan.pro { background: ${C.black}; color: #fff; border-color: ${C.black}; transform: translateY(-8px); box-shadow: 0 30px 70px -20px rgba(0,0,0,0.35); }
   .pr-plan.pro:hover { transform: translateY(-12px); }
   .pr-plan.pro :where(h3,.price,.suffix,.feat) { color: #fff; }
+  .pr-plan.pro .price, .pr-plan.pro .digits, .pr-plan.pro .digit-static, .pr-plan.pro .digit .strip > span { color: #fff; }
   .pr-plan.pro .subline { color: rgba(255,255,255,0.65); }
   .pr-plan.pro .feat.section { color: rgba(255,255,255,0.9); }
   .pr-plan .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: ${C.red}; color: #fff; padding: 6px 14px; border-radius: 100px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; font-family: 'Satoshi', sans-serif; }
@@ -404,14 +404,30 @@ export default function PricingPage() {
                   displayPrice = <><span>₹</span><DigitRoll value={proValue} /></>;
                   displaySuffix = proSuffix;
                 } else if (p.id === "starter") {
-                  // Starter's price stays "FREE" but show the post-trial line via subline
-                  displayPrice = p.price;
+                  displayPrice = <><span>₹</span><DigitRoll value={isAnnual ? starterAnnual : starterMonthly} /></>;
+                  displaySuffix = isAnnual ? "/year" : "/month";
                 }
 
                 return (
                   <div key={p.id} className={`pr-plan${isPro ? " pro" : ""}`}>
                     {p.badge && <span className="badge">{p.badge}</span>}
                     <div className="name">{p.name}</div>
+                    {p.id === "starter" && (
+                      <span
+                        style={{
+                          background: "rgba(16,185,129,0.12)",
+                          color: "#0B7A5A",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          padding: "4px 12px",
+                          borderRadius: 99,
+                          display: "inline-block",
+                          marginBottom: 8,
+                        }}
+                      >
+                        FREE for 30 days
+                      </span>
+                    )}
                     <div className="price-wrap">
                       <span className="price num">{displayPrice}</span>
                       {displaySuffix && <span className="suffix">{displaySuffix}</span>}
