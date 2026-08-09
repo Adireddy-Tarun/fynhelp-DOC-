@@ -355,11 +355,14 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
           <div className="flex gap-2">
             {platform === "email" && (
               <>
-                <button onClick={() => toast.info("Preview coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Preview</button>
-                <button onClick={() => toast.info("Send test coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Send Test</button>
+                <button onClick={() => setPreviewOpen((p) => !p)} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
+                  {previewOpen ? "Hide Preview" : "Preview"}
+                </button>
+                <button onClick={sendTest} disabled={sending} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))", opacity: sending ? 0.6 : 1 }}>Send Test</button>
               </>
             )}
           </div>
+
           <div className="flex gap-3">
             <button onClick={onClose} className="px-4 py-2 rounded-lg"
               style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
