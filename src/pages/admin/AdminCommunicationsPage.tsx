@@ -220,6 +220,28 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
   const max = platform === "twitter" ? 280 : 1000;
 
   const [sending, setSending] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  const sendTest = async () => {
+    if (!subject.trim() || !content.trim()) { toast.error("Subject and body are required"); return; }
+    setSending(true);
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const email = userRes?.user?.email;
+      if (!email) { toast.error("Could not resolve your email"); return; }
+      const { error } = await supabase.functions.invoke("email-blast", {
+        body: { subject: `[TEST] ${subject}`, body: content, emails: [email] },
+      });
+      if (error) throw error;
+      toast.success(`Test email sent to ${email}`);
+    } catch (err) {
+      console.error("Test email error:", err);
+      toast.error((err as Error).message || "Failed to send test email");
+    } finally {
+      setSending(false);
+    }
+  };
+
 
   const send = async () => {
     if (platform === "email") {
