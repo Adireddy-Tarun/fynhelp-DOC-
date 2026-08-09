@@ -253,16 +253,8 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
       return;
     }
 
-    await logAdminAction({
-      action: `${platform}_blast_sent`,
-      target_type: "communications",
-      details: {
-        platform, audience, length: content.length,
-        meta: platform === "meta" ? { facebook, instagram, postType } : undefined,
-      },
-    });
-    toast.success(`${PLATFORM_META[platform].label} ${platform === "twitter" ? "tweet" : platform === "meta" ? "post" : "message"} queued`);
-    onClose();
+    toast.error(`${PLATFORM_META[platform].label} is not connected yet — nothing was sent.`);
+
   };
 
   const title = platform === "twitter" ? "New Tweet"
