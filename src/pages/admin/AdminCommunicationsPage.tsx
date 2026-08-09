@@ -371,7 +371,18 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               </div>
             )}
           </Field>
+
+          {platform === "email" && previewOpen && (
+            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(26,16,8,0.12)" }}>
+              <div className="px-4 py-2" style={{ background: "rgba(244,237,218,0.6)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
+                Preview — {subject || "(no subject)"}
+              </div>
+              <div className="p-4" style={{ background: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}
+                dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          )}
         </div>
+
 
         <div className="flex items-center justify-between gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
           <div className="flex gap-2">
