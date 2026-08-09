@@ -184,8 +184,8 @@ export const useReplaceMedia = () => {
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(asset.file_path);
-      const publicUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      const publicUrl = await signMediaUrl(asset.file_path);
+
       const newHash = await sha256(processed);
 
       const { data: row, error } = await (supabase.from(TABLE) as any)
