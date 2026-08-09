@@ -31,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin"] },
   { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin"] },
+  { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck, roles: ["super_admin"] },
   { to: "/admin/settings", label: "Settings", icon: Settings, roles: ["super_admin"] },
   { to: "/admin/system-health", label: "System Health", icon: Activity, roles: ["super_admin","ops_admin"] },
   { to: "/admin/internal-access", label: "Internal Access", icon: Lock, roles: ["super_admin","ops_admin"] },

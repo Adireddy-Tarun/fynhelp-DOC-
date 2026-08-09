@@ -12,6 +12,7 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage.tsx";
 import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage.tsx";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage.tsx";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage.tsx";
+import AdminRolesPage from "./pages/admin/AdminRolesPage.tsx";
 import AdminPlaceholderPage from "./pages/admin/AdminPlaceholderPage.tsx";
 import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage.tsx";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage.tsx";
@@ -233,6 +234,7 @@ const App = () => (
               <Route path="users/:id" element={<AdminUserDetailPage />} />
               <Route path="audit-logs" element={<AdminAuditLogsPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="roles" element={<ProtectedCeoRoute><AdminRolesPage /></ProtectedCeoRoute>} />
               <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
               <Route path="ai-monitoring" element={<AdminAIMonitoringPage />} />
               <Route path="content" element={<AdminContentPage />} />

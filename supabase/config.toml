@@ -101,3 +101,6 @@ verify_jwt = false
 
 [functions.compute-revenue]
 verify_jwt = true
+
+[functions.admin-roles]
+verify_jwt = true
