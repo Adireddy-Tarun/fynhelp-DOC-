@@ -412,6 +412,66 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
   );
 }
 
+const SETUP_STEPS: Record<Platform, { title: string; steps: string[] }> = {
+  whatsapp: {
+    title: "WhatsApp Business",
+    steps: [
+      "Connect a WhatsApp Business API provider (Twilio or Meta Cloud API).",
+      "Verify your business number and get message templates approved.",
+      "Add the provider credentials as backend secrets, then broadcasting turns on here.",
+    ],
+  },
+  meta: {
+    title: "Facebook & Instagram",
+    steps: [
+      "Create a Meta app and link your Facebook Page + Instagram business account.",
+      "Grant pages_manage_posts and instagram_content_publish permissions.",
+      "Store the long-lived page access token as a backend secret.",
+    ],
+  },
+  twitter: {
+    title: "Twitter / X",
+    steps: [
+      "Create an X developer project with write access.",
+      "Generate OAuth 2.0 credentials for the posting account.",
+      "Store the credentials as backend secrets to enable posting.",
+    ],
+  },
+  email: { title: "Email", steps: [] },
+};
+
+function SetupModal({ platform, onClose }: { platform: Platform; onClose: () => void }) {
+  const info = SETUP_STEPS[platform];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+          <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+            {info.title} — not connected
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"><X size={18} /></button>
+        </div>
+        <div className="p-6">
+          <p className="mb-4" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.75)" }}>
+            This channel has no provider connected yet, so no messages can be sent from FynHelp. To enable it:
+          </p>
+          <ol className="space-y-2 list-decimal pl-5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.85)" }}>
+            {info.steps.map((s) => <li key={s}>{s}</li>)}
+          </ol>
+          <div className="mt-5 p-3 rounded-lg" style={{ background: "rgba(139,105,20,0.08)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)" }}>
+            Email Blast is live today and can reach the same audiences.
+          </div>
+        </div>
+        <div className="flex justify-end px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
