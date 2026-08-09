@@ -144,8 +144,8 @@ export const useUploadMedia = () => {
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      const publicUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      const publicUrl = await signMediaUrl(path);
+
 
       const { data: row, error: insErr } = await (supabase.from(TABLE) as any).insert({
         file_name: finalName,
