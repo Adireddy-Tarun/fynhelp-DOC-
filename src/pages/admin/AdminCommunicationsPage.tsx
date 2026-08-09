@@ -182,7 +182,12 @@ export default function AdminCommunicationsPage() {
         <EmptyState icon={Calendar} title="No scheduled posts" hint="Scheduling will be available once we wire up a scheduler. For now, all messages send immediately." />
       </Card>
 
-      {openModal && <ComposeModal platform={openModal} onClose={() => { setOpenModal(null); loadActivity(); }} />}
+      {openModal && (
+        CHANNELS.find((c) => c.id === openModal)?.status === "connected"
+          ? <ComposeModal platform={openModal} onClose={() => { setOpenModal(null); loadActivity(); }} />
+          : <SetupModal platform={openModal} onClose={() => setOpenModal(null)} />
+      )}
+
     </div>
   );
 
