@@ -549,14 +549,8 @@ const Navbar = () => {
 
           {/* Right cluster */}
           <div className="hidden lg:flex items-center gap-4 shrink-0">
-            {isAdmin && (
-              <Link
-                to="/admin/ca-approvals"
-                className="text-[15px] font-semibold text-white/85 hover:text-white transition-colors py-2"
-              >
-                Admin
-              </Link>
-            )}
+
+
 
             <div className="relative">
               <button
