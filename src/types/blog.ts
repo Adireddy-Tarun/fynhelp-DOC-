@@ -29,5 +29,11 @@ export const BLOG_CATEGORIES = [
   "Investor updates",
   "Product updates",
   "Founder stories",
+  "MSME",
+  "Startup finance",
+  "Compliance",
+  "CA resources",
+  "Hiring",
   "Other",
 ];
+
