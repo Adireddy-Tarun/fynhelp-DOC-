@@ -106,14 +106,21 @@ export default function AdminCommunicationsPage() {
               </div>
               <button
                 onClick={() => setOpenModal(c.id)}
-                className="w-full mt-4 py-2.5 rounded-xl text-white"
+                className="w-full mt-4 py-2.5 rounded-xl"
                 style={{
-                  background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                  background: c.status === "connected"
+                    ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
+                    : "transparent",
+                  border: c.status === "connected" ? "none" : "1px solid rgba(26,16,8,0.18)",
+                  color: c.status === "connected" ? "#FFFFFF" : "hsl(var(--fyn-ink) / 0.75)",
                   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                 }}
               >
-                {c.id === "whatsapp" || c.id === "email" ? "Send Message" : c.id === "twitter" ? "Tweet" : "Create Post"}
+                {c.status !== "connected"
+                  ? "Setup required"
+                  : c.id === "whatsapp" || c.id === "email" ? "Send Message" : c.id === "twitter" ? "Tweet" : "Create Post"}
               </button>
+
             </Card>
           );
         })}
@@ -175,7 +182,12 @@ export default function AdminCommunicationsPage() {
         <EmptyState icon={Calendar} title="No scheduled posts" hint="Scheduling will be available once we wire up a scheduler. For now, all messages send immediately." />
       </Card>
 
-      {openModal && <ComposeModal platform={openModal} onClose={() => { setOpenModal(null); loadActivity(); }} />}
+      {openModal && (
+        CHANNELS.find((c) => c.id === openModal)?.status === "connected"
+          ? <ComposeModal platform={openModal} onClose={() => { setOpenModal(null); loadActivity(); }} />
+          : <SetupModal platform={openModal} onClose={() => setOpenModal(null)} />
+      )}
+
     </div>
   );
 
@@ -208,6 +220,28 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
   const max = platform === "twitter" ? 280 : 1000;
 
   const [sending, setSending] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  const sendTest = async () => {
+    if (!subject.trim() || !content.trim()) { toast.error("Subject and body are required"); return; }
+    setSending(true);
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const email = userRes?.user?.email;
+      if (!email) { toast.error("Could not resolve your email"); return; }
+      const { error } = await supabase.functions.invoke("email-blast", {
+        body: { subject: `[TEST] ${subject}`, body: content, emails: [email] },
+      });
+      if (error) throw error;
+      toast.success(`Test email sent to ${email}`);
+    } catch (err) {
+      console.error("Test email error:", err);
+      toast.error((err as Error).message || "Failed to send test email");
+    } finally {
+      setSending(false);
+    }
+  };
+
 
   const send = async () => {
     if (platform === "email") {
@@ -241,16 +275,8 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
       return;
     }
 
-    await logAdminAction({
-      action: `${platform}_blast_sent`,
-      target_type: "communications",
-      details: {
-        platform, audience, length: content.length,
-        meta: platform === "meta" ? { facebook, instagram, postType } : undefined,
-      },
-    });
-    toast.success(`${PLATFORM_META[platform].label} ${platform === "twitter" ? "tweet" : platform === "meta" ? "post" : "message"} queued`);
-    onClose();
+    toast.error(`${PLATFORM_META[platform].label} is not connected yet — nothing was sent.`);
+
   };
 
   const title = platform === "twitter" ? "New Tweet"
@@ -345,17 +371,31 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               </div>
             )}
           </Field>
+
+          {platform === "email" && previewOpen && (
+            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(26,16,8,0.12)" }}>
+              <div className="px-4 py-2" style={{ background: "rgba(244,237,218,0.6)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
+                Preview — {subject || "(no subject)"}
+              </div>
+              <div className="p-4" style={{ background: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}
+                dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          )}
         </div>
+
 
         <div className="flex items-center justify-between gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
           <div className="flex gap-2">
             {platform === "email" && (
               <>
-                <button onClick={() => toast.info("Preview coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Preview</button>
-                <button onClick={() => toast.info("Send test coming in Part 4")} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>Send Test</button>
+                <button onClick={() => setPreviewOpen((p) => !p)} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
+                  {previewOpen ? "Hide Preview" : "Preview"}
+                </button>
+                <button onClick={sendTest} disabled={sending} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))", opacity: sending ? 0.6 : 1 }}>Send Test</button>
               </>
             )}
           </div>
+
           <div className="flex gap-3">
             <button onClick={onClose} className="px-4 py-2 rounded-lg"
               style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
@@ -371,6 +411,66 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
     </div>
   );
 }
+
+const SETUP_STEPS: Record<Platform, { title: string; steps: string[] }> = {
+  whatsapp: {
+    title: "WhatsApp Business",
+    steps: [
+      "Connect a WhatsApp Business API provider (Twilio or Meta Cloud API).",
+      "Verify your business number and get message templates approved.",
+      "Add the provider credentials as backend secrets, then broadcasting turns on here.",
+    ],
+  },
+  meta: {
+    title: "Facebook & Instagram",
+    steps: [
+      "Create a Meta app and link your Facebook Page + Instagram business account.",
+      "Grant pages_manage_posts and instagram_content_publish permissions.",
+      "Store the long-lived page access token as a backend secret.",
+    ],
+  },
+  twitter: {
+    title: "Twitter / X",
+    steps: [
+      "Create an X developer project with write access.",
+      "Generate OAuth 2.0 credentials for the posting account.",
+      "Store the credentials as backend secrets to enable posting.",
+    ],
+  },
+  email: { title: "Email", steps: [] },
+};
+
+function SetupModal({ platform, onClose }: { platform: Platform; onClose: () => void }) {
+  const info = SETUP_STEPS[platform];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+          <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
+            {info.title} — not connected
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"><X size={18} /></button>
+        </div>
+        <div className="p-6">
+          <p className="mb-4" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.75)" }}>
+            This channel has no provider connected yet, so no messages can be sent from FynHelp. To enable it:
+          </p>
+          <ol className="space-y-2 list-decimal pl-5" style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink) / 0.85)" }}>
+            {info.steps.map((s) => <li key={s}>{s}</li>)}
+          </ol>
+          <div className="mt-5 p-3 rounded-lg" style={{ background: "rgba(139,105,20,0.08)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)" }}>
+            Email Blast is live today and can reach the same audiences.
+          </div>
+        </div>
+        <div className="flex justify-end px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

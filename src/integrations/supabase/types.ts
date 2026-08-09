@@ -3550,6 +3550,63 @@ export type Database = {
         }
         Relationships: []
       }
+      media_assets: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          file_hash: string | null
+          file_name: string
+          file_path: string
+          folder: string
+          height: number | null
+          id: string
+          mime_type: string | null
+          public_url: string
+          size_bytes: number | null
+          updated_at: string
+          uploaded_by: string | null
+          used_in: string[]
+          version: number
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          file_hash?: string | null
+          file_name: string
+          file_path: string
+          folder?: string
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          public_url: string
+          size_bytes?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+          used_in?: string[]
+          version?: number
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          file_hash?: string | null
+          file_name?: string
+          file_path?: string
+          folder?: string
+          height?: number | null
+          id?: string
+          mime_type?: string | null
+          public_url?: string
+          size_bytes?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+          used_in?: string[]
+          version?: number
+          width?: number | null
+        }
+        Relationships: []
+      }
       nidhi_briefs: {
         Row: {
           brief_date: string

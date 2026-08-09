@@ -23,6 +23,23 @@ export interface MediaAsset {
   updated_at: string;
 }
 
+const SIGNED_TTL = 60 * 60 * 24 * 365; // 1 year
+
+export async function signMediaUrl(path: string): Promise<string> {
+  const { data } = await supabase.storage.from(BUCKET).createSignedUrl(path, SIGNED_TTL);
+  return data?.signedUrl ?? "";
+}
+
+async function withSignedUrls(rows: MediaAsset[]): Promise<MediaAsset[]> {
+  if (!rows.length) return rows;
+  const { data } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrls(rows.map((r) => r.file_path), SIGNED_TTL);
+  const map = new Map<string, string>();
+  (data ?? []).forEach((d: any) => { if (d?.path && d?.signedUrl) map.set(d.path, d.signedUrl); });
+  return rows.map((r) => ({ ...r, public_url: map.get(r.file_path) ?? r.public_url }));
+}
+
 export const useMediaAssets = (folder?: string) => {
   return useQuery({
     queryKey: ["media_assets", folder ?? "all"],
@@ -32,17 +49,20 @@ export const useMediaAssets = (folder?: string) => {
         if (folder && folder !== "all") q = q.eq("folder", folder);
         const { data, error } = await q;
         if (error) {
-          // Table likely missing — graceful empty
+          console.error("media_assets query failed:", error.message);
           return { rows: [] as MediaAsset[], backendReady: false };
         }
-        return { rows: (data ?? []) as MediaAsset[], backendReady: true };
-      } catch {
+        const rows = await withSignedUrls((data ?? []) as MediaAsset[]);
+        return { rows, backendReady: true };
+      } catch (e) {
+        console.error("media_assets query threw:", e);
         return { rows: [] as MediaAsset[], backendReady: false };
       }
     },
     staleTime: 30_000,
   });
 };
+
 
 async function sha256(file: Blob): Promise<string> {
   const buf = await file.arrayBuffer();
@@ -124,8 +144,8 @@ export const useUploadMedia = () => {
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      const publicUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      const publicUrl = await signMediaUrl(path);
+
 
       const { data: row, error: insErr } = await (supabase.from(TABLE) as any).insert({
         file_name: finalName,
@@ -164,8 +184,8 @@ export const useReplaceMedia = () => {
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(asset.file_path);
-      const publicUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      const publicUrl = await signMediaUrl(asset.file_path);
+
       const newHash = await sha256(processed);
 
       const { data: row, error } = await (supabase.from(TABLE) as any)
