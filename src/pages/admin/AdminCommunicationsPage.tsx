@@ -106,14 +106,21 @@ export default function AdminCommunicationsPage() {
               </div>
               <button
                 onClick={() => setOpenModal(c.id)}
-                className="w-full mt-4 py-2.5 rounded-xl text-white"
+                className="w-full mt-4 py-2.5 rounded-xl"
                 style={{
-                  background: "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)",
+                  background: c.status === "connected"
+                    ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
+                    : "transparent",
+                  border: c.status === "connected" ? "none" : "1px solid rgba(26,16,8,0.18)",
+                  color: c.status === "connected" ? "#FFFFFF" : "hsl(var(--fyn-ink) / 0.75)",
                   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                 }}
               >
-                {c.id === "whatsapp" || c.id === "email" ? "Send Message" : c.id === "twitter" ? "Tweet" : "Create Post"}
+                {c.status !== "connected"
+                  ? "Setup required"
+                  : c.id === "whatsapp" || c.id === "email" ? "Send Message" : c.id === "twitter" ? "Tweet" : "Create Post"}
               </button>
+
             </Card>
           );
         })}
