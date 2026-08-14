@@ -12,11 +12,13 @@ import {
   Star,
   Eye,
   EyeOff,
+  Upload,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { BlogPost, BLOG_CATEGORIES } from "@/types/blog";
+import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -433,6 +435,9 @@ function BlogSection() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [coverUploadingId, setCoverUploadingId] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const coverTargetId = useRef<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -514,6 +519,26 @@ function BlogSection() {
     if (error) return toast.error(error.message);
     toast.success(msg);
     await load();
+  };
+
+  const pickCover = (id: string) => {
+    coverTargetId.current = id;
+    coverInputRef.current?.click();
+  };
+
+  const handleCoverFile = async (file: File) => {
+    const id = coverTargetId.current;
+    if (!id) return;
+    const invalid = validateImageFile(file);
+    if (invalid) return toast.error(invalid);
+    setCoverUploadingId(id);
+    const url = await uploadBlogImage(file, "cover");
+    if (!url) {
+      setCoverUploadingId(null);
+      return toast.error("Image upload failed");
+    }
+    await update([id], { cover_image_url: url, updated_at: new Date().toISOString() }, "Cover image updated");
+    setCoverUploadingId(null);
   };
 
   const runBulk = async (patch: Record<string, unknown>, msg: string) => {
@@ -707,6 +732,9 @@ function BlogSection() {
                     >
                       <ExternalLink size={12} /> View
                     </a>
+                    <RowBtn onClick={() => pickCover(p.id)} disabled={coverUploadingId === p.id}>
+                      <Upload size={12} /> {coverUploadingId === p.id ? "Uploading…" : p.cover_image_url ? "Replace image" : "Upload image"}
+                    </RowBtn>
                     {p.archived_at ? (
                       <RowBtn onClick={() => update([p.id], { archived_at: null, status: "draft" }, "Restored")}>
                         <RotateCcw size={12} /> Restore
@@ -723,6 +751,18 @@ function BlogSection() {
           </tbody>
         </table>
       </div>
+
+      <input
+        ref={coverInputRef}
+        type="file"
+        accept={IMAGE_ACCEPT}
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleCoverFile(f);
+          e.target.value = "";
+        }}
+      />
 
       <div className="flex items-center justify-between">
         <span style={{ fontSize: 12, color: "rgba(26,16,8,0.55)", fontFamily: BODY }}>

@@ -7,7 +7,7 @@ import Image from "@tiptap/extension-image";
 import Underline from "@tiptap/extension-underline";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { uploadBlogImage } from "@/lib/blogImageUpload";
+import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 import { BLOG_CATEGORIES } from "@/types/blog";
 import {
   Bold,
@@ -181,6 +181,11 @@ export default function AdminBlogEditorPage() {
   };
 
   const handleCoverUpload = async (file: File) => {
+    const invalid = validateImageFile(file);
+    if (invalid) {
+      toast.error(invalid);
+      return;
+    }
     setUploading(true);
     const url = await uploadBlogImage(file, "cover");
     setUploading(false);
@@ -194,6 +199,11 @@ export default function AdminBlogEditorPage() {
   };
 
   const handleContentImage = async (file: File) => {
+    const invalid = validateImageFile(file);
+    if (invalid) {
+      toast.error(invalid);
+      return;
+    }
     setUploading(true);
     const url = await uploadBlogImage(file, "content");
     setUploading(false);
@@ -347,7 +357,7 @@ export default function AdminBlogEditorPage() {
               <input
                 ref={contentInputRef}
                 type="file"
-                accept="image/*"
+                accept={IMAGE_ACCEPT}
                 style={{ display: "none" }}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
@@ -451,7 +461,7 @@ export default function AdminBlogEditorPage() {
             <input
               ref={coverInputRef}
               type="file"
-              accept="image/*"
+              accept={IMAGE_ACCEPT}
               style={{ display: "none" }}
               onChange={(e) => {
                 const f = e.target.files?.[0];
