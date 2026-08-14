@@ -235,10 +235,10 @@ export default function AdminContentPage() {
 
   return (
     <div>
-      <PageHeader title="Content Management" subtitle="Manage blog, resources and glossary" />
+      <PageHeader title="Content Management" subtitle="Manage blog, resources, glossary and videos" />
 
       <div className="flex items-center gap-1 mb-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        {(["blog", "resources", "glossary"] as Tab[]).map((t) => (
+        {(["blog", "resources", "glossary", "videos"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
