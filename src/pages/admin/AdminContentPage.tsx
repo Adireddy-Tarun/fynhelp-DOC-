@@ -1414,6 +1414,8 @@ function VideoModal({
   const [videoUrl, setVideoUrl] = useState(row?.video_url ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(row?.thumbnail_url ?? "");
   const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
   const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? nextOrder);
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
   const [saving, setSaving] = useState(false);
