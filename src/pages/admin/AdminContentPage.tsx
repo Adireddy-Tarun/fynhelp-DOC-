@@ -1515,9 +1515,31 @@ function VideoModal({
             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} style={inputStyle} />
           </Field>
         </div>
-        <Field label="Video embed URL (YouTube/Vimeo embed link — leave blank for 'coming soon')">
-          <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
+        <Field label="Video source (upload a file, or paste a YouTube/Vimeo embed link — leave blank for 'coming soon')">
+          <div className="flex flex-col gap-2">
+            <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
+            <div className="flex items-center gap-3 flex-wrap">
+              <input
+                type="file"
+                accept="video/*"
+                disabled={uploadingVideo}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) void uploadVideoFile(f);
+                }}
+                style={{ fontFamily: BODY, fontSize: 12, color: INK }}
+              />
+              <span style={{ fontFamily: BODY, fontSize: 11, color: "#8A7B63" }}>
+                {uploadingVideo ? "Uploading video… (large files may take a while)" : "MP4/WebM, max 500MB — stored in your Cloud bucket"}
+              </span>
+            </div>
+            {videoUrl && isSelfHostedVideo(videoUrl) && (
+              <video src={videoUrl} controls preload="metadata" style={{ width: "100%", maxHeight: 200, borderRadius: 8, background: "#000" }} />
+            )}
+          </div>
         </Field>
+
         <Field label="Thumbnail image (optional — upload JPG/PNG/WebP, max 10MB)">
           <div className="flex items-start gap-3">
             <div
