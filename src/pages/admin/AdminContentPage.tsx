@@ -21,6 +21,7 @@ import { BlogPost, BLOG_CATEGORIES } from "@/types/blog";
 import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 import ResourceHealthCheck from "./ResourceHealthCheck";
 import { logResourceAction } from "@/lib/resourceAudit";
+import ResourceActivityLog from "./ResourceActivityLog";
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -311,6 +312,8 @@ export default function AdminContentPage() {
           </div>
 
           <ResourceHealthCheck onChanged={() => loadResources()} />
+
+          <ResourceActivityLog resources={resources.map((r) => ({ id: r.id, title: r.title }))} />
           {lastResRefreshed && (
             <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
               Last updated: {lastResRefreshed.toLocaleTimeString()}
