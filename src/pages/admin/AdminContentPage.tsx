@@ -808,7 +808,25 @@ function ResourceModal({
   const [format, setFormat] = useState(row?.format ?? "Template");
   const [externalUrl, setExternalUrl] = useState(row?.external_url ?? "");
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
+  const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? 0);
+  const [filePath, setFilePath] = useState<string | null>(row?.file_path ?? null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (file: File) => {
+    if (file.size > 50 * 1024 * 1024) return toast.error("File is larger than 50 MB");
+    setUploading(true);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${Date.now()}-${safeName}`;
+    const { error } = await supabase.storage
+      .from("resources")
+      .upload(path, file, { upsert: false, contentType: file.type || "application/octet-stream" });
+    setUploading(false);
+    if (error) return toast.error(error.message);
+    setFilePath(path);
+    toast.success("File uploaded — save to publish it");
+  };
 
   const save = async () => {
     if (!title.trim()) return toast.error("Title is required");
@@ -818,6 +836,8 @@ function ResourceModal({
       description: description.trim(),
       format,
       external_url: externalUrl.trim() || null,
+      file_path: filePath,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_published: isPublished,
       updated_at: new Date().toISOString(),
     };
@@ -857,8 +877,48 @@ function ResourceModal({
           {RESOURCE_FORMATS.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
       </Field>
-      <Field label="External URL">
+      <Field label="Downloadable file">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-2 px-3"
+            style={{ height: 32, borderRadius: 8, border: `0.5px solid ${BORDER}`, background: "#FFFFFF", fontFamily: BODY, fontSize: 12, fontWeight: 600, color: INK }}
+          >
+            <Upload size={13} /> {uploading ? "Uploading…" : filePath ? "Replace file" : "Upload file"}
+          </button>
+          <span style={{ fontFamily: BODY, fontSize: 11, color: filePath ? "#0B7A5A" : "rgba(26,16,8,0.5)" }}>
+            {filePath ?? "No file attached — download will fail"}
+          </span>
+          {filePath && (
+            <button type="button" onClick={() => setFilePath(null)} style={{ fontFamily: BODY, fontSize: 11, color: RED }}>
+              Remove
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.ppt,.pptx,.zip,.png,.jpg,.jpeg,.webp"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+              e.target.value = "";
+            }}
+          />
+        </div>
+      </Field>
+      <Field label="External URL (used when no file is attached)">
         <input value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} style={inputStyle} placeholder="https://…" />
+      </Field>
+      <Field label="Sort order">
+        <input
+          type="number"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(Number(e.target.value))}
+          style={inputStyle}
+        />
       </Field>
       <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
         <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
@@ -879,30 +939,33 @@ function GlossaryModal({
   onSaved: () => void;
 }) {
   const [term, setTerm] = useState(row?.term ?? "");
-  const [definition, setDefinition] = useState(row?.definition ?? "");
-  const [category, setCategory] = useState(row?.category ?? "General");
+  const [shortDefinition, setShortDefinition] = useState(row?.short_definition ?? "");
+  const [fullDefinition, setFullDefinition] = useState(row?.full_definition ?? "");
+  const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? 0);
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
     if (!term.trim()) return toast.error("Term is required");
-    if (!definition.trim()) return toast.error("Definition is required");
+    if (!shortDefinition.trim()) return toast.error("Short definition is required");
     setSaving(true);
     const payload = {
       term: term.trim(),
-      definition: definition.trim(),
-      category,
+      short_definition: shortDefinition.trim(),
+      full_definition: (fullDefinition.trim() || shortDefinition.trim()),
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_published: isPublished,
+      updated_at: new Date().toISOString(),
     };
     let error;
     if (row) {
       ({ error } = await (supabase as never as typeof supabase)
-        .from("glossary_terms")
+        .from("resource_glossary")
         .update(payload as never)
         .eq("id", row.id));
     } else {
       ({ error } = await (supabase as never as typeof supabase)
-        .from("glossary_terms")
+        .from("resource_glossary")
         .insert(payload as never));
     }
     setSaving(false);
