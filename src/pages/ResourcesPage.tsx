@@ -215,7 +215,7 @@ const STYLES = `
   /* Video card */
   .rs-thumb { position: relative; height: 140px; background: ${C.panel}; border-bottom: 1px solid ${C.border}; display: flex; align-items: center; justify-content: center; color: ${C.ink}; }
   .rs-thumb .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .rs-thumb .play { width: 52px; height: 52px; border-radius: 50%; background: ${C.red}; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(184,51,58,0.35); }
+  .rs-thumb .play { position: relative; z-index: 1; width: 52px; height: 52px; border-radius: 50%; background: ${C.red}; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(184,51,58,0.35); }
   .rs-thumb .dur { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
   .rs-thumb .cat-icon { position: absolute; top: 12px; left: 12px; background: ${C.card}; border: 1px solid ${C.border}; padding: 6px; border-radius: 8px; color: ${C.ink}; }
 
