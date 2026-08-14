@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { BlogPost, BLOG_CATEGORIES } from "@/types/blog";
 import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
+import ResourceHealthCheck from "./ResourceHealthCheck";
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -301,6 +302,8 @@ export default function AdminContentPage() {
             <Stat label="Total resources" value={String(resources.length)} />
             <Stat label="Published" value={String(resources.filter((r) => r.is_published).length)} />
           </div>
+
+          <ResourceHealthCheck onChanged={() => loadResources()} />
           {lastResRefreshed && (
             <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
               Last updated: {lastResRefreshed.toLocaleTimeString()}
