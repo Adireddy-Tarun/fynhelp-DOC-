@@ -30,7 +30,23 @@ const BODY = "Arial, Helvetica, sans-serif";
 
 const PER_PAGE = 5;
 
-type Tab = "blog" | "resources" | "glossary";
+type Tab = "blog" | "resources" | "glossary" | "videos";
+
+const VIDEO_STEPS = ["DAY 1", "WEEK 1", "WEEK 2", "WEEK 3", "MONTH 1"];
+
+interface VideoRow {
+  id: string;
+  step: string;
+  title: string;
+  description: string;
+  duration: string;
+  category: string;
+  video_url: string | null;
+  thumbnail_url: string | null;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+}
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
 
 const RESOURCE_FORMATS = ["Template", "Guide", "Checklist", "Video", "Article", "Tool"];
