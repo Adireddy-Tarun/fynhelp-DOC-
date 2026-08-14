@@ -34,7 +34,6 @@ type Tab = "blog" | "resources" | "glossary";
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
 
 const RESOURCE_FORMATS = ["Template", "Guide", "Checklist", "Video", "Article", "Tool"];
-const GLOSSARY_CATEGORIES = ["General", "Tax", "Compliance", "Finance", "Banking", "GST"];
 
 export type ResourceRow = {
   id: string;
@@ -979,13 +978,14 @@ function GlossaryModal({
       <Field label="Term *">
         <input value={term} onChange={(e) => setTerm(e.target.value)} style={inputStyle} placeholder="e.g. Input Tax Credit" />
       </Field>
-      <Field label="Definition *">
-        <textarea value={definition} onChange={(e) => setDefinition(e.target.value)} rows={4} style={{ ...inputStyle, resize: "vertical" }} />
+      <Field label="Short definition *">
+        <textarea value={shortDefinition} onChange={(e) => setShortDefinition(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" }} placeholder="One-line summary shown on the card" />
       </Field>
-      <Field label="Category">
-        <select value={category} onChange={(e) => setCategory(e.target.value)} style={inputStyle}>
-          {GLOSSARY_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
+      <Field label="Full definition">
+        <textarea value={fullDefinition} onChange={(e) => setFullDefinition(e.target.value)} rows={5} style={{ ...inputStyle, resize: "vertical" }} placeholder="Detailed explanation shown when the term is opened" />
+      </Field>
+      <Field label="Sort order">
+        <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} style={inputStyle} />
       </Field>
       <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
         <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
