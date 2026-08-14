@@ -59,6 +59,7 @@ interface VideoItem {
   duration: string;
   icon: IconCmp;
   category: string;
+  videoUrl?: string | null;
 }
 interface ArticleItem {
   id: string;
