@@ -307,6 +307,27 @@ const ResourcesPage = () => {
   }, []);
 
   useEffect(() => {
+    supabase
+      .from("resource_videos")
+      .select("id, step, title, description, duration, category, video_url")
+      .eq("is_published", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        const rows = (data ?? []).map((row): VideoItem => ({
+          id: row.id,
+          step: row.step,
+          title: row.title,
+          description: row.description ?? "",
+          duration: row.duration ?? "5 min",
+          category: row.category ?? "",
+          icon: VIDEO_ICON_BY_CATEGORY[row.category ?? ""] ?? IconRocket,
+          videoUrl: row.video_url,
+        }));
+        setDbVideos(rows);
+      });
+  }, []);
+
+  useEffect(() => {
     const cur = params.get("tab");
     if (cur !== activeTab) {
       const next = new URLSearchParams(params);
