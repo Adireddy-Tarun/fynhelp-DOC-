@@ -22,6 +22,8 @@ import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImag
 import ResourceHealthCheck from "./ResourceHealthCheck";
 import { logResourceAction } from "@/lib/resourceAudit";
 import ResourceActivityLog from "./ResourceActivityLog";
+import { isSelfHostedVideo } from "@/lib/videoSource";
+
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
