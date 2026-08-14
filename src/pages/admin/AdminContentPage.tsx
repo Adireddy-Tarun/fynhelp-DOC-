@@ -30,7 +30,23 @@ const BODY = "Arial, Helvetica, sans-serif";
 
 const PER_PAGE = 5;
 
-type Tab = "blog" | "resources" | "glossary";
+type Tab = "blog" | "resources" | "glossary" | "videos";
+
+const VIDEO_STEPS = ["DAY 1", "WEEK 1", "WEEK 2", "WEEK 3", "MONTH 1"];
+
+interface VideoRow {
+  id: string;
+  step: string;
+  title: string;
+  description: string;
+  duration: string;
+  category: string;
+  video_url: string | null;
+  thumbnail_url: string | null;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string;
+}
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
 
 const RESOURCE_FORMATS = ["Template", "Guide", "Checklist", "Video", "Article", "Tool"];
@@ -219,10 +235,10 @@ export default function AdminContentPage() {
 
   return (
     <div>
-      <PageHeader title="Content Management" subtitle="Manage blog, resources and glossary" />
+      <PageHeader title="Content Management" subtitle="Manage blog, resources, glossary and videos" />
 
       <div className="flex items-center gap-1 mb-5" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        {(["blog", "resources", "glossary"] as Tab[]).map((t) => (
+        {(["blog", "resources", "glossary", "videos"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -258,7 +274,7 @@ export default function AdminContentPage() {
           >
             <Plus size={14} /> New post
           </Link>
-        ) : (
+        ) : tab === "videos" ? null : (
           <button
             onClick={() => (tab === "resources" ? setResModal("add") : setGlossModal("add"))}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-white"
@@ -275,6 +291,8 @@ export default function AdminContentPage() {
       </div>
 
       {tab === "blog" && <BlogSection />}
+
+      {tab === "videos" && <VideosSection />}
 
       {tab === "resources" && (
         <div className="flex flex-col gap-4">
@@ -1193,5 +1211,253 @@ function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfir
         </div>
       </div>
     </div>
+  );
+}
+
+/* --------------------------------- Videos --------------------------------- */
+
+function VideosSection() {
+  const [rows, setRows] = useState<VideoRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [modal, setModal] = useState<null | "add" | VideoRow>(null);
+  const [delTarget, setDelTarget] = useState<null | VideoRow>(null);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const loadRef = useRef<() => void>(() => {});
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await (supabase as never as typeof supabase)
+      .from("resource_videos")
+      .select("id, step, title, description, duration, category, video_url, thumbnail_url, sort_order, is_published, created_at")
+      .order("sort_order", { ascending: true });
+    if (error) toast.error(error.message);
+    else setLastRefreshed(new Date());
+    setRows(((data ?? []) as unknown) as VideoRow[]);
+    setLoading(false);
+  };
+  loadRef.current = load;
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("resource_videos_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "resource_videos" }, () => loadRef.current())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (r) =>
+        r.title.toLowerCase().includes(q) ||
+        (r.category ?? "").toLowerCase().includes(q) ||
+        (r.step ?? "").toLowerCase().includes(q),
+    );
+  }, [rows, search]);
+
+  const togglePublish = async (row: VideoRow) => {
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resource_videos")
+      .update({ is_published: !row.is_published } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(row.is_published ? "Unpublished" : "Published");
+    load();
+  };
+
+  const remove = async (row: VideoRow) => {
+    const { error } = await (supabase as never as typeof supabase).from("resource_videos").delete().eq("id", row.id);
+    setDelTarget(null);
+    if (error) return toast.error(error.message);
+    toast.success("Video deleted");
+    load();
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <LiveDot />
+      <div className="grid grid-cols-2 gap-3">
+        <Stat label="Total videos" value={String(rows.length)} />
+        <Stat label="Published" value={String(rows.filter((r) => r.is_published).length)} />
+      </div>
+      {lastRefreshed && (
+        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+          Last updated: {lastRefreshed.toLocaleTimeString()}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search title, step or category"
+          style={{ ...controlStyle, width: 260 }}
+        />
+        <button
+          onClick={() => setModal("add")}
+          className="inline-flex items-center gap-2 px-3 ml-auto"
+          style={{ height: 32, background: RED, color: "#FFFFFF", borderRadius: 8, fontFamily: BODY, fontSize: 12, fontWeight: 700 }}
+        >
+          <Plus size={14} /> Add Video
+        </button>
+      </div>
+
+      <Card>
+        <Table headers={["Title", "Step", "Category", "Duration", "Link", "Order", "Status", "Actions"]}>
+          {loading && (
+            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+          )}
+          {!loading && filtered.length === 0 && (
+            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No videos yet.</td></tr>
+          )}
+          {!loading && filtered.map((r) => (
+            <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+              <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontSize: 11, fontWeight: 700 }}>{r.step}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.category || "—"}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.duration}</td>
+              <td className="py-3 px-2" style={{ fontSize: 11 }}>
+                {r.video_url ? (
+                  <a href={r.video_url} target="_blank" rel="noreferrer" style={{ color: "#0B7A5A", fontWeight: 700 }} className="inline-flex items-center gap-1">
+                    Embed <ExternalLink size={11} />
+                  </a>
+                ) : (
+                  <span style={{ color: GOLD, fontWeight: 700 }}>Coming soon</span>
+                )}
+              </td>
+              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.sort_order ?? 0}</td>
+              <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
+              <td className="py-3 px-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <RowBtn onClick={() => setModal(r)}><Edit2 size={12} /> Edit</RowBtn>
+                  <RowBtn onClick={() => togglePublish(r)}>
+                    {r.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                  </RowBtn>
+                  <RowBtn onClick={() => setDelTarget(r)}><Trash2 size={12} /> Delete</RowBtn>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </Table>
+      </Card>
+
+      {modal && (
+        <VideoModal
+          row={modal === "add" ? null : modal}
+          nextOrder={rows.length ? Math.max(...rows.map((r) => r.sort_order ?? 0)) + 1 : 1}
+          onClose={() => setModal(null)}
+          onSaved={() => {
+            setModal(null);
+            load();
+          }}
+        />
+      )}
+      {delTarget && (
+        <ConfirmDelete label="video" onCancel={() => setDelTarget(null)} onConfirm={() => remove(delTarget)} />
+      )}
+    </div>
+  );
+}
+
+function VideoModal({
+  row,
+  nextOrder,
+  onClose,
+  onSaved,
+}: {
+  row: VideoRow | null;
+  nextOrder: number;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [step, setStep] = useState(row?.step ?? "DAY 1");
+  const [title, setTitle] = useState(row?.title ?? "");
+  const [description, setDescription] = useState(row?.description ?? "");
+  const [duration, setDuration] = useState(row?.duration ?? "5 min");
+  const [category, setCategory] = useState(row?.category ?? "");
+  const [videoUrl, setVideoUrl] = useState(row?.video_url ?? "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(row?.thumbnail_url ?? "");
+  const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? nextOrder);
+  const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (!title.trim()) return toast.error("Title is required");
+    if (!description.trim()) return toast.error("Description is required");
+    if (!category.trim()) return toast.error("Category is required");
+    setSaving(true);
+    const payload = {
+      step,
+      title: title.trim(),
+      description: description.trim(),
+      duration: duration.trim() || "5 min",
+      category: category.trim(),
+      video_url: videoUrl.trim() || null,
+      thumbnail_url: thumbnailUrl.trim() || null,
+      sort_order: Number(sortOrder) || 0,
+      is_published: isPublished,
+      updated_at: new Date().toISOString(),
+    };
+    const client = supabase as never as typeof supabase;
+    const { error } = row
+      ? await client.from("resource_videos").update(payload as never).eq("id", row.id)
+      : await client.from("resource_videos").insert(payload as never);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success(row ? "Video updated" : "Video added");
+    onSaved();
+  };
+
+  return (
+    <AdminModal title={row ? "Edit video" : "Add video"} onClose={onClose}>
+      <div className="flex flex-col gap-3">
+        <Field label="Title">
+          <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} />
+        </Field>
+        <Field label="Description">
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ ...inputStyle, height: "auto", paddingTop: 8 }} />
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Step">
+            <select value={step} onChange={(e) => setStep(e.target.value)} style={inputStyle}>
+              {VIDEO_STEPS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Category">
+            <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="GST, Dashboard, Alerts…" style={inputStyle} />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Duration">
+            <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="5 min" style={inputStyle} />
+          </Field>
+          <Field label="Sort order">
+            <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} style={inputStyle} />
+          </Field>
+        </div>
+        <Field label="Video embed URL (YouTube/Vimeo embed link — leave blank for 'coming soon')">
+          <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
+        </Field>
+        <Field label="Thumbnail URL (optional)">
+          <input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} style={inputStyle} />
+        </Field>
+        <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 12, color: INK }}>
+          <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
+          Published
+        </label>
+      </div>
+      <ModalActions saving={saving} onCancel={onClose} onSave={save} />
+    </AdminModal>
   );
 }

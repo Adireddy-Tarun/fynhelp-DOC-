@@ -59,6 +59,7 @@ interface VideoItem {
   duration: string;
   icon: IconCmp;
   category: string;
+  videoUrl?: string | null;
 }
 interface ArticleItem {
   id: string;
@@ -105,6 +106,17 @@ const VIDEOS: VideoItem[] = [
   { id: "v7", step: "WEEK 2", title: "ITC reconciliation walkthrough", description: "Match GSTR-2B against your purchase register in minutes.", duration: "8 min", icon: IconFileSpreadsheet, category: "GST" },
   { id: "v8", step: "MONTH 1", title: "WhatsApp alerts setup", description: "Get daily cash, GST and overdue invoice nudges on WhatsApp.", duration: "3 min", icon: IconBellRinging, category: "Alerts" },
 ];
+
+const VIDEO_ICON_BY_CATEGORY: Record<string, IconCmp> = {
+  "Bank connection": IconBuildingBank,
+  Sync: IconRefresh,
+  Compliance: IconCalendarEvent,
+  Dashboard: IconGauge,
+  "AI CFO": IconMessageChatbot,
+  Simulation: IconChartArrowsVertical,
+  GST: IconFileSpreadsheet,
+  Alerts: IconBellRinging,
+};
 
 const ARTICLES: ArticleItem[] = [
   { id: "a1", title: "5 signs you need an AI CFO before your next funding round", excerpt: "Financial intelligence is no longer a luxury. Here's how to know it's time to upgrade from spreadsheets.", views: "1.2K", date: "May 1, 2026" },
@@ -275,6 +287,7 @@ const ResourcesPage = () => {
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [dbGlossary, setDbGlossary] = useState<any[]>([]);
+  const [dbVideos, setDbVideos] = useState<VideoItem[]>([]);
 
   useEffect(() => {
     supabase
@@ -292,6 +305,27 @@ const ResourcesPage = () => {
       .eq("is_published", true)
       .order("sort_order")
       .then(({ data }) => setDbGlossary(data ?? []));
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from("resource_videos")
+      .select("id, step, title, description, duration, category, video_url")
+      .eq("is_published", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        const rows = (data ?? []).map((row): VideoItem => ({
+          id: row.id,
+          step: row.step,
+          title: row.title,
+          description: row.description ?? "",
+          duration: row.duration ?? "5 min",
+          category: row.category ?? "",
+          icon: VIDEO_ICON_BY_CATEGORY[row.category ?? ""] ?? IconRocket,
+          videoUrl: row.video_url,
+        }));
+        setDbVideos(rows);
+      });
   }, []);
 
   useEffect(() => {
@@ -346,9 +380,10 @@ const ResourcesPage = () => {
 
   const matchesSearch = (haystack: string) => !debounced || haystack.toLowerCase().includes(debounced);
 
+  const allVideos = dbVideos.length > 0 ? dbVideos : VIDEOS;
   const filteredVideos = useMemo(
-    () => VIDEOS.filter((v) => matchesSearch(`${v.title} ${v.description} ${v.step}`)),
-    [debounced],
+    () => allVideos.filter((v) => matchesSearch(`${v.title} ${v.description} ${v.step}`)),
+    [debounced, allVideos],
   );
   const groupedVideos = useMemo(() => {
     return STEP_ORDER.map((step) => ({
@@ -449,7 +484,7 @@ const ResourcesPage = () => {
                   >
                     <Icon size={15} stroke={2} />
                     <span>{t.label}</span>
-                    <span className="badge">{t.badge}</span>
+                    <span className="badge">{t.key === "getting-started" ? `${allVideos.length} videos` : t.badge}</span>
                   </button>
                 );
               })}
@@ -637,15 +672,27 @@ const ResourcesPage = () => {
                   <X size={18} />
                 </button>
               </div>
-              <div style={{ padding: 40, textAlign: "center", background: C.panel }}>
-                <div style={{ display: "inline-flex", padding: 14, borderRadius: 12, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
-                  <IconMessage size={22} stroke={1.75} />
+              {videoModal.videoUrl ? (
+                <div style={{ background: "#000", aspectRatio: "16 / 9" }}>
+                  <iframe
+                    src={videoModal.videoUrl}
+                    title={videoModal.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                  />
                 </div>
-                <p style={{ fontSize: 14, color: C.body, lineHeight: 1.6, margin: 0, maxWidth: 460, marginInline: "auto" }}>
-                  Our tutorial library is being recorded and will be published here. In the meantime, explore our written
-                  guides and templates in the tabs above.
-                </p>
-              </div>
+              ) : (
+                <div style={{ padding: 40, textAlign: "center", background: C.panel }}>
+                  <div style={{ display: "inline-flex", padding: 14, borderRadius: 12, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
+                    <IconMessage size={22} stroke={1.75} />
+                  </div>
+                  <p style={{ fontSize: 14, color: C.body, lineHeight: 1.6, margin: 0, maxWidth: 460, marginInline: "auto" }}>
+                    Our tutorial library is being recorded and will be published here. In the meantime, explore our written
+                    guides and templates in the tabs above.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
