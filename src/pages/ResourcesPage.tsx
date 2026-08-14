@@ -60,6 +60,7 @@ interface VideoItem {
   icon: IconCmp;
   category: string;
   videoUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 interface ArticleItem {
   id: string;
@@ -213,6 +214,7 @@ const STYLES = `
 
   /* Video card */
   .rs-thumb { position: relative; height: 140px; background: ${C.panel}; border-bottom: 1px solid ${C.border}; display: flex; align-items: center; justify-content: center; color: ${C.ink}; }
+  .rs-thumb .thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .rs-thumb .play { width: 52px; height: 52px; border-radius: 50%; background: ${C.red}; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(184,51,58,0.35); }
   .rs-thumb .dur { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
   .rs-thumb .cat-icon { position: absolute; top: 12px; left: 12px; background: ${C.card}; border: 1px solid ${C.border}; padding: 6px; border-radius: 8px; color: ${C.ink}; }
@@ -310,7 +312,7 @@ const ResourcesPage = () => {
   useEffect(() => {
     supabase
       .from("resource_videos")
-      .select("id, step, title, description, duration, category, video_url")
+      .select("id, step, title, description, duration, category, video_url, thumbnail_url")
       .eq("is_published", true)
       .order("sort_order")
       .then(({ data }) => {
@@ -323,6 +325,7 @@ const ResourcesPage = () => {
           category: row.category ?? "",
           icon: VIDEO_ICON_BY_CATEGORY[row.category ?? ""] ?? IconRocket,
           videoUrl: row.video_url,
+          thumbnailUrl: row.thumbnail_url,
         }));
         setDbVideos(rows);
       });
@@ -507,6 +510,9 @@ const ResourcesPage = () => {
                         {g.items.map((v) => (
                           <article key={v.id} className="rs-card" onClick={() => setVideoModal(v)} style={{ cursor: "pointer" }}>
                             <div className="rs-thumb">
+                              {v.thumbnailUrl && (
+                                <img src={v.thumbnailUrl} alt={`${v.title} thumbnail`} loading="lazy" className="thumb-img" />
+                              )}
                               <div className="cat-icon"><v.icon size={16} stroke={1.75} /></div>
                               <div className="dur">{v.duration}</div>
                               <div className="play"><IconPlayerPlayFilled size={20} /></div>
