@@ -42,6 +42,9 @@ export type ResourceRow = {
   description: string | null;
   format: string | null;
   external_url: string | null;
+  file_path: string | null;
+  file_url: string | null;
+  sort_order: number | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -50,8 +53,9 @@ export type ResourceRow = {
 export type GlossaryRow = {
   id: string;
   term: string;
-  definition: string;
-  category: string;
+  short_definition: string;
+  full_definition: string;
+  sort_order: number | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -108,7 +112,8 @@ export default function AdminContentPage() {
     setResLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
       .from("resources")
-      .select("id, title, description, format, external_url, is_published, created_at, updated_at")
+      .select("id, title, description, format, external_url, file_path, file_url, sort_order, is_published, created_at, updated_at")
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     else setLastResRefreshed(new Date());
@@ -120,9 +125,9 @@ export default function AdminContentPage() {
   const loadGlossary = async () => {
     setGlossLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
-      .from("glossary_terms")
-      .select("id, term, definition, category, is_published, created_at, updated_at")
-      .order("created_at", { ascending: false });
+      .from("resource_glossary")
+      .select("id, term, short_definition, full_definition, sort_order, is_published, created_at, updated_at")
+      .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
     else setLastGlossRefreshed(new Date());
     setGlossary(((data ?? []) as unknown) as GlossaryRow[]);
@@ -151,9 +156,9 @@ export default function AdminContentPage() {
   useEffect(() => {
     const channel = supabase
       .channel("glossary_realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -170,7 +175,10 @@ export default function AdminContentPage() {
     const q = glossSearch.trim().toLowerCase();
     if (!q) return glossary;
     return glossary.filter(
-      (g) => g.term.toLowerCase().includes(q) || g.definition.toLowerCase().includes(q),
+      (g) =>
+        g.term.toLowerCase().includes(q) ||
+        (g.short_definition ?? "").toLowerCase().includes(q) ||
+        (g.full_definition ?? "").toLowerCase().includes(q),
     );
   }, [glossary, glossSearch]);
 
@@ -194,7 +202,7 @@ export default function AdminContentPage() {
 
   const toggleGlossaryPublish = async (row: GlossaryRow) => {
     const { error } = await (supabase as never as typeof supabase)
-      .from("glossary_terms")
+      .from("resource_glossary")
       .update({ is_published: !row.is_published } as never)
       .eq("id", row.id);
     if (error) return toast.error(error.message);
@@ -203,7 +211,7 @@ export default function AdminContentPage() {
   };
 
   const deleteGlossary = async (row: GlossaryRow) => {
-    const { error } = await (supabase as never as typeof supabase).from("glossary_terms").delete().eq("id", row.id);
+    const { error } = await (supabase as never as typeof supabase).from("resource_glossary").delete().eq("id", row.id);
     setGlossDelTarget(null);
     if (error) return toast.error(error.message);
     toast.success("Term deleted");
@@ -299,17 +307,24 @@ export default function AdminContentPage() {
           </div>
 
           <Card>
-            <Table headers={["Title", "Format", "Status", "Created", "Actions"]}>
+            <Table headers={["Title", "Format", "File", "Status", "Created", "Actions"]}>
               {resLoading && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
               )}
               {!resLoading && filteredResources.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
               )}
               {!resLoading && filteredResources.map((r) => (
                 <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
                   <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.format ?? "—"}</td>
+                  <td className="py-3 px-2" style={{ fontSize: 11 }}>
+                    {r.file_path || r.file_url || r.external_url ? (
+                      <span style={{ color: "#0B7A5A", fontWeight: 700 }}>Attached</span>
+                    ) : (
+                      <span style={{ color: RED, fontWeight: 700 }}>Missing file</span>
+                    )}
+                  </td>
                   <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
                   <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)", fontFamily: "monospace", fontSize: 11 }}>
                     {new Date(r.created_at).toLocaleDateString("en-IN")}
@@ -360,7 +375,7 @@ export default function AdminContentPage() {
           </div>
 
           <Card>
-            <Table headers={["Term", "Definition", "Category", "Status", "Actions"]}>
+            <Table headers={["Term", "Short definition", "Order", "Status", "Actions"]}>
               {glossLoading && (
                 <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
               )}
@@ -371,9 +386,9 @@ export default function AdminContentPage() {
                 <tr key={g.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 700 }}>{g.term}</td>
                   <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.8)" }}>
-                    {g.definition.length > 80 ? `${g.definition.slice(0, 80)}…` : g.definition}
+                    {(g.short_definition ?? "").length > 80 ? `${g.short_definition.slice(0, 80)}…` : g.short_definition}
                   </td>
-                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{g.category}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{g.sort_order ?? 0}</td>
                   <td className="py-3 px-2"><PubBadge published={g.is_published} /></td>
                   <td className="py-3 px-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
