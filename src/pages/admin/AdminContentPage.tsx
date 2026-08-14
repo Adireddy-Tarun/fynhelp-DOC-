@@ -1413,9 +1413,29 @@ function VideoModal({
   const [category, setCategory] = useState(row?.category ?? "");
   const [videoUrl, setVideoUrl] = useState(row?.video_url ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(row?.thumbnail_url ?? "");
+  const [uploadingThumb, setUploadingThumb] = useState(false);
   const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? nextOrder);
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
   const [saving, setSaving] = useState(false);
+
+  const uploadThumbnail = async (file: File) => {
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image file");
+    if (file.size > 10 * 1024 * 1024) return toast.error("Image must be under 10MB");
+    setUploadingThumb(true);
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `video-thumbnails/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("resources").upload(path, file, {
+      cacheControl: "31536000",
+      upsert: false,
+      contentType: file.type,
+    });
+    setUploadingThumb(false);
+    if (error) return toast.error(error.message);
+    const { data } = supabase.storage.from("resources").getPublicUrl(path);
+    setThumbnailUrl(data.publicUrl);
+    toast.success("Thumbnail uploaded");
+  };
+
 
   const save = async () => {
     if (!title.trim()) return toast.error("Title is required");
