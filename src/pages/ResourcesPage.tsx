@@ -484,7 +484,7 @@ const ResourcesPage = () => {
                   >
                     <Icon size={15} stroke={2} />
                     <span>{t.label}</span>
-                    <span className="badge">{t.badge}</span>
+                    <span className="badge">{t.key === "getting-started" ? `${allVideos.length} videos` : t.badge}</span>
                   </button>
                 );
               })}
