@@ -1436,6 +1436,26 @@ function VideoModal({
     toast.success("Thumbnail uploaded");
   };
 
+  const uploadVideoFile = async (file: File) => {
+    if (!file.type.startsWith("video/")) return toast.error("Please choose a video file (MP4/WebM)");
+    if (file.size > 500 * 1024 * 1024) return toast.error("Video must be under 500MB");
+    setUploadingVideo(true);
+    const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
+    const path = `videos/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("resources").upload(path, file, {
+      cacheControl: "31536000",
+      upsert: false,
+      contentType: file.type,
+    });
+    setUploadingVideo(false);
+    if (error) return toast.error(error.message);
+    const { data } = supabase.storage.from("resources").getPublicUrl(path);
+    setVideoUrl(data.publicUrl);
+    toast.success("Video uploaded");
+  };
+
+
+
 
   const save = async () => {
     if (!title.trim()) return toast.error("Title is required");
