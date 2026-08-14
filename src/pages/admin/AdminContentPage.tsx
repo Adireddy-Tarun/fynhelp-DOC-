@@ -22,6 +22,8 @@ import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImag
 import ResourceHealthCheck from "./ResourceHealthCheck";
 import { logResourceAction } from "@/lib/resourceAudit";
 import ResourceActivityLog from "./ResourceActivityLog";
+import { isSelfHostedVideo } from "@/lib/videoSource";
+
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -1414,6 +1416,8 @@ function VideoModal({
   const [videoUrl, setVideoUrl] = useState(row?.video_url ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(row?.thumbnail_url ?? "");
   const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
   const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? nextOrder);
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
   const [saving, setSaving] = useState(false);
@@ -1435,6 +1439,26 @@ function VideoModal({
     setThumbnailUrl(data.publicUrl);
     toast.success("Thumbnail uploaded");
   };
+
+  const uploadVideoFile = async (file: File) => {
+    if (!file.type.startsWith("video/")) return toast.error("Please choose a video file (MP4/WebM)");
+    if (file.size > 500 * 1024 * 1024) return toast.error("Video must be under 500MB");
+    setUploadingVideo(true);
+    const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
+    const path = `videos/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("resources").upload(path, file, {
+      cacheControl: "31536000",
+      upsert: false,
+      contentType: file.type,
+    });
+    setUploadingVideo(false);
+    if (error) return toast.error(error.message);
+    const { data } = supabase.storage.from("resources").getPublicUrl(path);
+    setVideoUrl(data.publicUrl);
+    toast.success("Video uploaded");
+  };
+
+
 
 
   const save = async () => {
@@ -1493,9 +1517,31 @@ function VideoModal({
             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} style={inputStyle} />
           </Field>
         </div>
-        <Field label="Video embed URL (YouTube/Vimeo embed link — leave blank for 'coming soon')">
-          <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
+        <Field label="Video source (upload a file, or paste a YouTube/Vimeo embed link — leave blank for 'coming soon')">
+          <div className="flex flex-col gap-2">
+            <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
+            <div className="flex items-center gap-3 flex-wrap">
+              <input
+                type="file"
+                accept="video/*"
+                disabled={uploadingVideo}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) void uploadVideoFile(f);
+                }}
+                style={{ fontFamily: BODY, fontSize: 12, color: INK }}
+              />
+              <span style={{ fontFamily: BODY, fontSize: 11, color: "#8A7B63" }}>
+                {uploadingVideo ? "Uploading video… (large files may take a while)" : "MP4/WebM, max 500MB — stored in your Cloud bucket"}
+              </span>
+            </div>
+            {videoUrl && isSelfHostedVideo(videoUrl) && (
+              <video src={videoUrl} controls preload="metadata" style={{ width: "100%", maxHeight: 200, borderRadius: 8, background: "#000" }} />
+            )}
+          </div>
         </Field>
+
         <Field label="Thumbnail image (optional — upload JPG/PNG/WebP, max 10MB)">
           <div className="flex items-start gap-3">
             <div

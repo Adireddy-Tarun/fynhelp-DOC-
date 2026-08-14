@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { isSelfHostedVideo } from "@/lib/videoSource";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, X } from "lucide-react";
 import {
@@ -678,7 +679,19 @@ const ResourcesPage = () => {
                   <X size={18} />
                 </button>
               </div>
-              {videoModal.videoUrl ? (
+              {videoModal.videoUrl && isSelfHostedVideo(videoModal.videoUrl) ? (
+                <div style={{ background: "#000", aspectRatio: "16 / 9" }}>
+                  <video
+                    src={videoModal.videoUrl}
+                    poster={videoModal.thumbnailUrl ?? undefined}
+                    controls
+                    autoPlay
+                    playsInline
+                    preload="metadata"
+                    style={{ width: "100%", height: "100%", display: "block" }}
+                  />
+                </div>
+              ) : videoModal.videoUrl ? (
                 <div style={{ background: "#000", aspectRatio: "16 / 9" }}>
                   <iframe
                     src={videoModal.videoUrl}
