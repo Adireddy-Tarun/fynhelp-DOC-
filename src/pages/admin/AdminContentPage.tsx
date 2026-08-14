@@ -1496,9 +1496,48 @@ function VideoModal({
         <Field label="Video embed URL (YouTube/Vimeo embed link — leave blank for 'coming soon')">
           <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://www.youtube.com/embed/…" style={inputStyle} />
         </Field>
-        <Field label="Thumbnail URL (optional)">
-          <input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} style={inputStyle} />
+        <Field label="Thumbnail image (optional — upload JPG/PNG/WebP, max 10MB)">
+          <div className="flex items-start gap-3">
+            <div
+              style={{
+                width: 132, height: 74, borderRadius: 8, overflow: "hidden", flexShrink: 0,
+                border: `1px solid ${BORDER}`, background: "#F4EFE3",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: BODY, fontSize: 11, color: "#8A7B63",
+              }}
+            >
+              {thumbnailUrl ? (
+                <img src={thumbnailUrl} alt="Video thumbnail preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                "No thumbnail"
+              )}
+            </div>
+            <div className="flex flex-col gap-2" style={{ flex: 1 }}>
+              <input
+                type="file"
+                accept="image/*"
+                disabled={uploadingThumb}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) void uploadThumbnail(f);
+                }}
+                style={{ fontFamily: BODY, fontSize: 12, color: INK }}
+              />
+              {uploadingThumb && <span style={{ fontFamily: BODY, fontSize: 11, color: "#8A7B63" }}>Uploading…</span>}
+              {thumbnailUrl && !uploadingThumb && (
+                <button
+                  type="button"
+                  onClick={() => setThumbnailUrl("")}
+                  style={{ alignSelf: "flex-start", fontFamily: BODY, fontSize: 11, color: "#A93838", background: "transparent", border: "none", cursor: "pointer", padding: 0 }}
+                >
+                  Remove thumbnail
+                </button>
+              )}
+            </div>
+          </div>
         </Field>
+
         <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 12, color: INK }}>
           <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
           Published
