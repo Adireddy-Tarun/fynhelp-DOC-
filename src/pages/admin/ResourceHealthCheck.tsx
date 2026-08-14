@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, RefreshCw, Upload, Link2Off, EyeOff, Trash
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card } from "./AdminDashboardPage";
+import { logResourceAction, ResourceAuditAction } from "@/lib/resourceAudit";
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -132,7 +133,7 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
 
   /* ------------------------------ quick actions ----------------------------- */
 
-  const patch = async (row: Row, values: Record<string, unknown>, msg: string) => {
+  const patch = async (row: Row, values: Record<string, unknown>, msg: string, audit?: { action: ResourceAuditAction; details?: Record<string, unknown> }) => {
     setBusyId(row.id);
     const { error } = await (supabase as never as typeof supabase)
       .from("resources")
@@ -140,6 +141,7 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
       .eq("id", row.id);
     setBusyId(null);
     if (error) return toast.error(error.message);
+    if (audit) await logResourceAction(audit.action, row, { previous_file_path: row.file_path, ...audit.details });
     toast.success(msg);
     await scan();
     onChanged?.();
@@ -167,11 +169,17 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
       return toast.error(error.message);
     }
     setBusyId(null);
-    await patch(row, { file_path: path, file_url: null }, "File uploaded and linked");
+    await patch(row, { file_path: path, file_url: null }, "File uploaded and linked", {
+      action: row.file_path ? "resource_file_replace" : "resource_file_upload",
+      details: { file_path: path, file_name: file.name, file_size: file.size, content_type: file.type || null, via: "health_check" },
+    });
   };
 
   const attachOrphan = async (row: Row, path: string) => {
-    await patch(row, { file_path: path, file_url: null }, "Existing file linked");
+    await patch(row, { file_path: path, file_url: null }, "Existing file linked", {
+      action: "resource_file_relink",
+      details: { file_path: path, via: "health_check" },
+    });
   };
 
   const deleteOrphan = async (path: string) => {
@@ -179,6 +187,7 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
     const { error } = await supabase.storage.from(BUCKET).remove([path]);
     setBusyId(null);
     if (error) return toast.error(error.message);
+    await logResourceAction("resource_orphan_delete", { id: null, title: path }, { file_path: path });
     toast.success("Orphan file deleted");
     scan();
   };
@@ -272,17 +281,17 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
                   <Upload size={12} /> Upload file
                 </QuickBtn>
                 {issue.code === "missing_object" && (
-                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { file_path: null, file_url: null }, "Broken path cleared")}>
+                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { file_path: null, file_url: null }, "Broken path cleared", { action: "resource_file_unlink", details: { via: "health_check" } })}>
                     <Link2Off size={12} /> Clear broken path
                   </QuickBtn>
                 )}
                 {issue.code === "legacy_url" && issue.objectPath && (
-                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { file_path: issue.objectPath, file_url: null }, "Migrated to file_path")}>
+                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { file_path: issue.objectPath, file_url: null }, "Migrated to file_path", { action: "resource_file_relink", details: { file_path: issue.objectPath, via: "health_check" } })}>
                     <CheckCircle2 size={12} /> Convert to file_path
                   </QuickBtn>
                 )}
                 {issue.severity === "error" && issue.row.is_published && (
-                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { is_published: false }, "Unpublished")}>
+                  <QuickBtn disabled={busyId === issue.row.id} onClick={() => patch(issue.row, { is_published: false }, "Unpublished", { action: "resource_unpublish", details: { via: "health_check", reason: issue.code } })}>
                     <EyeOff size={12} /> Unpublish
                   </QuickBtn>
                 )}
