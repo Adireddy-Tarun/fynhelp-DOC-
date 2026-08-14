@@ -20,6 +20,8 @@ import { Card, PageHeader } from "./AdminDashboardPage";
 import { BlogPost, BLOG_CATEGORIES } from "@/types/blog";
 import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 import ResourceHealthCheck from "./ResourceHealthCheck";
+import { logResourceAction } from "@/lib/resourceAudit";
+import ResourceActivityLog from "./ResourceActivityLog";
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -204,6 +206,11 @@ export default function AdminContentPage() {
       .update({ is_published: !row.is_published } as never)
       .eq("id", row.id);
     if (error) return toast.error(error.message);
+    await logResourceAction(row.is_published ? "resource_unpublish" : "resource_publish", row, {
+      from: row.is_published,
+      to: !row.is_published,
+      file_path: row.file_path,
+    });
     toast.success(row.is_published ? "Unpublished" : "Published");
     loadResources();
   };
@@ -212,6 +219,7 @@ export default function AdminContentPage() {
     const { error } = await (supabase as never as typeof supabase).from("resources").delete().eq("id", row.id);
     setResDelTarget(null);
     if (error) return toast.error(error.message);
+    await logResourceAction("resource_delete", row, { file_path: row.file_path });
     toast.success("Resource deleted");
     loadResources();
   };
@@ -304,6 +312,8 @@ export default function AdminContentPage() {
           </div>
 
           <ResourceHealthCheck onChanged={() => loadResources()} />
+
+          <ResourceActivityLog resources={resources.map((r) => ({ id: r.id, title: r.title }))} />
           {lastResRefreshed && (
             <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
               Last updated: {lastResRefreshed.toLocaleTimeString()}
@@ -844,6 +854,13 @@ function ResourceModal({
       .upload(path, file, { upsert: false, contentType: file.type || "application/octet-stream" });
     setUploading(false);
     if (error) return toast.error(error.message);
+    await logResourceAction(filePath ? "resource_file_replace" : "resource_file_upload", { id: row?.id, title: title || row?.title }, {
+      file_path: path,
+      previous_file_path: filePath,
+      file_name: file.name,
+      file_size: file.size,
+      content_type: file.type || null,
+    });
     setFilePath(path);
     toast.success("File uploaded — save to publish it");
   };
@@ -880,6 +897,13 @@ function ResourceModal({
     }
     setSaving(false);
     if (error) return toast.error(error.message);
+    await logResourceAction(row ? "resource_update" : "resource_create", { id: row?.id, title: payload.title }, {
+      file_path: filePath,
+      previous_file_path: row?.file_path ?? null,
+      is_published: isPublished,
+      format,
+      external_url: payload.external_url,
+    });
     toast.success(row ? "Resource updated" : "Resource created");
     onSaved();
   };
