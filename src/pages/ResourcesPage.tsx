@@ -107,6 +107,17 @@ const VIDEOS: VideoItem[] = [
   { id: "v8", step: "MONTH 1", title: "WhatsApp alerts setup", description: "Get daily cash, GST and overdue invoice nudges on WhatsApp.", duration: "3 min", icon: IconBellRinging, category: "Alerts" },
 ];
 
+const VIDEO_ICON_BY_CATEGORY: Record<string, IconCmp> = {
+  "Bank connection": IconBuildingBank,
+  Sync: IconRefresh,
+  Compliance: IconCalendarEvent,
+  Dashboard: IconGauge,
+  "AI CFO": IconMessageChatbot,
+  Simulation: IconChartArrowsVertical,
+  GST: IconFileSpreadsheet,
+  Alerts: IconBellRinging,
+};
+
 const ARTICLES: ArticleItem[] = [
   { id: "a1", title: "5 signs you need an AI CFO before your next funding round", excerpt: "Financial intelligence is no longer a luxury. Here's how to know it's time to upgrade from spreadsheets.", views: "1.2K", date: "May 1, 2026" },
   { id: "a2", title: "Section 43B(h): The MSME payment law every founder must know", excerpt: "How a small change in the Income Tax Act gives MSMEs unprecedented leverage over delayed payments.", views: "2.4K", date: "Apr 28, 2026" },
