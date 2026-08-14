@@ -380,9 +380,10 @@ const ResourcesPage = () => {
 
   const matchesSearch = (haystack: string) => !debounced || haystack.toLowerCase().includes(debounced);
 
+  const allVideos = dbVideos.length > 0 ? dbVideos : VIDEOS;
   const filteredVideos = useMemo(
-    () => VIDEOS.filter((v) => matchesSearch(`${v.title} ${v.description} ${v.step}`)),
-    [debounced],
+    () => allVideos.filter((v) => matchesSearch(`${v.title} ${v.description} ${v.step}`)),
+    [debounced, allVideos],
   );
   const groupedVideos = useMemo(() => {
     return STEP_ORDER.map((step) => ({
