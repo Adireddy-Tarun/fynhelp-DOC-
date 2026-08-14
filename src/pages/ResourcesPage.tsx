@@ -287,6 +287,7 @@ const ResourcesPage = () => {
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [dbGlossary, setDbGlossary] = useState<any[]>([]);
+  const [dbVideos, setDbVideos] = useState<VideoItem[]>([]);
 
   useEffect(() => {
     supabase
