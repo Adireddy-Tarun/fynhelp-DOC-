@@ -4188,6 +4188,45 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_access_logs: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          id: string
+          ip_address: string | null
+          outcome: string
+          referer: string | null
+          resource_id: string
+          resource_title: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          ip_address?: string | null
+          outcome?: string
+          referer?: string | null
+          resource_id: string
+          resource_title?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          ip_address?: string | null
+          outcome?: string
+          referer?: string | null
+          resource_id?: string
+          resource_title?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       resource_glossary: {
         Row: {
           created_at: string
