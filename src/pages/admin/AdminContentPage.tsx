@@ -34,7 +34,6 @@ type Tab = "blog" | "resources" | "glossary";
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
 
 const RESOURCE_FORMATS = ["Template", "Guide", "Checklist", "Video", "Article", "Tool"];
-const GLOSSARY_CATEGORIES = ["General", "Tax", "Compliance", "Finance", "Banking", "GST"];
 
 export type ResourceRow = {
   id: string;
@@ -42,6 +41,9 @@ export type ResourceRow = {
   description: string | null;
   format: string | null;
   external_url: string | null;
+  file_path: string | null;
+  file_url: string | null;
+  sort_order: number | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -50,8 +52,9 @@ export type ResourceRow = {
 export type GlossaryRow = {
   id: string;
   term: string;
-  definition: string;
-  category: string;
+  short_definition: string;
+  full_definition: string;
+  sort_order: number | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -108,7 +111,8 @@ export default function AdminContentPage() {
     setResLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
       .from("resources")
-      .select("id, title, description, format, external_url, is_published, created_at, updated_at")
+      .select("id, title, description, format, external_url, file_path, file_url, sort_order, is_published, created_at, updated_at")
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     else setLastResRefreshed(new Date());
@@ -120,9 +124,9 @@ export default function AdminContentPage() {
   const loadGlossary = async () => {
     setGlossLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
-      .from("glossary_terms")
-      .select("id, term, definition, category, is_published, created_at, updated_at")
-      .order("created_at", { ascending: false });
+      .from("resource_glossary")
+      .select("id, term, short_definition, full_definition, sort_order, is_published, created_at, updated_at")
+      .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
     else setLastGlossRefreshed(new Date());
     setGlossary(((data ?? []) as unknown) as GlossaryRow[]);
@@ -151,9 +155,9 @@ export default function AdminContentPage() {
   useEffect(() => {
     const channel = supabase
       .channel("glossary_realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "glossary_terms" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "resource_glossary" }, () => loadGlossaryRef.current())
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -170,7 +174,10 @@ export default function AdminContentPage() {
     const q = glossSearch.trim().toLowerCase();
     if (!q) return glossary;
     return glossary.filter(
-      (g) => g.term.toLowerCase().includes(q) || g.definition.toLowerCase().includes(q),
+      (g) =>
+        g.term.toLowerCase().includes(q) ||
+        (g.short_definition ?? "").toLowerCase().includes(q) ||
+        (g.full_definition ?? "").toLowerCase().includes(q),
     );
   }, [glossary, glossSearch]);
 
@@ -194,7 +201,7 @@ export default function AdminContentPage() {
 
   const toggleGlossaryPublish = async (row: GlossaryRow) => {
     const { error } = await (supabase as never as typeof supabase)
-      .from("glossary_terms")
+      .from("resource_glossary")
       .update({ is_published: !row.is_published } as never)
       .eq("id", row.id);
     if (error) return toast.error(error.message);
@@ -203,7 +210,7 @@ export default function AdminContentPage() {
   };
 
   const deleteGlossary = async (row: GlossaryRow) => {
-    const { error } = await (supabase as never as typeof supabase).from("glossary_terms").delete().eq("id", row.id);
+    const { error } = await (supabase as never as typeof supabase).from("resource_glossary").delete().eq("id", row.id);
     setGlossDelTarget(null);
     if (error) return toast.error(error.message);
     toast.success("Term deleted");
@@ -299,17 +306,24 @@ export default function AdminContentPage() {
           </div>
 
           <Card>
-            <Table headers={["Title", "Format", "Status", "Created", "Actions"]}>
+            <Table headers={["Title", "Format", "File", "Status", "Created", "Actions"]}>
               {resLoading && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
               )}
               {!resLoading && filteredResources.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
               )}
               {!resLoading && filteredResources.map((r) => (
                 <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
                   <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.format ?? "—"}</td>
+                  <td className="py-3 px-2" style={{ fontSize: 11 }}>
+                    {r.file_path || r.file_url || r.external_url ? (
+                      <span style={{ color: "#0B7A5A", fontWeight: 700 }}>Attached</span>
+                    ) : (
+                      <span style={{ color: RED, fontWeight: 700 }}>Missing file</span>
+                    )}
+                  </td>
                   <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
                   <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)", fontFamily: "monospace", fontSize: 11 }}>
                     {new Date(r.created_at).toLocaleDateString("en-IN")}
@@ -360,7 +374,7 @@ export default function AdminContentPage() {
           </div>
 
           <Card>
-            <Table headers={["Term", "Definition", "Category", "Status", "Actions"]}>
+            <Table headers={["Term", "Short definition", "Order", "Status", "Actions"]}>
               {glossLoading && (
                 <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
               )}
@@ -371,9 +385,9 @@ export default function AdminContentPage() {
                 <tr key={g.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 700 }}>{g.term}</td>
                   <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.8)" }}>
-                    {g.definition.length > 80 ? `${g.definition.slice(0, 80)}…` : g.definition}
+                    {(g.short_definition ?? "").length > 80 ? `${g.short_definition.slice(0, 80)}…` : g.short_definition}
                   </td>
-                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{g.category}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{g.sort_order ?? 0}</td>
                   <td className="py-3 px-2"><PubBadge published={g.is_published} /></td>
                   <td className="py-3 px-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -793,7 +807,25 @@ function ResourceModal({
   const [format, setFormat] = useState(row?.format ?? "Template");
   const [externalUrl, setExternalUrl] = useState(row?.external_url ?? "");
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
+  const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? 0);
+  const [filePath, setFilePath] = useState<string | null>(row?.file_path ?? null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (file: File) => {
+    if (file.size > 50 * 1024 * 1024) return toast.error("File is larger than 50 MB");
+    setUploading(true);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${Date.now()}-${safeName}`;
+    const { error } = await supabase.storage
+      .from("resources")
+      .upload(path, file, { upsert: false, contentType: file.type || "application/octet-stream" });
+    setUploading(false);
+    if (error) return toast.error(error.message);
+    setFilePath(path);
+    toast.success("File uploaded — save to publish it");
+  };
 
   const save = async () => {
     if (!title.trim()) return toast.error("Title is required");
@@ -803,6 +835,8 @@ function ResourceModal({
       description: description.trim(),
       format,
       external_url: externalUrl.trim() || null,
+      file_path: filePath,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_published: isPublished,
       updated_at: new Date().toISOString(),
     };
@@ -842,8 +876,48 @@ function ResourceModal({
           {RESOURCE_FORMATS.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
       </Field>
-      <Field label="External URL">
+      <Field label="Downloadable file">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-2 px-3"
+            style={{ height: 32, borderRadius: 8, border: `0.5px solid ${BORDER}`, background: "#FFFFFF", fontFamily: BODY, fontSize: 12, fontWeight: 600, color: INK }}
+          >
+            <Upload size={13} /> {uploading ? "Uploading…" : filePath ? "Replace file" : "Upload file"}
+          </button>
+          <span style={{ fontFamily: BODY, fontSize: 11, color: filePath ? "#0B7A5A" : "rgba(26,16,8,0.5)" }}>
+            {filePath ?? "No file attached — download will fail"}
+          </span>
+          {filePath && (
+            <button type="button" onClick={() => setFilePath(null)} style={{ fontFamily: BODY, fontSize: 11, color: RED }}>
+              Remove
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.ppt,.pptx,.zip,.png,.jpg,.jpeg,.webp"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+              e.target.value = "";
+            }}
+          />
+        </div>
+      </Field>
+      <Field label="External URL (used when no file is attached)">
         <input value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} style={inputStyle} placeholder="https://…" />
+      </Field>
+      <Field label="Sort order">
+        <input
+          type="number"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(Number(e.target.value))}
+          style={inputStyle}
+        />
       </Field>
       <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
         <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
@@ -864,30 +938,33 @@ function GlossaryModal({
   onSaved: () => void;
 }) {
   const [term, setTerm] = useState(row?.term ?? "");
-  const [definition, setDefinition] = useState(row?.definition ?? "");
-  const [category, setCategory] = useState(row?.category ?? "General");
+  const [shortDefinition, setShortDefinition] = useState(row?.short_definition ?? "");
+  const [fullDefinition, setFullDefinition] = useState(row?.full_definition ?? "");
+  const [sortOrder, setSortOrder] = useState<number>(row?.sort_order ?? 0);
   const [isPublished, setIsPublished] = useState(row?.is_published ?? true);
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
     if (!term.trim()) return toast.error("Term is required");
-    if (!definition.trim()) return toast.error("Definition is required");
+    if (!shortDefinition.trim()) return toast.error("Short definition is required");
     setSaving(true);
     const payload = {
       term: term.trim(),
-      definition: definition.trim(),
-      category,
+      short_definition: shortDefinition.trim(),
+      full_definition: (fullDefinition.trim() || shortDefinition.trim()),
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
       is_published: isPublished,
+      updated_at: new Date().toISOString(),
     };
     let error;
     if (row) {
       ({ error } = await (supabase as never as typeof supabase)
-        .from("glossary_terms")
+        .from("resource_glossary")
         .update(payload as never)
         .eq("id", row.id));
     } else {
       ({ error } = await (supabase as never as typeof supabase)
-        .from("glossary_terms")
+        .from("resource_glossary")
         .insert(payload as never));
     }
     setSaving(false);
@@ -901,13 +978,14 @@ function GlossaryModal({
       <Field label="Term *">
         <input value={term} onChange={(e) => setTerm(e.target.value)} style={inputStyle} placeholder="e.g. Input Tax Credit" />
       </Field>
-      <Field label="Definition *">
-        <textarea value={definition} onChange={(e) => setDefinition(e.target.value)} rows={4} style={{ ...inputStyle, resize: "vertical" }} />
+      <Field label="Short definition *">
+        <textarea value={shortDefinition} onChange={(e) => setShortDefinition(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" }} placeholder="One-line summary shown on the card" />
       </Field>
-      <Field label="Category">
-        <select value={category} onChange={(e) => setCategory(e.target.value)} style={inputStyle}>
-          {GLOSSARY_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
+      <Field label="Full definition">
+        <textarea value={fullDefinition} onChange={(e) => setFullDefinition(e.target.value)} rows={5} style={{ ...inputStyle, resize: "vertical" }} placeholder="Detailed explanation shown when the term is opened" />
+      </Field>
+      <Field label="Sort order">
+        <input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} style={inputStyle} />
       </Field>
       <label className="flex items-center gap-2" style={{ fontFamily: BODY, fontSize: 13, color: INK }}>
         <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} />
