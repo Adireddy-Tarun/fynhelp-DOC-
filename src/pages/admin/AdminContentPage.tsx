@@ -274,7 +274,7 @@ export default function AdminContentPage() {
           >
             <Plus size={14} /> New post
           </Link>
-        ) : (
+        ) : tab === "videos" ? null : (
           <button
             onClick={() => (tab === "resources" ? setResModal("add") : setGlossModal("add"))}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-white"
@@ -291,6 +291,8 @@ export default function AdminContentPage() {
       </div>
 
       {tab === "blog" && <BlogSection />}
+
+      {tab === "videos" && <VideosSection />}
 
       {tab === "resources" && (
         <div className="flex flex-col gap-4">
