@@ -672,15 +672,27 @@ const ResourcesPage = () => {
                   <X size={18} />
                 </button>
               </div>
-              <div style={{ padding: 40, textAlign: "center", background: C.panel }}>
-                <div style={{ display: "inline-flex", padding: 14, borderRadius: 12, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
-                  <IconMessage size={22} stroke={1.75} />
+              {videoModal.videoUrl ? (
+                <div style={{ background: "#000", aspectRatio: "16 / 9" }}>
+                  <iframe
+                    src={videoModal.videoUrl}
+                    title={videoModal.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                  />
                 </div>
-                <p style={{ fontSize: 14, color: C.body, lineHeight: 1.6, margin: 0, maxWidth: 460, marginInline: "auto" }}>
-                  Our tutorial library is being recorded and will be published here. In the meantime, explore our written
-                  guides and templates in the tabs above.
-                </p>
-              </div>
+              ) : (
+                <div style={{ padding: 40, textAlign: "center", background: C.panel }}>
+                  <div style={{ display: "inline-flex", padding: 14, borderRadius: 12, background: C.card, border: `1px solid ${C.border}`, marginBottom: 14, color: C.red }}>
+                    <IconMessage size={22} stroke={1.75} />
+                  </div>
+                  <p style={{ fontSize: 14, color: C.body, lineHeight: 1.6, margin: 0, maxWidth: 460, marginInline: "auto" }}>
+                    Our tutorial library is being recorded and will be published here. In the meantime, explore our written
+                    guides and templates in the tabs above.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
