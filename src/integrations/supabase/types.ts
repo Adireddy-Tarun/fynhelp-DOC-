@@ -4229,6 +4229,7 @@ export type Database = {
       }
       resource_glossary: {
         Row: {
+          archived_at: string | null
           created_at: string
           created_by: string | null
           full_definition: string
@@ -4241,6 +4242,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           created_by?: string | null
           full_definition: string
@@ -4253,6 +4255,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           created_by?: string | null
           full_definition?: string
@@ -4268,6 +4271,7 @@ export type Database = {
       }
       resource_videos: {
         Row: {
+          archived_at: string | null
           category: string
           created_at: string
           created_by: string | null
@@ -4283,6 +4287,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          archived_at?: string | null
           category: string
           created_at?: string
           created_by?: string | null
@@ -4298,6 +4303,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          archived_at?: string | null
           category?: string
           created_at?: string
           created_by?: string | null
@@ -4316,6 +4322,7 @@ export type Database = {
       }
       resources: {
         Row: {
+          archived_at: string | null
           created_at: string
           description: string
           external_url: string | null
@@ -4331,6 +4338,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           description?: string
           external_url?: string | null
@@ -4346,6 +4354,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           description?: string
           external_url?: string | null
