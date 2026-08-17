@@ -69,21 +69,27 @@ const MOBILE_W = 280;
 const TOP_H = 70;
 
 export default function AdminLayout() {
-  const { user, signOut, primaryRole, hasRole } = useAdminAuth();
+  const { user, signOut, primaryRole, hasRole, loading, roles } = useAdminAuth();
   const isSuperAdmin = hasRole("super_admin");
   const isSupport = user?.email === SUPPORT_EMAIL;
   const location = useLocation();
   const nav = useNavigate();
 
+  // Roles arrive asynchronously after sign-in; running the guards before they
+  // land caused a redirect/toast loop on every admin page load.
+  const rolesReady = !loading && roles.length > 0;
+
   useEffect(() => {
+    if (!rolesReady) return;
     if (isSupport && !SUPPORT_ALLOWED_PATHS.some((p) => location.pathname.startsWith(p))) {
       nav("/admin/content", { replace: true });
     }
-  }, [isSupport, location.pathname, nav]);
+  }, [rolesReady, isSupport, location.pathname, nav]);
 
   // Route-level least privilege: block direct URL access to sections the
   // signed-in admin's roles do not cover.
   useEffect(() => {
+    if (!rolesReady) return;
     const match = NAV_ITEMS.filter((i): i is Extract<NavItem, { to: string }> => !("divider" in i && i.divider))
       .filter((i) => location.pathname === i.to || location.pathname.startsWith(i.to + "/"))
       .sort((a, b) => b.to.length - a.to.length)[0];
@@ -91,7 +97,7 @@ export default function AdminLayout() {
       toast.error("You do not have access to that section.");
       nav("/admin/dashboard", { replace: true });
     }
-  }, [location.pathname, hasRole, nav]);
+  }, [rolesReady, location.pathname, hasRole, nav]);
 
 
   const [windowWidth, setWindowWidth] = useState<number>(
