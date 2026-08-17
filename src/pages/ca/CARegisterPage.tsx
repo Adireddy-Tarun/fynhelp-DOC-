@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
@@ -115,8 +117,30 @@ export default function CARegisterPage() {
               <input style={caInputStyle} type="email" value={form.email} onChange={set("email")} placeholder="you@cafirm.com" />
             </CAField>
             <CAField label="Password" error={errors.password}>
-              <input style={caInputStyle} type="password" value={form.password} onChange={set("password")} placeholder="Minimum 8 characters" />
+              <div style={{ position: "relative" }}>
+                <input
+                  style={{ ...caInputStyle, paddingRight: 42 }}
+                  type={showPw ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={set("password")}
+                  placeholder="Minimum 8 characters"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw((v) => !v)}
+                  aria-label={showPw ? "Hide password" : "Show password"}
+                  style={{
+                    position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    background: "transparent", border: "none", cursor: "pointer", color: CA.muted,
+                    display: "flex", alignItems: "center",
+                  }}
+                >
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </CAField>
+
             <CAField label="ICAI membership number" error={errors.icai}>
               <input style={caInputStyle} value={form.icai} onChange={set("icai")} placeholder="123456" />
             </CAField>
