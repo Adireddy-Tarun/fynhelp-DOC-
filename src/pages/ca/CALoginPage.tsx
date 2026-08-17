@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { authErrorMessage } from "@/lib/authErrors";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 
 export default function CALoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,12 +23,13 @@ export default function CALoginPage() {
     const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInErr) {
-      setError(signInErr.message);
+      setError(authErrorMessage(signInErr.message, "signin"));
       return;
     }
     toast.success("Signed in");
     navigate("/ca/dashboard", { replace: true });
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: CA.bg }}>
