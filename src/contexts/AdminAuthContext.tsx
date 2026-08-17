@@ -83,8 +83,11 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAdmin = roles.some((r) => ADMIN_ROLES.includes(r));
 
-  const hasRole = (...needed: AdminRole[]) =>
-    needed.some((n) => roles.includes(n)) || roles.includes("super_admin");
+  const hasRole = useCallback(
+    (...needed: AdminRole[]) =>
+      needed.some((n) => roles.includes(n)) || roles.includes("super_admin"),
+    [roles]
+  );
 
   const signOut = async () => {
     await supabase.auth.signOut();
