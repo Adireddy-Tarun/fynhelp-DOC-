@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -51,6 +52,10 @@ function rateLimited(key: string): boolean {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  const originBlock = rejectDisallowedOrigin(req);
+  if (originBlock) return originBlock;
+  const sizeBlock = rejectOversizedBody(req, 2_000_000);
+  if (sizeBlock) return sizeBlock;
 
   const authHeader = req.headers.get("Authorization") ?? "";
   if (!authHeader) return json({ success: false, error: "Unauthorized" }, 401);

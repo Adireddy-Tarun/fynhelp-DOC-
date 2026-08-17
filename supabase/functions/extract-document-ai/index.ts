@@ -2,6 +2,7 @@
 // Lovable AI Gateway. Returns strict JSON matching the shape the existing
 // CSV importer already consumes, so the frontend can reuse its insertion path.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,6 +57,10 @@ function tryParseJson(raw: string): any | null {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const originBlock = rejectDisallowedOrigin(req);
+  if (originBlock) return originBlock;
+  const sizeBlock = rejectOversizedBody(req, 2_000_000);
+  if (sizeBlock) return sizeBlock;
 
   try {
     const auth = req.headers.get("Authorization") || "";

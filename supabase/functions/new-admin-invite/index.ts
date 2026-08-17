@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +14,10 @@ const VALID_ROLES = ["super_admin", "admin", "ops_admin", "support_agent", "anal
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const originBlock = rejectDisallowedOrigin(req);
+  if (originBlock) return originBlock;
+  const sizeBlock = rejectOversizedBody(req, 2_000_000);
+  if (sizeBlock) return sizeBlock;
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) return json({ error: "Unauthorized" }, 401);
