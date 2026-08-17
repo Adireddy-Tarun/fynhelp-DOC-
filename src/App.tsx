@@ -3,6 +3,11 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import SkipToContent from "@/components/system/SkipToContent";
+import ScrollManager from "@/components/system/ScrollManager";
+import SearchPalette from "@/components/system/SearchPalette";
+import FloatingContact from "@/components/system/FloatingContact";
+
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import AdminLayout, { AdminProtected } from "@/components/admin/AdminLayout";
@@ -420,7 +425,9 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        </div>
       </BrowserRouter>
+
     </TooltipProvider>
   </QueryClientProvider>
   </Sentry.ErrorBoundary>
