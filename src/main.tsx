@@ -4,6 +4,8 @@ import App from "./App.tsx";
 import { initMobileApp } from "@/lib/capacitor";
 import { initAnalytics } from "@/lib/analytics";
 import { initMonitoring } from "@/lib/monitoring";
+import { captureUtm } from "@/lib/utm";
+
 import "./index.css";
 import "./styles/typography.css";
 import "@fontsource/inter/400.css";
@@ -26,8 +28,10 @@ if ("serviceWorker" in navigator) {
 }
 
 initMobileApp();
+captureUtm();
 initAnalytics();
 initMonitoring();
+
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
