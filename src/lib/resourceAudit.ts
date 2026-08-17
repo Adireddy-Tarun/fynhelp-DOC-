@@ -21,7 +21,9 @@ export type ResourceAuditAction =
   | "resource_file_replace"
   | "resource_file_unlink"
   | "resource_file_relink"
-  | "resource_orphan_delete";
+  | "resource_orphan_delete"
+  | "resource_archive"
+  | "resource_unarchive";
 
 export async function logResourceAction(
   action: ResourceAuditAction,

@@ -52,6 +52,7 @@ interface VideoRow {
   thumbnail_url: string | null;
   sort_order: number;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
 }
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
@@ -68,6 +69,7 @@ export type ResourceRow = {
   file_url: string | null;
   sort_order: number | null;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -79,6 +81,7 @@ export type GlossaryRow = {
   full_definition: string;
   sort_order: number | null;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -118,6 +121,7 @@ export default function AdminContentPage() {
   const [resModal, setResModal] = useState<null | "add" | ResourceRow>(null);
   const [resDelTarget, setResDelTarget] = useState<null | ResourceRow>(null);
   const [lastResRefreshed, setLastResRefreshed] = useState<Date | null>(null);
+  const [resView, setResView] = useState<"active" | "archived">("active");
 
   /* ------------------------------ glossary ------------------------------- */
   const [glossary, setGlossary] = useState<GlossaryRow[]>([]);
@@ -126,6 +130,7 @@ export default function AdminContentPage() {
   const [glossModal, setGlossModal] = useState<null | "add" | GlossaryRow>(null);
   const [glossDelTarget, setGlossDelTarget] = useState<null | GlossaryRow>(null);
   const [lastGlossRefreshed, setLastGlossRefreshed] = useState<Date | null>(null);
+  const [glossView, setGlossView] = useState<"active" | "archived">("active");
 
   const loadResourcesRef = useRef<() => void>(() => {});
   const loadGlossaryRef = useRef<() => void>(() => {});
@@ -134,7 +139,7 @@ export default function AdminContentPage() {
     setResLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
       .from("resources")
-      .select("id, title, description, format, external_url, file_path, file_url, sort_order, is_published, created_at, updated_at")
+      .select("id, title, description, format, external_url, file_path, file_url, sort_order, is_published, archived_at, created_at, updated_at")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
@@ -148,7 +153,7 @@ export default function AdminContentPage() {
     setGlossLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
       .from("resource_glossary")
-      .select("id, term, short_definition, full_definition, sort_order, is_published, created_at, updated_at")
+      .select("id, term, short_definition, full_definition, sort_order, is_published, archived_at, created_at, updated_at")
       .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
     else setLastGlossRefreshed(new Date());
@@ -189,20 +194,22 @@ export default function AdminContentPage() {
 
   const filteredResources = useMemo(() => {
     const q = resSearch.trim().toLowerCase();
-    if (!q) return resources;
-    return resources.filter((r) => r.title.toLowerCase().includes(q));
-  }, [resources, resSearch]);
+    const scoped = resources.filter((r) => (resView === "archived" ? !!r.archived_at : !r.archived_at));
+    if (!q) return scoped;
+    return scoped.filter((r) => r.title.toLowerCase().includes(q));
+  }, [resources, resSearch, resView]);
 
   const filteredGlossary = useMemo(() => {
     const q = glossSearch.trim().toLowerCase();
-    if (!q) return glossary;
-    return glossary.filter(
+    const scoped = glossary.filter((g) => (glossView === "archived" ? !!g.archived_at : !g.archived_at));
+    if (!q) return scoped;
+    return scoped.filter(
       (g) =>
         g.term.toLowerCase().includes(q) ||
         (g.short_definition ?? "").toLowerCase().includes(q) ||
         (g.full_definition ?? "").toLowerCase().includes(q),
     );
-  }, [glossary, glossSearch]);
+  }, [glossary, glossSearch, glossView]);
 
   const toggleResourcePublish = async (row: ResourceRow) => {
     const { error } = await (supabase as never as typeof supabase)
@@ -216,6 +223,18 @@ export default function AdminContentPage() {
       file_path: row.file_path,
     });
     toast.success(row.is_published ? "Unpublished" : "Published");
+    loadResources();
+  };
+
+  const toggleResourceArchive = async (row: ResourceRow) => {
+    const next = row.archived_at ? null : new Date().toISOString();
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resources")
+      .update({ archived_at: next, ...(next ? { is_published: false } : {}) } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    await logResourceAction(next ? "resource_archive" : "resource_unarchive", row, { file_path: row.file_path });
+    toast.success(next ? "Resource archived" : "Resource restored");
     loadResources();
   };
 
@@ -235,6 +254,17 @@ export default function AdminContentPage() {
       .eq("id", row.id);
     if (error) return toast.error(error.message);
     toast.success(row.is_published ? "Unpublished" : "Published");
+    loadGlossary();
+  };
+
+  const toggleGlossaryArchive = async (row: GlossaryRow) => {
+    const next = row.archived_at ? null : new Date().toISOString();
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resource_glossary")
+      .update({ archived_at: next, ...(next ? { is_published: false } : {}) } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(next ? "Term archived" : "Term restored");
     loadGlossary();
   };
 
@@ -312,8 +342,14 @@ export default function AdminContentPage() {
           <LiveDot />
           <div className="grid grid-cols-2 gap-3">
             <Stat label="Total resources" value={String(resources.length)} />
-            <Stat label="Published" value={String(resources.filter((r) => r.is_published).length)} />
+            <Stat label="Published" value={String(resources.filter((r) => r.is_published && !r.archived_at).length)} />
           </div>
+          <ViewToggle
+            value={resView}
+            onChange={setResView}
+            activeCount={resources.filter((r) => !r.archived_at).length}
+            archivedCount={resources.filter((r) => !!r.archived_at).length}
+          />
 
           <ResourceHealthCheck onChanged={() => loadResources()} />
 
@@ -369,6 +405,9 @@ export default function AdminContentPage() {
                       <RowBtn onClick={() => toggleResourcePublish(r)}>
                         {r.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
                       </RowBtn>
+                      <RowBtn onClick={() => toggleResourceArchive(r)}>
+                        {r.archived_at ? <><RotateCcw size={12} /> Unarchive</> : <><Archive size={12} /> Archive</>}
+                      </RowBtn>
                       <RowBtn onClick={() => setResDelTarget(r)}><Trash2 size={12} /> Delete</RowBtn>
                     </div>
                   </td>
@@ -384,8 +423,14 @@ export default function AdminContentPage() {
           <LiveDot />
           <div className="grid grid-cols-2 gap-3">
             <Stat label="Total terms" value={String(glossary.length)} />
-            <Stat label="Published" value={String(glossary.filter((g) => g.is_published).length)} />
+            <Stat label="Published" value={String(glossary.filter((g) => g.is_published && !g.archived_at).length)} />
           </div>
+          <ViewToggle
+            value={glossView}
+            onChange={setGlossView}
+            activeCount={glossary.filter((g) => !g.archived_at).length}
+            archivedCount={glossary.filter((g) => !!g.archived_at).length}
+          />
           {lastGlossRefreshed && (
             <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
               Last updated: {lastGlossRefreshed.toLocaleTimeString()}
@@ -429,6 +474,9 @@ export default function AdminContentPage() {
                       <RowBtn onClick={() => setGlossModal(g)}><Edit2 size={12} /> Edit</RowBtn>
                       <RowBtn onClick={() => toggleGlossaryPublish(g)}>
                         {g.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                      </RowBtn>
+                      <RowBtn onClick={() => toggleGlossaryArchive(g)}>
+                        {g.archived_at ? <><RotateCcw size={12} /> Unarchive</> : <><Archive size={12} /> Archive</>}
                       </RowBtn>
                       <RowBtn onClick={() => setGlossDelTarget(g)}><Trash2 size={12} /> Delete</RowBtn>
                     </div>
@@ -1217,6 +1265,48 @@ function AdminModal({ title, onClose, children }: { title: string; onClose: () =
   );
 }
 
+function ViewToggle({
+  value,
+  onChange,
+  activeCount,
+  archivedCount,
+}: {
+  value: "active" | "archived";
+  onChange: (v: "active" | "archived") => void;
+  activeCount: number;
+  archivedCount: number;
+}) {
+  const opts: { key: "active" | "archived"; label: string; count: number }[] = [
+    { key: "active", label: "Active", count: activeCount },
+    { key: "archived", label: "Archived", count: archivedCount },
+  ];
+  return (
+    <div className="inline-flex items-center gap-1 p-1" style={{ border: `0.5px solid ${BORDER}`, borderRadius: 10, background: "#FFFFFF", width: "fit-content" }}>
+      {opts.map((o) => {
+        const on = value === o.key;
+        return (
+          <button
+            key={o.key}
+            onClick={() => onChange(o.key)}
+            className="px-3 py-1.5 inline-flex items-center gap-1.5"
+            style={{
+              borderRadius: 8,
+              fontFamily: BODY,
+              fontSize: 12,
+              fontWeight: 700,
+              background: on ? RED : "transparent",
+              color: on ? "#FFFFFF" : "rgba(26,16,8,0.65)",
+            }}
+          >
+            {o.key === "archived" ? <Archive size={12} /> : null}
+            {o.label} ({o.count})
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div
@@ -1255,6 +1345,7 @@ function VideosSection() {
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<null | "add" | VideoRow>(null);
   const [delTarget, setDelTarget] = useState<null | VideoRow>(null);
+  const [view, setView] = useState<"active" | "archived">("active");
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const loadRef = useRef<() => void>(() => {});
 
@@ -1262,7 +1353,7 @@ function VideosSection() {
     setLoading(true);
     const { data, error } = await (supabase as never as typeof supabase)
       .from("resource_videos")
-      .select("id, step, title, description, duration, category, video_url, thumbnail_url, sort_order, is_published, created_at")
+      .select("id, step, title, description, duration, category, video_url, thumbnail_url, sort_order, is_published, archived_at, created_at")
       .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
     else setLastRefreshed(new Date());
@@ -1288,14 +1379,15 @@ function VideosSection() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
+    const scoped = rows.filter((r) => (view === "archived" ? !!r.archived_at : !r.archived_at));
+    if (!q) return scoped;
+    return scoped.filter(
       (r) =>
         r.title.toLowerCase().includes(q) ||
         (r.category ?? "").toLowerCase().includes(q) ||
         (r.step ?? "").toLowerCase().includes(q),
     );
-  }, [rows, search]);
+  }, [rows, search, view]);
 
   const togglePublish = async (row: VideoRow) => {
     const { error } = await (supabase as never as typeof supabase)
@@ -1304,6 +1396,17 @@ function VideosSection() {
       .eq("id", row.id);
     if (error) return toast.error(error.message);
     toast.success(row.is_published ? "Unpublished" : "Published");
+    load();
+  };
+
+  const toggleArchive = async (row: VideoRow) => {
+    const next = row.archived_at ? null : new Date().toISOString();
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resource_videos")
+      .update({ archived_at: next, ...(next ? { is_published: false } : {}) } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(next ? "Video archived" : "Video restored");
     load();
   };
 
@@ -1320,8 +1423,14 @@ function VideosSection() {
       <LiveDot />
       <div className="grid grid-cols-2 gap-3">
         <Stat label="Total videos" value={String(rows.length)} />
-        <Stat label="Published" value={String(rows.filter((r) => r.is_published).length)} />
+        <Stat label="Published" value={String(rows.filter((r) => r.is_published && !r.archived_at).length)} />
       </div>
+      <ViewToggle
+        value={view}
+        onChange={setView}
+        activeCount={rows.filter((r) => !r.archived_at).length}
+        archivedCount={rows.filter((r) => !!r.archived_at).length}
+      />
       {lastRefreshed && (
         <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
           Last updated: {lastRefreshed.toLocaleTimeString()}
@@ -1374,6 +1483,9 @@ function VideosSection() {
                   <RowBtn onClick={() => setModal(r)}><Edit2 size={12} /> Edit</RowBtn>
                   <RowBtn onClick={() => togglePublish(r)}>
                     {r.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                  </RowBtn>
+                  <RowBtn onClick={() => toggleArchive(r)}>
+                    {r.archived_at ? <><RotateCcw size={12} /> Unarchive</> : <><Archive size={12} /> Archive</>}
                   </RowBtn>
                   <RowBtn onClick={() => setDelTarget(r)}><Trash2 size={12} /> Delete</RowBtn>
                 </div>
