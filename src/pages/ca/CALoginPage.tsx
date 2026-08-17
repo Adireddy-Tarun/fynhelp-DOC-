@@ -50,8 +50,30 @@ export default function CALoginPage() {
             <input style={caInputStyle} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@cafirm.com" />
           </CAField>
           <CAField label="Password">
-            <input style={caInputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" />
+            <div style={{ position: "relative" }}>
+              <input
+                style={{ ...caInputStyle, paddingRight: 42 }}
+                type={showPw ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw((v) => !v)}
+                aria-label={showPw ? "Hide password" : "Show password"}
+                style={{
+                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                  background: "transparent", border: "none", cursor: "pointer", color: CA.muted,
+                  display: "flex", alignItems: "center",
+                }}
+              >
+                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </CAField>
+
           {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
           <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
             {loading ? "Signing in…" : "Sign in"}
