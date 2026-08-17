@@ -68,6 +68,7 @@ export type ResourceRow = {
   file_url: string | null;
   sort_order: number | null;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -79,6 +80,7 @@ export type GlossaryRow = {
   full_definition: string;
   sort_order: number | null;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
