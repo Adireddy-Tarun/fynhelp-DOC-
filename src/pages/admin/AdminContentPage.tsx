@@ -1264,6 +1264,48 @@ function AdminModal({ title, onClose, children }: { title: string; onClose: () =
   );
 }
 
+function ViewToggle({
+  value,
+  onChange,
+  activeCount,
+  archivedCount,
+}: {
+  value: "active" | "archived";
+  onChange: (v: "active" | "archived") => void;
+  activeCount: number;
+  archivedCount: number;
+}) {
+  const opts: { key: "active" | "archived"; label: string; count: number }[] = [
+    { key: "active", label: "Active", count: activeCount },
+    { key: "archived", label: "Archived", count: archivedCount },
+  ];
+  return (
+    <div className="inline-flex items-center gap-1 p-1" style={{ border: `0.5px solid ${BORDER}`, borderRadius: 10, background: "#FFFFFF", width: "fit-content" }}>
+      {opts.map((o) => {
+        const on = value === o.key;
+        return (
+          <button
+            key={o.key}
+            onClick={() => onChange(o.key)}
+            className="px-3 py-1.5 inline-flex items-center gap-1.5"
+            style={{
+              borderRadius: 8,
+              fontFamily: BODY,
+              fontSize: 12,
+              fontWeight: 700,
+              background: on ? RED : "transparent",
+              color: on ? "#FFFFFF" : "rgba(26,16,8,0.65)",
+            }}
+          >
+            {o.key === "archived" ? <Archive size={12} /> : null}
+            {o.label} ({o.count})
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div
@@ -1302,6 +1344,7 @@ function VideosSection() {
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<null | "add" | VideoRow>(null);
   const [delTarget, setDelTarget] = useState<null | VideoRow>(null);
+  const [view, setView] = useState<"active" | "archived">("active");
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const loadRef = useRef<() => void>(() => {});
 
@@ -1335,14 +1378,15 @@ function VideosSection() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
+    const scoped = rows.filter((r) => (view === "archived" ? !!r.archived_at : !r.archived_at));
+    if (!q) return scoped;
+    return scoped.filter(
       (r) =>
         r.title.toLowerCase().includes(q) ||
         (r.category ?? "").toLowerCase().includes(q) ||
         (r.step ?? "").toLowerCase().includes(q),
     );
-  }, [rows, search]);
+  }, [rows, search, view]);
 
   const togglePublish = async (row: VideoRow) => {
     const { error } = await (supabase as never as typeof supabase)
@@ -1351,6 +1395,17 @@ function VideosSection() {
       .eq("id", row.id);
     if (error) return toast.error(error.message);
     toast.success(row.is_published ? "Unpublished" : "Published");
+    load();
+  };
+
+  const toggleArchive = async (row: VideoRow) => {
+    const next = row.archived_at ? null : new Date().toISOString();
+    const { error } = await (supabase as never as typeof supabase)
+      .from("resource_videos")
+      .update({ archived_at: next, ...(next ? { is_published: false } : {}) } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(next ? "Video archived" : "Video restored");
     load();
   };
 
@@ -1367,8 +1422,14 @@ function VideosSection() {
       <LiveDot />
       <div className="grid grid-cols-2 gap-3">
         <Stat label="Total videos" value={String(rows.length)} />
-        <Stat label="Published" value={String(rows.filter((r) => r.is_published).length)} />
+        <Stat label="Published" value={String(rows.filter((r) => r.is_published && !r.archived_at).length)} />
       </div>
+      <ViewToggle
+        value={view}
+        onChange={setView}
+        activeCount={rows.filter((r) => !r.archived_at).length}
+        archivedCount={rows.filter((r) => !!r.archived_at).length}
+      />
       {lastRefreshed && (
         <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
           Last updated: {lastRefreshed.toLocaleTimeString()}
@@ -1421,6 +1482,9 @@ function VideosSection() {
                   <RowBtn onClick={() => setModal(r)}><Edit2 size={12} /> Edit</RowBtn>
                   <RowBtn onClick={() => togglePublish(r)}>
                     {r.is_published ? <><EyeOff size={12} /> Unpublish</> : <><Eye size={12} /> Publish</>}
+                  </RowBtn>
+                  <RowBtn onClick={() => toggleArchive(r)}>
+                    {r.archived_at ? <><RotateCcw size={12} /> Unarchive</> : <><Archive size={12} /> Archive</>}
                   </RowBtn>
                   <RowBtn onClick={() => setDelTarget(r)}><Trash2 size={12} /> Delete</RowBtn>
                 </div>
