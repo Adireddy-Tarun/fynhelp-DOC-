@@ -52,6 +52,7 @@ interface VideoRow {
   thumbnail_url: string | null;
   sort_order: number;
   is_published: boolean;
+  archived_at: string | null;
   created_at: string;
 }
 type BlogTab = "all" | "published" | "draft" | "scheduled" | "archived";
