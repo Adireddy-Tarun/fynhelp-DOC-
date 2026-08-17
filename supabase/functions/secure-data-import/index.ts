@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const originBlock = rejectDisallowedOrigin(req);
   if (originBlock) return originBlock;
-  const sizeBlock = rejectOversizedBody(req, 2_000_000);
+  const sizeBlock = rejectOversizedBody(req, 25_000_000);
   if (sizeBlock) return sizeBlock;
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
