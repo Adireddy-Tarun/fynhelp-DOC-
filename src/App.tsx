@@ -213,9 +213,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <RouteTracker />
+          <SkipToContent />
+          <ScrollManager />
+          <SearchPalette />
+          <FloatingContact />
           <WaitlistPopup />
 
+        <div id="main-content" tabIndex={-1}>
         <Routes>
+
           {/* ===== INTERNAL ADMIN (email allowlist) ===== */}
           <Route path="/admin" element={<AdminGuard><InternalAdminLayout /></AdminGuard>}>
             <Route path="ca-approvals" element={<CAApprovalsPage />} />
