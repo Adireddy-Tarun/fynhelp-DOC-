@@ -531,6 +531,8 @@ function BlogSection() {
   const [blogPage, setBlogPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [postDelTarget, setPostDelTarget] = useState<null | BlogPost>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [coverUploadingId, setCoverUploadingId] = useState<string | null>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -615,6 +617,14 @@ function BlogSection() {
       .in("id", ids);
     if (error) return toast.error(error.message);
     toast.success(msg);
+    await load();
+  };
+
+  const removePosts = async (ids: string[]) => {
+    const { error } = await (supabase as never as typeof supabase).from("blog_posts").delete().in("id", ids);
+    if (error) return toast.error(error.message);
+    setSelectedIds((sel) => sel.filter((x) => !ids.includes(x)));
+    toast.success(ids.length > 1 ? `${ids.length} posts deleted` : "Post deleted");
     await load();
   };
 
@@ -743,6 +753,12 @@ function BlogSection() {
           <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ archived_at: new Date().toISOString() }, "Archived")}>
             Archive selected
           </BulkBtn>
+          <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ archived_at: null, status: "draft" }, "Unarchived")}>
+            Unarchive selected
+          </BulkBtn>
+          <BulkBtn disabled={bulkLoading} onClick={() => setBulkDeleteOpen(true)}>
+            Delete selected
+          </BulkBtn>
         </div>
       )}
 
@@ -833,14 +849,17 @@ function BlogSection() {
                       <Upload size={12} /> {coverUploadingId === p.id ? "Uploading…" : p.cover_image_url ? "Replace image" : "Upload image"}
                     </RowBtn>
                     {p.archived_at ? (
-                      <RowBtn onClick={() => update([p.id], { archived_at: null, status: "draft" }, "Restored")}>
-                        <RotateCcw size={12} /> Restore
+                      <RowBtn onClick={() => update([p.id], { archived_at: null, status: "draft" }, "Unarchived")}>
+                        <RotateCcw size={12} /> Unarchive
                       </RowBtn>
                     ) : (
                       <RowBtn onClick={() => update([p.id], { archived_at: new Date().toISOString() }, "Archived")}>
                         <Archive size={12} /> Archive
                       </RowBtn>
                     )}
+                    <RowBtn onClick={() => setPostDelTarget(p)}>
+                      <Trash2 size={12} /> Delete
+                    </RowBtn>
                   </div>
                 </Td>
               </tr>
@@ -870,6 +889,31 @@ function BlogSection() {
           <RowBtn disabled={page >= totalPages} onClick={() => setBlogPage(page + 1)}>Next</RowBtn>
         </div>
       </div>
+
+      {postDelTarget && (
+        <ConfirmDelete
+          label="post"
+          onCancel={() => setPostDelTarget(null)}
+          onConfirm={async () => {
+            const target = postDelTarget;
+            setPostDelTarget(null);
+            await removePosts([target.id]);
+          }}
+        />
+      )}
+      {bulkDeleteOpen && (
+        <ConfirmDelete
+          label={`${selectedIds.length} selected post${selectedIds.length === 1 ? "" : "s"}`}
+          onCancel={() => setBulkDeleteOpen(false)}
+          onConfirm={async () => {
+            const ids = selectedIds;
+            setBulkDeleteOpen(false);
+            setBulkLoading(true);
+            await removePosts(ids);
+            setBulkLoading(false);
+          }}
+        />
+      )}
     </div>
   );
 }
