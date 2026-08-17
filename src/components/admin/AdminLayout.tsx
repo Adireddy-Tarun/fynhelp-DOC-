@@ -81,6 +81,19 @@ export default function AdminLayout() {
     }
   }, [isSupport, location.pathname, nav]);
 
+  // Route-level least privilege: block direct URL access to sections the
+  // signed-in admin's roles do not cover.
+  useEffect(() => {
+    const match = NAV_ITEMS.filter((i): i is Extract<NavItem, { to: string }> => !("divider" in i && i.divider))
+      .filter((i) => location.pathname === i.to || location.pathname.startsWith(i.to + "/"))
+      .sort((a, b) => b.to.length - a.to.length)[0];
+    if (match && !hasRole(...match.roles)) {
+      toast.error("You do not have access to that section.");
+      nav("/admin/dashboard", { replace: true });
+    }
+  }, [location.pathname, hasRole, nav]);
+
+
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1280
   );
