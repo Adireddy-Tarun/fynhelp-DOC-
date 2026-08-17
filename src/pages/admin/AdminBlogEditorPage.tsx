@@ -225,7 +225,7 @@ export default function AdminBlogEditorPage() {
     const payload: Record<string, unknown> = {
       title: title.trim(),
       slug: slug.trim() || slugify(title),
-      content: editor?.getHTML() ?? "",
+      content: sanitizeForStorage(editor?.getHTML() ?? ""),
       excerpt: excerpt.trim(),
       category,
       tags,
