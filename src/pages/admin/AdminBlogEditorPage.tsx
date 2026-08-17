@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 import { BLOG_CATEGORIES } from "@/types/blog";
+import { sanitizeForStorage } from "@/lib/sanitizeHtml";
+
 import {
   Bold,
   Italic,
