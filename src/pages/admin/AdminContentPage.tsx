@@ -23,6 +23,8 @@ import ResourceHealthCheck from "./ResourceHealthCheck";
 import { logResourceAction } from "@/lib/resourceAudit";
 import ResourceActivityLog from "./ResourceActivityLog";
 import { isSelfHostedVideo } from "@/lib/videoSource";
+import { validateUpload } from "@/lib/uploadPolicy";
+
 
 
 const INK = "#1A1008";
