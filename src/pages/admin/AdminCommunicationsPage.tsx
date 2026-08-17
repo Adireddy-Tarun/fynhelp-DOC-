@@ -3,6 +3,7 @@ import { MessageCircle, Share2, Twitter, Mail, Eye, Clock, X, Send, Calendar } f
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { toast } from "sonner";
+import { sanitizeRichText } from "@/lib/sanitizeHtml";
 import { logAdminAction } from "@/lib/adminAudit";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -378,7 +379,7 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
                 Preview — {subject || "(no subject)"}
               </div>
               <div className="p-4" style={{ background: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}
-                dangerouslySetInnerHTML={{ __html: content }} />
+                dangerouslySetInnerHTML={{ __html: sanitizeRichText(content) }} />
             </div>
           )}
         </div>

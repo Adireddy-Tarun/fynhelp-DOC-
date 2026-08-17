@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { authErrorMessage } from "@/lib/authErrors";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 
 export default function CALoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,12 +23,13 @@ export default function CALoginPage() {
     const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInErr) {
-      setError(signInErr.message);
+      setError(authErrorMessage(signInErr.message, "signin"));
       return;
     }
     toast.success("Signed in");
     navigate("/ca/dashboard", { replace: true });
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: CA.bg }}>
@@ -46,8 +50,30 @@ export default function CALoginPage() {
             <input style={caInputStyle} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@cafirm.com" />
           </CAField>
           <CAField label="Password">
-            <input style={caInputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" />
+            <div style={{ position: "relative" }}>
+              <input
+                style={{ ...caInputStyle, paddingRight: 42 }}
+                type={showPw ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw((v) => !v)}
+                aria-label={showPw ? "Hide password" : "Show password"}
+                style={{
+                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                  background: "transparent", border: "none", cursor: "pointer", color: CA.muted,
+                  display: "flex", alignItems: "center",
+                }}
+              >
+                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </CAField>
+
           {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
           <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
             {loading ? "Signing in…" : "Sign in"}

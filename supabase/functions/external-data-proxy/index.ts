@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +37,10 @@ function json(body: unknown, status = 200) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const originBlock = rejectDisallowedOrigin(req);
+  if (originBlock) return originBlock;
+  const sizeBlock = rejectOversizedBody(req, 2_000_000);
+  if (sizeBlock) return sizeBlock;
   if (req.method !== "POST") return json({ success: false, error: "Method not allowed" }, 405);
 
   try {

@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadBlogImage, validateImageFile, IMAGE_ACCEPT } from "@/lib/blogImageUpload";
 import { BLOG_CATEGORIES } from "@/types/blog";
+import { sanitizeForStorage } from "@/lib/sanitizeHtml";
+
 import {
   Bold,
   Italic,
@@ -225,7 +227,7 @@ export default function AdminBlogEditorPage() {
     const payload: Record<string, unknown> = {
       title: title.trim(),
       slug: slug.trim() || slugify(title),
-      content: editor?.getHTML() ?? "",
+      content: sanitizeForStorage(editor?.getHTML() ?? ""),
       excerpt: excerpt.trim(),
       category,
       tags,

@@ -1000,3 +1000,67 @@ body {
   }
   .fyn-card-hover { transition: none; }
 }
+
+/* ── Skip to main content (keyboard a11y) ───────────────────────── */
+.fyn-skip-link {
+  position: fixed;
+  top: -60px;
+  left: 12px;
+  z-index: 200;
+  padding: 10px 16px;
+  border-radius: 0 0 10px 10px;
+  background: #A93838;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 160ms ease;
+}
+.fyn-skip-link:focus,
+.fyn-skip-link:focus-visible {
+  top: 0;
+  outline: 2px solid #1A1008;
+  outline-offset: 2px;
+}
+
+/* ── Global print stylesheet ────────────────────────────────────── */
+@media print {
+  @page { margin: 14mm; }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  header[role="banner"],
+  nav,
+  aside,
+  footer,
+  .fyn-no-print,
+  [data-no-print],
+  [data-sonner-toaster],
+  [role="dialog"] { display: none !important; }
+
+  main, #main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 10px;
+    color: #555;
+  }
+
+  .fyn-card, [class*="rounded"] { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  table { break-inside: auto; }
+  tr { break-inside: avoid; }
+}

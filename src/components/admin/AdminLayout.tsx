@@ -81,6 +81,19 @@ export default function AdminLayout() {
     }
   }, [isSupport, location.pathname, nav]);
 
+  // Route-level least privilege: block direct URL access to sections the
+  // signed-in admin's roles do not cover.
+  useEffect(() => {
+    const match = NAV_ITEMS.filter((i): i is Extract<NavItem, { to: string }> => !("divider" in i && i.divider))
+      .filter((i) => location.pathname === i.to || location.pathname.startsWith(i.to + "/"))
+      .sort((a, b) => b.to.length - a.to.length)[0];
+    if (match && !hasRole(...match.roles)) {
+      toast.error("You do not have access to that section.");
+      nav("/admin/dashboard", { replace: true });
+    }
+  }, [location.pathname, hasRole, nav]);
+
+
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1280
   );
@@ -128,14 +141,15 @@ export default function AdminLayout() {
   }, [location.pathname]);
   const badges: Record<string, number> = { ca_pending: caPending };
 
-  // Auth disabled during design, show all items EXCEPT super_admin-only ones.
+  // Least-privilege: a nav item is visible only when the signed-in admin holds
+  // one of its declared roles. Support agent is additionally path-restricted.
   const visible = NAV_ITEMS.filter((i) => {
     if ("divider" in i && i.divider) return !isSupport;
     const it = i as Extract<NavItem, { to: string }>;
-    if (it.roles.length === 1 && it.roles[0] === "super_admin" && !isSuperAdmin) return false;
-    if (isSupport) return SUPPORT_ALLOWED_PATHS.includes(it.to);
-    return true;
+    if (isSupport) return SUPPORT_ALLOWED_PATHS.includes(it.to) && hasRole(...it.roles);
+    return hasRole(...it.roles);
   });
+
 
   const initials = (user?.email ?? "A").slice(0, 2).toUpperCase();
 

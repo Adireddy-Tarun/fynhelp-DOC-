@@ -23,6 +23,8 @@ import ResourceHealthCheck from "./ResourceHealthCheck";
 import { logResourceAction } from "@/lib/resourceAudit";
 import ResourceActivityLog from "./ResourceActivityLog";
 import { isSelfHostedVideo } from "@/lib/videoSource";
+import { validateUpload } from "@/lib/uploadPolicy";
+
 
 
 const INK = "#1A1008";
@@ -847,7 +849,9 @@ function ResourceModal({
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
-    if (file.size > 50 * 1024 * 1024) return toast.error("File is larger than 50 MB");
+    const policyError = validateUpload("resources", file);
+    if (policyError) return toast.error(policyError);
+
     setUploading(true);
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${Date.now()}-${safeName}`;

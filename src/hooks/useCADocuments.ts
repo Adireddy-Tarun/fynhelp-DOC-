@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { validateUpload } from "@/lib/uploadPolicy";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { toast } from "sonner";
 
@@ -51,7 +52,9 @@ export function useCADocuments(business_id?: string | null) {
     options: UploadOptions
   ): Promise<{ success: boolean; document?: CADocument; error?: string }> => {
     if (!caFirm?.id) return { success: false, error: "CA firm not found" };
-    if (file.size > 52428800) return { success: false, error: "File exceeds 50MB limit" };
+    const policyError = validateUpload("ca-client-documents", file);
+    if (policyError) return { success: false, error: policyError };
+
 
     setUploading(true);
     try {
