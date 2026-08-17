@@ -306,6 +306,7 @@ const ResourcesPage = () => {
       .from("resource_glossary")
       .select("id, term, short_definition, full_definition")
       .eq("is_published", true)
+      .is("archived_at", null)
       .order("sort_order")
       .then(({ data }) => setDbGlossary(data ?? []));
   }, []);
@@ -315,6 +316,7 @@ const ResourcesPage = () => {
       .from("resource_videos")
       .select("id, step, title, description, duration, category, video_url, thumbnail_url")
       .eq("is_published", true)
+      .is("archived_at", null)
       .order("sort_order")
       .then(({ data }) => {
         const rows = (data ?? []).map((row): VideoItem => ({
@@ -367,6 +369,7 @@ const ResourcesPage = () => {
       .from("resources")
       .select("id, title, description, format, icon_url")
       .eq("is_published", true)
+      .is("archived_at", null)
       .order("sort_order", { ascending: true })
       .then(({ data }) => {
         const rows = (data ?? []).map((row): TemplateItem => ({
