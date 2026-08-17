@@ -87,17 +87,20 @@ export default function AdminLayout() {
   }, [rolesReady, isSupport, location.pathname, nav]);
 
   // Route-level least privilege: block direct URL access to sections the
-  // signed-in admin's roles do not cover.
+  // signed-in admin's roles do not cover. The support account is exempt on its
+  // own allowed paths — otherwise the two guards bounce against each other.
   useEffect(() => {
     if (!rolesReady) return;
+    const onSupportPath = isSupport && SUPPORT_ALLOWED_PATHS.some((p) => location.pathname.startsWith(p));
+    if (onSupportPath) return;
     const match = NAV_ITEMS.filter((i): i is Extract<NavItem, { to: string }> => !("divider" in i && i.divider))
       .filter((i) => location.pathname === i.to || location.pathname.startsWith(i.to + "/"))
       .sort((a, b) => b.to.length - a.to.length)[0];
-    if (match && !hasRole(...match.roles)) {
+    if (match && !hasRole(...match.roles) && location.pathname !== "/admin/dashboard") {
       toast.error("You do not have access to that section.");
       nav("/admin/dashboard", { replace: true });
     }
-  }, [rolesReady, location.pathname, hasRole, nav]);
+  }, [rolesReady, isSupport, location.pathname, hasRole, nav]);
 
 
   const [windowWidth, setWindowWidth] = useState<number>(
