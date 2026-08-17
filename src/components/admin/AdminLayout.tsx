@@ -23,9 +23,9 @@ const NAV_ITEMS: NavItem[] = [
 
   { to: "/admin/waitlist", label: "Waitlist", icon: UserPlus, roles: ["super_admin","ops_admin","support_agent","analyst"] },
   { to: "/admin/subscriptions", label: "Subscriptions & Billing", icon: CreditCard, roles: ["super_admin","ops_admin"] },
-  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin"] },
-  { to: "/admin/blog", label: "Blog", icon: Newspaper, roles: ["super_admin","ops_admin","admin"] },
-  { to: "/admin/media", label: "Media Library", icon: ImageIcon, roles: ["super_admin","admin"] },
+  { to: "/admin/content", label: "Content Management", icon: FileText, roles: ["super_admin","ops_admin","support_agent"] },
+  { to: "/admin/blog", label: "Blog", icon: Newspaper, roles: ["super_admin","ops_admin","admin","support_agent"] },
+  { to: "/admin/media", label: "Media Library", icon: ImageIcon, roles: ["super_admin","admin","support_agent"] },
   { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent"] },
   { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
