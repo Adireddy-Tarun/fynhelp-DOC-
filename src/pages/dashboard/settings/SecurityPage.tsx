@@ -41,10 +41,14 @@ const SecurityPage = () => {
     if (newPassword !== confirmPassword) { toast.error("Passwords do not match"); return; }
     setSaving(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) { setSaving(false); toast.error(error.message); return; }
+    // Revoke every other session so a stolen token cannot outlive the change.
+    await supabase.auth.signOut({ scope: "others" });
     setSaving(false);
-    if (error) toast.error(error.message);
-    else { toast.success("Password updated successfully"); setNewPassword(""); setConfirmPassword(""); }
+    toast.success("Password updated. All other devices have been signed out.");
+    setNewPassword(""); setConfirmPassword("");
   };
+
 
   const handleDelete = async () => {
     toast.warning("Account deletion requested");
