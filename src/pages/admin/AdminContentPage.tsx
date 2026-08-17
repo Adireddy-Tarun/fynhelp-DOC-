@@ -847,7 +847,9 @@ function ResourceModal({
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
-    if (file.size > 50 * 1024 * 1024) return toast.error("File is larger than 50 MB");
+    const policyError = validateUpload("resources", file);
+    if (policyError) return toast.error(policyError);
+
     setUploading(true);
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${Date.now()}-${safeName}`;
