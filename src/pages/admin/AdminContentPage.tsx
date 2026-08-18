@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
   Upload,
+  CalendarX,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -755,6 +756,9 @@ function BlogSection() {
           </BulkBtn>
           <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ archived_at: null, status: "draft" }, "Unarchived")}>
             Unarchive selected
+          </BulkBtn>
+          <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ status: "draft", published_at: null }, "Schedule cancelled")}>
+            Cancel schedule
           </BulkBtn>
           <BulkBtn disabled={bulkLoading} onClick={() => setBulkDeleteOpen(true)}>
             Delete selected
