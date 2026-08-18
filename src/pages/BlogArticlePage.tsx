@@ -24,6 +24,7 @@ interface BlogPost {
   views: number;
   reading_time_minutes: number;
   published_at: string;
+  cover_image_url?: string | null;
 }
 
 export default function BlogArticlePage() {
@@ -38,7 +39,7 @@ export default function BlogArticlePage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at")
+        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url")
         .eq("slug", slug)
         .eq("status", "published")
         .maybeSingle();
@@ -92,23 +93,43 @@ export default function BlogArticlePage() {
   return (
     <Layout>
       <div style={{ background: BEIGE, minHeight: "100vh" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 24px 80px" }}>
-          <Link to="/resources?tab=blog" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.55)", textDecoration: "none", marginBottom: 32 }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 24px 80px" }}>
+          <Link to="/resources?tab=blog" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.55)", textDecoration: "none", marginBottom: 28 }}>
             <ArrowLeft size={15} /> Back to blog
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: RED, background: "rgba(196,30,30,0.08)", padding: "4px 12px", borderRadius: 99, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: RED, background: "rgba(196,30,30,0.08)", padding: "4px 12px", borderRadius: 99, letterSpacing: "0.04em" }}>
               {post.category}
             </span>
-            {post.tags.map(t => (
-              <span key={t} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: GOLD, background: "rgba(139,105,20,0.1)", padding: "3px 8px", borderRadius: 6 }}>{t}</span>
-            ))}
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{formatDate(post.published_at)}</span>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{post.reading_time_minutes} min read</span>
           </div>
 
-          <h1 style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 34, color: INK, lineHeight: 1.2, margin: "0 0 20px 0" }}>{post.title}</h1>
+          <h1 style={{ fontFamily: "'Clash Display', Georgia, serif", fontWeight: 700, fontSize: 40, letterSpacing: "-0.02em", color: INK, lineHeight: 1.14, margin: "0 0 16px 0" }}>{post.title}</h1>
 
-          <p style={{ fontFamily: "Georgia, serif", fontSize: 18, color: "rgba(26,16,8,0.75)", lineHeight: 1.6, margin: "0 0 28px 0", fontStyle: "italic" }}>{post.excerpt}</p>
+          {post.excerpt && (
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 17, color: "rgba(26,16,8,0.65)", lineHeight: 1.6, margin: "0 0 10px 0" }}>{post.excerpt}</p>
+          )}
+
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.5)", margin: "0 0 28px 0" }}>By {post.author_name}</p>
+
+          {post.cover_image_url && (
+            <img
+              src={post.cover_image_url}
+              alt={post.title}
+              loading="lazy"
+              style={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: 16, display: "block", marginBottom: 32, border: "1px solid rgba(26,16,8,0.08)" }}
+            />
+          )}
+
+          {post.tags?.length > 0 && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+              {post.tags.map(t => (
+                <span key={t} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: GOLD, background: "rgba(139,105,20,0.1)", padding: "3px 8px", borderRadius: 6 }}>{t}</span>
+              ))}
+            </div>
+          )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderTop: "1px solid rgba(26,16,8,0.08)", borderBottom: "1px solid rgba(26,16,8,0.08)", marginBottom: 40, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
