@@ -243,6 +243,7 @@ export default function AdminBlogEditorPage() {
 
     if (mode === "draft") {
       payload.status = "draft";
+      payload.published_at = null;
     } else if (publishMode === "now") {
       payload.status = "published";
       payload.published_at = now;
