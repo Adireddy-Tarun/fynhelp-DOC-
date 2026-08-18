@@ -239,6 +239,18 @@ const STYLES = `
   .rs-blog-cat { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: ${C.red}; text-transform: uppercase; }
   .rs-blog-cat .d { width: 6px; height: 6px; border-radius: 50%; background: ${C.red}; }
   .rs-blog-cat.gold { color: ${C.ink}; } .rs-blog-cat.gold .d { background: ${C.ink}; }
+  .rs-blog-cover { position: relative; aspect-ratio: 16 / 9; background: ${C.panel}; border-bottom: 1px solid ${C.border}; overflow: hidden; }
+  .rs-blog-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.8,.3,1); }
+  .rs-blog-card:hover .rs-blog-cover img { transform: scale(1.04); }
+  .rs-blog-cover .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Clash Display', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(26,16,8,0.28); background: linear-gradient(135deg, ${C.panel} 0%, ${C.bg} 100%); }
+  .rs-blog-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rs-blog-pill { display: inline-flex; align-items: center; padding: 4px 11px; border-radius: 100px; background: rgba(184,51,58,0.10); color: ${C.red}; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .rs-blog-dot { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: ${C.muted}; font-variant-numeric: tabular-nums; }
+  .rs-blog-title { font-family: 'Clash Display', sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em; color: ${C.ink}; line-height: 1.28; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .rs-blog-ex { font-size: 13.5px; color: ${C.body}; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .rs-blog-read { display: inline-flex; align-items: center; gap: 7px; margin-top: auto; padding-top: 10px; color: ${C.red}; font-weight: 700; font-size: 13px; }
+  .rs-blog-read .arw { transition: transform .25s ease; }
+  .rs-blog-card:hover .rs-blog-read .arw { transform: translateX(4px); }
 
   /* Glossary */
   .rs-gl-list { display: flex; flex-direction: column; gap: 10px; max-width: 860px; margin: 0 auto; }
