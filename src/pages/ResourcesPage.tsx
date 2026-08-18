@@ -21,7 +21,6 @@ import {
   IconFileSpreadsheet,
   IconPlayerPlayFilled,
   IconClock,
-  IconEye,
   IconDownload,
   IconMessageCircle2,
   type IconProps,
