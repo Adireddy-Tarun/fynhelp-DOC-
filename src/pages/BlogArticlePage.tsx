@@ -77,7 +77,15 @@ export default function BlogArticlePage() {
     );
   }
 
-  const paragraphs = post.content.split("\n\n").filter(Boolean);
+  const isHtml = /<\/?(p|h[1-6]|ul|ol|li|blockquote|pre|img|figure|table|div|br|strong|em)\b/i.test(post.content);
+  const html = isHtml
+    ? sanitizeForStorage(post.content)
+    : post.content
+        .split("\n\n")
+        .filter(Boolean)
+        .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
+        .join("");
+
 
   return (
     <Layout>
