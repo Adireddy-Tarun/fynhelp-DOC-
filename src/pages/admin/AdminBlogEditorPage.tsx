@@ -252,8 +252,19 @@ export default function AdminBlogEditorPage() {
         setSaving(false);
         return;
       }
+      const when = new Date(scheduleAt);
+      if (Number.isNaN(when.getTime())) {
+        toast.error("That schedule date is not valid");
+        setSaving(false);
+        return;
+      }
+      if (when.getTime() <= Date.now()) {
+        toast.error("Schedule time must be in the future");
+        setSaving(false);
+        return;
+      }
       payload.status = "scheduled";
-      payload.published_at = new Date(scheduleAt).toISOString();
+      payload.published_at = when.toISOString();
     } else {
       payload.status = "draft";
     }

@@ -5733,6 +5733,7 @@ export type Database = {
         }[]
       }
       mark_overdue_filings: { Args: never; Returns: number }
+      publish_due_blog_posts: { Args: never; Returns: number }
       reset_rate_limit: {
         Args: { p_action: string; p_identifier: string }
         Returns: undefined
