@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
   Upload,
+  CalendarX,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -756,6 +757,9 @@ function BlogSection() {
           <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ archived_at: null, status: "draft" }, "Unarchived")}>
             Unarchive selected
           </BulkBtn>
+          <BulkBtn disabled={bulkLoading} onClick={() => runBulk({ status: "draft", published_at: null }, "Schedule cancelled")}>
+            Cancel schedule
+          </BulkBtn>
           <BulkBtn disabled={bulkLoading} onClick={() => setBulkDeleteOpen(true)}>
             Delete selected
           </BulkBtn>
@@ -848,6 +852,15 @@ function BlogSection() {
                     <RowBtn onClick={() => pickCover(p.id)} disabled={coverUploadingId === p.id}>
                       <Upload size={12} /> {coverUploadingId === p.id ? "Uploading…" : p.cover_image_url ? "Replace image" : "Upload image"}
                     </RowBtn>
+                    {p.status === "scheduled" && (
+                      <RowBtn
+                        onClick={() =>
+                          update([p.id], { status: "draft", published_at: null }, "Schedule cancelled — saved as draft")
+                        }
+                      >
+                        <CalendarX size={12} /> Cancel schedule
+                      </RowBtn>
+                    )}
                     {p.archived_at ? (
                       <RowBtn onClick={() => update([p.id], { archived_at: null, status: "draft" }, "Unarchived")}>
                         <RotateCcw size={12} /> Unarchive
