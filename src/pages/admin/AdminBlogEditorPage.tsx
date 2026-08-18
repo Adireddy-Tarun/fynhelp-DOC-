@@ -217,6 +217,21 @@ export default function AdminBlogEditorPage() {
     editor.chain().focus().setImage({ src: url }).run();
   };
 
+  const uniqueSlug = async (base: string): Promise<string> => {
+    const clean = base || "post";
+    const { data } = await supabase
+      .from("blog_posts")
+      .select("id, slug")
+      .like("slug", `${clean}%`);
+    const taken = new Set(
+      (data ?? []).filter((r: { id: string }) => r.id !== postId).map((r: { slug: string }) => r.slug),
+    );
+    if (!taken.has(clean)) return clean;
+    let n = 2;
+    while (taken.has(`${clean}-${n}`)) n += 1;
+    return `${clean}-${n}`;
+  };
+
   const save = async (mode: "draft" | "publish") => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -224,9 +239,12 @@ export default function AdminBlogEditorPage() {
     }
     setSaving(true);
     const now = new Date().toISOString();
+    const finalSlug = await uniqueSlug(slugify(slug.trim() || title));
+    if (finalSlug !== slug.trim()) setSlug(finalSlug);
     const payload: Record<string, unknown> = {
       title: title.trim(),
-      slug: slug.trim() || slugify(title),
+      slug: finalSlug,
+
       content: sanitizeForStorage(editor?.getHTML() ?? ""),
       excerpt: excerpt.trim(),
       category,
