@@ -39,7 +39,7 @@ export default function BlogArticlePage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at")
+        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url")
         .eq("slug", slug)
         .eq("status", "published")
         .maybeSingle();
