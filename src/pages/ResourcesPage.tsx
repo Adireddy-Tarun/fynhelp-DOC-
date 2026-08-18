@@ -307,7 +307,7 @@ const ResourcesPage = () => {
   useEffect(() => {
     supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, category, views, reading_time_minutes, published_at, tags")
+      .select("id, slug, title, excerpt, category, views, reading_time_minutes, published_at, tags, cover_image_url, author_name")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .then(({ data }) => setBlogPosts(data ?? []));
