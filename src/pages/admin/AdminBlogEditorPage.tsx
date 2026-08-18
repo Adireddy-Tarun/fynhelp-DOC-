@@ -294,9 +294,14 @@ export default function AdminBlogEditorPage() {
 
     setSaving(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message.includes("blog_posts_slug_key")
+          ? "A post with this URL slug already exists. Change the slug and try again."
+          : error.message,
+      );
       return;
     }
+
     setAutosaveState("saved");
     toast.success(mode === "draft" ? "Saved as draft" : "Post saved");
     if (mode === "publish") navigate("/admin/blog");
