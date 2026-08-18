@@ -3,6 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { ArrowLeft, Clock, Eye } from "lucide-react";
+import { sanitizeForStorage } from "@/lib/sanitizeHtml";
+
 
 const INK = "#1A1008";
 const RED = "#C41E1E";
@@ -77,7 +79,15 @@ export default function BlogArticlePage() {
     );
   }
 
-  const paragraphs = post.content.split("\n\n").filter(Boolean);
+  const isHtml = /<\/?(p|h[1-6]|ul|ol|li|blockquote|pre|img|figure|table|div|br|strong|em)\b/i.test(post.content);
+  const html = isHtml
+    ? sanitizeForStorage(post.content)
+    : post.content
+        .split("\n\n")
+        .filter(Boolean)
+        .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
+        .join("");
+
 
   return (
     <Layout>
@@ -117,19 +127,31 @@ export default function BlogArticlePage() {
             </div>
           </div>
 
-          <div>
-            {paragraphs.map((para, i) => {
-              const isHeading = para.length < 80 && !para.includes(".") && i > 0;
-              if (isHeading) {
-                return (
-                  <h2 key={i} style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.3, margin: "36px 0 16px 0" }}>{para}</h2>
-                );
-              }
-              return (
-                <p key={i} style={{ fontFamily: "Georgia, serif", fontSize: 17, color: "rgba(26,16,8,0.85)", lineHeight: 1.75, margin: "0 0 24px 0" }}>{para}</p>
-              );
-            })}
-          </div>
+          <style>{`
+            .fyn-article { font-family: Georgia, serif; font-size: 17px; color: rgba(26,16,8,0.85); line-height: 1.75; }
+            .fyn-article > *:first-child { margin-top: 0; }
+            .fyn-article p { margin: 0 0 24px 0; }
+            .fyn-article h1, .fyn-article h2 { font-weight: 700; font-size: 24px; color: ${INK}; line-height: 1.3; margin: 36px 0 16px 0; }
+            .fyn-article h3 { font-weight: 700; font-size: 20px; color: ${INK}; margin: 30px 0 14px 0; }
+            .fyn-article h4, .fyn-article h5, .fyn-article h6 { font-weight: 700; font-size: 17px; color: ${INK}; margin: 26px 0 12px 0; }
+            .fyn-article ul, .fyn-article ol { margin: 0 0 24px 0; padding-left: 26px; }
+            .fyn-article li { margin-bottom: 10px; }
+            .fyn-article a { color: ${RED}; text-decoration: underline; }
+            .fyn-article strong { color: ${INK}; }
+            .fyn-article blockquote { margin: 28px 0; padding: 4px 0 4px 20px; border-left: 3px solid ${RED}; font-style: italic; color: rgba(26,16,8,0.7); }
+            .fyn-article img, .fyn-article iframe, .fyn-article video { max-width: 100%; border-radius: 10px; margin: 12px 0 24px; display: block; }
+            .fyn-article figure { margin: 0 0 24px 0; }
+            .fyn-article figcaption { font-family: Inter, sans-serif; font-size: 12.5px; color: rgba(26,16,8,0.5); margin-top: 8px; text-align: center; }
+            .fyn-article pre { background: rgba(26,16,8,0.05); border-radius: 10px; padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; margin: 0 0 24px 0; }
+            .fyn-article code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; background: rgba(26,16,8,0.06); padding: 2px 5px; border-radius: 4px; }
+            .fyn-article pre code { background: none; padding: 0; }
+            .fyn-article hr { border: none; border-top: 1px solid rgba(26,16,8,0.12); margin: 36px 0; }
+            .fyn-article table { width: 100%; border-collapse: collapse; margin: 0 0 24px 0; font-family: Inter, sans-serif; font-size: 14px; }
+            .fyn-article th, .fyn-article td { border: 1px solid rgba(26,16,8,0.12); padding: 10px 12px; text-align: left; }
+            .fyn-article th { background: rgba(26,16,8,0.04); font-weight: 600; color: ${INK}; }
+          `}</style>
+          <div className="fyn-article" dangerouslySetInnerHTML={{ __html: html }} />
+
 
           <div style={{ background: "white", border: "1px solid rgba(26,16,8,0.08)", borderRadius: 12, padding: 24, marginTop: 48, textAlign: "center" }}>
             <div style={{ fontFamily: "Georgia, serif", fontWeight: 600, fontSize: 18, color: INK, marginBottom: 8 }}>Want financial intelligence like this, built into your dashboard?</div>
