@@ -24,6 +24,7 @@ interface BlogPost {
   views: number;
   reading_time_minutes: number;
   published_at: string;
+  cover_image_url?: string | null;
 }
 
 export default function BlogArticlePage() {
