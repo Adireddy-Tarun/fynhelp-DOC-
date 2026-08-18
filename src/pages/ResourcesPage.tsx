@@ -626,14 +626,26 @@ const ResourcesPage = () => {
                       className="rs-card rs-blog-card"
                       onClick={() => navigate(`/blog/${a.slug}`)}
                     >
+                      <div className="rs-blog-cover">
+                        {a.cover_image_url ? (
+                          <img src={a.cover_image_url} alt={a.title} loading="lazy" />
+                        ) : (
+                          <div className="ph">{a.category}</div>
+                        )}
+                      </div>
                       <div className="rs-card-body">
-                        <div className="rs-blog-cat"><span className="d" />{a.category}</div>
-                        <h3 className="rs-card-title" style={{ marginTop: 4 }}>{a.title}</h3>
-                        <div className="rs-card-desc">{a.excerpt}</div>
-                        <div className="rs-card-foot">
-                          <span className="rs-mono"><IconEye size={13} /> {(a.views ?? 0).toLocaleString("en-IN")} views</span>
-                          <span style={{ color: C.red, fontWeight: 700, fontSize: 12.5 }}>Read →</span>
+                        <div className="rs-blog-meta">
+                          <span className="rs-blog-pill">{a.category}</span>
+                          {a.published_at && (
+                            <span className="rs-blog-dot">
+                              {new Date(a.published_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                            </span>
+                          )}
+                          {a.reading_time_minutes ? <span className="rs-blog-dot">{a.reading_time_minutes} min read</span> : null}
                         </div>
+                        <h3 className="rs-blog-title" style={{ marginTop: 2 }}>{a.title}</h3>
+                        <div className="rs-blog-ex">{a.excerpt}</div>
+                        <span className="rs-blog-read">Read article <span className="arw">→</span></span>
                       </div>
                     </article>
                   ))}
