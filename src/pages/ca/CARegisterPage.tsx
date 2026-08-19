@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import HCaptcha from "@/components/HCaptcha";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 
 export default function CARegisterPage() {
@@ -15,6 +17,7 @@ export default function CARegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -35,8 +38,14 @@ export default function CARegisterPage() {
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!validate()) return;
+    if (!captcha) { setErrors((e) => ({ ...e, form: "Please complete the CAPTCHA" })); return; }
     setLoading(true);
     try {
+      const security = await checkAuthSecurity(form.email.trim(), "ca_register", captcha);
+      if (!security.allowed) {
+        setCaptcha(null);
+        throw new Error(security.error ?? "Too many attempts. Please try again later.");
+      }
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: form.email.trim(),
         password: form.password,
@@ -157,11 +166,13 @@ export default function CARegisterPage() {
             </CAField>
           </div>
 
+          <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+
           {errors.form && (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{errors.form}</div>
           )}
 
-          <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
+          <CAButton type="submit" disabled={loading || !captcha} style={{ height: 46, fontSize: 14 }}>
             {loading ? "Creating account…" : "Create CA account"}
           </CAButton>
         </form>
