@@ -30,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/ai-credits", label: "AI Credits & Usage", icon: Gauge, roles: ["super_admin","ops_admin","analyst"] },
+  { to: "/admin/ca-invites", label: "CA Portal Invites", icon: UserPlus, roles: ["super_admin","admin","ops_admin"] },
   { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin","support_agent"] },
   { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin"] },
   { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck, roles: ["super_admin"] },

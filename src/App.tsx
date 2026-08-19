@@ -23,6 +23,7 @@ import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage.tsx";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage.tsx";
 import AdminAIMonitoringPage from "./pages/admin/AdminAIMonitoringPage.tsx";
 import AdminAICreditsPage from "./pages/admin/AdminAICreditsPage.tsx";
+import AdminCAInvitesPage from "./pages/admin/AdminCAInvitesPage.tsx";
 import AdminFeatureFlagsPage from "./pages/admin/AdminFeatureFlagsPage.tsx";
 import AdminCommunicationsPage from "./pages/admin/AdminCommunicationsPage.tsx";
 import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
@@ -250,6 +251,7 @@ const App = () => (
               <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
               <Route path="ai-monitoring" element={<AdminAIMonitoringPage />} />
               <Route path="ai-credits" element={<AdminAICreditsPage />} />
+              <Route path="ca-invites" element={<AdminCAInvitesPage />} />
               <Route path="content" element={<AdminContentPage />} />
               <Route path="support" element={<AdminSupportPage />} />
               <Route path="support/:id" element={<AdminSupportTicketDetailPage />} />
