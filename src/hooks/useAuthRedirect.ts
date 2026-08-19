@@ -62,7 +62,10 @@ export function useAuthRedirect(intent: AuthIntent): { state: AuthState; ready: 
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // "public" never gates or redirects — used by the read-only /demo/* tree.
+    if (intent === "public") { setReady(true); return; }
     if (state === "loading") { setReady(false); return; }
+
 
     if (intent === "protected") {
       if (state === "visitor") {
