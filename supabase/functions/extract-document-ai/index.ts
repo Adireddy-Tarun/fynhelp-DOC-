@@ -3,6 +3,7 @@
 // CSV importer already consumes, so the frontend can reuse its insertion path.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
+import { checkAiQuota, quotaExceededResponse, logAiUsage, estimateTokens } from "../_shared/ai-metering.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +81,21 @@ Deno.serve(async (req) => {
       });
     }
 
+    const { data: profileRow } = await supabase
+      .from("profiles").select("business_id").eq("user_id", userData.user.id).maybeSingle();
+    const businessId = (profileRow as { business_id?: string } | null)?.business_id ?? null;
+
+    const quota = await checkAiQuota(businessId, userData.user.id);
+    if (!quota.allowed) {
+      await logAiUsage({
+        userId: userData.user.id, businessId, feature: "document_extraction",
+        model: "google/gemini-2.5-flash", prompt: "(blocked before call)",
+        status: "blocked", errorMessage: "daily_limit_reached",
+      });
+      return quotaExceededResponse(quota, corsHeaders);
+    }
+
+    const startedAt = Date.now();
     const body = await req.json().catch(() => ({}));
     const docType = String(body?.doc_type || "") as DocType;
     const fileBase64 = String(body?.file_base64 || "");
@@ -139,6 +155,11 @@ Deno.serve(async (req) => {
           : aiResp.status === 402
           ? "AI credits exhausted."
           : "AI gateway error";
+      await logAiUsage({
+        userId: userData.user.id, businessId, feature: "document_extraction",
+        model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
+        responseTimeMs: Date.now() - startedAt, status: "error", errorMessage: msg,
+      });
       return new Response(JSON.stringify({ error: msg, status: aiResp.status, details: detail.slice(0, 500) }), {
         status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -146,6 +167,14 @@ Deno.serve(async (req) => {
 
     const json = await aiResp.json();
     const raw = json?.choices?.[0]?.message?.content ?? "";
+    await logAiUsage({
+      userId: userData.user.id, businessId, feature: "document_extraction",
+      model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
+      response: String(raw).slice(0, 2000),
+      tokensUsed: json?.usage?.total_tokens ?? estimateTokens(String(raw)),
+      responseTimeMs: Date.now() - startedAt, status: "success",
+    });
+
     const parsed = tryParseJson(raw);
     if (!parsed || !Array.isArray(parsed.rows)) {
       console.error("extract-document-ai unparseable AI response:", raw?.slice(0, 500));
