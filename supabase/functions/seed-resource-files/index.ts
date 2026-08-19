@@ -6,8 +6,20 @@ const admin = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // One-off seeder: writes to a public storage bucket with the service role.
+  // Requires the operator secret — never callable by the public or by app users.
+  const secret = req.headers.get("x-cron-secret");
+  const expected = Deno.env.get("CRON_SECRET");
+  if (!expected || secret !== expected) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const results: Array<{ name: string; ok: boolean; error?: string }> = [];
+
 
   const xlsxFiles = [
     { name: "1_GSTR2B_Reconciliation_Tracker.xlsx", sheet: "ITC Reconciliation", headers: ["GSTIN", "Supplier", "Invoice No", "Invoice Date", "IGST", "CGST", "SGST", "Status"] },
