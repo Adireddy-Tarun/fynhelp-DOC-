@@ -1581,9 +1581,10 @@ export default function HomePage() {
             <Link to="/waitlist" className="btn-pill btn-red">
               Join Waitlist <ArrowRight size={18} />
             </Link>
-            <Link to="/demo/liquidity" className="btn-pill btn-outline">
-              <Calendar size={16} /> Watch Demo
+            <Link to="/waitlist#book" className="btn-pill btn-outline">
+              <Calendar size={16} /> Book a Walkthrough
             </Link>
+
           </div>
           <div className="stats-row">
             {STATS.map((s) => (
