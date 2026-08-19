@@ -40,14 +40,15 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   // Allow the Billing page even when the trial has expired, so users can upgrade.
   const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
-  if (!authReady || (trial.loading && !isBillingRoute)) {
+  const skipGates = isDemoRoute || isBillingRoute;
+  if (!authReady || (trial.loading && !skipGates)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
         <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
       </div>
     );
   }
-  if (trial.shouldBlock && !isBillingRoute) {
+  if (trial.shouldBlock && !skipGates) {
     return <TrialExpiredBlock />;
   }
 
