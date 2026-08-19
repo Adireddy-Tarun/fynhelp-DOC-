@@ -28,7 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export type AuthState = "loading" | "visitor" | "onboarding_incomplete" | "active_user";
-export type AuthIntent = "protected" | "onboarding" | "public-only";
+export type AuthIntent = "protected" | "onboarding" | "public-only" | "public";
 
 export function useAuthState(): AuthState {
   const { user, loading, businessId } = useAuth();
