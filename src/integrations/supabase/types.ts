@@ -161,12 +161,40 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_limits: {
+        Row: {
+          business_id: string | null
+          created_at: string
+          daily_request_limit: number
+          id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id?: string | null
+          created_at?: string
+          daily_request_limit?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string | null
+          created_at?: string
+          daily_request_limit?: number
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_usage_logs: {
         Row: {
           business_id: string | null
           cost_usd: number | null
           created_at: string
           error_message: string | null
+          feature: string
           id: string
           model: string
           prompt: string
@@ -181,6 +209,7 @@ export type Database = {
           cost_usd?: number | null
           created_at?: string
           error_message?: string | null
+          feature?: string
           id?: string
           model?: string
           prompt: string
@@ -195,6 +224,7 @@ export type Database = {
           cost_usd?: number | null
           created_at?: string
           error_message?: string | null
+          feature?: string
           id?: string
           model?: string
           prompt?: string
@@ -5529,6 +5559,10 @@ export type Database = {
       ca_firm_has_client_access: {
         Args: { _business_id: string; _firm_id: string }
         Returns: boolean
+      }
+      check_ai_quota: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: Json
       }
       check_and_increment_rate_limit: {
         Args: {
