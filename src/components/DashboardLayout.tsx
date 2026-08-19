@@ -11,7 +11,9 @@ const STORAGE_KEY = "fynhelp_sidebar_open";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
-  const { ready: authReady } = useAuthRedirect("protected");
+  // The public /demo/* tree reuses this layout but must stay reachable signed out.
+  const isDemoRoute = location.pathname.startsWith("/demo");
+  const { ready: authReady } = useAuthRedirect(isDemoRoute ? "public" : "protected");
   const trial = useTrialStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
