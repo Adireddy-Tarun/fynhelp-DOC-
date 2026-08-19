@@ -11,7 +11,9 @@ const STORAGE_KEY = "fynhelp_sidebar_open";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
-  const { ready: authReady } = useAuthRedirect("protected");
+  // The public /demo/* tree reuses this layout but must stay reachable signed out.
+  const isDemoRoute = location.pathname.startsWith("/demo");
+  const { ready: authReady } = useAuthRedirect(isDemoRoute ? "public" : "protected");
   const trial = useTrialStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -38,14 +40,15 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   // Allow the Billing page even when the trial has expired, so users can upgrade.
   const isBillingRoute = location.pathname.startsWith("/dashboard/settings/billing");
-  if (!authReady || (trial.loading && !isBillingRoute)) {
+  const skipGates = isDemoRoute || isBillingRoute;
+  if (!authReady || (trial.loading && !skipGates)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
         <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
       </div>
     );
   }
-  if (trial.shouldBlock && !isBillingRoute) {
+  if (trial.shouldBlock && !skipGates) {
     return <TrialExpiredBlock />;
   }
 

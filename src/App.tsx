@@ -279,6 +279,7 @@ const App = () => (
             <Route path="/ca/verification-pending" element={<CAVerificationPendingPage />} />
             <Route path="/ca/invite/accept" element={<CAInviteAcceptPage />} />
             <Route path="/ca" element={<CAPortalLayout />}>
+              <Route index element={<CADashboardPage />} />
               <Route path="dashboard" element={<CADashboardPage />} />
               <Route path="clients" element={<CAClientsPage />} />
               <Route path="clients/add" element={<CAAddClientPage />} />
