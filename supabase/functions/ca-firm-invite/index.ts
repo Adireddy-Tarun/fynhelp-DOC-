@@ -86,7 +86,6 @@ Deno.serve(async (req) => {
         .limit(1000);
       if (memErr) return reply({ error: memErr.message }, 500);
 
-      const { count: clientCounts } = { count: null };
       const { data: accessRows } = await admin
         .from("ca_client_access")
         .select("ca_firm_id")
@@ -96,7 +95,6 @@ Deno.serve(async (req) => {
       (accessRows ?? []).forEach((r: { ca_firm_id: string }) => {
         used[r.ca_firm_id] = (used[r.ca_firm_id] ?? 0) + 1;
       });
-      void clientCounts;
 
       return reply({
         success: true,
@@ -130,9 +128,6 @@ Deno.serve(async (req) => {
       }
 
       // Find or invite the auth user.
-      const { data: existing } = await admin.rpc("noop_placeholder").select?.() ?? { data: null };
-      void existing;
-
       let userId: string | null = null;
       const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
       if (inviteErr) {
