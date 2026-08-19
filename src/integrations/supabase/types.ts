@@ -5551,6 +5551,20 @@ export type Database = {
     }
     Functions: {
       accept_ca_invitation: { Args: { _token: string }; Returns: string }
+      admin_ai_usage_overview: {
+        Args: never
+        Returns: {
+          blocked_today: number
+          business_id: string
+          business_name: string
+          daily_limit: number
+          last_used_at: string
+          remaining: number
+          used_30d: number
+          used_7d: number
+          used_today: number
+        }[]
+      }
       bytea_to_text: { Args: { data: string }; Returns: string }
       ca_firm_has_all_client_access: {
         Args: { _business_ids: string[]; _firm_id: string }
