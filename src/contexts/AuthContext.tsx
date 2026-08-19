@@ -40,16 +40,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     // "Remember me" enforcement:
-    // If the user signed in WITHOUT Remember me, we sign them out at the start
-    // of every new browser session (i.e. when sessionStorage was cleared).
-    // Refreshes within the same tab/browser session keep the session alive.
+    // Ephemeral sessions have their persisted token purged on unload (see
+    // sessionPolicy). This is the backstop for browsers that skip the unload
+    // handler: if a token survived into a brand-new browser session, drop it.
+    const removeGuard = installEphemeralSessionGuard();
+
     const enforceRememberMe = async () => {
-      const sessionOnly = localStorage.getItem("fyn.sessionOnly") === "1";
+      const sessionOnly = isSessionOnly();
       const tabAlive = sessionStorage.getItem("fyn.tabAlive") === "1";
 
       if (sessionOnly && !tabAlive) {
+        purgePersistedAuthTokens();
         await supabase.auth.signOut();
-        localStorage.removeItem("fyn.sessionOnly");
+        clearRememberMeFlags();
       }
       sessionStorage.setItem("fyn.tabAlive", "1");
 
@@ -65,8 +68,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     enforceRememberMe();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      removeGuard();
+    };
   }, []);
+
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
