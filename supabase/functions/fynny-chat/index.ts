@@ -2,6 +2,7 @@
 // financial context (bank, txns, subs, payables, receivables, GST).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
+import { checkAiQuota, quotaExceededResponse, logAiUsage, estimateTokens } from "../_shared/ai-metering.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -104,6 +105,30 @@ async function buildContext(client: ReturnType<typeof createClient>) {
   };
 }
 
+// Resolves the signed-in caller (if any) so AI usage can be metered per
+// business. Anonymous demo traffic returns nulls and stays on the size caps.
+async function resolveCaller(auth: string) {
+  if (!auth.startsWith("Bearer ")) return { userId: null, businessId: null };
+  try {
+    const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: auth } },
+    });
+    const { data } = await client.auth.getUser();
+    const user = data?.user;
+    if (!user) return { userId: null, businessId: null };
+    const { data: profile } = await client
+      .from("profiles").select("business_id").eq("user_id", user.id).maybeSingle();
+    return {
+      userId: user.id,
+      businessId: (profile as { business_id?: string } | null)?.business_id ?? null,
+    };
+  } catch {
+    return { userId: null, businessId: null };
+  }
+}
+
+const CHAT_MODEL = "google/gemini-3-flash-preview";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const originBlock = rejectDisallowedOrigin(req);
@@ -141,6 +166,20 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      const caller = await resolveCaller(auth);
+      const startedAt = Date.now();
+      if (caller.userId) {
+        const quota = await checkAiQuota(caller.businessId, caller.userId);
+        if (!quota.allowed) {
+          await logAiUsage({
+            userId: caller.userId, businessId: caller.businessId, feature: "fynny_chat",
+            model: CHAT_MODEL, prompt: message.slice(0, 500),
+            status: "blocked", errorMessage: "daily_limit_reached",
+          });
+          return quotaExceededResponse(quota, corsHeaders);
+        }
+      }
+
       const ctx = body.context || {};
       // Task 7: caller-supplied real financial context, injected ahead of the
       // rest of the system prompt so the model answers from live metrics.
@@ -184,6 +223,13 @@ Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Kee
             : aiResp.status === 402
             ? "AI credits exhausted."
             : "AI gateway error";
+        if (caller.userId) {
+          await logAiUsage({
+            userId: caller.userId, businessId: caller.businessId, feature: "fynny_chat",
+            model: CHAT_MODEL, prompt: message.slice(0, 500),
+            responseTimeMs: Date.now() - startedAt, status: "error", errorMessage: msg,
+          });
+        }
         return new Response(JSON.stringify({ error: msg }), {
           status,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -192,6 +238,14 @@ Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Kee
 
       const json = await aiResp.json();
       const text = json?.choices?.[0]?.message?.content ?? "";
+      if (caller.userId) {
+        await logAiUsage({
+          userId: caller.userId, businessId: caller.businessId, feature: "fynny_chat",
+          model: CHAT_MODEL, prompt: message.slice(0, 500), response: text,
+          tokensUsed: json?.usage?.total_tokens ?? estimateTokens(systemPrompt + message + text),
+          responseTimeMs: Date.now() - startedAt, status: "success",
+        });
+      }
       return new Response(
         JSON.stringify({
           response: text,
@@ -214,6 +268,20 @@ Respond in plain text. Use **bold** for key numbers and \\n for line breaks. Kee
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: auth } },
     });
+
+    const streamCaller = await resolveCaller(auth);
+    const streamStartedAt = Date.now();
+    if (streamCaller.userId) {
+      const quota = await checkAiQuota(streamCaller.businessId, streamCaller.userId);
+      if (!quota.allowed) {
+        await logAiUsage({
+          userId: streamCaller.userId, businessId: streamCaller.businessId, feature: "fynny_chat",
+          model: CHAT_MODEL, prompt: "(blocked before call)",
+          status: "blocked", errorMessage: "daily_limit_reached",
+        });
+        return quotaExceededResponse(quota, corsHeaders);
+      }
+    }
 
     const { messages = [] } = body || {};
     const context = await buildContext(supabase);
@@ -258,10 +326,26 @@ ${JSON.stringify(context, null, 2)}`;
       }
       const t = await aiResp.text();
       console.error("AI gateway error", aiResp.status, t);
+      await logAiUsage({
+        userId: streamCaller.userId, businessId: streamCaller.businessId, feature: "fynny_chat",
+        model: CHAT_MODEL, prompt: "(streaming)",
+        responseTimeMs: Date.now() - streamStartedAt, status: "error",
+        errorMessage: `gateway_${aiResp.status}`,
+      });
       return new Response(JSON.stringify({ error: "AI gateway error" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Streamed answers are metered up-front (one request = one unit); token
+    // count is estimated from the prompt since the stream carries no usage block.
+    const lastUserMsg = String(messages[messages.length - 1]?.content ?? "").slice(0, 500);
+    await logAiUsage({
+      userId: streamCaller.userId, businessId: streamCaller.businessId, feature: "fynny_chat",
+      model: CHAT_MODEL, prompt: lastUserMsg || "(streaming)",
+      tokensUsed: estimateTokens(systemPrompt + lastUserMsg),
+      responseTimeMs: Date.now() - streamStartedAt, status: "success",
+    });
 
     return new Response(aiResp.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
