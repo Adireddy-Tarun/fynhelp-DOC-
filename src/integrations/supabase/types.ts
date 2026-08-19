@@ -5768,6 +5768,7 @@ export type Database = {
       is_blog_admin: { Args: never; Returns: boolean }
       is_blog_editor: { Args: never; Returns: boolean }
       is_ca_firm_privileged: { Args: { _firm_id: string }; Returns: boolean }
+      is_demo_viewer: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
       lookup_client_by_reference: {
         Args: { p_ca_firm_id: string; p_reference_code: string }
