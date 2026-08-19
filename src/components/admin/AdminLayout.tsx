@@ -3,8 +3,8 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react
 import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
-  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper, ShieldCheck,
-, Gauge } from "lucide-react";
+  Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper, ShieldCheck, Gauge,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
