@@ -19,11 +19,10 @@ type Row = {
 };
 
 const LOW_CREDIT_PCT = 80; // >= 80% of the daily allowance used = low credit
-const SENIOR_ROLES = ["super_admin", "ops_admin", "admin"];
 
 export default function AdminAICreditsPage() {
-  const { role } = useAdminAuth();
-  const canEditLimits = SENIOR_ROLES.includes(String(role ?? ""));
+  const { hasRole } = useAdminAuth();
+  const canEditLimits = hasRole("super_admin", "ops_admin", "admin");
 
   const [rows, setRows] = useState<Row[]>([]);
   const [defaultLimit, setDefaultLimit] = useState<number | null>(null);
@@ -121,7 +120,7 @@ export default function AdminAICreditsPage() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 32, flexWrap: "wrap" }}>
         <div style={{ position: "relative", flex: "1 1 260px", maxWidth: 360 }}>
-          <Search size={16} style={{ position: "absolute", left: 12, top: 11, color: "#9A8straight" as never }} />
+          <Search size={16} style={{ position: "absolute", left: 12, top: 11, color: "#9A8778" }} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}

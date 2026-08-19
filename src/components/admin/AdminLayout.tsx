@@ -4,7 +4,7 @@ import {
   BarChart3, Users, CreditCard, FileText, MessageCircle, TrendingUp, Bot,
   Send, Flag, Settings, Activity, ClipboardList, Menu, X, LogOut, ChevronDown,
   Search, Bell, LayoutDashboard, Lock, UserPlus, Image as ImageIcon, Newspaper, ShieldCheck,
-} from "lucide-react";
+, Gauge } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth, type AdminRole } from "@/contexts/AdminAuthContext";
@@ -29,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/admin/support", label: "Support Tickets", icon: MessageCircle, roles: ["super_admin","ops_admin","support_agent"] },
   { to: "/admin/analytics", label: "Analytics", icon: TrendingUp, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/ai-monitoring", label: "AI Monitoring", icon: Bot, roles: ["super_admin","ops_admin","analyst"] },
+  { to: "/admin/ai-credits", label: "AI Credits & Usage", icon: Gauge, roles: ["super_admin","ops_admin","analyst"] },
   { to: "/admin/communications", label: "Communications Hub", icon: Send, roles: ["super_admin","ops_admin","support_agent"] },
   { to: "/admin/feature-flags", label: "Feature Flags", icon: Flag, roles: ["super_admin","ops_admin"] },
   { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck, roles: ["super_admin"] },
