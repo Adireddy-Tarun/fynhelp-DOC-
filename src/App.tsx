@@ -375,7 +375,9 @@ const App = () => (
             <Route path="/signup" element={<Navigate to="/login" replace />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
 
+            <Route path="/dashboard" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cockpit"   element={<DashboardLayout><IntelligencePage mode="live" tab="liquidity" /></DashboardLayout>} />
+
             <Route path="/dashboard/360" element={<Navigate to="/dashboard/liquidity" replace />} />
             <Route path="/dashboard/cash-flow" element={<CashFlowPage />} />
             <Route path="/dashboard/runway" element={<Navigate to="/dashboard/liquidity" replace />} />
