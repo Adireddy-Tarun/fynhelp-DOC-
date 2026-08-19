@@ -49,6 +49,8 @@ import InternLoginPage from "./pages/intern/InternLoginPage";
 import InternResourcesPage from "./pages/intern/InternResourcesPage";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
+import DemoAccessGate from "@/components/demo/DemoAccessGate";
+
 import WaitlistPopup from "./components/WaitlistPopup";
 import { Sentry } from "@/lib/monitoring";
 import { usePageTracking } from "@/hooks/usePageTracking";
