@@ -4,6 +4,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { authErrorMessage } from "@/lib/authErrors";
+import HCaptcha from "@/components/HCaptcha";
+import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 
 export default function CALoginPage() {
@@ -13,17 +15,27 @@ export default function CALoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Enter a valid email address");
     if (!password) return setError("Enter your password");
+    if (!captcha) return setError("Please complete the CAPTCHA");
     setLoading(true);
+    const security = await checkAuthSecurity(email.trim(), "ca_login", captcha);
+    if (!security.allowed) {
+      setLoading(false);
+      setError(security.error ?? "Too many attempts. Please try again later.");
+      setCaptcha(null);
+      return;
+    }
     const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInErr) {
       setError(authErrorMessage(signInErr.message, "signin"));
+      setCaptcha(null);
       return;
     }
     toast.success("Signed in");
@@ -74,8 +86,10 @@ export default function CALoginPage() {
             </div>
           </CAField>
 
+          <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+
           {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
-          <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
+          <CAButton type="submit" disabled={loading || !captcha} style={{ height: 46, fontSize: 14 }}>
             {loading ? "Signing in…" : "Sign in"}
           </CAButton>
         </form>
