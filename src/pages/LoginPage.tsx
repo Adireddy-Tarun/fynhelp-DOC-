@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { setRememberMe } from "@/lib/sessionPolicy";
 import FynLogo from "@/components/FynLogo";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
@@ -91,10 +92,9 @@ const LoginPage = () => {
       return;
     }
 
-    // "Remember me": if unchecked, mark the browser session as ephemeral so
-    // AuthContext signs the user out at the start of a new browser session.
-    if (remember) localStorage.removeItem("fyn.sessionOnly");
-    else localStorage.setItem("fyn.sessionOnly", "1");
+    // "Remember me": if unchecked, the persisted auth token is purged when the
+    // page unloads, so the session cannot outlive this browser session.
+    setRememberMe(remember);
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: siPassword });
     setSiSubmitting(false);
