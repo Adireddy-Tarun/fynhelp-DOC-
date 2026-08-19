@@ -49,6 +49,8 @@ import InternLoginPage from "./pages/intern/InternLoginPage";
 import InternResourcesPage from "./pages/intern/InternResourcesPage";
 import ProtectedCeoRoute from "@/components/admin/ProtectedCeoRoute";
 import Index from "./pages/Index.tsx";
+import DemoAccessGate from "@/components/demo/DemoAccessGate";
+
 import WaitlistPopup from "./components/WaitlistPopup";
 import { Sentry } from "@/lib/monitoring";
 import { usePageTracking } from "@/hooks/usePageTracking";
@@ -335,41 +337,45 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/ca-firms" element={<CAFirmsPage />} />
             <Route path="/waitlist" element={<WaitlistPage />} />
-            <Route path="/demo/login" element={<DemoLogin />} />
-            <Route path="/demo/upload" element={<DemoUpload />} />
-            <Route path="/demo/onboarding" element={<DemoOnboarding />} />
-            <Route path="/demo/ca" element={<CADemoPage />} />
-            <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
-            <Route path="/demo/liquidity"  element={<DemoIntelligencePage tab="liquidity" />} />
-            <Route path="/demo/revenue"    element={<DemoIntelligencePage tab="revenue" />} />
-            <Route path="/demo/cost"       element={<DemoIntelligencePage tab="cost" />} />
-            <Route path="/demo/gst"        element={<DemoIntelligencePage tab="gst" />} />
-            <Route path="/demo/governance" element={<DemoIntelligencePage tab="governance" />} />
-            <Route path="/demo/hr"         element={<DemoIntelligencePage tab="hr" />} />
-            <Route path="/demo/investor"   element={<DemoIntelligencePage tab="investor" />} />
-            <Route path="/demo/fynny"      element={<DemoIntelligencePage tab="fynny" />} />
-            <Route path="/demo/reports"    element={<DemoReportsPage />} />
-            <Route path="/demo/customers"  element={<DemoCustomersPage />} />
-            <Route path="/demo/customers/:id" element={<DemoCustomerPage />} />
-            <Route path="/demo/vendors"    element={<DemoVendorsPage />} />
-            <Route path="/demo/vendors/:id" element={<DemoVendorPage />} />
-            <Route path="/demo/invoices"   element={<DemoInvoicesPage />} />
-            <Route path="/demo/invoices/:id" element={<DemoInvoicePage />} />
-            <Route path="/demo/expenses"   element={<DemoExpensesPage />} />
-            <Route path="/demo/expenses/:id" element={<DemoExpensePage />} />
-            <Route path="/demo/employees"  element={<DemoEmployeesPage />} />
-            <Route path="/demo/employees/:id" element={<DemoEmployeePage />} />
-            <Route path="/demo/gst/:id"    element={<DemoGstFilingPage />} />
-            <Route path="/demo/risks/:id"  element={<DemoRiskPage />} />
-            <Route path="/demo/insurance/:id" element={<DemoInsurancePage />} />
-            <Route path="/demo/deals/:id"  element={<DemoDealPage />} />
-            <Route path="/demo/bank/:id"   element={<DemoBankTxnPage />} />
-            <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
-            <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
-            <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
-            <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
+            {/* Demo workspace: seeded sample data, restricted to the pilot testing account */}
+            <Route element={<DemoAccessGate />}>
+              <Route path="/demo/login" element={<DemoLogin />} />
+              <Route path="/demo/upload" element={<DemoUpload />} />
+              <Route path="/demo/onboarding" element={<DemoOnboarding />} />
+              <Route path="/demo/ca" element={<CADemoPage />} />
+              <Route path="/demo/dashboard" element={<Navigate to="/demo/liquidity" replace />} />
+              <Route path="/demo" element={<Navigate to="/demo/liquidity" replace />} />
+              <Route path="/demo/cockpit"    element={<Navigate to="/demo/liquidity" replace />} />
+              <Route path="/demo/liquidity"  element={<DemoIntelligencePage tab="liquidity" />} />
+              <Route path="/demo/revenue"    element={<DemoIntelligencePage tab="revenue" />} />
+              <Route path="/demo/cost"       element={<DemoIntelligencePage tab="cost" />} />
+              <Route path="/demo/gst"        element={<DemoIntelligencePage tab="gst" />} />
+              <Route path="/demo/governance" element={<DemoIntelligencePage tab="governance" />} />
+              <Route path="/demo/hr"         element={<DemoIntelligencePage tab="hr" />} />
+              <Route path="/demo/investor"   element={<DemoIntelligencePage tab="investor" />} />
+              <Route path="/demo/fynny"      element={<DemoIntelligencePage tab="fynny" />} />
+              <Route path="/demo/reports"    element={<DemoReportsPage />} />
+              <Route path="/demo/customers"  element={<DemoCustomersPage />} />
+              <Route path="/demo/customers/:id" element={<DemoCustomerPage />} />
+              <Route path="/demo/vendors"    element={<DemoVendorsPage />} />
+              <Route path="/demo/vendors/:id" element={<DemoVendorPage />} />
+              <Route path="/demo/invoices"   element={<DemoInvoicesPage />} />
+              <Route path="/demo/invoices/:id" element={<DemoInvoicePage />} />
+              <Route path="/demo/expenses"   element={<DemoExpensesPage />} />
+              <Route path="/demo/expenses/:id" element={<DemoExpensePage />} />
+              <Route path="/demo/employees"  element={<DemoEmployeesPage />} />
+              <Route path="/demo/employees/:id" element={<DemoEmployeePage />} />
+              <Route path="/demo/gst/:id"    element={<DemoGstFilingPage />} />
+              <Route path="/demo/risks/:id"  element={<DemoRiskPage />} />
+              <Route path="/demo/insurance/:id" element={<DemoInsurancePage />} />
+              <Route path="/demo/deals/:id"  element={<DemoDealPage />} />
+              <Route path="/demo/bank/:id"   element={<DemoBankTxnPage />} />
+              <Route path="/demo/decision-simulator" element={<DemoModeBanner><DecisionSimulatorComingSoon /></DemoModeBanner>} />
+              <Route path="/demo/market-growth"      element={<DemoModeBanner><MarketGrowthComingSoon /></DemoModeBanner>} />
+              <Route path="/demo/banking"            element={<DemoModeBanner><BankingComingSoon /></DemoModeBanner>} />
+              <Route path="/demo/ca-partner"         element={<DemoModeBanner><CAPartnerComingSoon /></DemoModeBanner>} />
+            </Route>
+
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<Navigate to="/login" replace />} />
