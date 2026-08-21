@@ -268,7 +268,7 @@ const Footer = () => {
 
           {/* Mobile nav grid */}
           <div className="hidden max-md:grid grid-cols-2 gap-4 text-sm w-full max-w-[320px]">
-            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
+            {[...productItems.slice(0, 4), companyItems[0], { label: "Blog", href: "/blog" }, ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
               (item) => (
                 <Link
                   key={item.label}
