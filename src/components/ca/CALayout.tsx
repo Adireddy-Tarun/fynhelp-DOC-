@@ -128,6 +128,8 @@ export default function CALayout() {
     );
   }
 
+  if (!caFirm) return null;
+
   const title = pageTitles[location.pathname] ||
     (location.pathname.startsWith("/ca/client/") ? "Client Detail" : "CA Portal");
 

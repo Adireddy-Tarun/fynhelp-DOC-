@@ -36,7 +36,7 @@ const BEIGE = "#F4EDDA";
 // unique id suffix per render to avoid <defs> collisions
 let _gid = 0;
 const useGid = () => {
-  const ref = React.useRef<string>();
+  const ref = React.useRef<string | undefined>(undefined);
   if (!ref.current) ref.current = `fyni-${++_gid}`;
   return ref.current;
 };
@@ -74,7 +74,7 @@ const Wrap: React.FC<{
   >
     {/* clone child to inject size if needed */}
     {React.isValidElement(children)
-      ? React.cloneElement(children as React.ReactElement, { width: size, height: size })
+      ? React.cloneElement(children as React.ReactElement<any>, { width: size, height: size })
       : children}
   </span>
 );

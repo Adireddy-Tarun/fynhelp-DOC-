@@ -154,7 +154,7 @@ const Navbar = () => {
   const [previewModule, setPreviewModule] = useState<ModuleKey>("liquidity");
   const [mProducts, setMProducts] = useState(false);
   const [mCA, setMCA] = useState(false);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const scheduleClose = () => {
