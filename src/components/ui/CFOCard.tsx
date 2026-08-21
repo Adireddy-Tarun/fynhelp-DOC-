@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
-import CountUp from "react-countup";
+import CountUpImport from "react-countup";
+// react-countup ships CJS; some bundler paths hand back { default: Component }.
+const CountUp = ((CountUpImport as unknown as { default?: typeof CountUpImport })?.default ?? CountUpImport) as typeof CountUpImport;
 import { colors, shimmer, pulseGlow, typography } from "@/lib/design-system";
 
 interface CFOCardProps {
