@@ -774,7 +774,8 @@ function GlossaryModal({
 
   const save = async () => {
     if (!form.term || !form.short_definition || !form.full_definition) {
-      return toast.error("Term, short and full definition are required");
+      toast.error("Term, short and full definition are required");
+      return;
     }
     setSaving(true);
     const payload = {
@@ -783,7 +784,7 @@ function GlossaryModal({
       full_definition: form.full_definition,
       related_terms: form.related_terms
         .split(",")
-        .map((s) => s.trim())
+        .map((s: string) => s.trim())
         .filter(Boolean),
       is_published: form.is_published,
       sort_order: form.sort_order,
