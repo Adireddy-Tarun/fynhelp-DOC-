@@ -7,7 +7,7 @@ export function exportToCsv(data: CsvRow[], filename: string) {
     toast.error("No data to export");
     return;
   }
-  const headers = Object.keys(data[0]);
+  const headers = Object.keys(data[0]!);
   const csvContent = [
     headers.join(","),
     ...data.map((row) =>
