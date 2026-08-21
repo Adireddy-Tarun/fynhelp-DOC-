@@ -303,7 +303,7 @@ function VideosTab() {
 
   const del = async (id: string) => {
     const { error } = await supabase.from("resource_videos").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Video deleted");
     setConfirmId(null);
     load();
@@ -421,7 +421,7 @@ function VideoModal({
       ({ error } = await supabase.from("resource_videos").insert(payload));
     }
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(initial.id ? "Video updated" : "Video created");
     onSaved();
   };
@@ -480,7 +480,7 @@ function TemplatesTab() {
 
   const del = async (id: string) => {
     const { error } = await supabase.from("resources").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Template deleted");
     setConfirmId(null);
     load();
@@ -583,7 +583,7 @@ function TemplateModal({
   };
 
   const save = async () => {
-    if (!form.title) return toast.error("Title is required");
+    if (!form.title) { toast.error("Title is required"); return; }
     setSaving(true);
     const payload: any = {
       title: form.title,
@@ -606,7 +606,7 @@ function TemplateModal({
       ({ error } = await supabase.from("resources").insert(payload));
     }
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(initial.id ? "Template updated" : "Template created");
     onSaved();
   };
@@ -680,7 +680,7 @@ function GlossaryTab() {
 
   const del = async (id: string) => {
     const { error } = await supabase.from("resource_glossary").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Term deleted");
     setConfirmId(null);
     load();
@@ -796,7 +796,7 @@ function GlossaryModal({
       ({ error } = await supabase.from("resource_glossary").insert(payload));
     }
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(initial.id ? "Term updated" : "Term created");
     onSaved();
   };
