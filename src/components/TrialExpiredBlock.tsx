@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Lock, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,7 +14,7 @@ export default function TrialExpiredBlock() {
       style={{ background: BEIGE }}
     >
       <div
-        className="max-w-lg w-full bg-white rounded-2xl border p-8 md:p-10 text-center shadow-sm"
+        className="max-w-lg w-full bg-white rounded-2xl border p-8 md:p-10 text-center shadow-xs"
         style={{ borderColor: BORDER }}
       >
         <div

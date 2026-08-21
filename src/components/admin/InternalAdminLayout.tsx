@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "@/lib/router-compat";
 import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";

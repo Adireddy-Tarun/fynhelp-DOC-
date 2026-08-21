@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "@/lib/router-compat";
 import { LayoutGrid, Users, UserPlus, Bell, Settings, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";

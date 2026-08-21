@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@/lib/router-compat";
 import DemoModeBanner from "@/components/demo/DemoModeBanner";
 import CustomerDetail from "@/demo/components/detail/CustomerDetail";
 

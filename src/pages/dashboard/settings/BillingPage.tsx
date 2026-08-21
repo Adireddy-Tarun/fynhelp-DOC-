@@ -17,7 +17,7 @@ const Card = ({ title, danger, children }: { title: string; danger?: boolean; ch
   </div>
 );
 
-const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none";
+const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden";
 
 const Metric = ({ label, used, total, pct }: { label: string; used: string; total: string; pct: number }) => (
   <div className="p-4 rounded-md border" style={{ borderColor: BORDER }}>

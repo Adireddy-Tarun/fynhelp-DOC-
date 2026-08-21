@@ -9,7 +9,7 @@ import {
   BUSINESS_TYPES,
 } from "./productMeta";
 import { FYN } from "./widgets/Shared";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 

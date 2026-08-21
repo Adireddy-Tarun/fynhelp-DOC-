@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "@/lib/router-compat";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   ListPageShell, FilterChips, Pagination, useDebounced,

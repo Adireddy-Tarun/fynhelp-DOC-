@@ -115,7 +115,7 @@ export default function SignupGateModal({ open, scenarioName, onClose, onUnlocke
                     placeholder={f.label}
                     value={state[f.k as keyof typeof state] as string}
                     onChange={(e) => update(f.k, e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md border border-fyn-ink/15 bg-white/60 text-fyn-ink text-sm placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/15 transition"
+                    className="w-full px-3.5 py-2.5 rounded-md border border-fyn-ink/15 bg-white/60 text-fyn-ink text-sm placeholder:text-fyn-ink/40 focus:outline-hidden focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/15 transition"
                   />
                   {errors[f.k] && <p className="text-fyn-red text-xs mt-1">{errors[f.k]}</p>}
                 </div>

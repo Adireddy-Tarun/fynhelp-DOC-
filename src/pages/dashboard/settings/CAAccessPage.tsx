@@ -13,7 +13,7 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
   </div>
 );
 
-const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#A93838]/30";
 
 const moduleOpts = ["Liquidity", "Revenue", "Cost", "GST & Tax", "Governance"];
 

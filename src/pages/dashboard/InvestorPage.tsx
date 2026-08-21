@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ArrowDownRight, ArrowUpRight, Printer, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";

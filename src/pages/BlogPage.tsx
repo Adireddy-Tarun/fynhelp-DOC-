@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";

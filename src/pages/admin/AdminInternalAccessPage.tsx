@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { ChevronRight, Users, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

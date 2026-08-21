@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet } from "@/lib/router-compat";
 import { User, Lock, Bell, Globe, Building2, Users, Plug, CreditCard, Star, Briefcase, ChevronRight } from "lucide-react";
 
 const settingsNav = [

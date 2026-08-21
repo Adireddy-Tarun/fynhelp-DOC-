@@ -14,7 +14,7 @@ const Card = ({ title, sub, danger, children }: { title: string; sub?: string; d
   </div>
 );
 
-const inputCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+const inputCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#A93838]/30";
 
 const passwordStrength = (pw: string): { label: string; pct: number; color: string } => {
   let s = 0;

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { X } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useCustomerDetail } from "@/demo/hooks/useDemoData";

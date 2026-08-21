@@ -1,6 +1,6 @@
 // ─── src/pages/dashboard/ImportPage.tsx ────────────────────────────────────
 import { useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";

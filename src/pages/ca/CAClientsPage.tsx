@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { supabaseExternal } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";

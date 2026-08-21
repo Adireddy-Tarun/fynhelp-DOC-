@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { isAdminEmail } from "@/lib/adminEmails";
 

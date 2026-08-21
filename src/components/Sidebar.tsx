@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "@/lib/router-compat";
 import {
   LayoutDashboard, MessageSquare, Droplets, TrendingUp, DollarSign,
   FileText, Users, BarChart3, Upload,

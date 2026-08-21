@@ -3,7 +3,7 @@
  * Used by /demo/* and /dashboard/* via IntelligenceProvider mode.
  */
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Droplets, TrendingUp, DollarSign, FileText, Shield, Users, BarChart3, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LiquidityTab from "./tabs/LiquidityTab";

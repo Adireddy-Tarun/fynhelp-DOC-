@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -251,7 +251,7 @@ const CashFlowPage = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search description..."
-            className="outline-none flex-1 min-w-[160px]"
+            className="outline-hidden flex-1 min-w-[160px]"
             style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }}
           />
           <div className="flex gap-1">

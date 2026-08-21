@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import FynLogo from '@/components/FynLogo';
 
 /* ---------- FYNHELP palette ---------- */

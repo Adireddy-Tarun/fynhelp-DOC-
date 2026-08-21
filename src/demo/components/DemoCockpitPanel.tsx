@@ -5,7 +5,7 @@
  * Every metric card is clickable and either navigates to its list page or
  * opens the detail drawer. Drives the drill-down UX from the cockpit.
  */
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import { ArrowUpRight, TrendingDown, Wallet, Clock, Users, AlertTriangle, Receipt } from "lucide-react";
 import {
   FynCard, FynCardTitle, FynLabel, FynBadge, FynSectionTitle, FynLoading,

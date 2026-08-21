@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Lock, Download, ArrowRight, Shield } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { SCENARIOS, type Tone, type ScenarioResult } from "./simulator/scenarios";
@@ -161,7 +161,7 @@ export default function SimulatorSection() {
                       <select
                         value={String(state[inp.key])}
                         onChange={(e) => onSelectChange(inp.key, e.target.value)}
-                        className="w-full px-3 py-2 rounded-md border border-fyn-ink/15 bg-white/60 text-fyn-ink text-sm focus:outline-none focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/15"
+                        className="w-full px-3 py-2 rounded-md border border-fyn-ink/15 bg-white/60 text-fyn-ink text-sm focus:outline-hidden focus:border-fyn-red focus:ring-2 focus:ring-fyn-red/15"
                         style={{ fontFamily: "'Roboto', sans-serif" }}
                       >
                         {inp.options.map((o) => (

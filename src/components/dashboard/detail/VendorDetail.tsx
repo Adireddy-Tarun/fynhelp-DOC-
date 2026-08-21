@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { X } from "lucide-react";
 import { useVendorDetail } from "@/hooks/dashboard/useDashboardData";
 import { useMode } from "@/components/intelligence/DataSource";

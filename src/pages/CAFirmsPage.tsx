@@ -489,7 +489,7 @@ function LeadForm() {
 
   const label = "block text-[12px] font-semibold mb-1.5";
   const field =
-    "w-full h-11 px-3 rounded-md border bg-white text-[14px] outline-none focus:ring-2";
+    "w-full h-11 px-3 rounded-md border bg-white text-[14px] outline-hidden focus:ring-2";
   const fieldStyle = { borderColor: "rgba(26,16,8,0.12)", color: DARK } as const;
 
   return (
@@ -574,7 +574,7 @@ function LeadForm() {
                   rows={2}
                   value={form.pain}
                   onChange={onChange("pain")}
-                  className="w-full px-3 py-2 rounded-md border bg-white text-[14px] outline-none focus:ring-2"
+                  className="w-full px-3 py-2 rounded-md border bg-white text-[14px] outline-hidden focus:ring-2"
                   style={fieldStyle}
                 />
               </div>

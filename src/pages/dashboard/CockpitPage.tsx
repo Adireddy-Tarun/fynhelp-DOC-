@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatINR } from "@/lib/indian-format";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   Droplet, TrendingUp, DollarSign, FileText, Shield, Users,
@@ -158,7 +158,7 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 250, damping: 22 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="text-left bg-card border border-border rounded-xl p-6 h-full w-full flex flex-col hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+      className="text-left bg-card border border-border rounded-xl p-6 h-full w-full flex flex-col hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red"
     >
       <div className="flex items-start justify-between mb-fyn-sm">
         <div
@@ -378,7 +378,7 @@ const CockpitPage = () => {
             onClick={() => setDemoMode((v) => !v)}
             aria-pressed={demoMode}
             aria-label="Toggle demo mode"
-            className="relative h-6 w-11 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+            className="relative h-6 w-11 rounded-full transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red"
             style={{
               background: demoMode
                 ? "linear-gradient(135deg, hsl(var(--fyn-red)) 0%, hsl(var(--fyn-gold)) 100%)"

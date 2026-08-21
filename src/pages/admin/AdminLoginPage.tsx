@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

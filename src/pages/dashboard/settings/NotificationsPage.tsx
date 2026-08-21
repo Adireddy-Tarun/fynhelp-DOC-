@@ -15,7 +15,7 @@ const Card = ({ title, sub, children }: { title: string; sub?: string; children:
   </div>
 );
 
-const selCls = "h-9 px-3 rounded-md border bg-card text-[13px] focus:outline-none";
+const selCls = "h-9 px-3 rounded-md border bg-card text-[13px] focus:outline-hidden";
 
 const Row = ({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) => (
   <div className="flex items-start justify-between gap-4 py-2">

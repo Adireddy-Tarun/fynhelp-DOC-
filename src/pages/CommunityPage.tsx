@@ -99,7 +99,7 @@ const CommunityPage = () => {
                 <input
                   type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-hidden focus:border-fyn-red text-sm"
                   aria-label="Email for community waitlist"
                 />
                 <button type="submit" className="px-6 py-2.5 bg-fyn-red text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
@@ -140,7 +140,7 @@ const CommunityPage = () => {
                 <form onSubmit={(e) => { e.preventDefault(); registerEvent(eventEmail1, "office_hours", setEvent1Submitted); }} className="flex gap-2">
                   <input type="email" required value={eventEmail1} onChange={(e) => setEventEmail1(e.target.value)}
                     placeholder="your@email.com" aria-label="Register for CFO Office Hours"
-                    className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm" />
+                    className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-hidden focus:border-fyn-red text-sm" />
                   <button type="submit" className="px-4 py-2 bg-fyn-red text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Register →</button>
                 </form>
               )}
@@ -155,7 +155,7 @@ const CommunityPage = () => {
                 <form onSubmit={(e) => { e.preventDefault(); registerEvent(eventEmail2, "gst_clinic", setEvent2Submitted); }} className="flex gap-2">
                   <input type="email" required value={eventEmail2} onChange={(e) => setEventEmail2(e.target.value)}
                     placeholder="your@email.com" aria-label="Register for GST Clinic"
-                    className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red text-sm" />
+                    className="flex-1 px-3 py-2 rounded-lg border border-fyn-ink-10 bg-fyn-beige text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-hidden focus:border-fyn-red text-sm" />
                   <button type="submit" className="px-4 py-2 bg-fyn-red text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">Register →</button>
                 </form>
               )}

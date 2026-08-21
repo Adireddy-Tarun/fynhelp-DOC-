@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Fragment } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, CalendarIcon, ChevronDown, ChevronRight, Download } from "lucide-react";
 import { format } from "date-fns";
@@ -448,7 +448,7 @@ const CompliancePage = () => {
           })()}
           {isFetching && (
             <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-end p-2">
-              <span className="inline-flex items-center gap-1.5 bg-fyn-beige-card/95 border border-fyn-ink-10 text-fyn-ink/70 text-[11px] font-medium px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1.5 bg-fyn-beige-card/95 border border-fyn-ink-10 text-fyn-ink/70 text-[11px] font-medium px-2.5 py-1 rounded-full shadow-xs backdrop-blur-sm">
                 <RefreshCw className="h-3 w-3 animate-spin" />
                 Updating…
               </span>

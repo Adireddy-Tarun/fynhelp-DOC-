@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Upload, FileText, AlertCircle, Loader } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from '@/lib/router-compat'
 import { supabase } from '@/integrations/supabase/client'
 import Papa from 'papaparse'
 

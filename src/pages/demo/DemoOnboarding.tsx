@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Bot, Send } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from '@/lib/router-compat'
 import { supabase } from '@/integrations/supabase/client'
 
 const QUESTIONS = [
@@ -129,7 +129,7 @@ export function DemoOnboarding() {
           </p>
         </div>
 
-        <div className="bg-white border border-[rgba(26,16,8,0.08)] rounded-2xl p-6 mb-6 h-[500px] overflow-y-auto shadow-sm">
+        <div className="bg-white border border-[rgba(26,16,8,0.08)] rounded-2xl p-6 mb-6 h-[500px] overflow-y-auto shadow-xs">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -176,7 +176,7 @@ export function DemoOnboarding() {
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
               placeholder="Type your answer..."
-              className="flex-1 px-6 py-4 bg-white border border-[rgba(26,16,8,0.12)] rounded-xl text-fyn-ink text-lg placeholder:text-[#9A9A9A] focus:outline-none focus:border-[#A93838] transition-colors"
+              className="flex-1 px-6 py-4 bg-white border border-[rgba(26,16,8,0.12)] rounded-xl text-fyn-ink text-lg placeholder:text-[#9A9A9A] focus:outline-hidden focus:border-[#A93838] transition-colors"
               autoFocus
             />
             <button

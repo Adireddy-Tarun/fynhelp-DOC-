@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 
 const INK = "#1A1008";
 const BEIGE = "#F4EDDA";

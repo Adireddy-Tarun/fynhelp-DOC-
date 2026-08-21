@@ -4,7 +4,7 @@ import { FynTable, FynTH, FynTR, FynTD, FynBadge, FynLoading, FynEmpty } from "@
 import { useEmployeesDemo } from "@/demo/hooks/useDemoData";
 import { formatINR } from "@/lib/indian-format";
 import { UsersRound } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 
 export default function EmployeesListPage() {
   const { data: emps, isLoading, error } = useEmployeesDemo();

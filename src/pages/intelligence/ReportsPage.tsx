@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGeneratedReports, useGenerateReport } from "@/hooks/dashboard/useReports";
 import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/components/intelligence/DataSource";

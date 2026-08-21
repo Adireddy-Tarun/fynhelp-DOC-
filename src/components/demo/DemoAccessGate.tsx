@@ -1,4 +1,4 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link } from "@/lib/router-compat";
 import { useAuth } from "@/contexts/AuthContext";
 import { Lock } from "lucide-react";
 
@@ -33,7 +33,7 @@ export default function DemoAccessGate() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-6">
-      <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+      <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
           <Lock className="h-6 w-6 text-primary" aria-hidden="true" />
         </div>

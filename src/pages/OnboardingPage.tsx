@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -239,7 +239,7 @@ const OnboardingPage = () => {
   };
 
   const inputBase =
-    "w-full h-[42px] px-4 border rounded text-sm focus:outline-none focus:ring-2 transition-all duration-200";
+    "w-full h-[42px] px-4 border rounded text-sm focus:outline-hidden focus:ring-2 transition-all duration-200";
 
   const fieldStyle = (key: string) => ({
     background: "hsl(var(--fyn-beige))",

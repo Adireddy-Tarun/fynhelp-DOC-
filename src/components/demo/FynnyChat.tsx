@@ -447,7 +447,7 @@ export function FynnyChat({ data }: FynnyChatProps) {
               }
             }}
             placeholder="Ask FYNNY anything about your finances..."
-            className="flex-1 px-5 py-3 rounded-2xl outline-none font-medium text-sm"
+            className="flex-1 px-5 py-3 rounded-2xl outline-hidden font-medium text-sm"
             style={{
               background: colors.bg.tertiary,
               color: colors.text.primary,

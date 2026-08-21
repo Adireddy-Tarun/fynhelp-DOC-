@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "@/lib/router-compat";
 import { ArrowLeft, Send } from "lucide-react";
 import { Card } from "./AdminDashboardPage";
 import { toast } from "sonner";
@@ -223,7 +223,7 @@ export default function AdminSupportTicketDetailPage() {
             <div className="mt-5 rounded-xl p-3" style={{ background: "rgba(244,237,218,0.4)", border: "1px solid rgba(139,105,20,0.15)" }}>
               <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={3}
                 placeholder={`Write a reply to ${businessName || "the user"}…`}
-                className="w-full bg-transparent outline-none resize-y"
+                className="w-full bg-transparent outline-hidden resize-y"
                 style={{ fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))" }} />
               <div className="flex items-center justify-between mt-2">
                 <label className="flex items-center gap-2" style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>

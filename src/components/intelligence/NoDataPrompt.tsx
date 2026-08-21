@@ -2,7 +2,7 @@
  * Task 6 — universal "no data yet" prompt.
  * Rendered under zero-value metrics so a dashboard module is never blank.
  */
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Upload, Plug } from "lucide-react";
 import { ACCENT } from "./_primitives";
 

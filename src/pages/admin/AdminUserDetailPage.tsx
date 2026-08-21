@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "@/lib/router-compat";
 import { ArrowLeft, ExternalLink, Mail, Phone, Building2, Calendar, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";

@@ -14,7 +14,7 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
   </div>
 );
 
-const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+const inpCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#A93838]/30";
 
 type Member = { user_id: string; name: string; email: string; role: string; you: boolean };
 

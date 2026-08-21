@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Clock, Bot, Lightbulb, UserCheck, BarChart3, X, type LucideIcon } from "lucide-react";
 import { SUITES } from "@/data/suiteStatus";
 

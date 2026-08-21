@@ -63,7 +63,7 @@ export function GalaxyButton({
         onMouseLeave={() => setIsHovered(false)}
         onFocus={() => setIsHovered(true)}
         onBlur={() => setIsHovered(false)}
-        className="relative px-6 py-3 rounded-xl text-white overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        className="relative px-6 py-3 rounded-xl text-white overflow-hidden outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         style={{
           background: `linear-gradient(135deg, ${config.bg[0]} 0%, ${config.bg[1]} 100%)`,
           transformStyle: 'preserve-3d',

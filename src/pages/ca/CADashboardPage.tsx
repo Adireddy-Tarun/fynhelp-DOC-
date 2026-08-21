@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { supabaseExternal } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -168,7 +168,7 @@ export default function CADashboardPage() {
                 <CACard
                   key={c.id}
                   style={{ padding: 18, cursor: "pointer" }}
-                  className="hover:shadow-sm transition-shadow"
+                  className="hover:shadow-xs transition-shadow"
                 >
                   <div onClick={() => navigate(`/ca/clients/${c.id}`)}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 8 }}>

@@ -1,5 +1,5 @@
 import { useState, useRef, KeyboardEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Paperclip, Mic, ArrowRight } from "lucide-react";
 
 const FynnyMark = () => (
@@ -340,7 +340,7 @@ export default function HeroSection() {
                 onKeyDown={handleKey}
                 placeholder="Ask Fynny anything about your business..."
                 aria-label="Ask Fynny a question"
-                className="flex-1 bg-transparent outline-none border-0"
+                className="flex-1 bg-transparent outline-hidden border-0"
                 style={{
                   fontFamily: "'Roboto', sans-serif",
                   fontSize: 15,
