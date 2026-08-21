@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { ArrowLeft, Clock, Eye } from "lucide-react";
 import { sanitizeForStorage } from "@/lib/sanitizeHtml";
+import { cleanArticleHtml } from "@/lib/cleanArticleHtml";
 
 
 const INK = "#1A1008";
