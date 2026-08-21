@@ -218,6 +218,12 @@ const Footer = () => {
               onToggle={() => toggle("legal")}
               onClose={close}
             />
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 text-[15px] font-semibold text-white/90 hover:bg-[#C41E1E] hover:border-[#C41E1E] hover:text-white transition-colors duration-300"
+            >
+              Blog
+            </Link>
             <a
               href="mailto:support@fynhelp.com"
               className="text-[15px] font-semibold text-white/80 hover:text-[#C41E1E] hover:underline underline-offset-4 transition-colors duration-300"
@@ -262,7 +268,7 @@ const Footer = () => {
 
           {/* Mobile nav grid */}
           <div className="hidden max-md:grid grid-cols-2 gap-4 text-sm w-full max-w-[320px]">
-            {[...productItems.slice(0, 4), ...companyItems.slice(0, 2), ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
+            {[...productItems.slice(0, 4), companyItems[0], { label: "Blog", href: "/blog" }, ...legalItems.slice(0, 2), ...caItems.slice(0, 2)].map(
               (item) => (
                 <Link
                   key={item.label}
