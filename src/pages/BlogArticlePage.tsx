@@ -87,14 +87,16 @@ export default function BlogArticlePage() {
 
   const isHtml = /<\/?(p|h[1-6]|ul|ol|li|blockquote|pre|img|figure|table|div|br|strong|em)\b/i.test(post.content);
   const html = isHtml
-    ? sanitizeForStorage(post.content)
-    : post.content
-        .split("\n\n")
-        .filter(Boolean)
-        .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
-        .join("");
+    ? cleanArticleHtml(sanitizeForStorage(post.content))
+    : cleanArticleHtml(
+        post.content
+          .split("\n\n")
+          .filter(Boolean)
+          .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
+          .join(""),
+      );
 
-  const plain = (post.content || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   const metaTitle = (post.seo_title || post.title || "").slice(0, 65);
   const metaDesc = (post.seo_description || post.excerpt || plain).slice(0, 158);
   const canonical = `https://www.fynhelp.com/blog/${post.slug}`;
