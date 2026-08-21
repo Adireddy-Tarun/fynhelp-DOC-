@@ -94,17 +94,13 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
 
     if (DROP_SECTIONS.some((s) => title === s || title.startsWith(`${s} `))) return;
 
-    // A leading heading that just repeats the post title is redundant.
-    if (!seenBody && postTitle) {
-      const t = slugish(title);
-      if (t && (t === postTitle || t.startsWith(postTitle) || postTitle.startsWith(t))) {
-        out += body;
-        if (stripTags(body).length > 0) seenBody = true;
-        return;
-      }
+    // Leading top-level headings restate the post title — the page already has an H1.
+    if (!seenBody && (h.level === 1 || (postTitle && slugish(title) === postTitle))) {
+      out += body;
+      if (stripTags(body).length > 0) seenBody = true;
+      return;
     }
     seenBody = true;
-
 
     if (UNWRAP_SECTIONS.includes(title)) {
       out += body;
@@ -112,7 +108,8 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
     }
 
     const cleanTitle = h.inner.replace(/^(\s*(?:<(?:strong|b|em|span)[^>]*>\s*)*)\s*\d+[.)]\s+/i, "$1");
-    out += `<h${h.level}>${cleanTitle}</h${h.level}>${body}`;
+    const level = h.level === 1 ? 2 : h.level;
+    out += `<h${level}>${cleanTitle}</h${level}>${body}`;
   });
 
   return out
