@@ -40,8 +40,26 @@ const stripNumberPrefix = (text: string) => text.replace(/^\s*\d+[.)]\s+/, "");
 
 const normalise = (text: string) => stripNumberPrefix(stripTags(text)).toLowerCase().replace(/[:.]+$/, "").trim();
 
-export function cleanArticleHtml(html: string): string {
+export interface CleanOptions {
+  /** Post title — leading headings that repeat it are dropped. */
+  title?: string;
+  /** Cover image already shown in the page header — removed from the body. */
+  coverImageUrl?: string | null;
+}
+
+const slugish = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+export function cleanArticleHtml(html: string, options: CleanOptions = {}): string {
   if (!html) return "";
+
+  if (options.coverImageUrl) {
+    const src = options.coverImageUrl.split("?")[0];
+    const esc = src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    html = html
+      .replace(new RegExp(`<figure\\b[^>]*>(?:(?!</figure>)[\\s\\S])*?${esc}[\\s\\S]*?</figure>`, "gi"), "")
+      .replace(new RegExp(`<img\\b[^>]*${esc}[^>]*>`, "gi"), "");
+  }
+
 
   const headings: { start: number; end: number; level: number; inner: string }[] = [];
   let match: RegExpExecArray | null;
