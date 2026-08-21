@@ -69,6 +69,10 @@ export function useAuthRedirect(intent: AuthIntent): { state: AuthState; ready: 
 
     if (intent === "protected") {
       if (state === "visitor") {
+        // Never bounce /login back to itself — that used to nest the redirect
+        // param on every render and produce a runaway URL.
+        if (location.pathname === "/login" || redirectedRef.current) return;
+        redirectedRef.current = true;
         const redirect = encodeURIComponent(location.pathname + location.search);
         navigate(`/login?redirect=${redirect}`, { replace: true });
         return;
