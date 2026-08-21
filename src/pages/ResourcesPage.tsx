@@ -466,8 +466,22 @@ const ResourcesPage = () => {
     return "rs-fmt";
   };
 
+  const seoTab = TAB_SEO[activeTab] ?? TAB_SEO.videos;
+
   return (
     <Layout>
+      <Helmet>
+        <title>{seoTab.title}</title>
+        <meta name="description" content={seoTab.description} />
+        <link rel="canonical" href={`https://www.fynhelp.com/resources?tab=${activeTab}`} />
+        <meta property="og:title" content={seoTab.title} />
+        <meta property="og:description" content={seoTab.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.fynhelp.com/resources?tab=${activeTab}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTab.title} />
+        <meta name="twitter:description" content={seoTab.description} />
+      </Helmet>
       <div ref={pageRef} className="rs-page">
         <style>{STYLES}</style>
 
