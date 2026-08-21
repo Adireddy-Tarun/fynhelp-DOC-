@@ -24,8 +24,13 @@ const RED = "#C41E1E";
 const formatDate = (d: string | null) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "";
 
-const excerptOf = (p: ListPost) =>
-  p.excerpt?.trim() ? p.excerpt : articleExcerpt(p.content ?? "", 200, { title: p.title, coverImageUrl: p.cover_image_url });
+const SEO_BRIEF_RE = /(seo information|meta description|url slug|primary keyword|featured snippet)/i;
+
+const excerptOf = (p: ListPost) => {
+  const stored = p.excerpt?.trim();
+  if (stored && !SEO_BRIEF_RE.test(stored)) return stored;
+  return articleExcerpt(p.content ?? "", 200, { title: p.title, coverImageUrl: p.cover_image_url });
+};
 
 const BlogPage = () => {
   const [posts, setPosts] = useState<ListPost[]>([]);
