@@ -21,7 +21,7 @@
  * The /demo/* route tree DELIBERATELY does not call this hook. Demo pages must
  * render identically for logged-out and logged-in visitors.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@/lib/router-compat";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
