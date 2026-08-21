@@ -58,7 +58,15 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
     html = html
       .replace(new RegExp(`<figure\\b[^>]*>(?:(?!</figure>)[\\s\\S])*?${esc}[\\s\\S]*?</figure>`, "gi"), "")
       .replace(new RegExp(`<img\\b[^>]*${esc}[^>]*>`, "gi"), "");
+
+    // A leading image simply repeats the hero cover shown above the body.
+    html = html.replace(
+      /^(\s*(?:<p>\s*)?)(?:<figure\b[\s\S]*?<\/figure>|<img\b[^>]*>)(\s*(?:<\/p>)?\s*)/i,
+      "",
+    );
   }
+
+
 
 
   const headings: { start: number; end: number; level: number; inner: string }[] = [];
