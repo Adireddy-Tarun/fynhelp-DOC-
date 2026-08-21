@@ -157,8 +157,8 @@ export default function BlogArticlePage() {
 
           <h1 style={{ fontFamily: "'Clash Display', Georgia, serif", fontWeight: 700, fontSize: 40, letterSpacing: "-0.02em", color: INK, lineHeight: 1.14, margin: "0 0 16px 0" }}>{post.title}</h1>
 
-          {post.excerpt && (
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 17, color: "rgba(26,16,8,0.65)", lineHeight: 1.6, margin: "0 0 28px 0" }}>{post.excerpt}</p>
+          {cleanExcerpt && (
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 17, color: "rgba(26,16,8,0.65)", lineHeight: 1.6, margin: "0 0 28px 0" }}>{cleanExcerpt}</p>
           )}
 
 
