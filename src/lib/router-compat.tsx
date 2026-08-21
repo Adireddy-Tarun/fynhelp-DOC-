@@ -61,16 +61,19 @@ export function useNavigate(): NavigateFn {
 
 export function useLocation() {
   const loc = tsLocation();
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    // TanStack's searchStr may or may not carry the leading "?" — normalize so
+    // callers building `pathname + search` never produce "/login??foo=1".
+    const raw = loc.searchStr ?? "";
+    const stripped = raw.replace(/^\?+/, "");
+    return {
       pathname: loc.pathname,
-      search: loc.searchStr ? `?${loc.searchStr}` : "",
+      search: stripped ? `?${stripped}` : "",
       hash: loc.hash ?? "",
       state: (loc.state ?? null) as unknown,
-      key: loc.pathname + (loc.searchStr ?? ""),
-    }),
-    [loc.pathname, loc.searchStr, loc.hash, loc.state],
-  );
+      key: loc.pathname + stripped,
+    };
+  }, [loc.pathname, loc.searchStr, loc.hash, loc.state]);
 }
 
 // ---------- useParams ----------
