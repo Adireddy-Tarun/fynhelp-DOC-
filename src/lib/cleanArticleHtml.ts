@@ -117,8 +117,8 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
 }
 
 /** First real sentence(s) of an article, for use when a post has no excerpt. */
-export function articleExcerpt(html: string, maxLength = 200): string {
-  const text = stripTags(cleanArticleHtml(html));
+export function articleExcerpt(html: string, maxLength = 200, options: CleanOptions = {}): string {
+  const text = stripTags(cleanArticleHtml(html, options));
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength).replace(/\s+\S*$/, "")}…`;
 }
