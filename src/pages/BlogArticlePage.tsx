@@ -88,13 +88,14 @@ export default function BlogArticlePage() {
 
   const isHtml = /<\/?(p|h[1-6]|ul|ol|li|blockquote|pre|img|figure|table|div|br|strong|em)\b/i.test(post.content);
   const html = isHtml
-    ? cleanArticleHtml(sanitizeForStorage(post.content))
+    ? cleanArticleHtml(sanitizeForStorage(post.content), { title: post.title, coverImageUrl: post.cover_image_url })
     : cleanArticleHtml(
         post.content
           .split("\n\n")
           .filter(Boolean)
           .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
           .join(""),
+        { title: post.title, coverImageUrl: post.cover_image_url },
       );
 
   const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
