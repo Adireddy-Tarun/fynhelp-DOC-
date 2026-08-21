@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { ArrowLeft, Clock, Eye } from "lucide-react";
 import { sanitizeForStorage } from "@/lib/sanitizeHtml";
+import { cleanArticleHtml } from "@/lib/cleanArticleHtml";
 
 
 const INK = "#1A1008";
@@ -87,16 +88,22 @@ export default function BlogArticlePage() {
 
   const isHtml = /<\/?(p|h[1-6]|ul|ol|li|blockquote|pre|img|figure|table|div|br|strong|em)\b/i.test(post.content);
   const html = isHtml
-    ? sanitizeForStorage(post.content)
-    : post.content
-        .split("\n\n")
-        .filter(Boolean)
-        .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
-        .join("");
+    ? cleanArticleHtml(sanitizeForStorage(post.content), { title: post.title, coverImageUrl: post.cover_image_url })
+    : cleanArticleHtml(
+        post.content
+          .split("\n\n")
+          .filter(Boolean)
+          .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
+          .join(""),
+        { title: post.title, coverImageUrl: post.cover_image_url },
+      );
 
-  const plain = (post.content || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  // Some posts were pasted in with the SEO worksheet inside the excerpt field.
+  const seoBrief = /(seo information|meta description|url slug|primary keyword|featured snippet)/i;
+  const cleanExcerpt = post.excerpt && !seoBrief.test(post.excerpt) ? post.excerpt : "";
   const metaTitle = (post.seo_title || post.title || "").slice(0, 65);
-  const metaDesc = (post.seo_description || post.excerpt || plain).slice(0, 158);
+  const metaDesc = (post.seo_description || cleanExcerpt || plain).slice(0, 158);
   const canonical = `https://www.fynhelp.com/blog/${post.slug}`;
   const image = post.og_image || post.cover_image_url || null;
   const jsonLd = {
@@ -150,11 +157,10 @@ export default function BlogArticlePage() {
 
           <h1 style={{ fontFamily: "'Clash Display', Georgia, serif", fontWeight: 700, fontSize: 40, letterSpacing: "-0.02em", color: INK, lineHeight: 1.14, margin: "0 0 16px 0" }}>{post.title}</h1>
 
-          {post.excerpt && (
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 17, color: "rgba(26,16,8,0.65)", lineHeight: 1.6, margin: "0 0 10px 0" }}>{post.excerpt}</p>
+          {cleanExcerpt && (
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 17, color: "rgba(26,16,8,0.65)", lineHeight: 1.6, margin: "0 0 28px 0" }}>{cleanExcerpt}</p>
           )}
 
-          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.5)", margin: "0 0 28px 0" }}>By {post.author_name}</p>
 
           {post.cover_image_url && (
             <img
@@ -174,16 +180,7 @@ export default function BlogArticlePage() {
           )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderTop: "1px solid rgba(26,16,8,0.08)", borderBottom: "1px solid rgba(26,16,8,0.08)", marginBottom: 40, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: RED, color: "white", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {post.author_name.charAt(0)}
-              </div>
-              <div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13.5, color: INK }}>{post.author_name}</div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{post.author_role}</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 16, marginLeft: "auto", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)", display: "flex", alignItems: "center", gap: 5 }}><Clock size={13} /> {post.reading_time_minutes} min read</span>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)", display: "flex", alignItems: "center", gap: 5 }}><Eye size={13} /> {post.views.toLocaleString("en-IN")} views</span>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{formatDate(post.published_at)}</span>
