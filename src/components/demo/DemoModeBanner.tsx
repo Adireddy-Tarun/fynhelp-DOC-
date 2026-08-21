@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Eye } from "lucide-react";
 import { IntelligenceProvider } from "@/components/intelligence/DataSource";
 

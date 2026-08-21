@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/lib/router-compat";
 import { X } from "lucide-react";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,7 +64,7 @@ export default function WaitlistPopup() {
           type="button"
           onClick={close}
           aria-label="Close"
-          className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-9 h-9 rounded-full bg-fyn-ink/5 hover:bg-fyn-ink/15 text-fyn-ink/70 hover:text-fyn-ink flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fyn-red"
+          className="absolute top-3 right-3 md:top-4 md:right-4 z-10 w-9 h-9 rounded-full bg-fyn-ink/5 hover:bg-fyn-ink/15 text-fyn-ink/70 hover:text-fyn-ink flex items-center justify-center transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red"
         >
           <X className="w-4 h-4" />
         </button>

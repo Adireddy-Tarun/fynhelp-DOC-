@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "@/lib/router-compat";
 import { Helmet } from "react-helmet-async";
 import Layout from "@/components/Layout";
 

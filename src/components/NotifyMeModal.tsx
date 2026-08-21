@@ -105,7 +105,7 @@ export default function NotifyMeModal({ open, initialModuleId, onClose }: Props)
             <select
               value={moduleId}
               onChange={(e) => setModuleId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md border border-[#E5E7EB] bg-white text-sm text-fyn-ink focus:outline-none focus:border-fyn-red"
+              className="w-full px-3 py-2.5 rounded-md border border-[#E5E7EB] bg-white text-sm text-fyn-ink focus:outline-hidden focus:border-fyn-red"
             >
               {comingSoon.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -125,7 +125,7 @@ export default function NotifyMeModal({ open, initialModuleId, onClose }: Props)
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
-              className="w-full px-3 py-2.5 rounded-md border border-[#E5E7EB] bg-white text-sm text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-none focus:border-fyn-red"
+              className="w-full px-3 py-2.5 rounded-md border border-[#E5E7EB] bg-white text-sm text-fyn-ink placeholder:text-fyn-ink/40 focus:outline-hidden focus:border-fyn-red"
             />
           </div>
 

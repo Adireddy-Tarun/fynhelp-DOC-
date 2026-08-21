@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 
 const PRODUCTS: { name: string; desc: string; status: "Live" | "Coming Soon" }[] = [
   { name: "Liquidity Intelligence", desc: "Cash flow forecast, burn rate, runway alerts", status: "Live" },

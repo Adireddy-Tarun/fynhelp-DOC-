@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import {
   PanelLeft, PanelRight, Menu, Search, Bell,
   Droplets, TrendingUp, DollarSign, FileText, Shield, Users,

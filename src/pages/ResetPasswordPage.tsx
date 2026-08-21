@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
@@ -405,7 +405,7 @@ const ResetPasswordPage = () => {
   };
 
   const inputClass =
-    "w-full h-[42px] px-4 pr-11 bg-fyn-beige-card border border-fyn-ink-10 rounded text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-fyn-red transition-colors disabled:opacity-60";
+    "w-full h-[42px] px-4 pr-11 bg-fyn-beige-card border border-fyn-ink-10 rounded text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-fyn-red transition-colors disabled:opacity-60";
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-fyn-beige">

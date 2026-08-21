@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "@/lib/router-compat";
 import { Check, Plus, X as XIcon } from "lucide-react";
 import Layout from "@/components/Layout";
 import FYNIcon from "@/components/FYNIcon";

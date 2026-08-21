@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import Layout from "@/components/Layout";
 import WaitlistForm from "@/components/WaitlistForm";
 import {
@@ -37,7 +37,7 @@ export default function WaitlistPage() {
       >
         {!submitted && (
         <div className="mx-auto mb-8" style={{ maxWidth: 600 }}>
-          <div className="bg-white rounded-xl border border-fyn-ink/10 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-fyn-ink/10 shadow-xs px-5 py-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-fyn-red/10 text-fyn-red shrink-0">
                 <LogIn className="w-5 h-5" />
@@ -157,7 +157,7 @@ export default function WaitlistPage() {
                 </p>
               </header>
 
-              <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-sm p-6 md:p-8">
+              <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-xs p-6 md:p-8">
                 <WaitlistForm onSuccess={() => setSubmitted(true)} />
               </div>
             </div>

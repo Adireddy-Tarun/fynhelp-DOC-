@@ -17,7 +17,7 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
 );
 
 const selectCls =
-  "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+  "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#A93838]/30";
 
 const SaveBtn = ({ onClick }: { onClick: () => void }) => (
   <button onClick={onClick} className="px-5 py-2.5 rounded-md text-sm font-semibold text-white"

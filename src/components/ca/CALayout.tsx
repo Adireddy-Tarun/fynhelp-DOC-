@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { NavLink, useLocation, useNavigate, Outlet, Navigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, Outlet, Navigate } from "@/lib/router-compat";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import FynLogo from "@/components/FynLogo";
 import {
@@ -326,7 +326,7 @@ export default function CALayout() {
             <input
               type="text"
               placeholder="Search client name, GSTIN, or email..."
-              className="w-full h-9 pl-9 pr-3 rounded-md text-sm font-sans focus:outline-none focus:ring-1"
+              className="w-full h-9 pl-9 pr-3 rounded-md text-sm font-sans focus:outline-hidden focus:ring-1"
               style={{ border: "1px solid #E2D5BC", color: "#1A1008", background: "#FCFAF4" }}
             />
           </div>

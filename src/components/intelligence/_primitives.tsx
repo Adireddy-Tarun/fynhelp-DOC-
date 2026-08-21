@@ -2,7 +2,7 @@
  * Shared intelligence-tab primitives. Beige theme, white cards, alive micro-animations.
  */
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ArrowUpRight, Upload, RefreshCw } from "lucide-react";
 import CountUp from "react-countup";
 import { cn } from "@/lib/utils";

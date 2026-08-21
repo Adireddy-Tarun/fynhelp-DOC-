@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, KeyboardEvent, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Brain, Check, X, Clock,
@@ -746,7 +746,7 @@ export default function NeuralNetwork() {
               aria-label={`${n.name} module. Status: ${isLive ? "Live" : "In development"}. Click to explore.`}
               onClick={() => handleClick(n.id)}
               onKeyDown={(e) => onNodeKey(e, n.id)}
-              className="relative rounded-full flex items-center justify-center focus-visible:outline-none"
+              className="relative rounded-full flex items-center justify-center focus-visible:outline-hidden"
               style={{
                 width: layout.moduleSize,
                 height: layout.moduleSize,
@@ -849,7 +849,7 @@ export default function NeuralNetwork() {
                   setHovered(n.id);
                 }}
                 aria-label={`${c.label} metric. Click for details.`}
-                className="rounded-full flex items-center justify-center focus-visible:outline-none"
+                className="rounded-full flex items-center justify-center focus-visible:outline-hidden"
                 style={{
                   width: layout.childSize,
                   height: layout.childSize,

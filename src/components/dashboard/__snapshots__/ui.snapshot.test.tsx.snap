@@ -103,7 +103,7 @@ exports[`dashboard design-system snapshots > FynField composes label/hint 1`] = 
     GSTIN
   </label>
   <input
-    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     type="text"
     value=""
   />
@@ -125,7 +125,7 @@ exports[`dashboard design-system snapshots > FynField shows error in danger tone
     GSTIN
   </label>
   <input
-    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     type="text"
     value=""
   />
@@ -139,7 +139,7 @@ exports[`dashboard design-system snapshots > FynField shows error in danger tone
 
 exports[`dashboard design-system snapshots > FynInput uses brand input chrome 1`] = `
 <input
-  class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+  class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
   placeholder="Enter GSTIN"
   type="text"
 />
@@ -239,7 +239,7 @@ exports[`dashboard design-system snapshots > FynSearchInput renders icon + brand
     />
   </svg>
   <input
-    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed pl-9"
+    class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed pl-9"
     placeholder="Search filings…"
     type="search"
   />
@@ -256,7 +256,7 @@ exports[`dashboard design-system snapshots > FynSectionTitle uses serif h2 1`] =
 
 exports[`dashboard design-system snapshots > FynSelect uses brand input chrome with chevron 1`] = `
 <select
-  class="w-full border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-no-repeat bg-[right_12px_center] pr-10"
+  class="w-full border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-no-repeat bg-[right_12px_center] pr-10"
 >
   <option
     selected=""
@@ -315,7 +315,7 @@ exports[`dashboard design-system snapshots > FynTable renders header/row/cell wi
 
 exports[`dashboard design-system snapshots > FynTextarea uses brand input chrome 1`] = `
 <textarea
-  class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+  class="w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-y"
   placeholder="Notes"
   rows="4"
 />

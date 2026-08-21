@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { X } from "lucide-react";
 import LiquidityWidget from "./widgets/LiquidityWidget";
 import RevenueWidget from "./widgets/RevenueWidget";

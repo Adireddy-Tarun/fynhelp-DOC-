@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/lib/router-compat";
 import Sidebar, { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from "@/components/Sidebar";
 import GlobalHeader from "@/components/layout/GlobalHeader";
 import OfflineBanner from "@/components/OfflineBanner";

@@ -7,7 +7,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, PieChart, Pie, Cell, Legend, LineChart, Line,
 } from "recharts";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import WaitlistStatsWidget from "@/components/admin/WaitlistStatsWidget";
 import { EmptyState } from "@/components/admin/EmptyState";

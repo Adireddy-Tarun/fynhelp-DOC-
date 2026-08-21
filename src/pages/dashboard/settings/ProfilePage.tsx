@@ -14,7 +14,7 @@ const Card = ({ title, sub, children }: { title: string; sub?: string; children:
   </div>
 );
 
-const inputCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-none focus:ring-2 focus:ring-[#A93838]/30";
+const inputCls = "w-full h-10 px-3 rounded-md border bg-card text-[14px] focus:outline-hidden focus:ring-2 focus:ring-[#A93838]/30";
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>

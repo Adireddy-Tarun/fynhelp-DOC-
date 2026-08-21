@@ -163,7 +163,7 @@ export function FynTD({ children, align = "left", mono, className }: { children?
 /* ── Form inputs ──────────────────────────────────────── */
 
 const inputBase =
-  "w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-body text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
+  "w-full bg-fyn-beige-card border border-fyn-ink-10 rounded-md px-fyn-md py-fyn-sm text-fyn-body text-fyn-ink placeholder:text-fyn-ink-40 focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
 
 export const FynInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   function FynInput({ className, type = "text", ...rest }, ref) {

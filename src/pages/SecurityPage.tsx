@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Shield, Lock, Eye, RefreshCw, CheckCircle2, X, KeyRound, Server, Users, FileCheck, Clock, Calendar, Rocket, ShieldCheck, ArrowRight, MessageCircle, CreditCard, XCircle, Sparkles, Mail } from "lucide-react";
 import Layout from "@/components/Layout";

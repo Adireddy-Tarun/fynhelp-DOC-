@@ -231,7 +231,7 @@ export function RevenueBreakdownSection({ active, setActive }: { active: "produc
     <IntelCard title="Revenue Breakdown" action={
       <div className="flex gap-1 text-xs bg-slate-100 rounded-md p-0.5">
         {(["product", "segment", "channel"] as const).map((b) => (
-          <button key={b} onClick={() => setActive(b)} className={`px-2.5 py-1 rounded capitalize ${active === b ? "bg-white text-fyn-ink font-medium shadow-sm" : "text-[#6B6B6B]"}`}>By {b}</button>
+          <button key={b} onClick={() => setActive(b)} className={`px-2.5 py-1 rounded capitalize ${active === b ? "bg-white text-fyn-ink font-medium shadow-xs" : "text-[#6B6B6B]"}`}>By {b}</button>
         ))}
       </div>
     }>

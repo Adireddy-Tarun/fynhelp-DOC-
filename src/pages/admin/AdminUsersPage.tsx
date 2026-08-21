@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

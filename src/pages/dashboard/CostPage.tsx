@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import {
   Wallet, TrendingDown, TrendingUp, Users, RefreshCw, Download,
   AlertTriangle, AlertCircle, Info, ArrowUpRight, ArrowDownRight,

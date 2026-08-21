@@ -116,15 +116,15 @@ export default function WaitlistForm({
   const isDark = theme === "dark";
 
   const inputCls = isDark
-    ? "w-full px-4 py-3 rounded-lg border border-white/30 bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-none focus:ring-4 focus:ring-white/40 disabled:opacity-60"
-    : "w-full px-4 py-3 rounded-lg border border-border bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-none focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-all disabled:opacity-60";
+    ? "w-full px-4 py-3 rounded-lg border border-white/30 bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-hidden focus:ring-4 focus:ring-white/40 disabled:opacity-60"
+    : "w-full px-4 py-3 rounded-lg border border-border bg-white text-fyn-ink placeholder:text-fyn-ink/40 text-sm focus:outline-hidden focus:ring-2 focus:ring-fyn-red focus:border-transparent transition-all disabled:opacity-60";
 
   const labelCls = isDark
     ? "block text-sm font-medium text-white mb-1.5"
     : "block text-sm font-medium text-foreground mb-1.5";
 
   const buttonCls = isDark
-    ? "w-full inline-flex items-center justify-center gap-2 bg-white text-fyn-ink font-bold text-base md:text-lg px-10 py-4 rounded-lg shadow-md hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+    ? "w-full inline-flex items-center justify-center gap-2 bg-white text-fyn-ink font-bold text-base md:text-lg px-10 py-4 rounded-lg shadow-md hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] transition-all duration-200 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-white/60 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
     : "w-full inline-flex items-center justify-center gap-2 font-semibold text-white py-3.5 rounded-lg bg-fyn-red transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed";
 
   const helperCls = isDark

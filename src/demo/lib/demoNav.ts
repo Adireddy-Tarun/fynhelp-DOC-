@@ -3,7 +3,7 @@
  * Every "open" call navigates to the dedicated full-page route at
  * /demo/<entity>/:id. No drawer/sheet UI is rendered.
  */
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 
 export type DrawerKind =
   | "customer" | "vendor" | "invoice" | "expense" | "gst_filing"

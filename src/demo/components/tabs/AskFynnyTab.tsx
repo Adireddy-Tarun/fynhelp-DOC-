@@ -229,7 +229,7 @@ export default function AskFynnyTab() {
             onKeyDown={(e) => e.key === "Enter" && send(input)}
             placeholder="Ask FYNNY anything…"
             disabled={loading}
-            className="flex-1 px-3 py-2 text-sm bg-white rounded-md focus:outline-none focus:ring-2 disabled:opacity-60"
+            className="flex-1 px-3 py-2 text-sm bg-white rounded-md focus:outline-hidden focus:ring-2 disabled:opacity-60"
             style={{ border: "1px solid rgba(26,16,8,0.12)" }}
           />
           <button onClick={() => send(input)} disabled={loading || !input.trim()} className="px-3 rounded-md text-white disabled:opacity-50" style={{ background: ACCENT.red }}>

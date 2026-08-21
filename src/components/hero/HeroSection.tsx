@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "@/lib/router-compat"
 import {
   Shield, TrendingUp, TrendingDown, AlertTriangle, FileText,
   BarChart2, Activity, IndianRupee, Building2, Clock,

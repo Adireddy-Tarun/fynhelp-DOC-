@@ -3,7 +3,7 @@
  * Provides breadcrumb, back-link, count, search/filter/sort row, pagination.
  */
 import { ReactNode, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ChevronLeft } from "lucide-react";
 import { FynPage, FynCard, FynSearchInput, FynSelect } from "@/components/dashboard/ui";
 import { useMode } from "@/components/intelligence/DataSource";

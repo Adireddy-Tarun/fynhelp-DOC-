@@ -4,7 +4,7 @@
  * view-all links and the header refresh/export toolbar.
  */
 import { ReactNode, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {

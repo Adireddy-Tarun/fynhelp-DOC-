@@ -89,7 +89,7 @@ const CAROUSELS: Carousel[] = [
 function LogoCard({ item }: { item: LogoItem }) {
   return (
     <div className="shrink-0 mx-3 group">
-      <div className="h-[56px] min-w-[160px] px-5 flex items-center justify-center gap-2 bg-fyn-beige-card border border-fyn-ink/8 rounded-md shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:-translate-y-0.5">
+      <div className="h-[56px] min-w-[160px] px-5 flex items-center justify-center gap-2 bg-fyn-beige-card border border-fyn-ink/8 rounded-md shadow-xs transition-all duration-300 group-hover:shadow-md group-hover:-translate-y-0.5">
         <span
           className="font-semibold text-[15px] tracking-tight whitespace-nowrap transition-colors"
           style={{ color: item.color || "#1A1008", fontFamily: "'DM Sans', 'Inter', sans-serif" }}

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "@/lib/router-compat";
 import CASidebar from "./CASidebar";
 import CAAuthGuard from "./CAAuthGuard";
 import { CA } from "./portalUi";

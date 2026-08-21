@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "@/lib/router-compat";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, ChevronDown, Copy, Download, FileText, Link2, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -257,7 +257,7 @@ const CFOReportDetailPage = () => {
                 readOnly
                 onFocus={(e) => e.currentTarget.select()}
                 onClick={(e) => e.currentTarget.select()}
-                className="flex-1 bg-card border border-fyn-ink/15 rounded px-2.5 py-2.5 min-h-10 text-xs text-fyn-ink font-mono focus:outline-none focus:ring-2 focus:ring-fyn-red/30"
+                className="flex-1 bg-card border border-fyn-ink/15 rounded px-2.5 py-2.5 min-h-10 text-xs text-fyn-ink font-mono focus:outline-hidden focus:ring-2 focus:ring-fyn-red/30"
               />
               <button
                 onClick={() => {

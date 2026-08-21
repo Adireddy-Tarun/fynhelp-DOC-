@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "@/lib/router-compat";
 
 const routeNames: Record<string, string> = {
   solutions: "Solutions",

@@ -6,7 +6,7 @@
  *
  * Built on shadcn Sheet (right side, ESC + backdrop close handled).
  */
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "@/lib/router-compat";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useMemo } from "react";
 import CustomerDetail from "./detail/CustomerDetail";

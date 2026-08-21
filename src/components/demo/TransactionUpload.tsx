@@ -383,7 +383,7 @@ export function TransactionUpload({ organizationId, onUploadComplete, onClose }:
                   onChange={(e) =>
                     setMapping((m) => ({ ...m, [field.key]: e.target.value }))
                   }
-                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-hidden"
                   style={{
                     background: colors.bg.secondary,
                     border: `1px solid ${colors.primary[700]}60`,
