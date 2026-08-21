@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { proxyExternalQuery } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
@@ -62,28 +62,27 @@ export default function CADashboardPage() {
           let metrics: any = null;
           let gst: any = null;
           if (c.business_id) {
-            try {
-              const { data } = await supabaseExternal
-                .from("liquidity_metrics")
-                .select("cash_position, health_status, runway_months, burn_rate_current")
-                .eq("business_id", c.business_id)
-                .order("recorded_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-              metrics = data;
-            } catch (e) { console.warn("[fyn:ca] liquidity_metrics", c.business_id, e); }
-            try {
-              const { data } = await supabaseExternal
-                .from("gst_filings")
-                .select("due_date, return_type, status")
-                .eq("business_id", c.business_id)
-                .neq("status", "filed")
-                .order("due_date", { ascending: true })
-                .limit(1)
-                .maybeSingle();
-              gst = data;
-            } catch (e) { console.warn("[fyn:ca] gst_filings", c.business_id, e); }
+            const liq = await proxyExternalQuery({
+              table: "liquidity_metrics",
+              business_id: c.business_id,
+              select: "cash_position, health_status, runway_months, burn_rate_current",
+              order: { column: "recorded_at", ascending: false },
+              limit: 1,
+            });
+            if (liq.error) console.warn("[fyn:ca] liquidity_metrics", c.business_id, liq.error);
+            metrics = liq.data?.[0] ?? null;
+
+            const gstRes = await proxyExternalQuery({
+              table: "gst_filings",
+              business_id: c.business_id,
+              select: "due_date, return_type, status",
+              order: { column: "due_date", ascending: true },
+              limit: 50,
+            });
+            if (gstRes.error) console.warn("[fyn:ca] gst_filings", c.business_id, gstRes.error);
+            gst = (gstRes.data ?? []).find((g: any) => g.status !== "filed") ?? null;
           }
+
           return {
             ...c,
             cash_position: metrics?.cash_position ?? null,

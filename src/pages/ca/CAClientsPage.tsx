@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
-import { supabaseExternal } from "@/integrations/supabase/external";
+import { proxyExternalQuery } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import {
@@ -122,23 +122,20 @@ export default function CAClientsPage() {
           if (c.business_id) {
             const bid = c.business_id;
             const [liq, gst, itc, events, tds] = await Promise.all([
-              supabaseExternal
-                .from("liquidity_metrics")
-                .select("cash_position, health_status, runway_months, burn_rate_current")
-                .eq("business_id", bid)
-                .order("recorded_at", { ascending: false })
-                .limit(1)
-                .maybeSingle()
-                .then((r) => r, () => ({ data: null })),
-              supabaseExternal
-                .from("gst_filings")
-                .select("due_date, return_type, status")
-                .eq("business_id", bid)
-                .neq("status", "filed")
-                .order("due_date", { ascending: true })
-                .limit(1)
-                .maybeSingle()
-                .then((r) => r, () => ({ data: null })),
+              proxyExternalQuery({
+                table: "liquidity_metrics",
+                business_id: bid,
+                select: "cash_position, health_status, runway_months, burn_rate_current",
+                order: { column: "recorded_at", ascending: false },
+                limit: 1,
+              }),
+              proxyExternalQuery({
+                table: "gst_filings",
+                business_id: bid,
+                select: "due_date, return_type, status",
+                order: { column: "due_date", ascending: true },
+                limit: 50,
+              }),
               supabase
                 .from("ca_itc_records")
                 .select("total_itc, match_status")
@@ -156,18 +153,19 @@ export default function CAClientsPage() {
                 .then((r) => r, () => ({ data: null })),
             ]);
 
-            const l = (liq as { data: Record<string, unknown> | null }).data;
+            const l = (liq.data?.[0] ?? null) as Record<string, unknown> | null;
             if (l) {
               health = (l.health_status as string) ?? "";
               cash = num(l.cash_position);
               runway = num(l.runway_months);
               burn = num(l.burn_rate_current);
             }
-            const g = (gst as { data: Record<string, unknown> | null }).data;
+            const g = ((gst.data ?? []).find((r: any) => r.status !== "filed") ?? null) as Record<string, unknown> | null;
             if (g) {
               gstDue = fmtDate(g.due_date as string);
               gstType = (g.return_type as string) ?? "";
             }
+
             const itcRows = (itc as { data: { total_itc: number | null; match_status: string | null }[] | null }).data;
             if (itcRows) {
               itcTotal = String(itcRows.reduce((s, r) => s + Number(r.total_itc ?? 0), 0));
