@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { ArrowLeft, Clock, Eye } from "lucide-react";
@@ -25,6 +26,10 @@ interface BlogPost {
   reading_time_minutes: number;
   published_at: string;
   cover_image_url?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  og_image?: string | null;
+  updated_at?: string | null;
 }
 
 export default function BlogArticlePage() {
@@ -39,7 +44,7 @@ export default function BlogArticlePage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url")
+        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url, seo_title, seo_description, og_image, updated_at")
         .eq("slug", slug)
         .eq("status", "published")
         .maybeSingle();
@@ -89,9 +94,46 @@ export default function BlogArticlePage() {
         .map((para) => `<p>${para.replace(/\n/g, "<br />")}</p>`)
         .join("");
 
+  const plain = (post.content || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const metaTitle = (post.seo_title || post.title || "").slice(0, 65);
+  const metaDesc = (post.seo_description || post.excerpt || plain).slice(0, 158);
+  const canonical = `https://www.fynhelp.com/blog/${post.slug}`;
+  const image = post.og_image || post.cover_image_url || null;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: metaDesc,
+    ...(image ? { image: [image] } : {}),
+    datePublished: post.published_at,
+    dateModified: post.updated_at || post.published_at,
+    author: { "@type": "Person", name: post.author_name },
+    publisher: { "@type": "Organization", name: "FynHelp" },
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+    articleSection: post.category,
+    keywords: (post.tags || []).join(", "),
+  };
 
   return (
     <Layout>
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDesc} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:url" content={canonical} />
+        {image && <meta property="og:image" content={image} />}
+        <meta property="article:published_time" content={post.published_at} />
+        {post.category && <meta property="article:section" content={post.category} />}
+        {post.author_name && <meta property="article:author" content={post.author_name} />}
+        <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDesc} />
+        {image && <meta name="twitter:image" content={image} />}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <div style={{ background: BEIGE, minHeight: "100vh" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 24px 80px" }}>
           <Link to="/resources?tab=blog" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.55)", textDecoration: "none", marginBottom: 28 }}>
