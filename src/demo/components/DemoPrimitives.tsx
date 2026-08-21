@@ -4,7 +4,9 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Link } from "@/lib/router-compat";
 import { ArrowUpRight, Upload, RefreshCw } from "lucide-react";
-import CountUp from "react-countup";
+import CountUpImport from "react-countup";
+// react-countup ships CJS; some bundler paths hand back { default: Component }.
+const CountUp = ((CountUpImport as unknown as { default?: typeof CountUpImport })?.default ?? CountUpImport) as typeof CountUpImport;
 import { cn } from "@/lib/utils";
 import { formatINR } from "@/lib/indian-format";
 import { useMode } from "@/demo/components/DemoDataSource";
