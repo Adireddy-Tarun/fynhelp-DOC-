@@ -76,6 +76,8 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
   if (headings.length === 0) return html;
 
   let out = html.slice(0, headings[0].start);
+  const postTitle = options.title ? slugish(options.title) : "";
+  let seenBody = stripTags(out).length > 0;
 
   headings.forEach((h, i) => {
     const bodyEnd = i + 1 < headings.length ? headings[i + 1].start : html.length;
@@ -83,6 +85,18 @@ export function cleanArticleHtml(html: string, options: CleanOptions = {}): stri
     const title = normalise(h.inner);
 
     if (DROP_SECTIONS.some((s) => title === s || title.startsWith(`${s} `))) return;
+
+    // A leading heading that just repeats the post title is redundant.
+    if (!seenBody && postTitle) {
+      const t = slugish(title);
+      if (t && (t === postTitle || t.startsWith(postTitle) || postTitle.startsWith(t))) {
+        out += body;
+        if (stripTags(body).length > 0) seenBody = true;
+        return;
+      }
+    }
+    seenBody = true;
+
 
     if (UNWRAP_SECTIONS.includes(title)) {
       out += body;
