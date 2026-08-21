@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { SiClaude, SiGooglegemini, SiOpenai, SiPerplexity, SiX } from "react-icons/si";
+import { SiClaude, SiGooglegemini, SiPerplexity, SiX } from "react-icons/si";
+import { RiOpenaiFill as SiOpenai } from "react-icons/ri";
 
 const BG = "#F4EDDA";
 const INK = "#1A1008";

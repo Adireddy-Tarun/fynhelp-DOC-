@@ -34,7 +34,7 @@ export default function ProductsNav({
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<ModalProduct | null>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleEnter = () => {
     clearTimeout(closeTimer.current);

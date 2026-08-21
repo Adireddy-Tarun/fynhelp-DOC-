@@ -288,7 +288,7 @@ const CompliancePage = () => {
       const inMonth = rows.filter((r) => r.due_date?.startsWith(monthKey));
       if (inMonth.length === 0) return null;
       const onTime = inMonth.filter(
-        (r) => r.status === "filed" && r.filed_date && r.filed_date <= r.due_date
+        (r) => r.status === "filed" && r.filed_date && r.due_date && r.filed_date <= r.due_date
       ).length;
       return Math.round((onTime / inMonth.length) * 100);
     };
@@ -997,7 +997,7 @@ const CompliancePage = () => {
                 fontSize={12}
               />
               <Tooltip
-                formatter={(v: number | null) => (v === null ? "No filings" : `${v}%`)}
+                formatter={(v) => (v == null ? "No filings" : `${v}%`)}
                 contentStyle={{ background: "hsl(var(--background))", border: "1px solid rgba(26,16,8,0.1)" }}
               />
               <Legend />

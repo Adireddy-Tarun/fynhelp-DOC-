@@ -36,7 +36,7 @@ export function useCACompliance(business_id: string | null) {
 
       if (!cancelled) {
         if (err) { setError(err.message); }
-        else { setEvents(data ?? []); setError(null); }
+        else { setEvents((data ?? []) as ComplianceEvent[]); setError(null); }
         setLoading(false);
       }
     })();
@@ -49,7 +49,7 @@ export function useCACompliance(business_id: string | null) {
       .from("ca_compliance_events")
       .update({ status: "filed", filing_date, updated_at: new Date().toISOString() })
       .eq("id", event_id)
-      .eq("ca_firm_id", caFirm?.id);
+      .eq("ca_firm_id", caFirm?.id ?? "");
     if (!error) {
       const ev = events.find((e) => e.id === event_id);
       track("gst_filing_marked_filed", { event_type: ev?.event_type, filing_period: ev?.filing_period });

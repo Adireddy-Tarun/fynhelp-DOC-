@@ -41,6 +41,7 @@ export const colors = {
     50:  "#F9DCDC",
     100: "#F2B5B5",
     300: "#E06A6A",
+    400: "#D14444",
     500: "#C41E1E", // Main brand color
     600: "#a51818",
     700: "#8a1414",

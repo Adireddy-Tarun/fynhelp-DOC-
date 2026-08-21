@@ -87,12 +87,12 @@ export default function WaitlistForm({
 
       const { error } = await supabase.from("waitlist").insert({
         email: formData.email.trim().toLowerCase(),
-        name: formData.name || null,
-        company_name: formData.company_name || null,
-        phone: formData.phone || null,
-        company_type: formData.company_type || null,
-        company_size: formData.company_size || null,
-        location: formData.location || null,
+        name: formData.name || "",
+        company_name: formData.company_name || "",
+        phone: formData.phone || "",
+        company_type: formData.company_type || "",
+        company_size: formData.company_size || "",
+        location: formData.location || "",
         position: nextPos,
         is_converted: false,
       });

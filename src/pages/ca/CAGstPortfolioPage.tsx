@@ -152,7 +152,7 @@ export default function CAGstPortfolioPage() {
       (vendorRes.data || []).forEach((v: any) => {
         const key = v.vendor_gstin || v.vendor_name;
         if (!key) return;
-        const cur = vMap.get(key) || { name: v.vendor_name, clients: new Set(), scores: [] };
+        const cur = vMap.get(key) || { name: v.vendor_name, clients: new Set<string>(), scores: [] as number[] };
         cur.clients.add(v.business_id);
         if (v.compliance_score != null) cur.scores.push(v.compliance_score);
         vMap.set(key, cur);

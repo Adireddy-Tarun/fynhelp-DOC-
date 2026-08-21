@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw, Download, Upload, Eye, EyeOff, Trash2, FileText, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -254,7 +255,7 @@ export default function ResourceActivityLog({ resources }: { resources: { id: st
                 <span style={{ fontFamily: "monospace", fontSize: 10.5, color: "rgba(26,16,8,0.5)", whiteSpace: "nowrap" }}>
                   {new Date(e.at).toLocaleString("en-IN")}
                 </span>
-                {e.meta.outcome && e.meta.outcome !== "success" && (
+                {Boolean(e.meta.outcome) && e.meta.outcome !== "success" && (
                   <span style={{ fontFamily: BODY, fontSize: 10, fontWeight: 700, color: RED }}>{String(e.meta.outcome)}</span>
                 )}
               </div>

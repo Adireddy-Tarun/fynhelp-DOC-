@@ -52,7 +52,7 @@ export function useCAITC(business_id: string | null, filing_period: string | nul
 
       if (!cancelled) {
         if (err) { setError(err.message); }
-        else { setRecords(data ?? []); setError(null); }
+        else { setRecords((data ?? []) as ITCRecord[]); setError(null); }
         setLoading(false);
       }
     })();

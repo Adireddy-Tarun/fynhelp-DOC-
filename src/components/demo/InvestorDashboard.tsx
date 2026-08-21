@@ -152,7 +152,7 @@ export function InvestorDashboard({ data: _data }: { data: any }) {
                 borderBottom: i < arr.length - 1 ? SURF.divider : "none",
               }}
             >
-              <div style={{ display: "flex", gap: 12, alignItems: "center", color: A.beige72, ...T.td }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", ...T.td, color: A.beige72 }}>
                 <Icon size={14} style={{ color: row.color, flexShrink: 0 }} />
                 <span>{row.text}</span>
               </div>
