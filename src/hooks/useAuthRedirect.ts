@@ -21,7 +21,7 @@
  * The /demo/* route tree DELIBERATELY does not call this hook. Demo pages must
  * render identically for logged-out and logged-in visitors.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "@/lib/router-compat";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,6 +60,7 @@ export function useAuthRedirect(intent: AuthIntent): { state: AuthState; ready: 
   const navigate = useNavigate();
   const location = useLocation();
   const [ready, setReady] = useState(false);
+  const redirectedRef = useRef(false);
 
   useEffect(() => {
     // "public" never gates or redirects — used by the read-only /demo/* tree.
@@ -69,6 +70,10 @@ export function useAuthRedirect(intent: AuthIntent): { state: AuthState; ready: 
 
     if (intent === "protected") {
       if (state === "visitor") {
+        // Never bounce /login back to itself — that used to nest the redirect
+        // param on every render and produce a runaway URL.
+        if (location.pathname === "/login" || redirectedRef.current) return;
+        redirectedRef.current = true;
         const redirect = encodeURIComponent(location.pathname + location.search);
         navigate(`/login?redirect=${redirect}`, { replace: true });
         return;
