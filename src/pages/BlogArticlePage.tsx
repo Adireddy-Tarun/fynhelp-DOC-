@@ -26,6 +26,10 @@ interface BlogPost {
   reading_time_minutes: number;
   published_at: string;
   cover_image_url?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  og_image?: string | null;
+  updated_at?: string | null;
 }
 
 export default function BlogArticlePage() {
@@ -40,7 +44,7 @@ export default function BlogArticlePage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url")
+        .select("id, slug, title, excerpt, content, category, author_name, author_role, tags, views, reading_time_minutes, published_at, cover_image_url, seo_title, seo_description, og_image, updated_at")
         .eq("slug", slug)
         .eq("status", "published")
         .maybeSingle();
