@@ -99,8 +99,11 @@ export default function BlogArticlePage() {
       );
 
   const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  // Some posts were pasted in with the SEO worksheet inside the excerpt field.
+  const seoBrief = /(seo information|meta description|url slug|primary keyword|featured snippet)/i;
+  const cleanExcerpt = post.excerpt && !seoBrief.test(post.excerpt) ? post.excerpt : "";
   const metaTitle = (post.seo_title || post.title || "").slice(0, 65);
-  const metaDesc = (post.seo_description || post.excerpt || plain).slice(0, 158);
+  const metaDesc = (post.seo_description || cleanExcerpt || plain).slice(0, 158);
   const canonical = `https://www.fynhelp.com/blog/${post.slug}`;
   const image = post.og_image || post.cover_image_url || null;
   const jsonLd = {
