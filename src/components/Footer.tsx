@@ -218,6 +218,12 @@ const Footer = () => {
               onToggle={() => toggle("legal")}
               onClose={close}
             />
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 text-[15px] font-semibold text-white/90 hover:bg-[#C41E1E] hover:border-[#C41E1E] hover:text-white transition-colors duration-300"
+            >
+              Blog
+            </Link>
             <a
               href="mailto:support@fynhelp.com"
               className="text-[15px] font-semibold text-white/80 hover:text-[#C41E1E] hover:underline underline-offset-4 transition-colors duration-300"
