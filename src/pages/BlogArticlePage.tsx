@@ -176,16 +176,7 @@ export default function BlogArticlePage() {
           )}
 
           <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderTop: "1px solid rgba(26,16,8,0.08)", borderBottom: "1px solid rgba(26,16,8,0.08)", marginBottom: 40, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: RED, color: "white", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {post.author_name.charAt(0)}
-              </div>
-              <div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13.5, color: INK }}>{post.author_name}</div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{post.author_role}</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 16, marginLeft: "auto", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)", display: "flex", alignItems: "center", gap: 5 }}><Clock size={13} /> {post.reading_time_minutes} min read</span>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)", display: "flex", alignItems: "center", gap: 5 }}><Eye size={13} /> {post.views.toLocaleString("en-IN")} views</span>
               <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{formatDate(post.published_at)}</span>
