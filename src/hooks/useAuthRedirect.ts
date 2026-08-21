@@ -60,6 +60,7 @@ export function useAuthRedirect(intent: AuthIntent): { state: AuthState; ready: 
   const navigate = useNavigate();
   const location = useLocation();
   const [ready, setReady] = useState(false);
+  const redirectedRef = useRef(false);
 
   useEffect(() => {
     // "public" never gates or redirects — used by the read-only /demo/* tree.
