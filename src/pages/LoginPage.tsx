@@ -22,7 +22,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { ready: authReady } = useAuthRedirect("public-only");
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(searchParams.get("mode") === "signup" ? "signup" : "signin");
 
   // Sign-in state
   const [siEmail, setSiEmail] = useState("");
