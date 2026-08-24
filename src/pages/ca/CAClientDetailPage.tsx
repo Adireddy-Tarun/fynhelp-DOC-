@@ -621,6 +621,96 @@ export default function CAClientDetailPage() {
           </>
         )}
       </div>
+
+      {mis && <MisModal report={mis} onClose={() => setMis(null)} />}
+    </div>
+  );
+}
+
+function MisModal({ report, onClose }: { report: MisReport; onClose: () => void }) {
+  const download = () => {
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mis-${report.client_name.replace(/\s+/g, "-").toLowerCase()}-${report.period.replace(/\s+/g, "-").toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const Row = ({ label, value }: { label: string; value: string }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `0.5px solid ${CA.line}` }}>
+      <span style={{ fontSize: 12.5, color: CA.muted }}>{label}</span>
+      <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+    </div>
+  );
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div style={{ marginTop: 16 }}>
+      <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: CA.faint, marginBottom: 6 }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(15,20,18,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 60 }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "#FFFFFF", borderRadius: 12, width: "100%", maxWidth: 640, maxHeight: "88vh", overflow: "auto", padding: 24, border: `0.5px solid ${CA.line}` }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>MIS — {report.period}</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 4 }}>{report.client_name}</div>
+          </div>
+          <button aria-label="Close" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted }}>
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+
+        <Section title="Revenue & expenses">
+          <Row label="Revenue" value={inr(report.revenue)} />
+          <Row label="Expenses" value={inr(report.expenses)} />
+          <Row label="Gross profit" value={inr(report.gross_profit)} />
+        </Section>
+
+        <Section title="GST summary">
+          <Row label="GST collected" value={inr(report.gst_collected)} />
+          <Row label="GST paid" value={inr(report.gst_paid)} />
+        </Section>
+
+        <Section title="ITC status">
+          <Row label="ITC available" value={inr(report.itc_available)} />
+          <Row label="ITC claimed" value={inr(report.itc_claimed)} />
+          <Row label="ITC balance" value={inr(report.itc_balance)} />
+        </Section>
+
+        <Section title="Compliance status">
+          <Row label="Filed" value={String(report.compliance_summary.filed)} />
+          <Row label="Pending" value={String(report.compliance_summary.pending)} />
+          <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
+        </Section>
+
+        <Section title="Exceptions">
+          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} />
+          <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
+        </Section>
+
+        <Section title="Data quality">
+          <Row label="Posted documents" value={String(report.data_quality.doc_count)} />
+          <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
+        </Section>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
+          <CAButton variant="ghost" onClick={onClose}>Close</CAButton>
+          <CAButton onClick={download}>Download JSON</CAButton>
+        </div>
+      </div>
     </div>
   );
 }
