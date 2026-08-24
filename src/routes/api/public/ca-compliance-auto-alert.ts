@@ -103,7 +103,7 @@ async function run(request: Request): Promise<Response> {
   if (inserts.length) {
     const { data: created, error: insErr } = await supabaseAdmin
       .from("ca_notifications")
-      .upsert(inserts as never, { onConflict: "compliance_event_id", ignoreDuplicates: true })
+      .insert(inserts as never)
       .select("id");
     if (insErr) {
       return new Response(JSON.stringify({ error: insErr.message }), {
