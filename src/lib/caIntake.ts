@@ -142,6 +142,10 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
 
   const { data: userRes } = await supabase.auth.getUser();
   const userId = userRes?.user?.id ?? null;
+  if (!userId) {
+    await supabase.storage.from("ca-client-documents").remove([path]);
+    return { ok: false, error: "Not authenticated" };
+  }
 
   const { data: docRow, error: docErr } = await supabase
     .from("ca_client_documents")
