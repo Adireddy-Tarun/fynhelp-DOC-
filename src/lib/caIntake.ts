@@ -1,0 +1,349 @@
+/**
+ * Document Intake OS — upload → OCR/extract → classify → confidence → review → post.
+ *
+ * Every step writes an audit event and keeps the link back to the source
+ * document, so any posted number can be traced to the file it came from.
+ */
+import { supabase } from "@/integrations/supabase/client";
+import { validateUpload } from "@/lib/uploadPolicy";
+import { logCAAudit } from "@/lib/caAudit";
+
+export type CADocClass = "bank" | "invoice" | "expense" | "challan" | "other";
+
+export const DOC_CLASS_LABELS: Record<CADocClass, string> = {
+  bank: "Bank statement",
+  invoice: "Sales invoice",
+  expense: "Expense bill",
+  challan: "Tax challan",
+  other: "Other",
+};
+
+/** Threshold above which an extraction skips manual review. */
+export const AUTO_ACCEPT_CONFIDENCE = 0.85;
+
+export interface ExtractionRow {
+  [key: string]: unknown;
+}
+
+export interface CAExtraction {
+  id: string;
+  ca_firm_id: string;
+  business_id: string;
+  request_id: string | null;
+  document_id: string | null;
+  storage_path: string | null;
+  original_filename: string | null;
+  classification: string;
+  confidence: number;
+  extracted: { rows?: ExtractionRow[] } | null;
+  corrected: { rows?: ExtractionRow[] } | null;
+  review_state: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  posted_at: string | null;
+  posted_ref: string | null;
+  error_message: string | null;
+  created_at: string;
+}
+
+/** Guess a document class from the filename before the model sees it. */
+export function guessClassification(filename: string): CADocClass {
+  const f = filename.toLowerCase();
+  if (/(statement|bank|passbook|acct|account)/.test(f)) return "bank";
+  if (/(invoice|inv[-_ ]?\d|bill[-_ ]?to|sales)/.test(f)) return "invoice";
+  if (/(expense|purchase|vendor|receipt|voucher)/.test(f)) return "expense";
+  if (/(challan|gst|tds|itns|payment[-_ ]?ack)/.test(f)) return "challan";
+  return "other";
+}
+
+/** Only these classes have an extraction prompt today. */
+export function extractableDocType(c: CADocClass): "bank" | "invoice" | "expense" | null {
+  if (c === "bank" || c === "invoice" || c === "expense") return c;
+  return null;
+}
+
+/**
+ * Confidence is derived from how complete the extracted rows are, not from
+ * the model's own self-report (which it does not provide).
+ */
+export function scoreConfidence(docType: "bank" | "invoice" | "expense", rows: ExtractionRow[]): number {
+  if (!rows.length) return 0;
+  const required: Record<string, string[]> = {
+    bank: ["date", "description", "amount", "direction"],
+    invoice: ["customer", "invoice_number", "amount", "date"],
+    expense: ["vendor", "amount", "date"],
+  };
+  const fields = required[docType];
+  let filled = 0;
+  let total = 0;
+  for (const r of rows) {
+    for (const f of fields) {
+      total += 1;
+      const v = r[f];
+      if (v !== null && v !== undefined && String(v).trim() !== "") filled += 1;
+    }
+  }
+  const completeness = total ? filled / total : 0;
+  // small penalty for single-row extractions of multi-row document types
+  const volumeFactor = docType === "bank" && rows.length < 3 ? 0.9 : 1;
+  return Math.round(completeness * volumeFactor * 100) / 100;
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function storagePathFor(firmId: string, businessId: string, period: string | null, filename: string) {
+  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_{2,}/g, "_").toLowerCase();
+  const seg = period ? period.replace(/[^a-zA-Z0-9-]/g, "") : "unfiled";
+  return `${firmId}/${businessId}/${seg}/${Date.now()}_${safe}`;
+}
+
+export interface IntakeInput {
+  file: File;
+  firmId: string;
+  businessId: string;
+  clientReferenceCode: string;
+  requestId?: string | null;
+  period?: string | null;
+  classification?: CADocClass;
+}
+
+export interface IntakeResult {
+  ok: boolean;
+  error?: string;
+  extractionId?: string;
+  reviewState?: string;
+  classification?: CADocClass;
+  confidence?: number;
+  rowCount?: number;
+}
+
+/** Full intake pipeline for one file. */
+export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> {
+  const { file, firmId, businessId, clientReferenceCode } = input;
+
+  const policyError = validateUpload("ca-client-documents", file);
+  if (policyError) return { ok: false, error: policyError };
+
+  const classification = input.classification ?? guessClassification(file.name);
+  const period = input.period ?? null;
+  const path = storagePathFor(firmId, businessId, period, file.name);
+
+  const { error: upErr } = await supabase.storage
+    .from("ca-client-documents")
+    .upload(path, file, { cacheControl: "3600", upsert: false });
+  if (upErr) return { ok: false, error: upErr.message };
+
+  const { data: userRes } = await supabase.auth.getUser();
+  const userId = userRes?.user?.id ?? null;
+
+  const { data: docRow, error: docErr } = await supabase
+    .from("ca_client_documents")
+    .insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      client_reference_code: clientReferenceCode,
+      original_filename: file.name,
+      stored_filename: path.split("/").pop() ?? file.name,
+      storage_path: path,
+      file_size_bytes: file.size,
+      mime_type: file.type,
+      document_type: classification,
+      filing_period: period,
+      uploaded_by: userId,
+    })
+    .select("id")
+    .single();
+
+  if (docErr) {
+    await supabase.storage.from("ca-client-documents").remove([path]);
+    return { ok: false, error: docErr.message };
+  }
+
+  const docType = extractableDocType(classification);
+  let rows: ExtractionRow[] = [];
+  let confidence = 0;
+  let errorMessage: string | null = null;
+
+  if (docType) {
+    try {
+      const dataUrl = await fileToBase64(file);
+      const { data, error } = await supabase.functions.invoke("extract-document-ai", {
+        body: { doc_type: docType, file_base64: dataUrl, mime_type: file.type },
+      });
+      if (error) {
+        errorMessage = error.message;
+      } else {
+        rows = Array.isArray((data as { rows?: ExtractionRow[] })?.rows) ? (data as { rows: ExtractionRow[] }).rows : [];
+        confidence = scoreConfidence(docType, rows);
+      }
+    } catch (e) {
+      errorMessage = e instanceof Error ? e.message : "Extraction failed";
+    }
+  } else {
+    errorMessage = "No extractor for this document class — needs manual classification";
+  }
+
+  const reviewState = errorMessage
+    ? "failed"
+    : confidence >= AUTO_ACCEPT_CONFIDENCE
+    ? "auto_accepted"
+    : "needs_review";
+
+  const { data: extraction, error: exErr } = await supabase
+    .from("ca_document_extractions")
+    .insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      request_id: input.requestId ?? null,
+      document_id: docRow.id,
+      storage_path: path,
+      original_filename: file.name,
+      classification,
+      confidence,
+      extracted: { rows } as never,
+      review_state: reviewState,
+      error_message: errorMessage,
+      uploaded_by: userId,
+    })
+    .select("id")
+    .single();
+
+  if (exErr) return { ok: false, error: exErr.message };
+
+  await logCAAudit({
+    firmId,
+    businessId,
+    entityType: "document_extraction",
+    entityId: extraction.id,
+    action: "document_ingested",
+    sourceDocumentId: docRow.id,
+    detail: { classification, confidence, rows: rows.length, review_state: reviewState, filename: file.name },
+  });
+
+  return {
+    ok: true,
+    extractionId: extraction.id,
+    reviewState,
+    classification,
+    confidence,
+    rowCount: rows.length,
+  };
+}
+
+function num(v: unknown): number {
+  const n = Number(String(v ?? "").replace(/[^0-9.\-]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function isoDate(v: unknown): string {
+  const s = String(v ?? "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? new Date().toISOString().slice(0, 10) : d.toISOString().slice(0, 10);
+}
+
+/** Post a reviewed extraction into the ledger, keeping the source link. */
+export async function postExtraction(
+  extraction: CAExtraction,
+  rows: ExtractionRow[],
+): Promise<{ ok: boolean; error?: string; posted?: number }> {
+  const cls = extraction.classification as CADocClass;
+  const businessId = extraction.business_id;
+  if (!rows.length) return { ok: false, error: "Nothing to post — no rows in this extraction." };
+
+  let error: string | null = null;
+  let posted = 0;
+
+  if (cls === "bank") {
+    const payload = rows.map((r) => ({
+      business_id: businessId,
+      date: isoDate(r.date),
+      description: String(r.description ?? "").slice(0, 500),
+      type: String(r.direction ?? "debit").toLowerCase() === "credit" ? "credit" : "debit",
+      amount: num(r.amount),
+      source_document_id: extraction.document_id,
+      source_reference: `ca_extraction:${extraction.id}`,
+    }));
+    const { error: e, count } = await supabase.from("bank_transactions").insert(payload).select("id", { count: "exact" });
+    error = e?.message ?? null;
+    posted = count ?? payload.length;
+  } else if (cls === "invoice") {
+    const payload = rows.map((r) => ({
+      business_id: businessId,
+      invoice_number: String(r.invoice_number ?? `AI-${extraction.id.slice(0, 8)}`),
+      invoice_date: isoDate(r.date),
+      subtotal: num(r.amount),
+      total_amount: num(r.amount),
+      outstanding_amount: num(r.amount),
+      status: "pending",
+    }));
+    const { error: e, count } = await supabase.from("invoices").insert(payload).select("id", { count: "exact" });
+    error = e?.message ?? null;
+    posted = count ?? payload.length;
+  } else if (cls === "expense") {
+    const payload = rows.map((r) => ({
+      business_id: businessId,
+      category: String(r.category ?? "Uncategorised"),
+      description: String(r.vendor ?? ""),
+      amount: num(r.amount),
+      date: isoDate(r.date),
+      payment_status: "pending",
+    }));
+    const { error: e, count } = await supabase.from("expenses").insert(payload).select("id", { count: "exact" });
+    error = e?.message ?? null;
+    posted = count ?? payload.length;
+  } else {
+    return { ok: false, error: "This document class cannot be posted to the ledger." };
+  }
+
+  if (error) return { ok: false, error };
+
+  const { error: updErr } = await supabase
+    .from("ca_document_extractions")
+    .update({
+      review_state: "posted",
+      corrected: { rows } as never,
+      posted_at: new Date().toISOString(),
+      posted_ref: `${cls}:${posted}`,
+    })
+    .eq("id", extraction.id);
+  if (updErr) return { ok: false, error: updErr.message };
+
+  await logCAAudit({
+    firmId: extraction.ca_firm_id,
+    businessId,
+    entityType: "document_extraction",
+    entityId: extraction.id,
+    action: "posted_to_ledger",
+    sourceDocumentId: extraction.document_id,
+    detail: { classification: cls, rows: posted },
+  });
+
+  return { ok: true, posted };
+}
+
+export async function rejectExtraction(extraction: CAExtraction, reason: string) {
+  const { error } = await supabase
+    .from("ca_document_extractions")
+    .update({ review_state: "rejected", error_message: reason, reviewed_at: new Date().toISOString() })
+    .eq("id", extraction.id);
+  if (!error) {
+    await logCAAudit({
+      firmId: extraction.ca_firm_id,
+      businessId: extraction.business_id,
+      entityType: "document_extraction",
+      entityId: extraction.id,
+      action: "rejected",
+      sourceDocumentId: extraction.document_id,
+      detail: { reason },
+    });
+  }
+  return error?.message ?? null;
+}
