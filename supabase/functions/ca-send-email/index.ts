@@ -52,7 +52,12 @@ Deno.serve(async (req) => {
 
 
   let body: {
-    kind?: "client_invite" | "team_invite";
+    kind?: "client_invite" | "team_invite" | "document_chase";
+    request_title?: string;
+    period?: string | null;
+    doc_types?: string[];
+    due_date?: string;
+    days_overdue?: number;
     ca_firm_id?: string;
     to: string;
     client_name?: string;
@@ -121,7 +126,21 @@ Deno.serve(async (req) => {
   let subject = "";
   let html = "";
 
-  if (kind === "client_invite") {
+  if (kind === "document_chase") {
+    const docs = (body.doc_types ?? []).map((d) => esc(String(d))).join(", ") || "the requested documents";
+    const period = body.period ? esc(String(body.period)) : "the current period";
+    subject = `Reminder from ${firm.firm_name}: ${body.request_title ?? "documents"} pending for ${period}`;
+    html = shell(
+      "Documents still pending",
+      `<p style="font-size:14px;color:rgba(26,26,26,0.72);line-height:1.7;margin:0">
+         Hello ${esc(body.client_name ?? "there")},<br><br>
+         <strong>${firmName}</strong> is still waiting for <strong>${docs}</strong> for the period <strong>${period}</strong>.<br>
+         This was due on <strong>${esc(body.due_date ?? "")}</strong>${body.days_overdue ? ` — <strong>${Number(body.days_overdue)} day(s) overdue</strong>` : ""}.<br><br>
+         Please upload the documents through your FynHelp client portal so your filings stay on schedule.
+       </p>`,
+      { label: "Upload documents", href: "https://fynhelp.com/client-portal" },
+    );
+  } else if (kind === "client_invite") {
     subject = `You have been invited to share financial access with ${firm.firm_name} on FynHelp`;
     html = shell(
       `${firmName} has requested access to your books`,
