@@ -6,6 +6,7 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
 } from "@/components/ca/portalUi";
+import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
 
 interface ClientRow {
   id: string;
