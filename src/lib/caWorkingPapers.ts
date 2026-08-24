@@ -90,31 +90,33 @@ export async function buildPaperContent(
       if (outstanding > 0) observations.push("Outstanding receivables should be aged and chased before sign-off.");
     } else {
       const output = rows.reduce((s, r) => s + Number(r.tax_amount ?? 0), 0);
-      const { data: exp } = await supabase
-        .from("expenses")
-        .select("gst_amount")
+      const { data: itc } = await supabase
+        .from("gst_itc_lines")
+        .select("itc_safe, itc_at_risk")
         .eq("business_id", businessId)
-        .gte("date", from)
-        .lte("date", to);
-      const input = ((exp ?? []) as { gst_amount: number | null }[]).reduce((s, r) => s + Number(r.gst_amount ?? 0), 0);
+        .eq("period", period);
+      const itcRows = (itc ?? []) as { itc_safe: number | null; itc_at_risk: number | null }[];
+      const input = itcRows.reduce((s, r) => s + Number(r.itc_safe ?? 0), 0);
+      const atRisk = itcRows.reduce((s, r) => s + Number(r.itc_at_risk ?? 0), 0);
       lines.push(
         { label: "Output tax (sales)", value: money(output) },
         { label: "Input credit (purchases)", value: money(input) },
         { label: "Net GST payable", value: money(Math.max(0, output - input)) },
         { label: "Credit carried forward", value: money(Math.max(0, input - output)) },
+        { label: "Credit at risk", value: money(atRisk) },
       );
-      observations.push("Input credit here is book-side only — confirm against GSTR-2B before filing.");
+      observations.push("Input credit is taken from matched GSTR-2B lines; credit at risk is not claimable until the vendor files.");
     }
   }
 
   if (paperType === "purchase_ledger" || paperType === "expense_scrutiny") {
     const { data } = await supabase
       .from("expenses")
-      .select("amount, category, payment_status, vendor_name")
+      .select("amount, category, payment_status")
       .eq("business_id", businessId)
       .gte("date", from)
       .lte("date", to);
-    const rows = (data ?? []) as { amount: number; category: string | null; payment_status: string | null; vendor_name: string | null }[];
+    const rows = (data ?? []) as { amount: number; category: string | null; payment_status: string | null }[];
     if (paperType === "purchase_ledger") {
       const unpaid = rows.filter((r) => r.payment_status !== "paid");
       lines.push(
