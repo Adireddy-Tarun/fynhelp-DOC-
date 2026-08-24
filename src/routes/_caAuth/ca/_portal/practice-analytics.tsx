@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CAPracticeAnalyticsPage } from "@/pages/ca/os/CASkeletonPages";
+import CAPracticeAnalyticsPage from "@/pages/ca/os/CAPracticeAnalyticsPage";
 
 export const Route = createFileRoute("/_caAuth/ca/_portal/practice-analytics")({
   component: CAPracticeAnalyticsPage,
