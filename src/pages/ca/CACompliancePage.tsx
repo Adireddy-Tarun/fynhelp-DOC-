@@ -14,7 +14,7 @@ import { CA, CABadge, CACard, CAButton, CAEmpty, caTd, caTh, dateIN, inr, type T
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
-import { penaltyEstimate } from "@/lib/caAutoPrepare.server";
+import { penaltyEstimate } from "@/lib/caPenalty";
 
 const DAY = 86_400_000;
 type TabKey = "upcoming" | "overdue" | "filed";

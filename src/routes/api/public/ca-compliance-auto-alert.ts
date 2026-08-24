@@ -8,7 +8,7 @@
  * `Authorization: Bearer <secret>`). No PII is returned.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { penaltyEstimate } from "@/lib/caAutoPrepare.server";
+import { penaltyEstimate } from "@/lib/caPenalty";
 
 const DAY = 86_400_000;
 
