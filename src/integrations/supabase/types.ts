@@ -1370,6 +1370,8 @@ export type Database = {
           created_at: string
           due_date: string
           event_type: string
+          filed_at: string | null
+          filed_by: string | null
           filing_date: string | null
           filing_period: string
           id: string
@@ -1386,6 +1388,8 @@ export type Database = {
           created_at?: string
           due_date: string
           event_type: string
+          filed_at?: string | null
+          filed_by?: string | null
           filing_date?: string | null
           filing_period: string
           id?: string
@@ -1402,6 +1406,8 @@ export type Database = {
           created_at?: string
           due_date?: string
           event_type?: string
+          filed_at?: string | null
+          filed_by?: string | null
           filing_date?: string | null
           filing_period?: string
           id?: string
@@ -1996,11 +2002,13 @@ export type Database = {
         Row: {
           business_id: string | null
           ca_firm_id: string
+          compliance_event_id: string | null
           created_at: string | null
           id: string
           is_demo: boolean
           is_read: boolean | null
           message: string
+          metadata: Json
           severity: string | null
           title: string
           type: string
@@ -2008,11 +2016,13 @@ export type Database = {
         Insert: {
           business_id?: string | null
           ca_firm_id: string
+          compliance_event_id?: string | null
           created_at?: string | null
           id?: string
           is_demo?: boolean
           is_read?: boolean | null
           message: string
+          metadata?: Json
           severity?: string | null
           title: string
           type: string
@@ -2020,11 +2030,13 @@ export type Database = {
         Update: {
           business_id?: string | null
           ca_firm_id?: string
+          compliance_event_id?: string | null
           created_at?: string | null
           id?: string
           is_demo?: boolean
           is_read?: boolean | null
           message?: string
+          metadata?: Json
           severity?: string | null
           title?: string
           type?: string
@@ -2042,6 +2054,13 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_notifications_compliance_event_id_fkey"
+            columns: ["compliance_event_id"]
+            isOneToOne: false
+            referencedRelation: "ca_compliance_events"
             referencedColumns: ["id"]
           },
         ]
