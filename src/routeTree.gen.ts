@@ -101,6 +101,7 @@ import { Route as AdminAuthAdminProtectedSystemHealthRouteImport } from './route
 import { Route as AdminAuthAdminProtectedWaitlistRouteImport } from './routes/_adminAuth/admin/_protected/waitlist'
 import { Route as CaAuthCaPortalIndexRouteImport } from './routes/_caAuth/ca/_portal/index'
 import { Route as CaAuthCaPortalAuditTrailRouteImport } from './routes/_caAuth/ca/_portal/audit-trail'
+import { Route as CaAuthCaPortalBillingRouteImport } from './routes/_caAuth/ca/_portal/billing'
 import { Route as CaAuthCaPortalBulkActionsRouteImport } from './routes/_caAuth/ca/_portal/bulk-actions'
 import { Route as CaAuthCaPortalChaserRouteImport } from './routes/_caAuth/ca/_portal/chaser'
 import { Route as CaAuthCaPortalClientPortalRouteImport } from './routes/_caAuth/ca/_portal/client-portal'
@@ -680,6 +681,11 @@ const CaAuthCaPortalAuditTrailRoute =
     path: '/audit-trail',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalBillingRoute = CaAuthCaPortalBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalBulkActionsRoute =
   CaAuthCaPortalBulkActionsRouteImport.update({
     id: '/bulk-actions',
@@ -1292,6 +1298,7 @@ export interface FileRoutesByFullPath {
   '/admin/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/admin/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
   '/ca/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
+  '/ca/billing': typeof CaAuthCaPortalBillingRoute
   '/ca/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
   '/ca/chaser': typeof CaAuthCaPortalChaserRoute
   '/ca/client-portal': typeof CaAuthCaPortalClientPortalRoute
@@ -1469,6 +1476,7 @@ export interface FileRoutesByTo {
   '/admin/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/admin/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
   '/ca/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
+  '/ca/billing': typeof CaAuthCaPortalBillingRoute
   '/ca/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
   '/ca/chaser': typeof CaAuthCaPortalChaserRoute
   '/ca/client-portal': typeof CaAuthCaPortalClientPortalRoute
@@ -1656,6 +1664,7 @@ export interface FileRoutesById {
   '/_adminAuth/admin/_protected/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/_adminAuth/admin/_protected/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
   '/_caAuth/ca/_portal/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
+  '/_caAuth/ca/_portal/billing': typeof CaAuthCaPortalBillingRoute
   '/_caAuth/ca/_portal/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
   '/_caAuth/ca/_portal/chaser': typeof CaAuthCaPortalChaserRoute
   '/_caAuth/ca/_portal/client-portal': typeof CaAuthCaPortalClientPortalRoute
@@ -1838,6 +1847,7 @@ export interface FileRouteTypes {
     | '/admin/system-health'
     | '/admin/waitlist'
     | '/ca/audit-trail'
+    | '/ca/billing'
     | '/ca/bulk-actions'
     | '/ca/chaser'
     | '/ca/client-portal'
@@ -2015,6 +2025,7 @@ export interface FileRouteTypes {
     | '/admin/system-health'
     | '/admin/waitlist'
     | '/ca/audit-trail'
+    | '/ca/billing'
     | '/ca/bulk-actions'
     | '/ca/chaser'
     | '/ca/client-portal'
@@ -2201,6 +2212,7 @@ export interface FileRouteTypes {
     | '/_adminAuth/admin/_protected/system-health'
     | '/_adminAuth/admin/_protected/waitlist'
     | '/_caAuth/ca/_portal/audit-trail'
+    | '/_caAuth/ca/_portal/billing'
     | '/_caAuth/ca/_portal/bulk-actions'
     | '/_caAuth/ca/_portal/chaser'
     | '/_caAuth/ca/_portal/client-portal'
@@ -2950,6 +2962,13 @@ declare module '@tanstack/react-router' {
       path: '/audit-trail'
       fullPath: '/ca/audit-trail'
       preLoaderRoute: typeof CaAuthCaPortalAuditTrailRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/billing': {
+      id: '/_caAuth/ca/_portal/billing'
+      path: '/billing'
+      fullPath: '/ca/billing'
+      preLoaderRoute: typeof CaAuthCaPortalBillingRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
     '/_caAuth/ca/_portal/bulk-actions': {
@@ -3718,6 +3737,7 @@ const BlogAdminRouteWithChildren = BlogAdminRoute._addFileChildren(
 
 interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalAuditTrailRoute: typeof CaAuthCaPortalAuditTrailRoute
+  CaAuthCaPortalBillingRoute: typeof CaAuthCaPortalBillingRoute
   CaAuthCaPortalBulkActionsRoute: typeof CaAuthCaPortalBulkActionsRoute
   CaAuthCaPortalChaserRoute: typeof CaAuthCaPortalChaserRoute
   CaAuthCaPortalClientPortalRoute: typeof CaAuthCaPortalClientPortalRoute
@@ -3757,6 +3777,7 @@ interface CaAuthCaPortalRouteChildren {
 
 const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalAuditTrailRoute: CaAuthCaPortalAuditTrailRoute,
+  CaAuthCaPortalBillingRoute: CaAuthCaPortalBillingRoute,
   CaAuthCaPortalBulkActionsRoute: CaAuthCaPortalBulkActionsRoute,
   CaAuthCaPortalChaserRoute: CaAuthCaPortalChaserRoute,
   CaAuthCaPortalClientPortalRoute: CaAuthCaPortalClientPortalRoute,
