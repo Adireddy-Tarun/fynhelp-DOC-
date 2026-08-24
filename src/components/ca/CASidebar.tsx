@@ -51,7 +51,8 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
     group: "Deliver",
     links: [
       { label: "Reports", path: "/ca/reports", icon: FileText },
-      { label: "Tasks & chasers", path: "/ca/tasks", icon: ListTodo },
+      { label: "Tasks", path: "/ca/tasks", icon: ListTodo },
+      { label: "Chaser queue", path: "/ca/chaser", icon: BellRing },
       { label: "Client portal", path: "/ca/client-portal", icon: MonitorSmartphone },
       { label: "Practice analytics", path: "/ca/practice-analytics", icon: BarChart3 },
     ],
