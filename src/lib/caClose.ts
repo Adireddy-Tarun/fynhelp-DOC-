@@ -25,7 +25,12 @@ export interface CloseReadiness {
   checks: CloseCheck[];
   score: number;
   blockers: number;
+  /** False when the period holds no bank lines, invoices or expenses at all —
+   *  a silent month scores 100% on every check, which would otherwise let a
+   *  firm sign off a period whose books were simply never loaded. */
+  hasActivity: boolean;
 }
+
 
 /** First and last instant of a YYYY-MM period, as ISO dates. */
 export function periodRange(period: string): { from: string; to: string } {
