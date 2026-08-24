@@ -154,7 +154,7 @@ export function prepareReturn(
 
   const r2 = (n: number) => Math.round(n * 100) / 100;
 
-  const totals =
+  const totals: Record<string, number> =
     returnType === "TDS_26Q"
       ? {
           total_payments: r2(taxableValue),
