@@ -130,7 +130,7 @@ export default function CAChaserQueuePage() {
       ca_firm_id: firmId,
       business_id: r.business_id,
       sender_type: "ca",
-      sender_id: userId,
+      sender_id: userId ?? "",
       message,
       is_read: false,
     });
