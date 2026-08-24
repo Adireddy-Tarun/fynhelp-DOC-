@@ -376,7 +376,7 @@ export default function CAGstPortfolioPage() {
                   const dueDays = r.next_due ? daysFromNow(r.next_due.date) : null;
                   const dueColor = dueDays === null ? "transparent" : dueDays < 3 ? COLORS.red : dueDays <= 7 ? COLORS.amber : COLORS.green;
                   return (
-                    <tr key={r.business_id} className="hover:bg-[#FAF7F0] cursor-pointer" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/client/${r.business_id}?tab=GST%20%26%20ITC`)}>
+                    <tr key={r.business_id} className="hover:bg-[#FAF7F0] cursor-pointer" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/clients/${r.business_id}?tab=GST%20%26%20ITC`)}>
                       <td className="py-3">
                         <div className="font-medium">{r.business_name}</div>
                         {r.industry && <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.45)" }}>{r.industry}</div>}
@@ -428,7 +428,7 @@ export default function CAGstPortfolioPage() {
                         ) : <Chip tone="green">All clear</Chip>}
                       </td>
                       <td className="py-3 text-right">
-                        <button onClick={(e) => { e.stopPropagation(); navigate(`/ca/client/${r.business_id}?tab=GST%20%26%20ITC`); }} className="text-xs font-medium" style={{ color: COLORS.red }}>
+                        <button onClick={(e) => { e.stopPropagation(); navigate(`/ca/clients/${r.business_id}?tab=GST%20%26%20ITC`); }} className="text-xs font-medium" style={{ color: COLORS.red }}>
                           View →
                         </button>
                       </td>
@@ -455,7 +455,7 @@ export default function CAGstPortfolioPage() {
                 return (
                   <div key={c.business_id}>
                     <div className="flex items-center justify-between text-[13px] mb-1">
-                      <button onClick={() => navigate(`/ca/client/${c.business_id}?tab=GST%20%26%20ITC`)} className="font-medium hover:underline text-left">{c.business_name}</button>
+                      <button onClick={() => navigate(`/ca/clients/${c.business_id}?tab=GST%20%26%20ITC`)} className="font-medium hover:underline text-left">{c.business_name}</button>
                       <span className="font-semibold" style={{ color: COLORS.red }}>{formatINRCompact(c.itc_at_risk)}</span>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.divider }}>
@@ -479,7 +479,7 @@ export default function CAGstPortfolioPage() {
                 return (
                   <div key={c.business_id}>
                     <div className="flex items-center justify-between text-[13px] mb-1">
-                      <button onClick={() => navigate(`/ca/client/${c.business_id}?tab=GST%20%26%20ITC`)} className="font-medium hover:underline text-left">{c.business_name}</button>
+                      <button onClick={() => navigate(`/ca/clients/${c.business_id}?tab=GST%20%26%20ITC`)} className="font-medium hover:underline text-left">{c.business_name}</button>
                       <span className="font-semibold" style={{ color }}>{c.notice_risk_score}/100</span>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.divider }}>

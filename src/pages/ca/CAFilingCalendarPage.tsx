@@ -335,16 +335,16 @@ export default function CAFilingCalendarPage() {
       ) : view === "Month" ? (
         <MonthGrid cursor={cursor} byDate={byDate} onCellClick={(d) => setDayModal(d)} />
       ) : view === "Week" ? (
-        <WeekGrid cursor={cursor} byDate={byDate} onCardClick={(f) => navigate(`/ca/client/${f.business_id}`)} />
+        <WeekGrid cursor={cursor} byDate={byDate} onCardClick={(f) => navigate(`/ca/clients/${f.business_id}`)} />
       ) : (
-        <ListView filings={filtered} onMarkFiled={markFiled} onViewClient={(id) => navigate(`/ca/client/${id}`)} />
+        <ListView filings={filtered} onMarkFiled={markFiled} onViewClient={(id) => navigate(`/ca/clients/${id}`)} />
       )}
 
       {/* Day modal */}
       {dayModal && (
         <DayFilingsModal date={dayModal} filings={byDate.get(fmtKey(dayModal)) || []}
           onClose={() => setDayModal(null)}
-          onView={(f) => { setDayModal(null); navigate(`/ca/client/${f.business_id}`); }}
+          onView={(f) => { setDayModal(null); navigate(`/ca/clients/${f.business_id}`); }}
           onMarkFiled={markFiled} />
       )}
 

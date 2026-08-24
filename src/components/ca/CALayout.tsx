@@ -131,7 +131,7 @@ export default function CALayout() {
   if (!caFirm) return null;
 
   const title = pageTitles[location.pathname] ||
-    (location.pathname.startsWith("/ca/client/") ? "Client Detail" : "CA Portal");
+    (location.pathname.startsWith("/ca/clients/") ? "Client Detail" : "CA Portal");
 
   const initials = caFirm.firm_name.split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
   const today = new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });

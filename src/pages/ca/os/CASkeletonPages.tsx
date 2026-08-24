@@ -5,38 +5,6 @@
  */
 import { ModuleInBuild } from "@/components/ca/os/primitives";
 
-export function CAClosePage() {
-  return (
-    <ModuleInBuild
-      title="Month-end close"
-      subtitle="A readiness score per client, a checklist that knows what is still open, and a sign-off trail you can defend in an audit."
-      capabilities={[
-        "Close checklist generated per engagement",
-        "Readiness score from open exceptions and missing documents",
-        "Preparer and reviewer sign-off with timestamps",
-        "Period lock once signed off",
-      ]}
-      dependsOn="Exception queue and working papers"
-    />
-  );
-}
-
-export function CAWorkingPapersPage() {
-  return (
-    <ModuleInBuild
-      title="Working papers"
-      subtitle="Schedules and reconciliations assembled from live data, each tied back to the source documents behind the numbers."
-      capabilities={[
-        "Auto-built ledger and balance schedules",
-        "Evidence links from every figure to its document",
-        "Reviewer comments and clearance",
-        "Export as a single indexed pack",
-      ]}
-      dependsOn="Month-end close"
-    />
-  );
-}
-
 export function CAEngagementsPage() {
   return (
     <ModuleInBuild
