@@ -162,7 +162,6 @@ import { Route as AdminAuthAdminProtectedSupportIndexRouteImport } from './route
 import { Route as AdminAuthAdminProtectedSupportIdRouteImport } from './routes/_adminAuth/admin/_protected/support/$id'
 import { Route as AdminAuthAdminProtectedUsersIndexRouteImport } from './routes/_adminAuth/admin/_protected/users/index'
 import { Route as AdminAuthAdminProtectedUsersIdRouteImport } from './routes/_adminAuth/admin/_protected/users/$id'
-import { Route as CaAuthCaPortalClientClientIdRouteImport } from './routes/_caAuth/ca/_portal/client/$clientId'
 import { Route as CaAuthCaPortalClientsIndexRouteImport } from './routes/_caAuth/ca/_portal/clients/index'
 import { Route as CaAuthCaPortalClientsClientIdRouteImport } from './routes/_caAuth/ca/_portal/clients/$clientId'
 import { Route as CaAuthCaPortalClientsAddRouteImport } from './routes/_caAuth/ca/_portal/clients/add'
@@ -1023,12 +1022,6 @@ const AdminAuthAdminProtectedUsersIdRoute =
     path: '/users/$id',
     getParentRoute: () => AdminAuthAdminProtectedRoute,
   } as any)
-const CaAuthCaPortalClientClientIdRoute =
-  CaAuthCaPortalClientClientIdRouteImport.update({
-    id: '/client/$clientId',
-    path: '/client/$clientId',
-    getParentRoute: () => CaAuthCaPortalRoute,
-  } as any)
 const CaAuthCaPortalClientsIndexRoute =
   CaAuthCaPortalClientsIndexRouteImport.update({
     id: '/clients/',
@@ -1339,7 +1332,6 @@ export interface FileRoutesByFullPath {
   '/admin/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
   '/admin/support/$id': typeof AdminAuthAdminProtectedSupportIdRoute
   '/admin/users/$id': typeof AdminAuthAdminProtectedUsersIdRoute
-  '/ca/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/ca/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/ca/clients/add': typeof CaAuthCaPortalClientsAddRoute
   '/ca/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
@@ -1514,7 +1506,6 @@ export interface FileRoutesByTo {
   '/admin/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
   '/admin/support/$id': typeof AdminAuthAdminProtectedSupportIdRoute
   '/admin/users/$id': typeof AdminAuthAdminProtectedUsersIdRoute
-  '/ca/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/ca/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/ca/clients/add': typeof CaAuthCaPortalClientsAddRoute
   '/ca/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
@@ -1699,7 +1690,6 @@ export interface FileRoutesById {
   '/_adminAuth/admin/_protected/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
   '/_adminAuth/admin/_protected/support/$id': typeof AdminAuthAdminProtectedSupportIdRoute
   '/_adminAuth/admin/_protected/users/$id': typeof AdminAuthAdminProtectedUsersIdRoute
-  '/_caAuth/ca/_portal/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/_caAuth/ca/_portal/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/_caAuth/ca/_portal/clients/add': typeof CaAuthCaPortalClientsAddRoute
   '/_caAuth/ca/_portal/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
@@ -1879,7 +1869,6 @@ export interface FileRouteTypes {
     | '/admin/blog/new'
     | '/admin/support/$id'
     | '/admin/users/$id'
-    | '/ca/client/$clientId'
     | '/ca/clients/$clientId'
     | '/ca/clients/add'
     | '/ca/intake/inbox'
@@ -2054,7 +2043,6 @@ export interface FileRouteTypes {
     | '/admin/blog/new'
     | '/admin/support/$id'
     | '/admin/users/$id'
-    | '/ca/client/$clientId'
     | '/ca/clients/$clientId'
     | '/ca/clients/add'
     | '/ca/intake/inbox'
@@ -2238,7 +2226,6 @@ export interface FileRouteTypes {
     | '/_adminAuth/admin/_protected/blog/new'
     | '/_adminAuth/admin/_protected/support/$id'
     | '/_adminAuth/admin/_protected/users/$id'
-    | '/_caAuth/ca/_portal/client/$clientId'
     | '/_caAuth/ca/_portal/clients/$clientId'
     | '/_caAuth/ca/_portal/clients/add'
     | '/_caAuth/ca/_portal/intake/inbox'
@@ -3353,13 +3340,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthAdminProtectedUsersIdRouteImport
       parentRoute: typeof AdminAuthAdminProtectedRoute
     }
-    '/_caAuth/ca/_portal/client/$clientId': {
-      id: '/_caAuth/ca/_portal/client/$clientId'
-      path: '/client/$clientId'
-      fullPath: '/ca/client/$clientId'
-      preLoaderRoute: typeof CaAuthCaPortalClientClientIdRouteImport
-      parentRoute: typeof CaAuthCaPortalRoute
-    }
     '/_caAuth/ca/_portal/clients/': {
       id: '/_caAuth/ca/_portal/clients/'
       path: '/clients'
@@ -3700,7 +3680,6 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalVaultRoute: typeof CaAuthCaPortalVaultRoute
   CaAuthCaPortalWorkingPapersRoute: typeof CaAuthCaPortalWorkingPapersRoute
   CaAuthCaPortalIndexRoute: typeof CaAuthCaPortalIndexRoute
-  CaAuthCaPortalClientClientIdRoute: typeof CaAuthCaPortalClientClientIdRoute
   CaAuthCaPortalClientsClientIdRoute: typeof CaAuthCaPortalClientsClientIdRoute
   CaAuthCaPortalClientsAddRoute: typeof CaAuthCaPortalClientsAddRoute
   CaAuthCaPortalIntakeInboxRoute: typeof CaAuthCaPortalIntakeInboxRoute
@@ -3738,7 +3717,6 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalVaultRoute: CaAuthCaPortalVaultRoute,
   CaAuthCaPortalWorkingPapersRoute: CaAuthCaPortalWorkingPapersRoute,
   CaAuthCaPortalIndexRoute: CaAuthCaPortalIndexRoute,
-  CaAuthCaPortalClientClientIdRoute: CaAuthCaPortalClientClientIdRoute,
   CaAuthCaPortalClientsClientIdRoute: CaAuthCaPortalClientsClientIdRoute,
   CaAuthCaPortalClientsAddRoute: CaAuthCaPortalClientsAddRoute,
   CaAuthCaPortalIntakeInboxRoute: CaAuthCaPortalIntakeInboxRoute,
