@@ -444,7 +444,7 @@ export default function CABillingPage() {
               </tbody>
             </table>
 
-            <div style={{ marginTop: 18, padding: 12, background: CA.wash ?? "rgba(0,0,0,0.02)", borderRadius: 8, color: CA.muted, fontSize: 12.5 }}>
+            <div style={{ marginTop: 18, padding: 12, background: CA.tealSoft, borderRadius: 8, color: CA.muted, fontSize: 12.5 }}>
               <b style={{ color: CA.ink }}>Bank details</b>
               <div>Add your firm's bank account, IFSC and UPI ID in Settings to print them here.</div>
             </div>
