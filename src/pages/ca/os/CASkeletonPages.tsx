@@ -5,39 +5,6 @@
  */
 import { ModuleInBuild } from "@/components/ca/os/primitives";
 
-export function CAReconciliationPage() {
-  return (
-    <ModuleInBuild
-      title="Reconciliation engine"
-      subtitle="Match bank lines to invoices and bills in three passes — exact, fuzzy, then rule-based — and send whatever is left to the exception queue."
-      capabilities={[
-        "Exact match on amount, date window and reference",
-        "Fuzzy match on narration, party name and part payments",
-        "Firm-level and client-level matching rules",
-        "Reason codes on every unmatched line",
-        "One-click accept, split and part-settle",
-      ]}
-      dependsOn="Posted bank, sales and purchase data from the intake pipeline"
-    />
-  );
-}
-
-export function CAExceptionsPage() {
-  return (
-    <ModuleInBuild
-      title="Exception queue"
-      subtitle="Everything the system could not resolve on its own, ranked by money at risk and days open."
-      capabilities={[
-        "Unified queue across reconciliation, ITC and TDS",
-        "Owner, SLA and ageing on each exception",
-        "Reason codes and resolution notes",
-        "Bulk resolve for repeating patterns",
-      ]}
-      dependsOn="Reconciliation engine"
-    />
-  );
-}
-
 export function CAClosePage() {
   return (
     <ModuleInBuild
@@ -66,22 +33,6 @@ export function CAWorkingPapersPage() {
         "Export as a single indexed pack",
       ]}
       dependsOn="Month-end close"
-    />
-  );
-}
-
-export function CATasksPage() {
-  return (
-    <ModuleInBuild
-      title="Tasks & chasers"
-      subtitle="Work allocated across the team with due dates and SLAs, plus automatic follow-ups to clients who have not sent what was asked."
-      capabilities={[
-        "Task board by client, owner and engagement",
-        "SLA timers and escalation to the manager",
-        "Automatic email and WhatsApp chasers on open document requests",
-        "Client-visible status so they stop asking",
-      ]}
-      dependsOn="Document requests"
     />
   );
 }
