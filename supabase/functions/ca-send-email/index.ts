@@ -52,7 +52,12 @@ Deno.serve(async (req) => {
 
 
   let body: {
-    kind?: "client_invite" | "team_invite";
+    kind?: "client_invite" | "team_invite" | "document_chase";
+    request_title?: string;
+    period?: string | null;
+    doc_types?: string[];
+    due_date?: string;
+    days_overdue?: number;
     ca_firm_id?: string;
     to: string;
     client_name?: string;
