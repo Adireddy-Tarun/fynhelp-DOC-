@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "@/lib/router-compat";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { proxyExternalQuery } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
-import { FileText } from "lucide-react";
+import { FileText, X } from "lucide-react";
+import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -54,6 +56,9 @@ export default function CAClientDetailPage() {
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [misBusy, setMisBusy] = useState(false);
+  const [mis, setMis] = useState<MisReport | null>(null);
+  const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
   const [uploadingGstr, setUploadingGstr] = useState(false);
   const [gstrPeriod, setGstrPeriod] = useState(() => {
@@ -243,6 +248,29 @@ export default function CAClientDetailPage() {
     });
   };
 
+  const runMis = useServerFn(generateMisReport);
+
+  const generateMis = async () => {
+    if (!businessId || !firmId) return;
+    const m = misPeriodInput.match(/^(\d{4})-(\d{2})$/);
+    if (!m) return toast.error("Pick a period first");
+    const label = new Date(Number(m[1]), Number(m[2]) - 1, 1)
+      .toLocaleString("en-IN", { month: "short", year: "numeric" });
+
+    setMisBusy(true);
+    try {
+      const report = await runMis({
+        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label },
+      });
+      setMis(report);
+      await loadReports();
+      toast.success(`MIS for ${label} generated`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "MIS generation failed");
+    } finally {
+      setMisBusy(false);
+    }
+  };
 
 
   const itcTotals = useMemo(() => {
@@ -545,9 +573,21 @@ export default function CAClientDetailPage() {
 
         {tab === "Reports" && (
           <>
-            <CAButton onClick={generateReport} disabled={!businessId || generating}>
-              {generating ? "Generating…" : "Generate MIS report"}
-            </CAButton>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <CAButton onClick={generateReport} disabled={!businessId || generating}>
+                {generating ? "Generating…" : "Generate MIS PDF"}
+              </CAButton>
+              <input
+                type="month"
+                value={misPeriodInput}
+                onChange={(e) => setMisPeriodInput(e.target.value)}
+                style={{ ...caInputStyle, width: 170, height: 38 }}
+                aria-label="MIS period"
+              />
+              <CAButton variant="ghost" onClick={generateMis} disabled={!businessId || misBusy}>
+                {misBusy ? "Building…" : "Generate MIS"}
+              </CAButton>
+            </div>
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -580,6 +620,96 @@ export default function CAClientDetailPage() {
             </CACard>
           </>
         )}
+      </div>
+
+      {mis && <MisModal report={mis} onClose={() => setMis(null)} />}
+    </div>
+  );
+}
+
+function MisModal({ report, onClose }: { report: MisReport; onClose: () => void }) {
+  const download = () => {
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mis-${report.client_name.replace(/\s+/g, "-").toLowerCase()}-${report.period.replace(/\s+/g, "-").toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const Row = ({ label, value }: { label: string; value: string }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `0.5px solid ${CA.line}` }}>
+      <span style={{ fontSize: 12.5, color: CA.muted }}>{label}</span>
+      <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+    </div>
+  );
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div style={{ marginTop: 16 }}>
+      <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: CA.faint, marginBottom: 6 }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(15,20,18,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 60 }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "#FFFFFF", borderRadius: 12, width: "100%", maxWidth: 640, maxHeight: "88vh", overflow: "auto", padding: 24, border: `0.5px solid ${CA.line}` }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>MIS — {report.period}</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 4 }}>{report.client_name}</div>
+          </div>
+          <button aria-label="Close" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted }}>
+            <X size={18} aria-hidden="true" />
+          </button>
+        </div>
+
+        <Section title="Revenue & expenses">
+          <Row label="Revenue" value={inr(report.revenue)} />
+          <Row label="Expenses" value={inr(report.expenses)} />
+          <Row label="Gross profit" value={inr(report.gross_profit)} />
+        </Section>
+
+        <Section title="GST summary">
+          <Row label="GST collected" value={inr(report.gst_collected)} />
+          <Row label="GST paid" value={inr(report.gst_paid)} />
+        </Section>
+
+        <Section title="ITC status">
+          <Row label="ITC available" value={inr(report.itc_available)} />
+          <Row label="ITC claimed" value={inr(report.itc_claimed)} />
+          <Row label="ITC balance" value={inr(report.itc_balance)} />
+        </Section>
+
+        <Section title="Compliance status">
+          <Row label="Filed" value={String(report.compliance_summary.filed)} />
+          <Row label="Pending" value={String(report.compliance_summary.pending)} />
+          <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
+        </Section>
+
+        <Section title="Exceptions">
+          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} />
+          <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
+        </Section>
+
+        <Section title="Data quality">
+          <Row label="Posted documents" value={String(report.data_quality.doc_count)} />
+          <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
+        </Section>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
+          <CAButton variant="ghost" onClick={onClose}>Close</CAButton>
+          <CAButton onClick={download}>Download JSON</CAButton>
+        </div>
       </div>
     </div>
   );
