@@ -1523,11 +1523,13 @@ export type Database = {
         Row: {
           business_id: string
           ca_firm_id: string
+          chaser_count: number
           created_at: string
           doc_types: string[]
           due_date: string | null
           fulfilled_at: string | null
           id: string
+          last_chased_at: string | null
           notes: string | null
           period: string | null
           requested_by: string | null
@@ -1538,11 +1540,13 @@ export type Database = {
         Insert: {
           business_id: string
           ca_firm_id: string
+          chaser_count?: number
           created_at?: string
           doc_types?: string[]
           due_date?: string | null
           fulfilled_at?: string | null
           id?: string
+          last_chased_at?: string | null
           notes?: string | null
           period?: string | null
           requested_by?: string | null
@@ -1553,11 +1557,13 @@ export type Database = {
         Update: {
           business_id?: string
           ca_firm_id?: string
+          chaser_count?: number
           created_at?: string
           doc_types?: string[]
           due_date?: string | null
           fulfilled_at?: string | null
           id?: string
+          last_chased_at?: string | null
           notes?: string | null
           period?: string | null
           requested_by?: string | null
