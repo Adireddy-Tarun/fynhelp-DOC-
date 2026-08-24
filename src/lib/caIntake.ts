@@ -272,12 +272,13 @@ export async function postExtraction(
       description: String(r.description ?? "").slice(0, 500),
       type: String(r.direction ?? "debit").toLowerCase() === "credit" ? "credit" : "debit",
       amount: num(r.amount),
+      balance: 0,
       source_document_id: extraction.document_id,
       source_reference: `ca_extraction:${extraction.id}`,
     }));
-    const { error: e, count } = await supabase.from("bank_transactions").insert(payload).select("id", { count: "exact" });
+    const { error: e, data: inserted } = await supabase.from("bank_transactions").insert(payload).select("id");
     error = e?.message ?? null;
-    posted = count ?? payload.length;
+    posted = inserted?.length ?? payload.length;
   } else if (cls === "invoice") {
     const payload = rows.map((r) => ({
       business_id: businessId,
@@ -288,9 +289,9 @@ export async function postExtraction(
       outstanding_amount: num(r.amount),
       status: "pending",
     }));
-    const { error: e, count } = await supabase.from("invoices").insert(payload).select("id", { count: "exact" });
+    const { error: e, data: inserted } = await supabase.from("invoices").insert(payload).select("id");
     error = e?.message ?? null;
-    posted = count ?? payload.length;
+    posted = inserted?.length ?? payload.length;
   } else if (cls === "expense") {
     const payload = rows.map((r) => ({
       business_id: businessId,
@@ -300,9 +301,9 @@ export async function postExtraction(
       date: isoDate(r.date),
       payment_status: "pending",
     }));
-    const { error: e, count } = await supabase.from("expenses").insert(payload).select("id", { count: "exact" });
+    const { error: e, data: inserted } = await supabase.from("expenses").insert(payload).select("id");
     error = e?.message ?? null;
-    posted = count ?? payload.length;
+    posted = inserted?.length ?? payload.length;
   } else {
     return { ok: false, error: "This document class cannot be posted to the ledger." };
   }
