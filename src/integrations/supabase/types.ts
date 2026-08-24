@@ -1899,6 +1899,84 @@ export type Database = {
           },
         ]
       }
+      ca_invoices: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          engagement_id: string | null
+          gst_amount: number
+          gst_rate: number
+          id: string
+          invoice_number: string
+          line_items: Json
+          paid_at: string | null
+          payment_ref: string | null
+          period: string
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          engagement_id?: string | null
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_number: string
+          line_items?: Json
+          paid_at?: string | null
+          payment_ref?: string | null
+          period: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          engagement_id?: string | null
+          gst_amount?: number
+          gst_rate?: number
+          id?: string
+          invoice_number?: string
+          line_items?: Json
+          paid_at?: string | null
+          payment_ref?: string | null
+          period?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoices_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoices_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "ca_engagements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_itc_records: {
         Row: {
           block_reason: string | null
@@ -2126,6 +2204,7 @@ export type Database = {
         Row: {
           business_id: string | null
           ca_firm_id: string
+          content: Json | null
           created_at: string | null
           file_path: string | null
           file_size: number | null
@@ -2143,6 +2222,7 @@ export type Database = {
         Insert: {
           business_id?: string | null
           ca_firm_id: string
+          content?: Json | null
           created_at?: string | null
           file_path?: string | null
           file_size?: number | null
@@ -2160,6 +2240,7 @@ export type Database = {
         Update: {
           business_id?: string | null
           ca_firm_id?: string
+          content?: Json | null
           created_at?: string | null
           file_path?: string | null
           file_size?: number | null
