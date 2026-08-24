@@ -545,9 +545,21 @@ export default function CAClientDetailPage() {
 
         {tab === "Reports" && (
           <>
-            <CAButton onClick={generateReport} disabled={!businessId || generating}>
-              {generating ? "Generating…" : "Generate MIS report"}
-            </CAButton>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <CAButton onClick={generateReport} disabled={!businessId || generating}>
+                {generating ? "Generating…" : "Generate MIS PDF"}
+              </CAButton>
+              <input
+                type="month"
+                value={misPeriodInput}
+                onChange={(e) => setMisPeriodInput(e.target.value)}
+                style={{ ...caInputStyle, width: 170, height: 38 }}
+                aria-label="MIS period"
+              />
+              <CAButton variant="ghost" onClick={generateMis} disabled={!businessId || misBusy}>
+                {misBusy ? "Building…" : "Generate MIS"}
+              </CAButton>
+            </div>
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
