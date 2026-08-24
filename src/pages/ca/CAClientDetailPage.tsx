@@ -54,6 +54,9 @@ export default function CAClientDetailPage() {
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [misBusy, setMisBusy] = useState(false);
+  const [mis, setMis] = useState<MisReport | null>(null);
+  const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
   const [uploadingGstr, setUploadingGstr] = useState(false);
   const [gstrPeriod, setGstrPeriod] = useState(() => {
