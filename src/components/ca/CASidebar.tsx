@@ -1,17 +1,72 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "@/lib/router-compat";
-import { LayoutGrid, Users, UserPlus, Bell, Settings, LogOut } from "lucide-react";
+import {
+  LayoutGrid, Users, UserPlus, Bell, Settings, LogOut, Inbox, ClipboardList, CheckCheck,
+  Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, Briefcase, ShieldCheck,
+  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { CA } from "./portalUi";
 
-const LINKS = [
-  { label: "Portfolio", path: "/ca/dashboard", icon: LayoutGrid },
-  { label: "Clients", path: "/ca/clients", icon: Users },
-  { label: "Add Client", path: "/ca/clients/add", icon: UserPlus },
-  { label: "Notifications", path: "/ca/notifications", icon: Bell },
-  { label: "Settings", path: "/ca/settings", icon: Settings },
+const GROUPS: { group: string; links: { label: string; path: string; icon: typeof LayoutGrid }[] }[] = [
+  {
+    group: "Practice",
+    links: [
+      { label: "Portfolio", path: "/ca/dashboard", icon: LayoutGrid },
+      { label: "Clients", path: "/ca/clients", icon: Users },
+      { label: "Add Client", path: "/ca/clients/add", icon: UserPlus },
+      { label: "Engagements", path: "/ca/engagements", icon: Briefcase },
+    ],
+  },
+  {
+    group: "Collect",
+    links: [
+      { label: "Intake inbox", path: "/ca/intake/inbox", icon: Inbox },
+      { label: "Requests", path: "/ca/intake/requests", icon: ClipboardList },
+      { label: "Review queue", path: "/ca/intake/review", icon: CheckCheck },
+      { label: "Evidence vault", path: "/ca/vault", icon: Archive },
+    ],
+  },
+  {
+    group: "Process",
+    links: [
+      { label: "Reconciliation", path: "/ca/reconciliation", icon: Scale },
+      { label: "Exceptions", path: "/ca/exceptions", icon: AlertTriangle },
+      { label: "Month-end close", path: "/ca/close", icon: CalendarCheck },
+      { label: "Working papers", path: "/ca/working-papers", icon: FileStack },
+    ],
+  },
+  {
+    group: "Compliance",
+    links: [
+      { label: "Compliance", path: "/ca/compliance", icon: ShieldCheck },
+      { label: "GST portfolio", path: "/ca/gst-portfolio", icon: Receipt },
+      { label: "ITC recon", path: "/ca/itc-recon", icon: Scale },
+      { label: "TDS tracker", path: "/ca/tds-tracker", icon: FileText },
+      { label: "Filing calendar", path: "/ca/filing-calendar", icon: CalendarCheck },
+    ],
+  },
+  {
+    group: "Deliver",
+    links: [
+      { label: "Reports", path: "/ca/reports", icon: FileText },
+      { label: "Tasks & chasers", path: "/ca/tasks", icon: ListTodo },
+      { label: "Client portal", path: "/ca/client-portal", icon: MonitorSmartphone },
+      { label: "Practice analytics", path: "/ca/practice-analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    group: "Firm",
+    links: [
+      { label: "Users & roles", path: "/ca/users", icon: UserCog },
+      { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck },
+      { label: "Notifications", path: "/ca/notifications", icon: Bell },
+      { label: "Settings", path: "/ca/settings", icon: Settings },
+    ],
+  },
 ];
+
 
 export default function CASidebar() {
   const { firmId, firmName, caName } = useCAPortal();
