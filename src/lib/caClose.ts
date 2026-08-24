@@ -195,12 +195,20 @@ export async function computeReadiness(
   const earned = checks.reduce((s, c) => s + (c.passed ? c.weight : 0), 0);
   const total = checks.reduce((s, c) => s + c.weight, 0);
 
+  const [bankLines, invoiceLines, expenseLines] = await Promise.all([
+    activityOf("bank_transactions", "date"),
+    activityOf("invoices", "invoice_date"),
+    activityOf("expenses", "date"),
+  ]);
+
   return {
     period,
     checks,
     score: Math.round((earned / total) * 100),
     blockers: checks.filter((c) => !c.passed).reduce((s, c) => s + c.blockers, 0),
+    hasActivity: bankLines + invoiceLines + expenseLines > 0,
   };
+
 }
 
 export interface ClosePeriodRow {
