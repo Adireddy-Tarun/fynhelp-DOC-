@@ -98,11 +98,11 @@ export default function CAWorkingPapersPage() {
 
   const setStatus = async (p: PaperRow, status: string) => {
     const { data: userRes } = await supabase.auth.getUser();
-    const patch: Record<string, unknown> = { status };
-    if (status === "approved") {
-      patch.reviewed_at = new Date().toISOString();
-      patch.reviewed_by = userRes?.user?.id ?? null;
-    }
+    const patch = {
+      status,
+      reviewed_at: status === "approved" ? new Date().toISOString() : null,
+      reviewed_by: status === "approved" ? userRes?.user?.id ?? null : null,
+    };
     const { error } = await supabase.from("ca_working_papers").update(patch).eq("id", p.id);
     if (error) return toast.error(error.message);
     await logCAAudit({
