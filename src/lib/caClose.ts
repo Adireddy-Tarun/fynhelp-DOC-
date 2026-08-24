@@ -51,14 +51,7 @@ export function recentPeriods(count = 12): string[] {
   return out;
 }
 
-async function countRows(
-  table: "bank_transactions" | "ca_exceptions" | "ca_document_extractions" | "ca_document_requests" | "invoices" | "expenses",
-  build: (q: ReturnType<typeof supabase.from>) => unknown,
-): Promise<number> {
-  const q = build(supabase.from(table) as never) as { count: number | null } | Promise<{ count: number | null }>;
-  const res = (await q) as { count: number | null };
-  return res.count ?? 0;
-}
+const countOf = async (p: PromiseLike<{ count: number | null }>) => (await p).count ?? 0;
 
 /**
  * Runs every close check for one client and period. All counts are scoped to
@@ -71,48 +64,55 @@ export async function computeReadiness(
   period: string,
 ): Promise<CloseReadiness> {
   const { from, to } = periodRange(period);
+  const head = { count: "exact" as const, head: true };
 
   const [unreconciled, exceptions, pendingReview, openRequests, unpaidInvoices, uncategorised] = await Promise.all([
-    countRows("bank_transactions", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"bank_transactions">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("bank_transactions")
+        .select("id", head)
         .eq("business_id", businessId)
         .gte("date", from)
         .lte("date", to)
         .eq("reconciled", false),
     ),
-    countRows("ca_exceptions", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"ca_exceptions">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("ca_exceptions")
+        .select("id", head)
         .eq("ca_firm_id", firmId)
         .eq("business_id", businessId)
         .neq("status", "resolved"),
     ),
-    countRows("ca_document_extractions", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"ca_document_extractions">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("ca_document_extractions")
+        .select("id", head)
         .eq("ca_firm_id", firmId)
         .eq("business_id", businessId)
         .in("status", ["pending", "needs_review", "reviewed"]),
     ),
-    countRows("ca_document_requests", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"ca_document_requests">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("ca_document_requests")
+        .select("id", head)
         .eq("ca_firm_id", firmId)
         .eq("business_id", businessId)
         .neq("status", "fulfilled"),
     ),
-    countRows("invoices", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"invoices">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("invoices")
+        .select("id", head)
         .eq("business_id", businessId)
         .gte("invoice_date", from)
         .lte("invoice_date", to)
         .neq("status", "paid"),
     ),
-    countRows("expenses", (q) =>
-      (q as never as ReturnType<typeof supabase.from<"expenses">>)
-        .select("id", { count: "exact", head: true })
+    countOf(
+      supabase
+        .from("expenses")
+        .select("id", head)
         .eq("business_id", businessId)
         .gte("date", from)
         .lte("date", to)
