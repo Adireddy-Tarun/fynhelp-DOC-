@@ -30,7 +30,12 @@ export interface MisReport {
   itc_available: number;
   itc_claimed: number;
   itc_balance: number;
-  compliance_summary: { filed: number; pending: number; overdue: number; items: unknown[] };
+  compliance_summary: {
+    filed: number;
+    pending: number;
+    overdue: number;
+    items: { event_type: string | null; filing_period: string | null; due_date: string | null; status: string | null }[];
+  };
   exceptions_summary: { open_count: number; amount_at_risk: number };
   data_quality: { doc_count: number; confidence_avg: number };
   generated_at: string;
