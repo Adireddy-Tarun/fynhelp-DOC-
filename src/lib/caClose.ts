@@ -45,7 +45,7 @@ export function recentPeriods(count = 12): string[] {
   const out: string[] = [];
   const now = new Date();
   for (let i = 1; i <= count; i++) {
-    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i + 1, 1));
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
     out.push(`${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`);
   }
   return out;
