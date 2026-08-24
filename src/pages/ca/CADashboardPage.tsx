@@ -216,6 +216,8 @@ export default function CADashboardPage() {
           )}
         </CACard>
       </div>
+
+      <CATasksSummaryCard />
     </div>
   );
 }
