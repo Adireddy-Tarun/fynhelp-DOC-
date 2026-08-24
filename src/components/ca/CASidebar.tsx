@@ -17,6 +17,7 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
       { label: "Clients", path: "/ca/clients", icon: Users },
       { label: "Add Client", path: "/ca/clients/add", icon: UserPlus },
       { label: "Engagements", path: "/ca/engagements", icon: Briefcase },
+      { label: "Billing", path: "/ca/billing", icon: Receipt },
     ],
   },
   {
