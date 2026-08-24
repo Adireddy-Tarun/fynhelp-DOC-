@@ -836,6 +836,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string | null
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          detail: Json
+          entity_id: string | null
+          entity_type: string
+          id: string
+          source_document_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          source_document_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          source_document_id?: string | null
+        }
+        Relationships: []
+      }
       ca_bulk_filing_jobs: {
         Row: {
           ca_firm_id: string
@@ -1183,6 +1225,45 @@ export type Database = {
           },
         ]
       }
+      ca_client_users: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          contact_name: string | null
+          created_at: string
+          id: string
+          invite_token: string
+          invited_email: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string
+          invited_email: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string
+          invited_email?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ca_clients: {
         Row: {
           assigned_to: string | null
@@ -1237,6 +1318,48 @@ export type Database = {
           onboarded_at?: string | null
           pan?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ca_close_periods: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          checklist: Json
+          created_at: string
+          id: string
+          period: string
+          readiness_score: number
+          signed_off_at: string | null
+          signed_off_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          checklist?: Json
+          created_at?: string
+          id?: string
+          period: string
+          readiness_score?: number
+          signed_off_at?: string | null
+          signed_off_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          checklist?: Json
+          created_at?: string
+          id?: string
+          period?: string
+          readiness_score?: number
+          signed_off_at?: string | null
+          signed_off_by?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1305,6 +1428,243 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ca_document_extractions: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          classification: string
+          confidence: number
+          corrected: Json | null
+          created_at: string
+          document_id: string | null
+          error_message: string | null
+          extracted: Json
+          id: string
+          original_filename: string | null
+          posted_at: string | null
+          posted_ref: string | null
+          request_id: string | null
+          review_state: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          storage_path: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          classification?: string
+          confidence?: number
+          corrected?: Json | null
+          created_at?: string
+          document_id?: string | null
+          error_message?: string | null
+          extracted?: Json
+          id?: string
+          original_filename?: string | null
+          posted_at?: string | null
+          posted_ref?: string | null
+          request_id?: string | null
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          storage_path?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          classification?: string
+          confidence?: number
+          corrected?: Json | null
+          created_at?: string
+          document_id?: string | null
+          error_message?: string | null
+          extracted?: Json
+          id?: string
+          original_filename?: string | null
+          posted_at?: string | null
+          posted_ref?: string | null
+          request_id?: string | null
+          review_state?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          storage_path?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_document_extractions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "ca_client_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_document_extractions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ca_document_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_document_requests: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          doc_types: string[]
+          due_date: string | null
+          fulfilled_at: string | null
+          id: string
+          notes: string | null
+          period: string | null
+          requested_by: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          doc_types?: string[]
+          due_date?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          period?: string | null
+          requested_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          doc_types?: string[]
+          due_date?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          notes?: string | null
+          period?: string | null
+          requested_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ca_engagements: {
+        Row: {
+          billing_cycle: string | null
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          end_date: string | null
+          engagement_type: string
+          fee_amount: number | null
+          id: string
+          manager_id: string | null
+          name: string
+          partner_id: string | null
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string | null
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          end_date?: string | null
+          engagement_type?: string
+          fee_amount?: number | null
+          id?: string
+          manager_id?: string | null
+          name: string
+          partner_id?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          end_date?: string | null
+          engagement_type?: string
+          fee_amount?: number | null
+          id?: string
+          manager_id?: string | null
+          name?: string
+          partner_id?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ca_exceptions: {
+        Row: {
+          amount: number | null
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          description: string | null
+          evidence_document_id: string | null
+          id: string
+          owner_id: string | null
+          reason_code: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          description?: string | null
+          evidence_document_id?: string | null
+          id?: string
+          owner_id?: string | null
+          reason_code: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          description?: string | null
+          evidence_document_id?: string | null
+          id?: string
+          owner_id?: string | null
+          reason_code?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       ca_firm_members: {
         Row: {
@@ -1806,6 +2166,92 @@ export type Database = {
           },
         ]
       }
+      ca_role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission: string
+          role: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission?: string
+          role?: string
+        }
+        Relationships: []
+      }
+      ca_tasks: {
+        Row: {
+          assigned_to: string | null
+          business_id: string | null
+          ca_firm_id: string
+          category: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          engagement_id: string | null
+          id: string
+          priority: string
+          sla_hours: number | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          engagement_id?: string | null
+          id?: string
+          priority?: string
+          sla_hours?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          engagement_id?: string | null
+          id?: string
+          priority?: string
+          sla_hours?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_tasks_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "ca_engagements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_tds_records: {
         Row: {
           business_id: string
@@ -1936,6 +2382,65 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_working_papers: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          close_period_id: string | null
+          content: Json
+          created_at: string
+          id: string
+          paper_type: string
+          prepared_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          storage_path: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          close_period_id?: string | null
+          content?: Json
+          created_at?: string
+          id?: string
+          paper_type?: string
+          prepared_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_path?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          close_period_id?: string | null
+          content?: Json
+          created_at?: string
+          id?: string
+          paper_type?: string
+          prepared_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_working_papers_close_period_id_fkey"
+            columns: ["close_period_id"]
+            isOneToOne: false
+            referencedRelation: "ca_close_periods"
             referencedColumns: ["id"]
           },
         ]
@@ -5566,6 +6071,10 @@ export type Database = {
         }[]
       }
       bytea_to_text: { Args: { data: string }; Returns: string }
+      ca_can: {
+        Args: { _firm_id: string; _permission: string }
+        Returns: boolean
+      }
       ca_firm_has_all_client_access: {
         Args: { _business_ids: string[]; _firm_id: string }
         Returns: boolean
@@ -5574,6 +6083,7 @@ export type Database = {
         Args: { _business_id: string; _firm_id: string }
         Returns: boolean
       }
+      ca_member_role: { Args: { _firm_id: string }; Returns: string }
       check_ai_quota: {
         Args: { _business_id: string; _user_id: string }
         Returns: Json
@@ -5596,6 +6106,7 @@ export type Database = {
         }[]
       }
       clear_ca_demo_data: { Args: never; Returns: string }
+      client_portal_business_id: { Args: never; Returns: string }
       compute_client_health_score: {
         Args: { p_business_id: string; p_ca_firm_id: string }
         Returns: Json
