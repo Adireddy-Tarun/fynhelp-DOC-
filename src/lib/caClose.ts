@@ -71,6 +71,16 @@ export async function computeReadiness(
   const { from, to } = periodRange(period);
   const head = { count: "exact" as const, head: true };
 
+  const activityOf = async (table: "bank_transactions" | "invoices" | "expenses", dateCol: string) =>
+    countOf(
+      supabase
+        .from(table)
+        .select("id", head)
+        .eq("business_id", businessId)
+        .gte(dateCol, from)
+        .lte(dateCol, to),
+    );
+
   const [unreconciled, exceptions, pendingReview, openRequests, unpaidInvoices, uncategorised] = await Promise.all([
     countOf(
       supabase
