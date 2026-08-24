@@ -209,7 +209,7 @@ export default function CAClosePage() {
                   Re-open period
                 </CAButton>
               ) : (
-                <CAButton onClick={doSignOff} disabled={readiness.score < 100}>
+                <CAButton onClick={doSignOff} disabled={readiness.score < 100 || !readiness.hasActivity}>
                   Sign off {periodLabel(readiness.period)}
                 </CAButton>
               )
@@ -218,11 +218,16 @@ export default function CAClosePage() {
                 Only a Partner or Manager can sign off a period.
               </span>
             )}
-            {readiness.score < 100 && (
+            {!readiness.hasActivity ? (
+              <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                Nothing was booked in this period — load the books before signing off.
+              </span>
+            ) : readiness.score < 100 ? (
               <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
                 Sign-off unlocks at 100% — clear the open checks above.
               </span>
-            )}
+            ) : null}
+
           </div>
         </CACard>
       ) : (

@@ -25,7 +25,12 @@ export interface CloseReadiness {
   checks: CloseCheck[];
   score: number;
   blockers: number;
+  /** False when the period holds no bank lines, invoices or expenses at all —
+   *  a silent month scores 100% on every check, which would otherwise let a
+   *  firm sign off a period whose books were simply never loaded. */
+  hasActivity: boolean;
 }
+
 
 /** First and last instant of a YYYY-MM period, as ISO dates. */
 export function periodRange(period: string): { from: string; to: string } {
@@ -45,7 +50,7 @@ export function recentPeriods(count = 12): string[] {
   const out: string[] = [];
   const now = new Date();
   for (let i = 1; i <= count; i++) {
-    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i + 1, 1));
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
     out.push(`${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`);
   }
   return out;
@@ -65,6 +70,16 @@ export async function computeReadiness(
 ): Promise<CloseReadiness> {
   const { from, to } = periodRange(period);
   const head = { count: "exact" as const, head: true };
+
+  const activityOf = async (table: "bank_transactions" | "invoices" | "expenses", dateCol: string) =>
+    countOf(
+      supabase
+        .from(table)
+        .select("id", head)
+        .eq("business_id", businessId)
+        .gte(dateCol, from)
+        .lte(dateCol, to),
+    );
 
   const [unreconciled, exceptions, pendingReview, openRequests, unpaidInvoices, uncategorised] = await Promise.all([
     countOf(
@@ -180,12 +195,20 @@ export async function computeReadiness(
   const earned = checks.reduce((s, c) => s + (c.passed ? c.weight : 0), 0);
   const total = checks.reduce((s, c) => s + c.weight, 0);
 
+  const [bankLines, invoiceLines, expenseLines] = await Promise.all([
+    activityOf("bank_transactions", "date"),
+    activityOf("invoices", "invoice_date"),
+    activityOf("expenses", "date"),
+  ]);
+
   return {
     period,
     checks,
     score: Math.round((earned / total) * 100),
     blockers: checks.filter((c) => !c.passed).reduce((s, c) => s + c.blockers, 0),
+    hasActivity: bankLines + invoiceLines + expenseLines > 0,
   };
+
 }
 
 export interface ClosePeriodRow {
@@ -233,10 +256,14 @@ export async function signOffPeriod(
   readiness: CloseReadiness,
   actorRole: string | null,
 ): Promise<{ ok: boolean; reason?: string }> {
+  if (!readiness.hasActivity) {
+    return { ok: false, reason: "No bank lines, invoices or expenses recorded in this period" };
+  }
   const blocking = readiness.checks.filter((c) => !c.passed);
   if (blocking.length) {
     return { ok: false, reason: `${blocking.length} check${blocking.length > 1 ? "s" : ""} still open` };
   }
+
 
   const row = await saveReadiness(firmId, businessId, readiness);
   const { data: userRes } = await supabase.auth.getUser();
