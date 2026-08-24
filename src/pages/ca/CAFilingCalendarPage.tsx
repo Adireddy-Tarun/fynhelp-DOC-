@@ -5,6 +5,7 @@ import { useCAAuth } from "@/contexts/CAAuthContext";
 import { COLORS, PageWrap, PageHeader, Card, Chip, PrimaryBtn, SecondaryBtn, GhostLink } from "@/components/ca/ui";
 import { Calendar as CalIcon, ChevronLeft, ChevronRight, X, Download, Loader2, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
+import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Filing = {

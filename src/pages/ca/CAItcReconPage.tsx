@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { formatIndianCurrency } from "@/utils/formatters";
 import { Search, Copy, AlertTriangle, CheckCircle2, X, Upload, FileText, Download } from "lucide-react";
+import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 
 type Client = { id: string; business_name: string; gstin: string | null };
 type ItcLine = {

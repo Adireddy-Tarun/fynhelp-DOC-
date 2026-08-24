@@ -9,6 +9,7 @@ import {
 } from "@/components/ca/ui";
 import { formatINR } from "@/lib/indian-format";
 import { AlertTriangle, Copy, X, Download, Loader2, FileText } from "lucide-react";
+import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 
 type ClientRow = {
   business_id: string;

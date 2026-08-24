@@ -1,4 +1,5 @@
 import { COLORS, PageWrap, PageHeader, Card, MetricCard, Chip } from "@/components/ca/ui";
+import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 
 export default function CATdsTrackerPage() {
   return (
