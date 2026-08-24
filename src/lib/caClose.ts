@@ -256,10 +256,14 @@ export async function signOffPeriod(
   readiness: CloseReadiness,
   actorRole: string | null,
 ): Promise<{ ok: boolean; reason?: string }> {
+  if (!readiness.hasActivity) {
+    return { ok: false, reason: "No bank lines, invoices or expenses recorded in this period" };
+  }
   const blocking = readiness.checks.filter((c) => !c.passed);
   if (blocking.length) {
     return { ok: false, reason: `${blocking.length} check${blocking.length > 1 ? "s" : ""} still open` };
   }
+
 
   const row = await saveReadiness(firmId, businessId, readiness);
   const { data: userRes } = await supabase.auth.getUser();
