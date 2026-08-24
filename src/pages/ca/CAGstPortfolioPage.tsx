@@ -280,6 +280,7 @@ export default function CAGstPortfolioPage() {
 
   return (
     <PageWrap>
+      <GspLimitationBanner />
       <div className="text-[13px] mb-2" style={{ color: "rgba(26,16,8,0.45)" }}>
         Dashboard / GST Portfolio
       </div>

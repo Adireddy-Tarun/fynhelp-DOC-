@@ -212,6 +212,7 @@ export default function CAFilingCalendarPage() {
   // ─── Render ──
   return (
     <PageWrap>
+      <GspLimitationBanner />
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>

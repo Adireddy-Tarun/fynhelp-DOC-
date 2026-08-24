@@ -4,6 +4,7 @@ import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 export default function CATdsTrackerPage() {
   return (
     <PageWrap>
+      <GspLimitationBanner />
       <PageHeader title="TDS Tracker" sub="TDS deposits and returns across your portfolio." />
       <div className="grid grid-cols-4 gap-4 mb-6">
         <MetricCard label="TDS Due This Month" value="₹4.8L" valueColor={COLORS.amberSoft} sub="Across 12 clients" />

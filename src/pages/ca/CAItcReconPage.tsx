@@ -227,6 +227,7 @@ export default function CAItcReconPage() {
   // ---------- RENDER ----------
   return (
     <PageWrap>
+      <GspLimitationBanner />
       <div className="text-[12px] mb-2" style={{ color: "rgba(26,16,8,0.45)" }}>Dashboard / ITC Reconciliation</div>
       <PageHeader
         title="ITC Reconciliation Tool"
