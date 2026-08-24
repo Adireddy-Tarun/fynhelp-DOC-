@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "@/lib/router-compat";
 import {
   LayoutGrid, Users, UserPlus, Bell, Settings, LogOut, Inbox, ClipboardList, CheckCheck,
-  Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, Briefcase, ShieldCheck,
+  Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, Briefcase, ShieldCheck,
   BarChart3, Receipt, FileText, UserCog, MonitorSmartphone,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
