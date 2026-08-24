@@ -9,6 +9,7 @@ import {
 } from "@/components/ca/ui";
 import { formatINR } from "@/lib/indian-format";
 import { AlertTriangle, Copy, X, Download, Loader2, FileText } from "lucide-react";
+import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 
 type ClientRow = {
   business_id: string;
@@ -279,6 +280,7 @@ export default function CAGstPortfolioPage() {
 
   return (
     <PageWrap>
+      <GspLimitationBanner />
       <div className="text-[13px] mb-2" style={{ color: "rgba(26,16,8,0.45)" }}>
         Dashboard / GST Portfolio
       </div>
