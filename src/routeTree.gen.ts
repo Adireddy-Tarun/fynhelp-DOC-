@@ -99,17 +99,28 @@ import { Route as AdminAuthAdminProtectedSubscriptionsRouteImport } from './rout
 import { Route as AdminAuthAdminProtectedSystemHealthRouteImport } from './routes/_adminAuth/admin/_protected/system-health'
 import { Route as AdminAuthAdminProtectedWaitlistRouteImport } from './routes/_adminAuth/admin/_protected/waitlist'
 import { Route as CaAuthCaPortalIndexRouteImport } from './routes/_caAuth/ca/_portal/index'
+import { Route as CaAuthCaPortalAuditTrailRouteImport } from './routes/_caAuth/ca/_portal/audit-trail'
 import { Route as CaAuthCaPortalBulkActionsRouteImport } from './routes/_caAuth/ca/_portal/bulk-actions'
+import { Route as CaAuthCaPortalClientPortalRouteImport } from './routes/_caAuth/ca/_portal/client-portal'
+import { Route as CaAuthCaPortalCloseRouteImport } from './routes/_caAuth/ca/_portal/close'
 import { Route as CaAuthCaPortalComplianceRouteImport } from './routes/_caAuth/ca/_portal/compliance'
 import { Route as CaAuthCaPortalDashboardRouteImport } from './routes/_caAuth/ca/_portal/dashboard'
+import { Route as CaAuthCaPortalEngagementsRouteImport } from './routes/_caAuth/ca/_portal/engagements'
+import { Route as CaAuthCaPortalExceptionsRouteImport } from './routes/_caAuth/ca/_portal/exceptions'
 import { Route as CaAuthCaPortalFilingCalendarRouteImport } from './routes/_caAuth/ca/_portal/filing-calendar'
 import { Route as CaAuthCaPortalGstPortfolioRouteImport } from './routes/_caAuth/ca/_portal/gst-portfolio'
 import { Route as CaAuthCaPortalItcReconRouteImport } from './routes/_caAuth/ca/_portal/itc-recon'
 import { Route as CaAuthCaPortalNotificationsRouteImport } from './routes/_caAuth/ca/_portal/notifications'
 import { Route as CaAuthCaPortalPortfolioHealthRouteImport } from './routes/_caAuth/ca/_portal/portfolio-health'
+import { Route as CaAuthCaPortalPracticeAnalyticsRouteImport } from './routes/_caAuth/ca/_portal/practice-analytics'
+import { Route as CaAuthCaPortalReconciliationRouteImport } from './routes/_caAuth/ca/_portal/reconciliation'
 import { Route as CaAuthCaPortalReportsRouteImport } from './routes/_caAuth/ca/_portal/reports'
 import { Route as CaAuthCaPortalRevenueRouteImport } from './routes/_caAuth/ca/_portal/revenue'
+import { Route as CaAuthCaPortalTasksRouteImport } from './routes/_caAuth/ca/_portal/tasks'
 import { Route as CaAuthCaPortalTdsTrackerRouteImport } from './routes/_caAuth/ca/_portal/tds-tracker'
+import { Route as CaAuthCaPortalUsersRouteImport } from './routes/_caAuth/ca/_portal/users'
+import { Route as CaAuthCaPortalVaultRouteImport } from './routes/_caAuth/ca/_portal/vault'
+import { Route as CaAuthCaPortalWorkingPapersRouteImport } from './routes/_caAuth/ca/_portal/working-papers'
 import { Route as CaAuthCaInviteAcceptRouteImport } from './routes/_caAuth/ca/invite/accept'
 import { Route as MainDemoGateDemoIndexRouteImport } from './routes/_main/_demoGate/demo/index'
 import { Route as MainDemoGateDemoBankingRouteImport } from './routes/_main/_demoGate/demo/banking'
@@ -155,6 +166,9 @@ import { Route as CaAuthCaPortalClientClientIdRouteImport } from './routes/_caAu
 import { Route as CaAuthCaPortalClientsIndexRouteImport } from './routes/_caAuth/ca/_portal/clients/index'
 import { Route as CaAuthCaPortalClientsClientIdRouteImport } from './routes/_caAuth/ca/_portal/clients/$clientId'
 import { Route as CaAuthCaPortalClientsAddRouteImport } from './routes/_caAuth/ca/_portal/clients/add'
+import { Route as CaAuthCaPortalIntakeInboxRouteImport } from './routes/_caAuth/ca/_portal/intake/inbox'
+import { Route as CaAuthCaPortalIntakeRequestsRouteImport } from './routes/_caAuth/ca/_portal/intake/requests'
+import { Route as CaAuthCaPortalIntakeReviewRouteImport } from './routes/_caAuth/ca/_portal/intake/review'
 import { Route as CaAuthCaPortalSettingsIndexRouteImport } from './routes/_caAuth/ca/_portal/settings/index'
 import { Route as CaAuthCaPortalSettingsBillingRouteImport } from './routes/_caAuth/ca/_portal/settings/billing'
 import { Route as CaAuthCaPortalSettingsDefaultsRouteImport } from './routes/_caAuth/ca/_portal/settings/defaults'
@@ -652,12 +666,29 @@ const CaAuthCaPortalIndexRoute = CaAuthCaPortalIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalAuditTrailRoute =
+  CaAuthCaPortalAuditTrailRouteImport.update({
+    id: '/audit-trail',
+    path: '/audit-trail',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalBulkActionsRoute =
   CaAuthCaPortalBulkActionsRouteImport.update({
     id: '/bulk-actions',
     path: '/bulk-actions',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalClientPortalRoute =
+  CaAuthCaPortalClientPortalRouteImport.update({
+    id: '/client-portal',
+    path: '/client-portal',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalCloseRoute = CaAuthCaPortalCloseRouteImport.update({
+  id: '/close',
+  path: '/close',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalComplianceRoute =
   CaAuthCaPortalComplianceRouteImport.update({
     id: '/compliance',
@@ -669,6 +700,18 @@ const CaAuthCaPortalDashboardRoute = CaAuthCaPortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalEngagementsRoute =
+  CaAuthCaPortalEngagementsRouteImport.update({
+    id: '/engagements',
+    path: '/engagements',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalExceptionsRoute =
+  CaAuthCaPortalExceptionsRouteImport.update({
+    id: '/exceptions',
+    path: '/exceptions',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalFilingCalendarRoute =
   CaAuthCaPortalFilingCalendarRouteImport.update({
     id: '/filing-calendar',
@@ -698,6 +741,18 @@ const CaAuthCaPortalPortfolioHealthRoute =
     path: '/portfolio-health',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalPracticeAnalyticsRoute =
+  CaAuthCaPortalPracticeAnalyticsRouteImport.update({
+    id: '/practice-analytics',
+    path: '/practice-analytics',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalReconciliationRoute =
+  CaAuthCaPortalReconciliationRouteImport.update({
+    id: '/reconciliation',
+    path: '/reconciliation',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalReportsRoute = CaAuthCaPortalReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -708,10 +763,31 @@ const CaAuthCaPortalRevenueRoute = CaAuthCaPortalRevenueRouteImport.update({
   path: '/revenue',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalTasksRoute = CaAuthCaPortalTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalTdsTrackerRoute =
   CaAuthCaPortalTdsTrackerRouteImport.update({
     id: '/tds-tracker',
     path: '/tds-tracker',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalUsersRoute = CaAuthCaPortalUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
+const CaAuthCaPortalVaultRoute = CaAuthCaPortalVaultRouteImport.update({
+  id: '/vault',
+  path: '/vault',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
+const CaAuthCaPortalWorkingPapersRoute =
+  CaAuthCaPortalWorkingPapersRouteImport.update({
+    id: '/working-papers',
+    path: '/working-papers',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
 const CaAuthCaInviteAcceptRoute = CaAuthCaInviteAcceptRouteImport.update({
@@ -971,6 +1047,24 @@ const CaAuthCaPortalClientsAddRoute =
     path: '/clients/add',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalIntakeInboxRoute =
+  CaAuthCaPortalIntakeInboxRouteImport.update({
+    id: '/intake/inbox',
+    path: '/intake/inbox',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalIntakeRequestsRoute =
+  CaAuthCaPortalIntakeRequestsRouteImport.update({
+    id: '/intake/requests',
+    path: '/intake/requests',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
+const CaAuthCaPortalIntakeReviewRoute =
+  CaAuthCaPortalIntakeReviewRouteImport.update({
+    id: '/intake/review',
+    path: '/intake/review',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalSettingsIndexRoute =
   CaAuthCaPortalSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -1183,17 +1277,28 @@ export interface FileRoutesByFullPath {
   '/admin/subscriptions': typeof AdminAuthAdminProtectedSubscriptionsRoute
   '/admin/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/admin/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
+  '/ca/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
   '/ca/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
+  '/ca/client-portal': typeof CaAuthCaPortalClientPortalRoute
+  '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
+  '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
+  '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
+  '/ca/reconciliation': typeof CaAuthCaPortalReconciliationRoute
   '/ca/reports': typeof CaAuthCaPortalReportsRoute
   '/ca/revenue': typeof CaAuthCaPortalRevenueRoute
+  '/ca/tasks': typeof CaAuthCaPortalTasksRoute
   '/ca/tds-tracker': typeof CaAuthCaPortalTdsTrackerRoute
+  '/ca/users': typeof CaAuthCaPortalUsersRoute
+  '/ca/vault': typeof CaAuthCaPortalVaultRoute
+  '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -1237,6 +1342,9 @@ export interface FileRoutesByFullPath {
   '/ca/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/ca/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/ca/clients/add': typeof CaAuthCaPortalClientsAddRoute
+  '/ca/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
+  '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
+  '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
@@ -1344,17 +1452,28 @@ export interface FileRoutesByTo {
   '/admin/subscriptions': typeof AdminAuthAdminProtectedSubscriptionsRoute
   '/admin/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/admin/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
+  '/ca/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
   '/ca/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
+  '/ca/client-portal': typeof CaAuthCaPortalClientPortalRoute
+  '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
+  '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
+  '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
+  '/ca/reconciliation': typeof CaAuthCaPortalReconciliationRoute
   '/ca/reports': typeof CaAuthCaPortalReportsRoute
   '/ca/revenue': typeof CaAuthCaPortalRevenueRoute
+  '/ca/tasks': typeof CaAuthCaPortalTasksRoute
   '/ca/tds-tracker': typeof CaAuthCaPortalTdsTrackerRoute
+  '/ca/users': typeof CaAuthCaPortalUsersRoute
+  '/ca/vault': typeof CaAuthCaPortalVaultRoute
+  '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -1398,6 +1517,9 @@ export interface FileRoutesByTo {
   '/ca/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/ca/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/ca/clients/add': typeof CaAuthCaPortalClientsAddRoute
+  '/ca/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
+  '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
+  '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
@@ -1515,17 +1637,28 @@ export interface FileRoutesById {
   '/_adminAuth/admin/_protected/subscriptions': typeof AdminAuthAdminProtectedSubscriptionsRoute
   '/_adminAuth/admin/_protected/system-health': typeof AdminAuthAdminProtectedSystemHealthRoute
   '/_adminAuth/admin/_protected/waitlist': typeof AdminAuthAdminProtectedWaitlistRoute
+  '/_caAuth/ca/_portal/audit-trail': typeof CaAuthCaPortalAuditTrailRoute
   '/_caAuth/ca/_portal/bulk-actions': typeof CaAuthCaPortalBulkActionsRoute
+  '/_caAuth/ca/_portal/client-portal': typeof CaAuthCaPortalClientPortalRoute
+  '/_caAuth/ca/_portal/close': typeof CaAuthCaPortalCloseRoute
   '/_caAuth/ca/_portal/compliance': typeof CaAuthCaPortalComplianceRoute
   '/_caAuth/ca/_portal/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/_caAuth/ca/_portal/engagements': typeof CaAuthCaPortalEngagementsRoute
+  '/_caAuth/ca/_portal/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/_caAuth/ca/_portal/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
   '/_caAuth/ca/_portal/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/_caAuth/ca/_portal/itc-recon': typeof CaAuthCaPortalItcReconRoute
   '/_caAuth/ca/_portal/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/_caAuth/ca/_portal/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
+  '/_caAuth/ca/_portal/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
+  '/_caAuth/ca/_portal/reconciliation': typeof CaAuthCaPortalReconciliationRoute
   '/_caAuth/ca/_portal/reports': typeof CaAuthCaPortalReportsRoute
   '/_caAuth/ca/_portal/revenue': typeof CaAuthCaPortalRevenueRoute
+  '/_caAuth/ca/_portal/tasks': typeof CaAuthCaPortalTasksRoute
   '/_caAuth/ca/_portal/tds-tracker': typeof CaAuthCaPortalTdsTrackerRoute
+  '/_caAuth/ca/_portal/users': typeof CaAuthCaPortalUsersRoute
+  '/_caAuth/ca/_portal/vault': typeof CaAuthCaPortalVaultRoute
+  '/_caAuth/ca/_portal/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/_caAuth/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/_main/_demoGate/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/_main/_demoGate/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -1569,6 +1702,9 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/client/$clientId': typeof CaAuthCaPortalClientClientIdRoute
   '/_caAuth/ca/_portal/clients/$clientId': typeof CaAuthCaPortalClientsClientIdRoute
   '/_caAuth/ca/_portal/clients/add': typeof CaAuthCaPortalClientsAddRoute
+  '/_caAuth/ca/_portal/intake/inbox': typeof CaAuthCaPortalIntakeInboxRoute
+  '/_caAuth/ca/_portal/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
+  '/_caAuth/ca/_portal/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/_caAuth/ca/_portal/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
   '/_caAuth/ca/_portal/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/_caAuth/ca/_portal/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
@@ -1681,17 +1817,28 @@ export interface FileRouteTypes {
     | '/admin/subscriptions'
     | '/admin/system-health'
     | '/admin/waitlist'
+    | '/ca/audit-trail'
     | '/ca/bulk-actions'
+    | '/ca/client-portal'
+    | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/engagements'
+    | '/ca/exceptions'
     | '/ca/filing-calendar'
     | '/ca/gst-portfolio'
     | '/ca/itc-recon'
     | '/ca/notifications'
     | '/ca/portfolio-health'
+    | '/ca/practice-analytics'
+    | '/ca/reconciliation'
     | '/ca/reports'
     | '/ca/revenue'
+    | '/ca/tasks'
     | '/ca/tds-tracker'
+    | '/ca/users'
+    | '/ca/vault'
+    | '/ca/working-papers'
     | '/ca/invite/accept'
     | '/demo/banking'
     | '/demo/ca'
@@ -1735,6 +1882,9 @@ export interface FileRouteTypes {
     | '/ca/client/$clientId'
     | '/ca/clients/$clientId'
     | '/ca/clients/add'
+    | '/ca/intake/inbox'
+    | '/ca/intake/requests'
+    | '/ca/intake/review'
     | '/ca/settings/billing'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
@@ -1842,17 +1992,28 @@ export interface FileRouteTypes {
     | '/admin/subscriptions'
     | '/admin/system-health'
     | '/admin/waitlist'
+    | '/ca/audit-trail'
     | '/ca/bulk-actions'
+    | '/ca/client-portal'
+    | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/engagements'
+    | '/ca/exceptions'
     | '/ca/filing-calendar'
     | '/ca/gst-portfolio'
     | '/ca/itc-recon'
     | '/ca/notifications'
     | '/ca/portfolio-health'
+    | '/ca/practice-analytics'
+    | '/ca/reconciliation'
     | '/ca/reports'
     | '/ca/revenue'
+    | '/ca/tasks'
     | '/ca/tds-tracker'
+    | '/ca/users'
+    | '/ca/vault'
+    | '/ca/working-papers'
     | '/ca/invite/accept'
     | '/demo/banking'
     | '/demo/ca'
@@ -1896,6 +2057,9 @@ export interface FileRouteTypes {
     | '/ca/client/$clientId'
     | '/ca/clients/$clientId'
     | '/ca/clients/add'
+    | '/ca/intake/inbox'
+    | '/ca/intake/requests'
+    | '/ca/intake/review'
     | '/ca/settings/billing'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
@@ -2012,17 +2176,28 @@ export interface FileRouteTypes {
     | '/_adminAuth/admin/_protected/subscriptions'
     | '/_adminAuth/admin/_protected/system-health'
     | '/_adminAuth/admin/_protected/waitlist'
+    | '/_caAuth/ca/_portal/audit-trail'
     | '/_caAuth/ca/_portal/bulk-actions'
+    | '/_caAuth/ca/_portal/client-portal'
+    | '/_caAuth/ca/_portal/close'
     | '/_caAuth/ca/_portal/compliance'
     | '/_caAuth/ca/_portal/dashboard'
+    | '/_caAuth/ca/_portal/engagements'
+    | '/_caAuth/ca/_portal/exceptions'
     | '/_caAuth/ca/_portal/filing-calendar'
     | '/_caAuth/ca/_portal/gst-portfolio'
     | '/_caAuth/ca/_portal/itc-recon'
     | '/_caAuth/ca/_portal/notifications'
     | '/_caAuth/ca/_portal/portfolio-health'
+    | '/_caAuth/ca/_portal/practice-analytics'
+    | '/_caAuth/ca/_portal/reconciliation'
     | '/_caAuth/ca/_portal/reports'
     | '/_caAuth/ca/_portal/revenue'
+    | '/_caAuth/ca/_portal/tasks'
     | '/_caAuth/ca/_portal/tds-tracker'
+    | '/_caAuth/ca/_portal/users'
+    | '/_caAuth/ca/_portal/vault'
+    | '/_caAuth/ca/_portal/working-papers'
     | '/_caAuth/ca/invite/accept'
     | '/_main/_demoGate/demo/banking'
     | '/_main/_demoGate/demo/ca'
@@ -2066,6 +2241,9 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/client/$clientId'
     | '/_caAuth/ca/_portal/clients/$clientId'
     | '/_caAuth/ca/_portal/clients/add'
+    | '/_caAuth/ca/_portal/intake/inbox'
+    | '/_caAuth/ca/_portal/intake/requests'
+    | '/_caAuth/ca/_portal/intake/review'
     | '/_caAuth/ca/_portal/settings/billing'
     | '/_caAuth/ca/_portal/settings/defaults'
     | '/_caAuth/ca/_portal/settings/notifications'
@@ -2734,11 +2912,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalIndexRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/audit-trail': {
+      id: '/_caAuth/ca/_portal/audit-trail'
+      path: '/audit-trail'
+      fullPath: '/ca/audit-trail'
+      preLoaderRoute: typeof CaAuthCaPortalAuditTrailRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/bulk-actions': {
       id: '/_caAuth/ca/_portal/bulk-actions'
       path: '/bulk-actions'
       fullPath: '/ca/bulk-actions'
       preLoaderRoute: typeof CaAuthCaPortalBulkActionsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/client-portal': {
+      id: '/_caAuth/ca/_portal/client-portal'
+      path: '/client-portal'
+      fullPath: '/ca/client-portal'
+      preLoaderRoute: typeof CaAuthCaPortalClientPortalRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/close': {
+      id: '/_caAuth/ca/_portal/close'
+      path: '/close'
+      fullPath: '/ca/close'
+      preLoaderRoute: typeof CaAuthCaPortalCloseRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
     '/_caAuth/ca/_portal/compliance': {
@@ -2753,6 +2952,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/ca/dashboard'
       preLoaderRoute: typeof CaAuthCaPortalDashboardRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/engagements': {
+      id: '/_caAuth/ca/_portal/engagements'
+      path: '/engagements'
+      fullPath: '/ca/engagements'
+      preLoaderRoute: typeof CaAuthCaPortalEngagementsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/exceptions': {
+      id: '/_caAuth/ca/_portal/exceptions'
+      path: '/exceptions'
+      fullPath: '/ca/exceptions'
+      preLoaderRoute: typeof CaAuthCaPortalExceptionsRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
     '/_caAuth/ca/_portal/filing-calendar': {
@@ -2790,6 +3003,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalPortfolioHealthRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/practice-analytics': {
+      id: '/_caAuth/ca/_portal/practice-analytics'
+      path: '/practice-analytics'
+      fullPath: '/ca/practice-analytics'
+      preLoaderRoute: typeof CaAuthCaPortalPracticeAnalyticsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/reconciliation': {
+      id: '/_caAuth/ca/_portal/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/ca/reconciliation'
+      preLoaderRoute: typeof CaAuthCaPortalReconciliationRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/reports': {
       id: '/_caAuth/ca/_portal/reports'
       path: '/reports'
@@ -2804,11 +3031,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalRevenueRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/tasks': {
+      id: '/_caAuth/ca/_portal/tasks'
+      path: '/tasks'
+      fullPath: '/ca/tasks'
+      preLoaderRoute: typeof CaAuthCaPortalTasksRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/tds-tracker': {
       id: '/_caAuth/ca/_portal/tds-tracker'
       path: '/tds-tracker'
       fullPath: '/ca/tds-tracker'
       preLoaderRoute: typeof CaAuthCaPortalTdsTrackerRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/users': {
+      id: '/_caAuth/ca/_portal/users'
+      path: '/users'
+      fullPath: '/ca/users'
+      preLoaderRoute: typeof CaAuthCaPortalUsersRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/vault': {
+      id: '/_caAuth/ca/_portal/vault'
+      path: '/vault'
+      fullPath: '/ca/vault'
+      preLoaderRoute: typeof CaAuthCaPortalVaultRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/working-papers': {
+      id: '/_caAuth/ca/_portal/working-papers'
+      path: '/working-papers'
+      fullPath: '/ca/working-papers'
+      preLoaderRoute: typeof CaAuthCaPortalWorkingPapersRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
     '/_caAuth/ca/invite/accept': {
@@ -3126,6 +3381,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalClientsAddRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/intake/inbox': {
+      id: '/_caAuth/ca/_portal/intake/inbox'
+      path: '/intake/inbox'
+      fullPath: '/ca/intake/inbox'
+      preLoaderRoute: typeof CaAuthCaPortalIntakeInboxRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/intake/requests': {
+      id: '/_caAuth/ca/_portal/intake/requests'
+      path: '/intake/requests'
+      fullPath: '/ca/intake/requests'
+      preLoaderRoute: typeof CaAuthCaPortalIntakeRequestsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/intake/review': {
+      id: '/_caAuth/ca/_portal/intake/review'
+      path: '/intake/review'
+      fullPath: '/ca/intake/review'
+      preLoaderRoute: typeof CaAuthCaPortalIntakeReviewRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/settings/': {
       id: '/_caAuth/ca/_portal/settings/'
       path: '/settings'
@@ -3401,21 +3677,35 @@ const BlogAdminRouteWithChildren = BlogAdminRoute._addFileChildren(
 )
 
 interface CaAuthCaPortalRouteChildren {
+  CaAuthCaPortalAuditTrailRoute: typeof CaAuthCaPortalAuditTrailRoute
   CaAuthCaPortalBulkActionsRoute: typeof CaAuthCaPortalBulkActionsRoute
+  CaAuthCaPortalClientPortalRoute: typeof CaAuthCaPortalClientPortalRoute
+  CaAuthCaPortalCloseRoute: typeof CaAuthCaPortalCloseRoute
   CaAuthCaPortalComplianceRoute: typeof CaAuthCaPortalComplianceRoute
   CaAuthCaPortalDashboardRoute: typeof CaAuthCaPortalDashboardRoute
+  CaAuthCaPortalEngagementsRoute: typeof CaAuthCaPortalEngagementsRoute
+  CaAuthCaPortalExceptionsRoute: typeof CaAuthCaPortalExceptionsRoute
   CaAuthCaPortalFilingCalendarRoute: typeof CaAuthCaPortalFilingCalendarRoute
   CaAuthCaPortalGstPortfolioRoute: typeof CaAuthCaPortalGstPortfolioRoute
   CaAuthCaPortalItcReconRoute: typeof CaAuthCaPortalItcReconRoute
   CaAuthCaPortalNotificationsRoute: typeof CaAuthCaPortalNotificationsRoute
   CaAuthCaPortalPortfolioHealthRoute: typeof CaAuthCaPortalPortfolioHealthRoute
+  CaAuthCaPortalPracticeAnalyticsRoute: typeof CaAuthCaPortalPracticeAnalyticsRoute
+  CaAuthCaPortalReconciliationRoute: typeof CaAuthCaPortalReconciliationRoute
   CaAuthCaPortalReportsRoute: typeof CaAuthCaPortalReportsRoute
   CaAuthCaPortalRevenueRoute: typeof CaAuthCaPortalRevenueRoute
+  CaAuthCaPortalTasksRoute: typeof CaAuthCaPortalTasksRoute
   CaAuthCaPortalTdsTrackerRoute: typeof CaAuthCaPortalTdsTrackerRoute
+  CaAuthCaPortalUsersRoute: typeof CaAuthCaPortalUsersRoute
+  CaAuthCaPortalVaultRoute: typeof CaAuthCaPortalVaultRoute
+  CaAuthCaPortalWorkingPapersRoute: typeof CaAuthCaPortalWorkingPapersRoute
   CaAuthCaPortalIndexRoute: typeof CaAuthCaPortalIndexRoute
   CaAuthCaPortalClientClientIdRoute: typeof CaAuthCaPortalClientClientIdRoute
   CaAuthCaPortalClientsClientIdRoute: typeof CaAuthCaPortalClientsClientIdRoute
   CaAuthCaPortalClientsAddRoute: typeof CaAuthCaPortalClientsAddRoute
+  CaAuthCaPortalIntakeInboxRoute: typeof CaAuthCaPortalIntakeInboxRoute
+  CaAuthCaPortalIntakeRequestsRoute: typeof CaAuthCaPortalIntakeRequestsRoute
+  CaAuthCaPortalIntakeReviewRoute: typeof CaAuthCaPortalIntakeReviewRoute
   CaAuthCaPortalSettingsBillingRoute: typeof CaAuthCaPortalSettingsBillingRoute
   CaAuthCaPortalSettingsDefaultsRoute: typeof CaAuthCaPortalSettingsDefaultsRoute
   CaAuthCaPortalSettingsNotificationsRoute: typeof CaAuthCaPortalSettingsNotificationsRoute
@@ -3425,21 +3715,35 @@ interface CaAuthCaPortalRouteChildren {
 }
 
 const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
+  CaAuthCaPortalAuditTrailRoute: CaAuthCaPortalAuditTrailRoute,
   CaAuthCaPortalBulkActionsRoute: CaAuthCaPortalBulkActionsRoute,
+  CaAuthCaPortalClientPortalRoute: CaAuthCaPortalClientPortalRoute,
+  CaAuthCaPortalCloseRoute: CaAuthCaPortalCloseRoute,
   CaAuthCaPortalComplianceRoute: CaAuthCaPortalComplianceRoute,
   CaAuthCaPortalDashboardRoute: CaAuthCaPortalDashboardRoute,
+  CaAuthCaPortalEngagementsRoute: CaAuthCaPortalEngagementsRoute,
+  CaAuthCaPortalExceptionsRoute: CaAuthCaPortalExceptionsRoute,
   CaAuthCaPortalFilingCalendarRoute: CaAuthCaPortalFilingCalendarRoute,
   CaAuthCaPortalGstPortfolioRoute: CaAuthCaPortalGstPortfolioRoute,
   CaAuthCaPortalItcReconRoute: CaAuthCaPortalItcReconRoute,
   CaAuthCaPortalNotificationsRoute: CaAuthCaPortalNotificationsRoute,
   CaAuthCaPortalPortfolioHealthRoute: CaAuthCaPortalPortfolioHealthRoute,
+  CaAuthCaPortalPracticeAnalyticsRoute: CaAuthCaPortalPracticeAnalyticsRoute,
+  CaAuthCaPortalReconciliationRoute: CaAuthCaPortalReconciliationRoute,
   CaAuthCaPortalReportsRoute: CaAuthCaPortalReportsRoute,
   CaAuthCaPortalRevenueRoute: CaAuthCaPortalRevenueRoute,
+  CaAuthCaPortalTasksRoute: CaAuthCaPortalTasksRoute,
   CaAuthCaPortalTdsTrackerRoute: CaAuthCaPortalTdsTrackerRoute,
+  CaAuthCaPortalUsersRoute: CaAuthCaPortalUsersRoute,
+  CaAuthCaPortalVaultRoute: CaAuthCaPortalVaultRoute,
+  CaAuthCaPortalWorkingPapersRoute: CaAuthCaPortalWorkingPapersRoute,
   CaAuthCaPortalIndexRoute: CaAuthCaPortalIndexRoute,
   CaAuthCaPortalClientClientIdRoute: CaAuthCaPortalClientClientIdRoute,
   CaAuthCaPortalClientsClientIdRoute: CaAuthCaPortalClientsClientIdRoute,
   CaAuthCaPortalClientsAddRoute: CaAuthCaPortalClientsAddRoute,
+  CaAuthCaPortalIntakeInboxRoute: CaAuthCaPortalIntakeInboxRoute,
+  CaAuthCaPortalIntakeRequestsRoute: CaAuthCaPortalIntakeRequestsRoute,
+  CaAuthCaPortalIntakeReviewRoute: CaAuthCaPortalIntakeReviewRoute,
   CaAuthCaPortalSettingsBillingRoute: CaAuthCaPortalSettingsBillingRoute,
   CaAuthCaPortalSettingsDefaultsRoute: CaAuthCaPortalSettingsDefaultsRoute,
   CaAuthCaPortalSettingsNotificationsRoute:
