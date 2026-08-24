@@ -110,42 +110,60 @@ export default function CASidebar() {
         {caName && <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>{caName}</div>}
       </div>
 
-      <nav style={{ padding: "6px 12px", flex: 1 }}>
-        {LINKS.map(({ label, path, icon: Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            end={path === "/ca/clients"}
-            style={({ isActive }) => ({
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "9px 12px",
-              borderRadius: 9,
-              marginBottom: 2,
-              fontFamily: CA.sans,
-              fontSize: 13.5,
-              fontWeight: isActive ? 600 : 500,
-              color: isActive ? CA.teal : CA.ink,
-              background: isActive ? CA.tealSoft : "transparent",
-              textDecoration: "none",
-            })}
-          >
-            <Icon size={16} />
-            <span style={{ flex: 1 }}>{label}</span>
-            {label === "Notifications" && unread > 0 && (
-              <span
-                style={{
-                  fontFamily: CA.mono, fontSize: 10.5, fontWeight: 700, color: "#fff",
-                  background: CA.teal, borderRadius: 999, padding: "1px 7px",
-                }}
+      <nav style={{ padding: "6px 12px", flex: 1, overflowY: "auto" }}>
+        {GROUPS.map(({ group, links }) => (
+          <div key={group} style={{ marginBottom: 14 }}>
+            <div
+              style={{
+                fontFamily: CA.sans,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: CA.faint,
+                padding: "6px 12px 4px",
+              }}
+            >
+              {group}
+            </div>
+            {links.map(({ label, path, icon: Icon }) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/ca/clients"}
+                style={({ isActive }) => ({
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "8px 12px",
+                  borderRadius: 9,
+                  marginBottom: 1,
+                  fontFamily: CA.sans,
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? CA.teal : CA.ink,
+                  background: isActive ? CA.tealSoft : "transparent",
+                  textDecoration: "none",
+                })}
               >
-                {unread}
-              </span>
-            )}
-          </NavLink>
+                <Icon size={15} />
+                <span style={{ flex: 1 }}>{label}</span>
+                {label === "Notifications" && unread > 0 && (
+                  <span
+                    style={{
+                      fontFamily: CA.mono, fontSize: 10.5, fontWeight: 700, color: "#fff",
+                      background: CA.teal, borderRadius: 999, padding: "1px 7px",
+                    }}
+                  >
+                    {unread}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
+
 
       <button
         onClick={signOut}
