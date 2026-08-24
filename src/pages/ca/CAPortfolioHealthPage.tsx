@@ -425,7 +425,7 @@ export default function CAPortfolioHealthPage() {
             {topPerformers.length === 0 ? <Empty small /> : (
               <ul className="space-y-2.5">
                 {topPerformers.map((c, i) => (
-                  <li key={c.business_id} className="flex items-center gap-3 text-sm cursor-pointer hover:bg-[#FBF8F0] -mx-2 px-2 py-1.5 rounded-md" onClick={() => navigate(`/ca/client/${c.business_id}`)}>
+                  <li key={c.business_id} className="flex items-center gap-3 text-sm cursor-pointer hover:bg-[#FBF8F0] -mx-2 px-2 py-1.5 rounded-md" onClick={() => navigate(`/ca/clients/${c.business_id}`)}>
                     <span className="w-5 text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>#{i + 1}</span>
                     <span className="flex-1 font-medium truncate">{c.business_name}</span>
                     <Chip tone={c.health_score > 85 ? "green" : "amber"}>{c.health_score}</Chip>
@@ -453,7 +453,7 @@ export default function CAPortfolioHealthPage() {
                       </div>
                     </span>
                     <Chip tone={c.health_score < 40 ? "red" : "amber"}>{c.health_score < 40 ? "Critical" : "Warning"}</Chip>
-                    <button onClick={() => navigate(`/ca/client/${c.business_id}`)} className="text-[12px] font-medium" style={{ color: COLORS.red }}>View →</button>
+                    <button onClick={() => navigate(`/ca/clients/${c.business_id}`)} className="text-[12px] font-medium" style={{ color: COLORS.red }}>View →</button>
                   </li>
                 ))}
               </ul>
