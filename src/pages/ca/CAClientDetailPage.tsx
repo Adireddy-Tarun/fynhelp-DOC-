@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "@/lib/router-compat";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { proxyExternalQuery } from "@/integrations/supabase/external";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
-import { FileText } from "lucide-react";
+import { FileText, X } from "lucide-react";
+import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
