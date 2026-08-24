@@ -248,6 +248,29 @@ export default function CAClientDetailPage() {
     });
   };
 
+  const runMis = useServerFn(generateMisReport);
+
+  const generateMis = async () => {
+    if (!businessId || !firmId) return;
+    const m = misPeriodInput.match(/^(\d{4})-(\d{2})$/);
+    if (!m) return toast.error("Pick a period first");
+    const label = new Date(Number(m[1]), Number(m[2]) - 1, 1)
+      .toLocaleString("en-IN", { month: "short", year: "numeric" });
+
+    setMisBusy(true);
+    try {
+      const report = await runMis({
+        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label },
+      });
+      setMis(report);
+      await loadReports();
+      toast.success(`MIS for ${label} generated`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "MIS generation failed");
+    } finally {
+      setMisBusy(false);
+    }
+  };
 
 
   const itcTotals = useMemo(() => {
