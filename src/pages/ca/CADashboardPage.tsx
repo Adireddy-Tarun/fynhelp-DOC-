@@ -112,9 +112,21 @@ export default function CADashboardPage() {
         .order("created_at", { ascending: false })
         .limit(10);
 
+      const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
+      const { data: reminders } = await supabase
+        .from("ca_reminders")
+        .select("id, title, business_id, remind_at")
+        .eq("ca_firm_id", firmId)
+        .eq("is_done", false)
+        .gte("remind_at", startOfDay.toISOString())
+        .lte("remind_at", endOfDay.toISOString())
+        .order("remind_at", { ascending: true });
+
       if (cancelled) return;
       setClients(enriched);
       setNotifications((notes as Notification[]) ?? []);
+      setDueToday((reminders as DueReminder[]) ?? []);
       setLoading(false);
 
       console.log("[fyn:ca] portfolio mount", {
