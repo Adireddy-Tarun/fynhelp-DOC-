@@ -18,7 +18,17 @@ interface Invitation {
   expires_at: string | null;
 }
 
-const EMPTY = { clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "" };
+const ENTITY_TYPES = [
+  "Private Limited", "Public Limited", "One Person Company", "LLP", "Partnership Firm",
+  "Sole Proprietorship", "Section 8 Company", "Nidhi Company", "Producer Company",
+  "HUF", "Trust", "Society",
+];
+
+const EMPTY = {
+  clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "",
+  entityType: "Private Limited", entitySubtype: "", cin: "", llpin: "",
+  incorporationDate: "", dpiitNumber: "", udyamNumber: "",
+};
 
 export default function CAAddClientPage() {
   const { firmId, firmName, userId } = useCAPortal();
