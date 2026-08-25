@@ -2260,6 +2260,68 @@ export type Database = {
           },
         ]
       }
+      ca_recon_runs: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          id: string
+          matched: number
+          mismatched: number
+          period: string
+          recon_type: string
+          run_at: string
+          run_by: string | null
+          snapshot: Json | null
+          total_at_risk: number
+          total_items: number
+          total_matched_value: number
+          unmatched: number
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          matched?: number
+          mismatched?: number
+          period: string
+          recon_type: string
+          run_at?: string
+          run_by?: string | null
+          snapshot?: Json | null
+          total_at_risk?: number
+          total_items?: number
+          total_matched_value?: number
+          unmatched?: number
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          matched?: number
+          mismatched?: number
+          period?: string
+          recon_type?: string
+          run_at?: string
+          run_by?: string | null
+          snapshot?: Json | null
+          total_at_risk?: number
+          total_items?: number
+          total_matched_value?: number
+          unmatched?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_recon_runs_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_report_schedules: {
         Row: {
           ca_firm_id: string
