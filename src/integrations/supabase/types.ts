@@ -6814,6 +6814,7 @@ export type Database = {
         Returns: undefined
       }
       run_security_sanity_check: { Args: { p_probe?: Json }; Returns: Json }
+      security_check_caller_allowed: { Args: never; Returns: boolean }
       text_to_bytea: { Args: { data: string }; Returns: string }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
       trigger_compliance_alerts: { Args: never; Returns: undefined }
