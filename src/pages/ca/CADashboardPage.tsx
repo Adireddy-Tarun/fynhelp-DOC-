@@ -24,6 +24,13 @@ interface Enriched extends ClientRow {
   next_gst_type: string | null;
 }
 
+interface DueReminder {
+  id: string;
+  title: string;
+  business_id: string | null;
+  remind_at: string;
+}
+
 interface Notification {
   id: string;
   title: string | null;
