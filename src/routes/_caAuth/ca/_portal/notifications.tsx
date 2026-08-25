@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import CANotificationsPage from "@/pages/ca/CANotificationsPage";
+import CAAlertMonitorPage from "@/pages/ca/CAAlertMonitorPage";
 
 export const Route = createFileRoute("/_caAuth/ca/_portal/notifications")({
-  component: CANotificationsPage,
+  component: CAAlertMonitorPage,
 });

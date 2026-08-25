@@ -67,9 +67,9 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
   {
     group: "Firm",
     links: [
-      { label: "Users & roles", path: "/ca/users", icon: UserCog },
+      { label: "Users & Roles", path: "/ca/users", icon: UserCog },
       { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck },
-      { label: "Notifications", path: "/ca/notifications", icon: Bell },
+      { label: "Alert Monitor", path: "/ca/notifications", icon: Bell },
       { label: "Settings", path: "/ca/settings", icon: Settings },
       { label: "Communications", path: "/ca/settings/communications", icon: BellRing },
     ],
@@ -157,7 +157,7 @@ export default function CASidebar() {
               >
                 <Icon size={15} />
                 <span style={{ flex: 1 }}>{label}</span>
-                {label === "Notifications" && unread > 0 && (
+                {path === "/ca/notifications" && unread > 0 && (
                   <span
                     style={{
                       fontFamily: CA.mono, fontSize: 10.5, fontWeight: 700, color: "#fff",
