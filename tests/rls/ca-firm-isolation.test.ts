@@ -50,6 +50,7 @@ interface Firm {
   email: string;
   password: string;
   userId: string;
+  smeUserId: string;
   firmId: string;
   businessId: string;
   clientId: string;
@@ -188,7 +189,7 @@ async function provision(label: "A" | "B"): Promise<Firm> {
   if (signInErr) throw new Error(`sign in ${label}: ${signInErr.message}`);
 
   return {
-    label, email, password, userId, firmId, businessId, clientId, notificationId,
+    label, email, password, userId, smeUserId, firmId, businessId, clientId, notificationId,
     taskId, reminderId, ruleId, invoiceId, accessId, client,
   };
 }
@@ -206,6 +207,7 @@ async function teardown(f: Firm) {
   await admin.from("ca_firms").delete().eq("id", f.firmId);
   await admin.from("businesses").delete().eq("id", f.businessId);
   await admin.auth.admin.deleteUser(f.userId);
+  await admin.auth.admin.deleteUser(f.smeUserId);
 }
 
 // Firm-scoped tables and the id field on the seeded row for each firm.
