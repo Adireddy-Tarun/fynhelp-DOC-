@@ -388,6 +388,12 @@ export default function CAClientDetailPage() {
           <ClientDocumentsTab firmId={firmId} businessId={businessId} />
         )}
 
+        {tab === "Deductions" && businessId && firmId && (
+          <ClientDeductionsTab firmId={firmId} businessId={businessId} clientId={clientId ?? null} userId={userId} />
+        )}
+
+
+
         {tab === "GST & ITC" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
