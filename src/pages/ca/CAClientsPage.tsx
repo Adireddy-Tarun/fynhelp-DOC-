@@ -38,14 +38,27 @@ export default function CAClientsPage() {
   const load = useCallback(async () => {
     if (!firmId) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("ca_clients")
-      .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
-      .eq("ca_firm_id", firmId)
-      .eq("is_demo", false)
-      .order("created_at", { ascending: false });
+    const [{ data, error }, { data: reminders }] = await Promise.all([
+      supabase
+        .from("ca_clients")
+        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
+        .eq("ca_firm_id", firmId)
+        .eq("is_demo", false)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("ca_reminders")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .eq("is_done", false)
+        .lt("remind_at", new Date().toISOString()),
+    ]);
     if (error) toast.error(error.message);
     setRows((data as ClientRow[]) ?? []);
+    const counts: Record<string, number> = {};
+    for (const r of (reminders ?? []) as { business_id: string | null }[]) {
+      if (r.business_id) counts[r.business_id] = (counts[r.business_id] ?? 0) + 1;
+    }
+    setDueReminders(counts);
     setLoading(false);
   }, [firmId]);
 
