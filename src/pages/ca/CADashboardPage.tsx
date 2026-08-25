@@ -162,6 +162,29 @@ export default function CADashboardPage() {
     <div>
       <CAHeading>Portfolio</CAHeading>
 
+      {dueToday.length > 0 && (
+        <CACard style={{ marginTop: 16, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", borderColor: "rgba(179,38,30,0.35)" }}>
+          <CABadge tone="red">Due today</CABadge>
+          {dueToday.map((r) => {
+            const client = clients.find((c) => c.business_id && c.business_id === r.business_id);
+            return (
+              <button
+                key={r.id}
+                onClick={() => client && navigate(`/ca/clients/${client.id}`)}
+                style={{
+                  background: "none", border: `0.5px solid ${CA.line}`, borderRadius: 8, padding: "6px 10px",
+                  fontFamily: CA.sans, fontSize: 12.5, color: CA.ink, cursor: client ? "pointer" : "default",
+                }}
+              >
+                <strong>{client?.client_name ?? "Client"}</strong> · {r.title} ·{" "}
+                {new Date(r.remind_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+              </button>
+            );
+          })}
+        </CACard>
+      )}
+
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 18 }}>
         {summary.map((s) => (
           <CACard key={s.label} style={{ padding: "16px 18px" }}>
