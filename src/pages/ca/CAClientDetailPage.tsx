@@ -9,6 +9,7 @@ import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
+import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
 import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import {
