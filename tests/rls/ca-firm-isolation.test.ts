@@ -103,14 +103,37 @@ async function provision(label: "A" | "B"): Promise<Firm> {
     status: "active",
   });
 
-  const businessId = await insertOne("businesses", { business_name: `${tag} Business ${label}` });
+  // The client business is created by its own SME owner, so the CA firm can only
+  // reach it through ca_client_access — never through ownership.
+  const smeEmail = `${tag}-${label.toLowerCase()}-sme@rls-test.fynhelp.dev`;
+  const { data: smeCreated, error: smeErr } = await admin.auth.admin.createUser({
+    email: smeEmail,
+    password,
+    email_confirm: true,
+  });
+  if (smeErr || !smeCreated.user) throw new Error(`create SME user ${label}: ${smeErr?.message}`);
+  const smeUserId = smeCreated.user.id;
+
+  const smeClient = createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  await smeClient.auth.signInWithPassword({ email: smeEmail, password });
+  const { data: bizRow, error: bizErr } = await smeClient
+    .from("businesses")
+    .insert({ business_name: `${tag} Business ${label}` })
+    .select("id")
+    .single();
+  await smeClient.auth.signOut();
+  if (bizErr || !bizRow) throw new Error(`seed business ${label}: ${bizErr?.message}`);
+  const businessId = (bizRow as { id: string }).id;
 
   const accessId = await insertOne("ca_client_access", {
     ca_firm_id: firmId,
     business_id: businessId,
     access_level: "full_read",
-    status: "active",
+    is_active: true,
   });
+
 
   const clientId = await insertOne("ca_clients", {
     ca_firm_id: firmId,
