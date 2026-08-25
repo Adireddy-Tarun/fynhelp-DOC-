@@ -176,6 +176,7 @@ import { Route as CaAuthCaPortalIntakeRequestsRouteImport } from './routes/_caAu
 import { Route as CaAuthCaPortalIntakeReviewRouteImport } from './routes/_caAuth/ca/_portal/intake/review'
 import { Route as CaAuthCaPortalSettingsIndexRouteImport } from './routes/_caAuth/ca/_portal/settings/index'
 import { Route as CaAuthCaPortalSettingsBillingRouteImport } from './routes/_caAuth/ca/_portal/settings/billing'
+import { Route as CaAuthCaPortalSettingsCommunicationsRouteImport } from './routes/_caAuth/ca/_portal/settings/communications'
 import { Route as CaAuthCaPortalSettingsDefaultsRouteImport } from './routes/_caAuth/ca/_portal/settings/defaults'
 import { Route as CaAuthCaPortalSettingsNotificationsRouteImport } from './routes/_caAuth/ca/_portal/settings/notifications'
 import { Route as CaAuthCaPortalSettingsTeamRouteImport } from './routes/_caAuth/ca/_portal/settings/team'
@@ -1109,6 +1110,12 @@ const CaAuthCaPortalSettingsBillingRoute =
     path: '/settings/billing',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalSettingsCommunicationsRoute =
+  CaAuthCaPortalSettingsCommunicationsRouteImport.update({
+    id: '/settings/communications',
+    path: '/settings/communications',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalSettingsDefaultsRoute =
   CaAuthCaPortalSettingsDefaultsRouteImport.update({
     id: '/settings/defaults',
@@ -1383,6 +1390,7 @@ export interface FileRoutesByFullPath {
   '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/ca/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1563,6 +1571,7 @@ export interface FileRoutesByTo {
   '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/ca/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1753,6 +1762,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/_caAuth/ca/_portal/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/_caAuth/ca/_portal/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/_caAuth/ca/_portal/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/_caAuth/ca/_portal/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/_caAuth/ca/_portal/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/_caAuth/ca/_portal/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1938,6 +1948,7 @@ export interface FileRouteTypes {
     | '/ca/intake/requests'
     | '/ca/intake/review'
     | '/ca/settings/billing'
+    | '/ca/settings/communications'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
@@ -2118,6 +2129,7 @@ export interface FileRouteTypes {
     | '/ca/intake/requests'
     | '/ca/intake/review'
     | '/ca/settings/billing'
+    | '/ca/settings/communications'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
@@ -2307,6 +2319,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/intake/requests'
     | '/_caAuth/ca/_portal/intake/review'
     | '/_caAuth/ca/_portal/settings/billing'
+    | '/_caAuth/ca/_portal/settings/communications'
     | '/_caAuth/ca/_portal/settings/defaults'
     | '/_caAuth/ca/_portal/settings/notifications'
     | '/_caAuth/ca/_portal/settings/team'
@@ -3515,6 +3528,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalSettingsBillingRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/settings/communications': {
+      id: '/_caAuth/ca/_portal/settings/communications'
+      path: '/settings/communications'
+      fullPath: '/ca/settings/communications'
+      preLoaderRoute: typeof CaAuthCaPortalSettingsCommunicationsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/settings/defaults': {
       id: '/_caAuth/ca/_portal/settings/defaults'
       path: '/settings/defaults'
@@ -3809,6 +3829,7 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalIntakeRequestsRoute: typeof CaAuthCaPortalIntakeRequestsRoute
   CaAuthCaPortalIntakeReviewRoute: typeof CaAuthCaPortalIntakeReviewRoute
   CaAuthCaPortalSettingsBillingRoute: typeof CaAuthCaPortalSettingsBillingRoute
+  CaAuthCaPortalSettingsCommunicationsRoute: typeof CaAuthCaPortalSettingsCommunicationsRoute
   CaAuthCaPortalSettingsDefaultsRoute: typeof CaAuthCaPortalSettingsDefaultsRoute
   CaAuthCaPortalSettingsNotificationsRoute: typeof CaAuthCaPortalSettingsNotificationsRoute
   CaAuthCaPortalSettingsTeamRoute: typeof CaAuthCaPortalSettingsTeamRoute
@@ -3850,6 +3871,8 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalIntakeRequestsRoute: CaAuthCaPortalIntakeRequestsRoute,
   CaAuthCaPortalIntakeReviewRoute: CaAuthCaPortalIntakeReviewRoute,
   CaAuthCaPortalSettingsBillingRoute: CaAuthCaPortalSettingsBillingRoute,
+  CaAuthCaPortalSettingsCommunicationsRoute:
+    CaAuthCaPortalSettingsCommunicationsRoute,
   CaAuthCaPortalSettingsDefaultsRoute: CaAuthCaPortalSettingsDefaultsRoute,
   CaAuthCaPortalSettingsNotificationsRoute:
     CaAuthCaPortalSettingsNotificationsRoute,
