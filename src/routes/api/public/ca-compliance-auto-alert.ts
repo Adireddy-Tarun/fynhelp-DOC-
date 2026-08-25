@@ -70,8 +70,32 @@ async function run(request: Request): Promise<Response> {
     }
   }
 
+  // Per-firm notification preferences. Missing keys fire (backward compatible);
+  // only an explicit "false" suppresses a reminder window.
+  const firmIds = [...new Set(rows.map((e) => e.ca_firm_id).filter(Boolean))] as string[];
+  const prefs = new Map<string, Record<string, unknown>>();
+  if (firmIds.length) {
+    const { data: firms } = await supabaseAdmin
+      .from("ca_firms")
+      .select("id, notification_prefs")
+      .in("id", firmIds);
+    for (const f of firms ?? []) {
+      prefs.set(f.id as string, (f.notification_prefs ?? {}) as Record<string, unknown>);
+    }
+  }
+
+  const prefAllows = (firmId: string | null, daysRemaining: number): boolean => {
+    const p = firmId ? prefs.get(firmId) : undefined;
+    if (!p) return true;
+    const key = daysRemaining <= 0 ? "compliance_0d" : daysRemaining <= 3 ? "compliance_3d" : "compliance_7d";
+    const value = p[key];
+    if (value === undefined || value === null) return true;
+    return String(value) !== "false";
+  };
+
   const inserts = rows
     .filter((e) => !existing.has(e.id))
+
     .map((e) => {
       const due = new Date(e.due_date as string);
       const daysRemaining = Math.ceil((due.getTime() - now.getTime()) / DAY);
