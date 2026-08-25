@@ -120,13 +120,13 @@ async function provision(label: "A" | "B"): Promise<Firm> {
   });
   const { error: smeSignInErr } = await smeClient.auth.signInWithPassword({ email: smeEmail, password });
   if (smeSignInErr) throw new Error(`SME sign in ${label}: ${smeSignInErr.message}`);
-  const { data: bizRow, error: bizErr } = await smeClient
-    .from("businesses")
-    .insert({ business_name: `${tag} Business ${label}` })
-    .select("id")
-    .single();
+  const businessName = `${tag} Business ${label}`;
+  // No .select() here: PostgREST would evaluate the SELECT policy on a snapshot
+  // taken before the profile-linking trigger runs, so the returning clause fails.
+  const { error: bizErr } = await smeClient.from("businesses").insert({ business_name: businessName });
   await smeClient.auth.signOut();
-  if (bizErr || !bizRow) throw new Error(`seed business ${label}: ${bizErr?.message}`);
+  if (bizErr) throw new Error(`seed business ${label}: ${bizErr.message}`);
+  const { data: bizRow } = await admin.from("businesses").select("id").eq("business_name", businessName).single();
   const businessId = (bizRow as { id: string }).id;
 
   const accessId = await insertOne("ca_client_access", {
