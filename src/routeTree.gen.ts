@@ -79,6 +79,7 @@ import { Route as MainDashboardSimulatorRouteImport } from './routes/_main/dashb
 import { Route as MainDashboardTdsTaxRouteImport } from './routes/_main/dashboard/tds-tax'
 import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboard/vendors'
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
+import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
@@ -551,6 +552,11 @@ const MainDashboardWorkingCapitalRoute =
     path: '/dashboard/working-capital',
     getParentRoute: () => MainRoute,
   } as any)
+const ApiPublicCaAutoFollowupRoute = ApiPublicCaAutoFollowupRouteImport.update({
+  id: '/api/public/ca-auto-followup',
+  path: '/api/public/ca-auto-followup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCaComplianceAutoAlertRoute =
   ApiPublicCaComplianceAutoAlertRouteImport.update({
     id: '/api/public/ca-compliance-auto-alert',
@@ -1281,6 +1287,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
@@ -1460,6 +1467,7 @@ export interface FileRoutesByTo {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
@@ -1649,6 +1657,7 @@ export interface FileRoutesById {
   '/_main/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/_main/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
@@ -1833,6 +1842,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/blog-admin/'
     | '/intern/'
@@ -2012,6 +2022,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/blog-admin'
     | '/intern'
@@ -2200,6 +2211,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/tds-tax'
     | '/_main/dashboard/vendors'
     | '/_main/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
@@ -2328,6 +2340,7 @@ export interface RootRouteChildren {
   CaAuthRoute: typeof CaAuthRouteWithChildren
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
+  ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
 }
 
@@ -2822,6 +2835,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/working-capital'
       preLoaderRoute: typeof MainDashboardWorkingCapitalRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/api/public/ca-auto-followup': {
+      id: '/api/public/ca-auto-followup'
+      path: '/api/public/ca-auto-followup'
+      fullPath: '/api/public/ca-auto-followup'
+      preLoaderRoute: typeof ApiPublicCaAutoFollowupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/ca-compliance-auto-alert': {
       id: '/api/public/ca-compliance-auto-alert'
@@ -4115,6 +4135,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaAuthRoute: CaAuthRouteWithChildren,
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
+  ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
 }
 export const routeTree = rootRouteImport
