@@ -6587,6 +6587,14 @@ export type Database = {
         Returns: boolean
       }
       ca_member_role: { Args: { _firm_id: string }; Returns: string }
+      ca_probe_sample: {
+        Args: { p_limit?: number }
+        Returns: {
+          allowed_firms: string[]
+          firm_id: string
+          probe_user: string
+        }[]
+      }
       check_ai_quota: {
         Args: { _business_id: string; _user_id: string }
         Returns: Json
@@ -6798,22 +6806,14 @@ export type Database = {
       mark_overdue_filings: { Args: never; Returns: number }
       probe_ca_firm_isolation: {
         Args: { p_firm_sample?: number }
-        Returns: {
-          detail: Json
-          finding_type: string
-          severity: string
-          table_name: string
-        }[]
+        Returns: Json
       }
       publish_due_blog_posts: { Args: never; Returns: number }
       reset_rate_limit: {
         Args: { p_action: string; p_identifier: string }
         Returns: undefined
       }
-      run_security_sanity_check: {
-        Args: { p_firm_sample?: number }
-        Returns: Json
-      }
+      run_security_sanity_check: { Args: { p_probe?: Json }; Returns: Json }
       text_to_bytea: { Args: { data: string }; Returns: string }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
       trigger_compliance_alerts: { Args: never; Returns: undefined }
