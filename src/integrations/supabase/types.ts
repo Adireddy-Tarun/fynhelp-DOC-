@@ -1935,6 +1935,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_follow_up_rules: {
+        Row: {
+          action_type: string
+          ca_firm_id: string
+          created_at: string
+          escalate_to_role: string | null
+          id: string
+          is_active: boolean
+          rule_name: string
+          trigger_event: string
+          wait_days: number
+        }
+        Insert: {
+          action_type?: string
+          ca_firm_id: string
+          created_at?: string
+          escalate_to_role?: string | null
+          id?: string
+          is_active?: boolean
+          rule_name: string
+          trigger_event: string
+          wait_days?: number
+        }
+        Update: {
+          action_type?: string
+          ca_firm_id?: string
+          created_at?: string
+          escalate_to_role?: string | null
+          id?: string
+          is_active?: boolean
+          rule_name?: string
+          trigger_event?: string
+          wait_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_follow_up_rules_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_gstr2b_uploads: {
         Row: {
           business_id: string
@@ -2315,6 +2359,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "ca_recon_runs_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_reminders: {
+        Row: {
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          created_by: string | null
+          done_at: string | null
+          id: string
+          is_done: boolean
+          linked_entity_id: string | null
+          linked_entity_type: string | null
+          notes: string | null
+          remind_at: string
+          title: string
+        }
+        Insert: {
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          id?: string
+          is_done?: boolean
+          linked_entity_id?: string | null
+          linked_entity_type?: string | null
+          notes?: string | null
+          remind_at: string
+          title: string
+        }
+        Update: {
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          id?: string
+          is_done?: boolean
+          linked_entity_id?: string | null
+          linked_entity_type?: string | null
+          notes?: string | null
+          remind_at?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_reminders_ca_firm_id_fkey"
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"

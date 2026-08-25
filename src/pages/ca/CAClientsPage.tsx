@@ -34,18 +34,32 @@ export default function CAClientsPage() {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
+  const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
 
   const load = useCallback(async () => {
     if (!firmId) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("ca_clients")
-      .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
-      .eq("ca_firm_id", firmId)
-      .eq("is_demo", false)
-      .order("created_at", { ascending: false });
+    const [{ data, error }, { data: reminders }] = await Promise.all([
+      supabase
+        .from("ca_clients")
+        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
+        .eq("ca_firm_id", firmId)
+        .eq("is_demo", false)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("ca_reminders")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .eq("is_done", false)
+        .lt("remind_at", new Date().toISOString()),
+    ]);
     if (error) toast.error(error.message);
     setRows((data as ClientRow[]) ?? []);
+    const counts: Record<string, number> = {};
+    for (const r of (reminders ?? []) as { business_id: string | null }[]) {
+      if (r.business_id) counts[r.business_id] = (counts[r.business_id] ?? 0) + 1;
+    }
+    setDueReminders(counts);
     setLoading(false);
   }, [firmId]);
 
@@ -303,7 +317,14 @@ export default function CAClientsPage() {
                       onChange={(e) => setSelected((s) => ({ ...s, [r.id]: e.target.checked }))}
                     />
                   </td>
-                  <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_name}</td>
+                  <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>
+                    <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                      {r.client_name}
+                      {r.business_id && (dueReminders[r.business_id] ?? 0) > 0 && (
+                        <CABadge tone="red">{dueReminders[r.business_id]} due</CABadge>
+                      )}
+                    </span>
+                  </td>
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>

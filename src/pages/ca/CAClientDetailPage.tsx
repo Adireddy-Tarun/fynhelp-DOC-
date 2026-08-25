@@ -9,6 +9,7 @@ import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
+import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
 import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import {
@@ -376,6 +377,9 @@ export default function CAClientDetailPage() {
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
             {businessId && firmId && <ClientSyncPanel firmId={firmId} businessId={businessId} />}
+            {businessId && firmId && (
+              <ClientRemindersSection firmId={firmId} businessId={businessId} userId={userId} />
+            )}
           </>
         )}
 

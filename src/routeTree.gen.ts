@@ -79,6 +79,7 @@ import { Route as MainDashboardSimulatorRouteImport } from './routes/_main/dashb
 import { Route as MainDashboardTdsTaxRouteImport } from './routes/_main/dashboard/tds-tax'
 import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboard/vendors'
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
+import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
@@ -175,6 +176,7 @@ import { Route as CaAuthCaPortalIntakeRequestsRouteImport } from './routes/_caAu
 import { Route as CaAuthCaPortalIntakeReviewRouteImport } from './routes/_caAuth/ca/_portal/intake/review'
 import { Route as CaAuthCaPortalSettingsIndexRouteImport } from './routes/_caAuth/ca/_portal/settings/index'
 import { Route as CaAuthCaPortalSettingsBillingRouteImport } from './routes/_caAuth/ca/_portal/settings/billing'
+import { Route as CaAuthCaPortalSettingsCommunicationsRouteImport } from './routes/_caAuth/ca/_portal/settings/communications'
 import { Route as CaAuthCaPortalSettingsDefaultsRouteImport } from './routes/_caAuth/ca/_portal/settings/defaults'
 import { Route as CaAuthCaPortalSettingsNotificationsRouteImport } from './routes/_caAuth/ca/_portal/settings/notifications'
 import { Route as CaAuthCaPortalSettingsTeamRouteImport } from './routes/_caAuth/ca/_portal/settings/team'
@@ -551,6 +553,11 @@ const MainDashboardWorkingCapitalRoute =
     path: '/dashboard/working-capital',
     getParentRoute: () => MainRoute,
   } as any)
+const ApiPublicCaAutoFollowupRoute = ApiPublicCaAutoFollowupRouteImport.update({
+  id: '/api/public/ca-auto-followup',
+  path: '/api/public/ca-auto-followup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCaComplianceAutoAlertRoute =
   ApiPublicCaComplianceAutoAlertRouteImport.update({
     id: '/api/public/ca-compliance-auto-alert',
@@ -1103,6 +1110,12 @@ const CaAuthCaPortalSettingsBillingRoute =
     path: '/settings/billing',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalSettingsCommunicationsRoute =
+  CaAuthCaPortalSettingsCommunicationsRouteImport.update({
+    id: '/settings/communications',
+    path: '/settings/communications',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalSettingsDefaultsRoute =
   CaAuthCaPortalSettingsDefaultsRouteImport.update({
     id: '/settings/defaults',
@@ -1281,6 +1294,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
@@ -1376,6 +1390,7 @@ export interface FileRoutesByFullPath {
   '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/ca/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1460,6 +1475,7 @@ export interface FileRoutesByTo {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
@@ -1555,6 +1571,7 @@ export interface FileRoutesByTo {
   '/ca/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/ca/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/ca/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/ca/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1649,6 +1666,7 @@ export interface FileRoutesById {
   '/_main/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/_main/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
@@ -1744,6 +1762,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/intake/requests': typeof CaAuthCaPortalIntakeRequestsRoute
   '/_caAuth/ca/_portal/intake/review': typeof CaAuthCaPortalIntakeReviewRoute
   '/_caAuth/ca/_portal/settings/billing': typeof CaAuthCaPortalSettingsBillingRoute
+  '/_caAuth/ca/_portal/settings/communications': typeof CaAuthCaPortalSettingsCommunicationsRoute
   '/_caAuth/ca/_portal/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/_caAuth/ca/_portal/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/_caAuth/ca/_portal/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
@@ -1833,6 +1852,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/blog-admin/'
     | '/intern/'
@@ -1928,6 +1948,7 @@ export interface FileRouteTypes {
     | '/ca/intake/requests'
     | '/ca/intake/review'
     | '/ca/settings/billing'
+    | '/ca/settings/communications'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
@@ -2012,6 +2033,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/blog-admin'
     | '/intern'
@@ -2107,6 +2129,7 @@ export interface FileRouteTypes {
     | '/ca/intake/requests'
     | '/ca/intake/review'
     | '/ca/settings/billing'
+    | '/ca/settings/communications'
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
@@ -2200,6 +2223,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/tds-tax'
     | '/_main/dashboard/vendors'
     | '/_main/dashboard/working-capital'
+    | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
@@ -2295,6 +2319,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/intake/requests'
     | '/_caAuth/ca/_portal/intake/review'
     | '/_caAuth/ca/_portal/settings/billing'
+    | '/_caAuth/ca/_portal/settings/communications'
     | '/_caAuth/ca/_portal/settings/defaults'
     | '/_caAuth/ca/_portal/settings/notifications'
     | '/_caAuth/ca/_portal/settings/team'
@@ -2328,6 +2353,7 @@ export interface RootRouteChildren {
   CaAuthRoute: typeof CaAuthRouteWithChildren
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
+  ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
 }
 
@@ -2822,6 +2848,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/working-capital'
       preLoaderRoute: typeof MainDashboardWorkingCapitalRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/api/public/ca-auto-followup': {
+      id: '/api/public/ca-auto-followup'
+      path: '/api/public/ca-auto-followup'
+      fullPath: '/api/public/ca-auto-followup'
+      preLoaderRoute: typeof ApiPublicCaAutoFollowupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/ca-compliance-auto-alert': {
       id: '/api/public/ca-compliance-auto-alert'
@@ -3495,6 +3528,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalSettingsBillingRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/settings/communications': {
+      id: '/_caAuth/ca/_portal/settings/communications'
+      path: '/settings/communications'
+      fullPath: '/ca/settings/communications'
+      preLoaderRoute: typeof CaAuthCaPortalSettingsCommunicationsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/settings/defaults': {
       id: '/_caAuth/ca/_portal/settings/defaults'
       path: '/settings/defaults'
@@ -3789,6 +3829,7 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalIntakeRequestsRoute: typeof CaAuthCaPortalIntakeRequestsRoute
   CaAuthCaPortalIntakeReviewRoute: typeof CaAuthCaPortalIntakeReviewRoute
   CaAuthCaPortalSettingsBillingRoute: typeof CaAuthCaPortalSettingsBillingRoute
+  CaAuthCaPortalSettingsCommunicationsRoute: typeof CaAuthCaPortalSettingsCommunicationsRoute
   CaAuthCaPortalSettingsDefaultsRoute: typeof CaAuthCaPortalSettingsDefaultsRoute
   CaAuthCaPortalSettingsNotificationsRoute: typeof CaAuthCaPortalSettingsNotificationsRoute
   CaAuthCaPortalSettingsTeamRoute: typeof CaAuthCaPortalSettingsTeamRoute
@@ -3830,6 +3871,8 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalIntakeRequestsRoute: CaAuthCaPortalIntakeRequestsRoute,
   CaAuthCaPortalIntakeReviewRoute: CaAuthCaPortalIntakeReviewRoute,
   CaAuthCaPortalSettingsBillingRoute: CaAuthCaPortalSettingsBillingRoute,
+  CaAuthCaPortalSettingsCommunicationsRoute:
+    CaAuthCaPortalSettingsCommunicationsRoute,
   CaAuthCaPortalSettingsDefaultsRoute: CaAuthCaPortalSettingsDefaultsRoute,
   CaAuthCaPortalSettingsNotificationsRoute:
     CaAuthCaPortalSettingsNotificationsRoute,
@@ -4115,6 +4158,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaAuthRoute: CaAuthRouteWithChildren,
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
+  ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
 }
 export const routeTree = rootRouteImport

@@ -24,6 +24,13 @@ interface Enriched extends ClientRow {
   next_gst_type: string | null;
 }
 
+interface DueReminder {
+  id: string;
+  title: string;
+  business_id: string | null;
+  remind_at: string;
+}
+
 interface Notification {
   id: string;
   title: string | null;
@@ -41,6 +48,7 @@ export default function CADashboardPage() {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Enriched[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [dueToday, setDueToday] = useState<DueReminder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -104,9 +112,21 @@ export default function CADashboardPage() {
         .order("created_at", { ascending: false })
         .limit(10);
 
+      const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
+      const { data: reminders } = await supabase
+        .from("ca_reminders")
+        .select("id, title, business_id, remind_at")
+        .eq("ca_firm_id", firmId)
+        .eq("is_done", false)
+        .gte("remind_at", startOfDay.toISOString())
+        .lte("remind_at", endOfDay.toISOString())
+        .order("remind_at", { ascending: true });
+
       if (cancelled) return;
       setClients(enriched);
       setNotifications((notes as Notification[]) ?? []);
+      setDueToday((reminders as DueReminder[]) ?? []);
       setLoading(false);
 
       console.log("[fyn:ca] portfolio mount", {
@@ -141,6 +161,29 @@ export default function CADashboardPage() {
   return (
     <div>
       <CAHeading>Portfolio</CAHeading>
+
+      {dueToday.length > 0 && (
+        <CACard style={{ marginTop: 16, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", borderColor: "rgba(179,38,30,0.35)" }}>
+          <CABadge tone="red">Due today</CABadge>
+          {dueToday.map((r) => {
+            const client = clients.find((c) => c.business_id && c.business_id === r.business_id);
+            return (
+              <button
+                key={r.id}
+                onClick={() => client && navigate(`/ca/clients/${client.id}`)}
+                style={{
+                  background: "none", border: `0.5px solid ${CA.line}`, borderRadius: 8, padding: "6px 10px",
+                  fontFamily: CA.sans, fontSize: 12.5, color: CA.ink, cursor: client ? "pointer" : "default",
+                }}
+              >
+                <strong>{client?.client_name ?? "Client"}</strong> · {r.title} ·{" "}
+                {new Date(r.remind_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+              </button>
+            );
+          })}
+        </CACard>
+      )}
+
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 18 }}>
         {summary.map((s) => (
