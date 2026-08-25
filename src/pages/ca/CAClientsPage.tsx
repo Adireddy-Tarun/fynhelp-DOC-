@@ -15,6 +15,7 @@ interface ClientRow {
   client_email: string | null;
   gstin: string | null;
   pan: string | null;
+  entity_type: string | null;
   client_phone: string | null;
   client_status: string | null;
   onboarded_at: string | null;
@@ -39,7 +40,7 @@ export default function CAClientsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("ca_clients")
-      .select("id, business_id, client_name, client_email, gstin, pan, client_phone, client_status, onboarded_at, last_activity_at")
+      .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
       .eq("ca_firm_id", firmId)
       .eq("is_demo", false)
       .order("created_at", { ascending: false });
@@ -284,6 +285,7 @@ export default function CAClientsPage() {
               <tr>
                 <th style={{ ...caTh, width: 40 }} />
                 <th style={caTh}>Client</th>
+                <th style={caTh}>Entity type</th>
                 <th style={caTh}>Email</th>
                 <th style={caTh}>GSTIN</th>
                 <th style={caTh}>Status</th>
@@ -302,6 +304,7 @@ export default function CAClientsPage() {
                     />
                   </td>
                   <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_name}</td>
+                  <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>
                   <td style={caTd}><CABadge tone={statusTone(r.client_status)}>{r.client_status ?? "—"}</CABadge></td>

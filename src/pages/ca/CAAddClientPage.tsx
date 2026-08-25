@@ -18,7 +18,17 @@ interface Invitation {
   expires_at: string | null;
 }
 
-const EMPTY = { clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "" };
+const ENTITY_TYPES = [
+  "Private Limited", "Public Limited", "One Person Company", "LLP", "Partnership Firm",
+  "Sole Proprietorship", "Section 8 Company", "Nidhi Company", "Producer Company",
+  "HUF", "Trust", "Society",
+];
+
+const EMPTY = {
+  clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "",
+  entityType: "Private Limited", entitySubtype: "", cin: "", llpin: "",
+  incorporationDate: "", dpiitNumber: "", udyamNumber: "",
+};
 
 export default function CAAddClientPage() {
   const { firmId, firmName, userId } = useCAPortal();
@@ -84,6 +94,13 @@ export default function CAAddClientPage() {
         client_phone: form.phone.trim() || null,
         gstin: form.gstin.trim().toUpperCase() || null,
         pan: form.pan.trim().toUpperCase() || null,
+        entity_type: form.entityType,
+        entity_subtype: form.entitySubtype.trim() || null,
+        cin: form.cin.trim().toUpperCase() || null,
+        llpin: form.llpin.trim().toUpperCase() || null,
+        incorporation_date: form.incorporationDate || null,
+        dpiit_number: form.dpiitNumber.trim() || null,
+        udyam_number: form.udyamNumber.trim() || null,
         notes: form.notes.trim() || null,
         client_status: "pending",
         is_demo: false,
@@ -147,6 +164,29 @@ export default function CAAddClientPage() {
             </CAField>
             <CAField label="PAN" error={errors.pan}>
               <input style={caInputStyle} value={form.pan} onChange={set("pan")} placeholder="ABCDE1234F" />
+            </CAField>
+            <CAField label="Entity type">
+              <select style={caInputStyle as any} value={form.entityType} onChange={set("entityType")} required>
+                {ENTITY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </CAField>
+            <CAField label="Entity subtype">
+              <input style={caInputStyle} value={form.entitySubtype} onChange={set("entitySubtype")} placeholder="e.g. Small Company, MSME Micro" />
+            </CAField>
+            <CAField label="CIN">
+              <input style={caInputStyle} value={form.cin} onChange={set("cin")} placeholder="U12345KA2024PTC123456" />
+            </CAField>
+            <CAField label="LLPIN">
+              <input style={caInputStyle} value={form.llpin} onChange={set("llpin")} placeholder="AAA-1234, for LLPs only" />
+            </CAField>
+            <CAField label="Incorporation date">
+              <input style={caInputStyle} type="date" value={form.incorporationDate} onChange={set("incorporationDate")} />
+            </CAField>
+            <CAField label="DPIIT number">
+              <input style={caInputStyle} value={form.dpiitNumber} onChange={set("dpiitNumber")} placeholder="DIPP12345" />
+            </CAField>
+            <CAField label="Udyam number">
+              <input style={caInputStyle} value={form.udyamNumber} onChange={set("udyamNumber")} placeholder="UDYAM-KA-01-0000001" />
             </CAField>
             <CAField label="Phone">
               <input style={caInputStyle} value={form.phone} onChange={set("phone")} placeholder="9876543210" />

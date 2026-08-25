@@ -7,6 +7,7 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
+import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -22,9 +23,13 @@ interface Client {
   pan: string | null;
   client_status: string | null;
   onboarded_at: string | null;
+  entity_type: string | null;
+  entity_subtype: string | null;
+  cin: string | null;
+  llpin: string | null;
 }
 
-const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "Reports"] as const;
+const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "Documents", "Reports"] as const;
 type Tab = typeof TABS[number];
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -74,7 +79,7 @@ export default function CAClientDetailPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("ca_clients")
-        .select("id, business_id, client_name, client_email, client_phone, gstin, pan, client_status, onboarded_at")
+        .select("id, business_id, client_name, client_email, client_phone, gstin, pan, client_status, onboarded_at, entity_type, entity_subtype, cin, llpin")
         .eq("id", clientId)
         .maybeSingle();
       if (error) toast.error(error.message);
@@ -311,6 +316,12 @@ export default function CAClientDetailPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginTop: 10, gap: 16 }}>
         <div>
           <CAHeading>{client.client_name}</CAHeading>
+          <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <CABadge tone="teal">{client.entity_type ?? "—"}</CABadge>
+            {client.entity_subtype && <CABadge tone="grey">{client.entity_subtype}</CABadge>}
+            {client.cin && <CABadge tone="grey">CIN {client.cin}</CABadge>}
+            {client.llpin && <CABadge tone="grey">LLPIN {client.llpin}</CABadge>}
+          </div>
           <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 6, display: "flex", gap: 14, flexWrap: "wrap" }}>
             <span>GSTIN <b style={{ fontFamily: CA.mono }}>{client.gstin ?? "—"}</b></span>
             <span>PAN <b style={{ fontFamily: CA.mono }}>{client.pan ?? "—"}</b></span>
@@ -360,6 +371,10 @@ export default function CAClientDetailPage() {
             <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
           </div>
+        )}
+
+        {tab === "Documents" && businessId && firmId && (
+          <ClientDocumentsTab firmId={firmId} businessId={businessId} />
         )}
 
         {tab === "GST & ITC" && (
