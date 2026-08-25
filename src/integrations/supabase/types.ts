@@ -5553,6 +5553,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rls_security_findings: {
+        Row: {
+          checked_at: string
+          detail: Json
+          finding_type: string
+          id: string
+          resolved: boolean
+          severity: string
+          table_name: string
+        }
+        Insert: {
+          checked_at?: string
+          detail?: Json
+          finding_type: string
+          id?: string
+          resolved?: boolean
+          severity: string
+          table_name: string
+        }
+        Update: {
+          checked_at?: string
+          detail?: Json
+          finding_type?: string
+          id?: string
+          resolved?: boolean
+          severity?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       roadmap_stops: {
         Row: {
           color: string
@@ -6534,6 +6564,15 @@ export type Database = {
           used_today: number
         }[]
       }
+      audit_rls_permissiveness: {
+        Args: never
+        Returns: {
+          detail: Json
+          finding_type: string
+          severity: string
+          table_name: string
+        }[]
+      }
       bytea_to_text: { Args: { data: string }; Returns: string }
       ca_can: {
         Args: { _firm_id: string; _permission: string }
@@ -6757,10 +6796,23 @@ export type Database = {
         }[]
       }
       mark_overdue_filings: { Args: never; Returns: number }
+      probe_ca_firm_isolation: {
+        Args: { p_firm_sample?: number }
+        Returns: {
+          detail: Json
+          finding_type: string
+          severity: string
+          table_name: string
+        }[]
+      }
       publish_due_blog_posts: { Args: never; Returns: number }
       reset_rate_limit: {
         Args: { p_action: string; p_identifier: string }
         Returns: undefined
+      }
+      run_security_sanity_check: {
+        Args: { p_firm_sample?: number }
+        Returns: Json
       }
       text_to_bytea: { Args: { data: string }; Returns: string }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
