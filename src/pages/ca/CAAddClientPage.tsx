@@ -165,6 +165,29 @@ export default function CAAddClientPage() {
             <CAField label="PAN" error={errors.pan}>
               <input style={caInputStyle} value={form.pan} onChange={set("pan")} placeholder="ABCDE1234F" />
             </CAField>
+            <CAField label="Entity type">
+              <select style={caInputStyle as any} value={form.entityType} onChange={set("entityType")} required>
+                {ENTITY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </CAField>
+            <CAField label="Entity subtype">
+              <input style={caInputStyle} value={form.entitySubtype} onChange={set("entitySubtype")} placeholder="e.g. Small Company, MSME Micro" />
+            </CAField>
+            <CAField label="CIN">
+              <input style={caInputStyle} value={form.cin} onChange={set("cin")} placeholder="U12345KA2024PTC123456" />
+            </CAField>
+            <CAField label="LLPIN">
+              <input style={caInputStyle} value={form.llpin} onChange={set("llpin")} placeholder="AAA-1234, for LLPs only" />
+            </CAField>
+            <CAField label="Incorporation date">
+              <input style={caInputStyle} type="date" value={form.incorporationDate} onChange={set("incorporationDate")} />
+            </CAField>
+            <CAField label="DPIIT number">
+              <input style={caInputStyle} value={form.dpiitNumber} onChange={set("dpiitNumber")} placeholder="DIPP12345" />
+            </CAField>
+            <CAField label="Udyam number">
+              <input style={caInputStyle} value={form.udyamNumber} onChange={set("udyamNumber")} placeholder="UDYAM-KA-01-0000001" />
+            </CAField>
             <CAField label="Phone">
               <input style={caInputStyle} value={form.phone} onChange={set("phone")} placeholder="9876543210" />
             </CAField>
