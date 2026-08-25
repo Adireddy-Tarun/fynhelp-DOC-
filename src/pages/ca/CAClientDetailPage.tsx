@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
+import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -358,7 +359,8 @@ export default function CAClientDetailPage() {
         )}
 
         {tab === "Overview" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
             <Metric label="Cash position" value={inr(liquidity?.cash_position)} />
             <Metric label="Runway (months)" value={liquidity?.runway_months != null ? String(liquidity.runway_months) : "—"} />
             <Metric label="Monthly burn" value={inr(liquidity?.burn_rate_current)} />
@@ -370,7 +372,9 @@ export default function CAClientDetailPage() {
             <Metric label="ARR" value={inr(revenue?.arr)} />
             <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
-          </div>
+            </div>
+            {businessId && firmId && <ClientSyncPanel firmId={firmId} businessId={businessId} />}
+          </>
         )}
 
         {tab === "Documents" && businessId && firmId && (
