@@ -377,6 +377,9 @@ export default function CAClientDetailPage() {
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
             {businessId && firmId && <ClientSyncPanel firmId={firmId} businessId={businessId} />}
+            {businessId && firmId && (
+              <ClientRemindersSection firmId={firmId} businessId={businessId} userId={userId} />
+            )}
           </>
         )}
 
