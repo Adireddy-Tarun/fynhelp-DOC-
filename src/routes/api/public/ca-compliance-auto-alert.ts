@@ -95,8 +95,12 @@ async function run(request: Request): Promise<Response> {
 
   const inserts = rows
     .filter((e) => !existing.has(e.id))
-
+    .filter((e) => {
+      const days = Math.ceil((new Date(e.due_date as string).getTime() - now.getTime()) / DAY);
+      return prefAllows((e.ca_firm_id as string) ?? null, days);
+    })
     .map((e) => {
+
       const due = new Date(e.due_date as string);
       const daysRemaining = Math.ceil((due.getTime() - now.getTime()) / DAY);
       const penalty = penaltyEstimate(e.event_type as string, e.due_date as string, now);
