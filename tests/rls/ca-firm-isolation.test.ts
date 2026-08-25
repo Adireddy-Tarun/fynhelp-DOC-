@@ -118,7 +118,8 @@ async function provision(label: "A" | "B"): Promise<Firm> {
   const smeClient = createClient(SUPABASE_URL, PUBLISHABLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  await smeClient.auth.signInWithPassword({ email: smeEmail, password });
+  const { error: smeSignInErr } = await smeClient.auth.signInWithPassword({ email: smeEmail, password });
+  if (smeSignInErr) throw new Error(`SME sign in ${label}: ${smeSignInErr.message}`);
   const { data: bizRow, error: bizErr } = await smeClient
     .from("businesses")
     .insert({ business_name: `${tag} Business ${label}` })
