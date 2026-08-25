@@ -1486,6 +1486,72 @@ export type Database = {
           },
         ]
       }
+      ca_deduction_findings: {
+        Row: {
+          action_required: string
+          actioned_at: string | null
+          actioned_by: string | null
+          business_id: string
+          ca_firm_id: string
+          category: string
+          confidence: string
+          created_at: string | null
+          dismissed_at: string | null
+          dismissed_by: string | null
+          estimated_benefit: number
+          evidence: Json
+          explanation: string
+          id: string
+          period: string
+          provision: string
+          provision_label: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_required: string
+          actioned_at?: string | null
+          actioned_by?: string | null
+          business_id: string
+          ca_firm_id: string
+          category: string
+          confidence?: string
+          created_at?: string | null
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          estimated_benefit?: number
+          evidence?: Json
+          explanation: string
+          id?: string
+          period: string
+          provision: string
+          provision_label: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_required?: string
+          actioned_at?: string | null
+          actioned_by?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          category?: string
+          confidence?: string
+          created_at?: string | null
+          dismissed_at?: string | null
+          dismissed_by?: string | null
+          estimated_benefit?: number
+          evidence?: Json
+          explanation?: string
+          id?: string
+          period?: string
+          provision?: string
+          provision_label?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ca_document_extractions: {
         Row: {
           business_id: string
