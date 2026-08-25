@@ -34,6 +34,7 @@ export default function CAClientsPage() {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
+  const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
 
   const load = useCallback(async () => {
     if (!firmId) return;
