@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
+import { logReconRun } from "@/lib/caReconRuns";
 import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { CA, CACard, CAButton, CABadge, caInputStyle, inr, dateIN } from "@/components/ca/portalUi";
@@ -82,9 +83,38 @@ export default function CAReconciliationPage() {
     }));
 
     setBankCount(bank.length);
-    setResult(reconcile(bank, invoices, expenses));
+    const res = reconcile(bank, invoices, expenses);
+    setResult(res);
     setLoading(false);
-  }, [businessId, from, to]);
+
+    if (firmId) {
+      const partial = res.suggestions.filter((s) => s.partial).length;
+      await logReconRun({
+        firmId,
+        businessId,
+        reconType: "bank",
+        period: `${from} → ${to}`,
+        totalItems: bank.length,
+        matched: res.suggestions.length,
+        mismatched: partial,
+        unmatched: res.unmatched.length,
+        totalMatchedValue: res.suggestions.reduce((s, x) => s + x.bank.amount, 0),
+        totalAtRisk: res.unmatched.reduce((s, x) => s + Math.abs(x.bank.amount), 0),
+        snapshot: {
+          bank_lines: bank.length,
+          open_invoices: invoices.filter((i) => i.outstanding_amount > 0).length,
+          open_expenses: expenses.filter((e) => e.payment_status !== "paid").length,
+          exact: res.suggestions.filter((s) => s.pass === "exact").length,
+          fuzzy: res.suggestions.filter((s) => s.pass === "fuzzy").length,
+          rule: res.suggestions.filter((s) => s.pass === "rule").length,
+          part_payments: partial,
+          unmatched: res.unmatched.length,
+          window: `${from} to ${to}`,
+        },
+      });
+    }
+  }, [businessId, from, to, firmId]);
+
 
   const accept = async (s: MatchSuggestion) => {
     if (!firmId) return;

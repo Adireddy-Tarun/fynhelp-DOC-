@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
+import { logReconRun } from "@/lib/caReconRuns";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import {
   CA, CACard, CAButton, CABadge, CAEmpty, caInputStyle, inr, dateIN, caTd, caTh, caNum,
@@ -196,6 +197,25 @@ export default function CAItcReconPage() {
     await logCAAudit({
       firmId, businessId, entityType: "gstr2b_upload", action: "gstr2b_uploaded",
       detail: { period, file_name: file.name, ...data },
+    });
+    await logReconRun({
+      firmId,
+      businessId,
+      reconType: "itc",
+      period,
+      totalItems: Number(data.records_parsed ?? 0),
+      matched: Number(data.records_matched ?? 0),
+      mismatched: Number(data.records_mismatched ?? 0),
+      unmatched: Number(data.records_new ?? 0),
+      totalMatchedValue: Number(data.matched_value ?? 0),
+      totalAtRisk: Number(data.at_risk_value ?? 0),
+      snapshot: {
+        file_name: file.name,
+        records_parsed: data.records_parsed ?? 0,
+        records_matched: data.records_matched ?? 0,
+        records_mismatched: data.records_mismatched ?? 0,
+        records_new: data.records_new ?? 0,
+      },
     });
     void load();
   };
