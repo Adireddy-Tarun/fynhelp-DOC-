@@ -40,11 +40,14 @@ const daysOverdue = (due: string, now: Date) =>
   Math.max(0, Math.floor((now.getTime() - new Date(due).getTime()) / DAY));
 
 async function run(request: Request): Promise<Response> {
-  const secret = process.env["CA_CRON_SECRET"];
+  // Either the shared CA cron secret or the scheduler-specific secret is accepted.
+  const accepted = [process.env["CA_CRON_SECRET"], process.env["CA_AUTO_FOLLOWUP_SECRET"]].filter(
+    (s): s is string => Boolean(s),
+  );
   const provided =
     request.headers.get("x-cron-secret") ??
     (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  if (!secret || provided !== secret) {
+  if (!accepted.length || !provided || !accepted.includes(provided)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "content-type": "application/json" },
