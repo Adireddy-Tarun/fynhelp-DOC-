@@ -9,6 +9,8 @@ import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
+import ReconHistorySection from "@/components/ca/ReconHistorySection";
+import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -30,7 +32,7 @@ interface Client {
   llpin: string | null;
 }
 
-const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "Documents", "Reports"] as const;
+const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "3-Way Match", "Documents", "Reports"] as const;
 type Tab = typeof TABS[number];
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -556,7 +558,12 @@ export default function CAClientDetailPage() {
           </>
         )}
 
+        {tab === "3-Way Match" && (
+          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
+        )}
+
         {tab === "Bank" && (
+          <>
           <CACard style={{ overflow: "hidden" }}>
             {txns.length === 0 ? <CAEmpty title="No bank transactions" /> : (
               <>
@@ -588,6 +595,8 @@ export default function CAClientDetailPage() {
               </>
             )}
           </CACard>
+          <ReconHistorySection firmId={firmId} businessId={businessId} />
+          </>
         )}
 
         {tab === "Reports" && (
