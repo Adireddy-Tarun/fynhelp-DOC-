@@ -940,6 +940,36 @@ export type Database = {
           },
         ]
       }
+      ca_canonical_fields: {
+        Row: {
+          created_at: string
+          data_type: string
+          description: string | null
+          display_label: string
+          field_name: string
+          id: string
+          unit: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_type?: string
+          description?: string | null
+          display_label: string
+          field_name: string
+          id?: string
+          unit?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          description?: string | null
+          display_label?: string
+          field_name?: string
+          id?: string
+          unit?: string | null
+        }
+        Relationships: []
+      }
       ca_client_access: {
         Row: {
           access_level: string | null
@@ -2373,6 +2403,94 @@ export type Database = {
           role?: string
         }
         Relationships: []
+      }
+      ca_source_field_map: {
+        Row: {
+          canonical_field_id: string | null
+          created_at: string
+          id: string
+          source_field: string
+          source_system: string
+          transform_rule: string | null
+        }
+        Insert: {
+          canonical_field_id?: string | null
+          created_at?: string
+          id?: string
+          source_field: string
+          source_system: string
+          transform_rule?: string | null
+        }
+        Update: {
+          canonical_field_id?: string | null
+          created_at?: string
+          id?: string
+          source_field?: string
+          source_system?: string
+          transform_rule?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_source_field_map_canonical_field_id_fkey"
+            columns: ["canonical_field_id"]
+            isOneToOne: false
+            referencedRelation: "ca_canonical_fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_sync_jobs: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          last_sync_cursor: string | null
+          records_synced: number
+          source_system: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_cursor?: string | null
+          records_synced?: number
+          source_system: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_cursor?: string | null
+          records_synced?: number
+          source_system?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_sync_jobs_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_tasks: {
         Row: {

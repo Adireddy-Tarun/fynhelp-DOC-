@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "@/lib/router-compat";
 import {
   LayoutGrid, Users, UserPlus, Bell, Settings, LogOut, Inbox, ClipboardList, CheckCheck,
   Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, Briefcase, ShieldCheck,
-  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone,
+  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -27,6 +27,12 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
       { label: "Requests", path: "/ca/intake/requests", icon: ClipboardList },
       { label: "Review queue", path: "/ca/intake/review", icon: CheckCheck },
       { label: "Evidence vault", path: "/ca/vault", icon: Archive },
+    ],
+  },
+  {
+    group: "Data",
+    links: [
+      { label: "Integrations", path: "/ca/integrations", icon: Plug },
     ],
   },
   {
