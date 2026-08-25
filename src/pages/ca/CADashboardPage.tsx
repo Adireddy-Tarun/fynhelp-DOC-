@@ -48,6 +48,7 @@ export default function CADashboardPage() {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Enriched[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [dueToday, setDueToday] = useState<DueReminder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
