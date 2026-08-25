@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -189,8 +189,8 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
             </tr></thead>
             <tbody>
               {docs.map((d) => (
-                <>
-                  <tr key={d.id}>
+                <Fragment key={d.id}>
+                  <tr>
                     <td style={caTd}>{d.original_filename ?? "—"}</td>
                     <td style={caTd}>{DOC_CLASS_LABELS[d.classification as CADocClass] ?? d.classification}</td>
                     <td style={caTd}>{Math.round((d.confidence ?? 0) * (d.confidence <= 1 ? 100 : 1))}%</td>
@@ -206,7 +206,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                     </td>
                   </tr>
                   {expanded === d.id && (
-                    <tr key={`${d.id}-versions`}>
+                    <tr>
                       <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={6}>
                         {!versions[d.id] ? (
                           <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>Loading versions…</span>
@@ -234,7 +234,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
