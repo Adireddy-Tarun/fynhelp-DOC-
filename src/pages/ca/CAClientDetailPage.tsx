@@ -12,6 +12,7 @@ import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
 import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
 import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
+import ClientDeductionsTab from "@/components/ca/ClientDeductionsTab";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -33,7 +34,7 @@ interface Client {
   llpin: string | null;
 }
 
-const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "3-Way Match", "Documents", "Reports"] as const;
+const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "3-Way Match", "Documents", "Reports", "Deductions"] as const;
 type Tab = typeof TABS[number];
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -386,6 +387,12 @@ export default function CAClientDetailPage() {
         {tab === "Documents" && businessId && firmId && (
           <ClientDocumentsTab firmId={firmId} businessId={businessId} />
         )}
+
+        {tab === "Deductions" && businessId && firmId && (
+          <ClientDeductionsTab firmId={firmId} businessId={businessId} clientId={clientId ?? null} userId={userId} />
+        )}
+
+
 
         {tab === "GST & ITC" && (
           <>
