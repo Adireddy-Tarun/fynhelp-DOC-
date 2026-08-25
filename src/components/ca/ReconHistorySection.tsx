@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { loadReconRuns, type ReconRun } from "@/lib/caReconRuns";
 import { CA, CACard, CABadge, CAEmpty, caTh, caTd, caNum, inr } from "@/components/ca/portalUi";
 
@@ -64,8 +64,8 @@ export default function ReconHistorySection({ firmId, businessId }: { firmId: st
           </tr></thead>
           <tbody>
             {runs.map((r) => (
-              <>
-                <tr key={r.id} onClick={() => setOpen(open === r.id ? null : r.id)} style={{ cursor: "pointer" }}>
+              <Fragment key={r.id}>
+                <tr onClick={() => setOpen(open === r.id ? null : r.id)} style={{ cursor: "pointer" }}>
                   <td style={caTd}>{fmtWhen(r.run_at)}</td>
                   <td style={caTd}><CABadge tone={r.recon_type === "bank" ? "green" : r.recon_type === "itc" ? "amber" : "grey"}>{TYPE_LABEL[r.recon_type] ?? r.recon_type}</CABadge></td>
                   <td style={caTd}>{r.period}</td>
@@ -76,13 +76,13 @@ export default function ReconHistorySection({ firmId, businessId }: { firmId: st
                   <td style={{ ...caNum, color: Number(r.total_at_risk) > 0 ? CA.red : undefined }}>{inr(r.total_at_risk)}</td>
                 </tr>
                 {open === r.id && (
-                  <tr key={`${r.id}-snap`}>
+                  <tr>
                     <td colSpan={8} style={{ padding: 0, borderBottom: `1px solid ${CA.line}` }}>
                       <SnapshotCard snapshot={r.snapshot} />
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>
