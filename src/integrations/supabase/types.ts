@@ -1269,54 +1269,75 @@ export type Database = {
           assigned_to: string | null
           business_id: string | null
           ca_firm_id: string
+          cin: string | null
           client_email: string | null
           client_name: string
           client_phone: string | null
           client_status: string | null
           created_at: string | null
+          dpiit_number: string | null
+          entity_subtype: string | null
+          entity_type: string
           gstin: string | null
           id: string
+          incorporation_date: string | null
           is_demo: boolean | null
           last_activity_at: string | null
+          llpin: string | null
           notes: string | null
           onboarded_at: string | null
           pan: string | null
+          udyam_number: string | null
           updated_at: string | null
         }
         Insert: {
           assigned_to?: string | null
           business_id?: string | null
           ca_firm_id: string
+          cin?: string | null
           client_email?: string | null
           client_name: string
           client_phone?: string | null
           client_status?: string | null
           created_at?: string | null
+          dpiit_number?: string | null
+          entity_subtype?: string | null
+          entity_type?: string
           gstin?: string | null
           id?: string
+          incorporation_date?: string | null
           is_demo?: boolean | null
           last_activity_at?: string | null
+          llpin?: string | null
           notes?: string | null
           onboarded_at?: string | null
           pan?: string | null
+          udyam_number?: string | null
           updated_at?: string | null
         }
         Update: {
           assigned_to?: string | null
           business_id?: string | null
           ca_firm_id?: string
+          cin?: string | null
           client_email?: string | null
           client_name?: string
           client_phone?: string | null
           client_status?: string | null
           created_at?: string | null
+          dpiit_number?: string | null
+          entity_subtype?: string | null
+          entity_type?: string
           gstin?: string | null
           id?: string
+          incorporation_date?: string | null
           is_demo?: boolean | null
           last_activity_at?: string | null
+          llpin?: string | null
           notes?: string | null
           onboarded_at?: string | null
           pan?: string | null
+          udyam_number?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1572,6 +1593,66 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ca_document_versions: {
+        Row: {
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          extraction_id: string | null
+          id: string
+          original_filename: string | null
+          reason: string | null
+          replaced_by: string | null
+          storage_path: string
+          updated_at: string
+          uploaded_by: string | null
+          version_number: number
+        }
+        Insert: {
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          extraction_id?: string | null
+          id?: string
+          original_filename?: string | null
+          reason?: string | null
+          replaced_by?: string | null
+          storage_path: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version_number?: number
+        }
+        Update: {
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          extraction_id?: string | null
+          id?: string
+          original_filename?: string | null
+          reason?: string | null
+          replaced_by?: string | null
+          storage_path?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_document_versions_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_document_versions_extraction_id_fkey"
+            columns: ["extraction_id"]
+            isOneToOne: false
+            referencedRelation: "ca_document_extractions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_engagements: {
         Row: {
