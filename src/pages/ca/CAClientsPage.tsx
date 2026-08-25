@@ -304,7 +304,7 @@ export default function CAClientsPage() {
                     />
                   </td>
                   <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_name}</td>
-                  <td style={caTd}><CABadge tone="neutral">{r.entity_type ?? "—"}</CABadge></td>
+                  <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>
                   <td style={caTd}><CABadge tone={statusTone(r.client_status)}>{r.client_status ?? "—"}</CABadge></td>
