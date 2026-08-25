@@ -71,6 +71,7 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
       { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck },
       { label: "Notifications", path: "/ca/notifications", icon: Bell },
       { label: "Settings", path: "/ca/settings", icon: Settings },
+      { label: "Communications", path: "/ca/settings/communications", icon: BellRing },
     ],
   },
 ];
