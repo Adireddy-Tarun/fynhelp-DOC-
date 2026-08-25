@@ -211,6 +211,27 @@ async function teardown(f: Firm) {
   await admin.auth.admin.deleteUser(f.smeUserId);
 }
 
+/** Removes fixtures left behind by an earlier run that crashed mid-setup. */
+async function purgeStaleFixtures() {
+  const { data: firms } = await admin.from("ca_firms").select("id").like("firm_name", "rls-%");
+  for (const f of (firms ?? []) as { id: string }[]) {
+    await admin.from("ca_invoices").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_follow_up_rules").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_reminders").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_tasks").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_notifications").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_clients").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_client_access").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_firm_members").delete().eq("ca_firm_id", f.id);
+    await admin.from("ca_firms").delete().eq("id", f.id);
+  }
+  await admin.from("businesses").delete().like("business_name", "rls-%");
+  const { data: users } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+  for (const u of users?.users ?? []) {
+    if ((u.email ?? "").endsWith("@rls-test.fynhelp.dev")) await admin.auth.admin.deleteUser(u.id);
+  }
+}
+
 // Firm-scoped tables and the id field on the seeded row for each firm.
 const SCOPED_TABLES: { table: string; idOf: (f: Firm) => string; extraInsert?: (f: Firm) => Record<string, unknown> }[] = [
   { table: "ca_clients", idOf: (f) => f.clientId, extraInsert: (f) => ({ client_name: "intruder", entity_type: "Private Limited", business_id: f.businessId }) },
@@ -227,6 +248,7 @@ describe.skipIf(!CONFIGURED)("RLS regression — CA firm isolation", () => {
   let B: Firm;
 
   beforeAll(async () => {
+    await purgeStaleFixtures();
     A = await provision("A");
     B = await provision("B");
   }, 120_000);
