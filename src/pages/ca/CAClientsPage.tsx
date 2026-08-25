@@ -317,7 +317,14 @@ export default function CAClientsPage() {
                       onChange={(e) => setSelected((s) => ({ ...s, [r.id]: e.target.checked }))}
                     />
                   </td>
-                  <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_name}</td>
+                  <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>
+                    <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                      {r.client_name}
+                      {r.business_id && (dueReminders[r.business_id] ?? 0) > 0 && (
+                        <CABadge tone="red">{dueReminders[r.business_id]} due</CABadge>
+                      )}
+                    </span>
+                  </td>
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>
