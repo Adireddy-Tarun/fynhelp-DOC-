@@ -109,6 +109,7 @@ import { Route as CaAuthCaPortalClientPortalRouteImport } from './routes/_caAuth
 import { Route as CaAuthCaPortalCloseRouteImport } from './routes/_caAuth/ca/_portal/close'
 import { Route as CaAuthCaPortalComplianceRouteImport } from './routes/_caAuth/ca/_portal/compliance'
 import { Route as CaAuthCaPortalDashboardRouteImport } from './routes/_caAuth/ca/_portal/dashboard'
+import { Route as CaAuthCaPortalDataQualityRouteImport } from './routes/_caAuth/ca/_portal/data-quality'
 import { Route as CaAuthCaPortalEngagementsRouteImport } from './routes/_caAuth/ca/_portal/engagements'
 import { Route as CaAuthCaPortalExceptionsRouteImport } from './routes/_caAuth/ca/_portal/exceptions'
 import { Route as CaAuthCaPortalFilingCalendarRouteImport } from './routes/_caAuth/ca/_portal/filing-calendar'
@@ -728,6 +729,12 @@ const CaAuthCaPortalDashboardRoute = CaAuthCaPortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalDataQualityRoute =
+  CaAuthCaPortalDataQualityRouteImport.update({
+    id: '/data-quality',
+    path: '/data-quality',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalEngagementsRoute =
   CaAuthCaPortalEngagementsRouteImport.update({
     id: '/engagements',
@@ -1332,6 +1339,7 @@ export interface FileRoutesByFullPath {
   '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
@@ -1514,6 +1522,7 @@ export interface FileRoutesByTo {
   '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
@@ -1706,6 +1715,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/close': typeof CaAuthCaPortalCloseRoute
   '/_caAuth/ca/_portal/compliance': typeof CaAuthCaPortalComplianceRoute
   '/_caAuth/ca/_portal/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/_caAuth/ca/_portal/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/_caAuth/ca/_portal/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/_caAuth/ca/_portal/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/_caAuth/ca/_portal/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
@@ -1893,6 +1903,7 @@ export interface FileRouteTypes {
     | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/data-quality'
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
@@ -2075,6 +2086,7 @@ export interface FileRouteTypes {
     | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/data-quality'
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
@@ -2266,6 +2278,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/close'
     | '/_caAuth/ca/_portal/compliance'
     | '/_caAuth/ca/_portal/dashboard'
+    | '/_caAuth/ca/_portal/data-quality'
     | '/_caAuth/ca/_portal/engagements'
     | '/_caAuth/ca/_portal/exceptions'
     | '/_caAuth/ca/_portal/filing-calendar'
@@ -3071,6 +3084,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalDashboardRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/data-quality': {
+      id: '/_caAuth/ca/_portal/data-quality'
+      path: '/data-quality'
+      fullPath: '/ca/data-quality'
+      preLoaderRoute: typeof CaAuthCaPortalDataQualityRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/engagements': {
       id: '/_caAuth/ca/_portal/engagements'
       path: '/engagements'
@@ -3823,6 +3843,7 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalCloseRoute: typeof CaAuthCaPortalCloseRoute
   CaAuthCaPortalComplianceRoute: typeof CaAuthCaPortalComplianceRoute
   CaAuthCaPortalDashboardRoute: typeof CaAuthCaPortalDashboardRoute
+  CaAuthCaPortalDataQualityRoute: typeof CaAuthCaPortalDataQualityRoute
   CaAuthCaPortalEngagementsRoute: typeof CaAuthCaPortalEngagementsRoute
   CaAuthCaPortalExceptionsRoute: typeof CaAuthCaPortalExceptionsRoute
   CaAuthCaPortalFilingCalendarRoute: typeof CaAuthCaPortalFilingCalendarRoute
@@ -3866,6 +3887,7 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalCloseRoute: CaAuthCaPortalCloseRoute,
   CaAuthCaPortalComplianceRoute: CaAuthCaPortalComplianceRoute,
   CaAuthCaPortalDashboardRoute: CaAuthCaPortalDashboardRoute,
+  CaAuthCaPortalDataQualityRoute: CaAuthCaPortalDataQualityRoute,
   CaAuthCaPortalEngagementsRoute: CaAuthCaPortalEngagementsRoute,
   CaAuthCaPortalExceptionsRoute: CaAuthCaPortalExceptionsRoute,
   CaAuthCaPortalFilingCalendarRoute: CaAuthCaPortalFilingCalendarRoute,
