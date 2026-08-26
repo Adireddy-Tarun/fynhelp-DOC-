@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "@/lib/router-compat";
 import {
   LayoutGrid, Users, UserPlus, Bell, Settings, LogOut, Inbox, ClipboardList, CheckCheck,
   Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, Briefcase, ShieldCheck,
-  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug,
+  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug, BookOpen, Gauge, Boxes,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
