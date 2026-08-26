@@ -531,6 +531,81 @@ export default function MyCAPage() {
         </div>
       )}
 
+      {activeTab === "reports" && (
+        <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
+          {reports.length === 0 ? (
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+              Your CA has not shared any reports with you yet.
+            </div>
+          ) : (
+            reports.map((r, i) => (
+              <div key={r.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 16px", borderTop: i > 0 ? "0.5px solid " + BORDER : "none" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <FileText size={15} style={{ color: GOLD, flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+                      {r.report?.report_name ?? r.report?.report_type ?? "Report"}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                      {[r.report?.period, "Shared " + formatDate(r.created_at)].filter(Boolean).join(" · ")}
+                      {r.note ? " · " + r.note : ""}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => downloadReport(r)}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: RED, background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
+                >
+                  <Download size={13} /> Download
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === "invoices" && (
+        <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
+          {invoices.length === 0 ? (
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+              No invoices from your CA yet.
+            </div>
+          ) : (
+            invoices.map((inv, i) => {
+              const paid = inv.status === "paid";
+              return (
+                <div key={inv.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 16px", borderTop: i > 0 ? "0.5px solid " + BORDER : "none" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+                      {inv.invoice_number ?? "Invoice"} {inv.period ? "· " + inv.period : ""}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                      {paid
+                        ? "Paid " + (inv.paid_at ? formatDate(inv.paid_at) : "")
+                        : inv.due_date ? "Due " + formatDate(inv.due_date) : "Payment pending"}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 14, fontWeight: 500, color: paid ? GREEN : INK }}>
+                      {formatMoney(inv.total)}
+                    </div>
+                    {!paid && (
+                      <button
+                        onClick={() => payInvoice(inv)}
+                        disabled={payingId === inv.id}
+                        style={{ height: 32, padding: "0 14px", borderRadius: 7, background: RED, color: "white", border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", opacity: payingId === inv.id ? 0.6 : 1 }}
+                      >
+                        {payingId === inv.id ? "Starting…" : "Pay now"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
       {activeTab === "messages" && (
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", height: 480 }}>
           <div style={{ padding: "12px 16px", borderBottom: "0.5px solid " + BORDER, fontSize: 12, color: "rgba(26,16,8,0.4)", fontWeight: 500 }}>
