@@ -12,7 +12,7 @@ import { logCAAudit } from "@/lib/caAudit";
 import { CA, CACard, CAButton, CABadge, CAEmpty, CAField, caInputStyle, caTh, caTd, inr, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader } from "@/components/ca/os/primitives";
 
-type Tab = "parties" | "items" | "currency";
+type Tab = "parties" | "items" | "currency" | "custom";
 
 interface Party {
   id: string; name: string; party_type: string; gstin: string | null; pan: string | null;
@@ -25,12 +25,17 @@ interface Item {
 interface FxRate {
   id: string; base_currency: string; quote_currency: string; rate: number; rate_date: string; source: string;
 }
+interface FieldDef {
+  id: string; field_key: string; label: string; field_type: string; options: unknown; is_required: boolean; sort_order: number;
+}
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "parties", label: "Customers & Vendors" },
   { key: "items", label: "Items" },
   { key: "currency", label: "Currency & FX" },
+  { key: "custom", label: "Custom fields" },
 ];
+
 
 export default function CAMastersPage() {
   const { firmId, userId } = useCAPortal();
