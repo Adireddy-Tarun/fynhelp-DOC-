@@ -76,7 +76,10 @@ export const reportManualPayment = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!invoice) throw new Error("Invoice not found");
 
-    const { error: insErr } = await supabase.from("ca_invoice_payments").insert({
+    // The caller passed RLS on the invoice read above, which is the access
+    // check. Client-portal users cannot write payment rows directly.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: insErr } = await supabaseAdmin.from("ca_invoice_payments").insert({
       ca_firm_id: invoice.ca_firm_id,
       business_id: invoice.business_id,
       invoice_id: invoice.id,
