@@ -7396,6 +7396,7 @@ export type Database = {
       security_check_caller_allowed: { Args: never; Returns: boolean }
       text_to_bytea: { Args: { data: string }; Returns: string }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
+      trigger_ca_integration_sync: { Args: never; Returns: undefined }
       trigger_compliance_alerts: { Args: never; Returns: undefined }
       urlencode:
         | { Args: { data: Json }; Returns: string }
