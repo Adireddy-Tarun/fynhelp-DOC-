@@ -151,7 +151,7 @@ export default function MyCAPage() {
       granted_at: access.granted_at,
     });
 
-    const [complianceRes, docsRes, msgsRes] = await Promise.all([
+    const [complianceRes, docsRes, msgsRes, reportsRes, invoicesRes] = await Promise.all([
       supabase
         .from("ca_compliance_events")
         .select("id, event_type, filing_period, due_date, filing_date, status, penalty_amount")
