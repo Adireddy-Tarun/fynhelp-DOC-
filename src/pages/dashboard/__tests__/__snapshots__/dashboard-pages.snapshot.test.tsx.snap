@@ -5,575 +5,201 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > AuditRea
   data-testid="dashboard-layout-mock"
 >
   <div
-    class="bg-fyn-ink rounded-xl p-8 mb-6 text-center"
+    class="rounded-lg border text-card-foreground shadow-xs p-6 mb-6 bg-fyn-beige-card border-fyn-ink-10"
   >
     <p
-      class="text-white/40 text-xs fyn-label mb-2"
+      class="text-[13px] fyn-label text-secondary-foreground"
     >
-      AUDIT READINESS SCORE
+      Audit Readiness Score
     </p>
     <p
-      class="text-[72px] font-bold leading-none text-accent font-sans"
+      class="text-[40px] font-bold mt-1 font-sans"
+      style="color: rgb(196, 30, 30);"
     >
-      67
+      0
+      %
     </p>
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      class="relative w-full overflow-hidden rounded-full bg-secondary mt-3 h-2"
+      data-max="100"
+      data-state="indeterminate"
+      role="progressbar"
+    >
+      <div
+        class="h-full w-full flex-1 bg-primary transition-all"
+        data-max="100"
+        data-state="indeterminate"
+        style="transform: translateX(-100%);"
+      />
+    </div>
     <p
-      class="text-white/40 text-base"
+      class="text-xs text-fyn-ink/60 mt-2"
     >
-      /100, Moderate Risk
+      0
+       of 
+      4
+       requirements met
     </p>
-    <p
-      class="text-white/50 text-sm mt-2"
-    >
-      If a GST officer walked in today, these are the 5 things you'd need to explain.
-    </p>
-    <button
-      class="mt-4 text-fyn-red text-sm font-medium hover:underline"
-    >
-      Improve your score →
-    </button>
   </div>
   <div
-    class="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6"
+    class="rounded-lg border text-card-foreground shadow-xs p-6 bg-fyn-beige-dark border-fyn-ink-10"
   >
     <h3
-      class="text-fyn-ink text-lg mb-4 font-sans"
+      class="font-serif text-lg text-fyn-ink mb-4"
     >
-      Readiness by Area
+      Readiness Checklist
     </h3>
-    <div
+    <ul
       class="space-y-3"
     >
-      <div
-        class="flex items-center gap-4"
+      <li
+        class="flex items-center gap-3 p-3 rounded-md bg-fyn-beige border border-fyn-ink-10"
       >
         <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
+          class="flex items-center justify-center w-6 h-6 rounded-full"
+          style="background: transparent; border: 1.5px solid #1a100833; color: rgba(26, 16, 8, 0.4);"
         >
-          GST Records
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-circle w-3 h-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+          </svg>
         </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 72%; background: rgb(139, 90, 0);"
-          />
-        </div>
         <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
+          class="text-sm"
+          style="color: rgba(26, 16, 8, 0.6); text-decoration: none; font-weight: 400;"
         >
-          72
-          /100
+          Bank Transactions Recorded
         </span>
-      </div>
-      <div
-        class="flex items-center gap-4"
+      </li>
+      <li
+        class="flex items-center gap-3 p-3 rounded-md bg-fyn-beige border border-fyn-ink-10"
       >
         <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
+          class="flex items-center justify-center w-6 h-6 rounded-full"
+          style="background: transparent; border: 1.5px solid #1a100833; color: rgba(26, 16, 8, 0.4);"
         >
-          Cash Documentation
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-circle w-3 h-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+          </svg>
         </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 81%; background: rgb(26, 107, 60);"
-          />
-        </div>
         <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
+          class="text-sm"
+          style="color: rgba(26, 16, 8, 0.6); text-decoration: none; font-weight: 400;"
         >
-          81
-          /100
+          Invoices & Receivables Tracked
         </span>
-      </div>
-      <div
-        class="flex items-center gap-4"
+      </li>
+      <li
+        class="flex items-center gap-3 p-3 rounded-md bg-fyn-beige border border-fyn-ink-10"
       >
         <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
+          class="flex items-center justify-center w-6 h-6 rounded-full"
+          style="background: transparent; border: 1.5px solid #1a100833; color: rgba(26, 16, 8, 0.4);"
         >
-          Vendor Contracts
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-circle w-3 h-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+          </svg>
         </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 54%; background: rgb(196, 30, 30);"
-          />
-        </div>
         <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
+          class="text-sm"
+          style="color: rgba(26, 16, 8, 0.6); text-decoration: none; font-weight: 400;"
         >
-          54
-          /100
+          Vendor Bills & Payables Tracked
         </span>
-      </div>
-      <div
-        class="flex items-center gap-4"
+      </li>
+      <li
+        class="flex items-center gap-3 p-3 rounded-md bg-fyn-beige border border-fyn-ink-10"
       >
         <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
+          class="flex items-center justify-center w-6 h-6 rounded-full"
+          style="background: transparent; border: 1.5px solid #1a100833; color: rgba(26, 16, 8, 0.4);"
         >
-          Invoice Compliance
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-circle w-3 h-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+          </svg>
         </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 89%; background: rgb(26, 107, 60);"
-          />
-        </div>
         <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
+          class="text-sm"
+          style="color: rgba(26, 16, 8, 0.6); text-decoration: none; font-weight: 400;"
         >
-          89
-          /100
+          GST Returns Filed
         </span>
-      </div>
-      <div
-        class="flex items-center gap-4"
-      >
-        <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
-        >
-          TDS Records
-        </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 71%; background: rgb(139, 90, 0);"
-          />
-        </div>
-        <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
-        >
-          71
-          /100
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-4"
-      >
-        <span
-          class="text-sm w-40 font-sans text-secondary-foreground"
-        >
-          Labour Records
-        </span>
-        <div
-          class="flex-1 h-3 bg-fyn-ink/5 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-3 rounded-full transition-all"
-            style="width: 61%; background: rgb(139, 90, 0);"
-          />
-        </div>
-        <span
-          class="text-fyn-ink/60 fyn-metric text-sm w-16 text-right"
-        >
-          61
-          /100
-        </span>
-      </div>
-    </div>
-  </div>
-  <div
-    class="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 mb-6"
-  >
-    <h3
-      class="text-fyn-ink text-lg mb-4 font-sans"
-    >
-      What Auditors Check
-    </h3>
-    <p
-      class="sr-only"
-    >
-      Use Enter or Space to expand a row. Use Up and Down arrow keys to move between rows. Home and End jump to the first or last row.
-    </p>
+      </li>
+    </ul>
     <div
-      class="space-y-2"
-      role="list"
+      class="mt-6"
     >
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
+      <button
+        class="inline-flex items-center gap-2 transition-colors hover:opacity-90"
+        style="background: rgb(196, 30, 30); color: rgb(255, 255, 255); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500;"
       >
-        <button
-          aria-controls="audit-row-panel-0"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-0"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-[#C41E1E]/10 text-[#C41E1E]"
-            >
-              HIGH
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              GST Record Maintenance
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
-      >
-        <button
-          aria-controls="audit-row-panel-1"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-1"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-[#8B5A00]"
-            >
-              MEDIUM
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              Cash and Bank Records
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
-      >
-        <button
-          aria-controls="audit-row-panel-2"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-2"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-[#C41E1E]/10 text-[#C41E1E]"
-            >
-              HIGH
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              Vendor Documentation
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
-      >
-        <button
-          aria-controls="audit-row-panel-3"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-3"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-[#1A6B3C]/10 text-[#1A6B3C]"
-            >
-              LOW
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              Invoice Compliance
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
-      >
-        <button
-          aria-controls="audit-row-panel-4"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-4"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-[#8B5A00]"
-            >
-              MEDIUM
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              TDS Records
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-      <div
-        class="border border-fyn-ink-10 rounded-lg overflow-hidden"
-        role="listitem"
-      >
-        <button
-          aria-controls="audit-row-panel-5"
-          aria-expanded="false"
-          class="w-full flex items-center justify-between p-4 hover:bg-fyn-beige focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red focus-visible:ring-offset-2 focus-visible:ring-offset-fyn-beige-dark transition-colors text-left"
-          id="audit-row-button-5"
-          type="button"
-        >
-          <div
-            class="flex items-center gap-3"
-          >
-            <span
-              class="text-[10px] px-2 py-0.5 rounded bg-[#1A6B3C]/10 text-[#1A6B3C]"
-            >
-              LOW
-            </span>
-            <span
-              class="text-fyn-ink font-medium text-sm font-sans"
-            >
-              Director / Partner Compliance
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            class="text-fyn-ink/30"
-          >
-            ▼
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-  <div
-    class="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5"
-  >
-    <div
-      class="flex items-center justify-between mb-4"
-    >
-      <h3
-        class="text-fyn-ink text-lg font-sans"
-      >
-        Documents AI CFO Nidhi Recommends You Keep Ready
-      </h3>
-      <span
-        class="text-fyn-gold text-sm fyn-metric"
-      >
-        6
-         of 
-        8
-         ready (
-        75
-        %)
-      </span>
-    </div>
-    <div
-      class="space-y-2"
-    >
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          Last 3 years GSTR-1/3B filed confirmation
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          Bank statements last 12 months
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs border-fyn-ink/20"
-        />
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink/60"
-        >
-          Purchase register (reconciled with 2B)
-        </span>
-        <button
-          class="text-fyn-red text-xs font-medium hover:underline"
-        >
-          Upload
-        </button>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs border-fyn-ink/20"
-        />
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink/60"
-        >
-          Signed vendor agreements (top 10 vendors)
-        </span>
-        <button
-          class="text-fyn-red text-xs font-medium hover:underline"
-        >
-          Upload
-        </button>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          Fixed asset register with invoices
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          Director KYC documents
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          MSME Udyam certificate
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
-      <div
-        class="flex items-center gap-3 p-3 bg-fyn-beige rounded-lg hover:bg-fyn-beige-deep transition-colors"
-      >
-        <span
-          class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs bg-[#1A6B3C] border-[#1A6B3C] text-white"
-        >
-          ✓
-        </span>
-        <span
-          class="flex-1 text-sm font-sans text-fyn-ink"
-        >
-          PF/ESIC registration certificate
-        </span>
-        <span
-          class="text-[#1A6B3C] text-xs"
-        >
-          Uploaded
-        </span>
-      </div>
+        Upload Missing Data →
+      </button>
     </div>
   </div>
 </div>
@@ -592,7 +218,6 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
       Period:
     </span>
     <button
-      aria-controls="radix-:r0:"
       aria-expanded="false"
       aria-haspopup="dialog"
       class="inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-2 h-9 justify-start text-left font-normal text-fyn-small"
@@ -601,6 +226,7 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
       type="button"
     >
       <svg
+        aria-hidden="true"
         class="lucide lucide-calendar mr-2 h-4 w-4"
         fill="none"
         height="24"
@@ -629,7 +255,7 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
           d="M3 10h18"
         />
       </svg>
-      25 Jan 2026
+      26 May 2026
     </button>
     <span
       class="text-fyn-ink/40 text-fyn-tiny"
@@ -637,7 +263,6 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
       →
     </span>
     <button
-      aria-controls="radix-:r1:"
       aria-expanded="false"
       aria-haspopup="dialog"
       class="inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-2 h-9 justify-start text-left font-normal text-fyn-small"
@@ -646,6 +271,7 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
       type="button"
     >
       <svg
+        aria-hidden="true"
         class="lucide lucide-calendar mr-2 h-4 w-4"
         fill="none"
         height="24"
@@ -674,13 +300,14 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
           d="M3 10h18"
         />
       </svg>
-      25 Apr 2026
+      26 Aug 2026
     </button>
     <button
       class="px-5 py-2.5 font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2 border bg-fyn-ink text-white border-fyn-ink hover:bg-fyn-ink/90 hover:text-white"
       disabled=""
     >
       <svg
+        aria-hidden="true"
         class="lucide lucide-refresh-cw h-4 w-4 animate-spin"
         fill="none"
         height="24"
@@ -719,86 +346,6 @@ exports[`Dashboard page snapshots, shared-primitive layout regression > Complian
     />
     <div
       class="h-32 bg-fyn-ink-05 animate-pulse rounded-lg"
-    />
-  </div>
-</div>
-`;
-
-exports[`Dashboard page snapshots, shared-primitive layout regression > TDSTaxPage (empty state): disconnected banner + 'YOU\\'LL NEED' checklist 1`] = `
-<div
-  data-testid="dashboard-layout-mock"
->
-  <div
-    class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
-  >
-    <div
-      class="bg-fyn-ink rounded-lg p-5"
-    >
-      <p
-        class="text-white/40 text-[13px] fyn-label"
-      >
-        UPCOMING FILINGS
-      </p>
-      <p
-        class="text-white text-[28px] font-bold mt-1 font-sans"
-      >
-        0
-      </p>
-    </div>
-    <div
-      class="bg-fyn-ink rounded-lg p-5"
-    >
-      <p
-        class="text-white/40 text-[13px] fyn-label"
-      >
-        OVERDUE FILINGS
-      </p>
-      <p
-        class="text-[28px] font-bold mt-1 font-sans text-white"
-      >
-        0
-      </p>
-    </div>
-    <div
-      class="bg-fyn-ink rounded-lg p-5"
-    >
-      <p
-        class="text-white/40 text-[13px] fyn-label"
-      >
-        TOTAL TDS DEDUCTED
-      </p>
-      <p
-        class="text-white text-[28px] font-bold mt-1 font-sans"
-      >
-        ₹0
-      </p>
-    </div>
-    <div
-      class="bg-fyn-ink rounded-lg p-5"
-    >
-      <p
-        class="text-white/40 text-[13px] fyn-label"
-      >
-        TOTAL TDS DEPOSITED
-      </p>
-      <p
-        class="text-white text-[28px] font-bold mt-1 font-sans"
-      >
-        ₹0
-      </p>
-    </div>
-  </div>
-  <div
-    class="space-y-3"
-  >
-    <div
-      class="h-24 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse"
-    />
-    <div
-      class="h-24 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse"
-    />
-    <div
-      class="h-24 bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg animate-pulse"
     />
   </div>
 </div>
