@@ -48,9 +48,10 @@ interface Job {
 
 interface Doc {
   id: string;
-  file_name: string | null;
+  original_filename: string | null;
   document_type: string | null;
-  uploaded_at: string | null;
+  filing_period: string | null;
+  created_at: string | null;
 }
 
 export default function TxnLineageDrawer({
@@ -80,7 +81,7 @@ export default function TxnLineageDrawer({
       if (txn.source_document_id) {
         const { data } = await supabase
           .from("ca_client_documents")
-          .select("id, file_name, document_type, uploaded_at")
+          .select("id, original_filename, document_type, filing_period, created_at")
           .eq("id", txn.source_document_id)
           .maybeSingle();
         if (!cancelled) setDoc((data as Doc) ?? null);
@@ -140,9 +141,10 @@ export default function TxnLineageDrawer({
               {doc && (
                 <div style={{ marginTop: 20 }}>
                   <div style={{ fontFamily: CA.serif, fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Source document</div>
-                  <Row label="File" value={doc.file_name ?? "—"} />
+                  <Row label="File" value={doc.original_filename ?? "—"} />
                   <Row label="Type" value={doc.document_type ?? "—"} />
-                  <Row label="Uploaded" value={dateIN(doc.uploaded_at)} />
+                  <Row label="Period" value={doc.filing_period ?? "—"} />
+                  <Row label="Uploaded" value={dateIN(doc.created_at)} />
                 </div>
               )}
               {!job && !doc && (
