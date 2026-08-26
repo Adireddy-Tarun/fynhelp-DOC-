@@ -1308,6 +1308,7 @@ export type Database = {
           dpiit_number: string | null
           entity_subtype: string | null
           entity_type: string
+          group_id: string | null
           gstin: string | null
           id: string
           incorporation_date: string | null
@@ -1316,6 +1317,7 @@ export type Database = {
           llpin: string | null
           notes: string | null
           onboarded_at: string | null
+          ownership_pct: number | null
           pan: string | null
           udyam_number: string | null
           updated_at: string | null
@@ -1333,6 +1335,7 @@ export type Database = {
           dpiit_number?: string | null
           entity_subtype?: string | null
           entity_type?: string
+          group_id?: string | null
           gstin?: string | null
           id?: string
           incorporation_date?: string | null
@@ -1341,6 +1344,7 @@ export type Database = {
           llpin?: string | null
           notes?: string | null
           onboarded_at?: string | null
+          ownership_pct?: number | null
           pan?: string | null
           udyam_number?: string | null
           updated_at?: string | null
@@ -1358,6 +1362,7 @@ export type Database = {
           dpiit_number?: string | null
           entity_subtype?: string | null
           entity_type?: string
+          group_id?: string | null
           gstin?: string | null
           id?: string
           incorporation_date?: string | null
@@ -1366,11 +1371,20 @@ export type Database = {
           llpin?: string | null
           notes?: string | null
           onboarded_at?: string | null
+          ownership_pct?: number | null
           pan?: string | null
           udyam_number?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ca_clients_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "ca_entity_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_close_periods: {
         Row: {
@@ -1482,6 +1496,83 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_custom_field_defs: {
+        Row: {
+          ca_firm_id: string
+          created_at: string
+          field_key: string
+          field_type: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          label: string
+          options: Json
+          sort_order: number
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string
+          field_key: string
+          field_type?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          label: string
+          options?: Json
+          sort_order?: number
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string
+          field_key?: string
+          field_type?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          label?: string
+          options?: Json
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      ca_custom_field_values: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          field_id: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+          value: string | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          field_id: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          field_id?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_custom_field_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "ca_custom_field_defs"
             referencedColumns: ["id"]
           },
         ]
@@ -1908,6 +1999,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_entity_groups: {
+        Row: {
+          ca_firm_id: string
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          parent_business_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          parent_business_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          parent_business_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ca_exceptions: {
         Row: {
           amount: number | null
@@ -2259,6 +2380,62 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_inter_entity_transactions: {
+        Row: {
+          amount: number
+          ca_firm_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          elimination_status: string
+          from_business_id: string
+          group_id: string | null
+          id: string
+          nature: string
+          source_reference: string | null
+          to_business_id: string
+          txn_date: string
+        }
+        Insert: {
+          amount: number
+          ca_firm_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          elimination_status?: string
+          from_business_id: string
+          group_id?: string | null
+          id?: string
+          nature?: string
+          source_reference?: string | null
+          to_business_id: string
+          txn_date: string
+        }
+        Update: {
+          amount?: number
+          ca_firm_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          elimination_status?: string
+          from_business_id?: string
+          group_id?: string | null
+          id?: string
+          nature?: string
+          source_reference?: string | null
+          to_business_id?: string
+          txn_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_inter_entity_transactions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "ca_entity_groups"
             referencedColumns: ["id"]
           },
         ]
