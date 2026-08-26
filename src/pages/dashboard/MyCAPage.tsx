@@ -85,7 +85,10 @@ export default function MyCAPage() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"compliance" | "documents" | "messages">("compliance");
+  const [reports, setReports] = useState<SharedReport[]>([]);
+  const [invoices, setInvoices] = useState<ClientInvoice[]>([]);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"compliance" | "documents" | "reports" | "invoices" | "messages">("compliance");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
