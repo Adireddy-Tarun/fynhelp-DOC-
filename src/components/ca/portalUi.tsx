@@ -200,3 +200,120 @@ export const caTd: CSSProperties = {
 };
 
 export const caNum: CSSProperties = { ...caTd, fontFamily: CA.mono, fontVariantNumeric: "tabular-nums", textAlign: "right" };
+
+/* ---------------------------------------------------------------
+   Responsive data table.
+   Renders a normal table on desktop and a label/value card list on
+   phones, so a CA list adapts everywhere by using this one primitive.
+   --------------------------------------------------------------- */
+
+export interface CAColumn<T> {
+  key: string;
+  label: string;
+  render: (row: T) => ReactNode;
+  /** Right-align + mono on desktop (amounts, counts). */
+  numeric?: boolean;
+  /** Hidden in the phone card view (low-signal columns). */
+  hideOnPhone?: boolean;
+  /** Rendered as the card headline instead of a label/value row. */
+  primary?: boolean;
+}
+
+export function CADataTable<T>({
+  columns,
+  rows,
+  rowKey,
+  onRowClick,
+  empty,
+  phone,
+}: {
+  columns: CAColumn<T>[];
+  rows: T[];
+  rowKey: (row: T) => string;
+  onRowClick?: (row: T) => void;
+  empty?: ReactNode;
+  /** Pass the result of useIsPhone() from the page. */
+  phone?: boolean;
+}) {
+  if (!rows.length) return <>{empty ?? <CAEmpty title="Nothing here yet" />}</>;
+
+  if (phone) {
+    return (
+      <div style={{ display: "grid", gap: 10 }}>
+        {rows.map((row) => {
+          const head = columns.find((c) => c.primary) ?? columns[0];
+          const rest = columns.filter((c) => c !== head && !c.hideOnPhone);
+          return (
+            <div
+              key={rowKey(row)}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              style={{
+                border: `0.5px solid ${CA.line}`,
+                borderRadius: 10,
+                padding: "12px 13px",
+                background: CA.card,
+                cursor: onRowClick ? "pointer" : "default",
+              }}
+            >
+              <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: CA.ink, marginBottom: 8 }}>
+                {head?.render(row)}
+              </div>
+              <div style={{ display: "grid", gap: 6 }}>
+                {rest.map((c) => (
+                  <div key={c.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <span
+                      style={{
+                        fontFamily: CA.sans, fontSize: 10.5, fontWeight: 700, letterSpacing: "0.06em",
+                        textTransform: "uppercase", color: CA.faint,
+                      }}
+                    >
+                      {c.label}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: c.numeric ? CA.mono : CA.sans,
+                        fontVariantNumeric: c.numeric ? "tabular-nums" : undefined,
+                        fontSize: 13,
+                        color: CA.ink,
+                        textAlign: "right",
+                      }}
+                    >
+                      {c.render(row)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            {columns.map((c) => (
+              <th key={c.key} style={c.numeric ? { ...caTh, textAlign: "right" } : caTh}>{c.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              key={rowKey(row)}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              style={{ cursor: onRowClick ? "pointer" : "default" }}
+            >
+              {columns.map((c) => (
+                <td key={c.key} style={c.numeric ? caNum : caTd}>{c.render(row)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

@@ -133,15 +133,19 @@ export default function CAReportsPage() {
   const [presetTemplate, setPresetTemplate] = useState<TemplateId | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [actionMenu, setActionMenu] = useState<string | null>(null);
+  const [sharedIds, setSharedIds] = useState<Set<string>>(new Set());
 
   const loadAll = async () => {
     if (!caFirm?.id) return;
     setLoading(true);
-    const [rep, sch, acc] = await Promise.all([
+    const [rep, sch, acc, shr] = await Promise.all([
       supabase.from("ca_reports_log").select("*").eq("ca_firm_id", caFirm.id).order("created_at", { ascending: false }).limit(20),
       supabase.from("ca_report_schedules").select("*").eq("ca_firm_id", caFirm.id).order("created_at", { ascending: false }),
       supabase.from("ca_client_access").select("business_id, businesses(business_name)").eq("ca_firm_id", caFirm.id).eq("is_active", true),
+      supabase.from("ca_report_shares").select("report_log_id, revoked_at").eq("ca_firm_id", caFirm.id),
     ]);
+    setSharedIds(new Set(((shr.data ?? []) as { report_log_id: string; revoked_at: string | null }[])
+      .filter(s => !s.revoked_at).map(s => s.report_log_id)));
 
     const reportRows = (rep.data || []) as ReportRow[];
     // hydrate client names
@@ -166,6 +170,27 @@ export default function CAReportsPage() {
     // ca_reports_log has no delete RLS; soft-hide locally
     setReports(prev => prev.filter(r => r.id !== id));
     toast.success("Report removed from view");
+  };
+
+  /** Share a report with the client it belongs to, or revoke an existing share. */
+  const toggleShare = async (r: ReportRow) => {
+    if (!caFirm?.id) return;
+    if (!r.business_id) { toast.error("Portfolio-wide reports cannot be shared with a single client"); return; }
+    const currentlyShared = sharedIds.has(r.id);
+    const { error } = await supabase.from("ca_report_shares").upsert({
+      ca_firm_id: caFirm.id,
+      business_id: r.business_id,
+      report_log_id: r.id,
+      shared_by: user?.id ?? null,
+      revoked_at: currentlyShared ? new Date().toISOString() : null,
+    }, { onConflict: "report_log_id" });
+    if (error) { toast.error(error.message); return; }
+    setSharedIds(prev => {
+      const next = new Set(prev);
+      if (currentlyShared) next.delete(r.id); else next.add(r.id);
+      return next;
+    });
+    toast.success(currentlyShared ? "Share revoked" : "Shared with client — visible in their portal");
   };
 
   const handleRegenerate = async (r: ReportRow) => {
@@ -251,6 +276,7 @@ export default function CAReportsPage() {
                               <m.Icon size={14} />
                             </div>
                             <div className="text-[13px] font-medium">{r.report_name || m.name}</div>
+                            {sharedIds.has(r.id) && <Chip tone="green">Shared</Chip>}
                           </div>
                         </td>
                         <td className="py-3 pr-4 text-[13px]">{r.business?.business_name || (r.business_id ? "-" : <em style={{ color: "rgba(26,16,8,0.55)" }}>Portfolio-wide</em>)}</td>
@@ -282,7 +308,11 @@ export default function CAReportsPage() {
                                 <ActionItem icon={Download} label="Download PDF" onClick={() => { toast.success("PDF download started"); setActionMenu(null); }} />
                                 <ActionItem icon={Download} label="Download Excel" onClick={() => { toast.success("Excel download started"); setActionMenu(null); }} />
                                 <ActionItem icon={Eye} label="View Online" onClick={() => { toast.info("Opening preview..."); setActionMenu(null); }} />
-                                <ActionItem icon={Share2} label="Share with Client" onClick={() => { toast.success("Share link copied"); setActionMenu(null); }} />
+                                <ActionItem
+                                  icon={Share2}
+                                  label={sharedIds.has(r.id) ? "Stop sharing with client" : "Share with Client"}
+                                  onClick={() => { toggleShare(r); setActionMenu(null); }}
+                                />
                                 <ActionItem icon={RefreshCw} label="Regenerate" onClick={() => { handleRegenerate(r); setActionMenu(null); }} />
                                 <ActionItem icon={Trash2} label="Delete" danger onClick={() => { handleDelete(r.id); setActionMenu(null); }} />
                               </div>
