@@ -16,6 +16,21 @@ export default function CAPortalLayout() {
   useEffect(() => { setOpen(false); }, [location.pathname]);
   useEffect(() => { if (!compact) setOpen(false); }, [compact]);
 
+  // Lock background scroll and allow Escape to dismiss the drawer.
+  useEffect(() => {
+    if (!compact || !open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [compact, open]);
+
+
+
   return (
     <CAAuthGuard>
       <div className="min-h-screen ca-portal" style={{ background: CA.bg }}>
