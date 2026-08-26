@@ -390,6 +390,7 @@ export default function CAMastersPage() {
           </CACard>
         </>
       )}
-
+    </div>
   );
+
 }
