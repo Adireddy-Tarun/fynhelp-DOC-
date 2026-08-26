@@ -14,6 +14,7 @@ import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import ClientDeductionsTab from "@/components/ca/ClientDeductionsTab";
 import ClientProfilePanel from "@/components/ca/ClientProfilePanel";
+import TxnLineageDrawer, { sourceLabel, type LineageTxn } from "@/components/ca/TxnLineageDrawer";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -63,6 +64,7 @@ export default function CAClientDetailPage() {
   const [compliance, setCompliance] = useState<any[]>([]);
   const [txns, setTxns] = useState<any[]>([]);
   const [txnPage, setTxnPage] = useState(0);
+  const [lineageTxn, setLineageTxn] = useState<LineageTxn | null>(null);
   const [reports, setReports] = useState<any[]>([]);
   const [showTdsForm, setShowTdsForm] = useState(false);
   const [showComplianceForm, setShowComplianceForm] = useState(false);
@@ -157,7 +159,7 @@ export default function CAClientDetailPage() {
       const { data, error } = await proxyExternalQuery({
         table: "bank_transactions",
         business_id: businessId,
-        select: "id, date, description, category, amount, balance, type",
+        select: "id, date, description, category, amount, balance, type, source_reference, source_document_id",
         order: { column: "date", ascending: false },
         limit: (page + 1) * 100,
       });
@@ -586,6 +588,7 @@ export default function CAClientDetailPage() {
                   <thead><tr>
                     <th style={caTh}>Date</th><th style={caTh}>Description</th><th style={caTh}>Category</th>
                     <th style={{ ...caTh, textAlign: "right" }}>Amount</th><th style={{ ...caTh, textAlign: "right" }}>Balance</th>
+                    <th style={caTh}>Source</th>
                   </tr></thead>
                   <tbody>
                     {txns.map((t) => {
@@ -597,6 +600,18 @@ export default function CAClientDetailPage() {
                           <td style={caTd}>{t.category ?? "—"}</td>
                           <td style={{ ...caNum, color: signed < 0 ? CA.red : CA.green }}>{inr(signed)}</td>
                           <td style={caNum}>{inr(t.balance)}</td>
+                          <td style={caTd}>
+                            <button
+                              onClick={() => setLineageTxn(t as LineageTxn)}
+                              title="Show where this number came from"
+                              style={{
+                                background: "none", border: "none", padding: 0, cursor: "pointer",
+                                fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, color: CA.teal,
+                              }}
+                            >
+                              {sourceLabel(t)}
+                            </button>
+                          </td>
                         </tr>
                       );
                     })}
@@ -611,6 +626,14 @@ export default function CAClientDetailPage() {
             )}
           </CACard>
           <ReconHistorySection firmId={firmId} businessId={businessId} />
+          {lineageTxn && firmId && businessId && (
+            <TxnLineageDrawer
+              firmId={firmId}
+              businessId={businessId}
+              txn={lineageTxn}
+              onClose={() => setLineageTxn(null)}
+            />
+          )}
           </>
         )}
 
