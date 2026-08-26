@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "@/lib/router-compat";
 import {
   LayoutGrid, Users, UserPlus, Bell, Settings, LogOut, Inbox, ClipboardList, CheckCheck,
   Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, Briefcase, ShieldCheck,
-  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug,
+  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug, BookOpen, Gauge, Boxes, Network,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -16,7 +16,9 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
       { label: "Portfolio", path: "/ca/dashboard", icon: LayoutGrid },
       { label: "Clients", path: "/ca/clients", icon: Users },
       { label: "Add Client", path: "/ca/clients/add", icon: UserPlus },
+      { label: "Entity groups", path: "/ca/groups", icon: Network },
       { label: "Engagements", path: "/ca/engagements", icon: Briefcase },
+
       { label: "Billing", path: "/ca/billing", icon: Receipt },
     ],
   },
@@ -33,6 +35,9 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
     group: "Data",
     links: [
       { label: "Integrations", path: "/ca/integrations", icon: Plug },
+      { label: "Ledgers & CoA", path: "/ca/ledgers", icon: BookOpen },
+      { label: "Data quality", path: "/ca/data-quality", icon: Gauge },
+      { label: "Master data", path: "/ca/masters", icon: Boxes },
     ],
   },
   {

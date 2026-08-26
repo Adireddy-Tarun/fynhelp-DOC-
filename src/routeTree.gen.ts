@@ -109,12 +109,16 @@ import { Route as CaAuthCaPortalClientPortalRouteImport } from './routes/_caAuth
 import { Route as CaAuthCaPortalCloseRouteImport } from './routes/_caAuth/ca/_portal/close'
 import { Route as CaAuthCaPortalComplianceRouteImport } from './routes/_caAuth/ca/_portal/compliance'
 import { Route as CaAuthCaPortalDashboardRouteImport } from './routes/_caAuth/ca/_portal/dashboard'
+import { Route as CaAuthCaPortalDataQualityRouteImport } from './routes/_caAuth/ca/_portal/data-quality'
 import { Route as CaAuthCaPortalEngagementsRouteImport } from './routes/_caAuth/ca/_portal/engagements'
 import { Route as CaAuthCaPortalExceptionsRouteImport } from './routes/_caAuth/ca/_portal/exceptions'
 import { Route as CaAuthCaPortalFilingCalendarRouteImport } from './routes/_caAuth/ca/_portal/filing-calendar'
+import { Route as CaAuthCaPortalGroupsRouteImport } from './routes/_caAuth/ca/_portal/groups'
 import { Route as CaAuthCaPortalGstPortfolioRouteImport } from './routes/_caAuth/ca/_portal/gst-portfolio'
 import { Route as CaAuthCaPortalIntegrationsRouteImport } from './routes/_caAuth/ca/_portal/integrations'
 import { Route as CaAuthCaPortalItcReconRouteImport } from './routes/_caAuth/ca/_portal/itc-recon'
+import { Route as CaAuthCaPortalLedgersRouteImport } from './routes/_caAuth/ca/_portal/ledgers'
+import { Route as CaAuthCaPortalMastersRouteImport } from './routes/_caAuth/ca/_portal/masters'
 import { Route as CaAuthCaPortalNotificationsRouteImport } from './routes/_caAuth/ca/_portal/notifications'
 import { Route as CaAuthCaPortalPortfolioHealthRouteImport } from './routes/_caAuth/ca/_portal/portfolio-health'
 import { Route as CaAuthCaPortalPracticeAnalyticsRouteImport } from './routes/_caAuth/ca/_portal/practice-analytics'
@@ -727,6 +731,12 @@ const CaAuthCaPortalDashboardRoute = CaAuthCaPortalDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalDataQualityRoute =
+  CaAuthCaPortalDataQualityRouteImport.update({
+    id: '/data-quality',
+    path: '/data-quality',
+    getParentRoute: () => CaAuthCaPortalRoute,
+  } as any)
 const CaAuthCaPortalEngagementsRoute =
   CaAuthCaPortalEngagementsRouteImport.update({
     id: '/engagements',
@@ -745,6 +755,11 @@ const CaAuthCaPortalFilingCalendarRoute =
     path: '/filing-calendar',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalGroupsRoute = CaAuthCaPortalGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalGstPortfolioRoute =
   CaAuthCaPortalGstPortfolioRouteImport.update({
     id: '/gst-portfolio',
@@ -760,6 +775,16 @@ const CaAuthCaPortalIntegrationsRoute =
 const CaAuthCaPortalItcReconRoute = CaAuthCaPortalItcReconRouteImport.update({
   id: '/itc-recon',
   path: '/itc-recon',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
+const CaAuthCaPortalLedgersRoute = CaAuthCaPortalLedgersRouteImport.update({
+  id: '/ledgers',
+  path: '/ledgers',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
+const CaAuthCaPortalMastersRoute = CaAuthCaPortalMastersRouteImport.update({
+  id: '/masters',
+  path: '/masters',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
 const CaAuthCaPortalNotificationsRoute =
@@ -1326,12 +1351,16 @@ export interface FileRoutesByFullPath {
   '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/ca/groups': typeof CaAuthCaPortalGroupsRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/ca/ledgers': typeof CaAuthCaPortalLedgersRoute
+  '/ca/masters': typeof CaAuthCaPortalMastersRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1507,12 +1536,16 @@ export interface FileRoutesByTo {
   '/ca/close': typeof CaAuthCaPortalCloseRoute
   '/ca/compliance': typeof CaAuthCaPortalComplianceRoute
   '/ca/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/ca/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/ca/groups': typeof CaAuthCaPortalGroupsRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/ca/ledgers': typeof CaAuthCaPortalLedgersRoute
+  '/ca/masters': typeof CaAuthCaPortalMastersRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1698,12 +1731,16 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/close': typeof CaAuthCaPortalCloseRoute
   '/_caAuth/ca/_portal/compliance': typeof CaAuthCaPortalComplianceRoute
   '/_caAuth/ca/_portal/dashboard': typeof CaAuthCaPortalDashboardRoute
+  '/_caAuth/ca/_portal/data-quality': typeof CaAuthCaPortalDataQualityRoute
   '/_caAuth/ca/_portal/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/_caAuth/ca/_portal/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/_caAuth/ca/_portal/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/_caAuth/ca/_portal/groups': typeof CaAuthCaPortalGroupsRoute
   '/_caAuth/ca/_portal/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/_caAuth/ca/_portal/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/_caAuth/ca/_portal/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/_caAuth/ca/_portal/ledgers': typeof CaAuthCaPortalLedgersRoute
+  '/_caAuth/ca/_portal/masters': typeof CaAuthCaPortalMastersRoute
   '/_caAuth/ca/_portal/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/_caAuth/ca/_portal/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/_caAuth/ca/_portal/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1884,12 +1921,16 @@ export interface FileRouteTypes {
     | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/data-quality'
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
+    | '/ca/groups'
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
+    | '/ca/ledgers'
+    | '/ca/masters'
     | '/ca/notifications'
     | '/ca/portfolio-health'
     | '/ca/practice-analytics'
@@ -2065,12 +2106,16 @@ export interface FileRouteTypes {
     | '/ca/close'
     | '/ca/compliance'
     | '/ca/dashboard'
+    | '/ca/data-quality'
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
+    | '/ca/groups'
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
+    | '/ca/ledgers'
+    | '/ca/masters'
     | '/ca/notifications'
     | '/ca/portfolio-health'
     | '/ca/practice-analytics'
@@ -2255,12 +2300,16 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/close'
     | '/_caAuth/ca/_portal/compliance'
     | '/_caAuth/ca/_portal/dashboard'
+    | '/_caAuth/ca/_portal/data-quality'
     | '/_caAuth/ca/_portal/engagements'
     | '/_caAuth/ca/_portal/exceptions'
     | '/_caAuth/ca/_portal/filing-calendar'
+    | '/_caAuth/ca/_portal/groups'
     | '/_caAuth/ca/_portal/gst-portfolio'
     | '/_caAuth/ca/_portal/integrations'
     | '/_caAuth/ca/_portal/itc-recon'
+    | '/_caAuth/ca/_portal/ledgers'
+    | '/_caAuth/ca/_portal/masters'
     | '/_caAuth/ca/_portal/notifications'
     | '/_caAuth/ca/_portal/portfolio-health'
     | '/_caAuth/ca/_portal/practice-analytics'
@@ -3059,6 +3108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalDashboardRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/data-quality': {
+      id: '/_caAuth/ca/_portal/data-quality'
+      path: '/data-quality'
+      fullPath: '/ca/data-quality'
+      preLoaderRoute: typeof CaAuthCaPortalDataQualityRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/engagements': {
       id: '/_caAuth/ca/_portal/engagements'
       path: '/engagements'
@@ -3080,6 +3136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalFilingCalendarRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/groups': {
+      id: '/_caAuth/ca/_portal/groups'
+      path: '/groups'
+      fullPath: '/ca/groups'
+      preLoaderRoute: typeof CaAuthCaPortalGroupsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/gst-portfolio': {
       id: '/_caAuth/ca/_portal/gst-portfolio'
       path: '/gst-portfolio'
@@ -3099,6 +3162,20 @@ declare module '@tanstack/react-router' {
       path: '/itc-recon'
       fullPath: '/ca/itc-recon'
       preLoaderRoute: typeof CaAuthCaPortalItcReconRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/ledgers': {
+      id: '/_caAuth/ca/_portal/ledgers'
+      path: '/ledgers'
+      fullPath: '/ca/ledgers'
+      preLoaderRoute: typeof CaAuthCaPortalLedgersRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
+    '/_caAuth/ca/_portal/masters': {
+      id: '/_caAuth/ca/_portal/masters'
+      path: '/masters'
+      fullPath: '/ca/masters'
+      preLoaderRoute: typeof CaAuthCaPortalMastersRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
     '/_caAuth/ca/_portal/notifications': {
@@ -3804,12 +3881,16 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalCloseRoute: typeof CaAuthCaPortalCloseRoute
   CaAuthCaPortalComplianceRoute: typeof CaAuthCaPortalComplianceRoute
   CaAuthCaPortalDashboardRoute: typeof CaAuthCaPortalDashboardRoute
+  CaAuthCaPortalDataQualityRoute: typeof CaAuthCaPortalDataQualityRoute
   CaAuthCaPortalEngagementsRoute: typeof CaAuthCaPortalEngagementsRoute
   CaAuthCaPortalExceptionsRoute: typeof CaAuthCaPortalExceptionsRoute
   CaAuthCaPortalFilingCalendarRoute: typeof CaAuthCaPortalFilingCalendarRoute
+  CaAuthCaPortalGroupsRoute: typeof CaAuthCaPortalGroupsRoute
   CaAuthCaPortalGstPortfolioRoute: typeof CaAuthCaPortalGstPortfolioRoute
   CaAuthCaPortalIntegrationsRoute: typeof CaAuthCaPortalIntegrationsRoute
   CaAuthCaPortalItcReconRoute: typeof CaAuthCaPortalItcReconRoute
+  CaAuthCaPortalLedgersRoute: typeof CaAuthCaPortalLedgersRoute
+  CaAuthCaPortalMastersRoute: typeof CaAuthCaPortalMastersRoute
   CaAuthCaPortalNotificationsRoute: typeof CaAuthCaPortalNotificationsRoute
   CaAuthCaPortalPortfolioHealthRoute: typeof CaAuthCaPortalPortfolioHealthRoute
   CaAuthCaPortalPracticeAnalyticsRoute: typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -3846,12 +3927,16 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalCloseRoute: CaAuthCaPortalCloseRoute,
   CaAuthCaPortalComplianceRoute: CaAuthCaPortalComplianceRoute,
   CaAuthCaPortalDashboardRoute: CaAuthCaPortalDashboardRoute,
+  CaAuthCaPortalDataQualityRoute: CaAuthCaPortalDataQualityRoute,
   CaAuthCaPortalEngagementsRoute: CaAuthCaPortalEngagementsRoute,
   CaAuthCaPortalExceptionsRoute: CaAuthCaPortalExceptionsRoute,
   CaAuthCaPortalFilingCalendarRoute: CaAuthCaPortalFilingCalendarRoute,
+  CaAuthCaPortalGroupsRoute: CaAuthCaPortalGroupsRoute,
   CaAuthCaPortalGstPortfolioRoute: CaAuthCaPortalGstPortfolioRoute,
   CaAuthCaPortalIntegrationsRoute: CaAuthCaPortalIntegrationsRoute,
   CaAuthCaPortalItcReconRoute: CaAuthCaPortalItcReconRoute,
+  CaAuthCaPortalLedgersRoute: CaAuthCaPortalLedgersRoute,
+  CaAuthCaPortalMastersRoute: CaAuthCaPortalMastersRoute,
   CaAuthCaPortalNotificationsRoute: CaAuthCaPortalNotificationsRoute,
   CaAuthCaPortalPortfolioHealthRoute: CaAuthCaPortalPortfolioHealthRoute,
   CaAuthCaPortalPracticeAnalyticsRoute: CaAuthCaPortalPracticeAnalyticsRoute,
