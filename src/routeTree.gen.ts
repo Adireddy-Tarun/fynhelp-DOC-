@@ -115,6 +115,7 @@ import { Route as CaAuthCaPortalFilingCalendarRouteImport } from './routes/_caAu
 import { Route as CaAuthCaPortalGstPortfolioRouteImport } from './routes/_caAuth/ca/_portal/gst-portfolio'
 import { Route as CaAuthCaPortalIntegrationsRouteImport } from './routes/_caAuth/ca/_portal/integrations'
 import { Route as CaAuthCaPortalItcReconRouteImport } from './routes/_caAuth/ca/_portal/itc-recon'
+import { Route as CaAuthCaPortalLedgersRouteImport } from './routes/_caAuth/ca/_portal/ledgers'
 import { Route as CaAuthCaPortalNotificationsRouteImport } from './routes/_caAuth/ca/_portal/notifications'
 import { Route as CaAuthCaPortalPortfolioHealthRouteImport } from './routes/_caAuth/ca/_portal/portfolio-health'
 import { Route as CaAuthCaPortalPracticeAnalyticsRouteImport } from './routes/_caAuth/ca/_portal/practice-analytics'
@@ -762,6 +763,11 @@ const CaAuthCaPortalItcReconRoute = CaAuthCaPortalItcReconRouteImport.update({
   path: '/itc-recon',
   getParentRoute: () => CaAuthCaPortalRoute,
 } as any)
+const CaAuthCaPortalLedgersRoute = CaAuthCaPortalLedgersRouteImport.update({
+  id: '/ledgers',
+  path: '/ledgers',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalNotificationsRoute =
   CaAuthCaPortalNotificationsRouteImport.update({
     id: '/notifications',
@@ -1332,6 +1338,7 @@ export interface FileRoutesByFullPath {
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/ca/ledgers': typeof CaAuthCaPortalLedgersRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1513,6 +1520,7 @@ export interface FileRoutesByTo {
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/ca/ledgers': typeof CaAuthCaPortalLedgersRoute
   '/ca/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/ca/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/ca/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1704,6 +1712,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/_caAuth/ca/_portal/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/_caAuth/ca/_portal/itc-recon': typeof CaAuthCaPortalItcReconRoute
+  '/_caAuth/ca/_portal/ledgers': typeof CaAuthCaPortalLedgersRoute
   '/_caAuth/ca/_portal/notifications': typeof CaAuthCaPortalNotificationsRoute
   '/_caAuth/ca/_portal/portfolio-health': typeof CaAuthCaPortalPortfolioHealthRoute
   '/_caAuth/ca/_portal/practice-analytics': typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -1890,6 +1899,7 @@ export interface FileRouteTypes {
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
+    | '/ca/ledgers'
     | '/ca/notifications'
     | '/ca/portfolio-health'
     | '/ca/practice-analytics'
@@ -2071,6 +2081,7 @@ export interface FileRouteTypes {
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
+    | '/ca/ledgers'
     | '/ca/notifications'
     | '/ca/portfolio-health'
     | '/ca/practice-analytics'
@@ -2261,6 +2272,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/gst-portfolio'
     | '/_caAuth/ca/_portal/integrations'
     | '/_caAuth/ca/_portal/itc-recon'
+    | '/_caAuth/ca/_portal/ledgers'
     | '/_caAuth/ca/_portal/notifications'
     | '/_caAuth/ca/_portal/portfolio-health'
     | '/_caAuth/ca/_portal/practice-analytics'
@@ -3101,6 +3113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalItcReconRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/ledgers': {
+      id: '/_caAuth/ca/_portal/ledgers'
+      path: '/ledgers'
+      fullPath: '/ca/ledgers'
+      preLoaderRoute: typeof CaAuthCaPortalLedgersRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/notifications': {
       id: '/_caAuth/ca/_portal/notifications'
       path: '/notifications'
@@ -3810,6 +3829,7 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalGstPortfolioRoute: typeof CaAuthCaPortalGstPortfolioRoute
   CaAuthCaPortalIntegrationsRoute: typeof CaAuthCaPortalIntegrationsRoute
   CaAuthCaPortalItcReconRoute: typeof CaAuthCaPortalItcReconRoute
+  CaAuthCaPortalLedgersRoute: typeof CaAuthCaPortalLedgersRoute
   CaAuthCaPortalNotificationsRoute: typeof CaAuthCaPortalNotificationsRoute
   CaAuthCaPortalPortfolioHealthRoute: typeof CaAuthCaPortalPortfolioHealthRoute
   CaAuthCaPortalPracticeAnalyticsRoute: typeof CaAuthCaPortalPracticeAnalyticsRoute
@@ -3852,6 +3872,7 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalGstPortfolioRoute: CaAuthCaPortalGstPortfolioRoute,
   CaAuthCaPortalIntegrationsRoute: CaAuthCaPortalIntegrationsRoute,
   CaAuthCaPortalItcReconRoute: CaAuthCaPortalItcReconRoute,
+  CaAuthCaPortalLedgersRoute: CaAuthCaPortalLedgersRoute,
   CaAuthCaPortalNotificationsRoute: CaAuthCaPortalNotificationsRoute,
   CaAuthCaPortalPortfolioHealthRoute: CaAuthCaPortalPortfolioHealthRoute,
   CaAuthCaPortalPracticeAnalyticsRoute: CaAuthCaPortalPracticeAnalyticsRoute,
