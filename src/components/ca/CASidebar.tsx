@@ -163,6 +163,7 @@ export default function CASidebar({
               <NavLink
                 key={path}
                 to={path}
+                className="ca-nav-link"
                 end={path === "/ca/clients"}
                 onClick={onNavigate}
                 style={({ isActive }) => ({
