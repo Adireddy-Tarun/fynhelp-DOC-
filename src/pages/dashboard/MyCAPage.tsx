@@ -170,11 +170,29 @@ export default function MyCAPage() {
         .eq("business_id", businessId)
         .eq("ca_firm_id", firm?.id)
         .order("created_at", { ascending: true }),
+      supabase
+        .from("ca_report_shares")
+        .select("id, created_at, note, ca_reports_log(report_name, report_type, period, file_path)")
+        .eq("business_id", businessId)
+        .is("revoked_at", null)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("ca_invoices")
+        .select("id, invoice_number, period, total, status, due_date, paid_at")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false }),
     ]);
 
     setCompliance((complianceRes.data ?? []) as ComplianceEvent[]);
     setDocuments((docsRes.data ?? []) as Document[]);
     setMessages((msgsRes.data ?? []) as Message[]);
+    setReports(((reportsRes.data ?? []) as any[]).map(r => ({
+      id: r.id,
+      created_at: r.created_at,
+      note: r.note,
+      report: r.ca_reports_log ?? null,
+    })));
+    setInvoices((invoicesRes.data ?? []) as ClientInvoice[]);
     setLoading(false);
 
     if (firm?.id) {
