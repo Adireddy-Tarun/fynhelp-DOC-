@@ -1541,8 +1541,9 @@ export type Database = {
       }
       ca_custom_field_values: {
         Row: {
-          business_id: string
+          business_id: string | null
           ca_firm_id: string
+          client_id: string | null
           field_id: string
           id: string
           updated_at: string
@@ -1550,8 +1551,9 @@ export type Database = {
           value: string | null
         }
         Insert: {
-          business_id: string
+          business_id?: string | null
           ca_firm_id: string
+          client_id?: string | null
           field_id: string
           id?: string
           updated_at?: string
@@ -1559,8 +1561,9 @@ export type Database = {
           value?: string | null
         }
         Update: {
-          business_id?: string
+          business_id?: string | null
           ca_firm_id?: string
+          client_id?: string | null
           field_id?: string
           id?: string
           updated_at?: string
@@ -1568,6 +1571,13 @@ export type Database = {
           value?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "ca_custom_field_values_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "ca_clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ca_custom_field_values_field_id_fkey"
             columns: ["field_id"]
@@ -2146,6 +2156,7 @@ export type Database = {
           phone: string | null
           plan_type: string | null
           practice_certificate_path: string | null
+          require_mfa: boolean
           specializations: string[] | null
           state: string | null
           updated_at: string | null
@@ -2181,6 +2192,7 @@ export type Database = {
           phone?: string | null
           plan_type?: string | null
           practice_certificate_path?: string | null
+          require_mfa?: boolean
           specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
@@ -2216,6 +2228,7 @@ export type Database = {
           phone?: string | null
           plan_type?: string | null
           practice_certificate_path?: string | null
+          require_mfa?: boolean
           specializations?: string[] | null
           state?: string | null
           updated_at?: string | null
@@ -4927,9 +4940,12 @@ export type Database = {
       integrations: {
         Row: {
           access_token: string | null
+          auto_sync_enabled: boolean
+          auto_sync_frequency: string
           created_at: string | null
           expires_at: string | null
           id: string
+          last_auto_sync_at: string | null
           metadata: Json | null
           organization_id: string
           provider: string
@@ -4939,9 +4955,12 @@ export type Database = {
         }
         Insert: {
           access_token?: string | null
+          auto_sync_enabled?: boolean
+          auto_sync_frequency?: string
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          last_auto_sync_at?: string | null
           metadata?: Json | null
           organization_id: string
           provider: string
@@ -4951,9 +4970,12 @@ export type Database = {
         }
         Update: {
           access_token?: string | null
+          auto_sync_enabled?: boolean
+          auto_sync_frequency?: string
           created_at?: string | null
           expires_at?: string | null
           id?: string
+          last_auto_sync_at?: string | null
           metadata?: Json | null
           organization_id?: string
           provider?: string
@@ -7137,6 +7159,10 @@ export type Database = {
       }
       ca_firm_has_client_access: {
         Args: { _business_id: string; _firm_id: string }
+        Returns: boolean
+      }
+      ca_firm_owns_client: {
+        Args: { _client_id: string; _firm_id: string }
         Returns: boolean
       }
       ca_member_role: { Args: { _firm_id: string }; Returns: string }
