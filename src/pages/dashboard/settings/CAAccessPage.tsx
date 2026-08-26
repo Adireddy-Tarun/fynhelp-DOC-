@@ -40,26 +40,35 @@ const CAAccessPage = () => {
 
   const refresh = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user || !businessId) { setCas([]); return; }
     const { data } = await (supabase.from("ca_access_requests") as any)
-      .select("id, ca_name, ca_firm, ca_email, access_level, expiry_date, status")
-      .eq("client_user_id", user.id)
+      .select("id, target_email, access_level, status, message, created_at")
+      .eq("business_id", businessId)
       .order("created_at", { ascending: false });
-    setCas((data as Access[]) ?? []);
+    setCas(((data as any[]) ?? []).map((r) => {
+      const meta = parseMeta(r.message);
+      return {
+        id: r.id,
+        ca_name: meta.name ?? null,
+        ca_firm: meta.firm ?? null,
+        ca_email: r.target_email ?? "—",
+        access_level: r.access_level ?? null,
+        expiry_date: meta.expiry ?? null,
+        status: r.status ?? "pending",
+      } satisfies Access;
+    }));
 
-    if (businessId) {
-      const { data: logs } = await (supabase.from("admin_audit_logs") as any)
-        .select("action, module, actor_name, created_at")
-        .eq("target_business_id", businessId)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      setAuditLog((logs ?? []).map((l: any) => ({
-        action: l.action ?? "",
-        module: l.module ?? "—",
-        ca: l.actor_name ?? "—",
-        dt: new Date(l.created_at).toLocaleString(),
-      })));
-    }
+    const { data: logs } = await (supabase.from("admin_audit_logs") as any)
+      .select("action, target_type, details, created_at")
+      .eq("target_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    setAuditLog(((logs as any[]) ?? []).map((l) => ({
+      action: l.action ?? "",
+      module: l.target_type ?? "—",
+      ca: l.details?.actor_name ?? l.details?.actor_email ?? "—",
+      dt: new Date(l.created_at).toLocaleString(),
+    })));
   };
 
   useEffect(() => { refresh(); }, [businessId]);
@@ -68,19 +77,20 @@ const CAAccessPage = () => {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast.error("Invalid CA email"); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast.error("Please sign in"); return; }
+    if (!businessId) { toast.error("Complete your business profile first"); return; }
     setSending(true);
     const { error } = await (supabase.from("ca_access_requests") as any).insert({
-      client_user_id: user.id,
-      ca_email: email,
-      ca_name: name,
-      ca_firm: firm,
+      business_id: businessId,
+      target_email: email,
       access_level: level,
-      module_access: level === "limited" ? limited : null,
-      has_expiry: hasExpiry,
-      expiry_date: hasExpiry ? expiry : null,
-      can_export: canExport,
-      can_view_hr: canViewHr,
       status: "pending",
+      message: JSON.stringify({
+        name, firm,
+        modules: level === "limited" ? limited : null,
+        expiry: hasExpiry ? expiry : null,
+        can_export: canExport,
+        can_view_hr: canViewHr,
+      }),
     });
     if (error) {
       // Fallback to early_access_requests
