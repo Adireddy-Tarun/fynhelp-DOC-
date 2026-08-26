@@ -229,6 +229,39 @@ export default function MyCAPage() {
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
+  const downloadReport = async (r: SharedReport) => {
+    if (!r.report?.file_path) { toast.error("This report has no file attached"); return; }
+    const { data, error } = await supabase.storage
+      .from("ca-reports")
+      .createSignedUrl(r.report.file_path, 3600);
+    if (error || !data) { toast.error("Could not generate download link"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const payInvoice = async (inv: ClientInvoice) => {
+    setPayingId(inv.id);
+    try {
+      const res = await startInvoicePaymentFn({ data: { invoiceId: inv.id } });
+      if (res.alreadyPaid) { toast.success("This invoice is already marked paid"); return; }
+      if (!res.configured) {
+        toast.info("Online payment is not switched on yet — pay your CA directly and record the reference below.");
+        const reference = window.prompt("Payment reference (UTR / UPI transaction id)")?.trim();
+        if (!reference || reference.length < 3) return;
+        await reportManualPaymentFn({ data: { invoiceId: inv.id, reference, method: "upi" } });
+        toast.success("Your CA has been notified of the payment");
+        return;
+      }
+      if (res.paymentUrl) window.open(res.paymentUrl, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start payment");
+    } finally {
+      setPayingId(null);
+    }
+  };
+
+  const formatMoney = (n: number | null) =>
+    "₹" + Number(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
