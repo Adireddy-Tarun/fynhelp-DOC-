@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import CATwoFactorCard from "@/components/ca/CATwoFactorCard";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
@@ -434,13 +435,10 @@ export default function CASettingsPage() {
             </div>
           </CACard>
 
-          <CACard style={{ padding: 24, display: "flex", gap: 14, alignItems: "flex-start" }}>
-            <ShieldCheck size={20} color={CA.teal} />
-            <div style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.ink, lineHeight: 1.6 }}>
-              Two-factor authentication (2FA) is available via your email provider. For enterprise-grade
-              security including hardware key support, contact support@fynhelp.com.
-            </div>
-          </CACard>
+          <CATwoFactorCard
+            firmId={firmId}
+            canManageFirm={caRole === "partner" || caRole === "manager" || caRole === "admin"}
+          />
 
           <CACard style={{ padding: 24, border: `0.5px solid rgba(179,38,30,0.35)` }}>
             <SectionTitle>Danger zone</SectionTitle>

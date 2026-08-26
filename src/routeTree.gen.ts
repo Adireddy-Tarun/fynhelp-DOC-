@@ -81,6 +81,7 @@ import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboa
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
 import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
+import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
 import { Route as AdminAuthAdminProtectedAiMonitoringRouteImport } from './routes/_adminAuth/admin/_protected/ai-monitoring'
@@ -566,6 +567,12 @@ const ApiPublicCaComplianceAutoAlertRoute =
   ApiPublicCaComplianceAutoAlertRouteImport.update({
     id: '/api/public/ca-compliance-auto-alert',
     path: '/api/public/ca-compliance-auto-alert',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaIntegrationSyncRoute =
+  ApiPublicCaIntegrationSyncRouteImport.update({
+    id: '/api/public/ca-integration-sync',
+    path: '/api/public/ca-integration-sync',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminAuthAdminProtectedIndexRoute =
@@ -1321,6 +1328,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
+  '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
   '/blog/': typeof MainBlogIndexRoute
@@ -1506,6 +1514,7 @@ export interface FileRoutesByTo {
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
+  '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
   '/blog': typeof MainBlogIndexRoute
@@ -1701,6 +1710,7 @@ export interface FileRoutesById {
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
+  '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
   '/_main/blog/': typeof MainBlogIndexRoute
@@ -1891,6 +1901,7 @@ export interface FileRouteTypes {
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
+    | '/api/public/ca-integration-sync'
     | '/blog-admin/'
     | '/intern/'
     | '/blog/'
@@ -2076,6 +2087,7 @@ export interface FileRouteTypes {
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
+    | '/api/public/ca-integration-sync'
     | '/blog-admin'
     | '/intern'
     | '/blog'
@@ -2270,6 +2282,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
+    | '/api/public/ca-integration-sync'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
     | '/_main/blog/'
@@ -2404,6 +2417,7 @@ export interface RootRouteChildren {
   MainRoute: typeof MainRouteWithChildren
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
+  ApiPublicCaIntegrationSyncRoute: typeof ApiPublicCaIntegrationSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2910,6 +2924,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/ca-compliance-auto-alert'
       fullPath: '/api/public/ca-compliance-auto-alert'
       preLoaderRoute: typeof ApiPublicCaComplianceAutoAlertRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-integration-sync': {
+      id: '/api/public/ca-integration-sync'
+      path: '/api/public/ca-integration-sync'
+      fullPath: '/api/public/ca-integration-sync'
+      preLoaderRoute: typeof ApiPublicCaIntegrationSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_adminAuth/admin/_protected/': {
@@ -4245,6 +4266,7 @@ const rootRouteChildren: RootRouteChildren = {
   MainRoute: MainRouteWithChildren,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
+  ApiPublicCaIntegrationSyncRoute: ApiPublicCaIntegrationSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

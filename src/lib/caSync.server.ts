@@ -173,3 +173,158 @@ export async function zohoAccessToken(
   if (!token) throw new Error("Zoho connection has no access token — reconnect required");
   return { token, apiDomain };
 }
+
+/* ------------------------------------------------------------------ */
+/* Provider pulls — shared by the interactive server functions and the */
+/* nightly auto-sync cron route.                                       */
+/* ------------------------------------------------------------------ */
+
+export interface SyncArgs {
+  firmId: string;
+  businessId: string;
+  actorId: string | null;
+}
+
+export async function runZohoBooksSync(
+  admin: SupabaseClient, { firmId, businessId, actorId }: SyncArgs,
+): Promise<SyncResult> {
+  const { data: integration } = await admin
+    .from("integrations")
+    .select("access_token, refresh_token, expires_at, metadata")
+    .eq("organization_id", businessId)
+    .eq("provider", "zoho_books")
+    .maybeSingle();
+  if (!integration) throw new Error("Zoho Books is not connected for this client");
+
+  const jobId = await openSyncJob(admin, firmId, businessId, "zoho_books");
+  const errors: string[] = [];
+
+  try {
+    const { token, apiDomain } = await zohoAccessToken(admin, integration as never, businessId);
+    const auth = { Authorization: `Zoho-oauthtoken ${token}` };
+
+    const orgRes = await fetch(`${apiDomain}/books/v3/organizations`, { headers: auth });
+    if (!orgRes.ok) throw new Error(`Zoho organizations failed (${orgRes.status})`);
+    const orgBody = await orgRes.json();
+    const zohoOrgId = orgBody?.organizations?.[0]?.organization_id;
+    if (!zohoOrgId) throw new Error("No Zoho Books organization found on this connection");
+
+    const [invRes, expRes] = await Promise.all([
+      fetch(`${apiDomain}/books/v3/invoices?status=all&organization_id=${zohoOrgId}`, { headers: auth }),
+      fetch(`${apiDomain}/books/v3/expenses?organization_id=${zohoOrgId}`, { headers: auth }),
+    ]);
+    if (!invRes.ok) errors.push(`Invoices fetch failed (${invRes.status})`);
+    if (!expRes.ok) errors.push(`Expenses fetch failed (${expRes.status})`);
+
+    const invoices: Array<Record<string, unknown>> = invRes.ok ? (await invRes.json())?.invoices ?? [] : [];
+    const expenses: Array<Record<string, unknown>> = expRes.ok ? (await expRes.json())?.expenses ?? [] : [];
+
+    const rows: CanonicalTxn[] = [];
+    for (const inv of invoices) {
+      rows.push({
+        business_id: businessId,
+        date: String(inv.date ?? "").slice(0, 10),
+        description: `Invoice ${inv.invoice_number ?? ""} — ${inv.customer_name ?? "Customer"}`.slice(0, 300),
+        amount: Number(inv.total ?? 0),
+        type: "credit",
+        category: "Revenue",
+        source_reference: `zoho_books:invoice:${inv.invoice_id}`,
+        is_demo: false,
+      });
+    }
+    for (const exp of expenses) {
+      rows.push({
+        business_id: businessId,
+        date: String(exp.date ?? "").slice(0, 10),
+        description: String(exp.description || exp.account_name || "Expense").slice(0, 300),
+        amount: Number(exp.total ?? exp.amount ?? 0),
+        type: "debit",
+        category: String(exp.account_name ?? "Expense").slice(0, 100),
+        source_reference: `zoho_books:expense:${exp.expense_id}`,
+        is_demo: false,
+      });
+    }
+
+    const inserted = await insertNewTxns(admin, businessId, rows);
+    const cursor = new Date().toISOString();
+
+    await closeSyncJob(admin, jobId, {
+      status: errors.length ? "completed_with_errors" : "completed",
+      records_synced: inserted,
+      error_message: errors.join("; ") || null,
+      last_sync_cursor: cursor,
+    });
+    await logSyncAudit(admin, {
+      firmId, businessId, actorId: actorId ?? "system",
+      action: "zoho_sync",
+      detail: { records_synced: inserted, invoices: invoices.length, expenses: expenses.length, period: cursor },
+    });
+
+    return { success: true, records_synced: inserted, errors, cursor };
+  } catch (e) {
+    const message = (e as Error).message ?? "Zoho sync failed";
+    await closeSyncJob(admin, jobId, { status: "failed", error_message: message });
+    return { success: false, records_synced: 0, errors: [message] };
+  }
+}
+
+export async function runRazorpaySync(
+  admin: SupabaseClient, { firmId, businessId, actorId }: SyncArgs,
+): Promise<SyncResult> {
+  const { data: integration } = await admin
+    .from("integrations")
+    .select("metadata")
+    .eq("organization_id", businessId)
+    .eq("provider", "razorpay")
+    .maybeSingle();
+  const meta = (integration?.metadata ?? {}) as Record<string, string>;
+  if (!meta.key_id || !meta.key_secret) throw new Error("Razorpay is not connected for this client");
+
+  const jobId = await openSyncJob(admin, firmId, businessId, "razorpay");
+
+  try {
+    const cursor = await lastCursor(admin, firmId, businessId, "razorpay");
+    const from = cursor ? Number(cursor) : null;
+    const params = new URLSearchParams({ count: "100" });
+    if (from && Number.isFinite(from)) params.set("from", String(from + 1));
+
+    const res = await fetch(`https://api.razorpay.com/v1/payments?${params.toString()}`, {
+      headers: { Authorization: "Basic " + btoa(`${meta.key_id}:${meta.key_secret}`) },
+    });
+    if (!res.ok) throw new Error(`Razorpay request failed (${res.status})`);
+    const payload = await res.json();
+    const payments: Array<Record<string, unknown>> = payload?.items ?? [];
+    const usable = payments.filter((p) => p.status === "captured" || p.status === "authorized");
+
+    const rows: CanonicalTxn[] = usable.map((p) => ({
+      business_id: businessId,
+      date: new Date(Number(p.created_at ?? 0) * 1000).toISOString().slice(0, 10),
+      description: String(p.description ?? `Razorpay payment ${p.id}`).slice(0, 300),
+      amount: Number(p.amount ?? 0) / 100,
+      type: "credit" as const,
+      category: "Payment Gateway",
+      source_reference: `razorpay:${p.id}`,
+      is_demo: false,
+    }));
+
+    const inserted = await insertNewTxns(admin, businessId, rows);
+    const maxCursor = usable.reduce((m, p) => Math.max(m, Number(p.created_at ?? 0)), from ?? 0);
+
+    await closeSyncJob(admin, jobId, {
+      status: "completed",
+      records_synced: inserted,
+      last_sync_cursor: maxCursor ? String(maxCursor) : null,
+    });
+    await logSyncAudit(admin, {
+      firmId, businessId, actorId: actorId ?? "system",
+      action: "razorpay_sync",
+      detail: { records_synced: inserted, payments_seen: payments.length, cursor: maxCursor ? String(maxCursor) : null },
+    });
+
+    return { success: true, records_synced: inserted, errors: [], cursor: maxCursor ? String(maxCursor) : null };
+  } catch (e) {
+    const message = (e as Error).message ?? "Razorpay sync failed";
+    await closeSyncJob(admin, jobId, { status: "failed", error_message: message });
+    return { success: false, records_synced: 0, errors: [message] };
+  }
+}
