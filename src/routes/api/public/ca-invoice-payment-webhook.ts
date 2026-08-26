@@ -107,10 +107,10 @@ export const Route = createFileRoute("/api/public/ca-invoice-payment-webhook")({
           await supabaseAdmin.from("ca_audit_events").insert({
             ca_firm_id: firmId,
             business_id: pending?.business_id ?? null,
-            event_type: "invoice_paid",
             entity_type: "ca_invoice",
             entity_id: targetInvoice,
-            metadata: { provider: "razorpay", payment_id: paymentId, amount },
+            action: "invoice_paid",
+            detail: { provider: "razorpay", payment_id: paymentId, amount },
           } as never);
         }
 
