@@ -107,10 +107,20 @@
     flex: 1 1 200px;
     min-width: 0;
   }
-  /* Grids that hard-code desktop columns collapse to a single column. */
+  /* Grids that hard-code desktop columns reflow into 1-2 phone columns. */
   .ca-portal-main [style*="grid-template-columns"]:not(.ca-keep-grid) {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
   }
+  /* Content + fixed-width sidebar layouts stack instead of splitting. */
+  .ca-portal-main [style*="280px"],
+  .ca-portal-main [style*="300px"],
+  .ca-portal-main [style*="320px"],
+  .ca-portal-main [style*="340px"],
+  .ca-portal-main [style*="360px"],
+  .ca-portal-main [style*="380px"] {
+    grid-template-columns: 1fr !important;
+  }
+
 
   /* Headings shrink so long firm/client names never overflow. */
   .ca-portal-main h1 {
