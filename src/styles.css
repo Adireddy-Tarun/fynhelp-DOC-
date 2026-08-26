@@ -22,3 +22,40 @@
    scales, keyframes, tailwindcss-animate plugin) loaded via v4's
    compatibility layer. */
 @config "../tailwind.config.ts";
+
+/* ---------------------------------------------------------------
+   CA portal responsive fallbacks.
+   Wide data tables stay readable on phones by scrolling horizontally,
+   and controls keep comfortable touch targets at 375-468px.
+   --------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .ca-portal-main table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ca-portal-main th,
+  .ca-portal-main td {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  .ca-portal-main input,
+  .ca-portal-main select,
+  .ca-portal-main textarea {
+    font-size: 16px; /* stops iOS zoom-on-focus */
+    min-height: 42px;
+  }
+  .ca-portal-main button {
+    min-height: 40px;
+  }
+  /* Client 360 and other tab strips scroll instead of wrapping. */
+  .ca-tabstrip {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ca-tabstrip::-webkit-scrollbar { display: none; }
+  .ca-tabstrip > * { flex: 0 0 auto; }
+}

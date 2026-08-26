@@ -878,6 +878,185 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_bank_accounts_linked: {
+        Row: {
+          account_type: string | null
+          business_id: string
+          ca_firm_id: string
+          consent_row_id: string
+          created_at: string
+          currency: string
+          fip_name: string | null
+          id: string
+          ifsc: string | null
+          link_ref: string | null
+          masked_account_number: string | null
+        }
+        Insert: {
+          account_type?: string | null
+          business_id: string
+          ca_firm_id: string
+          consent_row_id: string
+          created_at?: string
+          currency?: string
+          fip_name?: string | null
+          id?: string
+          ifsc?: string | null
+          link_ref?: string | null
+          masked_account_number?: string | null
+        }
+        Update: {
+          account_type?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          consent_row_id?: string
+          created_at?: string
+          currency?: string
+          fip_name?: string | null
+          id?: string
+          ifsc?: string | null
+          link_ref?: string | null
+          masked_account_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_bank_accounts_linked_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_bank_accounts_linked_consent_row_id_fkey"
+            columns: ["consent_row_id"]
+            isOneToOne: false
+            referencedRelation: "ca_bank_consents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_bank_consents: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          consent_handle: string | null
+          consent_id: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          provider: string
+          raw: Json | null
+          redirect_url: string | null
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          consent_handle?: string | null
+          consent_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider?: string
+          raw?: Json | null
+          redirect_url?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          consent_handle?: string | null
+          consent_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider?: string
+          raw?: Json | null
+          redirect_url?: string | null
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_bank_consents_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_bank_fetch_sessions: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          completed_at: string | null
+          consent_row_id: string
+          created_at: string
+          error: string | null
+          from_date: string | null
+          id: string
+          provider: string
+          raw: Json | null
+          session_ref: string | null
+          status: string
+          to_date: string | null
+          txn_count: number
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          completed_at?: string | null
+          consent_row_id: string
+          created_at?: string
+          error?: string | null
+          from_date?: string | null
+          id?: string
+          provider?: string
+          raw?: Json | null
+          session_ref?: string | null
+          status?: string
+          to_date?: string | null
+          txn_count?: number
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          completed_at?: string | null
+          consent_row_id?: string
+          created_at?: string
+          error?: string | null
+          from_date?: string | null
+          id?: string
+          provider?: string
+          raw?: Json | null
+          session_ref?: string | null
+          status?: string
+          to_date?: string | null
+          txn_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_bank_fetch_sessions_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_bank_fetch_sessions_consent_row_id_fkey"
+            columns: ["consent_row_id"]
+            isOneToOne: false
+            referencedRelation: "ca_bank_consents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_bulk_filing_jobs: {
         Row: {
           ca_firm_id: string
@@ -2095,7 +2274,10 @@ export type Database = {
       }
       ca_firm_members: {
         Row: {
+          billing_rate: number | null
           ca_firm_id: string
+          capacity_hours_per_week: number
+          cost_rate: number | null
           created_at: string | null
           id: string
           invited_email: string
@@ -2104,7 +2286,10 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          billing_rate?: number | null
           ca_firm_id: string
+          capacity_hours_per_week?: number
+          cost_rate?: number | null
           created_at?: string | null
           id?: string
           invited_email: string
@@ -2113,7 +2298,10 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          billing_rate?: number | null
           ca_firm_id?: string
+          capacity_hours_per_week?: number
+          cost_rate?: number | null
           created_at?: string | null
           id?: string
           invited_email?: string
@@ -2453,6 +2641,72 @@ export type Database = {
           },
         ]
       }
+      ca_invoice_payments: {
+        Row: {
+          amount: number
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          method: string | null
+          paid_at: string | null
+          payment_url: string | null
+          provider: string
+          provider_link_id: string | null
+          provider_payment_id: string | null
+          raw: Json | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          method?: string | null
+          paid_at?: string | null
+          payment_url?: string | null
+          provider?: string
+          provider_link_id?: string | null
+          provider_payment_id?: string | null
+          raw?: Json | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          method?: string | null
+          paid_at?: string | null
+          payment_url?: string | null
+          provider?: string
+          provider_link_id?: string | null
+          provider_payment_id?: string | null
+          raw?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_invoice_payments_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_invoice_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "ca_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_invoices: {
         Row: {
           business_id: string
@@ -2739,6 +2993,71 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "ca_ledger_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_notification_outbox: {
+        Row: {
+          attempts: number
+          business_id: string | null
+          ca_firm_id: string
+          channel: string
+          created_at: string
+          dedupe_key: string | null
+          id: string
+          last_error: string | null
+          next_attempt_at: string
+          payload: Json
+          provider: string | null
+          provider_message_id: string | null
+          recipient: string | null
+          sent_at: string | null
+          status: string
+          template: string
+        }
+        Insert: {
+          attempts?: number
+          business_id?: string | null
+          ca_firm_id: string
+          channel?: string
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          provider?: string | null
+          provider_message_id?: string | null
+          recipient?: string | null
+          sent_at?: string | null
+          status?: string
+          template: string
+        }
+        Update: {
+          attempts?: number
+          business_id?: string | null
+          ca_firm_id?: string
+          channel?: string
+          created_at?: string
+          dedupe_key?: string | null
+          id?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          provider?: string | null
+          provider_message_id?: string | null
+          recipient?: string | null
+          sent_at?: string | null
+          status?: string
+          template?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_notification_outbox_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
             referencedColumns: ["id"]
           },
         ]
@@ -3035,6 +3354,54 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ca_report_shares: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          id: string
+          note: string | null
+          report_log_id: string
+          revoked_at: string | null
+          shared_by: string | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          report_log_id: string
+          revoked_at?: string | null
+          shared_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          report_log_id?: string
+          revoked_at?: string | null
+          shared_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_report_shares_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_report_shares_report_log_id_fkey"
+            columns: ["report_log_id"]
+            isOneToOne: true
+            referencedRelation: "ca_reports_log"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_reports_log: {
         Row: {
@@ -3371,6 +3738,79 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_time_entries: {
+        Row: {
+          billable: boolean
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          ended_at: string | null
+          engagement_id: string | null
+          entry_date: string
+          id: string
+          member_user_id: string
+          minutes: number
+          note: string | null
+          started_at: string | null
+          task_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          billable?: boolean
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          ended_at?: string | null
+          engagement_id?: string | null
+          entry_date?: string
+          id?: string
+          member_user_id: string
+          minutes?: number
+          note?: string | null
+          started_at?: string | null
+          task_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billable?: boolean
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          ended_at?: string | null
+          engagement_id?: string | null
+          entry_date?: string
+          id?: string
+          member_user_id?: string
+          minutes?: number
+          note?: string | null
+          started_at?: string | null
+          task_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_time_entries_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_time_entries_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "ca_engagements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_time_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "ca_tasks"
             referencedColumns: ["id"]
           },
         ]

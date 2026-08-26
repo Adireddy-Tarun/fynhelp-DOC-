@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { startInvoicePayment, reportManualPayment } from "@/lib/caPayments.functions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Send, FileText, Download, AlertCircle, CheckCircle2, Clock } from "lucide-react";
@@ -53,6 +55,28 @@ interface Message {
   created_at: string;
 }
 
+interface SharedReport {
+  id: string;
+  created_at: string;
+  note: string | null;
+  report: {
+    report_name: string | null;
+    report_type: string | null;
+    period: string | null;
+    file_path: string | null;
+  } | null;
+}
+
+interface ClientInvoice {
+  id: string;
+  invoice_number: string | null;
+  period: string | null;
+  total: number | null;
+  status: string | null;
+  due_date: string | null;
+  paid_at: string | null;
+}
+
 export default function MyCAPage() {
   const { user, businessId } = useAuth();
 
@@ -63,8 +87,13 @@ export default function MyCAPage() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"compliance" | "documents" | "messages">("compliance");
+  const [reports, setReports] = useState<SharedReport[]>([]);
+  const [invoices, setInvoices] = useState<ClientInvoice[]>([]);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"compliance" | "documents" | "reports" | "invoices" | "messages">("compliance");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const startInvoicePaymentFn = useServerFn(startInvoicePayment);
+  const reportManualPaymentFn = useServerFn(reportManualPayment);
 
   useEffect(() => {
     if (!businessId) return;
@@ -126,7 +155,7 @@ export default function MyCAPage() {
       granted_at: access.granted_at,
     });
 
-    const [complianceRes, docsRes, msgsRes] = await Promise.all([
+    const [complianceRes, docsRes, msgsRes, reportsRes, invoicesRes] = await Promise.all([
       supabase
         .from("ca_compliance_events")
         .select("id, event_type, filing_period, due_date, filing_date, status, penalty_amount")
@@ -145,11 +174,29 @@ export default function MyCAPage() {
         .eq("business_id", businessId)
         .eq("ca_firm_id", firm?.id)
         .order("created_at", { ascending: true }),
+      supabase
+        .from("ca_report_shares")
+        .select("id, created_at, note, ca_reports_log(report_name, report_type, period, file_path)")
+        .eq("business_id", businessId)
+        .is("revoked_at", null)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("ca_invoices")
+        .select("id, invoice_number, period, total, status, due_date, paid_at")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false }),
     ]);
 
     setCompliance((complianceRes.data ?? []) as ComplianceEvent[]);
     setDocuments((docsRes.data ?? []) as Document[]);
     setMessages((msgsRes.data ?? []) as Message[]);
+    setReports(((reportsRes.data ?? []) as any[]).map(r => ({
+      id: r.id,
+      created_at: r.created_at,
+      note: r.note,
+      report: r.ca_reports_log ?? null,
+    })));
+    setInvoices((invoicesRes.data ?? []) as ClientInvoice[]);
     setLoading(false);
 
     if (firm?.id) {
@@ -185,6 +232,39 @@ export default function MyCAPage() {
     if (error || !data) { toast.error("Could not generate download link"); return; }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
+
+  const downloadReport = async (r: SharedReport) => {
+    if (!r.report?.file_path) { toast.error("This report has no file attached"); return; }
+    const { data, error } = await supabase.storage
+      .from("ca-reports")
+      .createSignedUrl(r.report.file_path, 3600);
+    if (error || !data) { toast.error("Could not generate download link"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const payInvoice = async (inv: ClientInvoice) => {
+    setPayingId(inv.id);
+    try {
+      const res = await startInvoicePaymentFn({ data: { invoiceId: inv.id } });
+      if (res.alreadyPaid) { toast.success("This invoice is already marked paid"); return; }
+      if (!res.configured) {
+        toast.info("Online payment is not switched on yet — pay your CA directly and record the reference below.");
+        const reference = window.prompt("Payment reference (UTR / UPI transaction id)")?.trim();
+        if (!reference || reference.length < 3) return;
+        await reportManualPaymentFn({ data: { invoiceId: inv.id, reference, method: "upi" } });
+        toast.success("Your CA has been notified of the payment");
+        return;
+      }
+      if (res.paymentUrl) window.open(res.paymentUrl, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start payment");
+    } finally {
+      setPayingId(null);
+    }
+  };
+
+  const formatMoney = (n: number | null) =>
+    "₹" + Number(n ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -304,7 +384,7 @@ export default function MyCAPage() {
       </div>
 
       <div style={{ display: "flex", gap: 0, borderBottom: "0.5px solid " + BORDER, marginBottom: 20 }}>
-        {(["compliance", "documents", "messages"] as const).map(t => (
+        {(["compliance", "documents", "reports", "invoices", "messages"] as const).map(t => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
@@ -447,6 +527,81 @@ export default function MyCAPage() {
                 ))}
               </tbody>
             </table>
+          )}
+        </div>
+      )}
+
+      {activeTab === "reports" && (
+        <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
+          {reports.length === 0 ? (
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+              Your CA has not shared any reports with you yet.
+            </div>
+          ) : (
+            reports.map((r, i) => (
+              <div key={r.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 16px", borderTop: i > 0 ? "0.5px solid " + BORDER : "none" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <FileText size={15} style={{ color: GOLD, flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+                      {r.report?.report_name ?? r.report?.report_type ?? "Report"}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                      {[r.report?.period, "Shared " + formatDate(r.created_at)].filter(Boolean).join(" · ")}
+                      {r.note ? " · " + r.note : ""}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => downloadReport(r)}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 500, color: RED, background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
+                >
+                  <Download size={13} /> Download
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === "invoices" && (
+        <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
+          {invoices.length === 0 ? (
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+              No invoices from your CA yet.
+            </div>
+          ) : (
+            invoices.map((inv, i) => {
+              const paid = inv.status === "paid";
+              return (
+                <div key={inv.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 16px", borderTop: i > 0 ? "0.5px solid " + BORDER : "none" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+                      {inv.invoice_number ?? "Invoice"} {inv.period ? "· " + inv.period : ""}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                      {paid
+                        ? "Paid " + (inv.paid_at ? formatDate(inv.paid_at) : "")
+                        : inv.due_date ? "Due " + formatDate(inv.due_date) : "Payment pending"}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 14, fontWeight: 500, color: paid ? GREEN : INK }}>
+                      {formatMoney(inv.total)}
+                    </div>
+                    {!paid && (
+                      <button
+                        onClick={() => payInvoice(inv)}
+                        disabled={payingId === inv.id}
+                        style={{ height: 32, padding: "0 14px", borderRadius: 7, background: RED, color: "white", border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", opacity: payingId === inv.id ? 0.6 : 1 }}
+                      >
+                        {payingId === inv.id ? "Starting…" : "Pay now"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
       )}

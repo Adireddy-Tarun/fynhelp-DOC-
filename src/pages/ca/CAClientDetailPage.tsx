@@ -351,7 +351,7 @@ export default function CAClientDetailPage() {
         <CABadge tone={statusTone(client.client_status)}>{client.client_status ?? "—"}</CABadge>
       </div>
 
-      <div style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
+      <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
         {TABS.map((t) => (
           <button
             key={t}

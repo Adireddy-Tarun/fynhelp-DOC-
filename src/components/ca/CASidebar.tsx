@@ -82,7 +82,18 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
 ];
 
 
-export default function CASidebar() {
+export default function CASidebar({
+  open = false,
+  onNavigate,
+  drawer = false,
+}: {
+  /** Drawer visibility on compact screens. */
+  open?: boolean;
+  /** Called after a nav link is tapped, so the drawer can close. */
+  onNavigate?: () => void;
+  /** Render as an off-canvas drawer instead of a fixed desktop rail. */
+  drawer?: boolean;
+}) {
   const { firmId, firmName, caName } = useCAPortal();
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
@@ -108,8 +119,16 @@ export default function CASidebar() {
 
   return (
     <aside
-      className="fixed inset-y-0 left-0 flex flex-col z-40"
-      style={{ width: 236, background: "#FFFFFF", borderRight: `0.5px solid ${CA.line}` }}
+      className="fixed inset-y-0 left-0 flex flex-col z-50"
+      style={{
+        width: 236,
+        maxWidth: "84vw",
+        background: "#FFFFFF",
+        borderRight: `0.5px solid ${CA.line}`,
+        transform: drawer && !open ? "translateX(-100%)" : "translateX(0)",
+        transition: drawer ? "transform 200ms ease" : undefined,
+        boxShadow: drawer && open ? "0 0 40px rgba(0,0,0,0.18)" : undefined,
+      }}
     >
       <div style={{ padding: "22px 20px 16px" }}>
         <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700, color: CA.ink }}>
@@ -145,6 +164,7 @@ export default function CASidebar() {
                 key={path}
                 to={path}
                 end={path === "/ca/clients"}
+                onClick={onNavigate}
                 style={({ isActive }) => ({
                   display: "flex",
                   alignItems: "center",
