@@ -218,6 +218,7 @@ exports[`dashboard design-system snapshots > FynSearchInput renders icon + brand
   class="relative w-full"
 >
   <svg
+    aria-hidden="true"
     class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fyn-ink-40 pointer-events-none"
     fill="none"
     height="24"
@@ -229,13 +230,13 @@ exports[`dashboard design-system snapshots > FynSearchInput renders icon + brand
     width="24"
     xmlns="http://www.w3.org/2000/svg"
   >
+    <path
+      d="m21 21-4.34-4.34"
+    />
     <circle
       cx="11"
       cy="11"
       r="8"
-    />
-    <path
-      d="m21 21-4.3-4.3"
     />
   </svg>
   <input
