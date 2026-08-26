@@ -109,8 +109,9 @@
   }
   /* Grids that hard-code desktop columns collapse to a single column. */
   .ca-portal-main [style*="grid-template-columns"]:not(.ca-keep-grid) {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
   }
+
   /* Headings shrink so long firm/client names never overflow. */
   .ca-portal-main h1 {
     font-size: 21px !important;
