@@ -46,11 +46,14 @@ export default function CAMastersPage() {
   const [parties, setParties] = useState<Party[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [rates, setRates] = useState<FxRate[]>([]);
+  const [defs, setDefs] = useState<FieldDef[]>([]);
+  const [values, setValues] = useState<Record<string, string>>({});
   const editable = can("manage_clients");
 
   const [pForm, setPForm] = useState({ name: "", party_type: "customer", gstin: "", pan: "", email: "", phone: "", payment_terms_days: "30" });
   const [iForm, setIForm] = useState({ name: "", sku: "", hsn_code: "", uom: "NOS", unit_price: "", gst_rate: "18", category: "" });
   const [fForm, setFForm] = useState({ base_currency: "USD", quote_currency: "INR", rate: "", rate_date: new Date().toISOString().slice(0, 10) });
+  const [cForm, setCForm] = useState({ label: "", field_type: "text", options: "", is_required: false });
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
@@ -59,20 +62,64 @@ export default function CAMastersPage() {
   const load = useCallback(async () => {
     if (!firmId) return;
     if (businessId) {
-      const [{ data: p }, { data: i }] = await Promise.all([
+      const [{ data: p }, { data: i }, { data: v }] = await Promise.all([
         supabase.from("ca_parties").select("id, name, party_type, gstin, pan, email, phone, payment_terms_days, is_active")
           .eq("ca_firm_id", firmId).eq("business_id", businessId).order("name"),
         supabase.from("ca_items").select("id, name, sku, hsn_code, uom, unit_price, gst_rate, category, is_active")
           .eq("ca_firm_id", firmId).eq("business_id", businessId).order("name"),
+        supabase.from("ca_custom_field_values").select("field_id, value")
+          .eq("ca_firm_id", firmId).eq("business_id", businessId),
       ]);
       setParties((p ?? []) as Party[]);
       setItems((i ?? []) as Item[]);
+      const map: Record<string, string> = {};
+      for (const row of (v ?? []) as { field_id: string; value: string | null }[]) map[row.field_id] = row.value ?? "";
+      setValues(map);
     }
-    const { data: f } = await supabase.from("ca_fx_rates")
-      .select("id, base_currency, quote_currency, rate, rate_date, source")
-      .eq("ca_firm_id", firmId).order("rate_date", { ascending: false }).limit(60);
+    const [{ data: f }, { data: d }] = await Promise.all([
+      supabase.from("ca_fx_rates").select("id, base_currency, quote_currency, rate, rate_date, source")
+        .eq("ca_firm_id", firmId).order("rate_date", { ascending: false }).limit(60),
+      supabase.from("ca_custom_field_defs").select("id, field_key, label, field_type, options, is_required, sort_order")
+        .eq("ca_firm_id", firmId).eq("is_active", true).order("sort_order").order("label"),
+    ]);
     setRates((f ?? []) as FxRate[]);
+    setDefs((d ?? []) as FieldDef[]);
   }, [firmId, businessId]);
+
+  const addFieldDef = async () => {
+    if (!firmId || !cForm.label.trim()) return toast.error("Label is required");
+    const key = cForm.label.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+    const opts = cForm.field_type === "select"
+      ? cForm.options.split(",").map((o) => o.trim()).filter(Boolean)
+      : [];
+    const { error } = await supabase.from("ca_custom_field_defs").insert({
+      ca_firm_id: firmId, field_key: key, label: cForm.label.trim(), field_type: cForm.field_type,
+      options: opts, is_required: cForm.is_required, sort_order: defs.length,
+    });
+    if (error) return toast.error(error.message);
+    await logCAAudit({ firmId, entityType: "custom_field", action: "custom_field_created", detail: { key, type: cForm.field_type } });
+    toast.success("Custom field added");
+    setCForm({ label: "", field_type: "text", options: "", is_required: false });
+    await load();
+  };
+
+  const removeFieldDef = async (id: string) => {
+    const { error } = await supabase.from("ca_custom_field_defs").update({ is_active: false }).eq("id", id);
+    if (error) return toast.error(error.message);
+    setDefs((prev) => prev.filter((d) => d.id !== id));
+  };
+
+  const saveFieldValue = async (fieldId: string, value: string) => {
+    if (!firmId || !businessId) return;
+    const { error } = await supabase.from("ca_custom_field_values").upsert(
+      { ca_firm_id: firmId, business_id: businessId, field_id: fieldId, value, updated_by: userId ?? null, updated_at: new Date().toISOString() },
+      { onConflict: "field_id,business_id" },
+    );
+    if (error) return toast.error(error.message);
+    setValues((prev) => ({ ...prev, [fieldId]: value }));
+    toast.success("Saved");
+  };
+
 
   useEffect(() => { void load(); }, [load]);
 
