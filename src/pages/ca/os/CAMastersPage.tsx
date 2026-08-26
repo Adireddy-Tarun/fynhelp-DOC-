@@ -312,6 +312,84 @@ export default function CAMastersPage() {
           </CACard>
         </>
       )}
-    </div>
+
+      {tab === "custom" && (
+        <>
+          {editable && (
+            <CACard style={{ padding: 18, marginBottom: 16 }}>
+              <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>Define a firm-wide custom field</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
+                <CAField label="Label"><input value={cForm.label} onChange={(e) => setCForm({ ...cForm, label: e.target.value })} placeholder="e.g. Relationship manager" style={caInputStyle} /></CAField>
+                <CAField label="Type">
+                  <select value={cForm.field_type} onChange={(e) => setCForm({ ...cForm, field_type: e.target.value })} style={caInputStyle}>
+                    {["text", "number", "date", "select", "boolean"].map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </CAField>
+                {cForm.field_type === "select" && (
+                  <CAField label="Options (comma separated)"><input value={cForm.options} onChange={(e) => setCForm({ ...cForm, options: e.target.value })} style={caInputStyle} /></CAField>
+                )}
+                <CAField label="Required">
+                  <select value={cForm.is_required ? "yes" : "no"} onChange={(e) => setCForm({ ...cForm, is_required: e.target.value === "yes" })} style={caInputStyle}>
+                    <option value="no">No</option><option value="yes">Yes</option>
+                  </select>
+                </CAField>
+              </div>
+              <div style={{ marginTop: 14 }}><CAButton onClick={addFieldDef}>Add field</CAButton></div>
+            </CACard>
+          )}
+
+          <CACard style={{ padding: 18 }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>
+              Values for this client
+            </div>
+            {defs.length === 0 ? (
+              <CAEmpty title="No custom fields defined" hint="Define fields once for the firm, then capture their value on every client." />
+            ) : !businessId ? (
+              <CAEmpty title="Select a client" hint="Pick a client above to capture custom field values." />
+            ) : (
+              <div style={{ display: "grid", gap: 14 }}>
+                {defs.map((d) => (
+                  <div key={d.id} style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <CAField label={`${d.label}${d.is_required ? " *" : ""}`}>
+                        {d.field_type === "select" ? (
+                          <select
+                            value={values[d.id] ?? ""} disabled={!editable}
+                            onChange={(e) => saveFieldValue(d.id, e.target.value)} style={caInputStyle}
+                          >
+                            <option value="">—</option>
+                            {(Array.isArray(d.options) ? (d.options as string[]) : []).map((o) => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        ) : d.field_type === "boolean" ? (
+                          <select
+                            value={values[d.id] ?? ""} disabled={!editable}
+                            onChange={(e) => saveFieldValue(d.id, e.target.value)} style={caInputStyle}
+                          >
+                            <option value="">—</option><option value="true">Yes</option><option value="false">No</option>
+                          </select>
+                        ) : (
+                          <input
+                            type={d.field_type === "number" ? "number" : d.field_type === "date" ? "date" : "text"}
+                            defaultValue={values[d.id] ?? ""} disabled={!editable}
+                            onBlur={(e) => { if (e.target.value !== (values[d.id] ?? "")) saveFieldValue(d.id, e.target.value); }}
+                            style={caInputStyle}
+                          />
+                        )}
+                      </CAField>
+                    </div>
+                    <CABadge tone="grey">{d.field_type}</CABadge>
+                    {editable && (
+                      <button onClick={() => removeFieldDef(d.id)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: CA.sans, fontSize: 12, fontWeight: 600, color: CA.muted, paddingBottom: 10 }}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CACard>
+        </>
+      )}
+
   );
 }
