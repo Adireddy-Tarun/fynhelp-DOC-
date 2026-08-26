@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getFirmIntegrations, syncZohoBooks, syncRazorpay } from "@/lib/caSync.functions";
+import { getFirmIntegrations, syncZohoBooks, syncRazorpay, getAutoSyncSettings, setAutoSync, type AutoSyncSetting } from "@/lib/caSync.functions";
 import { CA, CACard, CABadge, CAButton, dateIN, caTh, caTd, CAEmpty } from "@/components/ca/portalUi";
 
 interface SyncJob {
@@ -24,6 +24,9 @@ export default function ClientSyncPanel({ firmId, businessId }: { firmId: string
   const runZoho = useServerFn(syncZohoBooks);
   const runRazorpay = useServerFn(syncRazorpay);
   const loadIntegrations = useServerFn(getFirmIntegrations);
+  const loadAuto = useServerFn(getAutoSyncSettings);
+  const saveAuto = useServerFn(setAutoSync);
+  const [autoSettings, setAutoSettings] = useState<AutoSyncSetting[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -34,6 +37,11 @@ export default function ClientSyncPanel({ firmId, businessId }: { firmId: string
     } catch {
       setProviders([]);
     }
+    try {
+      setAutoSettings(await loadAuto({ data: { firmId, businessId } }));
+    } catch {
+      setAutoSettings([]);
+    }
     const { data } = await supabase
       .from("ca_sync_jobs")
       .select("id, source_system, status, records_synced, error_message, completed_at, created_at")
@@ -42,7 +50,7 @@ export default function ClientSyncPanel({ firmId, businessId }: { firmId: string
       .order("created_at", { ascending: false })
       .limit(10);
     setJobs((data as SyncJob[]) ?? []);
-  }, [firmId, businessId, loadIntegrations]);
+  }, [firmId, businessId, loadIntegrations, loadAuto]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -62,6 +70,16 @@ export default function ClientSyncPanel({ firmId, businessId }: { firmId: string
     } finally {
       setBusy(null);
       load();
+    }
+  };
+
+  const toggleAuto = async (provider: string, enabled: boolean) => {
+    try {
+      await saveAuto({ data: { firmId, businessId, provider, enabled } });
+      toast.success(enabled ? `${LABELS[provider] ?? provider} will sync automatically every night` : `Automatic sync turned off for ${LABELS[provider] ?? provider}`);
+      load();
+    } catch (e) {
+      toast.error((e as Error).message ?? "Could not update auto-sync");
     }
   };
 
@@ -90,6 +108,33 @@ export default function ClientSyncPanel({ firmId, businessId }: { firmId: string
           )}
         </div>
       </div>
+
+      {providers.length > 0 && (
+        <div style={{
+          padding: "12px 18px", borderBottom: `0.5px solid ${CA.line}`,
+          display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center",
+        }}>
+          <span style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>
+            Automatic nightly sync
+          </span>
+          {providers.map((p) => {
+            const setting = autoSettings.find((a) => a.provider === p);
+            return (
+              <label key={p} style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: CA.sans, fontSize: 13, color: CA.ink }}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(setting?.auto_sync_enabled)}
+                  onChange={(e) => toggleAuto(p, e.target.checked)}
+                />
+                {LABELS[p] ?? p}
+                {setting?.last_auto_sync_at && (
+                  <span style={{ color: CA.faint, fontSize: 12 }}>· last {dateIN(setting.last_auto_sync_at)}</span>
+                )}
+              </label>
+            );
+          })}
+        </div>
+      )}
 
       {jobs.length === 0 ? (
         <CAEmpty title="No syncs yet" hint="Sync history appears here once you pull data from a connected source." />
