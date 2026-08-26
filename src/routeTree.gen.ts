@@ -82,6 +82,7 @@ import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/
 import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
 import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
+import { Route as ApiPublicCaInvoicePaymentWebhookRouteImport } from './routes/api/public/ca-invoice-payment-webhook'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
 import { Route as AdminAuthAdminProtectedAiMonitoringRouteImport } from './routes/_adminAuth/admin/_protected/ai-monitoring'
@@ -573,6 +574,12 @@ const ApiPublicCaIntegrationSyncRoute =
   ApiPublicCaIntegrationSyncRouteImport.update({
     id: '/api/public/ca-integration-sync',
     path: '/api/public/ca-integration-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaInvoicePaymentWebhookRoute =
+  ApiPublicCaInvoicePaymentWebhookRouteImport.update({
+    id: '/api/public/ca-invoice-payment-webhook',
+    path: '/api/public/ca-invoice-payment-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminAuthAdminProtectedIndexRoute =
@@ -1329,6 +1336,7 @@ export interface FileRoutesByFullPath {
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
+  '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
   '/blog/': typeof MainBlogIndexRoute
@@ -1515,6 +1523,7 @@ export interface FileRoutesByTo {
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
+  '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
   '/blog': typeof MainBlogIndexRoute
@@ -1711,6 +1720,7 @@ export interface FileRoutesById {
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
+  '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
   '/_main/blog/': typeof MainBlogIndexRoute
@@ -1902,6 +1912,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
+    | '/api/public/ca-invoice-payment-webhook'
     | '/blog-admin/'
     | '/intern/'
     | '/blog/'
@@ -2088,6 +2099,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
+    | '/api/public/ca-invoice-payment-webhook'
     | '/blog-admin'
     | '/intern'
     | '/blog'
@@ -2283,6 +2295,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
+    | '/api/public/ca-invoice-payment-webhook'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
     | '/_main/blog/'
@@ -2418,6 +2431,7 @@ export interface RootRouteChildren {
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
   ApiPublicCaIntegrationSyncRoute: typeof ApiPublicCaIntegrationSyncRoute
+  ApiPublicCaInvoicePaymentWebhookRoute: typeof ApiPublicCaInvoicePaymentWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2931,6 +2945,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/ca-integration-sync'
       fullPath: '/api/public/ca-integration-sync'
       preLoaderRoute: typeof ApiPublicCaIntegrationSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-invoice-payment-webhook': {
+      id: '/api/public/ca-invoice-payment-webhook'
+      path: '/api/public/ca-invoice-payment-webhook'
+      fullPath: '/api/public/ca-invoice-payment-webhook'
+      preLoaderRoute: typeof ApiPublicCaInvoicePaymentWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_adminAuth/admin/_protected/': {
@@ -4267,6 +4288,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
   ApiPublicCaIntegrationSyncRoute: ApiPublicCaIntegrationSyncRoute,
+  ApiPublicCaInvoicePaymentWebhookRoute: ApiPublicCaInvoicePaymentWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
