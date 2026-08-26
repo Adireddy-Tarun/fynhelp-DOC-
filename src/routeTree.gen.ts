@@ -113,6 +113,7 @@ import { Route as CaAuthCaPortalDataQualityRouteImport } from './routes/_caAuth/
 import { Route as CaAuthCaPortalEngagementsRouteImport } from './routes/_caAuth/ca/_portal/engagements'
 import { Route as CaAuthCaPortalExceptionsRouteImport } from './routes/_caAuth/ca/_portal/exceptions'
 import { Route as CaAuthCaPortalFilingCalendarRouteImport } from './routes/_caAuth/ca/_portal/filing-calendar'
+import { Route as CaAuthCaPortalGroupsRouteImport } from './routes/_caAuth/ca/_portal/groups'
 import { Route as CaAuthCaPortalGstPortfolioRouteImport } from './routes/_caAuth/ca/_portal/gst-portfolio'
 import { Route as CaAuthCaPortalIntegrationsRouteImport } from './routes/_caAuth/ca/_portal/integrations'
 import { Route as CaAuthCaPortalItcReconRouteImport } from './routes/_caAuth/ca/_portal/itc-recon'
@@ -754,6 +755,11 @@ const CaAuthCaPortalFilingCalendarRoute =
     path: '/filing-calendar',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaPortalGroupsRoute = CaAuthCaPortalGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => CaAuthCaPortalRoute,
+} as any)
 const CaAuthCaPortalGstPortfolioRoute =
   CaAuthCaPortalGstPortfolioRouteImport.update({
     id: '/gst-portfolio',
@@ -1349,6 +1355,7 @@ export interface FileRoutesByFullPath {
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/ca/groups': typeof CaAuthCaPortalGroupsRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
@@ -1533,6 +1540,7 @@ export interface FileRoutesByTo {
   '/ca/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/ca/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/ca/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/ca/groups': typeof CaAuthCaPortalGroupsRoute
   '/ca/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/ca/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/ca/itc-recon': typeof CaAuthCaPortalItcReconRoute
@@ -1727,6 +1735,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/engagements': typeof CaAuthCaPortalEngagementsRoute
   '/_caAuth/ca/_portal/exceptions': typeof CaAuthCaPortalExceptionsRoute
   '/_caAuth/ca/_portal/filing-calendar': typeof CaAuthCaPortalFilingCalendarRoute
+  '/_caAuth/ca/_portal/groups': typeof CaAuthCaPortalGroupsRoute
   '/_caAuth/ca/_portal/gst-portfolio': typeof CaAuthCaPortalGstPortfolioRoute
   '/_caAuth/ca/_portal/integrations': typeof CaAuthCaPortalIntegrationsRoute
   '/_caAuth/ca/_portal/itc-recon': typeof CaAuthCaPortalItcReconRoute
@@ -1916,6 +1925,7 @@ export interface FileRouteTypes {
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
+    | '/ca/groups'
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
@@ -2100,6 +2110,7 @@ export interface FileRouteTypes {
     | '/ca/engagements'
     | '/ca/exceptions'
     | '/ca/filing-calendar'
+    | '/ca/groups'
     | '/ca/gst-portfolio'
     | '/ca/integrations'
     | '/ca/itc-recon'
@@ -2293,6 +2304,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/engagements'
     | '/_caAuth/ca/_portal/exceptions'
     | '/_caAuth/ca/_portal/filing-calendar'
+    | '/_caAuth/ca/_portal/groups'
     | '/_caAuth/ca/_portal/gst-portfolio'
     | '/_caAuth/ca/_portal/integrations'
     | '/_caAuth/ca/_portal/itc-recon'
@@ -3124,6 +3136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalFilingCalendarRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/_portal/groups': {
+      id: '/_caAuth/ca/_portal/groups'
+      path: '/groups'
+      fullPath: '/ca/groups'
+      preLoaderRoute: typeof CaAuthCaPortalGroupsRouteImport
+      parentRoute: typeof CaAuthCaPortalRoute
+    }
     '/_caAuth/ca/_portal/gst-portfolio': {
       id: '/_caAuth/ca/_portal/gst-portfolio'
       path: '/gst-portfolio'
@@ -3866,6 +3885,7 @@ interface CaAuthCaPortalRouteChildren {
   CaAuthCaPortalEngagementsRoute: typeof CaAuthCaPortalEngagementsRoute
   CaAuthCaPortalExceptionsRoute: typeof CaAuthCaPortalExceptionsRoute
   CaAuthCaPortalFilingCalendarRoute: typeof CaAuthCaPortalFilingCalendarRoute
+  CaAuthCaPortalGroupsRoute: typeof CaAuthCaPortalGroupsRoute
   CaAuthCaPortalGstPortfolioRoute: typeof CaAuthCaPortalGstPortfolioRoute
   CaAuthCaPortalIntegrationsRoute: typeof CaAuthCaPortalIntegrationsRoute
   CaAuthCaPortalItcReconRoute: typeof CaAuthCaPortalItcReconRoute
@@ -3911,6 +3931,7 @@ const CaAuthCaPortalRouteChildren: CaAuthCaPortalRouteChildren = {
   CaAuthCaPortalEngagementsRoute: CaAuthCaPortalEngagementsRoute,
   CaAuthCaPortalExceptionsRoute: CaAuthCaPortalExceptionsRoute,
   CaAuthCaPortalFilingCalendarRoute: CaAuthCaPortalFilingCalendarRoute,
+  CaAuthCaPortalGroupsRoute: CaAuthCaPortalGroupsRoute,
   CaAuthCaPortalGstPortfolioRoute: CaAuthCaPortalGstPortfolioRoute,
   CaAuthCaPortalIntegrationsRoute: CaAuthCaPortalIntegrationsRoute,
   CaAuthCaPortalItcReconRoute: CaAuthCaPortalItcReconRoute,
