@@ -19,6 +19,12 @@ const moduleOpts = ["Liquidity", "Revenue", "Cost", "GST & Tax", "Governance"];
 
 type Access = { id: string; ca_name: string | null; ca_firm: string | null; ca_email: string; access_level: string | null; expiry_date: string | null; status: string };
 
+/** ca_access_requests stores extra invite details inside `message` as JSON. */
+const parseMeta = (message: unknown): Record<string, any> => {
+  if (typeof message !== "string") return {};
+  try { return JSON.parse(message) ?? {}; } catch { return {}; }
+};
+
 const CAAccessPage = () => {
   const { businessId } = useAuth();
   const [cas, setCas] = useState<Access[]>([]);
