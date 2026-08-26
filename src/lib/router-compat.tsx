@@ -195,3 +195,10 @@ export const NavLink = forwardRef<HTMLAnchorElement, NavLinkProps>(function NavL
     </Link>
   );
 });
+
+// ---------- MemoryRouter (test/compat shim) ----------
+// TanStack Router has no MemoryRouter component; tests only need a passthrough
+// wrapper so legacy `<MemoryRouter>` usage keeps compiling.
+export function MemoryRouter({ children }: { children?: ReactNode }) {
+  return <>{children}</>;
+}
