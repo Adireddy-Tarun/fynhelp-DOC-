@@ -92,6 +92,8 @@ export default function MyCAPage() {
   const [payingId, setPayingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"compliance" | "documents" | "reports" | "invoices" | "messages">("compliance");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const startInvoicePaymentFn = useServerFn(startInvoicePayment);
+  const reportManualPaymentFn = useServerFn(reportManualPayment);
 
   useEffect(() => {
     if (!businessId) return;
