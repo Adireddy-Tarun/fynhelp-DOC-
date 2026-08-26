@@ -1486,6 +1486,113 @@ export type Database = {
           },
         ]
       }
+      ca_data_quality_issues: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          description: string
+          detail: Json
+          entity_id: string | null
+          entity_type: string
+          id: string
+          issue_type: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          run_id: string
+          severity: string
+          status: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          description: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          issue_type: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          run_id: string
+          severity?: string
+          status?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          description?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          issue_type?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          run_id?: string
+          severity?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_data_quality_issues_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "ca_data_quality_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_data_quality_runs: {
+        Row: {
+          anomaly_count: number
+          business_id: string
+          ca_firm_id: string
+          completeness_score: number
+          created_at: string
+          created_by: string | null
+          duplicate_count: number
+          id: string
+          missing_field_count: number
+          period: string
+          summary: Json
+          total_records: number
+        }
+        Insert: {
+          anomaly_count?: number
+          business_id: string
+          ca_firm_id: string
+          completeness_score?: number
+          created_at?: string
+          created_by?: string | null
+          duplicate_count?: number
+          id?: string
+          missing_field_count?: number
+          period: string
+          summary?: Json
+          total_records?: number
+        }
+        Update: {
+          anomaly_count?: number
+          business_id?: string
+          ca_firm_id?: string
+          completeness_score?: number
+          created_at?: string
+          created_by?: string | null
+          duplicate_count?: number
+          id?: string
+          missing_field_count?: number
+          period?: string
+          summary?: Json
+          total_records?: number
+        }
+        Relationships: []
+      }
       ca_deduction_findings: {
         Row: {
           action_required: string
@@ -2045,6 +2152,42 @@ export type Database = {
           },
         ]
       }
+      ca_fx_rates: {
+        Row: {
+          base_currency: string
+          ca_firm_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          quote_currency: string
+          rate: number
+          rate_date: string
+          source: string
+        }
+        Insert: {
+          base_currency: string
+          ca_firm_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          quote_currency?: string
+          rate: number
+          rate_date: string
+          source?: string
+        }
+        Update: {
+          base_currency?: string
+          ca_firm_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          quote_currency?: string
+          rate?: number
+          rate_date?: string
+          source?: string
+        }
+        Relationships: []
+      }
       ca_gstr2b_uploads: {
         Row: {
           business_id: string
@@ -2303,6 +2446,113 @@ export type Database = {
           },
         ]
       }
+      ca_items: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          category: string | null
+          created_at: string
+          gst_rate: number
+          hsn_code: string | null
+          id: string
+          is_active: boolean
+          name: string
+          sku: string | null
+          unit_price: number | null
+          uom: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          category?: string | null
+          created_at?: string
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          sku?: string | null
+          unit_price?: number | null
+          uom?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          category?: string | null
+          created_at?: string
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          sku?: string | null
+          unit_price?: number | null
+          uom?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ca_ledger_accounts: {
+        Row: {
+          account_type: string
+          business_id: string
+          ca_firm_id: string
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_group: boolean
+          name: string
+          opening_balance: number
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_type: string
+          business_id: string
+          ca_firm_id: string
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_group?: boolean
+          name: string
+          opening_balance?: number
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_type?: string
+          business_id?: string
+          ca_firm_id?: string
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_group?: boolean
+          name?: string
+          opening_balance?: number
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_ledger_accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "ca_ledger_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_notifications: {
         Row: {
           business_id: string | null
@@ -2369,6 +2619,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ca_parties: {
+        Row: {
+          address: string | null
+          business_id: string
+          ca_firm_id: string
+          created_at: string
+          credit_limit: number | null
+          email: string | null
+          gstin: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          pan: string | null
+          party_type: string
+          payment_terms_days: number
+          phone: string | null
+          state_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          business_id: string
+          ca_firm_id: string
+          created_at?: string
+          credit_limit?: number | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          pan?: string | null
+          party_type?: string
+          payment_terms_days?: number
+          phone?: string | null
+          state_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          business_id?: string
+          ca_firm_id?: string
+          created_at?: string
+          credit_limit?: number | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          pan?: string | null
+          party_type?: string
+          payment_terms_days?: number
+          phone?: string | null
+          state_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       ca_recon_runs: {
         Row: {
