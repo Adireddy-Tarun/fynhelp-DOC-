@@ -33,6 +33,9 @@ const GROUPS: { group: string; links: { label: string; path: string; icon: typeo
     group: "Data",
     links: [
       { label: "Integrations", path: "/ca/integrations", icon: Plug },
+      { label: "Ledgers & CoA", path: "/ca/ledgers", icon: BookOpen },
+      { label: "Data quality", path: "/ca/data-quality", icon: Gauge },
+      { label: "Master data", path: "/ca/masters", icon: Boxes },
     ],
   },
   {
