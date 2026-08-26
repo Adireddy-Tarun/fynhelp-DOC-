@@ -437,7 +437,7 @@ export default function CASettingsPage() {
 
           <CATwoFactorCard
             firmId={firmId}
-            canManageFirm={role === "partner" || role === "manager" || role === "admin"}
+            canManageFirm={caRole === "partner" || caRole === "manager" || caRole === "admin"}
           />
 
           <CACard style={{ padding: 24, border: `0.5px solid rgba(179,38,30,0.35)` }}>

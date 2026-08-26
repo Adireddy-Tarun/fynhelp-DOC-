@@ -16,6 +16,8 @@ export default function CALoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [captcha, setCaptcha] = useState<string | null>(null);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +40,37 @@ export default function CALoginPage() {
       setCaptcha(null);
       return;
     }
+    // If the account has a verified authenticator, the session must reach aal2.
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const totp = (factors?.totp ?? []).find((f) => f.status === "verified");
+      if (totp) {
+        setMfaFactorId(totp.id);
+        return;
+      }
+    }
+
+    toast.success("Signed in");
+    navigate("/ca/dashboard", { replace: true });
+  };
+
+  const verifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaFactorId) return;
+    setError(null);
+    if (mfaCode.trim().length < 6) return setError("Enter the 6-digit code from your authenticator app");
+    setLoading(true);
+    const { data: ch, error: chErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+    if (chErr || !ch) {
+      setLoading(false);
+      return setError(chErr?.message ?? "Could not start verification");
+    }
+    const { error: verifyErr } = await supabase.auth.mfa.verify({
+      factorId: mfaFactorId, challengeId: ch.id, code: mfaCode.trim(),
+    });
+    setLoading(false);
+    if (verifyErr) return setError("That code is not valid. Try the current code from your app.");
     toast.success("Signed in");
     navigate("/ca/dashboard", { replace: true });
   };
@@ -57,6 +90,25 @@ export default function CALoginPage() {
           Access your firm's client portfolio.
         </p>
 
+        {mfaFactorId ? (
+          <form onSubmit={verifyMfa} style={{ marginTop: 24, display: "grid", gap: 16 }}>
+            <CAField label="Authentication code">
+              <input
+                style={caInputStyle}
+                inputMode="numeric"
+                maxLength={6}
+                autoFocus
+                value={mfaCode}
+                onChange={(ev) => setMfaCode(ev.target.value.replace(/\D/g, ""))}
+                placeholder="6-digit code"
+              />
+            </CAField>
+            {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
+            <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
+              {loading ? "Verifying…" : "Verify & continue"}
+            </CAButton>
+          </form>
+        ) : (
         <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
           <CAField label="Email">
             <input style={caInputStyle} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@cafirm.com" />
@@ -93,6 +145,7 @@ export default function CALoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </CAButton>
         </form>
+        )}
 
         <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 18, textAlign: "center" }}>
           New CA firm?{" "}
