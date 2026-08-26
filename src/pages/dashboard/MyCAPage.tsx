@@ -53,6 +53,28 @@ interface Message {
   created_at: string;
 }
 
+interface SharedReport {
+  id: string;
+  created_at: string;
+  note: string | null;
+  report: {
+    report_name: string | null;
+    report_type: string | null;
+    period: string | null;
+    file_path: string | null;
+  } | null;
+}
+
+interface ClientInvoice {
+  id: string;
+  invoice_number: string | null;
+  period: string | null;
+  total: number | null;
+  status: string | null;
+  due_date: string | null;
+  paid_at: string | null;
+}
+
 export default function MyCAPage() {
   const { user, businessId } = useAuth();
 
