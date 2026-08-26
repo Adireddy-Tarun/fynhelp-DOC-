@@ -156,13 +156,23 @@ export default function CAClientDetailPage() {
   const loadTxns = useCallback(async (page: number) => {
     if (!businessId) return;
     try {
-      const { data, error } = await proxyExternalQuery({
+      const base = {
         table: "bank_transactions",
         business_id: businessId,
-        select: "id, date, description, category, amount, balance, type, source_reference, source_document_id",
         order: { column: "date", ascending: false },
         limit: (page + 1) * 100,
+      } as const;
+      // Lineage columns are optional on older datasets — fall back when absent.
+      let { data, error } = await proxyExternalQuery({
+        ...base,
+        select: "id, date, description, category, amount, balance, type, source_reference, source_document_id",
       });
+      if (error) {
+        ({ data, error } = await proxyExternalQuery({
+          ...base,
+          select: "id, date, description, category, amount, balance, type",
+        }));
+      }
       if (error) throw new Error(error);
       const pageRows = (data ?? []).slice(page * 100, page * 100 + 100);
       setTxns((prev) => (page === 0 ? pageRows : [...prev, ...pageRows]));
