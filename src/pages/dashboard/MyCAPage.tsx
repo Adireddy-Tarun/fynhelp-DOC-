@@ -384,7 +384,7 @@ export default function MyCAPage() {
       </div>
 
       <div style={{ display: "flex", gap: 0, borderBottom: "0.5px solid " + BORDER, marginBottom: 20 }}>
-        {(["compliance", "documents", "messages"] as const).map(t => (
+        {(["compliance", "documents", "reports", "invoices", "messages"] as const).map(t => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
