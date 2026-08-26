@@ -13,6 +13,7 @@ import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
 import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import ClientDeductionsTab from "@/components/ca/ClientDeductionsTab";
+import ClientProfilePanel from "@/components/ca/ClientProfilePanel";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
@@ -377,6 +378,9 @@ export default function CAClientDetailPage() {
             <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
+            {firmId && clientId && (
+              <ClientProfilePanel firmId={firmId} clientId={clientId} businessId={businessId} />
+            )}
             {businessId && firmId && <ClientSyncPanel firmId={firmId} businessId={businessId} />}
             {businessId && firmId && (
               <ClientRemindersSection firmId={firmId} businessId={businessId} userId={userId} />
