@@ -9,6 +9,7 @@ import AdvanceTaxSection from "../sections/AdvanceTaxSection";
 import RegulatoryComplianceSection from "../sections/RegulatoryComplianceSection";
 import { EmptyCard } from "@/components/intelligence/EmptyCard";
 import GstFilingsSection from "../sections/GstFilingsSection";
+import { computeGstSummary, type ExpenseLike } from "@/lib/gstCompute";
 
 export default function GstTab() {
   useEffect(() => { track("intelligence_tab_viewed", { tab: "gst" }); }, []);
@@ -16,35 +17,22 @@ export default function GstTab() {
   const { data: invoices } = useInvoices();
   const { data: expenses } = useExpenses();
 
-  // Category-aware GST rate estimation. Payroll and rent typically carry no
-  // recoverable ITC (salaries are outside GST scope; rent is often composition
-  // or exempt for many SMEs). Everything else defaults to the standard 18%.
-  // If the row exposes an explicit tax_amount / gst_rate we use that instead.
-  const gstRateForExpense = (e: any): number => {
-    const cat = String(e?.category ?? "");
-    const sub = String(e?.subcategory ?? "");
-    const hay = `${cat} ${sub}`;
-    if (/salary|payroll|wages|stipend|bonus/i.test(hay)) return 0;
-    if (/rent|lease/i.test(hay)) return 0;
-    return 0.18;
-  };
-
+  // Category-aware GST estimation lives in @/lib/gstCompute (pure + unit-tested):
+  // payroll, rent, interest and taxes carry no recoverable ITC; transport,
+  // travel and food use concessional rates; everything else defaults to 18%.
+  // An explicit tax_amount / gst_rate on the row always wins over the estimate.
   const m = useMemo(() => {
-    const outputGst = (invoices ?? []).reduce((s, i) => s + Number(i.tax_amount), 0);
-    const inputGst = (expenses ?? []).reduce((s, e: any) => {
-      const explicit = Number(e?.tax_amount ?? e?.gst_amount ?? 0);
-      if (explicit > 0) return s + explicit;
-      const rate = typeof e?.gst_rate === "number" ? Number(e.gst_rate) : gstRateForExpense(e);
-      if (!rate) return s;
-      return s + (Number(e.amount) * rate) / (1 + rate);
-    }, 0);
-    const netPayable = Math.max(0, outputGst - inputGst);
+    const { outputGst, inputGst, netPayable } = computeGstSummary(
+      (invoices ?? []) as { tax_amount?: number | string | null }[],
+      (expenses ?? []) as ExpenseLike[],
+    );
     const itcAvailable = inputGst;
     const itcClaimed = NaN;
     const itcGap = itcAvailable > 0 ? ((itcAvailable - itcClaimed) / itcAvailable) * 100 : 0;
     const itcBlocked = NaN;
     return { outputGst, inputGst, netPayable, itcAvailable, itcClaimed, itcGap, itcBlocked };
   }, [invoices, expenses]);
+
 
 
   const statusTone = (status: string) => {
