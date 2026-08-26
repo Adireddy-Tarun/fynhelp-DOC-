@@ -6,6 +6,7 @@ import {
   CA, CACard, CAHeading, CAButton, CAField, caInputStyle, CABadge, statusTone,
   caTh, caTd, dateIN, CAEmpty,
 } from "@/components/ca/portalUi";
+import { CustomFieldInput, type FieldDef } from "@/components/ca/ClientProfilePanel";
 
 interface Invitation {
   id: string;
@@ -27,7 +28,7 @@ const ENTITY_TYPES = [
 const EMPTY = {
   clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "",
   entityType: "Private Limited", entitySubtype: "", cin: "", llpin: "",
-  incorporationDate: "", dpiitNumber: "", udyamNumber: "",
+  incorporationDate: "", dpiitNumber: "", udyamNumber: "", groupId: "", ownershipPct: "",
 };
 
 export default function CAAddClientPage() {
@@ -37,6 +38,9 @@ export default function CAAddClientPage() {
   const [saving, setSaving] = useState(false);
   const [invites, setInvites] = useState<Invitation[]>([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
+  const [defs, setDefs] = useState<FieldDef[]>([]);
+  const [customValues, setCustomValues] = useState<Record<string, string>>({});
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -56,12 +60,33 @@ export default function CAAddClientPage() {
 
   useEffect(() => { loadInvites(); }, [loadInvites]);
 
+  useEffect(() => {
+    if (!firmId) return;
+    (async () => {
+      const [defsRes, groupsRes] = await Promise.all([
+        supabase.from("ca_custom_field_defs")
+          .select("id, field_key, label, field_type, options, is_required, sort_order")
+          .eq("ca_firm_id", firmId).eq("is_active", true).order("sort_order"),
+        supabase.from("ca_entity_groups").select("id, name").eq("ca_firm_id", firmId).order("name"),
+      ]);
+      setDefs((defsRes.data as FieldDef[]) ?? []);
+      setGroups((groupsRes.data as { id: string; name: string }[]) ?? []);
+    })();
+  }, [firmId]);
+
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.clientName.trim()) e.clientName = "Client name is required";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.clientEmail)) e.clientEmail = "Enter a valid email address";
     if (form.gstin && !/^[0-9A-Z]{15}$/.test(form.gstin.toUpperCase())) e.gstin = "GSTIN must be 15 characters";
     if (form.pan && !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(form.pan.toUpperCase())) e.pan = "PAN format: AAAAA9999A";
+    if (form.ownershipPct.trim()) {
+      const pct = Number(form.ownershipPct);
+      if (Number.isNaN(pct) || pct < 0 || pct > 100) e.ownershipPct = "Ownership % must be between 0 and 100";
+    }
+    for (const d of defs) {
+      if (d.is_required && !(customValues[d.id] ?? "").trim()) e[d.id] = `${d.label} is required`;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -87,7 +112,7 @@ export default function CAAddClientPage() {
       });
       if (invErr) throw invErr;
 
-      const { error: clientErr } = await supabase.from("ca_clients").insert({
+      const { data: insertedClient, error: clientErr } = await supabase.from("ca_clients").insert({
         ca_firm_id: firmId,
         client_name: form.clientName.trim(),
         client_email: form.clientEmail.trim().toLowerCase(),
@@ -104,8 +129,23 @@ export default function CAAddClientPage() {
         notes: form.notes.trim() || null,
         client_status: "pending",
         is_demo: false,
-      });
+        group_id: form.groupId || null,
+        ownership_pct: form.ownershipPct.trim() ? Number(form.ownershipPct) : null,
+      }).select("id").single();
       if (clientErr) throw clientErr;
+
+      const customRows = defs
+        .filter((d) => (customValues[d.id] ?? "").trim())
+        .map((d) => ({
+          ca_firm_id: firmId,
+          client_id: insertedClient.id as string,
+          field_id: d.id,
+          value: customValues[d.id],
+        }));
+      if (customRows.length) {
+        const { error: cfErr } = await supabase.from("ca_custom_field_values").insert(customRows);
+        if (cfErr) toast.warning(`Client saved, but custom fields failed: ${cfErr.message}`);
+      }
 
       const acceptUrl = `${window.location.origin}/ca/invite/accept?token=${token}`;
       const { error: mailErr } = await supabase.functions.invoke("ca-send-email", {
@@ -128,6 +168,7 @@ export default function CAAddClientPage() {
       }
 
       setForm({ ...EMPTY });
+      setCustomValues({});
       loadInvites();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not add client");
@@ -197,6 +238,25 @@ export default function CAAddClientPage() {
                 <option value="full">Full access</option>
               </select>
             </CAField>
+            <CAField label="Entity group">
+              <select style={caInputStyle as React.CSSProperties} value={form.groupId} onChange={set("groupId")}>
+                <option value="">Not part of a group</option>
+                {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+              </select>
+            </CAField>
+            <CAField label="Ownership %" error={errors.ownershipPct}>
+              <input style={caInputStyle} type="number" min={0} max={100} step="0.01"
+                value={form.ownershipPct} onChange={set("ownershipPct")} placeholder="e.g. 100" />
+            </CAField>
+            {defs.map((d) => (
+              <CAField key={d.id} label={d.label + (d.is_required ? " *" : "")} error={errors[d.id]}>
+                <CustomFieldInput
+                  def={d}
+                  value={customValues[d.id] ?? ""}
+                  onChange={(v) => setCustomValues((s) => ({ ...s, [d.id]: v }))}
+                />
+              </CAField>
+            ))}
           </div>
           <CAField label="Notes">
             <textarea
