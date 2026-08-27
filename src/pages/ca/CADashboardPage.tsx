@@ -160,7 +160,13 @@ export default function CADashboardPage() {
 
   return (
     <div>
-      <CAHeading>Portfolio</CAHeading>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <CAHeading>Portfolio</CAHeading>
+        <span style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>
+          Intelligence updated {timeAgo(brainLastRunAt)}
+        </span>
+      </div>
+
 
       {dueToday.length > 0 && (
         <CACard style={{ marginTop: 16, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", borderColor: "rgba(179,38,30,0.35)" }}>
