@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { detectDeductions } from "@/lib/caDeductions.functions";
 import { logCAAudit } from "@/lib/caAudit";
 import { CA, CACard, CABadge, CAButton, CAEmpty, CAField, caInputStyle, inr, type Tone } from "./portalUi";
+import { useFirmIntelligence } from "@/hooks/useCAIntelligence";
 
 interface Finding {
   id: string;
@@ -86,7 +87,24 @@ export default function ClientDeductionsTab({
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
+  const [entityType, setEntityType] = useState<string | null>(null);
   const runScan = useServerFn(detectDeductions);
+  const { data: firmIntel } = useFirmIntelligence(firmId);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!clientId) return;
+    (async () => {
+      const { data } = await supabase
+        .from("ca_clients")
+        .select("entity_type")
+        .eq("id", clientId)
+        .eq("ca_firm_id", firmId)
+        .maybeSingle();
+      if (!cancelled) setEntityType((data as { entity_type: string | null } | null)?.entity_type ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [clientId, firmId]);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
