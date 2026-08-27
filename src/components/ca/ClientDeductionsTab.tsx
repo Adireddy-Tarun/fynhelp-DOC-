@@ -264,6 +264,14 @@ export default function ClientDeductionsTab({
                 {f.provision}
               </span>
               <span style={{ fontFamily: CA.serif, fontSize: 15, fontWeight: 700, color: CA.ink }}>{f.provision_label}</span>
+              {weightOf(f.provision) < 0.6 && (
+                <span
+                  title="Your firm has dismissed this provision for similar entity types."
+                  style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 600, color: CA.faint }}
+                >
+                  Less relevant for this entity type
+                </span>
+              )}
               <CABadge tone={confidenceTone(f.confidence)}>{f.confidence} confidence</CABadge>
               {f.status !== "open" && <CABadge tone={f.status === "actioned" ? "teal" : "grey"}>{f.status}</CABadge>}
               <span style={{ marginLeft: "auto", fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>{f.period} · {f.category}</span>
