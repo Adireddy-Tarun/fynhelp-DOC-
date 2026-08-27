@@ -15,6 +15,7 @@ import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
 import { penaltyEstimate } from "@/lib/caPenalty";
+import { useFirmClientIntelligence, filingRiskBand, lateSharePct } from "@/hooks/useCAIntelligence";
 
 const DAY = 86_400_000;
 type TabKey = "upcoming" | "overdue" | "filed";
@@ -47,6 +48,7 @@ const daysFromToday = (due: string) => Math.round((new Date(due).getTime() - sta
 
 export default function CACompliancePage() {
   const { firmId, userId } = useCAPortal();
+  const { byBusiness: intel } = useFirmClientIntelligence(firmId);
   const { can } = useCARole();
   const navigate = useNavigate();
   const prepare = useServerFn(autoPrepareReturn);
@@ -245,7 +247,21 @@ export default function CACompliancePage() {
                   const canPrepare = !!PREPARABLE[e.event_type] && can("process");
                   return (
                     <tr key={e.id}>
-                      <td style={caTd}>{clients.get(e.business_id) ?? "—"}</td>
+                      <td style={caTd}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                          {clients.get(e.business_id) ?? "—"}
+                          {(() => {
+                            const score = intel.get(e.business_id)?.filing_risk_score ?? null;
+                            const band = filingRiskBand(score);
+                            if (!band) return null;
+                            return (
+                              <span title={`This client has filed late in ${lateSharePct(score)}% of past filings.`}>
+                                <CABadge tone={band.tone}>{band.label}</CABadge>
+                              </span>
+                            );
+                          })()}
+                        </span>
+                      </td>
                       <td style={{ ...caTd, fontWeight: 600 }}>{e.event_type.replace(/_/g, " ")}</td>
                       <td style={caTd}>{e.filing_period}</td>
                       <td style={caTd}>{dateIN(e.due_date)}</td>

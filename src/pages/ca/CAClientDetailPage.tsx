@@ -14,6 +14,7 @@ import ReconHistorySection from "@/components/ca/ReconHistorySection";
 import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import ClientDeductionsTab from "@/components/ca/ClientDeductionsTab";
 import ClientProfilePanel from "@/components/ca/ClientProfilePanel";
+import ClientIntelligenceCard from "@/components/ca/ClientIntelligenceCard";
 import TxnLineageDrawer, { sourceLabel, type LineageTxn } from "@/components/ca/TxnLineageDrawer";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
@@ -390,6 +391,7 @@ export default function CAClientDetailPage() {
             <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
             <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
+            {firmId && businessId && <ClientIntelligenceCard firmId={firmId} businessId={businessId} />}
             {firmId && clientId && (
               <ClientProfilePanel firmId={firmId} clientId={clientId} businessId={businessId} />
             )}

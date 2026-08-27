@@ -80,6 +80,12 @@ import { Route as MainDashboardTdsTaxRouteImport } from './routes/_main/dashboar
 import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboard/vendors'
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
 import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
+import { Route as ApiPublicCaBrainChaserLearningRouteImport } from './routes/api/public/ca-brain-chaser-learning'
+import { Route as ApiPublicCaBrainDeductionLearningRouteImport } from './routes/api/public/ca-brain-deduction-learning'
+import { Route as ApiPublicCaBrainFilingLearningRouteImport } from './routes/api/public/ca-brain-filing-learning'
+import { Route as ApiPublicCaBrainMasterRouteImport } from './routes/api/public/ca-brain-master'
+import { Route as ApiPublicCaBrainOcrLearningRouteImport } from './routes/api/public/ca-brain-ocr-learning'
+import { Route as ApiPublicCaBrainReconLearningRouteImport } from './routes/api/public/ca-brain-recon-learning'
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
 import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
 import { Route as ApiPublicCaInvoicePaymentWebhookRouteImport } from './routes/api/public/ca-invoice-payment-webhook'
@@ -564,6 +570,41 @@ const ApiPublicCaAutoFollowupRoute = ApiPublicCaAutoFollowupRouteImport.update({
   path: '/api/public/ca-auto-followup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCaBrainChaserLearningRoute =
+  ApiPublicCaBrainChaserLearningRouteImport.update({
+    id: '/api/public/ca-brain-chaser-learning',
+    path: '/api/public/ca-brain-chaser-learning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaBrainDeductionLearningRoute =
+  ApiPublicCaBrainDeductionLearningRouteImport.update({
+    id: '/api/public/ca-brain-deduction-learning',
+    path: '/api/public/ca-brain-deduction-learning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaBrainFilingLearningRoute =
+  ApiPublicCaBrainFilingLearningRouteImport.update({
+    id: '/api/public/ca-brain-filing-learning',
+    path: '/api/public/ca-brain-filing-learning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaBrainMasterRoute = ApiPublicCaBrainMasterRouteImport.update({
+  id: '/api/public/ca-brain-master',
+  path: '/api/public/ca-brain-master',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCaBrainOcrLearningRoute =
+  ApiPublicCaBrainOcrLearningRouteImport.update({
+    id: '/api/public/ca-brain-ocr-learning',
+    path: '/api/public/ca-brain-ocr-learning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCaBrainReconLearningRoute =
+  ApiPublicCaBrainReconLearningRouteImport.update({
+    id: '/api/public/ca-brain-recon-learning',
+    path: '/api/public/ca-brain-recon-learning',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCaComplianceAutoAlertRoute =
   ApiPublicCaComplianceAutoAlertRouteImport.update({
     id: '/api/public/ca-compliance-auto-alert',
@@ -1334,6 +1375,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
+  '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
+  '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
+  '/api/public/ca-brain-filing-learning': typeof ApiPublicCaBrainFilingLearningRoute
+  '/api/public/ca-brain-master': typeof ApiPublicCaBrainMasterRoute
+  '/api/public/ca-brain-ocr-learning': typeof ApiPublicCaBrainOcrLearningRoute
+  '/api/public/ca-brain-recon-learning': typeof ApiPublicCaBrainReconLearningRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
@@ -1521,6 +1568,12 @@ export interface FileRoutesByTo {
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
+  '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
+  '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
+  '/api/public/ca-brain-filing-learning': typeof ApiPublicCaBrainFilingLearningRoute
+  '/api/public/ca-brain-master': typeof ApiPublicCaBrainMasterRoute
+  '/api/public/ca-brain-ocr-learning': typeof ApiPublicCaBrainOcrLearningRoute
+  '/api/public/ca-brain-recon-learning': typeof ApiPublicCaBrainReconLearningRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
@@ -1718,6 +1771,12 @@ export interface FileRoutesById {
   '/_main/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
+  '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
+  '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
+  '/api/public/ca-brain-filing-learning': typeof ApiPublicCaBrainFilingLearningRoute
+  '/api/public/ca-brain-master': typeof ApiPublicCaBrainMasterRoute
+  '/api/public/ca-brain-ocr-learning': typeof ApiPublicCaBrainOcrLearningRoute
+  '/api/public/ca-brain-recon-learning': typeof ApiPublicCaBrainReconLearningRoute
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
@@ -1910,6 +1969,12 @@ export interface FileRouteTypes {
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
+    | '/api/public/ca-brain-chaser-learning'
+    | '/api/public/ca-brain-deduction-learning'
+    | '/api/public/ca-brain-filing-learning'
+    | '/api/public/ca-brain-master'
+    | '/api/public/ca-brain-ocr-learning'
+    | '/api/public/ca-brain-recon-learning'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
@@ -2097,6 +2162,12 @@ export interface FileRouteTypes {
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
+    | '/api/public/ca-brain-chaser-learning'
+    | '/api/public/ca-brain-deduction-learning'
+    | '/api/public/ca-brain-filing-learning'
+    | '/api/public/ca-brain-master'
+    | '/api/public/ca-brain-ocr-learning'
+    | '/api/public/ca-brain-recon-learning'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
@@ -2293,6 +2364,12 @@ export interface FileRouteTypes {
     | '/_main/dashboard/vendors'
     | '/_main/dashboard/working-capital'
     | '/api/public/ca-auto-followup'
+    | '/api/public/ca-brain-chaser-learning'
+    | '/api/public/ca-brain-deduction-learning'
+    | '/api/public/ca-brain-filing-learning'
+    | '/api/public/ca-brain-master'
+    | '/api/public/ca-brain-ocr-learning'
+    | '/api/public/ca-brain-recon-learning'
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
@@ -2429,6 +2506,12 @@ export interface RootRouteChildren {
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
+  ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
+  ApiPublicCaBrainDeductionLearningRoute: typeof ApiPublicCaBrainDeductionLearningRoute
+  ApiPublicCaBrainFilingLearningRoute: typeof ApiPublicCaBrainFilingLearningRoute
+  ApiPublicCaBrainMasterRoute: typeof ApiPublicCaBrainMasterRoute
+  ApiPublicCaBrainOcrLearningRoute: typeof ApiPublicCaBrainOcrLearningRoute
+  ApiPublicCaBrainReconLearningRoute: typeof ApiPublicCaBrainReconLearningRoute
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
   ApiPublicCaIntegrationSyncRoute: typeof ApiPublicCaIntegrationSyncRoute
   ApiPublicCaInvoicePaymentWebhookRoute: typeof ApiPublicCaInvoicePaymentWebhookRoute
@@ -2931,6 +3014,48 @@ declare module '@tanstack/react-router' {
       path: '/api/public/ca-auto-followup'
       fullPath: '/api/public/ca-auto-followup'
       preLoaderRoute: typeof ApiPublicCaAutoFollowupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-chaser-learning': {
+      id: '/api/public/ca-brain-chaser-learning'
+      path: '/api/public/ca-brain-chaser-learning'
+      fullPath: '/api/public/ca-brain-chaser-learning'
+      preLoaderRoute: typeof ApiPublicCaBrainChaserLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-deduction-learning': {
+      id: '/api/public/ca-brain-deduction-learning'
+      path: '/api/public/ca-brain-deduction-learning'
+      fullPath: '/api/public/ca-brain-deduction-learning'
+      preLoaderRoute: typeof ApiPublicCaBrainDeductionLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-filing-learning': {
+      id: '/api/public/ca-brain-filing-learning'
+      path: '/api/public/ca-brain-filing-learning'
+      fullPath: '/api/public/ca-brain-filing-learning'
+      preLoaderRoute: typeof ApiPublicCaBrainFilingLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-master': {
+      id: '/api/public/ca-brain-master'
+      path: '/api/public/ca-brain-master'
+      fullPath: '/api/public/ca-brain-master'
+      preLoaderRoute: typeof ApiPublicCaBrainMasterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-ocr-learning': {
+      id: '/api/public/ca-brain-ocr-learning'
+      path: '/api/public/ca-brain-ocr-learning'
+      fullPath: '/api/public/ca-brain-ocr-learning'
+      preLoaderRoute: typeof ApiPublicCaBrainOcrLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-brain-recon-learning': {
+      id: '/api/public/ca-brain-recon-learning'
+      path: '/api/public/ca-brain-recon-learning'
+      fullPath: '/api/public/ca-brain-recon-learning'
+      preLoaderRoute: typeof ApiPublicCaBrainReconLearningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/ca-compliance-auto-alert': {
@@ -4286,6 +4411,13 @@ const rootRouteChildren: RootRouteChildren = {
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
+  ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,
+  ApiPublicCaBrainDeductionLearningRoute:
+    ApiPublicCaBrainDeductionLearningRoute,
+  ApiPublicCaBrainFilingLearningRoute: ApiPublicCaBrainFilingLearningRoute,
+  ApiPublicCaBrainMasterRoute: ApiPublicCaBrainMasterRoute,
+  ApiPublicCaBrainOcrLearningRoute: ApiPublicCaBrainOcrLearningRoute,
+  ApiPublicCaBrainReconLearningRoute: ApiPublicCaBrainReconLearningRoute,
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
   ApiPublicCaIntegrationSyncRoute: ApiPublicCaIntegrationSyncRoute,
   ApiPublicCaInvoicePaymentWebhookRoute: ApiPublicCaInvoicePaymentWebhookRoute,

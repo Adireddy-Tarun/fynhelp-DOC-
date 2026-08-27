@@ -7,6 +7,7 @@ import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
+import { timeAgo } from "@/hooks/useCAIntelligence";
 
 interface ClientRow {
   id: string;
@@ -50,6 +51,17 @@ export default function CADashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dueToday, setDueToday] = useState<DueReminder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [brainLastRunAt, setBrainLastRunAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!firmId) return;
+    (async () => {
+      const { data } = await supabase.from("ca_firms").select("brain_last_run_at").eq("id", firmId).maybeSingle();
+      if (!cancelled) setBrainLastRunAt((data as { brain_last_run_at: string | null } | null)?.brain_last_run_at ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [firmId]);
 
   useEffect(() => {
     if (!firmId) return;
@@ -160,7 +172,13 @@ export default function CADashboardPage() {
 
   return (
     <div>
-      <CAHeading>Portfolio</CAHeading>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <CAHeading>Portfolio</CAHeading>
+        <span style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>
+          Intelligence updated {timeAgo(brainLastRunAt)}
+        </span>
+      </div>
+
 
       {dueToday.length > 0 && (
         <CACard style={{ marginTop: 16, padding: "12px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", borderColor: "rgba(179,38,30,0.35)" }}>

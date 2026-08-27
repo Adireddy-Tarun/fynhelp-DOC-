@@ -11,6 +11,7 @@ import { useCARole } from "@/hooks/useCARole";
 import { CA, CACard, CAButton, CABadge, CAEmpty, caTd, caTh, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
+import { useFirmClientIntelligence, DOW } from "@/hooks/useCAIntelligence";
 
 interface RequestRow {
   id: string;
@@ -35,6 +36,7 @@ const daysOverdue = (due: string) => Math.max(0, Math.floor((Date.now() - new Da
 
 export default function CAChaserQueuePage() {
   const { firmId, firmName, userId } = useCAPortal();
+  const { byBusiness: intel } = useFirmClientIntelligence(firmId);
   const { can, role, isLoading: roleLoading } = useCARole();
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [clients, setClients] = useState<Map<string, ClientInfo>>(new Map());
@@ -247,7 +249,7 @@ export default function CAChaserQueuePage() {
                       onChange={() => setSelected(allSelected ? new Set() : new Set(sorted.map((r) => r.id)))}
                     />
                   </th>
-                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", ""].map((h) => (
+                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", "Predicted response", ""].map((h) => (
                     <th key={h} style={caTh}>{h}</th>
                   ))}
                 </tr>
@@ -276,6 +278,22 @@ export default function CAChaserQueuePage() {
                       </td>
                       <td style={caTd}>{r.last_chased_at ? dateIN(r.last_chased_at) : "Never"}</td>
                       <td style={{ ...caTd, fontFamily: CA.mono }}>{r.chaser_count ?? 0}</td>
+                      <td style={caTd}>
+                        {(() => {
+                          const ci = intel.get(r.business_id);
+                          if (!ci || ci.avg_response_days == null) {
+                            return <span style={{ color: CA.faint }}>Learning…</span>;
+                          }
+                          const best = ci.best_chase_day != null ? ` · best on ${DOW[ci.best_chase_day]}` : "";
+                          const channel = ci.preferred_channel ? ` · ${ci.preferred_channel}` : "";
+                          return (
+                            <span style={{ color: CA.muted }}>
+                              <span style={{ fontFamily: CA.mono, color: CA.ink }}>~{ci.avg_response_days}d</span>
+                              {best}{channel}
+                            </span>
+                          );
+                        })()}
+                      </td>
                       <td style={{ ...caTd, textAlign: "right", whiteSpace: "nowrap" }}>
                         <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                           <CAButton onClick={() => void onChase(r)} disabled={busy === r.id}>

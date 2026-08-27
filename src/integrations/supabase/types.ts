@@ -1338,6 +1338,48 @@ export type Database = {
           },
         ]
       }
+      ca_client_intelligence: {
+        Row: {
+          avg_days_before_due: number | null
+          avg_response_days: number | null
+          best_chase_day: number | null
+          business_id: string
+          ca_firm_id: string
+          computed_at: string | null
+          filing_risk_score: number | null
+          id: string
+          match_preferences: Json
+          preferred_channel: string | null
+          typical_docs_late: string[]
+        }
+        Insert: {
+          avg_days_before_due?: number | null
+          avg_response_days?: number | null
+          best_chase_day?: number | null
+          business_id: string
+          ca_firm_id: string
+          computed_at?: string | null
+          filing_risk_score?: number | null
+          id?: string
+          match_preferences?: Json
+          preferred_channel?: string | null
+          typical_docs_late?: string[]
+        }
+        Update: {
+          avg_days_before_due?: number | null
+          avg_response_days?: number | null
+          best_chase_day?: number | null
+          business_id?: string
+          ca_firm_id?: string
+          computed_at?: string | null
+          filing_risk_score?: number | null
+          id?: string
+          match_preferences?: Json
+          preferred_channel?: string | null
+          typical_docs_late?: string[]
+        }
+        Relationships: []
+      }
       ca_client_invitations: {
         Row: {
           accepted_at: string | null
@@ -1946,6 +1988,7 @@ export type Database = {
           classification: string
           confidence: number
           corrected: Json | null
+          correction_delta: Json | null
           created_at: string
           document_id: string | null
           error_message: string | null
@@ -1961,6 +2004,7 @@ export type Database = {
           storage_path: string | null
           updated_at: string
           uploaded_by: string | null
+          was_corrected: boolean
         }
         Insert: {
           business_id: string
@@ -1968,6 +2012,7 @@ export type Database = {
           classification?: string
           confidence?: number
           corrected?: Json | null
+          correction_delta?: Json | null
           created_at?: string
           document_id?: string | null
           error_message?: string | null
@@ -1983,6 +2028,7 @@ export type Database = {
           storage_path?: string | null
           updated_at?: string
           uploaded_by?: string | null
+          was_corrected?: boolean
         }
         Update: {
           business_id?: string
@@ -1990,6 +2036,7 @@ export type Database = {
           classification?: string
           confidence?: number
           corrected?: Json | null
+          correction_delta?: Json | null
           created_at?: string
           document_id?: string | null
           error_message?: string | null
@@ -2005,6 +2052,7 @@ export type Database = {
           storage_path?: string | null
           updated_at?: string
           uploaded_by?: string | null
+          was_corrected?: boolean
         }
         Relationships: [
           {
@@ -2272,6 +2320,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_firm_intelligence: {
+        Row: {
+          ca_firm_id: string
+          computed_at: string | null
+          confidence_overrides: Json
+          id: string
+          last_deduction_learning_at: string | null
+          last_filing_learning_at: string | null
+          last_ocr_learning_at: string | null
+          provision_weights: Json
+        }
+        Insert: {
+          ca_firm_id: string
+          computed_at?: string | null
+          confidence_overrides?: Json
+          id?: string
+          last_deduction_learning_at?: string | null
+          last_filing_learning_at?: string | null
+          last_ocr_learning_at?: string | null
+          provision_weights?: Json
+        }
+        Update: {
+          ca_firm_id?: string
+          computed_at?: string | null
+          confidence_overrides?: Json
+          id?: string
+          last_deduction_learning_at?: string | null
+          last_filing_learning_at?: string | null
+          last_ocr_learning_at?: string | null
+          provision_weights?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_firm_intelligence_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: true
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_firm_members: {
         Row: {
           billing_rate: number | null
@@ -2323,6 +2412,8 @@ export type Database = {
         Row: {
           aadhaar_document_path: string | null
           aadhaar_last4: string | null
+          brain_enabled: boolean
+          brain_last_run_at: string | null
           ca_name: string | null
           city: string | null
           created_at: string | null
@@ -2359,6 +2450,8 @@ export type Database = {
         Insert: {
           aadhaar_document_path?: string | null
           aadhaar_last4?: string | null
+          brain_enabled?: boolean
+          brain_last_run_at?: string | null
           ca_name?: string | null
           city?: string | null
           created_at?: string | null
@@ -2395,6 +2488,8 @@ export type Database = {
         Update: {
           aadhaar_document_path?: string | null
           aadhaar_last4?: string | null
+          brain_enabled?: boolean
+          brain_last_run_at?: string | null
           ca_name?: string | null
           city?: string | null
           created_at?: string | null
@@ -7836,6 +7931,7 @@ export type Database = {
       security_check_caller_allowed: { Args: never; Returns: boolean }
       text_to_bytea: { Args: { data: string }; Returns: string }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
+      trigger_ca_brain_master: { Args: never; Returns: undefined }
       trigger_ca_integration_sync: { Args: never; Returns: undefined }
       trigger_compliance_alerts: { Args: never; Returns: undefined }
       urlencode:
