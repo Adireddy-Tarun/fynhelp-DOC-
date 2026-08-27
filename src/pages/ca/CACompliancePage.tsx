@@ -15,6 +15,7 @@ import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
 import { penaltyEstimate } from "@/lib/caPenalty";
+import { useFirmClientIntelligence, filingRiskBand, lateSharePct } from "@/hooks/useCAIntelligence";
 
 const DAY = 86_400_000;
 type TabKey = "upcoming" | "overdue" | "filed";
@@ -47,6 +48,7 @@ const daysFromToday = (due: string) => Math.round((new Date(due).getTime() - sta
 
 export default function CACompliancePage() {
   const { firmId, userId } = useCAPortal();
+  const { byBusiness: intel } = useFirmClientIntelligence(firmId);
   const { can } = useCARole();
   const navigate = useNavigate();
   const prepare = useServerFn(autoPrepareReturn);
