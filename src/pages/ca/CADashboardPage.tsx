@@ -7,6 +7,7 @@ import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
+import { timeAgo } from "@/hooks/useCAIntelligence";
 
 interface ClientRow {
   id: string;
@@ -50,6 +51,17 @@ export default function CADashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dueToday, setDueToday] = useState<DueReminder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [brainLastRunAt, setBrainLastRunAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!firmId) return;
+    (async () => {
+      const { data } = await supabase.from("ca_firms").select("brain_last_run_at").eq("id", firmId).maybeSingle();
+      if (!cancelled) setBrainLastRunAt((data as { brain_last_run_at: string | null } | null)?.brain_last_run_at ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [firmId]);
 
   useEffect(() => {
     if (!firmId) return;
