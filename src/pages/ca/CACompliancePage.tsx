@@ -247,7 +247,21 @@ export default function CACompliancePage() {
                   const canPrepare = !!PREPARABLE[e.event_type] && can("process");
                   return (
                     <tr key={e.id}>
-                      <td style={caTd}>{clients.get(e.business_id) ?? "—"}</td>
+                      <td style={caTd}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                          {clients.get(e.business_id) ?? "—"}
+                          {(() => {
+                            const score = intel.get(e.business_id)?.filing_risk_score ?? null;
+                            const band = filingRiskBand(score);
+                            if (!band) return null;
+                            return (
+                              <span title={`This client has filed late in ${lateSharePct(score)}% of past filings.`}>
+                                <CABadge tone={band.tone}>{band.label}</CABadge>
+                              </span>
+                            );
+                          })()}
+                        </span>
+                      </td>
                       <td style={{ ...caTd, fontWeight: 600 }}>{e.event_type.replace(/_/g, " ")}</td>
                       <td style={caTd}>{e.filing_period}</td>
                       <td style={caTd}>{dateIN(e.due_date)}</td>
