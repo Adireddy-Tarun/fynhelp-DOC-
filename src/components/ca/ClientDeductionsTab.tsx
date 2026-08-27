@@ -156,10 +156,18 @@ export default function ClientDeductionsTab({
     low: open.filter((f) => f.confidence === "low").length,
   }), [open]);
 
+  // Firm-scoped provision weights (learned from THIS firm's own dismissals).
+  const weights = useMemo(() => {
+    const byEntity = firmIntel?.provision_weights ?? {};
+    return (byEntity[entityType ?? ""] ?? byEntity["default"] ?? {}) as Record<string, number>;
+  }, [firmIntel, entityType]);
+
+  const weightOf = useCallback((p: string) => weights[p] ?? 1, [weights]);
+
   const visible = useMemo(() => {
-    if (filter === "All") return findings;
-    return findings.filter((f) => f.status === filter.toLowerCase());
-  }, [findings, filter]);
+    const list = filter === "All" ? findings : findings.filter((f) => f.status === filter.toLowerCase());
+    return [...list].sort((a, b) => weightOf(b.provision) - weightOf(a.provision));
+  }, [findings, filter, weightOf]);
 
   const lastScan = findings[0]?.created_at ?? null;
 
