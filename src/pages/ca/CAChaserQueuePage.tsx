@@ -11,6 +11,7 @@ import { useCARole } from "@/hooks/useCARole";
 import { CA, CACard, CAButton, CABadge, CAEmpty, caTd, caTh, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
+import { useFirmClientIntelligence, DOW } from "@/hooks/useCAIntelligence";
 
 interface RequestRow {
   id: string;
@@ -35,6 +36,7 @@ const daysOverdue = (due: string) => Math.max(0, Math.floor((Date.now() - new Da
 
 export default function CAChaserQueuePage() {
   const { firmId, firmName, userId } = useCAPortal();
+  const { byBusiness: intel } = useFirmClientIntelligence(firmId);
   const { can, role, isLoading: roleLoading } = useCARole();
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [clients, setClients] = useState<Map<string, ClientInfo>>(new Map());
