@@ -774,9 +774,7 @@ export default function HomePage() {
         <div className="fh-wrap">
           <div className="fh-foot-grid">
             <div>
-              <div className="fh-mark">
-                Fyn<span>Help</span>
-              </div>
+              <FynLogo variant="light" size="md" />
               <p style={{ fontSize: 13.5, lineHeight: 1.65, marginTop: 12, color: "rgba(246,239,226,.58)" }}>
                 The intelligence layer between your documents and your ledger. Built in India, for Indian
                 practices.
