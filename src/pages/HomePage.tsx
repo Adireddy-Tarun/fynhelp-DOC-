@@ -891,18 +891,43 @@ export default function HomePage() {
               Choose a plan <span className="ital">that fits</span>
             </h2>
             <p className="fh-lead">Annual billing saves 15% on every plan. Fewer than 3 entities? The pilot is free.</p>
+            <div className="fh-billing" role="group" aria-label="Billing period">
+              <button
+                type="button"
+                className={billing === "monthly" ? "on" : ""}
+                aria-pressed={billing === "monthly"}
+                onClick={() => setBilling("monthly")}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                className={billing === "annual" ? "on" : ""}
+                aria-pressed={billing === "annual"}
+                onClick={() => setBilling("annual")}
+              >
+                Annual <i>Save 15%</i>
+              </button>
+            </div>
           </Reveal>
           <div className="fh-price-grid">
-            {PLANS.map((p, i) => (
+            {PLANS.map((p, i) => {
+              const annualPerMonth = Math.round((p.monthly * 0.85) / 10) * 10;
+              return (
               <Reveal key={p.name} delay={i * 80}>
                 <div className={`fh-plan ${p.popular ? "pop" : ""}`} style={{ height: "100%" }}>
                   {p.popular && <span className="badge">Most popular</span>}
                   <div className="pn">{p.name}</div>
                   <div className="pp num">
-                    {p.price}
-                    <small>{p.per}</small>
+                    {inr(billing === "annual" ? annualPerMonth : p.monthly)}
+                    <small>/mo</small>
                   </div>
-                  <div className="fh-annual">Save 15% annually</div>
+                  <div className="fh-annual">
+                    {billing === "annual"
+                      ? `${inr(annualPerMonth * 12)} billed yearly · save ${inr(p.monthly * 12 - annualPerMonth * 12)}`
+                      : "Billed monthly · switch to annual and save 15%"}
+                  </div>
+
                   <ul>
                     <li>
                       <Check size={15} style={{ color: C.coral, flex: "0 0 auto" }} />
