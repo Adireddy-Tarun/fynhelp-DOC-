@@ -33,7 +33,7 @@ const ROW_B = [
 ];
 
 const CSS = `
-.bm { background:#FAF6EC; padding:44px 0 40px; text-align:center; border-top:1px solid rgba(26,16,8,.06); border-bottom:1px solid rgba(26,16,8,.06); }
+.bm { background:#F2EEE7; padding:44px 0 40px; text-align:center; border-top:1px solid rgba(26,16,8,.06); border-bottom:1px solid rgba(26,16,8,.06); }
 .bm .cap { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(26,16,8,.42); font-weight:600; }
 .bm-rail { margin-top:24px; overflow:hidden;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
