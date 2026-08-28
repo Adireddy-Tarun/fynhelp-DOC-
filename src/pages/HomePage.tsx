@@ -22,7 +22,9 @@ import {
   Filter,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import FynIntelligence from "@/components/home/FynIntelligence";
 import FynLogo from "@/components/FynLogo";
+
 
 /* ─────────────────────────────────────────────────────────
    FynHelp homepage — premium fintech editorial layout
