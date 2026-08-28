@@ -119,7 +119,7 @@ const CSS = `
 .fyn-agent.on .fx-scan { animation:fx-scan 2.6s cubic-bezier(.5,0,.5,1) infinite; }
 @keyframes fx-scan { 0%{ top:-30px; } 100%{ top:104px; } }
 .fx-chip { position:absolute; right:9px; bottom:8px; font-size:9.5px; letter-spacing:.06em; padding:3px 8px; border-radius:999px;
-  background:color-mix(in srgb, var(--a) 22%, transparent); color:#FBF6EC; opacity:0; }
+  background:color-mix(in srgb, var(--a) 22%, transparent); color:#FBF6EC; opacity:.45; }
 .fyn-agent.on .fx-chip { animation:fyn-pop .5s ease 2.4s both; }
 @keyframes fyn-pop { from{ opacity:0; transform:translateY(6px) scale(.96);} to{ opacity:1; transform:none;} }
 
@@ -145,17 +145,17 @@ const CSS = `
 @keyframes nr-type { from { width:0; } to { width:100%; } }
 @keyframes nr-caret { 50% { border-color:transparent; } }
 .nr-clip { display:inline-flex; align-items:center; gap:6px; margin-top:9px; font-size:9.5px; padding:4px 8px; border-radius:6px;
-  background:rgba(246,239,226,.08); color:rgba(246,239,226,.7); opacity:0; }
+  background:rgba(246,239,226,.08); color:rgba(246,239,226,.7); opacity:.45; }
 .fyn-agent.on .nr-clip { animation:fyn-pop .5s ease 2.4s both; }
 
 /* 4 · chaser */
 .ch { position:relative; height:100%; display:flex; flex-direction:column; justify-content:center; gap:8px; }
 .ch-bubble { align-self:flex-end; max-width:82%; font-size:10.5px; line-height:1.45; padding:7px 10px; border-radius:12px 12px 3px 12px;
-  background:color-mix(in srgb, var(--a) 26%, transparent); color:#FBF6EC; opacity:0; }
+  background:color-mix(in srgb, var(--a) 26%, transparent); color:#FBF6EC; opacity:.45; }
 .fyn-agent.on .ch-bubble { animation:ch-send .7s cubic-bezier(.16,1,.3,1) .2s both; }
 @keyframes ch-send { from{ opacity:0; transform:translate(14px,8px) scale(.94);} to{ opacity:1; transform:none;} }
 .ch-reply { align-self:flex-start; max-width:78%; font-size:10.5px; padding:7px 10px; border-radius:12px 12px 12px 3px;
-  background:rgba(246,239,226,.09); color:rgba(246,239,226,.78); opacity:0; }
+  background:rgba(246,239,226,.09); color:rgba(246,239,226,.78); opacity:.45; }
 .fyn-agent.on .ch-reply { animation:ch-recv .7s cubic-bezier(.16,1,.3,1) 1.9s both; }
 @keyframes ch-recv { from{ opacity:0; transform:translate(-14px,8px) scale(.94);} to{ opacity:1; transform:none;} }
 
