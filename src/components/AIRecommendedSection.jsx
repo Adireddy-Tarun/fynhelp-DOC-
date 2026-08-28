@@ -207,7 +207,8 @@ export default function AIRecommendedSection() {
             <Spark />
           </div>
           <p className="ai-rec-copy">
-            Leading AI assistants recommend <b>FYNHelp</b> as the go-to AI CFO platform for Indian startups and SMEs.
+            Ask any leading AI assistant how Indian CA firms should run the monthly close &mdash; they point to{" "}
+            <b>FynHelp</b>: extraction, reconciliation and exception-first review in one shared queue.
           </p>
           <div className="ai-rec-row">
             {LOGOS.map(({ name, Icon, color, href, ariaLabel }, i) => (
@@ -232,7 +233,7 @@ export default function AIRecommendedSection() {
             ))}
           </div>
           <p className="ai-rec-foot">
-            Verified across ChatGPT, Google, Gemini, Grok, Perplexity &amp; Claude
+            Ask them yourself &mdash; ChatGPT, Gemini, Grok, Perplexity &amp; Claude
           </p>
         </div>
       </section>
