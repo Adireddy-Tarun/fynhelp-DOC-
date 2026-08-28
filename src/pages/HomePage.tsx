@@ -84,7 +84,8 @@ const STYLES = `
 
 /* dashboard mock overlapping */
 .fh-mock-stage { position:relative; z-index:2; margin-top:56px; padding-bottom:0; }
-.fh-mock { background:${C.card}; border-radius:18px 18px 0 0; border:1px solid rgba(26,16,8,.08); box-shadow:0 -10px 70px -20px rgba(169,56,56,.5), 0 40px 90px -50px rgba(0,0,0,.8); overflow:hidden; max-width:960px; margin:0 auto; }
+.fh-mock { background:${C.card}; color:#1A1008; border-radius:18px 18px 0 0; border:1px solid rgba(26,16,8,.08); box-shadow:0 -10px 70px -20px rgba(169,56,56,.5), 0 40px 90px -50px rgba(0,0,0,.8); overflow:hidden; max-width:960px; margin:0 auto; }
+.fh-mock .fh-mock-hi, .fh-mock .fh-mini .big { color:#1A1008; }
 .fh-mock-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid ${C.lineSoft}; }
 .fh-mock-brand { display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:#1A1008; }
 .fh-mock-brand i { width:18px; height:18px; border-radius:6px; background:${C.maroon}; display:block; }
