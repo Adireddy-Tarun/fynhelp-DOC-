@@ -122,8 +122,8 @@ const CSS = `
   background:linear-gradient(180deg, rgba(246,239,226,.05), rgba(246,239,226,.02));
   border:1px solid rgba(246,239,226,.07); }
 .fyn-scanline { position:absolute; left:10%; right:10%; height:1px; background:linear-gradient(90deg, transparent, var(--g1), transparent); animation:fyn-scan 2.8s ease-in-out infinite; }
-.fyn-state { position:absolute; left:14px; right:14px; bottom:12px; font-size:12px; letter-spacing:.01em; color:rgba(246,239,226,.82); }
-.fyn-state .k { display:inline-block; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--g2); margin-right:8px; }
+.fyn-state { position:absolute; left:14px; right:14px; bottom:12px; font-size:12px; line-height:1.5; letter-spacing:.01em; color:rgba(246,239,226,.82); display:flex; align-items:baseline; gap:8px; }
+.fyn-state .k { flex:0 0 auto; font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:#E8B45C; }
 .fyn-state.sw { animation:fyn-fade .5s ease both; }
 @keyframes fyn-fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 
