@@ -949,7 +949,9 @@ export default function HomePage() {
                   </Link>
                 </div>
               </Reveal>
-            ))}
+              );
+            })}
+
           </div>
         </div>
       </section>
