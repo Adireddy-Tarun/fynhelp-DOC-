@@ -180,8 +180,68 @@ const CSS = `
 .fyn-pipe-labels div.on { color:rgba(246,239,226,.7); }
 .fyn-pipe-labels div.on b { color:#FBF6EC; }
 @media (max-width:640px){ .fyn-pipe-labels { grid-template-columns:repeat(2,1fr); } }
+/* ── refinement layer: richer, more physical motion ── */
+.fyn-agent { will-change:transform; }
+.fyn-agent.on { transform:translateY(-6px) scale(1.012); box-shadow:0 40px 70px -50px var(--a); }
+.fyn-agent::before { content:''; position:absolute; inset:-1px; border-radius:18px; pointer-events:none; opacity:0;
+  background:radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--a) 22%, transparent), transparent 62%);
+  transition:opacity .6s ease; }
+.fyn-agent.on::before { opacity:1; }
+.fyn-agent.on .fyn-orb { animation:fyn-breathe 2.6s ease-in-out infinite; }
+@keyframes fyn-breathe { 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-2px) rotate(-1.5deg);} }
+.fyn-stage { transition:background .5s ease, border-color .5s ease; }
+.fyn-agent.on .fyn-stage { background:rgba(10,6,3,.5); border-color:color-mix(in srgb, var(--a) 26%, transparent); }
+.fyn-cap { transition:color .4s ease; }
+
+/* extract — field chips lift out of the page as they're read */
+.fx-doc::after { content:''; position:absolute; inset:0; opacity:0;
+  background:linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--a) 14%, transparent) 50%, transparent 60%); }
+.fyn-agent.on .fx-doc::after { opacity:1; animation:fx-sheen 2.6s cubic-bezier(.5,0,.5,1) infinite; }
+@keyframes fx-sheen { 0%{ transform:translateX(-100%);} 100%{ transform:translateX(100%);} }
+.fyn-agent.on .fx-line { animation:fx-fill .55s cubic-bezier(.16,1,.3,1) both, fx-nudge .55s cubic-bezier(.16,1,.3,1) both; }
+@keyframes fx-nudge { from{ transform:translateX(-6px); opacity:.5;} to{ transform:none; opacity:1;} }
+
+/* recon — lines drift, then snap and lock */
+.fyn-agent.on .rc-l, .fyn-agent.on .rc-r { animation-duration:1.05s; }
+.fyn-agent.on .rc-ok { animation-name:rc-snap-l, rc-lock; animation-duration:.95s,.5s; animation-fill-mode:both,both; animation-timing-function:cubic-bezier(.16,1,.3,1),ease-out; }
+.fyn-agent.on .rc-r.rc-ok { animation-name:rc-snap-r, rc-lock; }
+@keyframes rc-snap-l { 0%{ transform:translateX(-30px); opacity:0;} 65%{ transform:translateX(3px); opacity:1;} 100%{ transform:none;} }
+@keyframes rc-snap-r { 0%{ transform:translateX(30px); opacity:0;} 65%{ transform:translateX(-3px); opacity:1;} 100%{ transform:none;} }
+@keyframes rc-lock { 0%{ box-shadow:0 0 0 0 rgba(79,176,138,0);} 60%{ box-shadow:0 0 0 3px rgba(79,176,138,.22);} 100%{ box-shadow:0 0 0 0 rgba(79,176,138,0);} }
+.fyn-agent.on .rc-ex { animation:rc-shake .5s ease .8s both; }
+@keyframes rc-shake { 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-3px);} 75%{ transform:translateX(3px);} }
+.rc-link { transition:opacity .4s ease; }
+.fyn-agent.on .rc-link { animation:rc-draw .5s ease .55s both; }
+@keyframes rc-draw { from{ width:0; opacity:0;} to{ width:10px; opacity:1;} }
+
+/* narrate — line highlights as it writes, then the clip snaps on */
+.fyn-agent.on .nr-type { animation:nr-type 2.1s steps(40,end) both, nr-caret .65s step-end infinite; }
+.fyn-agent.on .nr-clip { animation:fyn-pop .45s cubic-bezier(.16,1,.3,1) 2.35s both, nr-attach .5s ease 2.35s both; }
+@keyframes nr-attach { 0%{ transform:translateY(8px) rotate(-4deg);} 100%{ transform:none; } }
+
+/* chaser — typing dots, then send, then reply */
+.ch-dots { align-self:flex-start; display:inline-flex; gap:4px; padding:6px 9px; border-radius:12px; background:rgba(246,239,226,.08); opacity:0; }
+.ch-dots i { width:4px; height:4px; border-radius:50%; background:rgba(246,239,226,.6); display:block; }
+.fyn-agent.on .ch-dots { animation:ch-dots-in .3s ease 1.1s both, ch-dots-out .3s ease 1.8s both; }
+@keyframes ch-dots-in { from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+@keyframes ch-dots-out { to{ opacity:0; transform:translateY(-4px);} }
+.fyn-agent.on .ch-dots i { animation:ch-blink 1s ease-in-out infinite; }
+.fyn-agent.on .ch-dots i:nth-child(2){ animation-delay:.15s; }
+.fyn-agent.on .ch-dots i:nth-child(3){ animation-delay:.3s; }
+@keyframes ch-blink { 0%,100%{ opacity:.3; transform:translateY(0);} 50%{ opacity:1; transform:translateY(-2px);} }
+
+/* pipeline — a light travels the track */
+.fyn-track { overflow:hidden; }
+.fyn-track::after { content:''; position:absolute; top:0; bottom:0; width:60px; border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,244,225,.85), transparent); animation:fyn-travel 3.2s linear infinite; }
+@keyframes fyn-travel { 0%{ transform:translateX(-70px);} 100%{ transform:translateX(calc(100% + 100vw));} }
+.fyn-node.on { animation:fyn-node-pop .5s cubic-bezier(.16,1,.3,1); }
+@keyframes fyn-node-pop { 0%{ transform:translateY(-50%) scale(.7);} 60%{ transform:translateY(-50%) scale(1.25);} 100%{ transform:translateY(-50%) scale(1);} }
+
+@media (max-width:600px){ .fyn-stage{ height:96px; } .fyn-agent{ padding:18px 16px 16px; } }
 @media (prefers-reduced-motion: reduce){ .fyn-int *,.fyn-int *::before,.fyn-int *::after { animation:none !important; transition:none !important; } }
 `;
+
 
 function Stage({ id }: { id: string }) {
   if (id === "extract") {
@@ -220,9 +280,15 @@ function Stage({ id }: { id: string }) {
   return (
     <div className="ch">
       <div className="ch-bubble">Hi Ramesh — August bank statement pending. Upload here?</div>
+      <div className="ch-dots" aria-hidden>
+        <i />
+        <i />
+        <i />
+      </div>
       <div className="ch-reply">Sent just now ✓</div>
     </div>
   );
+
 }
 
 export default function FynIntelligence() {
