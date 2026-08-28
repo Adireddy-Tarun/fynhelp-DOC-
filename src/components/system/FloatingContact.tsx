@@ -3,7 +3,7 @@ import { MessageCircle, X, Mail, Phone, CalendarClock } from "lucide-react";
 
 const WHATSAPP = "https://wa.me/919876543210";
 const EMAIL = "mailto:support@fynhelp.com";
-const CALL = "https://calendly.com/nidhi-fynhelp/shamiksha-s-meetings";
+const CALL = "https://calendly.com/nidhi-fynhelp/nidhi-meetings";
 
 /** Persistent contact launcher for public marketing pages. */
 export default function FloatingContact() {
