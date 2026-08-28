@@ -337,12 +337,14 @@ export default function HomePage() {
           <Reveal>
             <span className="fh-kicker">Built for chartered accountants</span>
             <h1>
-              The Intelligence Layer<br />Beneath Your Ledger
+              Every close,<br />
+              <span style={{ color: "#E8B45C" }}>without the chase.</span>
             </h1>
             <p className="sub">
-              FynHelp reads your documents, reconciles them against Tally, Zoho and bank feeds, and hands
-              your team only the exceptions that need a decision.
+              Documents extracted, transactions matched, narrations drafted and clients followed up —
+              automatically, so your firm&rsquo;s month-end is a review, not a scramble.
             </p>
+
             <form
               className="fh-capture"
               onSubmit={(e) => {
