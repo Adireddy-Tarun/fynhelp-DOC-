@@ -280,9 +280,15 @@ function Stage({ id }: { id: string }) {
   return (
     <div className="ch">
       <div className="ch-bubble">Hi Ramesh — August bank statement pending. Upload here?</div>
+      <div className="ch-dots" aria-hidden>
+        <i />
+        <i />
+        <i />
+      </div>
       <div className="ch-reply">Sent just now ✓</div>
     </div>
   );
+
 }
 
 export default function FynIntelligence() {
