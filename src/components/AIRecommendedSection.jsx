@@ -188,7 +188,14 @@ export default function AIRecommendedSection() {
       { threshold: 0.2 }
     );
     obs.observe(el);
-    return () => obs.disconnect();
+    const fallback = setTimeout(() => {
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) el.classList.add("is-visible");
+    }, 900);
+    return () => {
+      clearTimeout(fallback);
+      obs.disconnect();
+    };
   }, []);
 
   return (

@@ -24,6 +24,8 @@ import {
 import Navbar from "@/components/Navbar";
 import FynIntelligence from "@/components/home/FynIntelligence";
 import FynLogo from "@/components/FynLogo";
+import BrandMarquee from "@/components/home/BrandMarquee";
+import AIRecommendedSection from "@/components/AIRecommendedSection";
 
 
 /* ─────────────────────────────────────────────────────────
@@ -459,19 +461,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── LOGO MARQUEE ── */}
-      <section className="fh-logos">
-        <div className="fh-wrap">
-          <div className="cap">Reads from the systems Indian practices already run on</div>
-        </div>
-        <div className="fh-marquee">
-          <div className="fh-track">
-            {[...LOGOS, ...LOGOS].map((l, i) => (
-              <span key={`${l}-${i}`}>{l}</span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <BrandMarquee />
 
       {/* ── FEATURE SPLIT ── */}
       <section className="fh-sec">
@@ -776,6 +766,8 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <AIRecommendedSection />
 
       {/* ── FOOTER ── */}
       <footer className="fh-foot">
