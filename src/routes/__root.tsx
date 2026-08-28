@@ -120,6 +120,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap",
+      },
+      {
+        rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=DM+Sans:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap",
       },
       { rel: "dns-prefetch", href: "https://storage.googleapis.com" },
