@@ -24,6 +24,8 @@ import Navbar from "@/components/Navbar";
 import FynIntelligence from "@/components/home/FynIntelligence";
 import FynLogo from "@/components/FynLogo";
 import BrandMarquee from "@/components/home/BrandMarquee";
+import HeroVisual from "@/components/home/HeroVisual";
+
 import AIRecommendedSection from "@/components/AIRecommendedSection";
 
 /* ─────────────────────────────────────────────────────────
