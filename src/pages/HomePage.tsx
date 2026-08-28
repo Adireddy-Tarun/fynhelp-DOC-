@@ -364,8 +364,7 @@ export default function HomePage() {
             <div className="fh-mock">
               <div className="fh-mock-bar">
                 <div className="fh-mock-brand">
-                  <i />
-                  FynHelp
+                  <FynLogo variant="dark" size="sm" />
                 </div>
                 <div className="fh-mock-icons">
                   <Search size={14} />
