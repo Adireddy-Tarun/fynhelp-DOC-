@@ -102,7 +102,7 @@ const STYLES = `
   radial-gradient(90% 130% at 92% 30%, rgba(169,56,56,.55), transparent 62%),
   linear-gradient(120deg, #2A1109 0%, ${C.maroonDeep} 45%, #7A2A22 100%); }
 .fh-band::after { content:''; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 120%, rgba(0,0,0,.5), transparent 60%); }
-.fh-band-word { position:absolute; left:26px; right:26px; bottom:6px; font-family:'Instrument Sans',sans-serif; font-weight:700; letter-spacing:-0.05em; font-size:clamp(56px,13.5vw,190px); line-height:.86; color:rgba(255,250,242,.94); mix-blend-mode:soft-light; pointer-events:none; z-index:2; }
+.fh-band-word { position:absolute; left:26px; right:26px; bottom:6px; font-family:'Instrument Sans',sans-serif; font-weight:700; letter-spacing:-0.05em; font-size:clamp(56px,13.5vw,190px); line-height:.86; color:rgba(255,248,240,.9); text-shadow:0 10px 40px rgba(0,0,0,.25); pointer-events:none; z-index:2; }
 .fh-band-cards { position:relative; z-index:3; margin-left:auto; width:min(320px,100%); display:grid; gap:12px; }
 .fh-bcard { background:rgba(255,253,249,.95); backdrop-filter:blur(8px); border-radius:16px; padding:16px; }
 .fh-bcard h4 { font-size:15px; letter-spacing:-0.02em; }
