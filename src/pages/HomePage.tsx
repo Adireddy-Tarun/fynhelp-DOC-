@@ -532,33 +532,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SHOWCASE BAND ── */}
-      <div className="fh-band-wrap">
-        <Reveal delay={80}>
-          <div className="fh-band">
-            <div className="fh-band-word">Reconciled</div>
-            <div className="fh-band-cards">
-              <div className="fh-bcard">
-                <h4>Exception-first review</h4>
-                <p>
-                  What ties out never reaches a human. What doesn&rsquo;t arrives with its reason code, its
-                  source document and a one-click decision.
-                </p>
-                <div className="mini">
-                  <i />
-                  <span style={{ fontSize: 11.5, color: C.body }}>391 auto-matched · 2 flagged</span>
-                </div>
-              </div>
-              <div className="fh-bcard dark">
-                <p>
-                  <b style={{ color: "#FDF7EC" }}>One shared queue.</b> Every ledger, exception and sign-off
-                  for the whole firm — visible to the partner, the manager and the article.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
+
+
 
 
       <BrandMarquee />
