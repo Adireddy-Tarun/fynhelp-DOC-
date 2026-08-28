@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@/lib/router-compat";
 import {
   ArrowRight,
@@ -243,6 +243,11 @@ const STYLES = `
 .fh-step p { font-size:13px; color:${C.body}; line-height:1.6; margin-top:7px; }
 
 /* pricing */
+.fh-billing { display:inline-flex; gap:4px; margin-top:26px; padding:4px; border-radius:999px; background:${C.card}; border:1px solid ${C.line}; }
+.fh-billing button { border:0; cursor:pointer; background:transparent; color:${C.body}; font:inherit; font-size:13.5px; font-weight:500; padding:9px 20px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; transition:background .25s ease, color .25s ease; }
+.fh-billing button:hover { color:${C.ink}; }
+.fh-billing button.on { background:${C.ink}; color:${C.onDark}; }
+.fh-billing button i { font-style:normal; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:3px 7px; border-radius:999px; background:${C.coral}; color:#2A0F06; }
 .fh-price-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:44px; align-items:stretch; text-align:left; }
 @media (max-width:900px){ .fh-price-grid{ grid-template-columns:1fr; max-width:440px; margin-inline:auto; } }
 .fh-plan { background:${C.card}; border:1px solid ${C.line}; border-radius:22px; padding:28px; position:relative; display:flex; flex-direction:column; }
@@ -483,6 +488,8 @@ function DashboardMock() {
 }
 
 export default function HomePage() {
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".fh-rv"));
     const io = new IntersectionObserver(
