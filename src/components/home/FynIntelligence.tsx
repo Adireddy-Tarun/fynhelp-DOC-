@@ -159,6 +159,13 @@ const CSS = `
 .fyn-agent.on .ch-reply { animation:ch-recv .7s cubic-bezier(.16,1,.3,1) 1.9s both; }
 @keyframes ch-recv { from{ opacity:0; transform:translate(-14px,8px) scale(.94);} to{ opacity:1; transform:none;} }
 
+/* idle resting state — still readable, just quiet */
+.fyn-agent:not(.on) .ch-bubble,
+.fyn-agent:not(.on) .ch-reply,
+.fyn-agent:not(.on) .fx-chip,
+.fyn-agent:not(.on) .nr-clip { opacity:.42; }
+.fyn-agent:not(.on) .nr-type { border-right-color:transparent; }
+
 /* pipeline */
 .fyn-pipe { margin-top:34px; border-radius:18px; padding:22px; border:1px solid rgba(246,239,226,.09);
   background:linear-gradient(180deg, rgba(246,239,226,.05), rgba(246,239,226,.015)); }
