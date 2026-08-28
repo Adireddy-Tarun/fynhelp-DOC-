@@ -236,7 +236,7 @@ export default function FynIntelligence() {
     <section
       className="fh-sec fh-dark fyn-int"
       id="fyn-intelligence"
-      style={{ background: "radial-gradient(90% 120% at 80% 0%, #33141B, #150C05)", color: "#F6EFE2" }}
+      style={{ background: "radial-gradient(80% 120% at 85% 0%, rgba(226,103,63,.28), transparent 60%), linear-gradient(150deg,#241C15,#0E0B06)", color: "#F6EFE2" }}
     >
       <style>{CSS}</style>
       <div className="fh-wrap">
