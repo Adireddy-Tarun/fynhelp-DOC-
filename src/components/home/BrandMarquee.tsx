@@ -57,7 +57,7 @@ const CSS = `
 const Row = ({ items, cls }: { items: { n: string; I: React.ElementType | null }[]; cls: string }) => (
   <div className="bm-rail">
     <div className={`bm-track ${cls}`}>
-      {[...items, ...items].map(({ n, I }, i) => (
+      {[...items, ...items, ...items, ...items].map(({ n, I }, i) => (
         <span className="bm-item" key={`${n}-${i}`}>
           {I ? <I aria-hidden="true" /> : null}
           <span className={I ? "" : "bm-word"}>{n}</span>
