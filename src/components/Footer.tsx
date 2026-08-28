@@ -174,7 +174,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="max-md:flex max-md:flex-col max-md:items-center">
             <div className="flex items-center gap-3 mb-3">
-              <img src={iconCreamAsset} alt="FYNHelp" style={{ height: 36, width: 36, objectFit: "contain", display: "block" }} />
+              <FynLogo variant="light" size="md" />
             </div>
             <p
               className="text-white/40 uppercase"
