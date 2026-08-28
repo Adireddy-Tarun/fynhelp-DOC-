@@ -111,7 +111,7 @@ const STYLES = `
 .fh-bcard .mini i { width:30px; height:30px; border-radius:9px; background:linear-gradient(140deg,${C.coral},${C.maroon}); display:block; flex:0 0 auto; }
 .fh-bcard.dark { background:rgba(14,11,6,.72); color:${C.onDark}; border:1px solid rgba(247,241,230,.14); }
 .fh-bcard.dark p { color:rgba(247,241,230,.66); }
-@media (max-width:720px){ .fh-band{ min-height:340px; padding:20px; } .fh-band-cards{ width:100%; } }
+@media (max-width:720px){ .fh-band{ min-height:0; padding:20px; display:flex; flex-direction:column; gap:14px; } .fh-band-cards{ width:100%; } .fh-band-word{ position:static; font-size:clamp(44px,13vw,72px); margin:0 0 2px; } }
 
 /* ── STATEMENT ── */
 .fh-statement { display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start; }
