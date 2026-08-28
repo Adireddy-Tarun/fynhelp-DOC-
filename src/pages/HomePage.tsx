@@ -358,10 +358,13 @@ const TRUST = [
 ];
 
 const PLANS = [
-  { name: "Starter", price: "\u20B92,999", per: "/mo", clients: "15 client entities included", extra: "Extra client \u20B9149 (cap 25)", adds: ["Extract, Recon, Narrate", "Full audit trail", "Unlimited users"], cta: "Start with Starter" },
-  { name: "Professional", price: "\u20B95,999", per: "/mo", clients: "40 client entities included", extra: "Extra client \u20B9119", adds: ["Everything in Starter", "Chaser follow-ups", "White-label client packs", "Priority processing"], cta: "Book a firm demo", popular: true },
-  { name: "Scale", price: "\u20B912,999", per: "/mo", clients: "100 client entities included", extra: "Extra client \u20B999 (no cap)", adds: ["Everything in Professional", "Multi-partner dashboards", "API access", "Dedicated success manager"], cta: "Talk to us" },
+  { name: "Starter", monthly: 2999, clients: "15 client entities included", extra: "Extra client \u20B9149 (cap 25)", adds: ["Extract, Recon, Narrate", "Full audit trail", "Unlimited users"], cta: "Start with Starter" },
+  { name: "Professional", monthly: 5999, clients: "40 client entities included", extra: "Extra client \u20B9119", adds: ["Everything in Starter", "Chaser follow-ups", "White-label client packs", "Priority processing"], cta: "Book a firm demo", popular: true },
+  { name: "Scale", monthly: 12999, clients: "100 client entities included", extra: "Extra client \u20B999 (no cap)", adds: ["Everything in Professional", "Multi-partner dashboards", "API access", "Dedicated success manager"], cta: "Talk to us" },
 ];
+
+const inr = (n: number) => `\u20B9${n.toLocaleString("en-IN")}`;
+
 
 const QUOTES = [
   ["We stopped opening three tabs per client. The exception queue is the only screen my seniors touch now.", "Pilot partner", "40-entity practice · Bengaluru"],
