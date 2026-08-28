@@ -2,6 +2,7 @@ import { Link } from "@/lib/router-compat";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ArrowRight, Linkedin, Twitter, Youtube, MessageCircle } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
+import AIRecommendedSection from "@/components/AIRecommendedSection";
 
 type DropdownItem = { label: string; href: string; accent?: boolean; divider?: boolean };
 
@@ -138,6 +139,8 @@ const Footer = () => {
   ];
 
   return (
+    <>
+    <AIRecommendedSection />
     <footer
       className="relative overflow-hidden animate-fade-in"
       style={{
@@ -379,6 +382,7 @@ const Footer = () => {
         }
       `}</style>
     </footer>
+    </>
   );
 };
 
