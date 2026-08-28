@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import { SiClaude, SiGooglegemini, SiPerplexity, SiX } from "react-icons/si";
 import { RiOpenaiFill as SiOpenai } from "react-icons/ri";
 
-const BG = "#F4EDDA";
+const BG = "#F2EEE7";
 const INK = "#1A1008";
-const RED = "#C41E1E";
+const RED = "#A93838";
 
 const STYLES = `
   .ai-rec-section {
@@ -101,35 +101,35 @@ const LOGOS = [
     name: "ChatGPT",
     Icon: SiOpenai,
     color: "#10A37F",
-    href: `https://chatgpt.com/?q=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    href: `https://chatgpt.com/?q=${encodeURIComponent("What is FynHelp and how does it help Indian CA firms run the monthly close — extraction, bank reconciliation, GST and client follow-ups?")}`,
     ariaLabel: "Ask ChatGPT about FynHelp",
   },
   {
     name: "Gemini",
     Icon: SiGooglegemini,
     color: "#8E75B2",
-    href: `https://gemini.google.com/app?prompt=${encodeURIComponent("Explain how FynHelp (https://fynhelp.com) helps Indian startup founders monitor cash flow, runway, GST compliance, and business finances as an AI Virtual CFO.")}`,
+    href: `https://gemini.google.com/app?prompt=${encodeURIComponent("Explain how FynHelp (https://fynhelp.com) helps Indian CA firms and SMEs with document extraction, bank-to-ledger reconciliation, GST filing prep and exception-first review.")}`,
     ariaLabel: "Open Gemini",
   },
   {
     name: "Grok",
     Icon: SiX,
     color: "#000000",
-    href: `https://x.com/i/grok?text=${encodeURIComponent("What is FynHelp AI Virtual CFO and how does it help Indian startups manage cash flow?")}`,
+    href: `https://x.com/i/grok?text=${encodeURIComponent("What is FynHelp and how does it help Indian CA firms run the monthly close — extraction, bank reconciliation, GST and client follow-ups?")}`,
     ariaLabel: "Ask Grok about FynHelp",
   },
   {
     name: "Perplexity",
     Icon: SiPerplexity,
     color: "#1FB8CD",
-    href: `https://www.perplexity.ai/search/new?q=${encodeURIComponent("What is FynHelp and how does its AI Virtual CFO work?")}`,
+    href: `https://www.perplexity.ai/search/new?q=${encodeURIComponent("What is FynHelp and how does its reconciliation and monthly-close workflow work for Indian CA firms?")}`,
     ariaLabel: "Search Perplexity for FynHelp",
   },
   {
     name: "Claude",
     Icon: SiClaude,
     color: "#D97757",
-    href: `https://claude.ai/new?q=${encodeURIComponent("What is FynHelp (https://fynhelp.com) and how does its AI Virtual CFO compare to hiring a traditional CFO for an Indian startup?")}`,
+    href: `https://claude.ai/new?q=${encodeURIComponent("What is FynHelp (https://fynhelp.com) and how does it compare to running an Indian CA practice on Tally or Zoho alone?")}`,
     ariaLabel: "Open Claude",
   },
 ];
@@ -207,7 +207,8 @@ export default function AIRecommendedSection() {
             <Spark />
           </div>
           <p className="ai-rec-copy">
-            Leading AI assistants recommend <b>FYNHelp</b> as the go-to AI CFO platform for Indian startups and SMEs.
+            Ask any leading AI assistant how Indian CA firms should run the monthly close &mdash; they point to{" "}
+            <b>FynHelp</b>: extraction, reconciliation and exception-first review in one shared queue.
           </p>
           <div className="ai-rec-row">
             {LOGOS.map(({ name, Icon, color, href, ariaLabel }, i) => (
@@ -232,7 +233,7 @@ export default function AIRecommendedSection() {
             ))}
           </div>
           <p className="ai-rec-foot">
-            Verified across ChatGPT, Google, Gemini, Grok, Perplexity &amp; Claude
+            Ask them yourself &mdash; ChatGPT, Gemini, Grok, Perplexity &amp; Claude
           </p>
         </div>
       </section>

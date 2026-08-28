@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@/lib/router-compat";
 import {
   ArrowRight,
@@ -243,6 +243,11 @@ const STYLES = `
 .fh-step p { font-size:13px; color:${C.body}; line-height:1.6; margin-top:7px; }
 
 /* pricing */
+.fh-billing { display:inline-flex; gap:4px; margin-top:26px; padding:4px; border-radius:999px; background:${C.card}; border:1px solid ${C.line}; }
+.fh-billing button { border:0; cursor:pointer; background:transparent; color:${C.body}; font:inherit; font-size:13.5px; font-weight:500; padding:9px 20px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; transition:background .25s ease, color .25s ease; }
+.fh-billing button:hover { color:${C.ink}; }
+.fh-billing button.on { background:${C.ink}; color:${C.onDark}; }
+.fh-billing button i { font-style:normal; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:3px 7px; border-radius:999px; background:${C.coral}; color:#2A0F06; }
 .fh-price-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:44px; align-items:stretch; text-align:left; }
 @media (max-width:900px){ .fh-price-grid{ grid-template-columns:1fr; max-width:440px; margin-inline:auto; } }
 .fh-plan { background:${C.card}; border:1px solid ${C.line}; border-radius:22px; padding:28px; position:relative; display:flex; flex-direction:column; }
@@ -358,10 +363,13 @@ const TRUST = [
 ];
 
 const PLANS = [
-  { name: "Starter", price: "\u20B92,999", per: "/mo", clients: "15 client entities included", extra: "Extra client \u20B9149 (cap 25)", adds: ["Extract, Recon, Narrate", "Full audit trail", "Unlimited users"], cta: "Start with Starter" },
-  { name: "Professional", price: "\u20B95,999", per: "/mo", clients: "40 client entities included", extra: "Extra client \u20B9119", adds: ["Everything in Starter", "Chaser follow-ups", "White-label client packs", "Priority processing"], cta: "Book a firm demo", popular: true },
-  { name: "Scale", price: "\u20B912,999", per: "/mo", clients: "100 client entities included", extra: "Extra client \u20B999 (no cap)", adds: ["Everything in Professional", "Multi-partner dashboards", "API access", "Dedicated success manager"], cta: "Talk to us" },
+  { name: "Starter", monthly: 2999, clients: "15 client entities included", extra: "Extra client \u20B9149 (cap 25)", adds: ["Extract, Recon, Narrate", "Full audit trail", "Unlimited users"], cta: "Start with Starter" },
+  { name: "Professional", monthly: 5999, clients: "40 client entities included", extra: "Extra client \u20B9119", adds: ["Everything in Starter", "Chaser follow-ups", "White-label client packs", "Priority processing"], cta: "Book a firm demo", popular: true },
+  { name: "Scale", monthly: 12999, clients: "100 client entities included", extra: "Extra client \u20B999 (no cap)", adds: ["Everything in Professional", "Multi-partner dashboards", "API access", "Dedicated success manager"], cta: "Talk to us" },
 ];
+
+const inr = (n: number) => `\u20B9${n.toLocaleString("en-IN")}`;
+
 
 const QUOTES = [
   ["We stopped opening three tabs per client. The exception queue is the only screen my seniors touch now.", "Pilot partner", "40-entity practice · Bengaluru"],
@@ -480,6 +488,8 @@ function DashboardMock() {
 }
 
 export default function HomePage() {
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".fh-rv"));
     const io = new IntersectionObserver(
@@ -532,33 +542,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SHOWCASE BAND ── */}
-      <div className="fh-band-wrap">
-        <Reveal delay={80}>
-          <div className="fh-band">
-            <div className="fh-band-word">Reconciled</div>
-            <div className="fh-band-cards">
-              <div className="fh-bcard">
-                <h4>Exception-first review</h4>
-                <p>
-                  What ties out never reaches a human. What doesn&rsquo;t arrives with its reason code, its
-                  source document and a one-click decision.
-                </p>
-                <div className="mini">
-                  <i />
-                  <span style={{ fontSize: 11.5, color: C.body }}>391 auto-matched · 2 flagged</span>
-                </div>
-              </div>
-              <div className="fh-bcard dark">
-                <p>
-                  <b style={{ color: "#FDF7EC" }}>One shared queue.</b> Every ledger, exception and sign-off
-                  for the whole firm — visible to the partner, the manager and the article.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
+
+
 
 
       <BrandMarquee />
@@ -913,18 +898,43 @@ export default function HomePage() {
               Choose a plan <span className="ital">that fits</span>
             </h2>
             <p className="fh-lead">Annual billing saves 15% on every plan. Fewer than 3 entities? The pilot is free.</p>
+            <div className="fh-billing" role="group" aria-label="Billing period">
+              <button
+                type="button"
+                className={billing === "monthly" ? "on" : ""}
+                aria-pressed={billing === "monthly"}
+                onClick={() => setBilling("monthly")}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                className={billing === "annual" ? "on" : ""}
+                aria-pressed={billing === "annual"}
+                onClick={() => setBilling("annual")}
+              >
+                Annual <i>Save 15%</i>
+              </button>
+            </div>
           </Reveal>
           <div className="fh-price-grid">
-            {PLANS.map((p, i) => (
+            {PLANS.map((p, i) => {
+              const annualPerMonth = Math.round((p.monthly * 0.85) / 10) * 10;
+              return (
               <Reveal key={p.name} delay={i * 80}>
                 <div className={`fh-plan ${p.popular ? "pop" : ""}`} style={{ height: "100%" }}>
                   {p.popular && <span className="badge">Most popular</span>}
                   <div className="pn">{p.name}</div>
                   <div className="pp num">
-                    {p.price}
-                    <small>{p.per}</small>
+                    {inr(billing === "annual" ? annualPerMonth : p.monthly)}
+                    <small>/mo</small>
                   </div>
-                  <div className="fh-annual">Save 15% annually</div>
+                  <div className="fh-annual">
+                    {billing === "annual"
+                      ? `${inr(annualPerMonth * 12)} billed yearly · save ${inr(p.monthly * 12 - annualPerMonth * 12)}`
+                      : "Billed monthly · switch to annual and save 15%"}
+                  </div>
+
                   <ul>
                     <li>
                       <Check size={15} style={{ color: C.coral, flex: "0 0 auto" }} />
@@ -946,7 +956,9 @@ export default function HomePage() {
                   </Link>
                 </div>
               </Reveal>
-            ))}
+              );
+            })}
+
           </div>
         </div>
       </section>
