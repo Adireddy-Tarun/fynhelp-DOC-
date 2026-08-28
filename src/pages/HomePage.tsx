@@ -608,7 +608,10 @@ export default function HomePage() {
         </div>
       </section>
 
+      <FynIntelligence />
+
       {/* ── STEPS ── */}
+
       <section className="fh-sec">
         <div className="fh-wrap">
           <Reveal>
