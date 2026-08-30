@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { logReconRun } from "@/lib/caReconRuns";
+import { useClientIntelligence } from "@/hooks/useCAIntelligence";
 import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { CA, CACard, CAButton, CABadge, caInputStyle, inr, dateIN } from "@/components/ca/portalUi";
@@ -39,6 +40,17 @@ export default function CAReconciliationPage() {
   const [result, setResult] = useState<ReconResult | null>(null);
   const [bankCount, setBankCount] = useState(0);
   const [applying, setApplying] = useState<string | null>(null);
+
+  const { data: clientIntel } = useClientIntelligence(firmId ?? null, businessId || null);
+
+  /** Learned date window from the client's intelligence row; defaults when unset. */
+  const reconOpts = useMemo(
+    () => ({
+      exactWindowDays: clientIntel?.match_preferences?.date_window_days ?? 3,
+      fuzzyWindowDays: Math.min(28, (clientIntel?.match_preferences?.date_window_days ?? 3) * 7),
+    }),
+    [clientIntel],
+  );
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
@@ -83,7 +95,7 @@ export default function CAReconciliationPage() {
     }));
 
     setBankCount(bank.length);
-    const res = reconcile(bank, invoices, expenses);
+    const res = reconcile(bank, invoices, expenses, reconOpts);
     setResult(res);
     setLoading(false);
 
@@ -113,7 +125,7 @@ export default function CAReconciliationPage() {
         },
       });
     }
-  }, [businessId, from, to, firmId]);
+  }, [businessId, from, to, firmId, reconOpts]);
 
 
   const accept = async (s: MatchSuggestion) => {
@@ -169,6 +181,12 @@ export default function CAReconciliationPage() {
         title="Reconciliation"
         subtitle="Three passes over the client's bank lines — exact, then fuzzy on party name, then part-payment rules. Nothing is written until you accept."
       />
+
+      {clientIntel?.match_preferences?.tolerance_pct != null && (
+        <div style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, margin: "-8px 0 12px" }}>
+          Tolerance tuned to {clientIntel.match_preferences.tolerance_pct}% for this client
+        </div>
+      )}
 
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
