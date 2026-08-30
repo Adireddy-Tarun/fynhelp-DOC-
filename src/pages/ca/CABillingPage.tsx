@@ -306,7 +306,14 @@ export default function CABillingPage() {
                     <td style={caTd}>{r.period}</td>
                     <td style={caNum}>{inr(r.total)}</td>
                     <td style={caTd}>{dateIN(r.due_date)}</td>
-                    <td style={caTd}><CABadge tone={statusTone(r.status)}>{r.status}</CABadge></td>
+                    <td style={caTd}>
+                      {r.status === "sent" && r.due_date && new Date(r.due_date) < new Date() ? (
+                        <CABadge tone="red">overdue</CABadge>
+                      ) : (
+                        <CABadge tone={statusTone(r.status)}>{r.status}</CABadge>
+                      )}
+                    </td>
+
                     <td style={{ ...caTd, textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
                       {r.status === "draft" && <CAButton variant="ghost" onClick={() => markSent(r)}>Mark as sent</CAButton>}
                       {r.status === "sent" && <CAButton variant="ghost" onClick={() => recordPayment(r)}>Record payment</CAButton>}
