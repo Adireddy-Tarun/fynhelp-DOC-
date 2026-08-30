@@ -31,6 +31,8 @@ export default function CADocumentRequestsPage() {
   const [form, setForm] = useState({ business_id: "", title: "", period: "", due_date: "", types: ["bank"] as string[] });
   const [busy, setBusy] = useState(false);
 
+  const [autoMatched, setAutoMatched] = useState<Record<string, boolean>>({});
+
   const load = useCallback(async () => {
     if (!firmId) return;
     const { data } = await supabase
@@ -39,11 +41,22 @@ export default function CADocumentRequestsPage() {
       .eq("ca_firm_id", firmId)
       .order("created_at", { ascending: false });
     setRows((data ?? []) as RequestRow[]);
+
+    const { data: matches } = await supabase
+      .from("ca_client_documents")
+      .select("matched_request_id")
+      .eq("ca_firm_id", firmId)
+      .eq("auto_matched", true)
+      .not("matched_request_id", "is", null);
+    const map: Record<string, boolean> = {};
+    for (const m of (matches ?? []) as any[]) if (m.matched_request_id) map[m.matched_request_id] = true;
+    setAutoMatched(map);
   }, [firmId]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
 
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
 
