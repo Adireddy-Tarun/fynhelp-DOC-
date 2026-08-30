@@ -20,7 +20,9 @@ interface ClientRow {
   client_status: string | null;
   onboarded_at: string | null;
   last_activity_at: string | null;
+  parent_id: string | null;
 }
+
 
 const PAGE_SIZE = 20;
 
