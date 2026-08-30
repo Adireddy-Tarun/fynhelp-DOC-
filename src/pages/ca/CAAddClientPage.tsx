@@ -28,7 +28,7 @@ const ENTITY_TYPES = [
 const EMPTY = {
   clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "",
   entityType: "Private Limited", entitySubtype: "", cin: "", llpin: "",
-  incorporationDate: "", dpiitNumber: "", udyamNumber: "", groupId: "", ownershipPct: "",
+  incorporationDate: "", dpiitNumber: "", udyamNumber: "", groupId: "", ownershipPct: "", parentId: "",
 };
 
 export default function CAAddClientPage() {
