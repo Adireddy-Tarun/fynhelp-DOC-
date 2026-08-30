@@ -1,10 +1,13 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   CA, CACard, CABadge, CAField, caInputStyle, statusTone, dateIN, caTh, caTd, CAEmpty,
 } from "@/components/ca/portalUi";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
+import { scanAndClassifyDocument } from "@/lib/caDocs.functions";
+
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
 
