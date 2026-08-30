@@ -136,6 +136,8 @@ export default function CAAddClientPage() {
         client_status: "pending",
         is_demo: false,
         group_id: form.groupId || null,
+        parent_id: form.parentId || null,
+
         ownership_pct: form.ownershipPct.trim() ? Number(form.ownershipPct) : null,
       }).select("id").single();
       if (clientErr) throw clientErr;
