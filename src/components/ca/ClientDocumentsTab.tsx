@@ -141,7 +141,24 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
         }
       }
 
+      if (res.documentId) {
+        try {
+          const scan = await scanDoc({ data: { document_id: res.documentId } });
+          if (scan.scan_status === "infected") {
+            toast.error(`${file.name} was rejected: ${scan.reason}`);
+            continue;
+          }
+          if (scan.matched) {
+            toast.success(`${file.name} uploaded and matched to request "${scan.request_title}"`);
+            continue;
+          }
+        } catch (e) {
+          toast.warning(`${file.name}: safety scan could not run right now`);
+        }
+      }
+
       toast.success(`${file.name} uploaded`);
+
     }
     setBusy(false);
     if (fileRef.current) fileRef.current.value = "";
