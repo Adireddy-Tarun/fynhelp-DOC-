@@ -20,6 +20,8 @@ export interface FirmIntelligence {
   last_deduction_learning_at: string | null;
   last_filing_learning_at: string | null;
   computed_at: string | null;
+  /** Lives on ca_firms, joined here so every consumer sees one shape. */
+  brain_last_run_at: string | null;
 }
 
 export interface ClientIntelligence {
@@ -46,13 +48,20 @@ export function useFirmIntelligence(firmId: string | null) {
     if (!firmId) { setData(null); setLoading(false); return; }
     setLoading(true);
     (async () => {
-      const { data: row } = await db
-        .from("ca_firm_intelligence")
-        .select("confidence_overrides, provision_weights, last_ocr_learning_at, last_deduction_learning_at, last_filing_learning_at, computed_at")
-        .eq("ca_firm_id", firmId)
-        .maybeSingle();
+      const [{ data: row }, { data: firm }] = await Promise.all([
+        db
+          .from("ca_firm_intelligence")
+          .select("confidence_overrides, provision_weights, last_ocr_learning_at, last_deduction_learning_at, last_filing_learning_at, computed_at")
+          .eq("ca_firm_id", firmId)
+          .maybeSingle(),
+        db.from("ca_firms").select("brain_last_run_at").eq("id", firmId).maybeSingle(),
+      ]);
       if (cancelled) return;
-      setData((row as FirmIntelligence) ?? null);
+      setData({
+        ...((row as FirmIntelligence) ?? {}),
+        brain_last_run_at:
+          (firm as { brain_last_run_at: string | null } | null)?.brain_last_run_at ?? null,
+      } as FirmIntelligence);
       setLoading(false);
     })();
     return () => { cancelled = true; };

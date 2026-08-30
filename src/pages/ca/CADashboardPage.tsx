@@ -7,7 +7,7 @@ import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh,
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
-import { timeAgo } from "@/hooks/useCAIntelligence";
+import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
 
 interface ClientRow {
   id: string;
@@ -46,6 +46,7 @@ const sevTone = (s?: string | null) =>
 
 export default function CADashboardPage() {
   const { firmId } = useCAPortal();
+  const { data: firmIntel } = useFirmIntelligence(firmId ?? null);
   const navigate = useNavigate();
   const [clients, setClients] = useState<Enriched[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -215,6 +216,19 @@ export default function CADashboardPage() {
           </CACard>
         ))}
       </div>
+
+      {firmIntel?.brain_last_run_at && (
+        <div style={{
+          fontFamily: CA.mono,
+          fontSize: 11,
+          color: CA.faint,
+          textAlign: "right",
+          marginTop: 8,
+          paddingRight: 4,
+        }}>
+          Intelligence last updated: {timeAgo(firmIntel.brain_last_run_at)}
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 320px", gap: 20, marginTop: 22, alignItems: "start" }}>
         <div>

@@ -44,6 +44,30 @@ const categoryColor = (category: string): string => {
 const confidenceTone = (c: string): Tone =>
   c === "high" ? "green" : c === "medium" ? "amber" : "grey";
 
+/** Sample-size explainer — shows the firm-level count only, never clients or amounts. */
+function WhySuggestion({ count }: { count: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span style={{ fontFamily: CA.sans, fontSize: 11 }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          background: "none", border: "none", padding: 0, cursor: "pointer",
+          fontFamily: CA.sans, fontSize: 11, fontWeight: 600, color: CA.teal,
+          textDecoration: "underline dotted",
+        }}
+      >
+        Why this suggestion?
+      </button>
+      {open && (
+        <span style={{ display: "block", marginTop: 4, fontSize: 11, color: CA.faint, fontStyle: "italic" }}>
+          Based on {count} similar clients of this type in your firm.
+        </span>
+      )}
+    </span>
+  );
+}
+
 const stamp = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
@@ -175,12 +199,21 @@ export default function ClientDeductionsTab({
   }), [open]);
 
   // Firm-scoped provision weights (learned from THIS firm's own dismissals).
+  const entity = entityType ?? "Unspecified";
   const weights = useMemo(() => {
     const byEntity = firmIntel?.provision_weights ?? {};
-    return (byEntity[entityType ?? ""] ?? byEntity["default"] ?? {}) as Record<string, number>;
-  }, [firmIntel, entityType]);
+    return (byEntity[entity] ?? byEntity["default"] ?? {}) as Record<string, number>;
+  }, [firmIntel, entity]);
 
-  const weightOf = useCallback((p: string) => weights[p] ?? 1, [weights]);
+  // Unlearned provisions sit at neutral 0.5 until the brain has seen enough.
+  const weightOf = useCallback((p: string) => weights[p] ?? 0.5, [weights]);
+  const sampleOf = useCallback(
+    (p: string) => {
+      const n = weights[`${p}__n`];
+      return typeof n === "number" && n >= 5 ? n : null;
+    },
+    [weights],
+  );
 
   const visible = useMemo(() => {
     const list = filter === "All" ? findings : findings.filter((f) => f.status === filter.toLowerCase());
@@ -264,11 +297,9 @@ export default function ClientDeductionsTab({
                 {f.provision}
               </span>
               <span style={{ fontFamily: CA.serif, fontSize: 15, fontWeight: 700, color: CA.ink }}>{f.provision_label}</span>
-              {weightOf(f.provision) < 0.6 && (
-                <span
-                  title="Your firm has dismissed this provision for similar entity types."
-                  style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 600, color: CA.faint }}
-                >
+              {sampleOf(f.provision) !== null && <WhySuggestion count={sampleOf(f.provision)!} />}
+              {weightOf(f.provision) < 0.3 && (
+                <span style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, fontStyle: "italic" }}>
                   Less relevant for this entity type
                 </span>
               )}
