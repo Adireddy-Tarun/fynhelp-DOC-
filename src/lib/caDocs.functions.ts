@@ -122,7 +122,7 @@ export const renderReportHtml = createServerFn({ method: "POST" })
 
     const { data: firm } = await admin.from("ca_firms").select("firm_name").eq("id", firmId).maybeSingle();
 
-    const table = data.kind === "working_paper" ? "ca_working_papers" : "ca_mis_reports";
+    const table = data.kind === "working_paper" ? "ca_working_papers" : "ca_reports_log";
     const { data: row, error } = await admin
       .from(table)
       .select("*")
@@ -143,14 +143,14 @@ export const renderReportHtml = createServerFn({ method: "POST" })
       clientName = c?.client_name ?? clientName;
     }
 
-    const body =
-      row.computed_data ?? row.report_data ?? row.data ?? row.payload ?? row.summary ?? null;
+    const body = row.content ?? row.computed_data ?? row.report_data ?? null;
     const bodyText = typeof row.report_text === "string" ? row.report_text : null;
 
     const heading =
       data.kind === "working_paper"
-        ? `Working Paper: ${row.return_type ?? row.paper_type ?? "Return"}`
-        : `MIS Report: ${row.report_type ?? "Management Summary"}`;
+        ? row.title ?? `Working Paper: ${row.paper_type ?? "Return"}`
+        : row.report_name ?? `MIS Report: ${row.report_type ?? "Management Summary"}`;
+
 
     const html = buildPrintableHtml({
       firmName: firm?.firm_name ?? "FynHelp",
