@@ -191,7 +191,15 @@ export default function CADocumentRequestsPage() {
             </div>,
             r.period ?? "—",
             dateIN(r.due_date),
-            <StateChip key="s" value={r.status} />,
+            <div key="s" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <StateChip value={r.status} />
+              {autoMatched[r.id] ? (
+                <span style={{ fontFamily: CA.sans, fontSize: 11, color: CA.teal, background: CA.tealSoft, borderRadius: 6, padding: "2px 7px" }}>
+                  auto matched
+                </span>
+              ) : null}
+            </div>,
+
             r.status === "open" && can("process") ? (
               <CAButton key="c" variant="ghost" onClick={() => closeRequest(r)}>
                 Close
