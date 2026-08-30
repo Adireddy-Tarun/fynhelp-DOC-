@@ -91,6 +91,7 @@ export default function CASettingsPage() {
   const [tab, setTab] = useState<TabKey>("profile");
 
   const [firm, setFirm] = useState<FirmRow>(EMPTY_FIRM);
+  const [baseline, setBaseline] = useState<FirmRow>(EMPTY_FIRM);
   const [plan, setPlan] = useState<{ plan_type: string; max_clients: number }>({ plan_type: "free", max_clients: 10 });
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
   const [members, setMembers] = useState<Member[]>([]);
@@ -127,7 +128,7 @@ export default function CASettingsPage() {
     ]);
     if (fe) toast.error(fe.message);
     if (f) {
-      setFirm({
+      const loaded: FirmRow = {
         firm_name: f.firm_name ?? "",
         ca_name: f.ca_name ?? "",
         icai_membership_number: f.icai_membership_number ?? f.membership_number ?? "",
@@ -141,7 +142,9 @@ export default function CASettingsPage() {
         state: f.state ?? "",
         logo_url: f.logo_url ?? "",
         specializations: Array.isArray(f.specializations) ? f.specializations.join(", ") : "",
-      });
+      };
+      setFirm(loaded);
+      setBaseline(loaded);
       setPlan({ plan_type: f.plan_type ?? "free", max_clients: f.max_clients ?? 10 });
       setPrefs((f.notification_prefs as Record<string, boolean>) ?? {});
     }
@@ -170,6 +173,27 @@ export default function CASettingsPage() {
     })();
   }, []);
 
+  const profileDirty = useMemo(
+    () => (Object.keys(EMPTY_FIRM) as (keyof FirmRow)[]).some((k) => firm[k] !== baseline[k]),
+    [firm, baseline],
+  );
+
+  /** Field-level checks that run on blur, so a preparer sees the problem early. */
+  const validateField = (k: keyof FirmRow) => () => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[k];
+      const v = firm[k].trim();
+      if (k === "phone" && v && v.replace(/\D/g, "").length !== 10) next.phone = "Phone must be 10 digits";
+      if (k === "whatsapp_phone" && v && v.replace(/\D/g, "").length !== 10)
+        next.whatsapp_phone = "WhatsApp number must be 10 digits";
+      if (k === "icai_membership_number" && v.length < 8)
+        next.icai_membership_number = "ICAI membership number must be at least 8 characters";
+      if (k === "email" && v && !isEmail(v)) next.email = "Enter a valid email address";
+      return next;
+    });
+  };
+
   const set = (k: keyof FirmRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setFirm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -178,7 +202,7 @@ export default function CASettingsPage() {
     if (!firmId) return;
     const errs: Record<string, string> = {};
     if (firm.firm_name.trim().length < 3) errs.firm_name = "Firm name must be at least 3 characters";
-    if (!firm.icai_membership_number.trim()) errs.icai_membership_number = "ICAI membership number is required";
+    if (firm.icai_membership_number.trim().length < 8) errs.icai_membership_number = "ICAI membership number must be at least 8 characters";
     if (firm.phone.trim() && !/^\d{10}$/.test(firm.phone.replace(/\D/g, "").slice(-10)) ) errs.phone = "Phone must be 10 digits";
     if (firm.phone.trim() && firm.phone.replace(/\D/g, "").length !== 10) errs.phone = "Phone must be 10 digits";
     if (firm.email.trim() && !isEmail(firm.email)) errs.email = "Enter a valid email address";
@@ -205,6 +229,7 @@ export default function CASettingsPage() {
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile saved");
+    setBaseline(firm);
     void refresh();
   };
 
@@ -293,7 +318,7 @@ export default function CASettingsPage() {
                 </CAField>
                 <CAField label="CA name"><input style={caInputStyle} value={firm.ca_name} onChange={set("ca_name")} /></CAField>
                 <CAField label="ICAI membership number" error={errors.icai_membership_number}>
-                  <input style={caInputStyle} value={firm.icai_membership_number} onChange={set("icai_membership_number")} />
+                  <input style={caInputStyle} value={firm.icai_membership_number} onChange={set("icai_membership_number")} onBlur={validateField("icai_membership_number")} />
                 </CAField>
                 <CAField label="Firm registration number">
                   <input style={caInputStyle} value={firm.firm_registration_number} onChange={set("firm_registration_number")} />
@@ -306,13 +331,13 @@ export default function CASettingsPage() {
 
               <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
                 <CAField label="Email" error={errors.email}>
-                  <input style={caInputStyle} value={firm.email} onChange={set("email")} />
+                  <input style={caInputStyle} value={firm.email} onChange={set("email")} onBlur={validateField("email")} />
                 </CAField>
                 <CAField label="Phone" error={errors.phone}>
-                  <input style={caInputStyle} value={firm.phone} onChange={set("phone")} />
+                  <input style={caInputStyle} value={firm.phone} onChange={set("phone")} onBlur={validateField("phone")} />
                 </CAField>
-                <CAField label="WhatsApp phone">
-                  <input style={caInputStyle} value={firm.whatsapp_phone} onChange={set("whatsapp_phone")} />
+                <CAField label="WhatsApp phone" error={errors.whatsapp_phone}>
+                  <input style={caInputStyle} value={firm.whatsapp_phone} onChange={set("whatsapp_phone")} onBlur={validateField("whatsapp_phone")} />
                 </CAField>
                 <CAField label="City"><input style={caInputStyle} value={firm.city} onChange={set("city")} /></CAField>
                 <CAField label="State"><input style={caInputStyle} value={firm.state} onChange={set("state")} /></CAField>
@@ -336,7 +361,12 @@ export default function CASettingsPage() {
                 </div>
               </div>
             </div>
-            <div><CAButton type="submit" disabled={saving}>{saving ? "Saving…" : "Save profile"}</CAButton></div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <CAButton type="submit" disabled={saving || !profileDirty}>{saving ? "Saving…" : "Save profile"}</CAButton>
+              {!profileDirty && !saving && (
+                <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint }}>No unsaved changes</span>
+              )}
+            </div>
           </form>
         </CACard>
       ) : tab === "team" ? (

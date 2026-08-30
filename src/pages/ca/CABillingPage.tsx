@@ -75,6 +75,7 @@ export default function CABillingPage() {
   const [draft, setDraft] = useState(emptyDraft);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<InvoiceRow | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const clientName = useCallback(
     (businessId: string) => clients.find((c) => c.business_id === businessId)?.client_name ?? "Unknown client",
@@ -151,12 +152,17 @@ export default function CABillingPage() {
 
   const createInvoice = async () => {
     if (!firmId) return;
-    if (!draft.business_id) return toast.error("Pick the client to bill");
-    if (!draft.period.trim()) return toast.error("Enter the billing period");
     const items: LineItem[] = draft.items
       .filter((i) => i.description.trim() && Number(i.amount) > 0)
       .map((i) => ({ description: i.description.trim(), amount: Number(i.amount) }));
-    if (!items.length) return toast.error("Add at least one line item with an amount");
+
+    const errs: Record<string, string> = {};
+    if (!draft.business_id) errs.business_id = "Pick the client to bill";
+    if (!draft.period.trim()) errs.period = "Enter the billing period";
+    if (!items.length) errs.items = "Add at least one line with a description and an amount above zero";
+    if (!GST_RATES.includes(draft.gst_rate)) errs.gst_rate = "Pick a valid GST rate";
+    setFormErrors(errs);
+    if (Object.keys(errs).length) return toast.error("Please fix the highlighted fields");
 
     setBusy(true);
     let created: { id: string; invoice_number: string } | null = null;
@@ -248,7 +254,7 @@ export default function CABillingPage() {
       <ModuleHeader
         title="Billing"
         subtitle="Raise invoices against engagements, track what has been sent and what has actually been collected."
-        right={<CAButton onClick={() => { setDraft(emptyDraft()); setShowForm(true); }}>Generate invoice</CAButton>}
+        right={<CAButton onClick={() => { setDraft(emptyDraft()); setFormErrors({}); setShowForm(true); }}>Generate invoice</CAButton>}
       />
 
       <StatStrip
@@ -331,7 +337,7 @@ export default function CABillingPage() {
       {showForm && (
         <Modal title="Generate invoice" onClose={() => setShowForm(false)}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <CAField label="Client">
+            <CAField label="Client" error={formErrors.business_id}>
               <select
                 style={caInputStyle}
                 value={draft.business_id}
@@ -361,7 +367,7 @@ export default function CABillingPage() {
                 {draftEngagements.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
             </CAField>
-            <CAField label="Period">
+            <CAField label="Period" error={formErrors.period}>
               <input style={caInputStyle} value={draft.period} onChange={(e) => setDraft((d) => ({ ...d, period: e.target.value }))} placeholder="Apr 2026" />
             </CAField>
             <CAField label="Due date">
@@ -401,10 +407,14 @@ export default function CABillingPage() {
             <CAButton variant="ghost" onClick={() => setDraft((d) => ({ ...d, items: [...d.items, { description: "", amount: "" }] }))}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Plus size={13} aria-hidden="true" /> Add line</span>
             </CAButton>
+            {formErrors.items && (
+              <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.red, marginTop: 6 }}>{formErrors.items}</div>
+            )}
           </div>
 
+
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginTop: 18 }}>
-            <CAField label="GST rate">
+            <CAField label="GST rate" error={formErrors.gst_rate}>
               <select style={{ ...caInputStyle, width: 140 }} value={draft.gst_rate} onChange={(e) => setDraft((d) => ({ ...d, gst_rate: Number(e.target.value) }))}>
                 {GST_RATES.map((r) => <option key={r} value={r}>{r}%</option>)}
               </select>
