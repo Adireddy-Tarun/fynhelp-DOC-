@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { logReconRun } from "@/lib/caReconRuns";
+import { useClientIntelligence } from "@/hooks/useCAIntelligence";
 import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { CA, CACard, CAButton, CABadge, caInputStyle, inr, dateIN } from "@/components/ca/portalUi";
@@ -27,6 +28,7 @@ export default function CAReconciliationPage() {
   const { firmId } = useCAPortal();
   const { can, role, isLoading: roleLoading } = useCARole();
   const { clients } = useCAClientOptions();
+  const { data: clientIntel } = useClientIntelligence(firmId ?? null, businessId || null);
 
   const [businessId, setBusinessId] = useState("");
   const [from, setFrom] = useState(() => {
