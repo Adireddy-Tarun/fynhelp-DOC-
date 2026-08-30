@@ -234,6 +234,8 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   return {
     ok: true,
     extractionId: extraction.id,
+    documentId: docRow.id as string,
+
     reviewState,
     classification,
     confidence,
