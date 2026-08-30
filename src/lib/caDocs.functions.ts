@@ -88,7 +88,29 @@ export const scanAndClassifyDocument = createServerFn({ method: "POST" })
           .eq("id", match.id)
           .eq("ca_firm_id", firmId);
       }
+
+      await admin.from("ca_notifications").insert({
+        ca_firm_id: firmId,
+        business_id: doc.business_id,
+        type: "document",
+        severity: "info",
+        title: "Document auto matched",
+        message: `An uploaded document was matched to the open request "${match.title}" and the request is now closed.`,
+      });
+
+      await admin.from("ca_audit_events").insert({
+        ca_firm_id: firmId,
+        business_id: doc.business_id,
+        actor_id: context.userId,
+        actor_role: "system",
+        action: "document.auto_matched",
+        entity_type: "ca_document_request",
+        entity_id: match.id,
+        source_document_id: doc.id,
+        detail: { document_type: doc.document_type, period: doc.filing_period },
+      });
     }
+
 
     return {
       scan_status: "clean" as const,

@@ -31,8 +31,14 @@ interface VersionRow {
   created_at: string;
 }
 
+interface DocMeta {
+  virus_scan_status: string | null;
+  auto_matched: boolean | null;
+}
+
 export default function ClientDocumentsTab({ firmId, businessId }: { firmId: string; businessId: string }) {
   const [docs, setDocs] = useState<DocRow[]>([]);
+  const [meta, setMeta] = useState<Record<string, DocMeta>>({});
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
   const [classification, setClassification] = useState<CADocClass | "auto">("auto");
@@ -54,11 +60,29 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) console.warn("[fyn:ca] ca_document_extractions", error);
-    setDocs((data ?? []) as DocRow[]);
+    const rows = (data ?? []) as DocRow[];
+    setDocs(rows);
+
+    const ids = rows.map((r) => r.document_id).filter((v): v is string => !!v);
+    if (ids.length) {
+      const { data: metaRows } = await supabase
+        .from("ca_client_documents")
+        .select("id, virus_scan_status, auto_matched")
+        .eq("ca_firm_id", firmId)
+        .in("id", ids);
+      const map: Record<string, DocMeta> = {};
+      for (const m of (metaRows ?? []) as any[]) {
+        map[m.id] = { virus_scan_status: m.virus_scan_status ?? null, auto_matched: m.auto_matched ?? null };
+      }
+      setMeta(map);
+    } else {
+      setMeta({});
+    }
     setLoading(false);
   }, [firmId, businessId]);
 
   useEffect(() => { void load(); }, [load]);
+
 
   const loadVersions = async (extractionId: string) => {
     const { data, error } = await supabase
@@ -207,6 +231,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
               <th style={caTh}>File</th><th style={caTh}>Class</th><th style={caTh}>Confidence</th>
+              <th style={caTh}>Safety</th><th style={caTh}>Request</th>
               <th style={caTh}>State</th><th style={caTh}>Uploaded</th><th style={caTh} />
             </tr></thead>
             <tbody>
@@ -216,8 +241,21 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                     <td style={caTd}>{d.original_filename ?? "—"}</td>
                     <td style={caTd}>{DOC_CLASS_LABELS[d.classification as CADocClass] ?? d.classification}</td>
                     <td style={caTd}>{Math.round((d.confidence ?? 0) * (d.confidence <= 1 ? 100 : 1))}%</td>
+                    <td style={caTd}>
+                      {(() => {
+                        const scan = d.document_id ? meta[d.document_id]?.virus_scan_status : null;
+                        if (!scan) return <span style={{ color: CA.faint }}>not scanned</span>;
+                        return <CABadge tone={scan === "clean" ? "green" : scan === "infected" ? "red" : "amber"}>{scan}</CABadge>;
+                      })()}
+                    </td>
+                    <td style={caTd}>
+                      {d.document_id && meta[d.document_id]?.auto_matched
+                        ? <CABadge tone="teal">auto matched</CABadge>
+                        : <span style={{ color: CA.faint }}>—</span>}
+                    </td>
                     <td style={caTd}><CABadge tone={statusTone(d.review_state)}>{d.review_state}</CABadge></td>
                     <td style={caTd}>{dateIN(d.created_at)}</td>
+
                     <td style={{ ...caTd, textAlign: "right" }}>
                       <button
                         onClick={() => toggle(d.id)}
@@ -229,7 +267,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                   </tr>
                   {expanded === d.id && (
                     <tr>
-                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={6}>
+                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={8}>
                         {!versions[d.id] ? (
                           <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>Loading versions…</span>
                         ) : versions[d.id].length === 0 ? (
