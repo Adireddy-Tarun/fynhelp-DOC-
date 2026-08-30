@@ -252,6 +252,13 @@ export default function CAAddClientPage() {
                 {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
             </CAField>
+            <CAField label="Parent entity">
+              <select style={caInputStyle as React.CSSProperties} value={form.parentId} onChange={set("parentId")}>
+                <option value="">No parent entity</option>
+                {parents.map((p) => <option key={p.id} value={p.id}>{p.client_name}</option>)}
+              </select>
+            </CAField>
+
             <CAField label="Ownership %" error={errors.ownershipPct}>
               <input style={caInputStyle} type="number" min={0} max={100} step="0.01"
                 value={form.ownershipPct} onChange={set("ownershipPct")} placeholder="e.g. 100" />
