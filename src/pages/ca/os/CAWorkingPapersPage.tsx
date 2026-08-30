@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { renderReportHtml } from "@/lib/caDocs.functions";
+import { printHtmlDocument } from "@/lib/printPdf";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useCARole } from "@/hooks/useCARole";
