@@ -76,8 +76,35 @@ export default function CAClientsPage() {
     });
   }, [rows, search, status]);
 
-  const pageRows = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const ordered = useMemo(() => {
+    if (!grouped) return filtered;
+    const present = new Set(filtered.map((r) => r.id));
+    const childrenOf = new Map<string, ClientRow[]>();
+    const tops: ClientRow[] = [];
+    for (const r of filtered) {
+      if (r.parent_id && present.has(r.parent_id)) {
+        childrenOf.set(r.parent_id, [...(childrenOf.get(r.parent_id) ?? []), r]);
+      } else {
+        tops.push(r);
+      }
+    }
+    const out: ClientRow[] = [];
+    for (const p of tops) {
+      out.push(p);
+      for (const c of childrenOf.get(p.id) ?? []) out.push(c);
+    }
+    return out;
+  }, [filtered, grouped]);
+
+  const childCount = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of rows) if (r.parent_id) m.set(r.parent_id, (m.get(r.parent_id) ?? 0) + 1);
+    return m;
+  }, [rows]);
+
+  const pageRows = ordered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  const pageCount = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
 
   const sendReminder = async () => {
