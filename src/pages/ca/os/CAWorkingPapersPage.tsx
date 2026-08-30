@@ -34,6 +34,21 @@ export default function CAWorkingPapersPage() {
   const [rows, setRows] = useState<PaperRow[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pdfId, setPdfId] = useState<string | null>(null);
+  const renderPdf = useServerFn(renderReportHtml);
+
+  const downloadPdf = async (id: string) => {
+    setPdfId(id);
+    try {
+      const res = await renderPdf({ data: { kind: "working_paper", id } });
+      printHtmlDocument(res.html);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not prepare the PDF");
+    } finally {
+      setPdfId(null);
+    }
+  };
+
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
