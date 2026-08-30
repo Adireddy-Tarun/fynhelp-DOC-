@@ -89,6 +89,7 @@ import { Route as ApiPublicCaBrainReconLearningRouteImport } from './routes/api/
 import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api/public/ca-compliance-auto-alert'
 import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
 import { Route as ApiPublicCaInvoicePaymentWebhookRouteImport } from './routes/api/public/ca-invoice-payment-webhook'
+import { Route as SharedMisTokenRouteImport } from './routes/shared.mis.$token'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
 import { Route as AdminAuthAdminProtectedAiMonitoringRouteImport } from './routes/_adminAuth/admin/_protected/ai-monitoring'
@@ -623,6 +624,11 @@ const ApiPublicCaInvoicePaymentWebhookRoute =
     path: '/api/public/ca-invoice-payment-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SharedMisTokenRoute = SharedMisTokenRouteImport.update({
+  id: '/shared/mis/$token',
+  path: '/shared/mis/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAuthAdminProtectedIndexRoute =
   AdminAuthAdminProtectedIndexRouteImport.update({
     id: '/',
@@ -1384,6 +1390,7 @@ export interface FileRoutesByFullPath {
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
+  '/shared/mis/$token': typeof SharedMisTokenRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
   '/blog/': typeof MainBlogIndexRoute
@@ -1577,6 +1584,7 @@ export interface FileRoutesByTo {
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
+  '/shared/mis/$token': typeof SharedMisTokenRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
   '/blog': typeof MainBlogIndexRoute
@@ -1780,6 +1788,7 @@ export interface FileRoutesById {
   '/api/public/ca-compliance-auto-alert': typeof ApiPublicCaComplianceAutoAlertRoute
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
+  '/shared/mis/$token': typeof SharedMisTokenRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
   '/_main/blog/': typeof MainBlogIndexRoute
@@ -1978,6 +1987,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
+    | '/shared/mis/$token'
     | '/blog-admin/'
     | '/intern/'
     | '/blog/'
@@ -2171,6 +2181,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
+    | '/shared/mis/$token'
     | '/blog-admin'
     | '/intern'
     | '/blog'
@@ -2373,6 +2384,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-compliance-auto-alert'
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
+    | '/shared/mis/$token'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
     | '/_main/blog/'
@@ -2515,6 +2527,7 @@ export interface RootRouteChildren {
   ApiPublicCaComplianceAutoAlertRoute: typeof ApiPublicCaComplianceAutoAlertRoute
   ApiPublicCaIntegrationSyncRoute: typeof ApiPublicCaIntegrationSyncRoute
   ApiPublicCaInvoicePaymentWebhookRoute: typeof ApiPublicCaInvoicePaymentWebhookRoute
+  SharedMisTokenRoute: typeof SharedMisTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -3077,6 +3090,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/ca-invoice-payment-webhook'
       fullPath: '/api/public/ca-invoice-payment-webhook'
       preLoaderRoute: typeof ApiPublicCaInvoicePaymentWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shared/mis/$token': {
+      id: '/shared/mis/$token'
+      path: '/shared/mis/$token'
+      fullPath: '/shared/mis/$token'
+      preLoaderRoute: typeof SharedMisTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_adminAuth/admin/_protected/': {
@@ -4421,6 +4441,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCaComplianceAutoAlertRoute: ApiPublicCaComplianceAutoAlertRoute,
   ApiPublicCaIntegrationSyncRoute: ApiPublicCaIntegrationSyncRoute,
   ApiPublicCaInvoicePaymentWebhookRoute: ApiPublicCaInvoicePaymentWebhookRoute,
+  SharedMisTokenRoute: SharedMisTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
