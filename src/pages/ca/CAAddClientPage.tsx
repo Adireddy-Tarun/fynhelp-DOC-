@@ -41,6 +41,8 @@ export default function CAAddClientPage() {
   const [defs, setDefs] = useState<FieldDef[]>([]);
   const [customValues, setCustomValues] = useState<Record<string, string>>({});
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [parents, setParents] = useState<{ id: string; client_name: string }[]>([]);
+
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
