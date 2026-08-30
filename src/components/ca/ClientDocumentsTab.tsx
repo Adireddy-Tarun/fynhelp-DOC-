@@ -31,8 +31,14 @@ interface VersionRow {
   created_at: string;
 }
 
+interface DocMeta {
+  virus_scan_status: string | null;
+  auto_matched: boolean | null;
+}
+
 export default function ClientDocumentsTab({ firmId, businessId }: { firmId: string; businessId: string }) {
   const [docs, setDocs] = useState<DocRow[]>([]);
+  const [meta, setMeta] = useState<Record<string, DocMeta>>({});
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
   const [classification, setClassification] = useState<CADocClass | "auto">("auto");
@@ -54,11 +60,29 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) console.warn("[fyn:ca] ca_document_extractions", error);
-    setDocs((data ?? []) as DocRow[]);
+    const rows = (data ?? []) as DocRow[];
+    setDocs(rows);
+
+    const ids = rows.map((r) => r.document_id).filter((v): v is string => !!v);
+    if (ids.length) {
+      const { data: metaRows } = await supabase
+        .from("ca_client_documents")
+        .select("id, virus_scan_status, auto_matched")
+        .eq("ca_firm_id", firmId)
+        .in("id", ids);
+      const map: Record<string, DocMeta> = {};
+      for (const m of (metaRows ?? []) as any[]) {
+        map[m.id] = { virus_scan_status: m.virus_scan_status ?? null, auto_matched: m.auto_matched ?? null };
+      }
+      setMeta(map);
+    } else {
+      setMeta({});
+    }
     setLoading(false);
   }, [firmId, businessId]);
 
   useEffect(() => { void load(); }, [load]);
+
 
   const loadVersions = async (extractionId: string) => {
     const { data, error } = await supabase
