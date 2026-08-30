@@ -28,7 +28,7 @@ const ENTITY_TYPES = [
 const EMPTY = {
   clientName: "", clientEmail: "", gstin: "", pan: "", phone: "", accessLevel: "read", notes: "",
   entityType: "Private Limited", entitySubtype: "", cin: "", llpin: "",
-  incorporationDate: "", dpiitNumber: "", udyamNumber: "", groupId: "", ownershipPct: "",
+  incorporationDate: "", dpiitNumber: "", udyamNumber: "", groupId: "", ownershipPct: "", parentId: "",
 };
 
 export default function CAAddClientPage() {
@@ -41,6 +41,8 @@ export default function CAAddClientPage() {
   const [defs, setDefs] = useState<FieldDef[]>([]);
   const [customValues, setCustomValues] = useState<Record<string, string>>({});
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [parents, setParents] = useState<{ id: string; client_name: string }[]>([]);
+
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -63,15 +65,19 @@ export default function CAAddClientPage() {
   useEffect(() => {
     if (!firmId) return;
     (async () => {
-      const [defsRes, groupsRes] = await Promise.all([
+      const [defsRes, groupsRes, parentsRes] = await Promise.all([
         supabase.from("ca_custom_field_defs")
           .select("id, field_key, label, field_type, options, is_required, sort_order")
           .eq("ca_firm_id", firmId).eq("is_active", true).order("sort_order"),
         supabase.from("ca_entity_groups").select("id, name").eq("ca_firm_id", firmId).order("name"),
+        supabase.from("ca_clients").select("id, client_name")
+          .eq("ca_firm_id", firmId).eq("is_demo", false).order("client_name"),
       ]);
       setDefs((defsRes.data as FieldDef[]) ?? []);
       setGroups((groupsRes.data as { id: string; name: string }[]) ?? []);
+      setParents((parentsRes.data as { id: string; client_name: string }[]) ?? []);
     })();
+
   }, [firmId]);
 
   const validate = () => {
@@ -130,6 +136,8 @@ export default function CAAddClientPage() {
         client_status: "pending",
         is_demo: false,
         group_id: form.groupId || null,
+        parent_id: form.parentId || null,
+
         ownership_pct: form.ownershipPct.trim() ? Number(form.ownershipPct) : null,
       }).select("id").single();
       if (clientErr) throw clientErr;
@@ -244,6 +252,13 @@ export default function CAAddClientPage() {
                 {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
             </CAField>
+            <CAField label="Parent entity">
+              <select style={caInputStyle as React.CSSProperties} value={form.parentId} onChange={set("parentId")}>
+                <option value="">No parent entity</option>
+                {parents.map((p) => <option key={p.id} value={p.id}>{p.client_name}</option>)}
+              </select>
+            </CAField>
+
             <CAField label="Ownership %" error={errors.ownershipPct}>
               <input style={caInputStyle} type="number" min={0} max={100} step="0.01"
                 value={form.ownershipPct} onChange={set("ownershipPct")} placeholder="e.g. 100" />

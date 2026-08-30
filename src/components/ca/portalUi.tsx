@@ -14,6 +14,8 @@ export const CA = {
   teal: "#0F6E56",
   tealSoft: "rgba(15,110,86,0.08)",
   amber: "#B26B00",
+  gold: "#8B6914",
+
   red: "#B3261E",
   green: "#1A7F3C",
   serif: "Georgia, 'Times New Roman', serif",

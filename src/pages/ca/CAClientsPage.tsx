@@ -20,7 +20,9 @@ interface ClientRow {
   client_status: string | null;
   onboarded_at: string | null;
   last_activity_at: string | null;
+  parent_id: string | null;
 }
+
 
 const PAGE_SIZE = 20;
 
@@ -32,6 +34,8 @@ export default function CAClientsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(0);
+  const [grouped, setGrouped] = useState(false);
+
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
@@ -42,7 +46,7 @@ export default function CAClientsPage() {
     const [{ data, error }, { data: reminders }] = await Promise.all([
       supabase
         .from("ca_clients")
-        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
+        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at, parent_id")
         .eq("ca_firm_id", firmId)
         .eq("is_demo", false)
         .order("created_at", { ascending: false }),
@@ -74,8 +78,35 @@ export default function CAClientsPage() {
     });
   }, [rows, search, status]);
 
-  const pageRows = filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const ordered = useMemo(() => {
+    if (!grouped) return filtered;
+    const present = new Set(filtered.map((r) => r.id));
+    const childrenOf = new Map<string, ClientRow[]>();
+    const tops: ClientRow[] = [];
+    for (const r of filtered) {
+      if (r.parent_id && present.has(r.parent_id)) {
+        childrenOf.set(r.parent_id, [...(childrenOf.get(r.parent_id) ?? []), r]);
+      } else {
+        tops.push(r);
+      }
+    }
+    const out: ClientRow[] = [];
+    for (const p of tops) {
+      out.push(p);
+      for (const c of childrenOf.get(p.id) ?? []) out.push(c);
+    }
+    return out;
+  }, [filtered, grouped]);
+
+  const childCount = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of rows) if (r.parent_id) m.set(r.parent_id, (m.get(r.parent_id) ?? 0) + 1);
+    return m;
+  }, [rows]);
+
+  const pageRows = ordered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  const pageCount = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+
   const selectedIds = Object.keys(selected).filter((k) => selected[k]);
 
   const sendReminder = async () => {
@@ -276,7 +307,15 @@ export default function CAClientsPage() {
           <option value="pending">Pending</option>
           <option value="inactive">Inactive</option>
         </select>
+        <CAButton
+          variant="ghost"
+          onClick={() => { setGrouped((g) => !g); setPage(0); }}
+          style={{ padding: "8px 14px", fontSize: 12.5 }}
+        >
+          {grouped ? "Flat list" : "Group view"}
+        </CAButton>
         <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>{filtered.length} client(s)</span>
+
       </div>
 
       {selectedIds.length > 0 && (
@@ -318,13 +357,25 @@ export default function CAClientsPage() {
                     />
                   </td>
                   <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>
-                    <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        gap: 8,
+                        alignItems: "center",
+                        paddingLeft: grouped && r.parent_id ? 22 : 0,
+                      }}
+                    >
+                      {grouped && r.parent_id && <span style={{ color: CA.faint, fontFamily: CA.mono, fontSize: 12 }}>L</span>}
                       {r.client_name}
+                      {grouped && !r.parent_id && (childCount.get(r.id) ?? 0) > 0 && (
+                        <CABadge tone="teal">{childCount.get(r.id)} in group</CABadge>
+                      )}
                       {r.business_id && (dueReminders[r.business_id] ?? 0) > 0 && (
                         <CABadge tone="red">{dueReminders[r.business_id]} due</CABadge>
                       )}
                     </span>
                   </td>
+
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>

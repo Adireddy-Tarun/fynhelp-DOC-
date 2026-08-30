@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { CA } from "@/components/ca/portalUi";
 
-const KEY = "fyn_gsp_banner_dismissed";
+const KEY = "gsp_banner_dismissed";
 
 /**
  * Honest limitation notice on every CA surface that offers GST filing actions.
- * Dismissal is remembered for the browser session.
+ * Renders unconditionally. Dismissal is remembered for the browser session.
  */
 export function GspLimitationBanner() {
   const [visible, setVisible] = useState(false);
@@ -27,29 +27,29 @@ export function GspLimitationBanner() {
         display: "flex",
         alignItems: "flex-start",
         gap: 12,
-        background: "rgba(178,107,0,0.10)",
-        border: `0.5px solid rgba(178,107,0,0.35)`,
-        borderRadius: 10,
-        padding: "12px 14px",
+        background: "rgba(26,26,26,0.035)",
+        borderLeft: `3px solid ${CA.gold}`,
+        borderRadius: 8,
+        padding: "13px 16px",
         marginBottom: 16,
-        fontFamily: CA.sans,
-        fontSize: 13,
+        fontFamily: CA.serif,
+        fontSize: 13.5,
         color: CA.ink,
-        lineHeight: 1.5,
+        lineHeight: 1.55,
       }}
     >
-      <span style={{ color: CA.amber, fontWeight: 700 }}>Note</span>
       <span style={{ flex: 1 }}>
-        FynHelp prepares your return data. Direct GST portal submission requires your DSC/EVC login at gstn.gov.in.
-        One-click GSP filing is on our roadmap.
+        Note: GST filing through FynHelp is currently in preview. Direct filing via GSP integration is pending
+        regulatory approval. You can prepare and review returns here, then file through the GSTN portal directly.
       </span>
       <button
         type="button"
+        aria-label="Dismiss notice"
         onClick={() => {
           try {
             window.localStorage.setItem(KEY, "1");
           } catch {
-            /* storage unavailable — dismiss for this view only */
+            /* storage unavailable, dismiss for this view only */
           }
           setVisible(false);
         }}
@@ -58,12 +58,13 @@ export function GspLimitationBanner() {
           border: "none",
           color: CA.muted,
           cursor: "pointer",
-          fontSize: 12,
-          fontWeight: 600,
-          padding: 0,
+          fontSize: 15,
+          lineHeight: 1,
+          fontFamily: CA.sans,
+          padding: 2,
         }}
       >
-        Dismiss
+        X
       </button>
     </div>
   );

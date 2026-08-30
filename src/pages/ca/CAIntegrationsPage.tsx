@@ -209,6 +209,10 @@ export default function CAIntegrationsPage() {
       <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 6 }}>
         Every data source feeding your clients' books, and when each last pulled.
       </p>
+      <p style={{ fontFamily: CA.mono, fontSize: 11.5, color: CA.faint, marginTop: 4 }}>
+        Syncs every 6 hours
+      </p>
+
 
       <CACard style={{ marginTop: 20, overflow: "hidden" }}>
         {loading ? (

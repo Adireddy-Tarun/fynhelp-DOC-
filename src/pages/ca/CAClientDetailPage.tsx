@@ -7,6 +7,9 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
+import { renderReportHtml, createReportShare } from "@/lib/caDocs.functions";
+import { printHtmlDocument } from "@/lib/printPdf";
+
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
 import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
@@ -71,6 +74,39 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
+  const [reportBusyId, setReportBusyId] = useState<string | null>(null);
+  const renderPdf = useServerFn(renderReportHtml);
+  const shareReport = useServerFn(createReportShare);
+
+  const downloadReportPdf = async (id: string) => {
+    setReportBusyId(id);
+    try {
+      const res = await renderPdf({ data: { kind: "mis_report", id } });
+      printHtmlDocument(res.html);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not prepare the PDF");
+    } finally {
+      setReportBusyId(null);
+    }
+  };
+
+  const shareReportLink = async (id: string) => {
+    setReportBusyId(id);
+    try {
+      const res = await shareReport({ data: { report_log_id: id, origin: window.location.origin, expires_days: 30 } });
+      try {
+        await navigator.clipboard.writeText(res.url);
+        toast.success("Share link copied. It works for 30 days.");
+      } catch {
+        toast.success(`Share link ready: ${res.url}`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not create the share link");
+    } finally {
+      setReportBusyId(null);
+    }
+  };
+
   const [mis, setMis] = useState<MisReport | null>(null);
   const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
@@ -681,15 +717,32 @@ export default function CAClientDetailPage() {
                         <td style={caTd}><CABadge tone={statusTone(r.status)}>{r.status ?? "—"}</CABadge></td>
                         <td style={caTd}>{dateIN(r.created_at)}</td>
                         <td style={{ ...caTd, textAlign: "right" }}>
-                          {r.file_url ? (
-                            <a href={r.file_url} target="_blank" rel="noreferrer" style={{ color: CA.teal, fontWeight: 600, fontSize: 12.5, display: "inline-flex", alignItems: "center", gap: 6 }}>
-                              <FileText size={14} strokeWidth={2} aria-hidden="true" />
-                              Download PDF
-                            </a>
-                          ) : (
-                            <span style={{ color: CA.faint, fontSize: 12.5 }}>Not ready</span>
-                          )}
+                          <div style={{ display: "inline-flex", gap: 12, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                            {r.file_url && (
+                              <a href={r.file_url} target="_blank" rel="noreferrer" style={{ color: CA.teal, fontWeight: 600, fontSize: 12.5, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                                <FileText size={14} strokeWidth={2} aria-hidden="true" />
+                                Stored PDF
+                              </a>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => void downloadReportPdf(r.id)}
+                              disabled={reportBusyId === r.id}
+                              style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontWeight: 600, fontSize: 12.5, cursor: "pointer" }}
+                            >
+                              {reportBusyId === r.id ? "Working" : "Download PDF"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void shareReportLink(r.id)}
+                              disabled={reportBusyId === r.id}
+                              style={{ background: "none", border: "none", padding: 0, color: CA.ink, fontFamily: CA.sans, fontWeight: 600, fontSize: 12.5, cursor: "pointer" }}
+                            >
+                              Share with client
+                            </button>
+                          </div>
                         </td>
+
                       </tr>
                     ))}
                   </tbody>

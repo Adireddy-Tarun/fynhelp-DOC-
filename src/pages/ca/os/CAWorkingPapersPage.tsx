@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { renderReportHtml } from "@/lib/caDocs.functions";
+import { printHtmlDocument } from "@/lib/printPdf";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useCARole } from "@/hooks/useCARole";
@@ -34,6 +38,21 @@ export default function CAWorkingPapersPage() {
   const [rows, setRows] = useState<PaperRow[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pdfId, setPdfId] = useState<string | null>(null);
+  const renderPdf = useServerFn(renderReportHtml);
+
+  const downloadPdf = async (id: string) => {
+    setPdfId(id);
+    try {
+      const res = await renderPdf({ data: { kind: "working_paper", id } });
+      printHtmlDocument(res.html);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not prepare the PDF");
+    } finally {
+      setPdfId(null);
+    }
+  };
+
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
@@ -198,6 +217,14 @@ export default function CAWorkingPapersPage() {
                     </div>
                   </button>
                   <StateChip value={p.status} />
+                  <CAButton
+                    variant="ghost"
+                    disabled={pdfId === p.id}
+                    onClick={() => void downloadPdf(p.id)}
+                  >
+                    {pdfId === p.id ? "Preparing PDF" : "Download PDF"}
+                  </CAButton>
+
                   {p.status === "draft" && <CAButton variant="ghost" onClick={() => setStatus(p, "in_review")}>Send to review</CAButton>}
                   {p.status === "in_review" && can("sign_off") && <CAButton onClick={() => setStatus(p, "approved")}>Approve</CAButton>}
                   {p.status === "approved" && can("sign_off") && (

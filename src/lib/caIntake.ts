@@ -118,6 +118,8 @@ export interface IntakeResult {
   ok: boolean;
   error?: string;
   extractionId?: string;
+  documentId?: string;
+
   reviewState?: string;
   classification?: CADocClass;
   confidence?: number;
@@ -234,6 +236,8 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   return {
     ok: true,
     extractionId: extraction.id,
+    documentId: docRow.id as string,
+
     reviewState,
     classification,
     confidence,

@@ -1,10 +1,13 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   CA, CACard, CABadge, CAField, caInputStyle, statusTone, dateIN, caTh, caTd, CAEmpty,
 } from "@/components/ca/portalUi";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
+import { scanAndClassifyDocument } from "@/lib/caDocs.functions";
+
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
 
@@ -37,6 +40,8 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
   const [expanded, setExpanded] = useState<string | null>(null);
   const [versions, setVersions] = useState<Record<string, VersionRow[]>>({});
   const fileRef = useRef<HTMLInputElement>(null);
+  const scanDoc = useServerFn(scanAndClassifyDocument);
+
 
   const load = useCallback(async () => {
     if (!firmId || !businessId) return;
@@ -141,7 +146,24 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
         }
       }
 
+      if (res.documentId) {
+        try {
+          const scan = await scanDoc({ data: { document_id: res.documentId } });
+          if (scan.scan_status === "infected") {
+            toast.error(`${file.name} was rejected: ${scan.reason}`);
+            continue;
+          }
+          if (scan.matched) {
+            toast.success(`${file.name} uploaded and matched to request "${scan.request_title}"`);
+            continue;
+          }
+        } catch (e) {
+          toast.warning(`${file.name}: safety scan could not run right now`);
+        }
+      }
+
       toast.success(`${file.name} uploaded`);
+
     }
     setBusy(false);
     if (fileRef.current) fileRef.current.value = "";

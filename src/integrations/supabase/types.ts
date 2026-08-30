@@ -1208,6 +1208,7 @@ export type Database = {
       }
       ca_client_documents: {
         Row: {
+          auto_matched: boolean
           business_id: string
           ca_firm_id: string
           client_reference_code: string
@@ -1217,13 +1218,17 @@ export type Database = {
           file_size_bytes: number | null
           filing_period: string | null
           id: string
+          matched_request_id: string | null
           mime_type: string | null
           original_filename: string
           storage_path: string
           stored_filename: string
           uploaded_by: string
+          virus_scan_at: string | null
+          virus_scan_status: string
         }
         Insert: {
+          auto_matched?: boolean
           business_id: string
           ca_firm_id: string
           client_reference_code: string
@@ -1233,13 +1238,17 @@ export type Database = {
           file_size_bytes?: number | null
           filing_period?: string | null
           id?: string
+          matched_request_id?: string | null
           mime_type?: string | null
           original_filename: string
           storage_path: string
           stored_filename: string
           uploaded_by: string
+          virus_scan_at?: string | null
+          virus_scan_status?: string
         }
         Update: {
+          auto_matched?: boolean
           business_id?: string
           ca_firm_id?: string
           client_reference_code?: string
@@ -1249,11 +1258,14 @@ export type Database = {
           file_size_bytes?: number | null
           filing_period?: string | null
           id?: string
+          matched_request_id?: string | null
           mime_type?: string | null
           original_filename?: string
           storage_path?: string
           stored_filename?: string
           uploaded_by?: string
+          virus_scan_at?: string | null
+          virus_scan_status?: string
         }
         Relationships: [
           {
@@ -1268,6 +1280,13 @@ export type Database = {
             columns: ["ca_firm_id"]
             isOneToOne: false
             referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_documents_matched_request_id_fkey"
+            columns: ["matched_request_id"]
+            isOneToOne: false
+            referencedRelation: "ca_document_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1540,6 +1559,7 @@ export type Database = {
           onboarded_at: string | null
           ownership_pct: number | null
           pan: string | null
+          parent_id: string | null
           udyam_number: string | null
           updated_at: string | null
         }
@@ -1567,6 +1587,7 @@ export type Database = {
           onboarded_at?: string | null
           ownership_pct?: number | null
           pan?: string | null
+          parent_id?: string | null
           udyam_number?: string | null
           updated_at?: string | null
         }
@@ -1594,6 +1615,7 @@ export type Database = {
           onboarded_at?: string | null
           ownership_pct?: number | null
           pan?: string | null
+          parent_id?: string | null
           udyam_number?: string | null
           updated_at?: string | null
         }
@@ -1603,6 +1625,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "ca_entity_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_clients_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "ca_clients"
             referencedColumns: ["id"]
           },
         ]
@@ -3455,30 +3484,39 @@ export type Database = {
           business_id: string
           ca_firm_id: string
           created_at: string
+          expires_at: string | null
           id: string
           note: string | null
           report_log_id: string
           revoked_at: string | null
+          share_token: string | null
+          share_url: string | null
           shared_by: string | null
         }
         Insert: {
           business_id: string
           ca_firm_id: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           note?: string | null
           report_log_id: string
           revoked_at?: string | null
+          share_token?: string | null
+          share_url?: string | null
           shared_by?: string | null
         }
         Update: {
           business_id?: string
           ca_firm_id?: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           note?: string | null
           report_log_id?: string
           revoked_at?: string | null
+          share_token?: string | null
+          share_url?: string | null
           shared_by?: string | null
         }
         Relationships: [
@@ -7765,6 +7803,7 @@ export type Database = {
           org_id: string
         }[]
       }
+      get_shared_mis_report: { Args: { p_token: string }; Returns: Json }
       get_user_business_id: { Args: never; Returns: string }
       get_user_ca_firm_id: { Args: never; Returns: string }
       has_role: {
