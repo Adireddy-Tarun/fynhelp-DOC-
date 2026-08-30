@@ -256,3 +256,55 @@ export const createReportShare = createServerFn({ method: "POST" })
     return { url, expires_at: expiresAt, reused: false };
   });
 
+
+/**
+ * Look up the live share link for a report, if one exists.
+ */
+export const getReportShare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ report_log_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const firmId = await resolveCaFirmId(admin, context.userId);
+    if (!firmId) throw new Error("No CA firm for this user");
+
+    const { data: row } = await admin
+      .from("ca_report_shares")
+      .select("id, share_url, share_token, expires_at")
+      .eq("ca_firm_id", firmId)
+      .eq("report_log_id", data.report_log_id)
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    if (!row) return { active: false as const };
+    return {
+      active: true as const,
+      url: (row.share_url as string) ?? "",
+      expires_at: row.expires_at as string,
+    };
+  });
+
+/**
+ * Withdraw every live share link for a report. The public page stops resolving
+ * immediately because it filters on revoked_at.
+ */
+export const revokeReportShare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ report_log_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const firmId = await resolveCaFirmId(admin, context.userId);
+    if (!firmId) throw new Error("No CA firm for this user");
+
+    const { error } = await admin
+      .from("ca_report_shares")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("ca_firm_id", firmId)
+      .eq("report_log_id", data.report_log_id)
+      .is("revoked_at", null);
+    if (error) throw new Error(error.message);
+    return { revoked: true as const };
+  });

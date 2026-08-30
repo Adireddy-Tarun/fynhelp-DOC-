@@ -7,7 +7,7 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
-import { renderReportHtml, createReportShare } from "@/lib/caDocs.functions";
+import { renderReportHtml, createReportShare, revokeReportShare } from "@/lib/caDocs.functions";
 import { printHtmlDocument } from "@/lib/printPdf";
 
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
@@ -18,6 +18,7 @@ import ThreeWayMatchTab from "@/components/ca/ThreeWayMatchTab";
 import ClientDeductionsTab from "@/components/ca/ClientDeductionsTab";
 import ClientProfilePanel from "@/components/ca/ClientProfilePanel";
 import ClientIntelligenceCard from "@/components/ca/ClientIntelligenceCard";
+import ClientGroupCard from "@/components/ca/ClientGroupCard";
 import TxnLineageDrawer, { sourceLabel, type LineageTxn } from "@/components/ca/TxnLineageDrawer";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
@@ -75,6 +76,8 @@ export default function CAClientDetailPage() {
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
   const [reportBusyId, setReportBusyId] = useState<string | null>(null);
+  const [sharePanel, setSharePanel] = useState<{ reportId: string; url: string; expires_at: string } | null>(null);
+  const revokeShare = useServerFn(revokeReportShare);
   const renderPdf = useServerFn(renderReportHtml);
   const shareReport = useServerFn(createReportShare);
 
@@ -94,14 +97,28 @@ export default function CAClientDetailPage() {
     setReportBusyId(id);
     try {
       const res = await shareReport({ data: { report_log_id: id, origin: window.location.origin, expires_days: 30 } });
+      setSharePanel({ reportId: id, url: res.url, expires_at: res.expires_at });
       try {
         await navigator.clipboard.writeText(res.url);
         toast.success("Share link copied. It works for 30 days.");
       } catch {
-        toast.success(`Share link ready: ${res.url}`);
+        toast.success("Share link ready. Copy it from the panel below.");
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not create the share link");
+    } finally {
+      setReportBusyId(null);
+    }
+  };
+
+  const revokeShareLink = async (id: string) => {
+    setReportBusyId(id);
+    try {
+      await revokeShare({ data: { report_log_id: id } });
+      setSharePanel(null);
+      toast.success("Share link revoked. The client can no longer open it.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not revoke the share link");
     } finally {
       setReportBusyId(null);
     }
@@ -435,6 +452,7 @@ export default function CAClientDetailPage() {
             {businessId && firmId && (
               <ClientRemindersSection firmId={firmId} businessId={businessId} userId={userId} />
             )}
+            {firmId && clientId && <ClientGroupCard firmId={firmId} clientId={clientId} />}
           </>
         )}
 
@@ -749,6 +767,44 @@ export default function CAClientDetailPage() {
                 </table>
               )}
             </CACard>
+
+            {sharePanel && (
+              <CACard style={{ marginTop: 14, padding: 18 }}>
+                <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>
+                  Client share link
+                </div>
+                <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap", alignItems: "center" }}>
+                  <input
+                    readOnly
+                    value={sharePanel.url}
+                    onFocus={(e) => e.currentTarget.select()}
+                    style={{ ...caInputStyle, flex: "1 1 320px", fontFamily: CA.mono, fontSize: 12.5 }}
+                    aria-label="Share link"
+                  />
+                  <CAButton
+                    variant="ghost"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(sharePanel.url).then(
+                        () => toast.success("Link copied"),
+                        () => toast.error("Copy the link from the box"),
+                      );
+                    }}
+                  >
+                    Copy
+                  </CAButton>
+                  <CAButton
+                    variant="ghost"
+                    onClick={() => void revokeShareLink(sharePanel.reportId)}
+                    disabled={reportBusyId === sharePanel.reportId}
+                  >
+                    Revoke
+                  </CAButton>
+                </div>
+                <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 10 }}>
+                  Expires on {dateIN(sharePanel.expires_at)}. Anyone with this link can view the report until then.
+                </div>
+              </CACard>
+            )}
           </>
         )}
       </div>
