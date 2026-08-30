@@ -7,6 +7,9 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
 import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
+import { renderReportHtml, createReportShare } from "@/lib/caDocs.functions";
+import { printHtmlDocument } from "@/lib/printPdf";
+
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
 import ClientRemindersSection from "@/components/ca/ClientRemindersSection";
