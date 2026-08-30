@@ -65,15 +65,19 @@ export default function CAAddClientPage() {
   useEffect(() => {
     if (!firmId) return;
     (async () => {
-      const [defsRes, groupsRes] = await Promise.all([
+      const [defsRes, groupsRes, parentsRes] = await Promise.all([
         supabase.from("ca_custom_field_defs")
           .select("id, field_key, label, field_type, options, is_required, sort_order")
           .eq("ca_firm_id", firmId).eq("is_active", true).order("sort_order"),
         supabase.from("ca_entity_groups").select("id, name").eq("ca_firm_id", firmId).order("name"),
+        supabase.from("ca_clients").select("id, client_name")
+          .eq("ca_firm_id", firmId).eq("is_demo", false).order("client_name"),
       ]);
       setDefs((defsRes.data as FieldDef[]) ?? []);
       setGroups((groupsRes.data as { id: string; name: string }[]) ?? []);
+      setParents((parentsRes.data as { id: string; client_name: string }[]) ?? []);
     })();
+
   }, [firmId]);
 
   const validate = () => {
