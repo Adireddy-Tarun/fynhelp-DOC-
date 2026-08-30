@@ -118,6 +118,8 @@ export interface IntakeResult {
   ok: boolean;
   error?: string;
   extractionId?: string;
+  documentId?: string;
+
   reviewState?: string;
   classification?: CADocClass;
   confidence?: number;
