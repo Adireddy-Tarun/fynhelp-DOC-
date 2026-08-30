@@ -40,6 +40,8 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
   const [expanded, setExpanded] = useState<string | null>(null);
   const [versions, setVersions] = useState<Record<string, VersionRow[]>>({});
   const fileRef = useRef<HTMLInputElement>(null);
+  const scanDoc = useServerFn(scanAndClassifyDocument);
+
 
   const load = useCallback(async () => {
     if (!firmId || !businessId) return;
