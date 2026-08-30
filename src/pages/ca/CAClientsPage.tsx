@@ -34,6 +34,8 @@ export default function CAClientsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(0);
+  const [grouped, setGrouped] = useState(false);
+
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
