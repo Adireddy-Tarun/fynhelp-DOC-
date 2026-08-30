@@ -74,6 +74,39 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
+  const [reportBusyId, setReportBusyId] = useState<string | null>(null);
+  const renderPdf = useServerFn(renderReportHtml);
+  const shareReport = useServerFn(createReportShare);
+
+  const downloadReportPdf = async (id: string) => {
+    setReportBusyId(id);
+    try {
+      const res = await renderPdf({ data: { kind: "mis_report", id } });
+      printHtmlDocument(res.html);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not prepare the PDF");
+    } finally {
+      setReportBusyId(null);
+    }
+  };
+
+  const shareReportLink = async (id: string) => {
+    setReportBusyId(id);
+    try {
+      const res = await shareReport({ data: { report_log_id: id, origin: window.location.origin, expires_days: 30 } });
+      try {
+        await navigator.clipboard.writeText(res.url);
+        toast.success("Share link copied. It works for 30 days.");
+      } catch {
+        toast.success(`Share link ready: ${res.url}`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not create the share link");
+    } finally {
+      setReportBusyId(null);
+    }
+  };
+
   const [mis, setMis] = useState<MisReport | null>(null);
   const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
