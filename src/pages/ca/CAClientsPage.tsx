@@ -44,7 +44,7 @@ export default function CAClientsPage() {
     const [{ data, error }, { data: reminders }] = await Promise.all([
       supabase
         .from("ca_clients")
-        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at")
+        .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at, parent_id")
         .eq("ca_firm_id", firmId)
         .eq("is_demo", false)
         .order("created_at", { ascending: false }),
