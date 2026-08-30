@@ -7803,6 +7803,7 @@ export type Database = {
           org_id: string
         }[]
       }
+      get_shared_mis_report: { Args: { p_token: string }; Returns: Json }
       get_user_business_id: { Args: never; Returns: string }
       get_user_ca_firm_id: { Args: never; Returns: string }
       has_role: {
