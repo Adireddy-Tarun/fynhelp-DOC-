@@ -297,11 +297,9 @@ export default function ClientDeductionsTab({
                 {f.provision}
               </span>
               <span style={{ fontFamily: CA.serif, fontSize: 15, fontWeight: 700, color: CA.ink }}>{f.provision_label}</span>
-              {weightOf(f.provision) < 0.6 && (
-                <span
-                  title="Your firm has dismissed this provision for similar entity types."
-                  style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 600, color: CA.faint }}
-                >
+              {sampleOf(f.provision) !== null && <WhySuggestion count={sampleOf(f.provision)!} />}
+              {weightOf(f.provision) < 0.3 && (
+                <span style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, fontStyle: "italic" }}>
                   Less relevant for this entity type
                 </span>
               )}
