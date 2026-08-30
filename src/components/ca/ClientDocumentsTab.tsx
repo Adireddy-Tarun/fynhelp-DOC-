@@ -231,6 +231,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
               <th style={caTh}>File</th><th style={caTh}>Class</th><th style={caTh}>Confidence</th>
+              <th style={caTh}>Safety</th><th style={caTh}>Request</th>
               <th style={caTh}>State</th><th style={caTh}>Uploaded</th><th style={caTh} />
             </tr></thead>
             <tbody>
@@ -240,8 +241,21 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                     <td style={caTd}>{d.original_filename ?? "—"}</td>
                     <td style={caTd}>{DOC_CLASS_LABELS[d.classification as CADocClass] ?? d.classification}</td>
                     <td style={caTd}>{Math.round((d.confidence ?? 0) * (d.confidence <= 1 ? 100 : 1))}%</td>
+                    <td style={caTd}>
+                      {(() => {
+                        const scan = d.document_id ? meta[d.document_id]?.virus_scan_status : null;
+                        if (!scan) return <span style={{ color: CA.faint }}>not scanned</span>;
+                        return <CABadge tone={scan === "clean" ? "green" : scan === "infected" ? "red" : "amber"}>{scan}</CABadge>;
+                      })()}
+                    </td>
+                    <td style={caTd}>
+                      {d.document_id && meta[d.document_id]?.auto_matched
+                        ? <CABadge tone="teal">auto matched</CABadge>
+                        : <span style={{ color: CA.faint }}>—</span>}
+                    </td>
                     <td style={caTd}><CABadge tone={statusTone(d.review_state)}>{d.review_state}</CABadge></td>
                     <td style={caTd}>{dateIN(d.created_at)}</td>
+
                     <td style={{ ...caTd, textAlign: "right" }}>
                       <button
                         onClick={() => toggle(d.id)}
