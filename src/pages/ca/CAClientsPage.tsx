@@ -307,7 +307,15 @@ export default function CAClientsPage() {
           <option value="pending">Pending</option>
           <option value="inactive">Inactive</option>
         </select>
+        <CAButton
+          variant="ghost"
+          onClick={() => { setGrouped((g) => !g); setPage(0); }}
+          style={{ padding: "8px 14px", fontSize: 12.5 }}
+        >
+          {grouped ? "Flat list" : "Group view"}
+        </CAButton>
         <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>{filtered.length} client(s)</span>
+
       </div>
 
       {selectedIds.length > 0 && (
