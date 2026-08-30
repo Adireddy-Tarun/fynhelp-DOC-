@@ -357,13 +357,25 @@ export default function CAClientsPage() {
                     />
                   </td>
                   <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>
-                    <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        gap: 8,
+                        alignItems: "center",
+                        paddingLeft: grouped && r.parent_id ? 22 : 0,
+                      }}
+                    >
+                      {grouped && r.parent_id && <span style={{ color: CA.faint, fontFamily: CA.mono, fontSize: 12 }}>L</span>}
                       {r.client_name}
+                      {grouped && !r.parent_id && (childCount.get(r.id) ?? 0) > 0 && (
+                        <CABadge tone="teal">{childCount.get(r.id)} in group</CABadge>
+                      )}
                       {r.business_id && (dueReminders[r.business_id] ?? 0) > 0 && (
                         <CABadge tone="red">{dueReminders[r.business_id]} due</CABadge>
                       )}
                     </span>
                   </td>
+
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>
