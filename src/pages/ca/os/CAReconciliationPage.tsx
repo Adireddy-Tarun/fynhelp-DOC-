@@ -95,7 +95,7 @@ export default function CAReconciliationPage() {
     }));
 
     setBankCount(bank.length);
-    const res = reconcile(bank, invoices, expenses);
+    const res = reconcile(bank, invoices, expenses, reconOpts);
     setResult(res);
     setLoading(false);
 
@@ -125,7 +125,7 @@ export default function CAReconciliationPage() {
         },
       });
     }
-  }, [businessId, from, to, firmId]);
+  }, [businessId, from, to, firmId, reconOpts]);
 
 
   const accept = async (s: MatchSuggestion) => {
@@ -181,6 +181,12 @@ export default function CAReconciliationPage() {
         title="Reconciliation"
         subtitle="Three passes over the client's bank lines — exact, then fuzzy on party name, then part-payment rules. Nothing is written until you accept."
       />
+
+      {clientIntel?.match_preferences?.tolerance_pct != null && (
+        <div style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, margin: "-8px 0 12px" }}>
+          Tolerance tuned to {clientIntel.match_preferences.tolerance_pct}% for this client
+        </div>
+      )}
 
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
