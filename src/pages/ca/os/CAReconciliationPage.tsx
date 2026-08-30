@@ -28,7 +28,6 @@ export default function CAReconciliationPage() {
   const { firmId } = useCAPortal();
   const { can, role, isLoading: roleLoading } = useCARole();
   const { clients } = useCAClientOptions();
-  const { data: clientIntel } = useClientIntelligence(firmId ?? null, businessId || null);
 
   const [businessId, setBusinessId] = useState("");
   const [from, setFrom] = useState(() => {
@@ -41,6 +40,17 @@ export default function CAReconciliationPage() {
   const [result, setResult] = useState<ReconResult | null>(null);
   const [bankCount, setBankCount] = useState(0);
   const [applying, setApplying] = useState<string | null>(null);
+
+  const { data: clientIntel } = useClientIntelligence(firmId ?? null, businessId || null);
+
+  /** Learned date window from the client's intelligence row; defaults when unset. */
+  const reconOpts = useMemo(
+    () => ({
+      exactWindowDays: clientIntel?.match_preferences?.date_window_days ?? 3,
+      fuzzyWindowDays: Math.min(28, (clientIntel?.match_preferences?.date_window_days ?? 3) * 7),
+    }),
+    [clientIntel],
+  );
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
