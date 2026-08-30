@@ -198,6 +198,14 @@ export default function CAWorkingPapersPage() {
                     </div>
                   </button>
                   <StateChip value={p.status} />
+                  <CAButton
+                    variant="ghost"
+                    disabled={pdfId === p.id}
+                    onClick={() => void downloadPdf(p.id)}
+                  >
+                    {pdfId === p.id ? "Preparing PDF" : "Download PDF"}
+                  </CAButton>
+
                   {p.status === "draft" && <CAButton variant="ghost" onClick={() => setStatus(p, "in_review")}>Send to review</CAButton>}
                   {p.status === "in_review" && can("sign_off") && <CAButton onClick={() => setStatus(p, "approved")}>Approve</CAButton>}
                   {p.status === "approved" && can("sign_off") && (
