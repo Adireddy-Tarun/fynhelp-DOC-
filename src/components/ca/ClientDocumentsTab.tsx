@@ -267,7 +267,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                   </tr>
                   {expanded === d.id && (
                     <tr>
-                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={6}>
+                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={8}>
                         {!versions[d.id] ? (
                           <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>Loading versions…</span>
                         ) : versions[d.id].length === 0 ? (
