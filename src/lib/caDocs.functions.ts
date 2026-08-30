@@ -165,3 +165,72 @@ export const renderReportHtml = createServerFn({ method: "POST" })
 
     return { html, filename: `${heading.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase()}.pdf` };
   });
+
+/**
+ * Create (or reuse) a client-facing share link for a generated MIS report.
+ * Firm scoped. Links expire after the requested number of days.
+ */
+export const createReportShare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        report_log_id: z.string().uuid(),
+        origin: z.string().url(),
+        expires_days: z.number().int().min(1).max(90).default(30),
+        note: z.string().max(500).optional().nullable(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+
+    const firmId = await resolveCaFirmId(admin, context.userId);
+    if (!firmId) throw new Error("No CA firm for this user");
+
+    const { data: log, error } = await admin
+      .from("ca_reports_log")
+      .select("id, business_id, report_name")
+      .eq("id", data.report_log_id)
+      .eq("ca_firm_id", firmId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!log) throw new Error("Report not found");
+
+    const { data: existing } = await admin
+      .from("ca_report_shares")
+      .select("share_token, expires_at, share_url")
+      .eq("ca_firm_id", firmId)
+      .eq("report_log_id", log.id)
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    if (existing?.share_token) {
+      return {
+        url: existing.share_url ?? `${data.origin}/shared/mis/${existing.share_token}`,
+        expires_at: existing.expires_at as string,
+        reused: true,
+      };
+    }
+
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const expiresAt = new Date(Date.now() + data.expires_days * 86_400_000).toISOString();
+    const url = `${data.origin}/shared/mis/${token}`;
+
+    const { error: insErr } = await admin.from("ca_report_shares").insert({
+      ca_firm_id: firmId,
+      business_id: log.business_id,
+      report_log_id: log.id,
+      shared_by: context.userId,
+      share_token: token,
+      expires_at: expiresAt,
+      share_url: url,
+      note: data.note ?? null,
+    });
+    if (insErr) throw new Error(insErr.message);
+
+    return { url, expires_at: expiresAt, reused: false };
+  });
+
