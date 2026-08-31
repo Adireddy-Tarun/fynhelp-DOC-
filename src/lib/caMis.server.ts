@@ -56,8 +56,32 @@ export function inPeriod(row: MisExtraction, period: string): boolean {
   return label === p;
 }
 
-export function summariseDocuments(rows: MisExtraction[], period: string) {
-  const scoped = rows.filter((r) => inPeriod(r, period));
+/** True when the document's own date falls inside [start, end] (YYYY-MM-DD). */
+export function inRange(row: MisExtraction, start: string, end: string): boolean {
+  const raw = String(field(row, "invoice_date", "date", "period", "filing_period") ?? "");
+  if (!raw) return false;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return raw >= start && raw <= end;
+  const iso = d.toISOString().slice(0, 10);
+  return iso >= start && iso <= end;
+}
+
+/** Month labels ("Apr 2026") covered by a date range, for period-labelled tables. */
+export function monthsInRange(start: string, end: string): string[] {
+  const out: string[] = [];
+  const cursor = new Date(`${start.slice(0, 7)}-01T00:00:00Z`);
+  const last = new Date(`${end.slice(0, 7)}-01T00:00:00Z`);
+  while (cursor <= last && out.length < 24) {
+    out.push(`${cursor.toLocaleString("en-IN", { month: "short", timeZone: "UTC" })} ${cursor.getUTCFullYear()}`);
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+  }
+  return out;
+}
+
+export function summariseDocuments(rows: MisExtraction[], period: string, range?: { start: string; end: string }) {
+  const scoped = range
+    ? rows.filter((r) => inRange(r, range.start, range.end))
+    : rows.filter((r) => inPeriod(r, period));
   const used = scoped.length ? scoped : [];
   let revenue = 0, expenses = 0, gstCollected = 0, gstPaid = 0;
   let confidenceSum = 0;
