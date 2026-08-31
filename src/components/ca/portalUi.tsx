@@ -3,6 +3,7 @@
  * Background #F8F7F4, ink #1A1A1A, teal accent #0F6E56.
  */
 import { CSSProperties, ReactNode } from "react";
+import { formatINR, formatINRFull } from "@/lib/indian-format";
 
 export const CA = {
   bg: "#F8F7F4",
@@ -23,10 +24,16 @@ export const CA = {
   mono: "'JetBrains Mono', 'SF Mono', Menlo, monospace",
 };
 
+// Single source of truth for rupee display across the CA portal.
+// Exact amounts use formatINRFull (en-IN grouping); headline tiles may use
+// inrCompact for lakh and crore shorthand.
 export const inr = (n: number | null | undefined) =>
   n === null || n === undefined || Number.isNaN(Number(n))
     ? "—"
-    : `₹${Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+    : formatINRFull(Math.round(Number(n)));
+
+export const inrCompact = (n: number | null | undefined) =>
+  n === null || n === undefined || Number.isNaN(Number(n)) ? "—" : formatINR(Number(n));
 
 export const dateIN = (d: string | null | undefined) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";

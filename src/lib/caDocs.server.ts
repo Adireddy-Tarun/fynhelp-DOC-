@@ -49,8 +49,9 @@ export function scanVerdict(input: {
 }
 
 /**
- * Second scan layer. Set VIRUSTOTAL_API_KEY in Lovable secrets to enable full
- * virus scanning. Without it, basic MIME + size + extension checks run.
+ * Third scan layer, after MIME type, file size and extension checks.
+ * Set VIRUSTOTAL_API_KEY in Lovable project secrets to enable deep file
+ * scanning. Without it, MIME type, file size, and extension checks still run.
  * Never blocks an upload because the service is unavailable — an upload is only
  * rejected when VirusTotal explicitly reports malicious or suspicious hits.
  */
@@ -60,7 +61,11 @@ export async function scanWithVirusTotal(
 ): Promise<{ safe: boolean; reason: string }> {
   const apiKey = process.env["VIRUSTOTAL_API_KEY"] ?? "";
   if (!apiKey) {
-    return { safe: true, reason: "VirusTotal not configured. Basic checks passed" };
+    return {
+      safe: true,
+      reason:
+        "Basic checks passed. Set VIRUSTOTAL_API_KEY in Lovable secrets to enable deep scan.",
+    };
   }
   try {
     const formData = new FormData();
