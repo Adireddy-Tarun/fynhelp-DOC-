@@ -19,8 +19,10 @@ import { Route as MainDemoGateRouteImport } from './routes/_main/_demoGate'
 import { Route as MainAboutRouteImport } from './routes/_main/about'
 import { Route as MainCaFirmsRouteImport } from './routes/_main/ca-firms'
 import { Route as MainCommunityRouteImport } from './routes/_main/community'
+import { Route as MainContactRouteImport } from './routes/_main/contact'
 import { Route as MainLoginRouteImport } from './routes/_main/login'
 import { Route as MainOnboardingRouteImport } from './routes/_main/onboarding'
+import { Route as MainPipelineRouteImport } from './routes/_main/pipeline'
 import { Route as MainPricingRouteImport } from './routes/_main/pricing'
 import { Route as MainResetPasswordRouteImport } from './routes/_main/reset-password'
 import { Route as MainResourcesRouteImport } from './routes/_main/resources'
@@ -256,6 +258,11 @@ const MainCommunityRoute = MainCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => MainRoute,
 } as any)
+const MainContactRoute = MainContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainLoginRoute = MainLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -264,6 +271,11 @@ const MainLoginRoute = MainLoginRouteImport.update({
 const MainOnboardingRoute = MainOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainPipelineRoute = MainPipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
   getParentRoute: () => MainRoute,
 } as any)
 const MainPricingRoute = MainPricingRouteImport.update({
@@ -1330,8 +1342,10 @@ export interface FileRoutesByFullPath {
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
+  '/contact': typeof MainContactRoute
   '/login': typeof MainLoginRoute
   '/onboarding': typeof MainOnboardingRoute
+  '/pipeline': typeof MainPipelineRoute
   '/pricing': typeof MainPricingRoute
   '/reset-password': typeof MainResetPasswordRoute
   '/resources': typeof MainResourcesRoute
@@ -1528,8 +1542,10 @@ export interface FileRoutesByTo {
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
+  '/contact': typeof MainContactRoute
   '/login': typeof MainLoginRoute
   '/onboarding': typeof MainOnboardingRoute
+  '/pipeline': typeof MainPipelineRoute
   '/pricing': typeof MainPricingRoute
   '/reset-password': typeof MainResetPasswordRoute
   '/resources': typeof MainResourcesRoute
@@ -1729,8 +1745,10 @@ export interface FileRoutesById {
   '/_main/about': typeof MainAboutRoute
   '/_main/ca-firms': typeof MainCaFirmsRoute
   '/_main/community': typeof MainCommunityRoute
+  '/_main/contact': typeof MainContactRoute
   '/_main/login': typeof MainLoginRoute
   '/_main/onboarding': typeof MainOnboardingRoute
+  '/_main/pipeline': typeof MainPipelineRoute
   '/_main/pricing': typeof MainPricingRoute
   '/_main/reset-password': typeof MainResetPasswordRoute
   '/_main/resources': typeof MainResourcesRoute
@@ -1930,8 +1948,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/ca-firms'
     | '/community'
+    | '/contact'
     | '/login'
     | '/onboarding'
+    | '/pipeline'
     | '/pricing'
     | '/reset-password'
     | '/resources'
@@ -2128,8 +2148,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/ca-firms'
     | '/community'
+    | '/contact'
     | '/login'
     | '/onboarding'
+    | '/pipeline'
     | '/pricing'
     | '/reset-password'
     | '/resources'
@@ -2328,8 +2350,10 @@ export interface FileRouteTypes {
     | '/_main/about'
     | '/_main/ca-firms'
     | '/_main/community'
+    | '/_main/contact'
     | '/_main/login'
     | '/_main/onboarding'
+    | '/_main/pipeline'
     | '/_main/pricing'
     | '/_main/reset-password'
     | '/_main/resources'
@@ -2614,6 +2638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCommunityRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/contact': {
+      id: '/_main/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof MainContactRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/login': {
       id: '/_main/login'
       path: '/login'
@@ -2626,6 +2657,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof MainOnboardingRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/pipeline': {
+      id: '/_main/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof MainPipelineRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/pricing': {
@@ -4332,8 +4370,10 @@ interface MainRouteChildren {
   MainAboutRoute: typeof MainAboutRoute
   MainCaFirmsRoute: typeof MainCaFirmsRoute
   MainCommunityRoute: typeof MainCommunityRoute
+  MainContactRoute: typeof MainContactRoute
   MainLoginRoute: typeof MainLoginRoute
   MainOnboardingRoute: typeof MainOnboardingRoute
+  MainPipelineRoute: typeof MainPipelineRoute
   MainPricingRoute: typeof MainPricingRoute
   MainResetPasswordRoute: typeof MainResetPasswordRoute
   MainResourcesRoute: typeof MainResourcesRoute
@@ -4390,8 +4430,10 @@ const MainRouteChildren: MainRouteChildren = {
   MainAboutRoute: MainAboutRoute,
   MainCaFirmsRoute: MainCaFirmsRoute,
   MainCommunityRoute: MainCommunityRoute,
+  MainContactRoute: MainContactRoute,
   MainLoginRoute: MainLoginRoute,
   MainOnboardingRoute: MainOnboardingRoute,
+  MainPipelineRoute: MainPipelineRoute,
   MainPricingRoute: MainPricingRoute,
   MainResetPasswordRoute: MainResetPasswordRoute,
   MainResourcesRoute: MainResourcesRoute,

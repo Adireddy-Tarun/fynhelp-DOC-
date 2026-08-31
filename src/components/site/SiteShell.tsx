@@ -39,7 +39,7 @@ export function SiteFooter() {
           </div>
           <div>
             <h4>Product</h4>
-            <Link to="/#the-fix">How it works</Link>
+            <Link to="/pipeline">The pipeline</Link>
             <Link to="/pricing">Pricing</Link>
             <Link to="/#faq">FAQ</Link>
             <Link to="/demo">Live demo</Link>
@@ -64,6 +64,7 @@ export function SiteFooter() {
             <Link to="/about">About</Link>
             <Link to="/security">Security</Link>
             <Link to="/community">Community</Link>
+            <Link to="/contact">Contact</Link>
             <Link to="/login">Sign in</Link>
           </div>
         </div>

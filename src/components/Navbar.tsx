@@ -134,9 +134,11 @@ const CA_PREVIEW_STATS: ModuleStat[] = [
 ];
 
 const TOP_LINKS: { label: string; href: string }[] = [
+  { label: "Pipeline",  href: "/pipeline" },
   { label: "Pricing",   href: "/pricing" },
   { label: "Resources", href: "/resources" },
   { label: "About",     href: "/about" },
+  { label: "Contact",   href: "/contact" },
 ];
 
 /* ────────────────────────────────────────────────────────────────
