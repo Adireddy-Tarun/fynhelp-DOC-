@@ -76,28 +76,28 @@ export async function scanWithVirusTotal(
       headers: { "x-apikey": apiKey },
       body: formData,
     });
-    if (!uploadRes.ok) return { safe: true, reason: "VirusTotal upload failed. Basic checks passed" };
+    if (!uploadRes.ok) return { safe: true, reason: "VirusTotal unavailable — basic checks passed." };
     const uploadData = (await uploadRes.json()) as { data?: { id?: string } };
     const analysisId = uploadData?.data?.id;
-    if (!analysisId) return { safe: true, reason: "VirusTotal analysis reference missing" };
+    if (!analysisId) return { safe: true, reason: "VirusTotal unavailable — basic checks passed." };
 
-    await new Promise((r) => setTimeout(r, 3000));
+    await new Promise((r) => setTimeout(r, 4000));
 
     const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
       headers: { "x-apikey": apiKey },
     });
-    if (!resultRes.ok) return { safe: true, reason: "VirusTotal result fetch failed" };
+    if (!resultRes.ok) return { safe: true, reason: "VirusTotal unavailable — basic checks passed." };
     const resultData = (await resultRes.json()) as {
       data?: { attributes?: { stats?: { malicious?: number; suspicious?: number } } };
     };
     const stats = resultData?.data?.attributes?.stats;
     const malicious = (stats?.malicious ?? 0) + (stats?.suspicious ?? 0);
     if (malicious > 0) {
-      return { safe: false, reason: `VirusTotal flagged this file by ${malicious} scanner or scanners` };
+      return { safe: false, reason: `VirusTotal flagged by ${malicious} scanners` };
     }
     return { safe: true, reason: "VirusTotal scan clean" };
   } catch {
-    return { safe: true, reason: "VirusTotal unavailable. Basic checks passed" };
+    return { safe: true, reason: "VirusTotal unavailable — basic checks passed." };
   }
 }
 
