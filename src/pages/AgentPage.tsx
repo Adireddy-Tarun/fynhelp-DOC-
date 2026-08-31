@@ -117,7 +117,7 @@ export default function AgentPage({ slug }: { slug: string }) {
         </div>
       </Section>
 
-      <Section kicker="Other modules" title="Works alongside" italic="seven other agents">
+      <Section kicker="Other modules" title="Works alongside" italic="the rest of the pipeline">
         <div className="fh-grid fh-g3" style={{ marginTop: 40 }}>
           {others.map((a, i) => (
             <Reveal key={a.slug} delay={i * 80}>
