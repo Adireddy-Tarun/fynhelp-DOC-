@@ -20,7 +20,7 @@ const STYLES = `
 .fh-price .cur { font-size:19px; font-weight:600; color:${C.maroon}; }
 .fh-price .amount { font-size:44px; font-weight:600; letter-spacing:-0.05em; font-variant-numeric:tabular-nums; }
 .fh-price .per { color:${C.muted}; font-size:14px; }
-.fh-price .was { color:${C.muted}; font-size:15px; text-decoration:line-through; margin-left:8px; font-variant-numeric:tabular-nums; }
+.fh-price .was { color:${C.muted}; font-size:15px; text-decoration:line-through; margin-left:10px; font-variant-numeric:tabular-nums; }
 .fh-pbill { font-size:12.5px; color:${C.muted}; margin-top:6px; min-height:17px; }
 .fh-quota { background:rgba(169,56,56,.08); border-radius:14px; padding:14px; margin-top:18px; text-align:center; }
 .fh-quota .qn { font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:400; font-size:28px; color:${C.maroon}; font-variant-numeric:tabular-nums; }
