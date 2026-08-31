@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { Link } from "@/lib/router-compat";
 import SiteShell, { Section, Reveal, CtaBand } from "@/components/site/SiteShell";
 import { C } from "@/components/site/siteTheme";
@@ -63,7 +64,7 @@ const STYLES = `
 @media (prefers-reduced-motion:reduce){ .fh-demo * { animation:none !important; opacity:1 !important; transform:none !important; } }
 `;
 
-const STEP_DEMOS: Record<string, JSX.Element> = {
+const STEP_DEMOS: Record<string, ReactElement> = {
   extract: (
     <div className="fh-demo" aria-hidden="true">
       <div className="fh-doc">
