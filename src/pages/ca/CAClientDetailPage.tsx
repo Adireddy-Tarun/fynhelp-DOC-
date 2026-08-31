@@ -230,7 +230,7 @@ export default function CAClientDetailPage() {
       // Lineage columns are optional on older datasets — fall back when absent.
       let { data, error } = await proxyExternalQuery({
         ...base,
-        select: "id, date, description, category, amount, balance, type, source_reference, source_document_id",
+        select: "id, date, description, category, amount, balance, type, source_type, source_reference, source_document_id",
       });
       if (error) {
         ({ data, error } = await proxyExternalQuery({
