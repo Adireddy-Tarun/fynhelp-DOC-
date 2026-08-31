@@ -27,6 +27,7 @@ import BrandMarquee from "@/components/home/BrandMarquee";
 import HeroVisual from "@/components/home/HeroVisual";
 
 import AIRecommendedSection from "@/components/AIRecommendedSection";
+import { SiteFooter } from "@/components/site/SiteShell";
 
 /* ─────────────────────────────────────────────────────────
    FynHelp homepage — editorial fintech layout
@@ -1018,45 +1019,7 @@ export default function HomePage() {
       <AIRecommendedSection />
 
       {/* ── FOOTER ── */}
-      <footer className="fh-foot">
-        <div className="fh-wrap">
-          <div className="fh-foot-grid">
-            <div>
-              <FynLogo variant="dark" size="md" />
-              <p style={{ fontSize: 13.5, lineHeight: 1.65, marginTop: 12, color: C.body, maxWidth: "34ch" }}>
-                The intelligence layer between your documents and your ledger. Built in India, for Indian
-                practices.
-              </p>
-            </div>
-            <div>
-              <h4>Product</h4>
-              <a href="#the-fix">How it works</a>
-              <a href="#pricing">Pricing</a>
-              <a href="#faq">FAQ</a>
-              <Link to="/demo">Live demo</Link>
-            </div>
-            <div>
-              <h4>For firms</h4>
-              <Link to="/ca-firms">CA firms</Link>
-              <Link to="/ca/login">CA sign in</Link>
-              <Link to="/use-cases">Use cases</Link>
-              <Link to="/blog">Blog</Link>
-            </div>
-            <div>
-              <h4>Company</h4>
-              <Link to="/about">About</Link>
-              <Link to="/security">Security</Link>
-              <Link to="/community">Community</Link>
-              <Link to="/login">Sign in</Link>
-            </div>
-          </div>
-          <div className="fh-foot-bottom">
-            <span>© 2026 FynHelp Technologies · Bengaluru, India</span>
-            <span>support@fynhelp.com</span>
-          </div>
-          <div className="fh-wordmark" aria-hidden="true">FYNHELP</div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
