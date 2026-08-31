@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
@@ -206,12 +206,12 @@ export default function CAUsersRolesPage() {
         )}
       </CACard>
 
-      {isPartner && active.length <= 1 && (
+      {isPartner && active.length === 1 && (
         <RbacTestPanel
-          firmId={firmId ?? ""}
           onQuickInvite={(r) => {
             setInvite((v) => ({ ...v, role: r }));
             setPanelOpen(true);
+            window.setTimeout(() => emailRef.current?.focus(), 50);
           }}
         />
       )}
