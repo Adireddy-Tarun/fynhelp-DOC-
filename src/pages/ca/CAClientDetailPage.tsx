@@ -473,6 +473,12 @@ ${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMi
     printHtmlDocument(html);
   };
 
+  const seedCount = useMemo(() => txns.filter((t) => t.source_type === "seed").length, [txns]);
+  const visibleTxns = useMemo(
+    () => (hideDemo ? txns.filter((t) => t.source_type !== "seed") : txns),
+    [txns, hideDemo],
+  );
+
 
   const itcTotals = useMemo(() => {
     const sum = (f: (r: any) => number) => itc.reduce((s, r) => s + (Number(f(r)) || 0), 0);
