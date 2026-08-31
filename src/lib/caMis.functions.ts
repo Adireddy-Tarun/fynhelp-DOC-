@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  monthsInRange,
   summariseCompliance,
   summariseDocuments,
   summariseExceptions,
@@ -17,6 +18,9 @@ export interface GenerateMisInput {
   business_id: string;
   period: string;
   report_type?: string;
+  /** Optional YYYY-MM-DD bounds. When both are present the MIS covers the date range. */
+  period_start?: string;
+  period_end?: string;
 }
 
 export interface MisReport {
