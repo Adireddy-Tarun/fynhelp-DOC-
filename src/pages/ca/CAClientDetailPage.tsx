@@ -395,7 +395,7 @@ export default function CAClientDetailPage() {
     if (period_end < period_start) return toast.error("The end date cannot be before the start date");
 
     setGroupBusy(true);
-    setGroupModalOpen(false);
+    setGroupMisPhase("loading");
     try {
       const { data: kids } = await supabase
         .from("ca_clients")
@@ -454,9 +454,11 @@ export default function CAClientDetailPage() {
       setGroupLogId(logRow?.id ?? null);
 
       await loadReports();
+      setGroupMisPhase("done");
       toast.success(`Group MIS built for ${consolidated.entities.length} entities`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Group MIS failed");
+      setGroupMisPhase("picking");
     } finally {
       setGroupBusy(false);
     }
@@ -487,7 +489,7 @@ export default function CAClientDetailPage() {
     setGroupLogId(null);
     setGroupStart(monthStartIso());
     setGroupEnd(todayIso());
-    setGroupModalOpen(true);
+    setGroupMisPhase("picking");
   };
 
   const seedCount = useMemo(() => txns.filter((t) => t.source_type === "seed").length, [txns]);
