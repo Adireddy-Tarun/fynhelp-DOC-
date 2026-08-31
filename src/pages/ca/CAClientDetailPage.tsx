@@ -75,7 +75,13 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
-  const [hideDemo, setHideDemo] = useState(false);
+  const [hideDemo, setHideDemoState] = useState<boolean>(() => {
+    try { return window.localStorage.getItem("hide_seed_transactions") === "1"; } catch { return false; }
+  });
+  const setHideDemo = (v: boolean) => {
+    setHideDemoState(v);
+    try { window.localStorage.setItem("hide_seed_transactions", v ? "1" : "0"); } catch { /* restricted browser */ }
+  };
   const [groupStart, setGroupStart] = useState("");
   const [groupEnd, setGroupEnd] = useState("");
   const [groupBusy, setGroupBusy] = useState(false);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ export default function CAUsersRolesPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [invite, setInvite] = useState({ email: "", role: "junior" });
   const [inviting, setInviting] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
 
   const role = (caRole ?? "").toLowerCase();
   const isPartner = role === "partner" || role === "admin";
@@ -206,12 +207,12 @@ export default function CAUsersRolesPage() {
         )}
       </CACard>
 
-      {isPartner && active.length <= 1 && (
+      {isPartner && active.length === 1 && (
         <RbacTestPanel
-          firmId={firmId ?? ""}
           onQuickInvite={(r) => {
             setInvite((v) => ({ ...v, role: r }));
             setPanelOpen(true);
+            window.setTimeout(() => emailRef.current?.focus(), 50);
           }}
         />
       )}
@@ -270,6 +271,7 @@ export default function CAUsersRolesPage() {
             <form onSubmit={sendInvite} style={{ display: "grid", gap: 14 }}>
               <CAField label="Email">
                 <input
+                  ref={emailRef}
                   style={caInputStyle}
                   value={invite.email}
                   onChange={(e) => setInvite((i) => ({ ...i, email: e.target.value }))}
