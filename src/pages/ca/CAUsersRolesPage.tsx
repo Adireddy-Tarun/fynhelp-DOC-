@@ -6,6 +6,7 @@ import {
   CA, CACard, CAHeading, CAButton, CAField, caInputStyle, CABadge, statusTone,
   caTh, caTd, CAEmpty, dateIN,
 } from "@/components/ca/portalUi";
+import RbacTestPanel from "@/components/ca/RbacTestPanel";
 
 const ROLES = ["partner", "manager", "senior", "junior", "client"];
 const INVITE_ROLES = ["partner", "manager", "senior", "junior"];
@@ -204,6 +205,16 @@ export default function CAUsersRolesPage() {
           </table>
         )}
       </CACard>
+
+      {isPartner && active.length <= 1 && (
+        <RbacTestPanel
+          firmId={firmId ?? ""}
+          onQuickInvite={(r) => {
+            setInvite((v) => ({ ...v, role: r }));
+            setPanelOpen(true);
+          }}
+        />
+      )}
 
       <CACard style={{ marginTop: 18, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px", borderBottom: `0.5px solid ${CA.line}`, fontFamily: CA.serif, fontSize: 16, fontWeight: 700 }}>

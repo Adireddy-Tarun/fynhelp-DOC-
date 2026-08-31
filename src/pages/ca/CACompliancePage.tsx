@@ -276,7 +276,11 @@ export default function CACompliancePage() {
                             : `${days} days left`}
                       </td>
                       <td style={{ ...caTd, fontFamily: CA.mono, color: overdue ? CA.red : CA.muted, fontWeight: overdue ? 700 : 400 }}>
-                        {e.status === "filed" ? "—" : overdue ? `${inr(penalty)} accruing` : inr(penalty)}
+                        {e.status === "filed"
+                          ? "—"
+                          : overdue
+                            ? `${inr(penalty)} accruing over ${Math.abs(days)} days`
+                            : `${inr(penalty)} if missed`}
                       </td>
                       <td style={{ ...caTd, textAlign: "right", whiteSpace: "nowrap" }}>
                         {e.status !== "filed" && (

@@ -476,6 +476,7 @@ export type Database = {
           reconciled: boolean
           source_document_id: string | null
           source_reference: string | null
+          source_type: string
           type: string
           updated_at: string
         }
@@ -492,6 +493,7 @@ export type Database = {
           reconciled?: boolean
           source_document_id?: string | null
           source_reference?: string | null
+          source_type?: string
           type: string
           updated_at?: string
         }
@@ -508,6 +510,7 @@ export type Database = {
           reconciled?: boolean
           source_document_id?: string | null
           source_reference?: string | null
+          source_type?: string
           type?: string
           updated_at?: string
         }

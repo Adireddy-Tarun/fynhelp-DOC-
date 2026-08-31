@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   scanVerdict,
+  scanWithVirusTotal,
   resolveCaFirmId,
   buildPrintableHtml,
 } from "@/lib/caDocs.server";
@@ -32,16 +33,34 @@ export const scanAndClassifyDocument = createServerFn({ method: "POST" })
 
     const verdict = scanVerdict(doc);
 
+    // Deep scan runs only when the basic checks pass and the bytes are readable.
+    // Set VIRUSTOTAL_API_KEY in Lovable secrets to enable full virus scanning.
+    // Without it, basic MIME + size + extension checks run.
+    let status: "clean" | "infected" = verdict.status;
+    let reason = verdict.reason;
+    if (status === "clean" && doc.storage_path) {
+      try {
+        const { data: blob } = await admin.storage.from("ca-client-documents").download(doc.storage_path);
+        if (blob) {
+          const deep = await scanWithVirusTotal(await blob.arrayBuffer(), String(doc.original_filename ?? "document"));
+          reason = deep.reason;
+          if (!deep.safe) status = "infected";
+        }
+      } catch {
+        // Download or scan failure never blocks an upload.
+      }
+    }
+
     await admin
       .from("ca_client_documents")
-      .update({ virus_scan_status: verdict.status, virus_scan_at: new Date().toISOString() })
+      .update({ virus_scan_status: status, virus_scan_at: new Date().toISOString() })
       .eq("id", doc.id)
       .eq("ca_firm_id", firmId);
 
-    if (verdict.status === "infected") {
+    if (status === "infected") {
       await admin.storage.from("ca-client-documents").remove([doc.storage_path]);
       await admin.from("ca_client_documents").delete().eq("id", doc.id).eq("ca_firm_id", firmId);
-      return { scan_status: "infected" as const, reason: verdict.reason, matched: false, request_id: null, request_title: null };
+      return { scan_status: "infected" as const, reason, matched: false, request_id: null, request_title: null };
     }
 
     // Auto-match against open requests for the same client.
@@ -114,7 +133,7 @@ export const scanAndClassifyDocument = createServerFn({ method: "POST" })
 
     return {
       scan_status: "clean" as const,
-      reason: verdict.reason,
+      reason,
       matched: !!match,
       request_id: match?.id ?? null,
       request_title: match?.title ?? null,
