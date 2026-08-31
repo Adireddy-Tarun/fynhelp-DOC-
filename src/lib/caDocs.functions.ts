@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   scanVerdict,
+  scanWithVirusTotal,
   resolveCaFirmId,
   buildPrintableHtml,
 } from "@/lib/caDocs.server";
