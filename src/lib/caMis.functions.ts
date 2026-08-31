@@ -99,20 +99,36 @@ export const generateMisReport = createServerFn({ method: "POST" })
         .eq("business_id", data.business_id)
         .eq("review_state", "posted")
         .limit(5000),
-      supabase
-        .from("ca_itc_records")
-        .select("total_itc, match_status, filing_period")
-        .eq("ca_firm_id", data.firm_id)
-        .eq("business_id", data.business_id)
-        .eq("filing_period", data.period)
-        .limit(5000),
-      supabase
-        .from("ca_compliance_events")
-        .select("status, event_type, due_date, filing_period")
-        .eq("ca_firm_id", data.firm_id)
-        .eq("business_id", data.business_id)
-        .eq("filing_period", data.period)
-        .limit(500),
+      rangeMonths
+        ? supabase
+            .from("ca_itc_records")
+            .select("total_itc, match_status, filing_period")
+            .eq("ca_firm_id", data.firm_id)
+            .eq("business_id", data.business_id)
+            .in("filing_period", rangeMonths)
+            .limit(5000)
+        : supabase
+            .from("ca_itc_records")
+            .select("total_itc, match_status, filing_period")
+            .eq("ca_firm_id", data.firm_id)
+            .eq("business_id", data.business_id)
+            .eq("filing_period", data.period)
+            .limit(5000),
+      rangeMonths
+        ? supabase
+            .from("ca_compliance_events")
+            .select("status, event_type, due_date, filing_period")
+            .eq("ca_firm_id", data.firm_id)
+            .eq("business_id", data.business_id)
+            .in("filing_period", rangeMonths)
+            .limit(500)
+        : supabase
+            .from("ca_compliance_events")
+            .select("status, event_type, due_date, filing_period")
+            .eq("ca_firm_id", data.firm_id)
+            .eq("business_id", data.business_id)
+            .eq("filing_period", data.period)
+            .limit(500),
       supabase
         .from("ca_exceptions")
         .select("status, amount")
