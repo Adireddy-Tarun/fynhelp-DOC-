@@ -896,68 +896,56 @@ export default function CAClientDetailPage() {
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                   <CAButton
                     variant="ghost"
-                    onClick={() => { setGroupMis(null); setGroupLogId(null); setGroupModalOpen(true); }}
+                    onClick={() => { setGroupMis(null); setGroupLogId(null); setGroupMisPhase("picking"); }}
                     disabled={!businessId || groupBusy}
                   >
-                    {groupBusy ? "Generating group MIS…" : "Group MIS"}
+                    {groupMisPhase === "loading" ? "Generating group MIS…" : "Group MIS"}
                   </CAButton>
-                  {groupBusy && (
-                    <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                  {groupMisPhase === "loading" && (
+                    <span style={{ fontFamily: CA.sans, fontSize: 12.5, fontStyle: "italic", color: CA.muted }}>
                       Generating group MIS…
                     </span>
                   )}
                 </div>
 
-                {groupModalOpen && (
-                  <>
-                    <div
-                      onClick={() => setGroupModalOpen(false)}
-                      style={{ position: "absolute", inset: "-8px -16px", background: "rgba(26,26,26,0.18)", borderRadius: 12, zIndex: 10 }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute", top: 44, left: 0, zIndex: 11, width: 320,
-                        background: CA.card, border: `0.5px solid ${CA.line}`, borderRadius: 12,
-                        padding: "18px 20px", boxShadow: "0 12px 32px rgba(26,16,8,0.14)",
-                      }}
-                    >
-                      <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
-                        Group MIS period
-                      </div>
-                      <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
-                        Covers this entity and its {subCount} {subCount === 1 ? "subsidiary" : "subsidiaries"}.
-                      </div>
-                      <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-                        <CAField label="Period start">
-                          <input
-                            type="date"
-                            value={groupStart}
-                            onChange={(e) => setGroupStart(e.target.value)}
-                            style={{ ...caInputStyle, width: 128, height: 38 }}
-                          />
-                        </CAField>
-                        <CAField label="Period end">
-                          <input
-                            type="date"
-                            value={groupEnd}
-                            onChange={(e) => setGroupEnd(e.target.value)}
-                            style={{ ...caInputStyle, width: 128, height: 38 }}
-                          />
-                        </CAField>
-                      </div>
-                      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                        <CAButton onClick={generateGroupMis} disabled={groupBusy}>
-                          Generate
-                        </CAButton>
-                        <CAButton variant="ghost" onClick={() => setGroupModalOpen(false)}>
-                          Cancel
-                        </CAButton>
-                      </div>
+                {groupMisPhase === "picking" && (
+                  <CACard style={{ marginTop: 14, padding: "18px 20px", maxWidth: 420 }}>
+                    <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
+                      Group MIS period
                     </div>
-                  </>
+                    <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
+                      Covers this entity and its {subCount} {subCount === 1 ? "subsidiary" : "subsidiaries"}.
+                    </div>
+                    <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+                      <CAField label="Period start">
+                        <input
+                          type="date"
+                          value={groupStart}
+                          onChange={(e) => setGroupStart(e.target.value)}
+                          style={{ ...caInputStyle, width: 150, height: 38 }}
+                        />
+                      </CAField>
+                      <CAField label="Period end">
+                        <input
+                          type="date"
+                          value={groupEnd}
+                          onChange={(e) => setGroupEnd(e.target.value)}
+                          style={{ ...caInputStyle, width: 150, height: 38 }}
+                        />
+                      </CAField>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                      <CAButton onClick={generateGroupMis} disabled={groupBusy}>
+                        Generate
+                      </CAButton>
+                      <CAButton variant="ghost" onClick={() => setGroupMisPhase("idle")}>
+                        Cancel
+                      </CAButton>
+                    </div>
+                  </CACard>
                 )}
 
-                {groupMis && !groupBusy && (
+                {groupMisPhase === "done" && groupMis && (
                   <CACard style={{ marginTop: 14, padding: "18px 20px" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
                       <div style={{ fontFamily: CA.serif, fontSize: 18, fontWeight: 700, color: CA.ink }}>
