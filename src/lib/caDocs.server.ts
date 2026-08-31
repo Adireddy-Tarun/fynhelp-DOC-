@@ -48,6 +48,54 @@ export function scanVerdict(input: {
   return { status: "clean", reason: "Passed all safety checks" };
 }
 
+/**
+ * Second scan layer. Set VIRUSTOTAL_API_KEY in Lovable secrets to enable full
+ * virus scanning. Without it, basic MIME + size + extension checks run.
+ * Never blocks an upload because the service is unavailable — an upload is only
+ * rejected when VirusTotal explicitly reports malicious or suspicious hits.
+ */
+export async function scanWithVirusTotal(
+  fileBuffer: ArrayBuffer,
+  filename: string,
+): Promise<{ safe: boolean; reason: string }> {
+  const apiKey = process.env["VIRUSTOTAL_API_KEY"] ?? "";
+  if (!apiKey) {
+    return { safe: true, reason: "VirusTotal not configured. Basic checks passed" };
+  }
+  try {
+    const formData = new FormData();
+    const blob = new Blob([fileBuffer]);
+    formData.append("file", blob, filename);
+    const uploadRes = await fetch("https://www.virustotal.com/api/v3/files", {
+      method: "POST",
+      headers: { "x-apikey": apiKey },
+      body: formData,
+    });
+    if (!uploadRes.ok) return { safe: true, reason: "VirusTotal upload failed. Basic checks passed" };
+    const uploadData = (await uploadRes.json()) as { data?: { id?: string } };
+    const analysisId = uploadData?.data?.id;
+    if (!analysisId) return { safe: true, reason: "VirusTotal analysis reference missing" };
+
+    await new Promise((r) => setTimeout(r, 3000));
+
+    const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+      headers: { "x-apikey": apiKey },
+    });
+    if (!resultRes.ok) return { safe: true, reason: "VirusTotal result fetch failed" };
+    const resultData = (await resultRes.json()) as {
+      data?: { attributes?: { stats?: { malicious?: number; suspicious?: number } } };
+    };
+    const stats = resultData?.data?.attributes?.stats;
+    const malicious = (stats?.malicious ?? 0) + (stats?.suspicious ?? 0);
+    if (malicious > 0) {
+      return { safe: false, reason: `VirusTotal flagged this file by ${malicious} scanner or scanners` };
+    }
+    return { safe: true, reason: "VirusTotal scan clean" };
+  } catch {
+    return { safe: true, reason: "VirusTotal unavailable. Basic checks passed" };
+  }
+}
+
 /** Resolve the caller's CA firm from membership, falling back to firm ownership. */
 export async function resolveCaFirmId(admin: SupabaseClient, userId: string): Promise<string | null> {
   const { data: member } = await admin
