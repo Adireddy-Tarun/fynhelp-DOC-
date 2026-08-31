@@ -45,7 +45,7 @@ export function SiteFooter() {
             <Link to="/demo">Live demo</Link>
           </div>
           <div>
-            <h4>Agents</h4>
+            <h4>Modules</h4>
             {AGENTS.map((a) => (
               <Link key={a.slug} to={`/agents/${a.slug}`}>
                 {a.name} — {a.footerUse}

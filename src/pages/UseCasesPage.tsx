@@ -11,19 +11,9 @@ const SEGMENTS = [
     wins: ["Input credit recovered every cycle", "Vendor payment sequencing", "Inventory funded by real cash, not hope"],
   },
   {
-    t: "Services and agencies",
-    d: "Revenue is people. Utilisation, collections and a small number of large clients decide whether a good month is actually a good month.",
-    wins: ["Concentration risk visible early", "DSO tracked per client", "Cost per delivery team"],
-  },
-  {
     t: "D2C and marketplace sellers",
     d: "Settlement files, fee deductions and returns make reported revenue and banked revenue two different numbers every single week.",
     wins: ["Settlement reconciliation", "True contribution per channel", "Fee leakage flagged"],
-  },
-  {
-    t: "CA and accounting practices",
-    d: "Multiple clients, one calendar, and a team where review capacity is the constraint. The work is not harder, it is repeated forty times.",
-    wins: ["Firm wide compliance calendar", "Bulk reconciliation with review queue", "Branded client reporting"],
   },
 ];
 
@@ -32,9 +22,9 @@ export default function UseCasesPage() {
     <SiteShell>
       <PageHero
         kicker="Use cases"
-        title="Eight agents. One"
+        title="Four modules. One"
         italic="finance desk that never sleeps"
-        sub="Each agent owns a part of the month end. Together they read your books, reconcile them against source, and hand you the handful of things that genuinely need a decision."
+        sub="Each module owns a part of the month end. Together they read your books, reconcile them against source, and hand you the handful of things that genuinely need a decision."
         actions={
           <>
             <Link to="/waitlist" className="fh-btn fh-btn-primary">
@@ -50,7 +40,7 @@ export default function UseCasesPage() {
       <div className="fh-wrap">
         <div className="fh-strip">
           <div className="fh-strip-grid">
-            <div><div className="v num">8</div><div className="l">agents on every account</div></div>
+            <div><div className="v num">4</div><div className="l">modules on every account</div></div>
             <div><div className="v num">13 wk</div><div className="l">cash horizon</div></div>
             <div><div className="v num">100%</div><div className="l">figures traceable to source</div></div>
             <div><div className="v num">30 min</div><div className="l">to first finding</div></div>
@@ -59,10 +49,10 @@ export default function UseCasesPage() {
       </div>
 
       <Section
-        kicker="The agents"
+        kicker="The modules"
         title="Pick the one that owns"
         italic="your worst week of the month"
-        lead="Every agent runs on the same ledger, so a finding in one shows up as context in another."
+        lead="Every module runs on the same ledger, so a finding in one shows up as context in another."
       >
         <div className="fh-grid fh-g3" style={{ marginTop: 44 }}>
           {AGENTS.map((a, i) => (
@@ -85,7 +75,7 @@ export default function UseCasesPage() {
         kicker="By business type"
         title="The same books read"
         italic="through your industry"
-        lead="What matters in a trading business is not what matters in an agency. The agents weight accordingly."
+        lead="What matters in a trading business is not what matters in a D2C brand. The modules weight accordingly."
       >
         <div className="fh-grid fh-g2" style={{ marginTop: 40 }}>
           {SEGMENTS.map((s, i) => (
@@ -108,7 +98,7 @@ export default function UseCasesPage() {
       </Section>
 
       <CtaBand
-        title="See the agents run"
+        title="See it run"
         italic="on your own numbers"
         lead="Bring one month of statements. You leave with the findings whether or not you sign up."
         secondary={{ to: "/pricing", label: "See pricing" }}
