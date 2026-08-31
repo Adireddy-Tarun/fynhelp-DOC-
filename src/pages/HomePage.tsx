@@ -27,6 +27,7 @@ import BrandMarquee from "@/components/home/BrandMarquee";
 import HeroVisual from "@/components/home/HeroVisual";
 
 import AIRecommendedSection from "@/components/AIRecommendedSection";
+import { SiteFooter } from "@/components/site/SiteShell";
 
 /* ─────────────────────────────────────────────────────────
    FynHelp homepage — editorial fintech layout

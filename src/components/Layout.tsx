@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Navbar from "./Navbar";
-import Footer from "./Footer";
+import { SiteFooter } from "./site/SiteShell";
 import GlobalBackBar from "./GlobalBackBar";
 
 const Layout = ({ children }: { children: ReactNode }) => (
@@ -8,7 +8,7 @@ const Layout = ({ children }: { children: ReactNode }) => (
     <Navbar />
     <GlobalBackBar />
     <main className="flex-1">{children}</main>
-    <Footer />
+    <SiteFooter />
   </div>
 );
 
