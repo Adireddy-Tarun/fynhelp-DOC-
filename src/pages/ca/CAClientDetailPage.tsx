@@ -75,6 +75,17 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
+  const [hideDemo, setHideDemo] = useState(false);
+  const [groupStart, setGroupStart] = useState("");
+  const [groupEnd, setGroupEnd] = useState("");
+  const [groupBusy, setGroupBusy] = useState(false);
+  const [groupMis, setGroupMis] = useState<{
+    period: string;
+    rows: { name: string; revenue: number; expenses: number; net: number }[];
+    revenue: number;
+    expenses: number;
+    net: number;
+  } | null>(null);
   const [reportBusyId, setReportBusyId] = useState<string | null>(null);
   const [sharePanel, setSharePanel] = useState<{ reportId: string; url: string; expires_at: string } | null>(null);
   const revokeShare = useServerFn(revokeReportShare);
