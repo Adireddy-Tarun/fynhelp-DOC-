@@ -883,61 +883,118 @@ export default function CAClientDetailPage() {
               </CAButton>
             </div>
 
-            <CACard style={{ marginTop: 16, padding: "18px 20px" }}>
-              <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
-                Consolidated group MIS
-              </div>
-              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 6, lineHeight: 1.6 }}>
-                Combines this entity with every subsidiary that rolls up to it, month by month, into one revenue and
-                expense view. Up to twelve months per run.
-              </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end", marginTop: 14 }}>
-                <CAField label="From">
-                  <input type="month" value={groupStart} onChange={(e) => setGroupStart(e.target.value)} style={{ ...caInputStyle, width: 170, height: 38 }} />
-                </CAField>
-                <CAField label="To">
-                  <input type="month" value={groupEnd} onChange={(e) => setGroupEnd(e.target.value)} style={{ ...caInputStyle, width: 170, height: 38 }} />
-                </CAField>
-                <CAButton onClick={generateGroupMis} disabled={!businessId || groupBusy}>
-                  {groupBusy ? "Consolidating…" : "Generate group MIS"}
-                </CAButton>
-              </div>
-
-              {groupMis && (
-                <div style={{ marginTop: 18 }}>
-                  <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginBottom: 8 }}>
-                    Period {groupMis.period}. {groupMis.rows.length} entities consolidated.
-                  </div>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <thead><tr>
-                      <th style={caTh}>Entity</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Revenue</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Expenses</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Net</th>
-                    </tr></thead>
-                    <tbody>
-                      {groupMis.rows.map((r) => (
-                        <tr key={r.name}>
-                          <td style={caTd}>{r.name}</td>
-                          <td style={caNum}>{inr(r.revenue)}</td>
-                          <td style={caNum}>{inr(r.expenses)}</td>
-                          <td style={{ ...caNum, color: r.net < 0 ? CA.red : CA.green }}>{inr(r.net)}</td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td style={{ ...caTd, fontWeight: 700 }}>Group total</td>
-                        <td style={{ ...caNum, fontWeight: 700 }}>{inr(groupMis.revenue)}</td>
-                        <td style={{ ...caNum, fontWeight: 700 }}>{inr(groupMis.expenses)}</td>
-                        <td style={{ ...caNum, fontWeight: 700, color: groupMis.net < 0 ? CA.red : CA.green }}>{inr(groupMis.net)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div style={{ marginTop: 14 }}>
-                    <CAButton variant="ghost" onClick={downloadGroupPdf}>Download PDF</CAButton>
-                  </div>
+            {subCount > 0 && (
+              <div style={{ position: "relative", marginTop: 16 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  <CAButton
+                    variant="ghost"
+                    onClick={() => { setGroupMis(null); setGroupLogId(null); setGroupModalOpen(true); }}
+                    disabled={!businessId || groupBusy}
+                  >
+                    {groupBusy ? "Generating group MIS…" : "Group MIS"}
+                  </CAButton>
+                  {groupBusy && (
+                    <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                      Generating group MIS…
+                    </span>
+                  )}
                 </div>
-              )}
-            </CACard>
+
+                {groupModalOpen && (
+                  <>
+                    <div
+                      onClick={() => setGroupModalOpen(false)}
+                      style={{ position: "absolute", inset: "-8px -16px", background: "rgba(26,26,26,0.18)", borderRadius: 12, zIndex: 10 }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute", top: 44, left: 0, zIndex: 11, width: 320,
+                        background: CA.card, border: `0.5px solid ${CA.line}`, borderRadius: 12,
+                        padding: "18px 20px", boxShadow: "0 12px 32px rgba(26,16,8,0.14)",
+                      }}
+                    >
+                      <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
+                        Group MIS period
+                      </div>
+                      <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
+                        Covers this entity and its {subCount} {subCount === 1 ? "subsidiary" : "subsidiaries"}.
+                      </div>
+                      <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                        <CAField label="Period start">
+                          <input
+                            type="date"
+                            value={groupStart}
+                            onChange={(e) => setGroupStart(e.target.value)}
+                            style={{ ...caInputStyle, width: 128, height: 38 }}
+                          />
+                        </CAField>
+                        <CAField label="Period end">
+                          <input
+                            type="date"
+                            value={groupEnd}
+                            onChange={(e) => setGroupEnd(e.target.value)}
+                            style={{ ...caInputStyle, width: 128, height: 38 }}
+                          />
+                        </CAField>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                        <CAButton onClick={generateGroupMis} disabled={groupBusy}>
+                          Generate
+                        </CAButton>
+                        <CAButton variant="ghost" onClick={() => setGroupModalOpen(false)}>
+                          Cancel
+                        </CAButton>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {groupMis && !groupBusy && (
+                  <CACard style={{ marginTop: 14, padding: "18px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+                      <div style={{ fontFamily: CA.serif, fontSize: 18, fontWeight: 700, color: CA.ink }}>
+                        Group MIS
+                      </div>
+                      <div style={{ fontFamily: CA.mono, fontSize: 13, color: CA.muted }}>
+                        {groupMis.period_start} to {groupMis.period_end}
+                      </div>
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 14 }}>
+                      <thead><tr>
+                        <th style={caTh}>Entity</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Revenue</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Expenses</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Net</th>
+                      </tr></thead>
+                      <tbody>
+                        {groupMis.entities.map((e) => (
+                          <tr key={e.business_id}>
+                            <td style={caTd}>{e.client_name}</td>
+                            <td style={caNum}>{formatINR(e.revenue)}</td>
+                            <td style={caNum}>{formatINR(e.expenses)}</td>
+                            <td style={{ ...caNum, color: e.net < 0 ? CA.red : CA.green }}>{formatINR(e.net)}</td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <td style={{ ...caTd, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>Group Total</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>{formatINR(groupMis.group_revenue)}</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>{formatINR(groupMis.group_expenses)}</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}`, color: groupMis.group_net < 0 ? CA.red : CA.green }}>{formatINR(groupMis.group_net)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+                      <CAButton variant="ghost" onClick={downloadGroupPdf} disabled={reportBusyId === groupLogId}>
+                        {reportBusyId === groupLogId ? "Preparing…" : "Download PDF"}
+                      </CAButton>
+                      <CAButton variant="ghost" onClick={resetGroupPeriod}>
+                        New period
+                      </CAButton>
+                    </div>
+                  </CACard>
+                )}
+              </div>
+            )}
 
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
