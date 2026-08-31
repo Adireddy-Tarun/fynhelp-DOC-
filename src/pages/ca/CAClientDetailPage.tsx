@@ -171,6 +171,12 @@ export default function CAClientDetailPage() {
       if (error) toast.error(error.message);
       setClient((data as Client) ?? null);
       setLoading(false);
+      const { count } = await supabase
+        .from("ca_clients")
+        .select("id", { count: "exact", head: true })
+        .eq("ca_firm_id", firmId)
+        .eq("parent_id", clientId);
+      setSubCount(count ?? 0);
       console.log("[fyn:ca] client detail mount", { clientId, business_id: (data as Client)?.business_id ?? null });
     })();
   }, [clientId, firmId]);
