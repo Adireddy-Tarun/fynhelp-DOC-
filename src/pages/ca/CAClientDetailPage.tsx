@@ -455,8 +455,10 @@ export default function CAClientDetailPage() {
 
   const downloadGroupPdf = () => {
     if (!groupMis) return;
+    const cell = (v: string, i: number, tag: "td" | "th") =>
+      `<${tag} style="padding:8px 10px;border-bottom:1px solid #e3dbc9;text-align:${i ? "right" : "left"};font-variant-numeric:tabular-nums">${v}</${tag}>`;
     const row = (c: string[], tag: "td" | "th" = "td") =>
-      `<tr>${c.map((v, i) => `<${tag} style="padding:8px 10px;border-bottom:1px solid #e3dbc9;text-align:${i ? "right" : "left"};font-variant-numeric:tabular-nums">${v}</${tag}></tr>`.replace("</tr>", "")).join("")}</tr>`;
+      `<tr>${c.map((v, i) => cell(v, i, tag)).join("")}</tr>`;
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Consolidated MIS</title></head>
 <body style="font-family:Georgia,serif;color:#1A1008;padding:28px">
 <h1 style="font-size:20px;margin:0">Consolidated MIS</h1>
