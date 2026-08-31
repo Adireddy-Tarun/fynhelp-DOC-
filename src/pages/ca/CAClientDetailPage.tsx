@@ -771,8 +771,24 @@ ${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMi
 
         {tab === "Bank" && (
           <>
+          {seedCount > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+              <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: CA.sans, fontSize: 13, color: CA.ink, cursor: "pointer" }}>
+                <input type="checkbox" checked={hideDemo} onChange={(e) => setHideDemo(e.target.checked)} />
+                Hide demo data
+              </label>
+              <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                {seedCount} of {txns.length} rows loaded are sample data, not client records.
+              </span>
+            </div>
+          )}
           <CACard style={{ overflow: "hidden" }}>
-            {txns.length === 0 ? <CAEmpty title="No bank transactions" /> : (
+            {visibleTxns.length === 0 ? (
+              <CAEmpty
+                title={hideDemo && txns.length > 0 ? "No real bank transactions" : "No bank transactions"}
+                hint={hideDemo && txns.length > 0 ? "Only sample rows are loaded for this client." : undefined}
+              />
+            ) : (
               <>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead><tr>
@@ -781,12 +797,17 @@ ${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMi
                     <th style={caTh}>Source</th>
                   </tr></thead>
                   <tbody>
-                    {txns.map((t) => {
+                    {visibleTxns.map((t) => {
                       const signed = t.type === "debit" ? -Math.abs(Number(t.amount)) : Number(t.amount);
                       return (
                         <tr key={t.id}>
                           <td style={caTd}>{dateIN(t.date)}</td>
-                          <td style={caTd}>{t.description ?? "—"}</td>
+                          <td style={caTd}>
+                            {t.description ?? "—"}
+                            {t.source_type === "seed" && (
+                              <span style={{ marginLeft: 8 }}><CABadge tone="amber">Demo data</CABadge></span>
+                            )}
+                          </td>
                           <td style={caTd}>{t.category ?? "—"}</td>
                           <td style={{ ...caNum, color: signed < 0 ? CA.red : CA.green }}>{inr(signed)}</td>
                           <td style={caNum}>{inr(t.balance)}</td>
