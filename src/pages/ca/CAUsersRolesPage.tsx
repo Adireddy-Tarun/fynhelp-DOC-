@@ -205,12 +205,12 @@ export default function CAUsersRolesPage() {
         )}
       </CACard>
 
-      {members.length <= 1 && (
+      {isPartner && active.length <= 1 && (
         <RbacTestPanel
           firmId={firmId ?? ""}
           onQuickInvite={(r) => {
-            setInviteRole(r);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            setInvite((v) => ({ ...v, role: r }));
+            setPanelOpen(true);
           }}
         />
       )}
