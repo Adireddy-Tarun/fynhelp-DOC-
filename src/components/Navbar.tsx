@@ -32,82 +32,82 @@ import { isAdminEmail } from "@/lib/adminEmails";
 import type { LucideIcon } from "lucide-react";
 type IconType = LucideIcon;
 
-type ModuleKey = "liquidity" | "revenue" | "gst" | "fynny";
+type ModuleKey = "extract" | "recon" | "narrate" | "chaser";
 
 type ModuleStat = { label: string; value: string; sub?: string; tone?: "healthy" | "warning" | "critical" | "neutral" };
 type ModulePreview = { title: string; sub: string; stats: ModuleStat[]; footer?: string };
 
 const PRODUCT_MODULES: { key: ModuleKey; icon: IconType; label: string; href: string; desc: string; preview: ModulePreview }[] = [
   {
-    key: "liquidity",
-    icon: Droplet,
-    label: "Liquidity intelligence",
-    href: "/demo/liquidity",
-    desc: "Cash, runway, forecasts",
+    key: "extract",
+    icon: FileSearch,
+    label: "Extract",
+    href: "/agents/extract",
+    desc: "Documents to structured lines",
     preview: {
-      title: "Liquidity",
-      sub: "Live cash position",
+      title: "Extract",
+      sub: "Reading INV-4515.pdf",
       stats: [
-        { label: "Cash Balance", value: "₹42.1L", sub: "Operating ₹38.7L", tone: "healthy" },
-        { label: "Runway",       value: "8.2 mo", sub: "Zero by Mar 2027", tone: "warning" },
-        { label: "Net Burn",     value: "₹5.1L/mo", sub: "Gross ₹9.8L", tone: "warning" },
-        { label: "Working Cap.", value: "₹18.4L", sub: "Quick ratio 2.14", tone: "healthy" },
+        { label: "Amount",    value: "₹1,24,500", sub: "Field lifted",      tone: "healthy" },
+        { label: "GSTIN",     value: "27AAB…1Z5", sub: "Format valid",      tone: "healthy" },
+        { label: "Fields",    value: "3",         sub: "Extracted",         tone: "neutral" },
+        { label: "Confidence",value: "98%",       sub: "Shown, not hidden", tone: "healthy" },
       ],
-      footer: "13-week forecast · CCC · AR aging",
+      footer: "Classified · read · structured",
     },
   },
   {
-    key: "revenue",
-    icon: TrendingUp,
-    label: "Revenue intelligence",
-    href: "/demo/revenue",
-    desc: "MRR, churn, growth",
+    key: "recon",
+    icon: GitCompareArrows,
+    label: "Recon",
+    href: "/agents/recon",
+    desc: "Bank matched to ledger",
     preview: {
-      title: "Revenue",
-      sub: "Last 30 days",
+      title: "Recon",
+      sub: "Matching 423 transactions",
       stats: [
-        { label: "MRR",       value: "₹18.2L", sub: "+8.4% MoM", tone: "healthy" },
-        { label: "NRR",       value: "112%",  sub: "+3.2% QoQ", tone: "healthy" },
-        { label: "Churn",     value: "3.2%",  sub: "Below benchmark", tone: "healthy" },
-        { label: "LTV:CAC",   value: "3.8x",  sub: "Healthy", tone: "healthy" },
+        { label: "Matched",    value: "421",     sub: "Exact · fuzzy · rules", tone: "healthy" },
+        { label: "Exceptions", value: "2",       sub: "Visible, not hidden",   tone: "warning" },
+        { label: "INV-2288",   value: "₹41,200", sub: "Locked to bank line",   tone: "healthy" },
+        { label: "Unmatched",  value: "₹4,120",  sub: "Queued with reason",    tone: "warning" },
       ],
-      footer: "ARPA · Rule of 40 · Cohort retention",
+      footer: "A step, not a failure",
     },
   },
   {
-    key: "gst",
-    icon: Receipt,
-    label: "GST intelligence",
-    href: "/demo/gst",
-    desc: "Filings, ITC, 2B recon",
+    key: "narrate",
+    icon: PenLine,
+    label: "Narrate",
+    href: "/agents/narrate",
+    desc: "Drafts with sources attached",
     preview: {
-      title: "GST",
-      sub: "Current period",
+      title: "Narrate",
+      sub: "Drafting GSTR-3B note",
       stats: [
-        { label: "Net Payable",  value: "₹2.4L", sub: "Due 20 Nov",     tone: "warning" },
-        { label: "ITC Gap",      value: "4.1%",  sub: "Reconcile 2B",   tone: "warning" },
-        { label: "Output GST",   value: "₹6.8L", sub: "Collected",      tone: "neutral" },
-        { label: "Input GST",    value: "₹4.4L", sub: "Est · verify",   tone: "neutral" },
+        { label: "Draft",    value: "ITC reversed", sub: "Under Rule 42",        tone: "neutral" },
+        { label: "Amount",   value: "₹12,480",      sub: "Working shown",        tone: "neutral" },
+        { label: "Source",   value: "GSTR-2B_Aug",  sub: "Clipped to the draft", tone: "healthy" },
+        { label: "Posted",   value: "0 unseen",     sub: "You approve first",    tone: "healthy" },
       ],
-      footer: "GSTR-1 · GSTR-3B · 2B match rate",
+      footer: "Deliberate · reviewable",
     },
   },
   {
-    key: "fynny",
-    icon: Sparkles,
-    label: "Fynny, the AI CFO",
-    href: "/demo/fynny",
-    desc: "Ask anything about your books",
+    key: "chaser",
+    icon: Send,
+    label: "Chaser",
+    href: "/agents/chaser",
+    desc: "Polite follow-ups that send themselves",
     preview: {
-      title: "Fynny",
-      sub: "AI CFO briefing",
+      title: "Chaser",
+      sub: "Nudging 4 clients",
       stats: [
-        { label: "Today's alerts",   value: "3",   sub: "1 critical",       tone: "critical" },
-        { label: "Insights",         value: "12",  sub: "Reviewed 4",       tone: "neutral" },
-        { label: "Recommendations",  value: "5",   sub: "Reviewed w/ CA",   tone: "warning" },
-        { label: "Model",            value: "Gemini 2.5", sub: "Grounded on your data", tone: "healthy" },
+        { label: "Nudges sent", value: "4",      sub: "Polite, on schedule",  tone: "neutral" },
+        { label: "Replied",     value: "2",      sub: "Payment promised",     tone: "healthy" },
+        { label: "Asked again", value: "1",      sub: "Once more, then you",  tone: "warning" },
+        { label: "Escalated",   value: "1",      sub: "With full history",    tone: "warning" },
       ],
-      footer: "Ask anything · Auto-briefings · Scenario planning",
+      footer: "Sends · fades · asks once more",
     },
   },
 ];
@@ -153,7 +153,7 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
-  const [previewModule, setPreviewModule] = useState<ModuleKey>("liquidity");
+  const [previewModule, setPreviewModule] = useState<ModuleKey>("extract");
   const [mProducts, setMProducts] = useState(false);
   const [mCA, setMCA] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
