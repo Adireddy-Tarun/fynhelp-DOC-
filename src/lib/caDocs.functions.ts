@@ -133,7 +133,7 @@ export const scanAndClassifyDocument = createServerFn({ method: "POST" })
 
     return {
       scan_status: "clean" as const,
-      reason: verdict.reason,
+      reason,
       matched: !!match,
       request_id: match?.id ?? null,
       request_title: match?.title ?? null,
