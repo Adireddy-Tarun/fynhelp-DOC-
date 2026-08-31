@@ -360,6 +360,117 @@ export default function CAClientDetailPage() {
     }
   };
 
+  /**
+   * Consolidated MIS across the parent entity and every subsidiary that rolls
+   * up to it. Each entity and month is generated with the same server function
+   * used for a single client, then summed for the group view.
+   */
+  const monthsBetween = (start: string, end: string) => {
+    const out: { key: string; label: string }[] = [];
+    const [sy, sm] = start.split("-").map(Number);
+    const [ey, em] = end.split("-").map(Number);
+    const cursor = new Date(sy, sm - 1, 1);
+    const last = new Date(ey, em - 1, 1);
+    while (cursor <= last && out.length < 12) {
+      out.push({
+        key: `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`,
+        label: cursor.toLocaleString("en-IN", { month: "short", year: "numeric" }),
+      });
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+    return out;
+  };
+
+  const generateGroupMis = async () => {
+    if (!businessId || !firmId || !clientId) return;
+    if (!/^\d{4}-\d{2}$/.test(groupStart) || !/^\d{4}-\d{2}$/.test(groupEnd)) {
+      return toast.error("Choose a start month and an end month");
+    }
+    if (groupEnd < groupStart) return toast.error("The end month cannot be before the start month");
+    const months = monthsBetween(groupStart, groupEnd);
+    if (months.length === 0) return toast.error("That period has no months in it");
+
+    setGroupBusy(true);
+    try {
+      const { data: kids } = await supabase
+        .from("ca_clients")
+        .select("id, client_name, business_id")
+        .eq("ca_firm_id", firmId)
+        .eq("parent_id", clientId);
+
+      const entities = [
+        { id: clientId, name: client?.client_name ?? "Parent entity", business_id: businessId },
+        ...((kids ?? []) as { id: string; client_name: string; business_id: string | null }[])
+          .filter((k) => k.business_id)
+          .map((k) => ({ id: k.id, name: k.client_name, business_id: k.business_id as string })),
+      ];
+
+      const rows: { name: string; revenue: number; expenses: number; net: number }[] = [];
+      for (const ent of entities) {
+        let revenue = 0;
+        let expenses = 0;
+        for (const mo of months) {
+          try {
+            const r = await runMis({
+              data: { firm_id: firmId, business_id: ent.business_id, client_id: ent.id, period: mo.label },
+            });
+            revenue += Number(r.revenue) || 0;
+            expenses += Number(r.expenses) || 0;
+          } catch {
+            // A month with no posted data is skipped rather than failing the group run.
+          }
+        }
+        rows.push({ name: ent.name, revenue, expenses, net: revenue - expenses });
+      }
+
+      const revenue = rows.reduce((s, r) => s + r.revenue, 0);
+      const expenses = rows.reduce((s, r) => s + r.expenses, 0);
+      const periodLabel = months.length === 1
+        ? months[0].label
+        : `${months[0].label} to ${months[months.length - 1].label}`;
+
+      const summary = { period: periodLabel, rows, revenue, expenses, net: revenue - expenses };
+      setGroupMis(summary);
+
+      await supabase.from("ca_reports_log").insert({
+        ca_firm_id: firmId,
+        business_id: businessId,
+        report_type: "group_mis",
+        report_name: `Group MIS with ${entities.length} entities`,
+        period: periodLabel,
+        period_start: `${groupStart}-01`,
+        period_end: `${groupEnd}-01`,
+        status: "generated",
+        generated_by_user_id: userId ?? null,
+        content: summary as any,
+      });
+      await loadReports();
+      toast.success(`Consolidated MIS built for ${entities.length} entities`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Consolidated MIS failed");
+    } finally {
+      setGroupBusy(false);
+    }
+  };
+
+  const downloadGroupPdf = () => {
+    if (!groupMis) return;
+    const row = (c: string[], tag: "td" | "th" = "td") =>
+      `<tr>${c.map((v, i) => `<${tag} style="padding:8px 10px;border-bottom:1px solid #e3dbc9;text-align:${i ? "right" : "left"};font-variant-numeric:tabular-nums">${v}</${tag}></tr>`.replace("</tr>", "")).join("")}</tr>`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Consolidated MIS</title></head>
+<body style="font-family:Georgia,serif;color:#1A1008;padding:28px">
+<h1 style="font-size:20px;margin:0">Consolidated MIS</h1>
+<div style="font-size:13px;color:#6b5f52;margin:6px 0 18px">${client?.client_name ?? ""} group. Period ${groupMis.period}. Entities ${groupMis.rows.length}.</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+${row(["Entity", "Revenue", "Expenses", "Net"], "th")}
+${groupMis.rows.map((r) => row([r.name, inr(r.revenue), inr(r.expenses), inr(r.net)])).join("")}
+${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMis.net)], "th")}
+</table>
+<div style="margin-top:26px;font-size:11px;color:#6b5f52">Generated by FynHelp. Confidential.</div>
+</body></html>`;
+    printHtmlDocument(html);
+  };
+
 
   const itcTotals = useMemo(() => {
     const sum = (f: (r: any) => number) => itc.reduce((s, r) => s + (Number(f(r)) || 0), 0);
