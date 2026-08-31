@@ -11,13 +11,13 @@ export default function AgentPage({ slug }: { slug: string }) {
     return (
       <SiteShell>
         <PageHero
-          kicker="Agent not found"
-          title="That agent does not"
+          kicker="Module not found"
+          title="That module does not"
           italic="exist yet"
-          sub="Browse the eight agents that ship with FynHelp today."
+          sub="Browse the four modules that ship with FynHelp today."
           actions={
             <Link to="/use-cases" className="fh-btn fh-btn-primary">
-              See all agents
+              See all modules
             </Link>
           }
         />
