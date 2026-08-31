@@ -53,14 +53,27 @@ export interface MisReport {
 export const generateMisReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: GenerateMisInput) => {
-    if (!input?.firm_id || !input?.business_id || !input?.period?.trim()) {
+    const hasRange =
+      !!input?.period_start &&
+      !!input?.period_end &&
+      /^\d{4}-\d{2}-\d{2}$/.test(input.period_start) &&
+      /^\d{4}-\d{2}-\d{2}$/.test(input.period_end);
+    if (!input?.firm_id || !input?.business_id || (!input?.period?.trim() && !hasRange)) {
       throw new Error("firm_id, business_id and period are required");
+    }
+    if (input.period_start && input.period_end && input.period_end < input.period_start) {
+      throw new Error("period_end cannot be before period_start");
     }
     return input;
   })
   .handler(async ({ data, context }): Promise<MisReport> => {
     const { supabase, userId } = context;
     const reportType = data.report_type?.trim() || "monthly_mis";
+    const hasRange = !!data.period_start && !!data.period_end;
+    const periodLabel = hasRange
+      ? `${data.period_start} to ${data.period_end}`
+      : data.period.trim();
+    const rangeMonths = hasRange ? monthsInRange(data.period_start!, data.period_end!) : null;
 
     // Portfolio access is enforced in SQL as well; fail fast with a clear message.
     const { data: access } = await supabase
