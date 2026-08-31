@@ -1,7 +1,7 @@
 export type Agent = {
   slug: string;
   name: string;
-  /** Short use-case shown next to the agent name in the footer. */
+  /** Short use-case shown next to the module name in the footer. */
   footerUse: string;
   kicker: string;
   headline: string;
@@ -13,19 +13,23 @@ export type Agent = {
   inputs: string[];
 };
 
+/**
+ * The four modules FynHelp ships today, matching the home page Products menu.
+ * Do not add modules here unless they are live in the product.
+ */
 export const AGENTS: Agent[] = [
   {
     slug: "liquidity",
-    name: "Liquidity agent",
+    name: "Liquidity intelligence",
     footerUse: "cash and runway",
-    kicker: "Agent 01",
+    kicker: "Module 01",
     headline: "Know your cash position",
     italic: "before the month closes",
     sub: "Reads bank feeds and payables daily, rebuilds the 13 week forecast every morning, and tells you the date cash runs short instead of the balance you already knew.",
     stats: [
       ["13 wk", "rolling cash forecast"],
       ["Daily", "bank feed refresh"],
-      ["4", "runway scenarios kept live"],
+      ["AR", "ageing with CCC"],
       ["0", "manual sheets to maintain"],
     ],
     useCases: [
@@ -38,15 +42,15 @@ export const AGENTS: Agent[] = [
   },
   {
     slug: "revenue",
-    name: "Revenue agent",
-    footerUse: "collections and growth",
-    kicker: "Agent 02",
+    name: "Revenue intelligence",
+    footerUse: "MRR and growth",
+    kicker: "Module 02",
     headline: "See revenue the way",
     italic: "a CFO reads it",
-    sub: "Splits growth into new, retained and lost, tracks customer concentration, and flags invoices that slipped from paid on time to a collections problem.",
+    sub: "Tracks MRR, NRR and churn, splits growth into new, retained and lost, and flags customers whose payment behaviour is drifting before it becomes a write off.",
     stats: [
       ["MoM", "growth decomposition"],
-      ["Top 10", "concentration watch"],
+      ["NRR", "tracked per cohort"],
       ["DSO", "tracked per customer"],
       ["Auto", "overdue escalation"],
     ],
@@ -59,38 +63,16 @@ export const AGENTS: Agent[] = [
     inputs: ["Sales invoices", "Receipts and bank credits", "Customer master"],
   },
   {
-    slug: "cost",
-    name: "Cost agent",
-    footerUse: "spend and margin leaks",
-    kicker: "Agent 03",
-    headline: "Find the spend",
-    italic: "nobody approved twice",
-    sub: "Classifies every expense line, compares it with the last six months, and surfaces the increases that are real rather than seasonal.",
-    stats: [
-      ["6 mo", "rolling baseline"],
-      ["Line", "level anomaly checks"],
-      ["Vendor", "duplicate detection"],
-      ["Monthly", "margin walk"],
-    ],
-    useCases: [
-      { t: "Silent subscription creep", d: "Recurring charges that grew or renewed without a decision behind them." },
-      { t: "Duplicate vendor payments", d: "Same amount, same vendor, near dates, matched across bank and ledger." },
-      { t: "Cost to serve", d: "Shows which cost heads move with revenue and which stay fixed regardless of volume." },
-    ],
-    outputs: ["Expense anomaly queue", "Vendor spend summary", "Gross margin walk"],
-    inputs: ["Purchase invoices", "Bank debits", "Expense ledger"],
-  },
-  {
-    slug: "gst-tax",
-    name: "GST and tax agent",
+    slug: "gst",
+    name: "GST intelligence",
     footerUse: "filings and input credit",
-    kicker: "Agent 04",
+    kicker: "Module 03",
     headline: "Claim every rupee",
     italic: "of input credit you earned",
     sub: "Matches purchase registers with GSTR 2B, flags blocked credit, and keeps a calendar of every filing due date with the working papers already attached.",
     stats: [
       ["2B", "reconciliation each cycle"],
-      ["12", "compliance events tracked"],
+      ["GSTR 1 and 3B", "due dates tracked"],
       ["Blocked", "ITC flagged with section"],
       ["Auto", "due date reminders"],
     ],
@@ -103,76 +85,10 @@ export const AGENTS: Agent[] = [
     inputs: ["Purchase register", "GSTR 2B download", "Filing history"],
   },
   {
-    slug: "governance",
-    name: "Governance agent",
-    footerUse: "controls and audit trail",
-    kicker: "Agent 05",
-    headline: "Sign off you can",
-    italic: "defend months later",
-    sub: "Keeps an exportable trail of who changed what, when, and from which source line, plus the statutory registers a review will ask for.",
-    stats: [
-      ["100%", "actions logged"],
-      ["Source", "linked figures"],
-      ["Role", "based approvals"],
-      ["Export", "ready registers"],
-    ],
-    useCases: [
-      { t: "Audit preparation", d: "The trail is assembled as you work, so audit season is a download rather than a reconstruction." },
-      { t: "Maker checker discipline", d: "Junior review and partner sign off are separate steps with separate records." },
-      { t: "Related party visibility", d: "Flags transactions with linked entities so disclosure is never missed." },
-    ],
-    outputs: ["Audit trail export", "Approval history", "Statutory register pack"],
-    inputs: ["All ledger activity", "User actions", "Entity master"],
-  },
-  {
-    slug: "workforce",
-    name: "Workforce agent",
-    footerUse: "payroll and people cost",
-    kicker: "Agent 06",
-    headline: "People cost, explained",
-    italic: "before it surprises you",
-    sub: "Tracks payroll, statutory dues and headcount cost per function, and warns when a hiring plan pushes the runway past a threshold you set.",
-    stats: [
-      ["Monthly", "payroll variance"],
-      ["PF, ESI, TDS", "due date tracking"],
-      ["Per team", "cost breakdown"],
-      ["Hiring", "impact simulation"],
-    ],
-    useCases: [
-      { t: "Payroll variance", d: "Explains the month on month change by joiners, exits, increments and one time payouts." },
-      { t: "Statutory dues", d: "PF, ESI and TDS obligations tracked against payment, with penalties avoided." },
-      { t: "Hiring headroom", d: "Shows what a planned role does to runway before the offer goes out." },
-    ],
-    outputs: ["Payroll variance note", "Statutory dues tracker", "Cost per function"],
-    inputs: ["Payroll register", "Employee master", "Bank debits"],
-  },
-  {
-    slug: "investor",
-    name: "Investor agent",
-    footerUse: "board and lender packs",
-    kicker: "Agent 07",
-    headline: "A board pack",
-    italic: "assembled from source",
-    sub: "Builds the MIS, KPI sheet and commentary your investors and lenders ask for, with every figure one click from the transaction behind it.",
-    stats: [
-      ["Monthly", "MIS pack"],
-      ["Traceable", "to bank line"],
-      ["White label", "for your firm"],
-      ["Share", "by revocable link"],
-    ],
-    useCases: [
-      { t: "Monthly investor update", d: "Numbers, commentary and variance against plan, generated from closed books." },
-      { t: "Lender reporting", d: "Covenant tracking and the schedules banks ask for, on the same source data." },
-      { t: "Diligence readiness", d: "A consistent history of packs so diligence does not restart the accounting." },
-    ],
-    outputs: ["Board MIS pack", "KPI sheet", "Shareable report link"],
-    inputs: ["Closed ledgers", "Budget or plan", "Cap table basics"],
-  },
-  {
-    slug: "ask-fynny",
-    name: "Ask Fynny",
+    slug: "fynny",
+    name: "Fynny, the AI CFO",
     footerUse: "answers from your books",
-    kicker: "Agent 08",
+    kicker: "Module 04",
     headline: "Ask your books",
     italic: "a plain question",
     sub: "Answers in plain language and shows the lines behind the answer. If the data is not there, it says so rather than inventing a number.",
@@ -184,10 +100,10 @@ export const AGENTS: Agent[] = [
     ],
     useCases: [
       { t: "Quick answers in a meeting", d: "Why did travel cost rise in August, answered with the entries that caused it." },
-      { t: "Draft the commentary", d: "A first draft of the monthly note that a partner edits rather than writes." },
-      { t: "Explain a variance", d: "Traces a variance to the handful of transactions that created it." },
+      { t: "Auto briefings", d: "A morning note on what changed, what went overdue, and the three things worth your attention today." },
+      { t: "Scenario planning", d: "What a hire, a price change, or a slower collections month does to runway, computed from your books." },
     ],
-    outputs: ["Cited answers", "Draft commentary", "Variance explanations"],
+    outputs: ["Cited answers", "Daily briefings", "Scenario notes"],
     inputs: ["Your posted ledger", "Reconciled bank data", "Prior period figures"],
   },
 ];

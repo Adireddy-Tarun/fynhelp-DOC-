@@ -11,13 +11,13 @@ export default function AgentPage({ slug }: { slug: string }) {
     return (
       <SiteShell>
         <PageHero
-          kicker="Agent not found"
-          title="That agent does not"
+          kicker="Module not found"
+          title="That module does not"
           italic="exist yet"
-          sub="Browse the eight agents that ship with FynHelp today."
+          sub="Browse the four modules that ship with FynHelp today."
           actions={
             <Link to="/use-cases" className="fh-btn fh-btn-primary">
-              See all agents
+              See all modules
             </Link>
           }
         />
@@ -117,7 +117,7 @@ export default function AgentPage({ slug }: { slug: string }) {
         </div>
       </Section>
 
-      <Section kicker="The rest of the desk" title="Works alongside" italic="seven other agents">
+      <Section kicker="Other modules" title="Works alongside" italic="seven other agents">
         <div className="fh-grid fh-g3" style={{ marginTop: 40 }}>
           {others.map((a, i) => (
             <Reveal key={a.slug} delay={i * 80}>
