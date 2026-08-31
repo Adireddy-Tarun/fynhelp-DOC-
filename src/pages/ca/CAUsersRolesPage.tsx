@@ -6,6 +6,7 @@ import {
   CA, CACard, CAHeading, CAButton, CAField, caInputStyle, CABadge, statusTone,
   caTh, caTd, CAEmpty, dateIN,
 } from "@/components/ca/portalUi";
+import RbacTestPanel from "@/components/ca/RbacTestPanel";
 
 const ROLES = ["partner", "manager", "senior", "junior", "client"];
 const INVITE_ROLES = ["partner", "manager", "senior", "junior"];
