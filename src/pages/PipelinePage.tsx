@@ -179,10 +179,10 @@ export default function PipelinePage() {
 
       {/* AGENT MODELS */}
       <Section
-        kicker="Agent models"
-        title="Four modules run"
-        italic="on top of the pipeline."
-        lead="The pipeline produces clean, reconciled, source-traceable data. These modules read that data and turn it into the answers your firm and your clients act on."
+        kicker="The modules"
+        title="Four modules are"
+        italic="the pipeline."
+        lead="Extract, Recon, Narrate and Chaser are not add-ons. They are the product — every document that comes in travels through all four."
       >
         <div className="fh-grid fh-g2">
           {AGENTS.map((a, i) => (
@@ -232,7 +232,7 @@ export default function PipelinePage() {
             { t: "ITC that survives scrutiny", d: "Every claimed rupee of input credit carries its GSTR-2B line and the original invoice behind it." },
             { t: "Client reporting in your brand", d: "White-label MIS outputs go out with your firm's name, drafted by Narrate and approved by a partner." },
             { t: "Onboarding a new client in days", d: "Extract reads the backlog of PDFs and scans, so a new entity is current within the first week." },
-            { t: "Founder questions, answered", d: "Fynny answers plain questions from the reconciled books, and says so when the data is not there." },
+            { t: "Collections without awkward calls", d: "Chaser nudges overdue clients politely, asks once more if needed, and escalates to you with full history." },
             { t: "Practice visibility", d: "Per-client match rates, open exceptions and pending documents in one view for the whole firm." },
           ].map((u, i) => (
             <Reveal key={u.t} delay={i * 60}>
