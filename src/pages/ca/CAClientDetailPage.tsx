@@ -9,6 +9,7 @@ import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import { renderReportHtml, createReportShare, revokeReportShare } from "@/lib/caDocs.functions";
 import { printHtmlDocument } from "@/lib/printPdf";
+import { formatINR } from "@/lib/indian-format";
 
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
@@ -82,16 +83,22 @@ export default function CAClientDetailPage() {
     setHideDemoState(v);
     try { window.localStorage.setItem("hide_seed_transactions", v ? "1" : "0"); } catch { /* restricted browser */ }
   };
-  const [groupStart, setGroupStart] = useState("");
-  const [groupEnd, setGroupEnd] = useState("");
+  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const monthStartIso = () => `${todayIso().slice(0, 7)}-01`;
+  const [groupStart, setGroupStart] = useState(monthStartIso);
+  const [groupEnd, setGroupEnd] = useState(todayIso);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [groupBusy, setGroupBusy] = useState(false);
+  const [subCount, setSubCount] = useState(0);
   const [groupMis, setGroupMis] = useState<{
-    period: string;
-    rows: { name: string; revenue: number; expenses: number; net: number }[];
-    revenue: number;
-    expenses: number;
-    net: number;
+    period_start: string;
+    period_end: string;
+    entities: { client_name: string; business_id: string; revenue: number; expenses: number; net: number }[];
+    group_revenue: number;
+    group_expenses: number;
+    group_net: number;
   } | null>(null);
+  const [groupLogId, setGroupLogId] = useState<string | null>(null);
   const [reportBusyId, setReportBusyId] = useState<string | null>(null);
   const [sharePanel, setSharePanel] = useState<{ reportId: string; url: string; expires_at: string } | null>(null);
   const revokeShare = useServerFn(revokeReportShare);
