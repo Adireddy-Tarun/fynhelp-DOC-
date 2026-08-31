@@ -87,7 +87,7 @@ export default function CAClientDetailPage() {
   const monthStartIso = () => `${todayIso().slice(0, 7)}-01`;
   const [groupStart, setGroupStart] = useState(monthStartIso);
   const [groupEnd, setGroupEnd] = useState(todayIso);
-  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [groupMisPhase, setGroupMisPhase] = useState<"idle" | "picking" | "loading" | "done">("idle");
   const [groupBusy, setGroupBusy] = useState(false);
   const [subCount, setSubCount] = useState(0);
   const [groupMis, setGroupMis] = useState<{
