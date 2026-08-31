@@ -205,6 +205,16 @@ export default function CAUsersRolesPage() {
         )}
       </CACard>
 
+      {members.length <= 1 && (
+        <RbacTestPanel
+          firmId={firmId ?? ""}
+          onQuickInvite={(r) => {
+            setInviteRole(r);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+      )}
+
       <CACard style={{ marginTop: 18, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px", borderBottom: `0.5px solid ${CA.line}`, fontFamily: CA.serif, fontSize: 16, fontWeight: 700 }}>
           Pending invites
