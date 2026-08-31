@@ -121,7 +121,7 @@ const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
 
 const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }[] = [
   { icon: LayoutDashboard, label: "Portfolio dashboard",             href: "/ca-firms", desc: "All clients, one view" },
-  { icon: FileStack,       label: "Bulk filing & ITC reconciliation", href: "/ca-firms", desc: "GSTR filing in batches" },
+  { icon: FileStack,       label: "ITC reconciliation and bulk preparation", href: "/ca-firms", desc: "Prepare returns in batches, reconcile ITC" },
   { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
   { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
 ];

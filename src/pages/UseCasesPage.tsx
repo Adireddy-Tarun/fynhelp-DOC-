@@ -7,13 +7,23 @@ import { C } from "@/components/site/siteTheme";
 const SEGMENTS = [
   {
     t: "Manufacturing and trading",
-    d: "Working capital is the whole game. Purchase heavy books, GST credit tied up with slow filing vendors, and a cash cycle that stretches without warning.",
-    wins: ["Input credit recovered every cycle", "Vendor payment sequencing", "Inventory funded by real cash, not hope"],
+    d: "Working capital is the whole game. FynHelp reads purchase-heavy books, reconciles bank lines against ledger, and surfaces the ITC timing gaps and vendor payment clusters that eat your cash cycle before you notice.",
+    wins: [
+      "Input tax credit reconciled every cycle against GSTR-2B",
+      "Bank lines matched to purchase invoices in three passes",
+      "Cash position and burn visible without manual assembly",
+    ],
+    note: "FynHelp covers financial intelligence — bank recon, ITC recon, MIS and cash flow. Inventory and purchase order management are out of scope for v1.",
   },
   {
     t: "D2C and marketplace sellers",
-    d: "Settlement files, fee deductions and returns make reported revenue and banked revenue two different numbers every single week.",
-    wins: ["Settlement reconciliation", "True contribution per channel", "Fee leakage flagged"],
+    d: "Razorpay settlement files, fee deductions and returns make reported revenue and banked revenue two different numbers every week. FynHelp reconciles the settlements and flags the gaps automatically.",
+    wins: [
+      "Razorpay settlement reconciliation wired directly",
+      "Fee deductions and refunds separated from gross revenue",
+      "Cash position updated as settlements land",
+    ],
+    note: "FynHelp reconciles Razorpay settlements and tracks cash. SKU-level margin tracking and returns analytics are on the roadmap for a future release.",
   },
 ];
 
@@ -91,6 +101,11 @@ export default function UseCasesPage() {
                     </li>
                   ))}
                 </ul>
+                {s.note && (
+                  <p style={{ fontSize: 12, color: C.muted, marginTop: 14, fontStyle: "italic", lineHeight: 1.6 }}>
+                    {s.note}
+                  </p>
+                )}
               </div>
             </Reveal>
           ))}
