@@ -137,13 +137,17 @@ export const generateMisReport = createServerFn({ method: "POST" })
         .limit(2000),
     ]);
 
-    const docs = summariseDocuments((docsRes.data ?? []) as unknown as MisExtraction[], data.period);
+    const docs = summariseDocuments(
+      (docsRes.data ?? []) as unknown as MisExtraction[],
+      periodLabel,
+      hasRange ? { start: data.period_start!, end: data.period_end! } : undefined,
+    );
     const itc = summariseItc((itcRes.data ?? []) as unknown as MisItcRow[]);
     const compliance = summariseCompliance((complianceRes.data ?? []) as unknown as MisComplianceRow[]);
     const exceptions = summariseExceptions((exceptionsRes.data ?? []) as unknown as MisExceptionRow[]);
 
     const report = {
-      period: data.period,
+      period: periodLabel,
       client_name: clientRes.data?.client_name ?? "Client",
       revenue: docs.revenue,
       expenses: docs.expenses,
