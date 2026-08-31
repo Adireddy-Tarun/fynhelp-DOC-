@@ -169,8 +169,9 @@ export const generateMisReport = createServerFn({ method: "POST" })
         ca_firm_id: data.firm_id,
         business_id: data.business_id,
         report_type: reportType,
-        report_name: `MIS — ${report.client_name} — ${data.period}`,
-        period: data.period,
+        report_name: `MIS — ${report.client_name} — ${periodLabel}`,
+        period: periodLabel,
+        ...(hasRange ? { period_start: data.period_start, period_end: data.period_end } : {}),
         content: report as never,
         generated_by_user_id: userId,
         status: "ready",
@@ -186,7 +187,7 @@ export const generateMisReport = createServerFn({ method: "POST" })
       entity_type: "report",
       entity_id: logRow?.id ?? null,
       action: "mis_generated",
-      detail: { period: data.period, report_type: reportType, doc_count: docs.doc_count } as never,
+      detail: { period: periodLabel, report_type: reportType, doc_count: docs.doc_count } as never,
     });
 
     return { ...report, report_id: logRow?.id ?? "" };
