@@ -9,6 +9,7 @@ import { FileText, X } from "lucide-react";
 import { generateMisReport, type MisReport } from "@/lib/caMis.functions";
 import { renderReportHtml, createReportShare, revokeReportShare } from "@/lib/caDocs.functions";
 import { printHtmlDocument } from "@/lib/printPdf";
+import { formatINR } from "@/lib/indian-format";
 
 import ClientDocumentsTab from "@/components/ca/ClientDocumentsTab";
 import ClientSyncPanel from "@/components/ca/ClientSyncPanel";
@@ -82,16 +83,22 @@ export default function CAClientDetailPage() {
     setHideDemoState(v);
     try { window.localStorage.setItem("hide_seed_transactions", v ? "1" : "0"); } catch { /* restricted browser */ }
   };
-  const [groupStart, setGroupStart] = useState("");
-  const [groupEnd, setGroupEnd] = useState("");
+  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const monthStartIso = () => `${todayIso().slice(0, 7)}-01`;
+  const [groupStart, setGroupStart] = useState(monthStartIso);
+  const [groupEnd, setGroupEnd] = useState(todayIso);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [groupBusy, setGroupBusy] = useState(false);
+  const [subCount, setSubCount] = useState(0);
   const [groupMis, setGroupMis] = useState<{
-    period: string;
-    rows: { name: string; revenue: number; expenses: number; net: number }[];
-    revenue: number;
-    expenses: number;
-    net: number;
+    period_start: string;
+    period_end: string;
+    entities: { client_name: string; business_id: string; revenue: number; expenses: number; net: number }[];
+    group_revenue: number;
+    group_expenses: number;
+    group_net: number;
   } | null>(null);
+  const [groupLogId, setGroupLogId] = useState<string | null>(null);
   const [reportBusyId, setReportBusyId] = useState<string | null>(null);
   const [sharePanel, setSharePanel] = useState<{ reportId: string; url: string; expires_at: string } | null>(null);
   const revokeShare = useServerFn(revokeReportShare);
@@ -164,6 +171,12 @@ export default function CAClientDetailPage() {
       if (error) toast.error(error.message);
       setClient((data as Client) ?? null);
       setLoading(false);
+      const { count } = await supabase
+        .from("ca_clients")
+        .select("id", { count: "exact", head: true })
+        .eq("ca_firm_id", firmId)
+        .eq("parent_id", clientId);
+      setSubCount(count ?? 0);
       console.log("[fyn:ca] client detail mount", { clientId, business_id: (data as Client)?.business_id ?? null });
     })();
   }, [clientId, firmId]);
@@ -367,36 +380,22 @@ export default function CAClientDetailPage() {
   };
 
   /**
-   * Consolidated MIS across the parent entity and every subsidiary that rolls
-   * up to it. Each entity and month is generated with the same server function
-   * used for a single client, then summed for the group view.
+   * Consolidated group MIS. One MIS run per entity (parent plus every
+   * subsidiary) over a single date range, executed in parallel, then summed.
+   * The consolidated JSON is stored in ca_reports_log so it can be shared
+   * through the existing share link flow.
    */
-  const monthsBetween = (start: string, end: string) => {
-    const out: { key: string; label: string }[] = [];
-    const [sy, sm] = start.split("-").map(Number);
-    const [ey, em] = end.split("-").map(Number);
-    const cursor = new Date(sy, sm - 1, 1);
-    const last = new Date(ey, em - 1, 1);
-    while (cursor <= last && out.length < 12) {
-      out.push({
-        key: `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`,
-        label: cursor.toLocaleString("en-IN", { month: "short", year: "numeric" }),
-      });
-      cursor.setMonth(cursor.getMonth() + 1);
-    }
-    return out;
-  };
-
   const generateGroupMis = async () => {
     if (!businessId || !firmId || !clientId) return;
-    if (!/^\d{4}-\d{2}$/.test(groupStart) || !/^\d{4}-\d{2}$/.test(groupEnd)) {
-      return toast.error("Choose a start month and an end month");
+    const period_start = groupStart;
+    const period_end = groupEnd;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(period_start) || !/^\d{4}-\d{2}-\d{2}$/.test(period_end)) {
+      return toast.error("Choose a start date and an end date");
     }
-    if (groupEnd < groupStart) return toast.error("The end month cannot be before the start month");
-    const months = monthsBetween(groupStart, groupEnd);
-    if (months.length === 0) return toast.error("That period has no months in it");
+    if (period_end < period_start) return toast.error("The end date cannot be before the start date");
 
     setGroupBusy(true);
+    setGroupModalOpen(false);
     try {
       const { data: kids } = await supabase
         .from("ca_clients")
@@ -404,79 +403,91 @@ export default function CAClientDetailPage() {
         .eq("ca_firm_id", firmId)
         .eq("parent_id", clientId);
 
-      const entities = [
-        { id: clientId, name: client?.client_name ?? "Parent entity", business_id: businessId },
-        ...((kids ?? []) as { id: string; client_name: string; business_id: string | null }[])
+      const clients = [
+        { client_name: client?.client_name ?? "Parent entity", business_id: businessId },
+        ...((kids ?? []) as { client_name: string; business_id: string | null }[])
           .filter((k) => k.business_id)
-          .map((k) => ({ id: k.id, name: k.client_name, business_id: k.business_id as string })),
+          .map((k) => ({ client_name: k.client_name, business_id: k.business_id as string })),
       ];
 
-      const rows: { name: string; revenue: number; expenses: number; net: number }[] = [];
-      for (const ent of entities) {
-        let revenue = 0;
-        let expenses = 0;
-        for (const mo of months) {
-          try {
-            const r = await runMis({
-              data: { firm_id: firmId, business_id: ent.business_id, client_id: ent.id, period: mo.label },
-            });
-            revenue += Number(r.revenue) || 0;
-            expenses += Number(r.expenses) || 0;
-          } catch {
-            // A month with no posted data is skipped rather than failing the group run.
-          }
-        }
-        rows.push({ name: ent.name, revenue, expenses, net: revenue - expenses });
-      }
+      const results = await Promise.all(
+        clients.map((c) =>
+          runMis({
+            data: { firm_id: firmId, business_id: c.business_id, period: "", period_start, period_end },
+          }).catch(() => null),
+        ),
+      );
 
-      const revenue = rows.reduce((s, r) => s + r.revenue, 0);
-      const expenses = rows.reduce((s, r) => s + r.expenses, 0);
-      const periodLabel = months.length === 1
-        ? months[0].label
-        : `${months[0].label} to ${months[months.length - 1].label}`;
+      const consolidated = {
+        period_start,
+        period_end,
+        entities: results.map((r, i) => ({
+          client_name: clients[i].client_name,
+          business_id: clients[i].business_id,
+          revenue: r?.revenue ?? 0,
+          expenses: r?.expenses ?? 0,
+          net: (r?.revenue ?? 0) - (r?.expenses ?? 0),
+        })),
+        group_revenue: results.reduce((s, r) => s + (r?.revenue ?? 0), 0),
+        group_expenses: results.reduce((s, r) => s + (r?.expenses ?? 0), 0),
+        group_net: results.reduce((s, r) => s + ((r?.revenue ?? 0) - (r?.expenses ?? 0)), 0),
+      };
+      setGroupMis(consolidated);
 
-      const summary = { period: periodLabel, rows, revenue, expenses, net: revenue - expenses };
-      setGroupMis(summary);
+      const { data: logRow, error: logErr } = await supabase
+        .from("ca_reports_log")
+        .insert({
+          ca_firm_id: firmId,
+          business_id: businessId,
+          period: `${period_start} to ${period_end}`,
+          period_start,
+          period_end,
+          report_type: "group_mis",
+          report_name: `Group MIS — ${consolidated.entities.length} entities`,
+          status: "ready",
+          generated_by_user_id: userId ?? null,
+          content: consolidated as any,
+        })
+        .select("id")
+        .maybeSingle();
+      if (logErr) console.warn("[fyn:ca] group_mis log", logErr);
+      setGroupLogId(logRow?.id ?? null);
 
-      await supabase.from("ca_reports_log").insert({
-        ca_firm_id: firmId,
-        business_id: businessId,
-        report_type: "group_mis",
-        report_name: `Group MIS with ${entities.length} entities`,
-        period: periodLabel,
-        period_start: `${groupStart}-01`,
-        period_end: `${groupEnd}-01`,
-        status: "generated",
-        generated_by_user_id: userId ?? null,
-        content: summary as any,
-      });
       await loadReports();
-      toast.success(`Consolidated MIS built for ${entities.length} entities`);
+      toast.success(`Group MIS built for ${consolidated.entities.length} entities`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Consolidated MIS failed");
+      toast.error(e instanceof Error ? e.message : "Group MIS failed");
     } finally {
       setGroupBusy(false);
     }
   };
 
-  const downloadGroupPdf = () => {
+  const downloadGroupPdf = async () => {
     if (!groupMis) return;
-    const cell = (v: string, i: number, tag: "td" | "th") =>
-      `<${tag} style="padding:8px 10px;border-bottom:1px solid #e3dbc9;text-align:${i ? "right" : "left"};font-variant-numeric:tabular-nums">${v}</${tag}>`;
-    const row = (c: string[], tag: "td" | "th" = "td") =>
-      `<tr>${c.map((v, i) => cell(v, i, tag)).join("")}</tr>`;
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Consolidated MIS</title></head>
-<body style="font-family:Georgia,serif;color:#1A1008;padding:28px">
-<h1 style="font-size:20px;margin:0">Consolidated MIS</h1>
-<div style="font-size:13px;color:#6b5f52;margin:6px 0 18px">${client?.client_name ?? ""} group. Period ${groupMis.period}. Entities ${groupMis.rows.length}.</div>
-<table style="width:100%;border-collapse:collapse;font-size:13px">
-${row(["Entity", "Revenue", "Expenses", "Net"], "th")}
-${groupMis.rows.map((r) => row([r.name, inr(r.revenue), inr(r.expenses), inr(r.net)])).join("")}
-${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMis.net)], "th")}
-</table>
-<div style="margin-top:26px;font-size:11px;color:#6b5f52">Generated by FynHelp. Confidential.</div>
-</body></html>`;
-    printHtmlDocument(html);
+    // Same window.open print flow as the other report PDF buttons, via the
+    // shared report HTML renderer server function.
+    if (groupLogId) {
+      setReportBusyId(groupLogId);
+      try {
+        const res = await renderPdf({ data: { kind: "mis_report", id: groupLogId } });
+        printHtmlDocument(res.html);
+        return;
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Could not prepare the PDF");
+        return;
+      } finally {
+        setReportBusyId(null);
+      }
+    }
+    toast.error("Generate the report first");
+  };
+
+  const resetGroupPeriod = () => {
+    setGroupMis(null);
+    setGroupLogId(null);
+    setGroupStart(monthStartIso());
+    setGroupEnd(todayIso());
+    setGroupModalOpen(true);
   };
 
   const seedCount = useMemo(() => txns.filter((t) => t.source_type === "seed").length, [txns]);
@@ -878,61 +889,118 @@ ${row(["Group total", inr(groupMis.revenue), inr(groupMis.expenses), inr(groupMi
               </CAButton>
             </div>
 
-            <CACard style={{ marginTop: 16, padding: "18px 20px" }}>
-              <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
-                Consolidated group MIS
-              </div>
-              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 6, lineHeight: 1.6 }}>
-                Combines this entity with every subsidiary that rolls up to it, month by month, into one revenue and
-                expense view. Up to twelve months per run.
-              </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end", marginTop: 14 }}>
-                <CAField label="From">
-                  <input type="month" value={groupStart} onChange={(e) => setGroupStart(e.target.value)} style={{ ...caInputStyle, width: 170, height: 38 }} />
-                </CAField>
-                <CAField label="To">
-                  <input type="month" value={groupEnd} onChange={(e) => setGroupEnd(e.target.value)} style={{ ...caInputStyle, width: 170, height: 38 }} />
-                </CAField>
-                <CAButton onClick={generateGroupMis} disabled={!businessId || groupBusy}>
-                  {groupBusy ? "Consolidating…" : "Generate group MIS"}
-                </CAButton>
-              </div>
-
-              {groupMis && (
-                <div style={{ marginTop: 18 }}>
-                  <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginBottom: 8 }}>
-                    Period {groupMis.period}. {groupMis.rows.length} entities consolidated.
-                  </div>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <thead><tr>
-                      <th style={caTh}>Entity</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Revenue</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Expenses</th>
-                      <th style={{ ...caTh, textAlign: "right" }}>Net</th>
-                    </tr></thead>
-                    <tbody>
-                      {groupMis.rows.map((r) => (
-                        <tr key={r.name}>
-                          <td style={caTd}>{r.name}</td>
-                          <td style={caNum}>{inr(r.revenue)}</td>
-                          <td style={caNum}>{inr(r.expenses)}</td>
-                          <td style={{ ...caNum, color: r.net < 0 ? CA.red : CA.green }}>{inr(r.net)}</td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td style={{ ...caTd, fontWeight: 700 }}>Group total</td>
-                        <td style={{ ...caNum, fontWeight: 700 }}>{inr(groupMis.revenue)}</td>
-                        <td style={{ ...caNum, fontWeight: 700 }}>{inr(groupMis.expenses)}</td>
-                        <td style={{ ...caNum, fontWeight: 700, color: groupMis.net < 0 ? CA.red : CA.green }}>{inr(groupMis.net)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div style={{ marginTop: 14 }}>
-                    <CAButton variant="ghost" onClick={downloadGroupPdf}>Download PDF</CAButton>
-                  </div>
+            {subCount > 0 && (
+              <div style={{ position: "relative", marginTop: 16 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  <CAButton
+                    variant="ghost"
+                    onClick={() => { setGroupMis(null); setGroupLogId(null); setGroupModalOpen(true); }}
+                    disabled={!businessId || groupBusy}
+                  >
+                    {groupBusy ? "Generating group MIS…" : "Group MIS"}
+                  </CAButton>
+                  {groupBusy && (
+                    <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                      Generating group MIS…
+                    </span>
+                  )}
                 </div>
-              )}
-            </CACard>
+
+                {groupModalOpen && (
+                  <>
+                    <div
+                      onClick={() => setGroupModalOpen(false)}
+                      style={{ position: "absolute", inset: "-8px -16px", background: "rgba(26,26,26,0.18)", borderRadius: 12, zIndex: 10 }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute", top: 44, left: 0, zIndex: 11, width: 320,
+                        background: CA.card, border: `0.5px solid ${CA.line}`, borderRadius: 12,
+                        padding: "18px 20px", boxShadow: "0 12px 32px rgba(26,16,8,0.14)",
+                      }}
+                    >
+                      <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>
+                        Group MIS period
+                      </div>
+                      <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
+                        Covers this entity and its {subCount} {subCount === 1 ? "subsidiary" : "subsidiaries"}.
+                      </div>
+                      <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                        <CAField label="Period start">
+                          <input
+                            type="date"
+                            value={groupStart}
+                            onChange={(e) => setGroupStart(e.target.value)}
+                            style={{ ...caInputStyle, width: 128, height: 38 }}
+                          />
+                        </CAField>
+                        <CAField label="Period end">
+                          <input
+                            type="date"
+                            value={groupEnd}
+                            onChange={(e) => setGroupEnd(e.target.value)}
+                            style={{ ...caInputStyle, width: 128, height: 38 }}
+                          />
+                        </CAField>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                        <CAButton onClick={generateGroupMis} disabled={groupBusy}>
+                          Generate
+                        </CAButton>
+                        <CAButton variant="ghost" onClick={() => setGroupModalOpen(false)}>
+                          Cancel
+                        </CAButton>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {groupMis && !groupBusy && (
+                  <CACard style={{ marginTop: 14, padding: "18px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+                      <div style={{ fontFamily: CA.serif, fontSize: 18, fontWeight: 700, color: CA.ink }}>
+                        Group MIS
+                      </div>
+                      <div style={{ fontFamily: CA.mono, fontSize: 13, color: CA.muted }}>
+                        {groupMis.period_start} to {groupMis.period_end}
+                      </div>
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 14 }}>
+                      <thead><tr>
+                        <th style={caTh}>Entity</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Revenue</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Expenses</th>
+                        <th style={{ ...caTh, textAlign: "right" }}>Net</th>
+                      </tr></thead>
+                      <tbody>
+                        {groupMis.entities.map((e) => (
+                          <tr key={e.business_id}>
+                            <td style={caTd}>{e.client_name}</td>
+                            <td style={caNum}>{formatINR(e.revenue)}</td>
+                            <td style={caNum}>{formatINR(e.expenses)}</td>
+                            <td style={{ ...caNum, color: e.net < 0 ? CA.red : CA.green }}>{formatINR(e.net)}</td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <td style={{ ...caTd, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>Group Total</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>{formatINR(groupMis.group_revenue)}</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}` }}>{formatINR(groupMis.group_expenses)}</td>
+                          <td style={{ ...caNum, fontWeight: 700, borderTop: `1px solid ${CA.line}`, color: groupMis.group_net < 0 ? CA.red : CA.green }}>{formatINR(groupMis.group_net)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+                      <CAButton variant="ghost" onClick={downloadGroupPdf} disabled={reportBusyId === groupLogId}>
+                        {reportBusyId === groupLogId ? "Preparing…" : "Download PDF"}
+                      </CAButton>
+                      <CAButton variant="ghost" onClick={resetGroupPeriod}>
+                        New period
+                      </CAButton>
+                    </div>
+                  </CACard>
+                )}
+              </div>
+            )}
 
             <CACard style={{ marginTop: 16, overflow: "hidden" }}>
               {reports.length === 0 ? <CAEmpty title="No reports yet" /> : (
