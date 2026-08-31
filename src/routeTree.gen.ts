@@ -42,6 +42,7 @@ import { Route as CaAuthCaOnboardingRouteImport } from './routes/_caAuth/ca/onbo
 import { Route as CaAuthCaRegisterRouteImport } from './routes/_caAuth/ca/register'
 import { Route as CaAuthCaVerificationPendingRouteImport } from './routes/_caAuth/ca/verification-pending'
 import { Route as InternalAdminAdminCaApprovalsRouteImport } from './routes/_internalAdmin/admin/ca-approvals'
+import { Route as MainAgentsSlugRouteImport } from './routes/_main/agents.$slug'
 import { Route as MainBlogIndexRouteImport } from './routes/_main/blog/index'
 import { Route as MainBlogSlugRouteImport } from './routes/_main/blog/$slug'
 import { Route as MainDashboardIndexRouteImport } from './routes/_main/dashboard/index'
@@ -374,6 +375,11 @@ const InternalAdminAdminCaApprovalsRoute =
     path: '/admin/ca-approvals',
     getParentRoute: () => InternalAdminRoute,
   } as any)
+const MainAgentsSlugRoute = MainAgentsSlugRouteImport.update({
+  id: '/agents/$slug',
+  path: '/agents/$slug',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainBlogIndexRoute = MainBlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -1345,6 +1351,7 @@ export interface FileRoutesByFullPath {
   '/ca/register': typeof CaAuthCaRegisterRoute
   '/ca/verification-pending': typeof CaAuthCaVerificationPendingRoute
   '/admin/ca-approvals': typeof InternalAdminAdminCaApprovalsRoute
+  '/agents/$slug': typeof MainAgentsSlugRoute
   '/blog/$slug': typeof MainBlogSlugRoute
   '/dashboard/360': typeof MainDashboard360Route
   '/dashboard/audit-readiness': typeof MainDashboardAuditReadinessRoute
@@ -1540,6 +1547,7 @@ export interface FileRoutesByTo {
   '/ca/register': typeof CaAuthCaRegisterRoute
   '/ca/verification-pending': typeof CaAuthCaVerificationPendingRoute
   '/admin/ca-approvals': typeof InternalAdminAdminCaApprovalsRoute
+  '/agents/$slug': typeof MainAgentsSlugRoute
   '/blog/$slug': typeof MainBlogSlugRoute
   '/dashboard/360': typeof MainDashboard360Route
   '/dashboard/audit-readiness': typeof MainDashboardAuditReadinessRoute
@@ -1743,6 +1751,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/register': typeof CaAuthCaRegisterRoute
   '/_caAuth/ca/verification-pending': typeof CaAuthCaVerificationPendingRoute
   '/_internalAdmin/admin/ca-approvals': typeof InternalAdminAdminCaApprovalsRoute
+  '/_main/agents/$slug': typeof MainAgentsSlugRoute
   '/_main/blog/$slug': typeof MainBlogSlugRoute
   '/_main/dashboard/360': typeof MainDashboard360Route
   '/_main/dashboard/audit-readiness': typeof MainDashboardAuditReadinessRoute
@@ -1942,6 +1951,7 @@ export interface FileRouteTypes {
     | '/ca/register'
     | '/ca/verification-pending'
     | '/admin/ca-approvals'
+    | '/agents/$slug'
     | '/blog/$slug'
     | '/dashboard/360'
     | '/dashboard/audit-readiness'
@@ -2137,6 +2147,7 @@ export interface FileRouteTypes {
     | '/ca/register'
     | '/ca/verification-pending'
     | '/admin/ca-approvals'
+    | '/agents/$slug'
     | '/blog/$slug'
     | '/dashboard/360'
     | '/dashboard/audit-readiness'
@@ -2339,6 +2350,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/register'
     | '/_caAuth/ca/verification-pending'
     | '/_internalAdmin/admin/ca-approvals'
+    | '/_main/agents/$slug'
     | '/_main/blog/$slug'
     | '/_main/dashboard/360'
     | '/_main/dashboard/audit-readiness'
@@ -2762,6 +2774,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/ca-approvals'
       preLoaderRoute: typeof InternalAdminAdminCaApprovalsRouteImport
       parentRoute: typeof InternalAdminRoute
+    }
+    '/_main/agents/$slug': {
+      id: '/_main/agents/$slug'
+      path: '/agents/$slug'
+      fullPath: '/agents/$slug'
+      preLoaderRoute: typeof MainAgentsSlugRouteImport
+      parentRoute: typeof MainRoute
     }
     '/_main/blog/': {
       id: '/_main/blog/'
@@ -4323,6 +4342,7 @@ interface MainRouteChildren {
   MainUseCasesRoute: typeof MainUseCasesRoute
   MainWaitlistRoute: typeof MainWaitlistRoute
   MainIndexRoute: typeof MainIndexRoute
+  MainAgentsSlugRoute: typeof MainAgentsSlugRoute
   MainBlogSlugRoute: typeof MainBlogSlugRoute
   MainDashboard360Route: typeof MainDashboard360Route
   MainDashboardAuditReadinessRoute: typeof MainDashboardAuditReadinessRoute
@@ -4380,6 +4400,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainUseCasesRoute: MainUseCasesRoute,
   MainWaitlistRoute: MainWaitlistRoute,
   MainIndexRoute: MainIndexRoute,
+  MainAgentsSlugRoute: MainAgentsSlugRoute,
   MainBlogSlugRoute: MainBlogSlugRoute,
   MainDashboard360Route: MainDashboard360Route,
   MainDashboardAuditReadinessRoute: MainDashboardAuditReadinessRoute,
