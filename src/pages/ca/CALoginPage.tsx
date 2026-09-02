@@ -6,7 +6,35 @@ import { toast } from "sonner";
 import { authErrorMessage } from "@/lib/authErrors";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
-import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
+import { C } from "@/components/site/siteTheme";
+
+const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
+const serif = "'Fraunces',Georgia,serif";
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontFamily: sans,
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: C.muted,
+  marginBottom: 7,
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  height: 46,
+  padding: "0 14px",
+  borderRadius: 12,
+  border: `1px solid ${C.line}`,
+  background: C.page,
+  fontFamily: sans,
+  fontSize: 14,
+  color: C.ink,
+  outline: "none",
+  boxSizing: "border-box",
+};
 
 export default function CALoginPage() {
   const navigate = useNavigate();
@@ -75,83 +103,192 @@ export default function CALoginPage() {
     navigate("/ca/dashboard", { replace: true });
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: CA.bg }}>
-      <CACard style={{ width: "100%", maxWidth: 420, padding: 36 }}>
-        <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>
-          Fyn<span style={{ color: CA.teal }}>Help</span>
-        </div>
-        <div style={{ fontFamily: CA.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.teal, marginTop: 2 }}>
-          CA Portal
-        </div>
-        <CAHeading size={26} style={{ marginTop: 18 }}>Sign in</CAHeading>
-        <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 6 }}>
-          Access your firm's client portfolio.
-        </p>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "grid",
+        gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)",
+        background: C.page,
+        fontFamily: sans,
+        color: C.ink,
+      }}
+      className="ca-login-root"
+    >
+      <style>{`
+        @media (max-width: 860px) { .ca-login-root { grid-template-columns: 1fr !important; } .ca-login-side { display: none !important; } }
+        .ca-login-input:focus { border-color: ${C.maroon} !important; box-shadow: 0 0 0 3px rgba(169,56,56,0.12); }
+        .ca-login-btn:hover:not(:disabled) { background: ${C.maroonDeep} !important; transform: translateY(-1px); }
+      `}</style>
 
-        {mfaFactorId ? (
-          <form onSubmit={verifyMfa} style={{ marginTop: 24, display: "grid", gap: 16 }}>
-            <CAField label="Authentication code">
-              <input
-                style={caInputStyle}
-                inputMode="numeric"
-                maxLength={6}
-                autoFocus
-                value={mfaCode}
-                onChange={(ev) => setMfaCode(ev.target.value.replace(/\D/g, ""))}
-                placeholder="6-digit code"
-              />
-            </CAField>
-            {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
-            <CAButton type="submit" disabled={loading} style={{ height: 46, fontSize: 14 }}>
-              {loading ? "Verifying…" : "Verify & continue"}
-            </CAButton>
-          </form>
-        ) : (
-        <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
-          <CAField label="Email">
-            <input style={caInputStyle} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@cafirm.com" />
-          </CAField>
-          <CAField label="Password">
-            <div style={{ position: "relative" }}>
-              <input
-                style={{ ...caInputStyle, paddingRight: 42 }}
-                type={showPw ? "text" : "password"}
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw((v) => !v)}
-                aria-label={showPw ? "Hide password" : "Show password"}
-                style={{
-                  position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                  background: "transparent", border: "none", cursor: "pointer", color: CA.muted,
-                  display: "flex", alignItems: "center",
-                }}
-              >
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+      {/* Left maroon brand panel */}
+      <div
+        className="ca-login-side"
+        style={{
+          padding: "56px 52px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          color: C.onDark,
+          background: `radial-gradient(80% 120% at 100% 0%, rgba(226,103,63,.34), transparent 60%), linear-gradient(140deg, #7C1F20 0%, ${C.maroonDeep} 62%, #350B0E 100%)`,
+        }}
+      >
+        <div style={{ fontFamily: sans, fontSize: 20, fontWeight: 700, letterSpacing: "-0.02em" }}>
+          Fyn<span style={{ color: C.coral }}>Help</span>
+        </div>
+        <div>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "rgba(247,241,230,0.55)",
+            }}
+          >
+            <span style={{ width: 14, height: 1, background: "currentColor", opacity: 0.6 }} />
+            CA Portal
+          </div>
+          <h1
+            style={{
+              fontFamily: sans,
+              fontSize: "clamp(32px,3.6vw,46px)",
+              fontWeight: 600,
+              letterSpacing: "-0.035em",
+              lineHeight: 1.06,
+              margin: "18px 0 0",
+              maxWidth: "14ch",
+            }}
+          >
+            Your practice,{" "}
+            <span style={{ fontFamily: serif, fontStyle: "italic", fontWeight: 300, color: "rgba(247,241,230,0.55)" }}>
+              one ledger.
+            </span>
+          </h1>
+          <p style={{ fontSize: 15, lineHeight: 1.65, color: "rgba(247,241,230,0.62)", maxWidth: "40ch", marginTop: 18 }}>
+            Clients, filings, reconciliation and chasers — the whole firm runs from here.
+          </p>
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(247,241,230,0.4)" }}>
+          © {new Date().getFullYear()} FynHelp
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 22px" }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 420,
+            background: C.card,
+            border: `1px solid ${C.line}`,
+            borderRadius: 22,
+            padding: 36,
+            boxShadow: "0 30px 55px -42px rgba(23,18,8,0.6)",
+          }}
+        >
+          <h2 style={{ fontFamily: sans, fontSize: 26, fontWeight: 600, letterSpacing: "-0.03em", margin: 0 }}>
+            {mfaFactorId ? "Two-factor check" : "Sign in"}
+          </h2>
+          <p style={{ fontFamily: sans, fontSize: 13.5, color: C.body, marginTop: 8 }}>
+            {mfaFactorId
+              ? "Enter the current code from your authenticator app."
+              : "Access your firm's client portfolio."}
+          </p>
+
+          {mfaFactorId ? (
+            <form onSubmit={verifyMfa} style={{ marginTop: 24, display: "grid", gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Authentication code</label>
+                <input
+                  className="ca-login-input"
+                  style={{ ...inputStyle, fontVariantNumeric: "tabular-nums", letterSpacing: "0.2em" }}
+                  inputMode="numeric"
+                  maxLength={6}
+                  autoFocus
+                  value={mfaCode}
+                  onChange={(ev) => setMfaCode(ev.target.value.replace(/\D/g, ""))}
+                  placeholder="6-digit code"
+                />
+              </div>
+              {error && <div style={{ fontFamily: sans, fontSize: 13, color: C.maroon }}>{error}</div>}
+              <button type="submit" disabled={loading} className="ca-login-btn" style={primaryBtn(loading)}>
+                {loading ? "Verifying…" : "Verify & continue"}
               </button>
-            </div>
-          </CAField>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Email</label>
+                <input
+                  className="ca-login-input"
+                  style={inputStyle}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@cafirm.com"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Password</label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    className="ca-login-input"
+                    style={{ ...inputStyle, paddingRight: 42 }}
+                    type={showPw ? "text" : "password"}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    aria-label={showPw ? "Hide password" : "Show password"}
+                    style={{
+                      position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                      background: "transparent", border: "none", cursor: "pointer", color: C.muted,
+                      display: "flex", alignItems: "center",
+                    }}
+                  >
+                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
 
-          <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+              <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
 
-          {error && <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{error}</div>}
-          <CAButton type="submit" disabled={loading || !captcha} style={{ height: 46, fontSize: 14 }}>
-            {loading ? "Signing in…" : "Sign in"}
-          </CAButton>
-        </form>
-        )}
+              {error && <div style={{ fontFamily: sans, fontSize: 13, color: C.maroon }}>{error}</div>}
+              <button type="submit" disabled={loading || !captcha} className="ca-login-btn" style={primaryBtn(loading || !captcha)}>
+                {loading ? "Signing in…" : "Sign in"}
+              </button>
+            </form>
+          )}
 
-        <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 18, textAlign: "center" }}>
-          New CA firm?{" "}
-          <Link to="/ca/register" style={{ color: CA.teal, fontWeight: 600 }}>Register</Link>
-        </p>
-      </CACard>
+          <p style={{ fontFamily: sans, fontSize: 13, color: C.muted, marginTop: 18, textAlign: "center" }}>
+            New CA firm?{" "}
+            <Link to="/ca/register" style={{ color: C.maroon, fontWeight: 600 }}>Register</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
+}
+
+function primaryBtn(disabled: boolean): React.CSSProperties {
+  return {
+    height: 46,
+    borderRadius: 999,
+    border: "none",
+    background: disabled ? "rgba(23,18,8,0.3)" : "#171208",
+    color: "#F7F1E6",
+    fontFamily: "'Instrument Sans','Inter',system-ui,sans-serif",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: disabled ? "not-allowed" : "pointer",
+    transition: "transform .45s cubic-bezier(.16,1,.3,1), background .25s",
+  };
 }
