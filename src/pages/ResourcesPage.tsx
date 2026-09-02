@@ -56,18 +56,19 @@ const downloadHref = (id: string) =>
 
 /* --------------------------- Palette --------------------------- */
 const C = {
-  bg: "#ECE6D2",
-  card: "#FAF7EC",
-  panel: "#F1F0EC",
-  panelBorder: "#E3E1DA",
-  ink: "#111111",
-  body: "#3A3A3A",
-  muted: "#6B6B6B",
-  red: "#B8333A",
-  redDark: "#9E2A30",
-  green: "#10B981",
-  black: "#0E0E0E",
-  border: "rgba(0,0,0,0.08)",
+  bg: "#F2EEE7",
+  card: "#FFFDF9",
+  panel: "#EBE6DD",
+  panelBorder: "rgba(23,18,8,0.09)",
+  ink: "#171208",
+  body: "rgba(23,18,8,0.62)",
+  muted: "rgba(23,18,8,0.42)",
+  red: "#A93838",
+  redDark: "#5C1216",
+  coral: "#E2673F",
+  green: "#1F5A46",
+  black: "#0E0B06",
+  border: "rgba(23,18,8,0.09)",
 };
 
 type IconCmp = React.ComponentType<IconProps>;
