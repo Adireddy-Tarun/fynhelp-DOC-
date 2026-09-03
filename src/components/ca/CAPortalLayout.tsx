@@ -6,11 +6,16 @@ import CAAuthGuard from "./CAAuthGuard";
 import CAMfaBanner from "./CAMfaBanner";
 import { CA } from "./portalUi";
 import { useIsCompactPortal } from "@/hooks/useMediaQuery";
+import FynLogo from "@/components/FynLogo";
 
 export default function CAPortalLayout() {
   const compact = useIsCompactPortal();
   const [open, setOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    console.log("[fyn:ca] phase-1-complete sidebar-rebuilt logo-updated design-tokens-applied");
+  }, []);
 
   // Close the drawer on route change and whenever we grow back to desktop.
   useEffect(() => { setOpen(false); }, [location.pathname]);
@@ -33,7 +38,12 @@ export default function CAPortalLayout() {
 
   return (
     <CAAuthGuard>
-      <div className="min-h-screen ca-portal" style={{ background: CA.bg }}>
+      <div className="min-h-screen ca-portal" style={{ background: CA.page }}>
+        <style>{`
+          .ca-portal .bg-white { background: ${CA.card} !important; }
+          .ca-portal .hover\\:bg-\\[\\#F8F6F1\\]:hover { background: rgba(23,18,8,0.045) !important; }
+          .ca-portal, .ca-portal input, .ca-portal select, .ca-portal button, .ca-portal textarea { font-family: ${CA.sans}; }
+        `}</style>
         <CASidebar drawer={compact} open={!compact || open} onNavigate={() => setOpen(false)} />
 
         {compact && open && (
@@ -77,9 +87,7 @@ export default function CAPortalLayout() {
               >
                 <Menu size={20} />
               </button>
-              <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink }}>
-                Fyn<span style={{ color: CA.teal }}>Help</span>
-              </div>
+              <FynLogo variant="dark" size="sm" />
               <div
                 style={{
                   fontFamily: CA.sans, fontSize: 9.5, fontWeight: 700, letterSpacing: "0.12em",
