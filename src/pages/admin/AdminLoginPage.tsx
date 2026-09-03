@@ -1,3 +1,4 @@
+import BackHomeLink from "@/components/BackHomeLink";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { Eye, EyeOff, X } from "lucide-react";
@@ -104,6 +105,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex" style={{ background: "hsl(var(--fyn-ink))" }}>
+      <BackHomeLink />
       {/* Branding side */}
       <div
         className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden"
