@@ -554,6 +554,29 @@ export default function CAClientDetailPage() {
         <CABadge tone={statusTone(client.client_status)}>{client.client_status ?? "—"}</CABadge>
       </div>
 
+      <div style={{
+        background: CA.card, border: "1px solid rgba(23,18,8,0.09)", borderRadius: 12,
+        padding: "12px 16px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+        gap: 12, marginTop: 12, marginBottom: 0,
+      }}>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Cash position</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{inr(liquidity?.cash_position)}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Runway</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4 }}>{liquidity?.runway_months != null ? `${liquidity.runway_months} months` : "—"}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Monthly burn</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{inr(liquidity?.burn_rate_current)}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Health</div>
+          <div style={{ marginTop: 4 }}><CABadge tone={healthTone(liquidity?.health_status)}>{liquidity?.health_status ?? "no data"}</CABadge></div>
+        </div>
+      </div>
+
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
         {TABS.map((t) => (
           <button
