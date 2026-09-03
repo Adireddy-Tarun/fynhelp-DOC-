@@ -290,10 +290,10 @@ function Problem() {
 /* ---------- HOW IT WORKS ---------- */
 function HowItWorks() {
   const steps = [
-    { n: "01", icon: Link2, t: "Connect", d: "Link client data in minutes." },
-    { n: "02", icon: Activity, t: "FynHelp reads", d: "Live data across all accounts, automatically." },
-    { n: "03", icon: FileText, t: "Reports ready", d: "Client-ready MIS, generated automatically." },
-    { n: "04", icon: Building2, t: "Firm grows", d: "Take on more clients, same team." },
+    { n: "01", icon: FileSearch, title: "Upload", desc: "Bank statements, invoices, expense bills — any format." },
+    { n: "02", icon: FileSearch, title: "Extract", desc: "AI reads and classifies every line item with 98% accuracy." },
+    { n: "03", icon: FileText, title: "Reconcile", desc: "Lines matched against ledger in three passes." },
+    { n: "04", icon: FileStack, title: "Review", desc: "Exceptions resolved, reports generated automatically." },
   ];
   return (
     <section id="how-it-works" style={{ background: CREAM }}>
