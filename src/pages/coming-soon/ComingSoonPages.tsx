@@ -20,7 +20,7 @@ import {
 /* ---------- shared bits ---------- */
 
 const BEIGE = "#EFE8D8";
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#A93838";
 const GOLD = "#8B6914";
 
@@ -48,8 +48,8 @@ function PreviewBadge() {
       style={{
         fontSize: 10,
         fontWeight: 600,
-        background: "rgba(26,16,8,0.08)",
-        color: "rgba(26,16,8,0.65)",
+        background: "rgba(23,18,8,0.08)",
+        color: "rgba(23,18,8,0.65)",
         letterSpacing: "0.08em",
       }}
     >
@@ -182,7 +182,7 @@ export function DecisionSimulatorComingSoon() {
 
             <div key="cta" className="flex flex-col items-center mt-8 gap-2">
               <NotifyButton moduleId="simulator" />
-              <p style={{ fontSize: 11, color: "#6B6B6B" }}>
+              <p style={{ fontSize: 11, color: "rgba(23,18,8,0.62)" }}>
                 We'll email you as soon as this module launches.
               </p>
             </div>,
@@ -202,8 +202,8 @@ export function DecisionSimulatorComingSoon() {
                   label: "Burn impact",
                   before: "₹0.83L",
                   after: "₹0.21L",
-                  arrow: <ArrowUp size={14} color="#10B981" />,
-                  color: "#10B981",
+                  arrow: <ArrowUp size={14} color="#1F5A46" />,
+                  color: "#1F5A46",
                 },
                 {
                   title: "Take ₹50L Loan",
@@ -217,7 +217,7 @@ export function DecisionSimulatorComingSoon() {
                 <div
                   key={p.title}
                   className="relative rounded-xl bg-white p-4"
-                  style={{ opacity: 0.85, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.85, border: "0.5px solid rgba(23,18,8,0.08)" }}
                 >
                   <PreviewBadge />
                   <div className="uppercase mb-2" style={{ fontSize: 10, fontWeight: 600, color: "#5C5550", letterSpacing: "0.08em" }}>
@@ -312,7 +312,7 @@ export function MarketGrowthComingSoon() {
                 {/* Card 1 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(23,18,8,0.08)" }}
                 >
                   <PreviewBadge />
                   <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
@@ -321,12 +321,12 @@ export function MarketGrowthComingSoon() {
                   <div className="mb-1" style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
                     42%
                   </div>
-                  <div className="mb-2" style={{ fontSize: 11, color: "#6B6B6B" }}>
+                  <div className="mb-2" style={{ fontSize: 11, color: "rgba(23,18,8,0.62)" }}>
                     Industry median: 28%
                   </div>
                   <span
                     className="inline-block uppercase px-2 py-0.5 rounded-full"
-                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: "#10B98120", color: "#0E8F66" }}
+                    style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: "#1F5A4620", color: "#0E8F66" }}
                   >
                     Above median
                   </span>
@@ -335,14 +335,14 @@ export function MarketGrowthComingSoon() {
                 {/* Card 2 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(23,18,8,0.08)" }}
                 >
                   <PreviewBadge />
                   <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
                     <Shield size={14} color={RED} /> Business Credit Score
                   </div>
                   <div className="mb-2" style={{ fontSize: 28, fontWeight: 700, color: INK, fontFamily: "ui-monospace, monospace", letterSpacing: "-0.02em" }}>
-                    720<span style={{ fontSize: 14, fontWeight: 500, color: "#6B6B6B" }}> / 900</span>
+                    720<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(23,18,8,0.62)" }}> / 900</span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden mb-2" style={{ background: "#EFE8D8" }}>
                     <div className="h-full" style={{ width: "80%", background: GOLD }} />
@@ -358,7 +358,7 @@ export function MarketGrowthComingSoon() {
                 {/* Card 3 */}
                 <div
                   className="relative rounded-xl bg-white p-5"
-                  style={{ opacity: 0.9, border: "0.5px solid rgba(26,16,8,0.08)" }}
+                  style={{ opacity: 0.9, border: "0.5px solid rgba(23,18,8,0.08)" }}
                 >
                   <PreviewBadge />
                   <div className="flex items-center gap-2 mb-3" style={{ fontSize: 12, fontWeight: 500, color: "#4A4540" }}>
@@ -431,7 +431,7 @@ export function BankingComingSoon() {
                     build complete
                   </span>
                 </div>
-                <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(26,16,8,0.08)" }}>
+                <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(23,18,8,0.08)" }}>
                   <div className="h-full rounded-full" style={{ width: "60%", background: RED }} />
                 </div>
               </div>
@@ -460,7 +460,7 @@ export function BankingComingSoon() {
             <div key="right">
               <div
                 className="relative rounded-xl bg-white p-5"
-                style={{ border: "0.5px solid rgba(26,16,8,0.08)" }}
+                style={{ border: "0.5px solid rgba(23,18,8,0.08)" }}
               >
                 <div className="mb-4" style={{ fontSize: 14, fontWeight: 600, color: INK }}>Bank Accounts</div>
                 <div className="space-y-3">
@@ -472,10 +472,10 @@ export function BankingComingSoon() {
                     <div
                       key={b.name}
                       className="flex items-center justify-between py-2 border-b last:border-0"
-                      style={{ borderColor: "rgba(26,16,8,0.06)" }}
+                      style={{ borderColor: "rgba(23,18,8,0.06)" }}
                     >
                       <div className="flex items-center gap-2">
-                        {b.connected && <span className="block w-2 h-2 rounded-full" style={{ background: "#10B981" }} />}
+                        {b.connected && <span className="block w-2 h-2 rounded-full" style={{ background: "#1F5A46" }} />}
                         <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{b.name}</span>
                         {b.balance && (
                           <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>
@@ -491,7 +491,7 @@ export function BankingComingSoon() {
                     </div>
                   ))}
                 </div>
-                <div className="pt-3 mt-3 border-t" style={{ fontSize: 12, fontWeight: 500, borderColor: "rgba(26,16,8,0.06)", color: "#4A4540" }}>
+                <div className="pt-3 mt-3 border-t" style={{ fontSize: 12, fontWeight: 500, borderColor: "rgba(23,18,8,0.06)", color: "#4A4540" }}>
                   Total cash position: <span style={{ fontSize: 20, fontWeight: 700, color: INK }}>₹12.4L</span>
                 </div>
 
@@ -536,7 +536,7 @@ export function CAPartnerComingSoon() {
             <div
               key="card"
               className="relative rounded-2xl bg-white p-7"
-              style={{ border: "0.5px solid rgba(26,16,8,0.08)", boxShadow: "0 6px 24px rgba(26,16,8,0.04)" }}
+              style={{ border: "0.5px solid rgba(23,18,8,0.08)", boxShadow: "0 6px 24px rgba(23,18,8,0.04)" }}
             >
               <span
                 className="absolute top-5 right-5 uppercase px-2.5 py-1 rounded-full"
@@ -576,7 +576,7 @@ export function CAPartnerComingSoon() {
 
               <div
                 className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5"
-                style={{ borderTop: "1px solid rgba(26,16,8,0.08)" }}
+                style={{ borderTop: "1px solid rgba(23,18,8,0.08)" }}
               >
                 <span style={{ fontSize: 13, fontWeight: 500, color: "#3D3530" }}>
                   Are you a CA? Join the early access program.

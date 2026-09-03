@@ -228,10 +228,10 @@ const ErrorFallback = () => (
     }}
   >
     <div style={{ textAlign: "center", maxWidth: 400, padding: "0 24px" }}>
-      <p style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#1A1008", marginBottom: "12px" }}>
+      <p style={{ fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#171208", marginBottom: "12px" }}>
         Something went wrong
       </p>
-      <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14px", color: "rgba(26,16,8,0.6)", marginBottom: "24px" }}>
+      <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14px", color: "rgba(23,18,8,0.6)", marginBottom: "24px" }}>
         Our team has been notified and is looking into it.
       </p>
       <button

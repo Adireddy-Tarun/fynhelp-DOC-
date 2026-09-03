@@ -173,7 +173,7 @@ export default function LiquidityTab() {
       )}
 
       {liveEmpty && (
-        <div className="bg-white rounded-md px-5 py-4 flex items-center gap-4" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: "4px solid #C41E1E" }}>
+        <div className="bg-white rounded-md px-5 py-4 flex items-center gap-4" style={{ border: "1px solid rgba(23,18,8,0.08)", borderLeft: "4px solid #C41E1E" }}>
           <Upload className="w-5 h-5 flex-shrink-0" style={{ color: "#C41E1E" }} />
           <div className="flex-1">
             <div className="text-sm font-semibold text-fyn-ink">No liquidity data yet</div>
@@ -189,7 +189,7 @@ export default function LiquidityTab() {
         </div>
       )}
       {/* Alert ticker */}
-      <div className={`bg-white rounded-md px-4 py-2 flex items-center gap-3 overflow-hidden ${hasCriticalAlert ? "fyn-alert-critical" : ""}`} style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+      <div className={`bg-white rounded-md px-4 py-2 flex items-center gap-3 overflow-hidden ${hasCriticalAlert ? "fyn-alert-critical" : ""}`} style={{ border: "1px solid rgba(23,18,8,0.08)" }}>
         {hasCriticalAlert && <span className="w-1.5 h-1.5 rounded-full fyn-dot-blink flex-shrink-0" style={{ background: ACCENT.red }} />}
         <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT.red }} />
         <div className="flex gap-8 text-xs text-fyn-ink animate-[ticker-scroll_30s_linear_infinite] whitespace-nowrap">
@@ -215,12 +215,12 @@ export default function LiquidityTab() {
         <IntelCard title="Cash Conversion Cycle" sub="DSO + DIO − DPO">
           <div className="space-y-3">
             <div>
-              <p className="font-mono text-3xl text-fyn-ink font-semibold">{Number.isFinite(m.ccc) ? m.ccc.toFixed(0) : EMPTY} <span className="text-sm text-[#6B6B6B] font-sans">days</span></p>
+              <p className="font-mono text-3xl text-fyn-ink font-semibold">{Number.isFinite(m.ccc) ? m.ccc.toFixed(0) : EMPTY} <span className="text-sm text-[rgba(23,18,8,0.62)] font-sans">days</span></p>
             </div>
-            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(26,16,8,0.08)]">
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DSO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dso)}</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DIO</p><p className="font-mono text-base text-fyn-ink">{mode === "demo" ? "12d" : "—"}</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">DPO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dpo)}</p></div>
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(23,18,8,0.08)]">
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">DSO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dso)}</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">DIO</p><p className="font-mono text-base text-fyn-ink">{mode === "demo" ? "12d" : "—"}</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">DPO</p><p className="font-mono text-base text-fyn-ink">{fmtDays(m.dpo)}</p></div>
             </div>
           </div>
         </IntelCard>
@@ -312,10 +312,10 @@ export default function LiquidityTab() {
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} onClick={() => openDrawer("invoice", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                    <tr key={r.id} onClick={() => openDrawer("invoice", r.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5">
                         <p className="text-fyn-ink font-medium text-xs">{r.customer_name}</p>
-                        <p className="text-[11px] text-[#6B6B6B]">{r.invoice_number}</p>
+                        <p className="text-[11px] text-[rgba(23,18,8,0.62)]">{r.invoice_number}</p>
                       </td>
                       <td className="py-2.5 text-right">
                         <p className="font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(r.outstanding_amount)}</p>
@@ -342,20 +342,20 @@ export default function LiquidityTab() {
           {(rows) => (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vendor</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Category</th>
-                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Amount</th>
-                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Due Date</th>
+                <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Vendor</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Category</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Amount</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Due Date</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} onClick={() => openDrawer("expense", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                  <tr key={r.id} onClick={() => openDrawer("expense", r.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                     <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.vendor_name}</td>
-                    <td className="py-2.5 text-xs text-[#6B6B6B]">{r.category ?? "—"}</td>
+                    <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.category ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(r.amount)}</td>
-                    <td className="py-2.5 text-right text-xs text-[#6B6B6B]">{r.due_date?.slice(0, 10)}</td>
+                    <td className="py-2.5 text-right text-xs text-[rgba(23,18,8,0.62)]">{r.due_date?.slice(0, 10)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -369,12 +369,12 @@ export default function LiquidityTab() {
           {(rows) => (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Date</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Description</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Category</th>
-                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Amount</th>
-                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Balance</th>
+                <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Date</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Description</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Category</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Amount</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Balance</th>
                 </tr>
               </thead>
               <tbody>
@@ -382,15 +382,15 @@ export default function LiquidityTab() {
                   <tr
                     key={t.id}
                     onClick={() => openDrawer("bank_txn", t.id)}
-                    className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors"
+                    className="border-b border-[rgba(23,18,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors"
                   >
-                    <td className="py-2.5 text-xs text-[#6B6B6B]">{t.date?.slice(0, 10)}</td>
+                    <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{t.date?.slice(0, 10)}</td>
                     <td className="py-2.5 text-xs text-fyn-ink font-medium max-w-[280px] truncate">{t.description ?? "—"}</td>
-                    <td className="py-2.5 text-xs text-[#6B6B6B]">{t.category ?? "—"}</td>
+                    <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{t.category ?? "—"}</td>
                     <td className={`py-2.5 text-right font-mono text-xs font-semibold ${t.type === "credit" ? "text-emerald-600" : "text-fyn-ink"}`}>
                       {t.type === "credit" ? "+" : "−"}{fmtCompact(Number(t.amount))}
                     </td>
-                    <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(t.balance))}</td>
+                    <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(t.balance))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -411,7 +411,7 @@ export default function LiquidityTab() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className="text-[#6B6B6B]">{label}</span>
+      <span className="text-[rgba(23,18,8,0.62)]">{label}</span>
       <span className="font-mono text-fyn-ink font-semibold">{value}</span>
     </div>
   );

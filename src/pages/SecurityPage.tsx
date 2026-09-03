@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Shield, Lock, Eye, RefreshCw, CheckCircle2, X, KeyRound, Server, Users, FileCheck, Clock, Calendar, Rocket, ShieldCheck, ArrowRight, MessageCircle, CreditCard, XCircle, Sparkles, Mail } from "lucide-react";
 import Layout from "@/components/Layout";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const BEIGE = "#F4EDDA";
 const GOLD = "#8B6914";
@@ -41,7 +41,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      style={{ background: "rgba(26,16,8,0.7)", backdropFilter: "blur(8px)" }}
+      style={{ background: "rgba(23,18,8,0.7)", backdropFilter: "blur(8px)" }}
       onClick={onClose}
     >
       <motion.div
@@ -49,7 +49,7 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
         className="relative bg-white rounded-3xl w-full max-w-[900px] max-h-[85vh] overflow-hidden flex flex-col"
-        style={{ boxShadow: "0 40px 100px rgba(26,16,8,0.3)" }}
+        style={{ boxShadow: "0 40px 100px rgba(23,18,8,0.3)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -61,11 +61,11 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
           <X size={20} />
         </button>
 
-        <div className="px-8 md:px-14 pt-10 pb-6 border-b" style={{ borderColor: "rgba(26,16,8,0.08)" }}>
+        <div className="px-8 md:px-14 pt-10 pb-6 border-b" style={{ borderColor: "rgba(23,18,8,0.08)" }}>
           <h2 style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: 32, color: INK, lineHeight: 1.15 }}>
             FYNHelp Security &amp; Privacy Policy
           </h2>
-          <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(26,16,8,0.6)", marginTop: 8 }}>
+          <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(23,18,8,0.6)", marginTop: 8 }}>
             Last Updated: May 2026 · Version 1.0 (Pre-Launch)
           </p>
         </div>
@@ -149,8 +149,8 @@ const WhitepaperModal = ({ open, onClose }: { open: boolean; onClose: () => void
           </Section>
         </div>
 
-        <div className="px-8 md:px-14 py-5 border-t flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "rgba(26,16,8,0.08)", background: BEIGE }}>
-          <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>
+        <div className="px-8 md:px-14 py-5 border-t flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "rgba(23,18,8,0.08)", background: BEIGE }}>
+          <p style={{ fontFamily: "'Roboto'", fontSize: 13, color: "rgba(23,18,8,0.7)" }}>
             Questions? Email <a href="mailto:support@fynhelp.com" style={{ color: GOLD, fontWeight: 600 }}>support@fynhelp.com</a>
           </p>
           <button
@@ -473,7 +473,7 @@ const SecurityPage = () => {
           <motion.h2 {...fadeUp} className="text-center" style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(32px, 4.2vw, 48px)", color: INK, marginBottom: 20 }}>
             Built for Security, Designed for Trust
           </motion.h2>
-          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(26,16,8,0.7)", maxWidth: 800, marginBottom: 60, lineHeight: 1.6 }}>
+          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(23,18,8,0.7)", maxWidth: 800, marginBottom: 60, lineHeight: 1.6 }}>
             FYNHelp's security architecture is built on industry standards and India-first compliance. Here's what that means for your business:
           </motion.p>
 
@@ -508,12 +508,12 @@ const SecurityPage = () => {
                 transition={{ duration: 0.6, delay: i * 0.15 }}
                 className="rounded-[32px] p-12 transition-all duration-500 hover:-translate-y-2"
                 style={{
-                  background: `linear-gradient(145deg, rgba(26,16,8,0.97) 0%, rgba(26,16,8,0.9) 100%)`,
+                  background: `linear-gradient(145deg, rgba(23,18,8,0.97) 0%, rgba(23,18,8,0.9) 100%)`,
                   border: "1px solid rgba(139,105,20,0.2)",
-                  boxShadow: "0 20px 60px rgba(26,16,8,0.15)",
+                  boxShadow: "0 20px 60px rgba(23,18,8,0.15)",
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 30px 80px rgba(26,16,8,0.25)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 20px 60px rgba(26,16,8,0.15)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 30px 80px rgba(23,18,8,0.25)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 20px 60px rgba(23,18,8,0.15)"; }}
               >
                 <div
                   className="flex items-center justify-center mb-6"
@@ -559,7 +559,7 @@ const SecurityPage = () => {
           <motion.h2 {...fadeUp} className="text-center" style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(32px, 4.2vw, 48px)", color: INK, marginBottom: 20 }}>
             How FYNHelp Connects to Your Financial Systems
           </motion.h2>
-          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(26,16,8,0.7)", maxWidth: 900, marginBottom: 16, lineHeight: 1.6 }}>
+          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(23,18,8,0.7)", maxWidth: 900, marginBottom: 16, lineHeight: 1.6 }}>
             When you integrate FYNHelp with Razorpay, Zoho Books, or your bank via Account Aggregator, security is engineered into every step.
           </motion.p>
           <motion.div {...fadeUp} className="text-center mb-16">
@@ -617,7 +617,7 @@ const SecurityPage = () => {
                 className="relative rounded-3xl p-10 transition-all duration-300 hover:-translate-y-1"
                 style={{
                   background: BEIGE,
-                  border: "2px solid rgba(26,16,8,0.08)",
+                  border: "2px solid rgba(23,18,8,0.08)",
                   paddingTop: 48,
                 }}
                 onMouseEnter={(e) => {
@@ -625,7 +625,7 @@ const SecurityPage = () => {
                   e.currentTarget.style.boxShadow = "0 12px 40px rgba(139,105,20,0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(26,16,8,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(23,18,8,0.08)";
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
@@ -653,7 +653,7 @@ const SecurityPage = () => {
                   {step.bullets.map((b, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <span style={{ color: RED, fontSize: 20, lineHeight: 1, flexShrink: 0 }}>•</span>
-                      <span style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 15, color: "rgba(26,16,8,0.85)", lineHeight: 1.6 }}>{b}</span>
+                      <span style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 15, color: "rgba(23,18,8,0.85)", lineHeight: 1.6 }}>{b}</span>
                     </div>
                   ))}
                 </div>
@@ -680,8 +680,8 @@ const SecurityPage = () => {
               className="relative rounded-3xl overflow-hidden flex items-center justify-center"
               style={{
                 aspectRatio: "5 / 6",
-                background: `linear-gradient(145deg, ${INK} 0%, rgba(26,16,8,0.85) 50%, rgba(139,105,20,0.4) 100%)`,
-                boxShadow: "0 20px 60px rgba(26,16,8,0.2)",
+                background: `linear-gradient(145deg, ${INK} 0%, rgba(23,18,8,0.85) 50%, rgba(139,105,20,0.4) 100%)`,
+                boxShadow: "0 20px 60px rgba(23,18,8,0.2)",
               }}
             >
               {/* Geometric brand illustration */}
@@ -738,7 +738,7 @@ const SecurityPage = () => {
                     </div>
                     <div>
                       <div style={{ fontFamily: "'Roboto'", fontWeight: 500, fontSize: 16, color: INK, marginBottom: 4, lineHeight: 1.5 }}>{title}</div>
-                      <div style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 15, color: "rgba(26,16,8,0.75)", lineHeight: 1.7 }}>{desc}</div>
+                      <div style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 15, color: "rgba(23,18,8,0.75)", lineHeight: 1.7 }}>{desc}</div>
                     </div>
                   </div>
                 ))}
@@ -767,7 +767,7 @@ const SecurityPage = () => {
           <motion.h2 {...fadeUp} className="text-center" style={{ fontFamily: "'Oswald'", fontWeight: 700, fontSize: "clamp(28px, 3.6vw, 42px)", color: INK, marginBottom: 20 }}>
             Our Security Roadmap
           </motion.h2>
-          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(26,16,8,0.7)", maxWidth: 800, marginBottom: 60, lineHeight: 1.6 }}>
+          <motion.p {...fadeUp} className="text-center mx-auto" style={{ fontFamily: "'Raleway'", fontWeight: 400, fontSize: 18, color: "rgba(23,18,8,0.7)", maxWidth: 800, marginBottom: 60, lineHeight: 1.6 }}>
             Security is an ongoing commitment, not a one-time checkbox. Here's what we're building:
           </motion.p>
 
@@ -778,7 +778,7 @@ const SecurityPage = () => {
             {[
               {
                 status: "LIVE",
-                statusColor: "#10B981",
+                statusColor: "#1F5A46",
                 title: "Foundation",
                 icon: <CheckCircle2 size={28} color="#FFFFFF" />,
                 nodeBg: GOLD,
@@ -796,18 +796,18 @@ const SecurityPage = () => {
               },
               {
                 status: "Q3-Q4 2026",
-                statusColor: "rgba(26,16,8,0.5)",
+                statusColor: "rgba(23,18,8,0.5)",
                 title: "Compliance Certifications",
-                icon: <FileCheck size={28} color="rgba(26,16,8,0.5)" />,
+                icon: <FileCheck size={28} color="rgba(23,18,8,0.5)" />,
                 nodeBg: "#FFFFFF",
                 nodeBorder: "rgba(139,105,20,0.4)",
                 items: ["SOC 2 Type II audit", "ISO 27001 certification", "GDPR compliance attestation", "Quarterly penetration testing", "Bug bounty program"],
               },
               {
                 status: "2027",
-                statusColor: "rgba(26,16,8,0.5)",
+                statusColor: "rgba(23,18,8,0.5)",
                 title: "Advanced Security",
-                icon: <Rocket size={28} color="rgba(26,16,8,0.5)" />,
+                icon: <Rocket size={28} color="rgba(23,18,8,0.5)" />,
                 nodeBg: "#FFFFFF",
                 nodeBorder: "rgba(139,105,20,0.4)",
                 items: ["End-to-end encryption (sensitive)", "HSM integration", "Blockchain audit trail", "AI anomaly detection", "Compliance automation"],
@@ -838,7 +838,7 @@ const SecurityPage = () => {
                   style={{
                     fontFamily: "'Work Sans'", fontWeight: 600, fontSize: 11, letterSpacing: "1px",
                     color: stage.statusColor,
-                    background: i === 0 ? "rgba(16,185,129,0.12)" : i === 1 ? "rgba(139,105,20,0.12)" : "rgba(26,16,8,0.06)",
+                    background: i === 0 ? "rgba(16,185,129,0.12)" : i === 1 ? "rgba(139,105,20,0.12)" : "rgba(23,18,8,0.06)",
                     padding: "5px 12px", borderRadius: 12, textTransform: "uppercase",
                   }}
                 >
@@ -853,7 +853,7 @@ const SecurityPage = () => {
                   {stage.items.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2 mb-2">
                       <Calendar size={12} color={GOLD} className="mt-1 flex-shrink-0" />
-                      <span style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 13, color: "rgba(26,16,8,0.8)", lineHeight: 1.5 }}>{item}</span>
+                      <span style={{ fontFamily: "'Roboto'", fontWeight: 400, fontSize: 13, color: "rgba(23,18,8,0.8)", lineHeight: 1.5 }}>{item}</span>
                     </li>
                   ))}
                 </ul>

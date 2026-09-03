@@ -12,9 +12,9 @@ const fmtINR = (n: number) =>
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
   active:    { bg: "rgba(16,185,129,0.12)", fg: "#0F7B4F", label: "Active" },
   trial:     { bg: "rgba(139,105,20,0.15)", fg: "#8B6914", label: "Trial" },
-  cancelled: { bg: "rgba(26,16,8,0.08)",    fg: "hsl(var(--fyn-ink) / 0.7)", label: "Cancelled" },
+  cancelled: { bg: "rgba(23,18,8,0.08)",    fg: "hsl(var(--fyn-ink) / 0.7)", label: "Cancelled" },
   past_due:  { bg: "rgba(234,140,30,0.15)", fg: "#C26B00", label: "Past Due" },
-  none:      { bg: "rgba(26,16,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "No sub" },
+  none:      { bg: "rgba(23,18,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "No sub" },
 };
 
 const PLAN_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
@@ -22,7 +22,7 @@ const PLAN_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
   starter:    { bg: "rgba(59,130,246,0.12)", fg: "#3B82F6", label: "Starter" },
   pro:        { bg: "rgba(16,185,129,0.12)", fg: "#0F7B4F", label: "Pro" },
   enterprise: { bg: "rgba(120,53,15,0.12)",  fg: "#78350F", label: "Enterprise" },
-  none:       { bg: "rgba(26,16,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "-" },
+  none:       { bg: "rgba(23,18,8,0.06)",    fg: "hsl(var(--fyn-ink) / 0.55)", label: "-" },
 };
 
 type ProfileRow = {
@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
         <div className="overflow-x-auto">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(26,16,8,0.04)", borderBottom: "2px solid rgba(139,105,20,0.2)" }}>
+              <tr style={{ background: "rgba(23,18,8,0.04)", borderBottom: "2px solid rgba(139,105,20,0.2)" }}>
                 {COLUMNS.map((c) => (
                   <th key={c} style={{ padding: "16px", textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))", whiteSpace: "nowrap" }}>
                     {c === "Select" ? (
@@ -235,7 +235,7 @@ export default function AdminUsersPage() {
                 return (
                   <tr
                     key={r.user_id}
-                    style={{ background: isSel ? "rgba(139,105,20,0.06)" : baseBg, borderBottom: "1px solid rgba(26,16,8,0.06)", cursor: "pointer", transition: "background 0.15s" }}
+                    style={{ background: isSel ? "rgba(139,105,20,0.06)" : baseBg, borderBottom: "1px solid rgba(23,18,8,0.06)", cursor: "pointer", transition: "background 0.15s" }}
                   >
                     <td style={cell} onClick={(e) => e.stopPropagation()}>
                       <input
@@ -282,7 +282,7 @@ export default function AdminUsersPage() {
 }
 
 const inputStyle: CSSProperties = {
-  border: "1px solid rgba(26,16,8,0.15)",
+  border: "1px solid rgba(23,18,8,0.15)",
   fontFamily: "Roboto, sans-serif",
   fontSize: 14,
   color: "hsl(var(--fyn-ink))",
@@ -291,7 +291,7 @@ const inputStyle: CSSProperties = {
 
 const secondaryBtn: CSSProperties = {
   height: 36, padding: "0 14px", borderRadius: 8,
-  background: "transparent", border: "1px solid rgba(26,16,8,0.15)",
+  background: "transparent", border: "1px solid rgba(23,18,8,0.15)",
   color: "hsl(var(--fyn-ink))",
   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
 };
@@ -346,8 +346,8 @@ function ActionsMenu({ userId }: { userId: string }) {
           <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
           <div style={{
             position: "absolute", right: 0, top: "100%", marginTop: 4, minWidth: 200,
-            background: "#fff", border: "1px solid rgba(26,16,8,0.12)",
-            borderRadius: 10, boxShadow: "0 8px 24px rgba(26,16,8,0.12)",
+            background: "#fff", border: "1px solid rgba(23,18,8,0.12)",
+            borderRadius: 10, boxShadow: "0 8px 24px rgba(23,18,8,0.12)",
             zIndex: 50, overflow: "hidden", padding: "4px 0",
           }}>
             {items.map((item) => (

@@ -22,7 +22,7 @@ export default function RevenueQualitySection() {
       </div>
       <IntelCard title="Revenue Mix" sub="By type">
         <div className="space-y-3">
-          <div className="flex w-full h-3 rounded-full overflow-hidden" style={{ background: "rgba(26,16,8,0.06)" }}>
+          <div className="flex w-full h-3 rounded-full overflow-hidden" style={{ background: "rgba(23,18,8,0.06)" }}>
             <div style={{ width: `${Number(latest.recurring_pct)}%`, background: ACCENT.green }} />
             <div style={{ width: `${Number(latest.project_pct)}%`, background: ACCENT.gold }} />
             <div style={{ width: `${Number(latest.onetime_pct)}%`, background: ACCENT.red }} />

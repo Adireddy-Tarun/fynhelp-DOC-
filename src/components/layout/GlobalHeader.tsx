@@ -15,12 +15,12 @@ interface Props {
   onOpenMobileDrawer: () => void;
 }
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#A93838";
-const MUTED = "#6B6B6B";
+const MUTED = "rgba(23,18,8,0.62)";
 const SUB = "#9E9E9E";
 const SURFACE = "#F5F2EC";
-const BORDER = "rgba(26,16,8,0.08)";
+const BORDER = "rgba(23,18,8,0.08)";
 
 type BadgeDef = { icon: any; name: string; sub?: string; settings?: boolean };
 
@@ -177,7 +177,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
   }, [isDemo, profile, user]);
 
   const BadgeIcon = badge.icon;
-  const badgeIconBg = badge.settings ? "#6B6B6B" : RED;
+  const badgeIconBg = badge.settings ? "rgba(23,18,8,0.62)" : RED;
 
   const headerBorder = isOverdue ? "0.5px solid rgba(169,56,56,0.3)" : `0.5px solid ${BORDER}`;
 
@@ -187,7 +187,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
   };
 
   const Divider = () => (
-    <span style={{ width: 1, height: 16, background: "rgba(26,16,8,0.1)", flexShrink: 0 }} />
+    <span style={{ width: 1, height: 16, background: "rgba(23,18,8,0.1)", flexShrink: 0 }} />
   );
 
   return (
@@ -300,7 +300,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
             </span>
             <span style={{
               fontSize: 9, color: "#B0ABA4",
-              background: "rgba(26,16,8,0.07)", borderRadius: 4, padding: "1px 5px",
+              background: "rgba(23,18,8,0.07)", borderRadius: 4, padding: "1px 5px",
               marginLeft: "auto",
             }}>
               ⌘K
@@ -314,7 +314,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
         {!isMobile && isIntelligenceRoute(location.pathname) && (
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <span style={{
-              width: 6, height: 6, borderRadius: "50%", background: "#10B981",
+              width: 6, height: 6, borderRadius: "50%", background: "#1F5A46",
               animation: "fyn-pulse 2s infinite",
             }} />
             <span style={{ fontSize: 10, color: MUTED }}>Live</span>
@@ -379,7 +379,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
                 background: "#FFFFFF",
                 border: `0.5px solid ${BORDER}`,
                 borderRadius: 10,
-                boxShadow: "0 8px 24px rgba(26,16,8,0.08)",
+                boxShadow: "0 8px 24px rgba(23,18,8,0.08)",
                 minWidth: 200,
                 padding: 6,
                 zIndex: 60,

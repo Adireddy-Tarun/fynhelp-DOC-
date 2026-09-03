@@ -6,10 +6,10 @@ import { SUITES } from "@/data/suiteStatus";
 const COLORS = {
   panelBg: "#FDFAF3",
   panelBgAlt: "#F9F5EB",
-  border: "rgba(26,16,8,0.08)",
+  border: "rgba(23,18,8,0.08)",
   borderStrong: "rgba(139,105,20,0.2)",
-  text: "#1A1008",
-  textDim: "rgba(26,16,8,0.55)",
+  text: "#171208",
+  textDim: "rgba(23,18,8,0.55)",
   red: "#C41E1E",
   gold: "#8B6914",
 };
@@ -111,7 +111,7 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
             : undefined
         }
       >
-        <row.Icon size={18} color={isInvestor ? INVESTOR_BLUE : "#1A1008"} strokeWidth={1.8} />
+        <row.Icon size={18} color={isInvestor ? INVESTOR_BLUE : "#171208"} strokeWidth={1.8} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1, textAlign: "left" }}>
         <div
@@ -123,7 +123,7 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
             fontFamily: "Inter, sans-serif",
             fontWeight: 600,
             fontSize: 14,
-            color: isInvestor ? INVESTOR_BLUE : "#1A1008",
+            color: isInvestor ? INVESTOR_BLUE : "#171208",
             letterSpacing: -0.1,
             lineHeight: 1.25,
           }}
@@ -137,7 +137,7 @@ function ItemRow({ row, index }: { row: Row; index: number }) {
             fontFamily: "Inter, sans-serif",
             fontWeight: 400,
             fontSize: 12.5,
-            color: "rgba(26,16,8,0.55)",
+            color: "rgba(23,18,8,0.55)",
             lineHeight: 1.45,
           }}
         >
@@ -205,7 +205,7 @@ export default function ProductsDropdown({
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(26,16,8,0.4)",
+              background: "rgba(23,18,8,0.4)",
               backdropFilter: "blur(6px)",
               WebkitBackdropFilter: "blur(6px)",
               zIndex: 999,
@@ -248,7 +248,7 @@ export default function ProductsDropdown({
                 </div>
               </div>
               <div className="fyn-dropdown-footer">
-                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.45)" }}>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(23,18,8,0.45)" }}>
                   {liveCount} live modules across your financial stack
                 </span>
                 <button
@@ -305,7 +305,7 @@ export default function ProductsDropdown({
                 height: 40,
                 borderRadius: 999,
                 border: `1px solid ${COLORS.border}`,
-                background: "rgba(26,16,8,0.04)",
+                background: "rgba(23,18,8,0.04)",
                 color: COLORS.text,
                 display: "flex",
                 alignItems: "center",
@@ -340,14 +340,14 @@ export default function ProductsDropdown({
               border: 1px solid ${COLORS.borderStrong};
               border-radius: 20px;
               overflow: hidden;
-              box-shadow: 0 16px 48px rgba(26,16,8,0.12), 0 0 1px rgba(139,105,20,0.2);
+              box-shadow: 0 16px 48px rgba(23,18,8,0.12), 0 0 1px rgba(139,105,20,0.2);
             }
             .fyn-dropdown-header {
               font-family: Inter, sans-serif;
               font-weight: 600;
               font-size: 11px;
               letter-spacing: 1.5px;
-              color: rgba(26,16,8,0.4);
+              color: rgba(23,18,8,0.4);
               text-transform: uppercase;
               padding: 4px 14px 8px;
             }
@@ -360,8 +360,8 @@ export default function ProductsDropdown({
             }
             .fyn-dropdown-col { display: flex; flex-direction: column; gap: 2px; }
             .fyn-dropdown-footer {
-              background: rgba(26,16,8,0.02);
-              border-top: 1px solid rgba(26,16,8,0.06);
+              background: rgba(23,18,8,0.02);
+              border-top: 1px solid rgba(23,18,8,0.06);
               padding: 10px 24px;
               display: flex;
               justify-content: space-between;
@@ -388,8 +388,8 @@ export default function ProductsDropdown({
               width: 36px; height: 36px;
               flex-shrink: 0;
               border-radius: 9px;
-              background: rgba(26,16,8,0.04);
-              border: 1px solid rgba(26,16,8,0.08);
+              background: rgba(23,18,8,0.04);
+              border: 1px solid rgba(23,18,8,0.08);
               display: flex; align-items: center; justify-content: center;
               transition: background 180ms ease, border-color 180ms ease;
             }

@@ -104,12 +104,12 @@ export function DemoOnboarding() {
   return (
     <div className="min-h-screen bg-fyn-beige text-fyn-ink">
       {/* Header */}
-      <div className="border-b border-[rgba(26,16,8,0.08)] bg-white/60 backdrop-blur">
+      <div className="border-b border-[rgba(23,18,8,0.08)] bg-white/60 backdrop-blur">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-georgia font-bold text-fyn-ink">
             FynHelp Demo
           </h1>
-          <div className="text-[#6B6B6B] text-sm">
+          <div className="text-[rgba(23,18,8,0.62)] text-sm">
             Step {step + 1} of {QUESTIONS.length}
           </div>
         </div>
@@ -124,12 +124,12 @@ export function DemoOnboarding() {
           <h2 className="text-4xl font-georgia font-bold text-fyn-ink mb-3">
             Meet Fynny
           </h2>
-          <p className="text-xl text-[#6B6B6B]">
+          <p className="text-xl text-[rgba(23,18,8,0.62)]">
             Your AI CFO wants to know your business
           </p>
         </div>
 
-        <div className="bg-white border border-[rgba(26,16,8,0.08)] rounded-2xl p-6 mb-6 h-[500px] overflow-y-auto shadow-xs">
+        <div className="bg-white border border-[rgba(23,18,8,0.08)] rounded-2xl p-6 mb-6 h-[500px] overflow-y-auto shadow-xs">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -140,7 +140,7 @@ export function DemoOnboarding() {
                 style={
                   msg.role === 'fynny'
                     ? { background: '#A93838' }
-                    : { background: 'rgba(26,16,8,0.08)' }
+                    : { background: 'rgba(23,18,8,0.08)' }
                 }
               >
                 {msg.role === 'fynny' ? (
@@ -153,7 +153,7 @@ export function DemoOnboarding() {
               <div
                 className={`max-w-[70%] rounded-2xl px-6 py-4 ${
                   msg.role === 'user'
-                    ? 'bg-[rgba(26,16,8,0.05)] text-fyn-ink border border-[rgba(26,16,8,0.08)]'
+                    ? 'bg-[rgba(23,18,8,0.05)] text-fyn-ink border border-[rgba(23,18,8,0.08)]'
                     : 'text-fyn-ink border'
                 }`}
                 style={
@@ -176,7 +176,7 @@ export function DemoOnboarding() {
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
               placeholder="Type your answer..."
-              className="flex-1 px-6 py-4 bg-white border border-[rgba(26,16,8,0.12)] rounded-xl text-fyn-ink text-lg placeholder:text-[#9A9A9A] focus:outline-hidden focus:border-[#A93838] transition-colors"
+              className="flex-1 px-6 py-4 bg-white border border-[rgba(23,18,8,0.12)] rounded-xl text-fyn-ink text-lg placeholder:text-[#9A9A9A] focus:outline-hidden focus:border-[#A93838] transition-colors"
               autoFocus
             />
             <button
@@ -191,11 +191,11 @@ export function DemoOnboarding() {
         </form>
 
         <div className="mt-8">
-          <div className="flex justify-between text-sm text-[#6B6B6B] mb-2">
+          <div className="flex justify-between text-sm text-[rgba(23,18,8,0.62)] mb-2">
             <span>Progress</span>
             <span>{Math.round((step / QUESTIONS.length) * 100)}%</span>
           </div>
-          <div className="h-2 bg-[rgba(26,16,8,0.08)] rounded-full overflow-hidden">
+          <div className="h-2 bg-[rgba(23,18,8,0.08)] rounded-full overflow-hidden">
             <div
               className="h-full transition-all duration-500"
               style={{ width: `${(step / QUESTIONS.length) * 100}%`, background: '#A93838' }}

@@ -5,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "./AdminDashboardPage";
 import { exportToCsv } from "@/utils/csvExport";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
-const BORDER = "rgba(26,16,8,0.12)";
+const BORDER = "rgba(23,18,8,0.12)";
 const BODY = "Arial, Helvetica, sans-serif";
 const GREEN = "#0B7A5A";
 const AMBER = "#8B6914";
@@ -175,7 +175,7 @@ export default function ResourceActivityLog({ resources }: { resources: { id: st
           <FileText size={16} color={INK} />
           <span style={{ fontFamily: BODY, fontSize: 13, fontWeight: 700, color: INK }}>File activity log</span>
         </div>
-        <span style={{ fontFamily: BODY, fontSize: 12, color: "rgba(26,16,8,0.6)" }}>
+        <span style={{ fontFamily: BODY, fontSize: 12, color: "rgba(23,18,8,0.6)" }}>
           {loading ? "Loading…" : `${entries.length} events · ${downloads} downloads · ${uploads} uploads`}
         </span>
         <div className="ml-auto flex items-center gap-2">
@@ -231,28 +231,28 @@ export default function ResourceActivityLog({ resources }: { resources: { id: st
           </div>
 
           {visible.length === 0 && (
-            <div style={{ fontFamily: BODY, fontSize: 12, color: "rgba(26,16,8,0.5)" }}>No activity recorded yet.</div>
+            <div style={{ fontFamily: BODY, fontSize: 12, color: "rgba(23,18,8,0.5)" }}>No activity recorded yet.</div>
           )}
 
           <div className="flex flex-col" style={{ maxHeight: 420, overflowY: "auto" }}>
             {visible.map((e) => (
-              <div key={e.id} className="flex flex-wrap items-center gap-2 py-2" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
+              <div key={e.id} className="flex flex-wrap items-center gap-2 py-2" style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }}>
                 <span
                   className="inline-flex items-center gap-1.5 px-2"
-                  style={{ height: 22, borderRadius: 6, background: "rgba(26,16,8,0.05)", color: colorFor(e), fontFamily: BODY, fontSize: 11, fontWeight: 700 }}
+                  style={{ height: 22, borderRadius: 6, background: "rgba(23,18,8,0.05)", color: colorFor(e), fontFamily: BODY, fontSize: 11, fontWeight: 700 }}
                 >
                   {ICONS[e.action] ?? <FileText size={12} />} {labelFor(e.action)}
                 </span>
                 <span style={{ fontFamily: BODY, fontSize: 12, fontWeight: 600, color: INK }}>
                   {e.resourceTitle ?? e.resourceId ?? "—"}
                 </span>
-                <span style={{ fontFamily: "monospace", fontSize: 10.5, color: "rgba(26,16,8,0.55)" }} className="truncate">
+                <span style={{ fontFamily: "monospace", fontSize: 10.5, color: "rgba(23,18,8,0.55)" }} className="truncate">
                   {e.filePath ?? ""}
                 </span>
-                <span className="ml-auto" style={{ fontFamily: BODY, fontSize: 11, color: "rgba(26,16,8,0.7)" }}>
+                <span className="ml-auto" style={{ fontFamily: BODY, fontSize: 11, color: "rgba(23,18,8,0.7)" }}>
                   {e.actor}
                 </span>
-                <span style={{ fontFamily: "monospace", fontSize: 10.5, color: "rgba(26,16,8,0.5)", whiteSpace: "nowrap" }}>
+                <span style={{ fontFamily: "monospace", fontSize: 10.5, color: "rgba(23,18,8,0.5)", whiteSpace: "nowrap" }}>
                   {new Date(e.at).toLocaleString("en-IN")}
                 </span>
                 {Boolean(e.meta.outcome) && e.meta.outcome !== "success" && (

@@ -77,8 +77,8 @@ export default function AdminMediaLibraryPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-serif text-3xl font-bold" style={{ color: "#1A1008" }}>Media Library</h1>
-        <p className="text-[13px] mt-1" style={{ color: "rgba(26,16,8,0.6)" }}>
+        <h1 className="font-serif text-3xl font-bold" style={{ color: "#171208" }}>Media Library</h1>
+        <p className="text-[13px] mt-1" style={{ color: "rgba(23,18,8,0.6)" }}>
           Upload, replace, and manage images used across FynHelp
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function AdminMediaLibraryPage() {
         </Select>
 
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
-          <SearchIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "rgba(26,16,8,0.4)" }} />
+          <SearchIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "rgba(23,18,8,0.4)" }} />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -111,7 +111,7 @@ export default function AdminMediaLibraryPage() {
         <button
           onClick={() => { setMultiSelect((m) => !m); setSelected(new Set()); }}
           className="h-9 px-3 rounded-md border bg-white inline-flex items-center gap-2 text-[13px]"
-          style={{ borderColor: multiSelect ? RED : BORDER, color: multiSelect ? RED : "#1A1008" }}
+          style={{ borderColor: multiSelect ? RED : BORDER, color: multiSelect ? RED : "#171208" }}
         >
           {multiSelect ? <CheckSquare size={14} /> : <SquareIcon size={14} />}
           Multi-select
@@ -139,15 +139,15 @@ export default function AdminMediaLibraryPage() {
         <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-lg border bg-white p-3" style={{ borderColor: BORDER }}>
-              <div className="aspect-square rounded-md animate-pulse" style={{ background: "rgba(26,16,8,0.08)" }} />
-              <div className="h-3 mt-2 rounded animate-pulse" style={{ background: "rgba(26,16,8,0.08)" }} />
+              <div className="aspect-square rounded-md animate-pulse" style={{ background: "rgba(23,18,8,0.08)" }} />
+              <div className="h-3 mt-2 rounded animate-pulse" style={{ background: "rgba(23,18,8,0.08)" }} />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="border rounded-lg bg-white p-12 text-center" style={{ borderColor: BORDER }}>
-          <ImageIcon size={32} className="mx-auto mb-3" style={{ color: "rgba(26,16,8,0.3)" }} />
-          <p className="text-[14px] font-medium" style={{ color: "#1A1008" }}>
+          <ImageIcon size={32} className="mx-auto mb-3" style={{ color: "rgba(23,18,8,0.3)" }} />
+          <p className="text-[14px] font-medium" style={{ color: "#171208" }}>
             {backendReady ? "No images yet. Upload your first image to get started." : "Media library is being set up — check back shortly"}
           </p>
         </div>
@@ -267,13 +267,13 @@ function MediaCard({
       className="group relative rounded-lg border bg-white overflow-hidden animate-fade-in"
       style={{ borderColor: selected ? RED : BORDER, animationDelay: `${Math.min(index * 30, 400)}ms` }}
     >
-      <div className="relative aspect-square overflow-hidden" style={{ background: "rgba(26,16,8,0.04)" }}>
+      <div className="relative aspect-square overflow-hidden" style={{ background: "rgba(23,18,8,0.04)" }}>
         <img src={asset.public_url} alt={asset.alt_text ?? asset.file_name} className="w-full h-full object-cover" loading="lazy" />
 
         {/* Folder badge */}
         <span
           className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
-          style={{ background: "rgba(255,255,255,0.92)", color: "#1A1008" }}
+          style={{ background: "rgba(255,255,255,0.92)", color: "#171208" }}
         >
           {asset.folder}
         </span>
@@ -291,7 +291,7 @@ function MediaCard({
           <button
             onClick={onToggleSelect}
             className="absolute top-2 right-2 w-6 h-6 rounded flex items-center justify-center"
-            style={{ background: selected ? RED : "rgba(255,255,255,0.92)", color: selected ? "#fff" : "#1A1008" }}
+            style={{ background: selected ? RED : "rgba(255,255,255,0.92)", color: selected ? "#fff" : "#171208" }}
           >
             {selected ? <CheckSquare size={14} /> : <SquareIcon size={14} />}
           </button>
@@ -300,7 +300,7 @@ function MediaCard({
         {/* Hover overlay */}
         {!multiSelect && (
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
-            style={{ background: "rgba(26,16,8,0.55)" }}
+            style={{ background: "rgba(23,18,8,0.55)" }}
           >
             <IconBtn label="Replace" onClick={onReplace}><RefreshCw size={14} /></IconBtn>
             <IconBtn label="Copy URL" onClick={onCopy}><Copy size={14} /></IconBtn>
@@ -314,9 +314,9 @@ function MediaCard({
             onClick={onDelete}
             aria-label="Delete"
             className="absolute bottom-2 right-2 w-7 h-7 rounded-md flex items-center justify-center transition-colors"
-            style={{ background: "rgba(255,255,255,0.92)", color: "#1A1008" }}
+            style={{ background: "rgba(255,255,255,0.92)", color: "#171208" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = RED; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.92)"; e.currentTarget.style.color = "#1A1008"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.92)"; e.currentTarget.style.color = "#171208"; }}
           >
             <Trash2 size={13} />
           </button>
@@ -324,10 +324,10 @@ function MediaCard({
       </div>
 
       <div className="p-2.5">
-        <p className="text-[11px] font-medium truncate" style={{ color: "#1A1008" }} title={asset.file_name}>
+        <p className="text-[11px] font-medium truncate" style={{ color: "#171208" }} title={asset.file_name}>
           {asset.file_name}
         </p>
-        <p className="text-[10px] mt-0.5" style={{ color: "rgba(26,16,8,0.5)" }}>
+        <p className="text-[10px] mt-0.5" style={{ color: "rgba(23,18,8,0.5)" }}>
           {formatBytes(asset.size_bytes)}
           {asset.width && asset.height ? ` · ${asset.width}×${asset.height}` : ""}
         </p>
@@ -339,7 +339,7 @@ function MediaCard({
               </span>
             ))}
             {tags.length > 2 && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.6)" }}>
+              <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: "rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.6)" }}>
                 +{tags.length - 2} more
               </span>
             )}
@@ -357,7 +357,7 @@ function IconBtn({ children, label, onClick }: { children: React.ReactNode; labe
       aria-label={label}
       title={label}
       className="w-9 h-9 rounded-md flex items-center justify-center transition-colors"
-      style={{ background: "rgba(255,255,255,0.95)", color: "#1A1008" }}
+      style={{ background: "rgba(255,255,255,0.95)", color: "#171208" }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "#fff"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; }}
     >
@@ -454,15 +454,15 @@ function UploadModal({
           onDragOver={(e) => e.preventDefault()}
           onClick={() => inputRef.current?.click()}
           className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors"
-          style={{ borderColor: BORDER, background: "rgba(26,16,8,0.02)" }}
+          style={{ borderColor: BORDER, background: "rgba(23,18,8,0.02)" }}
         >
           {previewUrl ? (
             <img src={previewUrl} alt="preview" className="max-h-48 mx-auto rounded" />
           ) : (
             <div>
-              <UploadCloud size={28} className="mx-auto mb-2" style={{ color: "rgba(26,16,8,0.5)" }} />
-              <p className="text-[13px] font-medium" style={{ color: "#1A1008" }}>Drag & drop, or click to browse</p>
-              <p className="text-[11px] mt-1" style={{ color: "rgba(26,16,8,0.55)" }}>PNG, JPG, SVG, WEBP · up to 5 MB</p>
+              <UploadCloud size={28} className="mx-auto mb-2" style={{ color: "rgba(23,18,8,0.5)" }} />
+              <p className="text-[13px] font-medium" style={{ color: "#171208" }}>Drag & drop, or click to browse</p>
+              <p className="text-[11px] mt-1" style={{ color: "rgba(23,18,8,0.55)" }}>PNG, JPG, SVG, WEBP · up to 5 MB</p>
             </div>
           )}
           <input
@@ -477,7 +477,7 @@ function UploadModal({
         {error && <p className="text-[12px]" style={{ color: RED }}>{error}</p>}
 
         {duplicate && (
-          <div className="rounded-md p-3 text-[12px]" style={{ background: "rgba(169,56,56,0.06)", color: "#1A1008" }}>
+          <div className="rounded-md p-3 text-[12px]" style={{ background: "rgba(169,56,56,0.06)", color: "#171208" }}>
             <p className="mb-2">This image already exists as <strong>{duplicate.file_name}</strong>.</p>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => { toast.success("Using existing image"); onClose(); }}>
@@ -584,7 +584,7 @@ function EditModal({ asset, onClose }: { asset: MediaAsset; onClose: () => void 
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[12px] mr-1" style={{ color: "rgba(26,16,8,0.6)" }}>Aspect:</span>
+          <span className="text-[12px] mr-1" style={{ color: "rgba(23,18,8,0.6)" }}>Aspect:</span>
           {[
             { label: "Free", v: undefined },
             { label: "1:1", v: 1 },
@@ -597,7 +597,7 @@ function EditModal({ asset, onClose }: { asset: MediaAsset; onClose: () => void 
               className="text-[12px] px-2.5 py-1 rounded border"
               style={{
                 background: aspect === a.v ? RED : "transparent",
-                color: aspect === a.v ? "#fff" : "#1A1008",
+                color: aspect === a.v ? "#fff" : "#171208",
                 borderColor: aspect === a.v ? RED : BORDER,
               }}
             >

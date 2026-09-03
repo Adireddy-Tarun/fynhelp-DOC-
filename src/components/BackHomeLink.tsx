@@ -28,7 +28,7 @@ export default function BackHomeLink() {
         fontSize: 13,
         fontWeight: 600,
         textDecoration: "none",
-        boxShadow: "0 2px 10px rgba(26,16,8,0.08)",
+        boxShadow: "0 2px 10px rgba(23,18,8,0.08)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.color = C.maroon;

@@ -152,15 +152,15 @@ export default function RevenueTab() {
             { stage: "Negotiation", value: 980_000, count: 7 },
             { stage: "Closed Won", value: 540_000, count: 4 },
           ].map((s) => (
-            <div key={s.stage} className="flex items-center justify-between py-2 border-b border-[rgba(26,16,8,0.06)] last:border-0 text-sm">
-              <span className="text-fyn-ink">{s.stage} <span className="text-[#6B6B6B] text-xs">({s.count})</span></span>
+            <div key={s.stage} className="flex items-center justify-between py-2 border-b border-[rgba(23,18,8,0.06)] last:border-0 text-sm">
+              <span className="text-fyn-ink">{s.stage} <span className="text-[rgba(23,18,8,0.62)] text-xs">({s.count})</span></span>
               <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(s.value)}</span>
             </div>
           ))}
-          <div className="grid grid-cols-3 gap-2 pt-3 mt-2 border-t border-[rgba(26,16,8,0.08)] text-center">
-            <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Win Rate</p><p className="font-mono text-sm text-fyn-ink font-semibold">22%</p></div>
-            <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Avg Deal</p><p className="font-mono text-sm text-fyn-ink font-semibold">₹1.35L</p></div>
-            <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Cycle</p><p className="font-mono text-sm text-fyn-ink font-semibold">42d</p></div>
+          <div className="grid grid-cols-3 gap-2 pt-3 mt-2 border-t border-[rgba(23,18,8,0.08)] text-center">
+            <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Win Rate</p><p className="font-mono text-sm text-fyn-ink font-semibold">22%</p></div>
+            <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Avg Deal</p><p className="font-mono text-sm text-fyn-ink font-semibold">₹1.35L</p></div>
+            <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Cycle</p><p className="font-mono text-sm text-fyn-ink font-semibold">42d</p></div>
           </div>
         </IntelCard>
 
@@ -168,15 +168,15 @@ export default function RevenueTab() {
           <div className="space-y-3">
             <div>
               <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-[#6B6B6B]">Top 10 customer concentration</span>
+                <span className="text-[rgba(23,18,8,0.62)]">Top 10 customer concentration</span>
                 <Badge tone={m.concentration > 60 ? "red" : m.concentration > 40 ? "amber" : "green"}>{fmtPct(m.concentration, 0)}</Badge>
               </div>
-              <p className="text-xs text-[#6B6B6B]">{m.concentration > 60 ? "High concentration risk." : "Diversified base."}</p>
+              <p className="text-xs text-[rgba(23,18,8,0.62)]">{m.concentration > 60 ? "High concentration risk." : "Diversified base."}</p>
             </div>
-            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(26,16,8,0.08)] text-center">
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">New</p><p className="font-mono text-sm text-fyn-ink font-semibold">42%</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Expansion</p><p className="font-mono text-sm text-fyn-ink font-semibold">31%</p></div>
-              <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Renewal</p><p className="font-mono text-sm text-fyn-ink font-semibold">27%</p></div>
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[rgba(23,18,8,0.08)] text-center">
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">New</p><p className="font-mono text-sm text-fyn-ink font-semibold">42%</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Expansion</p><p className="font-mono text-sm text-fyn-ink font-semibold">31%</p></div>
+              <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Renewal</p><p className="font-mono text-sm text-fyn-ink font-semibold">27%</p></div>
             </div>
           </div>
         </IntelCard>

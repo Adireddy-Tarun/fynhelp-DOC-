@@ -7,14 +7,14 @@ const RED = "#A93838"; const BORDER = "#E0D9C8";
 
 const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in" style={{ borderColor: BORDER }}>
-    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
+    <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>{title}</h3>
     <div className="mt-4 space-y-4">{children}</div>
   </div>
 );
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>
-    <label className="block text-[13px] font-medium mb-1.5" style={{ color: "#1A1008" }}>{label}</label>
+    <label className="block text-[13px] font-medium mb-1.5" style={{ color: "#171208" }}>{label}</label>
     {children}
   </div>
 );
@@ -106,13 +106,13 @@ const BusinessProfilePage = () => {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Business Profile</h2>
-      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Company identity, legal, address and financial settings.</p>
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#171208" }}>Business Profile</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.60)" }}>Company identity, legal, address and financial settings.</p>
 
-      {loading && <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</p>}
+      {loading && <p className="text-[13px] mb-4" style={{ color: "rgba(23,18,8,0.5)" }}>Loading…</p>}
 
       <Card title="Company Identity">
-        <div className="border-2 border-dashed rounded-md p-6 text-center text-[12px]" style={{ borderColor: BORDER, color: "rgba(26,16,8,0.5)" }}>
+        <div className="border-2 border-dashed rounded-md p-6 text-center text-[12px]" style={{ borderColor: BORDER, color: "rgba(23,18,8,0.5)" }}>
           Drag & drop logo here, or click to upload
         </div>
         <Field label="Company name"><input value={name} onChange={(e) => setName(e.target.value)} className={inpCls} style={{ borderColor: BORDER }} /></Field>
@@ -170,7 +170,7 @@ const BusinessProfilePage = () => {
             </select>
           </Field>
         </div>
-        <p className="text-[12px] font-semibold mt-2" style={{ color: "rgba(26,16,8,0.6)" }}>Business bank account</p>
+        <p className="text-[12px] font-semibold mt-2" style={{ color: "rgba(23,18,8,0.6)" }}>Business bank account</p>
         <div className="grid grid-cols-3 gap-4">
           <Field label="Bank name"><input value={bank.name} onChange={(e) => setBank({ ...bank, name: e.target.value })} className={inpCls} style={{ borderColor: BORDER }} /></Field>
           <Field label="Account number"><input value={bank.account} onChange={(e) => setBank({ ...bank, account: e.target.value })} className={inpCls + " font-mono"} style={{ borderColor: BORDER }} /></Field>

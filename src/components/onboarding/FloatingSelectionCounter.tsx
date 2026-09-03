@@ -11,7 +11,7 @@ const FloatingSelectionCounter = ({ count, onClearAll }: Props) => {
       className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full px-5 py-2.5"
       style={{
         background: "hsl(var(--fyn-ink))",
-        boxShadow: "0 8px 32px rgba(26,16,8,0.30)",
+        boxShadow: "0 8px 32px rgba(23,18,8,0.30)",
         animation: "scaleIn 300ms cubic-bezier(0.34,1.56,0.64,1)",
       }}
     >

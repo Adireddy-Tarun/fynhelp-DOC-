@@ -24,8 +24,8 @@ export default function TdsIntelligenceSection() {
   return (
     <IntelCard title="TDS Intelligence" sub="Section-wise deductions · FY 2026-27">
       <div className="flex flex-wrap items-center gap-4 mb-3 text-sm">
-        <span className="text-[#6B6B6B]">Deducted <span className="font-mono font-semibold text-fyn-ink ml-1">{fmtCompact(m.deducted)}</span></span>
-        <span className="text-[#6B6B6B]">Deposited <span className="font-mono font-semibold text-fyn-ink ml-1">{fmtCompact(m.deposited)}</span></span>
+        <span className="text-[rgba(23,18,8,0.62)]">Deducted <span className="font-mono font-semibold text-fyn-ink ml-1">{fmtCompact(m.deducted)}</span></span>
+        <span className="text-[rgba(23,18,8,0.62)]">Deposited <span className="font-mono font-semibold text-fyn-ink ml-1">{fmtCompact(m.deposited)}</span></span>
         <Badge tone={m.allMatched ? "green" : "amber"}>{m.allMatched ? "26AS Matched" : "Partial Match"}</Badge>
         <Badge tone={m.allFiled ? "green" : "gold"}>{m.allFiled ? "Return Filed" : "Return Pending"}</Badge>
       </div>
@@ -39,19 +39,19 @@ export default function TdsIntelligenceSection() {
 
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-[rgba(26,16,8,0.08)]">
-            <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Section</th>
-            <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Description</th>
-            <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Deducted</th>
-            <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Rate</th>
-            <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
+          <tr className="border-b border-[rgba(23,18,8,0.08)]">
+            <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Section</th>
+            <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Description</th>
+            <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Deducted</th>
+            <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Rate</th>
+            <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r: any) => (
-            <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+            <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
               <td className="py-2.5 text-xs font-mono text-fyn-ink font-semibold">{r.section_code}</td>
-              <td className="py-2.5 text-xs text-[#6B6B6B]">{r.description}</td>
+              <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.description}</td>
               <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.amount_deducted))}</td>
               <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.rate).toFixed(1)}%</td>
               <td className="py-2.5 text-right"><Badge tone={tone[r.status] ?? "gray"}>{r.status}</Badge></td>

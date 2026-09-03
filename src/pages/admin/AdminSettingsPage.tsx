@@ -25,7 +25,7 @@ export default function AdminSettingsPage() {
                 style={{
                   padding: "12px 16px", borderRadius: 12,
                   background: active ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)" : "transparent",
-                  color: active ? "#fff" : "rgba(26,16,8,0.65)",
+                  color: active ? "#fff" : "rgba(23,18,8,0.65)",
                   fontFamily: "Raleway, sans-serif", fontWeight: 500, fontSize: 15,
                   border: "none", cursor: "pointer",
                 }}
@@ -93,7 +93,7 @@ function ProfileTab() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", height: 48, padding: "0 14px", borderRadius: 12,
-    border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+    border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
     fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", outline: "none",
   };
 
@@ -104,7 +104,7 @@ function ProfileTab() {
         <div className="grid gap-4 max-w-md">
           <label style={{ display: "block" }}>
             <span style={{ display: "block", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)", marginBottom: 6 }}>Email</span>
-            <input value={email} disabled style={{ ...inputStyle, background: "rgba(26,16,8,0.04)", color: "hsl(var(--fyn-ink) / 0.6)" }} />
+            <input value={email} disabled style={{ ...inputStyle, background: "rgba(23,18,8,0.04)", color: "hsl(var(--fyn-ink) / 0.6)" }} />
           </label>
           <label style={{ display: "block" }}>
             <span style={{ display: "block", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.7)", marginBottom: 6 }}>Display Name</span>
@@ -205,10 +205,10 @@ function AdminTeamTab() {
   return (
     <div>
       <SectionHeading title="Admin Users" subtitle="Team members with admin access to this portal" />
-      <div className="overflow-x-auto" style={{ borderRadius: 12, border: "1px solid rgba(26,16,8,0.08)" }}>
+      <div className="overflow-x-auto" style={{ borderRadius: 12, border: "1px solid rgba(23,18,8,0.08)" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ background: "rgba(26,16,8,0.04)" }}>
+            <tr style={{ background: "rgba(23,18,8,0.04)" }}>
               {["Name","User ID","Role","Actions"].map((h) => (
                 <th key={h} style={{ padding: 14, textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{h}</th>
               ))}
@@ -218,7 +218,7 @@ function AdminTeamTab() {
             {loading && <tr><td colSpan={4} style={{ ...cell, textAlign: "center", color: "hsl(var(--fyn-ink) / 0.5)" }}>Loading…</td></tr>}
             {!loading && rows.length === 0 && <tr><td colSpan={4} style={{ ...cell, textAlign: "center", color: "hsl(var(--fyn-ink) / 0.5)" }}>No admins yet.</td></tr>}
             {rows.map((r, i) => (
-              <tr key={`${r.user_id}-${r.role}`} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+              <tr key={`${r.user_id}-${r.role}`} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(23,18,8,0.06)" }}>
                 <td style={cell}>{r.name}</td>
                 <td style={{ ...cell, fontFamily: "JetBrains Mono, monospace", fontSize: 12 }}>{r.user_id.slice(0, 8)}…</td>
                 <td style={cell}>{r.role}</td>
@@ -242,15 +242,15 @@ function AdminTeamTab() {
       </button>
 
       {showInvite && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)" }} onClick={() => setShowInvite(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(23,18,8,0.5)" }} onClick={() => setShowInvite(false)}>
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl bg-white p-6">
             <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))", marginBottom: 16 }}>Invite Admin</h3>
             <label style={{ display: "block", fontSize: 13, marginBottom: 6 }}>Email</label>
             <input value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="name@fynhelp.com"
-              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", marginBottom: 14, fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(23,18,8,0.15)", marginBottom: 14, fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
             <label style={{ display: "block", fontSize: 13, marginBottom: 6 }}>Role</label>
             <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
-              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", marginBottom: 18, fontFamily: "Roboto, sans-serif", fontSize: 14, background: "#fff" }}>
+              style={{ width: "100%", height: 44, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(23,18,8,0.15)", marginBottom: 18, fontFamily: "Roboto, sans-serif", fontSize: 14, background: "#fff" }}>
               <option value="support_agent">Support Agent</option>
               <option value="analyst">Analyst</option>
               <option value="ops_admin">Ops Admin</option>
@@ -258,7 +258,7 @@ function AdminTeamTab() {
               <option value="super_admin">Super Admin</option>
             </select>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowInvite(false)} style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(26,16,8,0.15)", background: "transparent", cursor: "pointer", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>Cancel</button>
+              <button onClick={() => setShowInvite(false)} style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(23,18,8,0.15)", background: "transparent", cursor: "pointer", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14 }}>Cancel</button>
               <button onClick={inviteAdmin} disabled={inviting} style={{ padding: "10px 18px", borderRadius: 10, background: "linear-gradient(135deg,#C41E1E,#8B6914)", color: "#fff", border: "none", cursor: "pointer", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, opacity: inviting ? 0.6 : 1 }}>
                 {inviting ? "Sending…" : "Send Invite"}
               </button>
@@ -282,10 +282,10 @@ function SecurityTab() {
 
       <section>
         <SectionHeading title="Active Admin Sessions" />
-        <div className="overflow-x-auto" style={{ borderRadius: 12, border: "1px solid rgba(26,16,8,0.08)" }}>
+        <div className="overflow-x-auto" style={{ borderRadius: 12, border: "1px solid rgba(23,18,8,0.08)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(26,16,8,0.04)" }}>
+              <tr style={{ background: "rgba(23,18,8,0.04)" }}>
                 {["Admin","IP","Device","Login","Last Activity","Actions"].map((h) => (
                   <th key={h} style={{ padding: 14, textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{h}</th>
                 ))}
@@ -296,7 +296,7 @@ function SecurityTab() {
                 { a: "Tarun", ip: "103.x.x.x", d: "Chrome / macOS", l: "May 5, 14:35", la: "2 min ago" },
                 { a: "Fynny", ip: "103.y.y.y", d: "Safari / iOS", l: "May 5, 09:20", la: "1 hour ago" },
               ].map((r, i) => (
-                <tr key={r.ip} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+                <tr key={r.ip} style={{ background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff", borderTop: "1px solid rgba(23,18,8,0.06)" }}>
                   <td style={cell}>{r.a}</td>
                   <td style={cell}>{r.ip}</td>
                   <td style={cell}>{r.d}</td>
@@ -389,7 +389,7 @@ function NotificationsTab() {
           placeholder="https://hooks.slack.com/services/…"
           style={{
             width: "100%", height: 52, padding: "0 14px", borderRadius: 12,
-            border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+            border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
             fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", outline: "none",
           }}
         />
@@ -411,7 +411,7 @@ function ToggleRow({ label, sub, on, onChange }:
   { label: string; sub?: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
     <div className="flex items-center justify-between"
-      style={{ padding: "16px 0", borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
+      style={{ padding: "16px 0", borderBottom: "1px solid rgba(23,18,8,0.05)" }}>
       <div>
         <div style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 15, color: "hsl(var(--fyn-ink))" }}>{label}</div>
         {sub && <div style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.55)" }}>{sub}</div>}
@@ -420,7 +420,7 @@ function ToggleRow({ label, sub, on, onChange }:
         aria-pressed={on}
         style={{
           width: 56, height: 32, borderRadius: 999, position: "relative", border: "none", cursor: "pointer",
-          background: on ? "linear-gradient(135deg,#C41E1E,#8B6914)" : "rgba(26,16,8,0.15)",
+          background: on ? "linear-gradient(135deg,#C41E1E,#8B6914)" : "rgba(23,18,8,0.15)",
           transition: "background 0.25s ease",
         }}>
         <span style={{

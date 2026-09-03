@@ -61,15 +61,15 @@ const menuSections: Section[] = [
 ];
 
 const ACTIVE = "#A93838";
-const INK = "#1A1008";
+const INK = "#171208";
 const INACTIVE_ICON = "#9E9E9E";
-const INACTIVE_TEXT = "#6B6B6B";
+const INACTIVE_TEXT = "rgba(23,18,8,0.62)";
 
 const Divider = ({ collapsed }: { collapsed: boolean }) => (
   <div
     style={{
       height: "0.5px",
-      background: "rgba(26,16,8,0.05)",
+      background: "rgba(23,18,8,0.05)",
       margin: collapsed ? "6px 10px" : "4px 14px",
     }}
   />
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
           overflowX: "hidden",
           minWidth: width,
           maxWidth: width,
-          borderRight: "1px solid rgba(26,16,8,0.06)",
+          borderRight: "1px solid rgba(23,18,8,0.06)",
         }}
       >
         {/* Logo */}
@@ -137,7 +137,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
               padding: "12px 0",
               display: "flex",
               justifyContent: "center",
-              borderBottom: "0.5px solid rgba(26,16,8,0.06)",
+              borderBottom: "0.5px solid rgba(23,18,8,0.06)",
               marginBottom: 6,
             }}
           >
@@ -285,7 +285,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                             transition: "background 0.15s ease, color 0.15s ease",
                           }}
                           onMouseEnter={(e) => {
-                            if (!active) e.currentTarget.style.background = "rgba(26,16,8,0.04)";
+                            if (!active) e.currentTarget.style.background = "rgba(23,18,8,0.04)";
                           }}
                           onMouseLeave={(e) => {
                             if (!active) e.currentTarget.style.background = "transparent";
@@ -361,7 +361,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                         transition: "background 0.15s ease, color 0.15s ease",
                       }}
                       onMouseEnter={(e) => {
-                        if (!active) e.currentTarget.style.background = "rgba(26,16,8,0.03)";
+                        if (!active) e.currentTarget.style.background = "rgba(23,18,8,0.03)";
                       }}
                       onMouseLeave={(e) => {
                         if (!active) e.currentTarget.style.background = "transparent";
@@ -421,7 +421,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
         <div
           style={{
             marginTop: "auto",
-            borderTop: "0.5px solid rgba(26,16,8,0.06)",
+            borderTop: "0.5px solid rgba(23,18,8,0.06)",
             padding: collapsed ? "10px 0" : "10px 8px",
             display: "flex",
             justifyContent: "center",
@@ -463,7 +463,7 @@ export default function Sidebar({ isOpen, onToggle, collapsed, onCollapsedChange
                 cursor: "pointer",
                 transition: "background 0.15s ease",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,16,8,0.03)")}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(23,18,8,0.03)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               aria-label="Open user menu"
             >

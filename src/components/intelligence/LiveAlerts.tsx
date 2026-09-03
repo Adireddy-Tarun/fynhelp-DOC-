@@ -26,7 +26,7 @@ export default function LiveAlerts({ compact }: { compact?: boolean }) {
           <div
             key={a.id}
             className="bg-white rounded-md px-4 py-3 flex items-start gap-3"
-            style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `4px solid ${color}` }}
+            style={{ border: "1px solid rgba(23,18,8,0.08)", borderLeft: `4px solid ${color}` }}
           >
             <Icon className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color }} />
             <div className="min-w-0">

@@ -9,7 +9,7 @@ const RED = "#A93838"; const BORDER = "#E0D9C8";
 
 const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in" style={{ borderColor: BORDER }}>
-    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
+    <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>{title}</h3>
     <div className="mt-4 space-y-4">{children}</div>
   </div>
 );
@@ -91,17 +91,17 @@ const TeamAccessPage = () => {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Team & Access</h2>
-      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Invite teammates and manage role-based permissions.</p>
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#171208" }}>Team & Access</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.60)" }}>Invite teammates and manage role-based permissions.</p>
 
       <Card title="Current Team Members">
         {loading ? (
-          <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.5)" }}>Loading…</p>
+          <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.5)" }}>Loading…</p>
         ) : members.length === 0 ? (
-          <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.55)" }}>No team members yet. Invite someone below.</p>
+          <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.55)" }}>No team members yet. Invite someone below.</p>
         ) : (
           <table className="w-full text-[13px]">
-            <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
+            <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(23,18,8,0.5)" }}>
               <th className="py-2">Name</th><th>Role</th><th></th></tr></thead>
             <tbody>
               {members.map((m) => (
@@ -132,7 +132,7 @@ const TeamAccessPage = () => {
           </table>
         )}
         {!isOwner && (
-          <p className="mt-3 text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+          <p className="mt-3 text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>
             Only the workspace Owner can change team roles.
           </p>
         )}
@@ -150,12 +150,12 @@ const TeamAccessPage = () => {
             {sending ? "Sending…" : "Send Invite"}
           </button>
         </div>
-        {!isOwner && <p className="mt-2 text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>Only the Owner can invite new teammates.</p>}
+        {!isOwner && <p className="mt-2 text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>Only the Owner can invite new teammates.</p>}
       </Card>
 
       <Card title="Roles & Permissions">
         <table className="w-full text-[13px]">
-          <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(26,16,8,0.5)" }}>
+          <thead><tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: "rgba(23,18,8,0.5)" }}>
             <th className="py-2">Permission</th>
             <th className="text-center">Owner</th><th className="text-center">Manager</th>
             <th className="text-center">Accountant</th><th className="text-center">Viewer</th></tr></thead>

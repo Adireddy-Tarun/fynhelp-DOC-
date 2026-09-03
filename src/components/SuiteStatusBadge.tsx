@@ -15,7 +15,7 @@ export default function SuiteStatusBadge({ status, className = "" }: Props) {
     <span
       className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wide text-white ${className}`}
       style={{
-        backgroundColor: isLive ? "#10B981" : "#6B7280",
+        backgroundColor: isLive ? "#1F5A46" : "#6B7280",
         lineHeight: 1.4,
         fontFamily: "'Inter', sans-serif",
       }}

@@ -54,7 +54,7 @@ export default function CABulkActionsPage() {
             <Card key={p.id}>
               <Icon size={22} style={{ color: COLORS.red }} className="mb-3" />
               <h4 className="text-sm font-semibold mb-1">{p.title}</h4>
-              <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>{p.desc}</p>
+              <p className="text-[13px] mb-4" style={{ color: "rgba(23,18,8,0.60)" }}>{p.desc}</p>
               <PrimaryBtn size="sm" onClick={() => run(p.id)}>Run for {selected.length || 0} clients →</PrimaryBtn>
             </Card>
           );

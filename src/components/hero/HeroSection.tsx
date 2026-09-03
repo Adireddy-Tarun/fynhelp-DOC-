@@ -9,11 +9,11 @@ import {
 } from "lucide-react"
 
 const BRAND = {
-  ink: "#1A1008",
+  ink: "#171208",
   red: "#C41E1E",
   beige: "#F4EDDA",
   gold: "#8B6914",
-  green: "#10B981",
+  green: "#1F5A46",
   warn: "#F59E0B",
   muted: "rgba(244,237,218,0.38)",
   mutedBorder: "rgba(244,237,218,0.07)",
@@ -28,11 +28,11 @@ const CONVERSATIONS = [
         At current burn, you have{" "}
         <strong style={{ color: "#F4EDDA" }}>8.4 months runway</strong>.
         Cutting vendor Infra-X (₹40K/mo overpriced by 34%) extends this to{" "}
-        <strong style={{ color: "#10B981" }}>9.7 months</strong>. Cash position is stable.
+        <strong style={{ color: "#1F5A46" }}>9.7 months</strong>. Cash position is stable.
       </>
     ),
     actions: [
-      { label: "Export Report", icon: <FileText size={10} />, color: "#10B981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
+      { label: "Export Report", icon: <FileText size={10} />, color: "#1F5A46", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
       { label: "Set Alert", icon: <Bell size={10} />, color: "#8B6914", bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.22)" },
       { label: "Run Scenario", icon: <Play size={10} />, color: "#C41E1E", bg: "rgba(196,30,30,0.1)", border: "rgba(196,30,30,0.22)" },
     ],
@@ -49,7 +49,7 @@ const CONVERSATIONS = [
     ),
     actions: [
       { label: "Model This", icon: <BarChart2 size={10} />, color: "#8B6914", bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.22)" },
-      { label: "PDF Report", icon: <Download size={10} />, color: "#10B981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
+      { label: "PDF Report", icon: <Download size={10} />, color: "#1F5A46", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
       { label: "View Forecast", icon: <TrendingUp size={10} />, color: "#C41E1E", bg: "rgba(196,30,30,0.1)", border: "rgba(196,30,30,0.22)" },
     ],
   },
@@ -58,14 +58,14 @@ const CONVERSATIONS = [
     label: "GST INTELLIGENCE",
     reply: (
       <>
-        <span style={{ color: "#10B981" }}>GSTR-1 filed</span> · GSTR-3B due in{" "}
+        <span style={{ color: "#1F5A46" }}>GSTR-1 filed</span> · GSTR-3B due in{" "}
         <strong style={{ color: "#F59E0B" }}>3 days</strong>. ITC reconciliation shows{" "}
         <strong style={{ color: "#F4EDDA" }}>₹18K gap</strong> vs 2A. Recommend filing by tomorrow to avoid interest.
       </>
     ),
     actions: [
       { label: "View ITC Gap", icon: <AlertTriangle size={10} />, color: "#C41E1E", bg: "rgba(196,30,30,0.1)", border: "rgba(196,30,30,0.22)" },
-      { label: "File Now", icon: <CheckCircle size={10} />, color: "#10B981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
+      { label: "File Now", icon: <CheckCircle size={10} />, color: "#1F5A46", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
       { label: "Get Report", icon: <FileText size={10} />, color: "#8B6914", bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.22)" },
     ],
   },
@@ -76,12 +76,12 @@ const CONVERSATIONS = [
       <>
         Moving Infra-X to{" "}
         <strong style={{ color: "#F4EDDA" }}>60-day terms</strong> frees ₹80K working capital, covering 67 days of new hire cost. Vendor risk score:{" "}
-        <strong style={{ color: "#10B981" }}>LOW</strong>. Recommend negotiating now.
+        <strong style={{ color: "#1F5A46" }}>LOW</strong>. Recommend negotiating now.
       </>
     ),
     actions: [
       { label: "Draft Email", icon: <Mail size={10} />, color: "#8B6914", bg: "rgba(139,105,20,0.1)", border: "rgba(139,105,20,0.22)" },
-      { label: "Cash Report", icon: <Activity size={10} />, color: "#10B981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
+      { label: "Cash Report", icon: <Activity size={10} />, color: "#1F5A46", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.22)" },
       { label: "Set Reminder", icon: <Calendar size={10} />, color: "#C41E1E", bg: "rgba(196,30,30,0.1)", border: "rgba(196,30,30,0.22)" },
     ],
   },
@@ -105,7 +105,7 @@ const BRANDS = [
 const SKEUOMORPHIC_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
 
-  .fyn-hero-root { font-family: 'Instrument Sans', sans-serif; background: #1A1008; position: relative; overflow: hidden; color: #F4EDDA; }
+  .fyn-hero-root { font-family: 'Instrument Sans', sans-serif; background: #171208; position: relative; overflow: hidden; color: #F4EDDA; }
 
   .fyn-bg-texture { position: absolute; inset: 0; pointer-events: none; z-index: 0;
     background-image:
@@ -230,11 +230,11 @@ const SKEUOMORPHIC_CSS = `
   }
   .fyn-logo-pill:hover { transform: translateY(-1px); }
   .fyn-logo-abbr { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    background: #1A1008; color: #F4EDDA; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    background: #171208; color: #F4EDDA; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.4);
   }
-  .fyn-logo-name { font-family: 'Instrument Sans', sans-serif; font-size: 12.5px; font-weight: 600; color: #1A1008; white-space: nowrap; }
-  .fyn-logo-status { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #10B981; display: flex; align-items: center; gap: 3px; margin-top: 1px; }
+  .fyn-logo-name { font-family: 'Instrument Sans', sans-serif; font-size: 12.5px; font-weight: 600; color: #171208; white-space: nowrap; }
+  .fyn-logo-status { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #1F5A46; display: flex; align-items: center; gap: 3px; margin-top: 1px; }
 
   @keyframes fyn-fade-up { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
   @keyframes fyn-slide-left { from { opacity: 0; transform: translateX(-8px) } to { opacity: 1; transform: translateX(0) } }
@@ -350,8 +350,8 @@ export default function HeroSection() {
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "#10B981", letterSpacing: "0.1em" }}>LIVE</span>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#1F5A46", animation: "fyn-blink 1.6s ease-in-out infinite" }} />
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10.5, fontWeight: 600, color: "#1F5A46", letterSpacing: "0.1em" }}>LIVE</span>
                 </div>
               </div>
 
@@ -419,7 +419,7 @@ export default function HeroSection() {
             <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
 
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", background: "rgba(244,237,218,0.05)", border: "1px solid rgba(244,237,218,0.12)", borderRadius: 100, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, color: "rgba(244,237,218,0.75)", letterSpacing: "0.06em" }}>
-                <Shield size={12} color="#10B981" />
+                <Shield size={12} color="#1F5A46" />
                 Fynny Output · 94% Confidence · Powered by FYNHelp AI
               </div>
 
@@ -446,9 +446,9 @@ export default function HeroSection() {
 
           <div className="fyn-conn-wrap">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "#1A1008", letterSpacing: "0.1em", fontWeight: 600 }}>12+ LIVE INTEGRATIONS</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: "#171208", letterSpacing: "0.1em", fontWeight: 600 }}>12+ LIVE INTEGRATIONS</span>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 100 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#1F5A46" }} />
                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9.5, color: "#0A8862", letterSpacing: "0.08em" }}>All Systems Connected</span>
               </div>
             </div>

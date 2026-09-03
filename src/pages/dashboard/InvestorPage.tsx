@@ -8,13 +8,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 
 const BEIGE = "#F4EDDA";
-const CARD_BORDER = "1px solid rgba(26,16,8,0.08)";
-const INK = "#1A1008";
+const CARD_BORDER = "1px solid rgba(23,18,8,0.08)";
+const INK = "#171208";
 const GOLD = "#8B6914";
 const RED = "#C41E1E";
-const GREEN = "#10B981";
+const GREEN = "#1F5A46";
 const AMBER = "#D97706";
-const MUTED = "rgba(26,16,8,0.55)";
+const MUTED = "rgba(23,18,8,0.55)";
 
 const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace", fontVariantNumeric: "tabular-nums" };
 const HEAD: React.CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" };
@@ -49,7 +49,7 @@ const Pill = ({ tone, label }: { tone: "green" | "amber" | "red" | "muted"; labe
     green: { bg: "rgba(16,185,129,0.12)", fg: GREEN, border: "rgba(16,185,129,0.3)" },
     amber: { bg: "rgba(217,119,6,0.12)", fg: AMBER, border: "rgba(217,119,6,0.3)" },
     red: { bg: "rgba(196,30,30,0.10)", fg: RED, border: "rgba(196,30,30,0.3)" },
-    muted: { bg: "rgba(26,16,8,0.05)", fg: MUTED, border: "rgba(26,16,8,0.12)" },
+    muted: { bg: "rgba(23,18,8,0.05)", fg: MUTED, border: "rgba(23,18,8,0.12)" },
   }[tone];
   return (
     <span style={{ ...BODY, display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, background: map.bg, color: map.fg, border: `1px solid ${map.border}` }}>
@@ -296,7 +296,7 @@ export default function InvestorPage() {
               <div style={{ ...BODY, fontWeight: 600, color: INK, marginBottom: 4 }}>
                 Your Investor View is ready — it's just waiting for data.
               </div>
-              <div style={{ ...BODY, fontSize: 13, color: "rgba(26,16,8,0.65)" }}>
+              <div style={{ ...BODY, fontSize: 13, color: "rgba(23,18,8,0.65)" }}>
                 Connect your bank and payment accounts to populate MRR, ARR, cash, burn and runway automatically.
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function InvestorPage() {
               onBlur={(e) => e.target.value !== (manual.ltv ?? "") && saveManual("ltv", e.target.value)}
               placeholder="Enter LTV (₹)"
               inputMode="numeric"
-              style={{ ...BODY, marginTop: 10, width: "100%", padding: "8px 10px", background: BEIGE, border: "1px solid rgba(26,16,8,0.12)", borderRadius: 6, fontSize: 13, color: INK }}
+              style={{ ...BODY, marginTop: 10, width: "100%", padding: "8px 10px", background: BEIGE, border: "1px solid rgba(23,18,8,0.12)", borderRadius: 6, fontSize: 13, color: INK }}
             />
           </Card>
 
@@ -383,7 +383,7 @@ export default function InvestorPage() {
               onBlur={(e) => e.target.value !== (manual.cac ?? "") && saveManual("cac", e.target.value)}
               placeholder="Enter CAC (₹)"
               inputMode="numeric"
-              style={{ ...BODY, marginTop: 10, width: "100%", padding: "8px 10px", background: BEIGE, border: "1px solid rgba(26,16,8,0.12)", borderRadius: 6, fontSize: 13, color: INK }}
+              style={{ ...BODY, marginTop: 10, width: "100%", padding: "8px 10px", background: BEIGE, border: "1px solid rgba(23,18,8,0.12)", borderRadius: 6, fontSize: 13, color: INK }}
             />
           </Card>
 
@@ -416,7 +416,7 @@ export default function InvestorPage() {
             <div style={{ width: "100%", height: 260 }}>
               <ResponsiveContainer>
                 <BarChart data={monthly} margin={{ top: 12, right: 12, left: 4, bottom: 4 }}>
-                  <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                  <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
                   <XAxis dataKey="label" tick={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fill: MUTED }} axisLine={false} tickLine={false} />
                   <YAxis
                     tickFormatter={(v: number) => `₹${(v / 1e5).toFixed(1)}L`}
@@ -472,7 +472,7 @@ export default function InvestorPage() {
               marginTop: 12,
               width: "100%",
               background: BEIGE,
-              border: "1px solid rgba(26,16,8,0.12)",
+              border: "1px solid rgba(23,18,8,0.12)",
               borderRadius: 8,
               padding: 12,
               fontSize: 14,
@@ -489,7 +489,7 @@ export default function InvestorPage() {
 
 function MetricRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, borderBottom: "1px dashed rgba(26,16,8,0.08)", paddingBottom: 8 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, borderBottom: "1px dashed rgba(23,18,8,0.08)", paddingBottom: 8 }}>
       <span style={{ ...BODY, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: GOLD, fontWeight: 600 }}>{label}</span>
       <span style={{ ...(mono ? MONO : BODY), fontSize: 14, color: INK, fontWeight: 500 }}>{value}</span>
     </div>

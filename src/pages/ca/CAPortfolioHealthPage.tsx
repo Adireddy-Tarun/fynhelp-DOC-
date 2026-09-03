@@ -363,7 +363,7 @@ export default function CAPortfolioHealthPage() {
                   {distData.map((d) => (
                     <div key={d.k} className="flex items-center gap-2 text-[12px]">
                       <span className="w-2.5 h-2.5 rounded-sm" style={{ background: d.color }} />
-                      <span style={{ color: "rgba(26,16,8,0.65)" }}>{d.l}</span>
+                      <span style={{ color: "rgba(23,18,8,0.65)" }}>{d.l}</span>
                       <span className="ml-auto font-semibold">{d.count}</span>
                     </div>
                   ))}
@@ -376,17 +376,17 @@ export default function CAPortfolioHealthPage() {
           <Card>
             <div className="flex items-baseline justify-between mb-3">
               <h3 className="text-[15px] font-semibold">Monthly Revenue Trend</h3>
-              <span className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>Last 12 Months</span>
+              <span className="text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>Last 12 Months</span>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={sparkRevenue}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
-                <XAxis dataKey="m" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} />
-                <YAxis tickFormatter={(v) => `₹${(v / 1e7).toFixed(1)}Cr`} tick={{ fontSize: 11, fill: "rgba(26,16,8,0.50)" }} />
+                <XAxis dataKey="m" tick={{ fontSize: 11, fill: "rgba(23,18,8,0.50)" }} />
+                <YAxis tickFormatter={(v) => `₹${(v / 1e7).toFixed(1)}Cr`} tick={{ fontSize: 11, fill: "rgba(23,18,8,0.50)" }} />
                 <Tooltip formatter={(v: any) => v ? formatINR(Number(v)) : "-"} />
                 <Legend />
                 <Line type="monotone" dataKey="actual" name="Actual" stroke={COLORS.green} strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="projected" name="Projected" stroke="rgba(26,16,8,0.40)" strokeDasharray="4 4" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="projected" name="Projected" stroke="rgba(23,18,8,0.40)" strokeDasharray="4 4" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -408,8 +408,8 @@ export default function CAPortfolioHealthPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
-                <XAxis dataKey="d" tick={{ fontSize: 10, fill: "rgba(26,16,8,0.50)" }} />
-                <YAxis tickFormatter={(v) => `₹${(v / 1e7).toFixed(1)}Cr`} tick={{ fontSize: 10, fill: "rgba(26,16,8,0.50)" }} />
+                <XAxis dataKey="d" tick={{ fontSize: 10, fill: "rgba(23,18,8,0.50)" }} />
+                <YAxis tickFormatter={(v) => `₹${(v / 1e7).toFixed(1)}Cr`} tick={{ fontSize: 10, fill: "rgba(23,18,8,0.50)" }} />
                 <Tooltip formatter={(v: any) => formatINR(Number(v))} />
                 <ReferenceLine y={5000000} stroke={COLORS.red} strokeDasharray="4 4" label={{ value: "Danger ₹50L", fill: COLORS.red, fontSize: 10, position: "insideTopRight" }} />
                 <Area type="monotone" dataKey="cash" stroke={COLORS.green} strokeWidth={2} fill="url(#cashGrad)" />
@@ -426,10 +426,10 @@ export default function CAPortfolioHealthPage() {
               <ul className="space-y-2.5">
                 {topPerformers.map((c, i) => (
                   <li key={c.business_id} className="flex items-center gap-3 text-sm cursor-pointer hover:bg-[#FBF8F0] -mx-2 px-2 py-1.5 rounded-md" onClick={() => navigate(`/ca/clients/${c.business_id}`)}>
-                    <span className="w-5 text-[12px]" style={{ color: "rgba(26,16,8,0.50)" }}>#{i + 1}</span>
+                    <span className="w-5 text-[12px]" style={{ color: "rgba(23,18,8,0.50)" }}>#{i + 1}</span>
                     <span className="flex-1 font-medium truncate">{c.business_name}</span>
                     <Chip tone={c.health_score > 85 ? "green" : "amber"}>{c.health_score}</Chip>
-                    <span className="text-[12px] w-16 text-right" style={{ color: "rgba(26,16,8,0.65)" }}>{fmtL(c.revenue)}</span>
+                    <span className="text-[12px] w-16 text-right" style={{ color: "rgba(23,18,8,0.65)" }}>{fmtL(c.revenue)}</span>
                     <TrendingUp size={14} style={{ color: COLORS.green }} />
                   </li>
                 ))}
@@ -448,7 +448,7 @@ export default function CAPortfolioHealthPage() {
                   <li key={c.business_id} className="flex items-center gap-3 text-sm">
                     <span className="flex-1 min-w-0">
                       <div className="font-medium truncate">{c.business_name}</div>
-                      <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+                      <div className="text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>
                         {c.runway_days < 30 ? "Low cash" : c.itc_at_risk > 500000 ? "ITC risk" : c.overdue_filings > 0 ? "Overdue filings" : "Health declining"}
                       </div>
                     </span>
@@ -471,7 +471,7 @@ export default function CAPortfolioHealthPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] font-medium leading-snug">{w.text}</div>
-                      <div className="text-[11px] mt-0.5" style={{ color: "rgba(26,16,8,0.45)" }}>{w.ago}</div>
+                      <div className="text-[11px] mt-0.5" style={{ color: "rgba(23,18,8,0.45)" }}>{w.ago}</div>
                     </div>
                   </li>
                 ))}
@@ -488,7 +488,7 @@ export default function CAPortfolioHealthPage() {
           <div className="text-[44px] font-bold leading-none" style={{ color: filingComplianceRate > 95 ? COLORS.green : filingComplianceRate >= 85 ? COLORS.amber : COLORS.red }}>
             {filingComplianceRate}%
           </div>
-          <div className="text-[12px] mt-1.5 mb-3" style={{ color: "rgba(26,16,8,0.65)" }}>of filings submitted on time this month</div>
+          <div className="text-[12px] mt-1.5 mb-3" style={{ color: "rgba(23,18,8,0.65)" }}>of filings submitted on time this month</div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={compliance6m}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F0EBD8" />
@@ -514,14 +514,14 @@ export default function CAPortfolioHealthPage() {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <div className="text-[26px] font-bold">{stats.total}</div>
-              <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>clients</div>
+              <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.55)" }}>clients</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-3">
             {riskPie.map((r) => (
               <div key={r.name} className="flex items-center gap-2 text-[12px]">
                 <span className="w-2.5 h-2.5 rounded-sm" style={{ background: r.color }} />
-                <span style={{ color: "rgba(26,16,8,0.65)" }}>{r.name}</span>
+                <span style={{ color: "rgba(23,18,8,0.65)" }}>{r.name}</span>
                 <span className="ml-auto font-semibold">{r.value}</span>
               </div>
             ))}
@@ -535,7 +535,7 @@ export default function CAPortfolioHealthPage() {
           <h3 className="text-[15px] font-semibold">AI-Generated Portfolio Insights</h3>
           <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: COLORS.gold }}>Powered by Fynny</span>
         </div>
-        <p className="text-[12px] mb-4" style={{ color: "rgba(26,16,8,0.55)" }}>Auto-generated from your latest portfolio data</p>
+        <p className="text-[12px] mb-4" style={{ color: "rgba(23,18,8,0.55)" }}>Auto-generated from your latest portfolio data</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Insight
             cat="Cash Flow" tone="red" icon={<Wallet size={16} />}
@@ -583,13 +583,13 @@ export default function CAPortfolioHealthPage() {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <div className="text-[26px] font-bold">{stats.total}</div>
-              <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>clients</div>
+              <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.55)" }}>clients</div>
             </div>
           </div>
           <div>
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
+                <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.50)" }}>
                   <th className="pb-2 font-medium">Industry</th>
                   <th className="pb-2 font-medium">Clients</th>
                   <th className="pb-2 font-medium">Health</th>
@@ -603,13 +603,13 @@ export default function CAPortfolioHealthPage() {
                       <span className="w-2 h-2 rounded-full" style={{ background: ind.color }} />
                       {ind.name}
                     </td>
-                    <td className="py-2.5 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{ind.count}</td>
+                    <td className="py-2.5 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{ind.count}</td>
                     <td className="py-2.5"><Chip tone={ind.avgHealth > 75 ? "green" : ind.avgHealth >= 55 ? "amber" : "red"}>{ind.avgHealth}</Chip></td>
                     <td className="py-2.5 font-semibold">{fmtCr(ind.revenue)}</td>
                   </tr>
                 ))}
                 {industryStats.length === 0 && (
-                  <tr><td colSpan={4} className="py-6 text-center text-[13px]" style={{ color: "rgba(26,16,8,0.50)" }}>No industry data</td></tr>
+                  <tr><td colSpan={4} className="py-6 text-center text-[13px]" style={{ color: "rgba(23,18,8,0.50)" }}>No industry data</td></tr>
                 )}
               </tbody>
             </table>
@@ -621,12 +621,12 @@ export default function CAPortfolioHealthPage() {
       <Card className="mb-6">
         <div className="flex items-baseline justify-between mb-1">
           <h3 className="text-[15px] font-semibold">Team Performance</h3>
-          <span className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>Activity and productivity this month</span>
+          <span className="text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>Activity and productivity this month</span>
         </div>
         <div className="overflow-x-auto mt-3">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
+              <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.50)" }}>
                 <th className="pb-2 font-medium">Team Member</th>
                 <th className="pb-2 font-medium">Clients</th>
                 <th className="pb-2 font-medium">Filings</th>
@@ -636,19 +636,19 @@ export default function CAPortfolioHealthPage() {
             </thead>
             <tbody>
               {team.length === 0 ? (
-                <tr><td colSpan={5} className="py-8 text-center text-[13px]" style={{ color: "rgba(26,16,8,0.50)" }}>
+                <tr><td colSpan={5} className="py-8 text-center text-[13px]" style={{ color: "rgba(23,18,8,0.50)" }}>
                   No team members yet. Invite from Settings → Team.
                 </td></tr>
               ) : team.map((t, i) => (
                 <tr key={i} style={{ borderTop: `1px solid ${COLORS.divider}` }}>
                   <td className="py-3">
                     <div className="font-medium capitalize">{t.name}</div>
-                    <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>{t.email} · {t.role}</div>
+                    <div className="text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>{t.email} · {t.role}</div>
                   </td>
-                  <td className="py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{t.clients}</td>
+                  <td className="py-3 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{t.clients}</td>
                   <td className="py-3 font-semibold">{t.filings}</td>
                   <td className="py-3 font-semibold">{t.reports}</td>
-                  <td className="py-3 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{t.response_h} hrs</td>
+                  <td className="py-3 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{t.response_h} hrs</td>
                 </tr>
               ))}
             </tbody>
@@ -670,7 +670,7 @@ function KpiCard({ label, value, valueColor = COLORS.ink, trend, trendUp, icon, 
   return (
     <div className="rounded-md p-5 bg-white" style={{ border: `1px solid ${COLORS.caBorder}` }}>
       <div className="flex items-start justify-between mb-2">
-        <div className="text-[12px] font-medium" style={{ color: "rgba(26,16,8,0.55)" }}>{label}</div>
+        <div className="text-[12px] font-medium" style={{ color: "rgba(23,18,8,0.55)" }}>{label}</div>
         {icon}
       </div>
       <div className="flex items-end justify-between gap-3">
@@ -715,7 +715,7 @@ function Ring({ score }: { score: number }) {
 function Stat({ label, value, valueColor = COLORS.ink }: { label: string; value: string; valueColor?: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "rgba(26,16,8,0.50)" }}>{label}</div>
+      <div className="text-[11px] uppercase tracking-wider mb-1" style={{ color: "rgba(23,18,8,0.50)" }}>{label}</div>
       <div className="text-[22px] font-bold leading-none" style={{ color: valueColor }}>{value}</div>
     </div>
   );
@@ -723,7 +723,7 @@ function Stat({ label, value, valueColor = COLORS.ink }: { label: string; value:
 
 function Empty({ small, text }: { small?: boolean; text?: string }) {
   return (
-    <div className={`flex items-center justify-center text-[13px] ${small ? "py-6" : "py-10"}`} style={{ color: "rgba(26,16,8,0.50)" }}>
+    <div className={`flex items-center justify-center text-[13px] ${small ? "py-6" : "py-10"}`} style={{ color: "rgba(23,18,8,0.50)" }}>
       {text || "No data yet, add clients to see analytics"}
     </div>
   );
@@ -746,7 +746,7 @@ function Insight({ cat, tone, icon, text, sub, action, onClick }: {
       <div className="flex-1 min-w-0">
         <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded" style={{ background: t.bg, color: t.fg }}>{cat}</span>
         <div className="text-[14px] font-medium mt-1.5 leading-snug">{text}</div>
-        <div className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</div>
+        <div className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</div>
         <button onClick={onClick} className="text-[12px] font-semibold mt-2" style={{ color: COLORS.red }}>{action} →</button>
       </div>
     </div>
@@ -783,10 +783,10 @@ function ScheduleModal({ onClose, caFirmId }: { onClose: () => void; caFirmId: s
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.55)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(23,18,8,0.55)" }} onClick={onClose}>
       <div className="bg-white rounded-xl max-w-md w-full p-7" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-[20px] font-bold mb-1" style={{ color: COLORS.ink }}>Schedule Email Report</h3>
-        <p className="text-[13px] mb-5" style={{ color: "rgba(26,16,8,0.60)" }}>Email this dashboard automatically</p>
+        <p className="text-[13px] mb-5" style={{ color: "rgba(23,18,8,0.60)" }}>Email this dashboard automatically</p>
         <div className="space-y-4">
           <div>
             <label className="block text-[12px] font-medium mb-1.5">Frequency</label>

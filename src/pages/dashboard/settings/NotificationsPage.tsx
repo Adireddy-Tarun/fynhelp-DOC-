@@ -9,8 +9,8 @@ const RED = "#A93838"; const BORDER = "#E0D9C8";
 
 const Card = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in" style={{ borderColor: BORDER }}>
-    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
-    {sub && <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>}
+    <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>{title}</h3>
+    {sub && <p className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</p>}
     <div className="mt-4 space-y-4">{children}</div>
   </div>
 );
@@ -20,8 +20,8 @@ const selCls = "h-9 px-3 rounded-md border bg-card text-[13px] focus:outline-hid
 const Row = ({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) => (
   <div className="flex items-start justify-between gap-4 py-2">
     <div className="flex-1">
-      <p className="text-[13px] font-medium" style={{ color: "#1A1008" }}>{label}</p>
-      {sub && <p className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>{sub}</p>}
+      <p className="text-[13px] font-medium" style={{ color: "#171208" }}>{label}</p>
+      {sub && <p className="text-[11px]" style={{ color: "rgba(23,18,8,0.55)" }}>{sub}</p>}
     </div>
     <div className="flex items-center gap-2">{children}</div>
   </div>
@@ -68,8 +68,8 @@ const NotificationsPage = () => {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Notifications</h2>
-      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Choose how and when CFO Fynny contacts you.</p>
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#171208" }}>Notifications</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.60)" }}>Choose how and when CFO Fynny contacts you.</p>
 
       <Card title="Daily Brief" sub="Fynny sends a 3-sentence financial summary every morning">
         <Row label="Send daily financial brief"><Switch checked={dailyOn} onCheckedChange={setDailyOn} /></Row>
@@ -82,7 +82,7 @@ const NotificationsPage = () => {
           <div className="inline-flex rounded-md overflow-hidden border" style={{ borderColor: BORDER }}>
             {(["email", "whatsapp", "both"] as const).map((v) => (
               <button key={v} onClick={() => setBriefVia(v)} className="px-3 py-1.5 text-[12px] capitalize"
-                style={{ background: briefVia === v ? RED : "transparent", color: briefVia === v ? "#fff" : "#1A1008" }}>{v}</button>
+                style={{ background: briefVia === v ? RED : "transparent", color: briefVia === v ? "#fff" : "#171208" }}>{v}</button>
             ))}
           </div>
         </Row>
@@ -107,7 +107,7 @@ const NotificationsPage = () => {
         </Row>
         <Row label="Alert me when cash balance drops below">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px]" style={{ color: "rgba(26,16,8,0.5)" }}>₹</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px]" style={{ color: "rgba(23,18,8,0.5)" }}>₹</span>
             <input value={cashBal} onChange={(e) => setCashBal(e.target.value)} className="h-9 pl-7 pr-3 w-40 rounded-md border bg-card text-[13px]" style={{ borderColor: BORDER }} />
           </div>
         </Row>
@@ -203,7 +203,7 @@ const PushRow = () => {
         sub="Get instant alerts on this device — GST deadlines, overdue invoices, burn rate changes"
       >
         {status === "unsupported" && (
-          <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.6)" }}>
+          <span className="text-[11px] px-2 py-1 rounded" style={{ background: "rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.6)" }}>
             Not supported on this browser
           </span>
         )}
@@ -213,13 +213,13 @@ const PushRow = () => {
             <span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(169,56,56,0.10)", color: RED }}>
               Blocked
             </span>
-            <span className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+            <span className="text-[11px]" style={{ color: "rgba(23,18,8,0.55)" }}>
               Enable in browser settings
             </span>
           </>
         )}
         {status !== "unsupported" && status !== "denied" && !(isIOSSafari && !isStandalone) && isSubscribed && (
-          <span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(16,185,129,0.12)", color: "#10B981" }}>
+          <span className="text-[11px] px-2 py-1 rounded font-medium" style={{ background: "rgba(16,185,129,0.12)", color: "#1F5A46" }}>
             Enabled
           </span>
         )}
@@ -234,7 +234,7 @@ const PushRow = () => {
         )}
       </Row>
       {isIOSSafari && !isStandalone && status !== "unsupported" && (
-        <div className="mt-2 p-3 rounded-md text-[12px]" style={{ background: "rgba(26,16,8,0.05)", color: "rgba(26,16,8,0.7)", border: `1px solid ${BORDER}` }}>
+        <div className="mt-2 p-3 rounded-md text-[12px]" style={{ background: "rgba(23,18,8,0.05)", color: "rgba(23,18,8,0.7)", border: `1px solid ${BORDER}` }}>
           On iPhone, add FynHelp to your Home Screen first (Share → Add to Home Screen) for push notifications to work.
         </div>
       )}
@@ -250,7 +250,7 @@ const PushRow = () => {
           <button
             onClick={handleDisable}
             className="text-[12px] hover:underline"
-            style={{ color: "rgba(26,16,8,0.55)" }}
+            style={{ color: "rgba(23,18,8,0.55)" }}
           >
             Disable
           </button>

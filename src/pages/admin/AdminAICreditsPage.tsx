@@ -127,7 +127,7 @@ export default function AdminAICreditsPage() {
             placeholder="Search business name or ID"
             style={{
               width: "100%", padding: "10px 12px 10px 34px", borderRadius: 10,
-              border: "1px solid rgba(26,16,8,0.14)", background: "#fff", fontSize: 14,
+              border: "1px solid rgba(23,18,8,0.14)", background: "#fff", fontSize: 14,
             }}
           />
         </div>
@@ -148,7 +148,7 @@ export default function AdminAICreditsPage() {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 860 }}>
               <thead>
-                <tr style={{ background: "rgba(26,16,8,0.04)" }}>
+                <tr style={{ background: "rgba(23,18,8,0.04)" }}>
                   {["Business", "Today", "Usage", "Remaining", "7d", "30d", "Daily limit"].map((h) => (
                     <th key={h} style={th}>{h}</th>
                   ))}
@@ -158,7 +158,7 @@ export default function AdminAICreditsPage() {
                 {filtered.map((r, i) => {
                   const pct = pctOf(r);
                   return (
-                    <tr key={r.business_id} style={{ borderTop: "1px solid rgba(26,16,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
+                    <tr key={r.business_id} style={{ borderTop: "1px solid rgba(23,18,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
                       <td style={td}>
                         <div style={{ fontWeight: 600 }}>{r.business_name}</div>
                         <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#9A8778" }}>
@@ -208,7 +208,7 @@ function LimitEditor({ value, busy, onSave }: { value: number; busy: boolean; on
         value={v}
         inputMode="numeric"
         onChange={(e) => setV(e.target.value.replace(/[^0-9]/g, ""))}
-        style={{ width: 72, padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(26,16,8,0.14)", fontSize: 13 }}
+        style={{ width: 72, padding: "6px 8px", borderRadius: 8, border: "1px solid rgba(23,18,8,0.14)", fontSize: 13 }}
       />
       {dirty && (
         <button disabled={busy} onClick={() => onSave(Number(v))} style={{ ...btnStyle, padding: "6px 10px", fontSize: 12 }}>
@@ -220,9 +220,9 @@ function LimitEditor({ value, busy, onSave }: { value: number; busy: boolean; on
 }
 
 function Bar({ pct }: { pct: number }) {
-  const color = pct >= 100 ? "#C41E1E" : pct >= LOW_CREDIT_PCT ? "#EAC43C" : "#10B981";
+  const color = pct >= 100 ? "#C41E1E" : pct >= LOW_CREDIT_PCT ? "#EAC43C" : "#1F5A46";
   return (
-    <div style={{ height: 6, borderRadius: 999, background: "rgba(26,16,8,0.08)", overflow: "hidden", margin: "6px 0 4px" }}>
+    <div style={{ height: 6, borderRadius: 999, background: "rgba(23,18,8,0.08)", overflow: "hidden", margin: "6px 0 4px" }}>
       <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 999 }} />
     </div>
   );
@@ -234,7 +234,7 @@ function Metric({ label, value, icon, tone }: { label: string; value: string; ic
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <div style={{ fontSize: 13, color: "#6B5B4A", marginBottom: 8 }}>{label}</div>
-          <div style={{ fontSize: 30, fontWeight: 700, color: tone === "danger" ? "#C41E1E" : "#1A1008", fontVariantNumeric: "tabular-nums" }}>
+          <div style={{ fontSize: 30, fontWeight: 700, color: tone === "danger" ? "#C41E1E" : "#171208", fontVariantNumeric: "tabular-nums" }}>
             {value}
           </div>
         </div>
@@ -244,10 +244,10 @@ function Metric({ label, value, icon, tone }: { label: string; value: string; ic
   );
 }
 
-const h3Style: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "#1A1008" };
+const h3Style: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "#171208" };
 const th: React.CSSProperties = { textAlign: "left", padding: "12px 16px", fontSize: 12, fontWeight: 700, color: "#6B5B4A", textTransform: "uppercase", letterSpacing: "0.04em" };
-const td: React.CSSProperties = { padding: "12px 16px", fontSize: 14, color: "#1A1008" };
+const td: React.CSSProperties = { padding: "12px 16px", fontSize: 14, color: "#171208" };
 const btnStyle: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 10,
-  border: "1px solid rgba(26,16,8,0.14)", background: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
+  border: "1px solid rgba(23,18,8,0.14)", background: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
 };

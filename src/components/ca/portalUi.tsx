@@ -1,26 +1,26 @@
 /**
  * CA portal design primitives — isolated from the SME dashboard.
- * Background #F8F7F4, ink #1A1A1A, teal accent #0F6E56.
+ * FynHelp home palette: cream #F2EEE7, white cards #FFFDF9, ink #171208, maroon accent #A93838.
  */
 import { CSSProperties, ReactNode } from "react";
 import { formatINR, formatINRFull } from "@/lib/indian-format";
 
 export const CA = {
-  bg: "#F8F7F4",
-  card: "#FFFFFF",
-  ink: "#1A1A1A",
-  muted: "rgba(26,26,26,0.55)",
-  faint: "rgba(26,26,26,0.35)",
-  line: "rgba(26,26,26,0.10)",
-  teal: "#0F6E56",
-  tealSoft: "rgba(15,110,86,0.08)",
-  amber: "#B26B00",
+  bg: "#F2EEE7",
+  card: "#FFFDF9",
+  ink: "#171208",
+  muted: "rgba(23,18,8,0.62)",
+  faint: "rgba(23,18,8,0.42)",
+  line: "rgba(23,18,8,0.09)",
+  teal: "#A93838",
+  tealSoft: "rgba(169,56,56,0.08)",
+  amber: "#8B6914",
   gold: "#8B6914",
 
-  red: "#B3261E",
-  green: "#1A7F3C",
-  serif: "Georgia, 'Times New Roman', serif",
-  sans: "Inter, system-ui, sans-serif",
+  red: "#A93838",
+  green: "#1F5A46",
+  serif: "'Fraunces', Georgia, serif",
+  sans: "'Instrument Sans', Inter, system-ui, sans-serif",
   mono: "'JetBrains Mono', 'SF Mono', Menlo, monospace",
 };
 
@@ -65,11 +65,11 @@ export function CAHeading({ children, size = 24, style }: { children: ReactNode;
 }
 
 const TONES: Record<string, { bg: string; fg: string }> = {
-  green: { bg: "rgba(26,127,60,0.10)", fg: "#1A7F3C" },
-  teal: { bg: "rgba(15,110,86,0.10)", fg: "#0F6E56" },
-  amber: { bg: "rgba(178,107,0,0.12)", fg: "#B26B00" },
-  red: { bg: "rgba(179,38,30,0.10)", fg: "#B3261E" },
-  grey: { bg: "rgba(26,26,26,0.06)", fg: "rgba(26,26,26,0.6)" },
+  green: { bg: "rgba(31,90,70,0.10)", fg: "#1F5A46" },
+  teal: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
+  amber: { bg: "rgba(139,105,20,0.12)", fg: "#8B6914" },
+  red: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
+  grey: { bg: "rgba(23,18,8,0.06)", fg: "rgba(23,18,8,0.6)" },
 };
 
 export type Tone = keyof typeof TONES;

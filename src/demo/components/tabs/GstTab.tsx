@@ -49,22 +49,22 @@ export default function GstTab() {
           {(rows) => (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Type</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Period</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
-                  <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Due</th>
-                  <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Amount</th>
+                <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Type</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Period</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
+                  <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Due</th>
+                  <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Amount</th>
                   <th className="py-2"></th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} onClick={() => openDrawer("gst_filing", r.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                  <tr key={r.id} onClick={() => openDrawer("gst_filing", r.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                     <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.filing_type}</td>
-                    <td className="py-2.5 text-xs text-[#6B6B6B]">{r.period}</td>
+                    <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.period}</td>
                     <td className="py-2.5"><Badge tone={statusTone(r.status)}>{r.status}</Badge></td>
-                    <td className="py-2.5 text-xs text-[#6B6B6B]">{r.due_date?.slice(0, 10) ?? "—"}</td>
+                    <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.due_date?.slice(0, 10) ?? "—"}</td>
                     <td className="py-2.5 text-right font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(r.net_payable)}</td>
                     <td className="py-2.5 text-right">
                       {/pending/i.test(r.status) && <button onClick={() => setFilingOpen(r.period)} className="text-[11px] font-medium px-2 py-1 rounded text-white hover:opacity-90" style={{ background: ACCENT.red }}>File Now →</button>}
@@ -81,20 +81,20 @@ export default function GstTab() {
       <div className="grid lg:grid-cols-2 gap-4">
         <IntelCard title="ITC Reconciliation" sub="Input Tax Credit matching">
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Total ITC Available</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcAvailable)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">ITC Claimed</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcClaimed)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Blocked ITC</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcBlocked)}</span></div>
-            <div className="pt-2 border-t border-[rgba(26,16,8,0.08)] flex justify-between"><span className="text-fyn-ink font-semibold">Gap</span><Badge tone={m.itcGap < 5 ? "green" : "amber"}>{fmtPct(m.itcGap, 1)}</Badge></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Total ITC Available</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcAvailable)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">ITC Claimed</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcClaimed)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Blocked ITC</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.itcBlocked)}</span></div>
+            <div className="pt-2 border-t border-[rgba(23,18,8,0.08)] flex justify-between"><span className="text-fyn-ink font-semibold">Gap</span><Badge tone={m.itcGap < 5 ? "green" : "amber"}>{fmtPct(m.itcGap, 1)}</Badge></div>
           </div>
         </IntelCard>
 
         <IntelCard title="Compliance Health">
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Invoice Matching Rate</span><span className="font-mono font-semibold text-fyn-ink">94.3%</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">GSTIN Validation</span><Badge tone="green">All valid</Badge></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Audit Trail</span><Badge tone="green">Complete</Badge></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Effective Tax Rate</span><span className="font-mono font-semibold text-fyn-ink">22.8%</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Section 80IAC</span><Badge tone="gold">Eligible</Badge></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Invoice Matching Rate</span><span className="font-mono font-semibold text-fyn-ink">94.3%</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">GSTIN Validation</span><Badge tone="green">All valid</Badge></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Audit Trail</span><Badge tone="green">Complete</Badge></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Effective Tax Rate</span><span className="font-mono font-semibold text-fyn-ink">22.8%</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Section 80IAC</span><Badge tone="gold">Eligible</Badge></div>
           </div>
         </IntelCard>
       </div>
@@ -103,12 +103,12 @@ export default function GstTab() {
       <IntelCard title="Vendor GSTIN Matching" sub="Reconciliation against GSTR-2A">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[rgba(26,16,8,0.08)]">
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vendor GSTIN</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Invoice #</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">GST</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
+            <tr className="border-b border-[rgba(23,18,8,0.08)]">
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Vendor GSTIN</th>
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Invoice #</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Value</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">GST</th>
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Status</th>
               <th className="py-2"></th>
             </tr>
           </thead>
@@ -119,9 +119,9 @@ export default function GstTab() {
               { gstin: "29AAACR5055K1Z1", inv: "PUR-2025-443", val: 56000, gst: 10080, status: "Missing in 2A" as const, tone: "red" as const, reconcilable: true },
               { gstin: "33AAACB1234A1Z9", inv: "PUR-2025-444", val: 240000, gst: 43200, status: "Matched" as const, tone: "green" as const, reconcilable: false },
             ].map((r) => (
-              <tr key={r.inv} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+              <tr key={r.inv} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                 <td className="py-2.5 font-mono text-xs text-fyn-ink">{r.gstin}</td>
-                <td className="py-2.5 text-xs text-[#6B6B6B]">{r.inv}</td>
+                <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.inv}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.val)}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(r.gst)}</td>
                 <td className="py-2.5 pl-3"><Badge tone={r.tone}>{r.status}</Badge></td>

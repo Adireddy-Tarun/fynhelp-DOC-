@@ -30,7 +30,7 @@ export default function AdminGuard({ children }: { children?: ReactNode }) {
     return (
       <div
         className="min-h-screen grid place-items-center"
-        style={{ background: "#F8F7F4", color: "#1A1A1A", fontFamily: "Inter, sans-serif" }}
+        style={{ background: "#F2EEE7", color: "#171208", fontFamily: "'Instrument Sans', Inter, sans-serif" }}
       >
         <span className="text-sm">Checking admin access…</span>
       </div>

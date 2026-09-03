@@ -266,7 +266,7 @@ const OnboardingPage = () => {
             background: "rgba(255,255,255,0.85)",
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(139,105,20,0.15)",
-            boxShadow: "0 12px 40px rgba(26,16,8,0.10), 0 2px 6px rgba(26,16,8,0.04)",
+            boxShadow: "0 12px 40px rgba(23,18,8,0.10), 0 2px 6px rgba(23,18,8,0.04)",
           }}
         >
           <motion.div
@@ -303,7 +303,7 @@ const OnboardingPage = () => {
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(var(--fyn-beige)) 0%, #FFF9F0 100%)" }}>
       {/* Progress bar */}
-      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(26,16,8,0.25)" }}>
+      <div className="py-4" style={{ background: "hsl(var(--fyn-ink))", boxShadow: "0 4px 20px rgba(23,18,8,0.25)" }}>
         <div className="fyn-container flex items-center justify-center gap-4">
           {steps.map((s, i) => {
             const done = i < step;
@@ -315,7 +315,7 @@ const OnboardingPage = () => {
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
                   style={{
-                    background: done ? "#10B981" : active ? "hsl(var(--fyn-red))" : "rgba(255,255,255,0.10)",
+                    background: done ? "#1F5A46" : active ? "hsl(var(--fyn-red))" : "rgba(255,255,255,0.10)",
                     color: done || active ? "#fff" : "rgba(255,255,255,0.4)",
                     boxShadow: active
                       ? "0 6px 16px rgba(196,30,30,0.45), inset 0 1px 0 rgba(255,255,255,0.25)"
@@ -330,7 +330,7 @@ const OnboardingPage = () => {
                 {i < steps.length - 1 && (
                   <div
                     className="w-8 h-0.5 transition-colors duration-500"
-                    style={{ background: i < step ? "#10B981" : "rgba(255,255,255,0.1)" }}
+                    style={{ background: i < step ? "#1F5A46" : "rgba(255,255,255,0.1)" }}
                   />
                 )}
               </div>
@@ -365,7 +365,7 @@ const OnboardingPage = () => {
                     background: "rgba(255,255,255,0.85)",
                     backdropFilter: "blur(12px)",
                     border: "1px solid rgba(139,105,20,0.15)",
-                    boxShadow: "0 12px 40px rgba(26,16,8,0.08), 0 2px 6px rgba(26,16,8,0.04)",
+                    boxShadow: "0 12px 40px rgba(23,18,8,0.08), 0 2px 6px rgba(23,18,8,0.04)",
                   }}
                 >
                   {[
@@ -434,7 +434,7 @@ const OnboardingPage = () => {
                     style={{
                       background: "#FFFFFF",
                       color: "hsl(var(--fyn-ink))",
-                      border: "1.5px solid rgba(26,16,8,0.18)",
+                      border: "1.5px solid rgba(23,18,8,0.18)",
                       cursor: "pointer",
                     }}
                   >
@@ -509,7 +509,7 @@ const OnboardingPage = () => {
                   <button
                     onClick={() => goTo(2)}
                     className="text-[13px] hover:underline"
-                    style={{ color: "rgba(26,16,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
+                    style={{ color: "rgba(23,18,8,0.6)", background: "transparent", border: "none", cursor: "pointer" }}
                   >
                     ← Back
                   </button>

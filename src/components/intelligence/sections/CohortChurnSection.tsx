@@ -35,7 +35,7 @@ function CohortTable({ rows }: { rows: CohortRow[] }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "#6B6B6B" }}>
+          <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.62)" }}>
             <th className="py-2 pr-3 font-medium">Cohort Month</th>
             <th className="py-2 pr-3 font-medium">Cohort Size</th>
             {[1, 2, 3, 4, 5, 6].map((m) => (
@@ -45,7 +45,7 @@ function CohortTable({ rows }: { rows: CohortRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id ?? r.cohort_month} className="border-t" style={{ borderColor: "rgba(26,16,8,0.08)" }}>
+            <tr key={r.id ?? r.cohort_month} className="border-t" style={{ borderColor: "rgba(23,18,8,0.08)" }}>
               <td className="py-2 pr-3" style={{ color: INK, fontFamily: MONO }}>{r.cohort_month}</td>
               <td className="py-2 pr-3" style={{ color: INK, fontFamily: MONO }}>{r.cohort_size}</td>
               {[1, 2, 3, 4, 5, 6].map((m) => {
@@ -89,11 +89,11 @@ function ChurnPanel() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-white p-4" style={{ border: "0.5px solid rgba(26,26,26,0.15)" }}>
-          <p className="text-[11px] uppercase tracking-wider" style={{ color: "#6B6B6B" }}>At Risk</p>
+          <p className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.62)" }}>At Risk</p>
           <p className="text-2xl font-semibold" style={{ fontFamily: MONO, color: "#8B6914" }}>{atRisk}</p>
         </div>
         <div className="rounded-xl bg-white p-4" style={{ border: "0.5px solid rgba(26,26,26,0.15)" }}>
-          <p className="text-[11px] uppercase tracking-wider" style={{ color: "#6B6B6B" }}>Churned</p>
+          <p className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.62)" }}>Churned</p>
           <p className="text-2xl font-semibold" style={{ fontFamily: MONO, color: "#A93838" }}>{churned}</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ function ChurnPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "#6B6B6B" }}>
+              <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.62)" }}>
                 <th className="py-2 pr-3 font-medium">Customer</th>
                 <th className="py-2 pr-3 font-medium">Last Invoice</th>
                 <th className="py-2 pr-3 font-medium">Days Since</th>
@@ -116,7 +116,7 @@ function ChurnPanel() {
               {list.map((s) => {
                 const critical = s.severity === "critical";
                 return (
-                  <tr key={s.id} className="border-t" style={{ borderColor: "rgba(26,16,8,0.08)" }}>
+                  <tr key={s.id} className="border-t" style={{ borderColor: "rgba(23,18,8,0.08)" }}>
                     <td className="py-2 pr-3" style={{ color: INK }}>{s.customer_name || s.customer_id}</td>
                     <td className="py-2 pr-3" style={{ color: INK, fontFamily: MONO }}>
                       {s.last_invoice_date
@@ -198,7 +198,7 @@ export default function CohortChurnSection() {
               className="rounded-md px-3 py-1 text-xs font-medium transition-colors"
               style={{
                 background: tab === t ? "#FFFFFF" : "transparent",
-                color: tab === t ? TEAL : "#6B6B6B",
+                color: tab === t ? TEAL : "rgba(23,18,8,0.62)",
                 border: tab === t ? "0.5px solid rgba(26,26,26,0.12)" : "0.5px solid transparent",
               }}
             >

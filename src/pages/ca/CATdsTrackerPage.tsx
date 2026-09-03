@@ -15,7 +15,7 @@ export default function CATdsTrackerPage() {
       <Card>
         <h3 className="text-[15px] font-semibold mb-4">Client TDS status</h3>
         <table className="w-full text-sm">
-          <thead><tr className="text-left text-[11px] uppercase" style={{ color: "rgba(26,16,8,0.50)" }}>
+          <thead><tr className="text-left text-[11px] uppercase" style={{ color: "rgba(23,18,8,0.50)" }}>
             <th className="py-2">Client</th><th className="py-2">TAN</th><th className="py-2">Due</th><th className="py-2">Amount</th><th className="py-2">Status</th>
           </tr></thead>
           <tbody>

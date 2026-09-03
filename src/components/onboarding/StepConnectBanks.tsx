@@ -17,16 +17,16 @@ const BANKS = [
   { name: "UCO Bank", color: "#1A4E8C" },
   { name: "IDFC First Bank", color: "#A61F25" },
   { name: "Federal Bank", color: "#E31E26" },
-  { name: "RBL Bank", color: "#1A1008" },
-  { name: "Bandhan Bank", color: "#1A1008" },
-  { name: "South Indian Bank", color: "#1A1008" },
-  { name: "Karur Vysya Bank", color: "#1A1008" },
-  { name: "City Union Bank", color: "#1A1008" },
-  { name: "Dhanlaxmi Bank", color: "#1A1008" },
-  { name: "Saraswat Bank", color: "#1A1008" },
-  { name: "NSDL Payments Bank", color: "#1A1008" },
-  { name: "Airtel Payments Bank", color: "#1A1008" },
-  { name: "Paytm Payments Bank", color: "#1A1008" },
+  { name: "RBL Bank", color: "#171208" },
+  { name: "Bandhan Bank", color: "#171208" },
+  { name: "South Indian Bank", color: "#171208" },
+  { name: "Karur Vysya Bank", color: "#171208" },
+  { name: "City Union Bank", color: "#171208" },
+  { name: "Dhanlaxmi Bank", color: "#171208" },
+  { name: "Saraswat Bank", color: "#171208" },
+  { name: "NSDL Payments Bank", color: "#171208" },
+  { name: "Airtel Payments Bank", color: "#171208" },
+  { name: "Paytm Payments Bank", color: "#171208" },
 ];
 
 interface Props {
@@ -230,7 +230,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                      style={{ background: bank?.color || "#1A1008" }}
+                      style={{ background: bank?.color || "#171208" }}
                     >
                       {initial}
                     </div>
@@ -263,7 +263,7 @@ const StepConnectBanks = ({ selectedBanks, setSelectedBanks, onContinue, onSkip 
           style={{
             background: "#FFFFFF",
             color: "hsl(var(--fyn-ink))",
-            border: "1.5px solid rgba(26,16,8,0.18)",
+            border: "1.5px solid rgba(23,18,8,0.18)",
             cursor: "pointer",
           }}
         >

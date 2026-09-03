@@ -3,10 +3,10 @@ type Status = "connecting" | "live" | "offline";
 export function LiveBadge({ status }: { status: Status }) {
   const cfg =
     status === "live"
-      ? { dot: "#10B981", bg: "rgba(16,185,129,0.12)", fg: "#0F7B4F", label: "Live" }
+      ? { dot: "#1F5A46", bg: "rgba(16,185,129,0.12)", fg: "#0F7B4F", label: "Live" }
       : status === "connecting"
       ? { dot: "#B45309", bg: "rgba(245,158,11,0.15)", fg: "#B45309", label: "Connecting…" }
-      : { dot: "hsl(var(--fyn-ink) / 0.4)", bg: "rgba(26,16,8,0.06)", fg: "hsl(var(--fyn-ink) / 0.7)", label: "Offline" };
+      : { dot: "hsl(var(--fyn-ink) / 0.4)", bg: "rgba(23,18,8,0.06)", fg: "hsl(var(--fyn-ink) / 0.7)", label: "Offline" };
   return (
     <span
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"

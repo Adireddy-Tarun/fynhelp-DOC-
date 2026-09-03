@@ -16,7 +16,7 @@ export default function UnbilledWipSection() {
   if (mode === "live" && rows.length === 0 && !isLoading) {
     return (
       <IntelCard title="Unbilled Work in Progress">
-        <p className="text-sm text-[#6B6B6B] py-4 text-center">No unbilled work found</p>
+        <p className="text-sm text-[rgba(23,18,8,0.62)] py-4 text-center">No unbilled work found</p>
       </IntelCard>
     );
   }

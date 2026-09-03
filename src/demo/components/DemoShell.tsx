@@ -43,7 +43,7 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
       <ModeBanner />
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <nav className="flex items-center gap-1 bg-white rounded-lg p-1 overflow-x-auto" style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+        <nav className="flex items-center gap-1 bg-white rounded-lg p-1 overflow-x-auto" style={{ border: "1px solid rgba(23,18,8,0.08)" }}>
           {TABS.map((t) => {
             const Icon = t.icon;
             const isActive = active === t.id;
@@ -53,7 +53,7 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
                 onClick={() => setActive(t.id)}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
-                  isActive ? "text-white" : "text-[#6B6B6B] hover:text-fyn-ink hover:bg-[rgba(26,16,8,0.04)]",
+                  isActive ? "text-white" : "text-[rgba(23,18,8,0.62)] hover:text-fyn-ink hover:bg-[rgba(23,18,8,0.04)]",
                 )}
                 style={isActive ? { background: ACCENT.red } : undefined}
               >
@@ -76,7 +76,7 @@ export default function IntelligenceShell({ initialTab = "liquidity" }: { initia
       {mode === "demo" && (
         <footer
           className="mt-10 pt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs"
-          style={{ borderTop: "1px solid rgba(26,16,8,0.08)", color: "#6B6B6B" }}
+          style={{ borderTop: "1px solid rgba(23,18,8,0.08)", color: "rgba(23,18,8,0.62)" }}
         >
           <span>Exploring the FynHelp demo. No sign-in needed.</span>
           <Link to="/demo/login" className="hover:text-fyn-ink transition-colors underline-offset-4 hover:underline">

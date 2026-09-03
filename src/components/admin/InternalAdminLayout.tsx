@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const TEAL = "#0F6E56";
-const INK = "#1A1A1A";
+const TEAL = "#A93838";
+const INK = "#171208";
 
 const LINKS = [{ to: "/admin/ca-approvals", label: "CA Approvals", icon: ShieldCheck }];
 
@@ -20,7 +20,7 @@ export default function AdminLayout() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8F7F4", color: INK, fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#F2EEE7", color: INK, fontFamily: "'Instrument Sans', Inter, sans-serif" }}>
       <header
         style={{
           height: 64, background: "#FFFFFF", borderBottom: "1px solid rgba(26,26,26,0.10)",

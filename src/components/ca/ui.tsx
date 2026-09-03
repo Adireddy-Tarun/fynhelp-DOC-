@@ -2,7 +2,7 @@
 import { ReactNode } from "react";
 
 export const COLORS = {
-  ink: "#1A1008",
+  ink: "#171208",
   red: "#C41E1E",
   beige: "#F4EDDA",
   gold: "#8B6914",
@@ -28,7 +28,7 @@ export function PageHeader({ title, sub, right }: { title: string; sub?: string;
     <div className="flex items-start justify-between mb-6">
       <div>
         <h1 className="text-[28px] font-bold leading-tight" style={{ color: COLORS.ink }}>{title}</h1>
-        {sub && <p className="text-[15px] mt-1.5 max-w-2xl" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>}
+        {sub && <p className="text-[15px] mt-1.5 max-w-2xl" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</p>}
       </div>
       {right}
     </div>
@@ -73,7 +73,7 @@ export function Chip({ children, tone = "gray" }: { children: ReactNode; tone?: 
     amber: { bg: "#FEF3C7", text: "#92400E" },
     red: { bg: "#FEE2E2", text: "#991B1B" },
     blue: { bg: "#DBEAFE", text: "#1E40AF" },
-    gray: { bg: "#F3F0E6", text: "rgba(26,16,8,0.60)" },
+    gray: { bg: "#F3F0E6", text: "rgba(23,18,8,0.60)" },
     gold: { bg: "#FEF3C7", text: COLORS.gold },
   };
   const c = map[tone];

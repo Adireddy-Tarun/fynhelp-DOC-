@@ -87,8 +87,8 @@ const SettingsCard = ({
     <div className="flex items-start gap-4">
       <div style={{ color: iconColor }}>{icon}</div>
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
-        <p className="text-[13px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>
+        <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>{title}</h3>
+        <p className="text-[13px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</p>
         {statusChip ? (
           <span className="inline-flex items-center gap-1 mt-3 px-3 py-1 rounded-full text-[10px] font-semibold tracking-widest"
             style={{ background: "rgba(139,105,20,0.20)", border: "1px solid rgba(139,105,20,0.40)", color: "#8B6914" }}>
@@ -117,17 +117,17 @@ const SettingsLayout = () => {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <nav className="flex items-center gap-1.5 text-[12px] mb-2" style={{ color: "rgba(26,16,8,0.55)" }}>
+        <nav className="flex items-center gap-1.5 text-[12px] mb-2" style={{ color: "rgba(23,18,8,0.55)" }}>
           <Link to="/dashboard/settings" className="hover:underline" style={{ color: "#8B6914" }}>Settings</Link>
           {!isRoot && (
             <>
               <ChevronRight size={12} />
-              <span style={{ color: "rgba(26,16,8,0.75)" }}>{currentLabel}</span>
+              <span style={{ color: "rgba(23,18,8,0.75)" }}>{currentLabel}</span>
             </>
           )}
         </nav>
-        <h1 className="font-serif text-4xl font-bold" style={{ color: "#1A1008" }}>Settings</h1>
-        <p className="text-sm mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
+        <h1 className="font-serif text-4xl font-bold" style={{ color: "#171208" }}>Settings</h1>
+        <p className="text-sm mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>
           Manage your account, business profile, and subscription.
         </p>
       </div>
@@ -149,24 +149,24 @@ const SettingsLayout = () => {
                       to={item.href}
                       className="flex items-center gap-2.5 h-10 px-5 text-[13px] font-medium transition-all duration-150"
                       style={{
-                        color: active ? "#C41E1E" : "rgba(26,16,8,0.65)",
+                        color: active ? "#C41E1E" : "rgba(23,18,8,0.65)",
                         background: active ? "#FDF2F1" : "transparent",
                         borderRight: active ? "2px solid #C41E1E" : "2px solid transparent",
                       }}
                       onMouseEnter={(e) => {
                         if (!active) {
                           e.currentTarget.style.background = "#FAF7F0";
-                          e.currentTarget.style.color = "#1A1008";
+                          e.currentTarget.style.color = "#171208";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!active) {
                           e.currentTarget.style.background = "transparent";
-                          e.currentTarget.style.color = "rgba(26,16,8,0.65)";
+                          e.currentTarget.style.color = "rgba(23,18,8,0.65)";
                         }
                       }}
                     >
-                      <Icon size={16} style={{ color: active ? "#C41E1E" : "rgba(26,16,8,0.40)" }} />
+                      <Icon size={16} style={{ color: active ? "#C41E1E" : "rgba(23,18,8,0.40)" }} />
                       <span>{item.label}</span>
                     </Link>
                   );

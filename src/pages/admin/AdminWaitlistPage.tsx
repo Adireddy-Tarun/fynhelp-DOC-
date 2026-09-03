@@ -398,7 +398,7 @@ export default function AdminWaitlistPage() {
           </select>
 
           <div className="flex items-center gap-2 flex-1 min-w-[240px]" style={{
-            background: "#fff", border: "1px solid rgba(26,16,8,0.12)",
+            background: "#fff", border: "1px solid rgba(23,18,8,0.12)",
             borderRadius: 10, padding: "8px 12px",
           }}>
             <Search size={16} color="hsl(var(--fyn-ink) / 0.5)" />
@@ -448,7 +448,7 @@ export default function AdminWaitlistPage() {
         </div>
 
         {selectedIds.length > 0 && (
-          <div className="mt-3 flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: "1px dashed rgba(26,16,8,0.12)" }}>
+          <div className="mt-3 flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: "1px dashed rgba(23,18,8,0.12)" }}>
             <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
               {selectedIds.length} selected
             </span>
@@ -490,7 +490,7 @@ export default function AdminWaitlistPage() {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.1)" }}>
+                  <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.1)" }}>
                     <Th>
                       <input type="checkbox" checked={allOnPageSelected} onChange={toggleAllOnPage} aria-label="Select all on page" />
                     </Th>
@@ -510,7 +510,7 @@ export default function AdminWaitlistPage() {
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.id} style={{
-                      borderBottom: "1px solid rgba(26,16,8,0.06)",
+                      borderBottom: "1px solid rgba(23,18,8,0.06)",
                       background: selected.has(r.id) ? "rgba(139,105,20,0.06)" : "transparent",
                     }}>
                       <Td>
@@ -549,7 +549,7 @@ export default function AdminWaitlistPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid rgba(26,16,8,0.06)" }}>
+            <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid rgba(23,18,8,0.06)" }}>
               <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)" }}>
                 Page {safePage} of {totalPages} · {totalCount} total
               </span>
@@ -579,7 +579,7 @@ const cardStyle: React.CSSProperties = {
 
 const btnGhost: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", gap: 6,
-  background: "#fff", border: "1px solid rgba(26,16,8,0.15)",
+  background: "#fff", border: "1px solid rgba(23,18,8,0.15)",
   borderRadius: 8, padding: "8px 12px",
   fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13,
   color: "hsl(var(--fyn-ink))", cursor: "pointer",
@@ -594,7 +594,7 @@ const btnPrimary: React.CSSProperties = {
 };
 
 const selectStyle: React.CSSProperties = {
-  background: "#fff", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 10,
+  background: "#fff", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 10,
   padding: "10px 14px", fontFamily: "Roboto, sans-serif", fontSize: 14,
   color: "hsl(var(--fyn-ink))", outline: "none", maxWidth: 240,
 };

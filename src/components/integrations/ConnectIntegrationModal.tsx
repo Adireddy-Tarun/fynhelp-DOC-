@@ -96,7 +96,7 @@ export default function ConnectIntegrationModal({
       aria-modal="true"
       style={{
         position: "fixed", inset: 0, zIndex: 100,
-        background: "rgba(26,16,8,0.55)", backdropFilter: "blur(4px)",
+        background: "rgba(23,18,8,0.55)", backdropFilter: "blur(4px)",
         display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
       }}
     >
@@ -104,13 +104,13 @@ export default function ConnectIntegrationModal({
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "#FFFFFF", borderRadius: 12, maxWidth: 440, width: "100%",
-          boxShadow: "0 24px 64px rgba(26,16,8,0.20)", padding: 28, position: "relative",
+          boxShadow: "0 24px 64px rgba(23,18,8,0.20)", padding: 28, position: "relative",
           fontFamily: "'Inter', sans-serif",
         }}
       >
         <button
           type="button" onClick={onClose} aria-label="Close"
-          style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: "rgba(26,16,8,0.45)" }}
+          style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: "rgba(23,18,8,0.45)" }}
         >
           <X size={18} />
         </button>
@@ -123,7 +123,7 @@ export default function ConnectIntegrationModal({
           <Icon size={20} color="#A93838" />
         </div>
 
-        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1A1008", marginBottom: 6 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#171208", marginBottom: 6 }}>
           Connect {providerLabel}
         </h3>
         <p style={{ fontSize: 13, color: "#4A4540", lineHeight: 1.6, marginBottom: 18 }}>
@@ -166,7 +166,7 @@ export default function ConnectIntegrationModal({
               onChange={setShopDomain}
               placeholder="your-store.myshopify.com"
             />
-            <p style={{ fontSize: 11, color: "rgba(26,16,8,0.55)", lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: 11, color: "rgba(23,18,8,0.55)", lineHeight: 1.5, margin: 0 }}>
               Find this in your Shopify admin URL — it ends in .myshopify.com
             </p>
           </div>
@@ -199,10 +199,10 @@ export default function ConnectIntegrationModal({
               }}
             >
               <UploadIcon size={18} color="#8B6914" />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#1A1008" }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#171208" }}>
                 {file ? file.name : "Choose file or drop here"}
               </span>
-              <span style={{ fontSize: 11, color: "rgba(26,16,8,0.50)" }}>
+              <span style={{ fontSize: 11, color: "rgba(23,18,8,0.50)" }}>
                 {file ? `${(file.size / 1024).toFixed(1)} KB` : "CSV, Excel or PDF"}
               </span>
               <input
@@ -237,7 +237,7 @@ export default function ConnectIntegrationModal({
           </button>
         </div>
 
-        <p style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 14, textAlign: "center" }}>
+        <p style={{ fontSize: 11, color: "rgba(23,18,8,0.45)", marginTop: 14, textAlign: "center" }}>
           Provider: <code style={{ background: "#FAF7F0", padding: "1px 5px", borderRadius: 3 }}>{provider}</code>
         </p>
       </div>
@@ -258,7 +258,7 @@ function LabeledInput({
         style={{
           width: "100%", padding: "9px 11px", borderRadius: 6,
           border: "1px solid #E5DBC4", background: "#FFFFFF",
-          fontSize: 13, color: "#1A1008", outline: "none",
+          fontSize: 13, color: "#171208", outline: "none",
           fontFamily: "ui-monospace, monospace",
         }}
       />

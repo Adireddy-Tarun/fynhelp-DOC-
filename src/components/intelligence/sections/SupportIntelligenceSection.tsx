@@ -30,7 +30,7 @@ export default function SupportIntelligenceSection() {
               return (
                 <div key={r.id} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full rounded-t" style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${ACCENT.gold} 0%, ${ACCENT.goldLight} 100%)`, minHeight: 4 }} />
-                  <span className="text-[10px] text-[#6B6B6B]">{label}</span>
+                  <span className="text-[10px] text-[rgba(23,18,8,0.62)]">{label}</span>
                 </div>
               );
             })}

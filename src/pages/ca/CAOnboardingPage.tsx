@@ -62,7 +62,7 @@ const initialForm: FormData = {
 
 const cardStyle: React.CSSProperties = {
   background: "#fff",
-  border: "0.5px solid rgba(26,16,8,0.08)",
+  border: "0.5px solid rgba(23,18,8,0.08)",
   borderRadius: 12,
   padding: 28,
 };
@@ -72,7 +72,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "Inter, sans-serif",
   fontWeight: 600,
   fontSize: 12.5,
-  color: "#1A1008",
+  color: "#171208",
   textTransform: "uppercase",
   letterSpacing: "0.03em",
   marginBottom: 6,
@@ -83,11 +83,11 @@ const inputStyle: React.CSSProperties = {
   height: 44,
   padding: "0 14px",
   borderRadius: 10,
-  border: "1px solid rgba(26,16,8,0.12)",
+  border: "1px solid rgba(23,18,8,0.12)",
   background: "#FCFAF4",
   fontFamily: "Inter, sans-serif",
   fontSize: 14,
-  color: "#1A1008",
+  color: "#171208",
   outline: "none",
 };
 
@@ -355,10 +355,10 @@ export default function CAOnboardingPage() {
           <div style={{ width: 48, height: 48, borderRadius: 12, background: "#E8F5EC", display: "grid", placeItems: "center", marginBottom: 20 }}>
             <Check size={22} style={{ color: "#1A6B3C" }} />
           </div>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: "#1A1008", marginBottom: 10 }}>Application submitted</h1>
-          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14.5, color: "rgba(26,16,8,0.7)", lineHeight: 1.6 }}>
+          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: "#171208", marginBottom: 10 }}>Application submitted</h1>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14.5, color: "rgba(23,18,8,0.7)", lineHeight: 1.6 }}>
             Our team will review your credentials within 2 business days. You will receive an email at{" "}
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", color: "#1A1008" }}>{user?.email}</span> once approved.
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", color: "#171208" }}>{user?.email}</span> once approved.
           </p>
           <button onClick={() => navigate("/ca/verification-pending")}
             style={{ marginTop: 24, padding: "12px 22px", background: "#C41E1E", color: "#fff", border: "none", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
@@ -374,7 +374,7 @@ export default function CAOnboardingPage() {
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#C41E1E", fontWeight: 700 }}>CA Partner Onboarding</div>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: "#1A1008", marginTop: 6 }}>Verify your practice</h1>
+          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: "#171208", marginTop: 6 }}>Verify your practice</h1>
         </div>
 
         {/* Progress bar */}
@@ -388,15 +388,15 @@ export default function CAOnboardingPage() {
                 <div style={{
                   width: 28, height: 28, borderRadius: "50%",
                   background: done ? "#C41E1E" : active ? "#fff" : "#EFE8D8",
-                  border: done ? "none" : active ? "2px solid #C41E1E" : "1px solid rgba(26,16,8,0.15)",
-                  color: done ? "#fff" : active ? "#C41E1E" : "rgba(26,16,8,0.4)",
+                  border: done ? "none" : active ? "2px solid #C41E1E" : "1px solid rgba(23,18,8,0.15)",
+                  color: done ? "#fff" : active ? "#C41E1E" : "rgba(23,18,8,0.4)",
                   display: "grid", placeItems: "center",
                   fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700, flexShrink: 0,
                 }}>
                   {done ? <Check size={14} /> : step}
                 </div>
-                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? "#1A1008" : "rgba(26,16,8,0.5)", whiteSpace: "nowrap" }}>{label}</span>
-                {i < STEPS.length - 1 && <div style={{ flex: 1, height: 1, background: done ? "#C41E1E" : "rgba(26,16,8,0.1)", minWidth: 8 }} />}
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, fontWeight: active ? 700 : 500, color: active ? "#171208" : "rgba(23,18,8,0.5)", whiteSpace: "nowrap" }}>{label}</span>
+                {i < STEPS.length - 1 && <div style={{ flex: 1, height: 1, background: done ? "#C41E1E" : "rgba(23,18,8,0.1)", minWidth: 8 }} />}
               </div>
             );
           })}
@@ -405,7 +405,7 @@ export default function CAOnboardingPage() {
         <div style={cardStyle}>
           {currentStep === 1 && (
             <div style={{ display: "grid", gap: 18 }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#1A1008" }}>Firm details</h2>
+              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#171208" }}>Firm details</h2>
               <div style={{ display: "grid", gap: 14, gridTemplateColumns: "1fr 1fr" }}>
                 <Field label="Firm name *" error={errors.firm_name}>
                   <input style={inputStyle} value={form.firm_name} onChange={(e) => update("firm_name", e.target.value)} />
@@ -446,10 +446,10 @@ export default function CAOnboardingPage() {
                     return (
                       <label key={s} style={{
                         display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                        border: checked ? "1px solid #C41E1E" : "1px solid rgba(26,16,8,0.12)",
+                        border: checked ? "1px solid #C41E1E" : "1px solid rgba(23,18,8,0.12)",
                         background: checked ? "#FDF6F6" : "#FCFAF4",
                         borderRadius: 10, cursor: "pointer",
-                        fontFamily: "Inter, sans-serif", fontSize: 13, color: "#1A1008",
+                        fontFamily: "Inter, sans-serif", fontSize: 13, color: "#171208",
                       }}>
                         <input type="checkbox" checked={checked} onChange={(e) => {
                           const next = e.target.checked ? [...form.specializations, s] : form.specializations.filter((x) => x !== s);
@@ -466,7 +466,7 @@ export default function CAOnboardingPage() {
 
           {currentStep === 2 && (
             <div style={{ display: "grid", gap: 20 }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#1A1008" }}>Identity verification</h2>
+              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#171208" }}>Identity verification</h2>
               <Field label="Aadhaar last 4 digits *" error={errors.aadhaar_last4}>
                 <input maxLength={4} style={{ ...inputStyle, fontFamily: "'JetBrains Mono', monospace", maxWidth: 160, letterSpacing: "0.3em" }}
                   value={form.aadhaar_last4} onChange={(e) => update("aadhaar_last4", e.target.value.replace(/\D/g, "").slice(0, 4))} />
@@ -475,7 +475,7 @@ export default function CAOnboardingPage() {
                 slot="aadhaar" file={uploads.aadhaar} uploading={uploading.aadhaar}
                 onChange={(f) => handleFile("aadhaar", f)} onRemove={() => removeFile("aadhaar")}
                 error={errors.aadhaar_doc} />
-              <div style={{ padding: 14, background: "#FDF9EE", border: "1px solid #E8DBAE", borderRadius: 10, fontFamily: "Inter, sans-serif", fontSize: 12.5, color: "rgba(26,16,8,0.75)", lineHeight: 1.55, display: "flex", gap: 10 }}>
+              <div style={{ padding: 14, background: "#FDF9EE", border: "1px solid #E8DBAE", borderRadius: 10, fontFamily: "Inter, sans-serif", fontSize: 12.5, color: "rgba(23,18,8,0.75)", lineHeight: 1.55, display: "flex", gap: 10 }}>
                 <ShieldCheck size={16} style={{ color: "#8B6914", flexShrink: 0, marginTop: 2 }} />
                 <span>We store only the last 4 digits of your Aadhaar number. Your full Aadhaar is never stored — only the uploaded document for verification by our compliance team, after which the document is deleted.</span>
               </div>
@@ -491,7 +491,7 @@ export default function CAOnboardingPage() {
 
           {currentStep === 3 && (
             <div style={{ display: "grid", gap: 20 }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#1A1008" }}>Practice credentials</h2>
+              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#171208" }}>Practice credentials</h2>
               <FileUpload label="ICAI certificate of practice *" hint="PDF, JPG, or PNG · max 10MB"
                 slot="icai_certificate" file={uploads.icai_certificate} uploading={uploading.icai_certificate}
                 onChange={(f) => handleFile("icai_certificate", f)} onRemove={() => removeFile("icai_certificate")}
@@ -511,11 +511,11 @@ export default function CAOnboardingPage() {
 
           {currentStep === 4 && (
             <div style={{ display: "grid", gap: 18 }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#1A1008" }}>Review and submit</h2>
+              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#171208" }}>Review and submit</h2>
               <ReviewGrid form={form} uploads={uploads} />
-              <label style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: 14, background: "#FCFAF4", border: "1px solid rgba(26,16,8,0.1)", borderRadius: 10, cursor: "pointer" }}>
+              <label style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: 14, background: "#FCFAF4", border: "1px solid rgba(23,18,8,0.1)", borderRadius: 10, cursor: "pointer" }}>
                 <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} style={{ marginTop: 3 }} />
-                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "#1A1008", lineHeight: 1.55 }}>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "#171208", lineHeight: 1.55 }}>
                   I confirm that all information provided is accurate and I authorise FYNHelp to verify my ICAI credentials.
                 </span>
               </label>
@@ -523,9 +523,9 @@ export default function CAOnboardingPage() {
           )}
 
           {/* Navigation */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28, paddingTop: 20, borderTop: "1px solid rgba(26,16,8,0.08)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28, paddingTop: 20, borderTop: "1px solid rgba(23,18,8,0.08)" }}>
             <button type="button" onClick={handleBack} disabled={currentStep === 1}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 16px", background: "transparent", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13.5, color: "#1A1008", cursor: currentStep === 1 ? "not-allowed" : "pointer", opacity: currentStep === 1 ? 0.4 : 1 }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 16px", background: "transparent", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13.5, color: "#171208", cursor: currentStep === 1 ? "not-allowed" : "pointer", opacity: currentStep === 1 ? 0.4 : 1 }}>
               <ArrowLeft size={14} /> Back
             </button>
             {currentStep < 4 ? (
@@ -559,19 +559,19 @@ function FileUpload({ label, hint, slot, file, uploading, onChange, onRemove, er
         <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "#F6FBF7", border: "1px solid #B8DCC1", borderRadius: 10 }}>
           <FileText size={18} style={{ color: "#1A6B3C", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, fontWeight: 600, color: "#1A1008", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
-            {file.size > 0 && <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>{(file.size / 1024).toFixed(1)} KB</div>}
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, fontWeight: 600, color: "#171208", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+            {file.size > 0 && <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "rgba(23,18,8,0.5)" }}>{(file.size / 1024).toFixed(1)} KB</div>}
           </div>
-          <button type="button" onClick={onRemove} style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(26,16,8,0.5)" }}>
+          <button type="button" onClick={onRemove} style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(23,18,8,0.5)" }}>
             <X size={16} />
           </button>
         </div>
       ) : (
         <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading}
-          style={{ width: "100%", padding: "20px 16px", background: "#FCFAF4", border: "1.5px dashed rgba(26,16,8,0.2)", borderRadius: 10, cursor: uploading ? "wait" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          {uploading ? <Loader2 size={20} className="animate-spin" style={{ color: "#C41E1E" }} /> : <Upload size={20} style={{ color: "rgba(26,16,8,0.5)" }} />}
-          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "#1A1008", fontWeight: 500 }}>{uploading ? "Uploading…" : "Click to upload"}</span>
-          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: "rgba(26,16,8,0.5)" }}>{hint}</span>
+          style={{ width: "100%", padding: "20px 16px", background: "#FCFAF4", border: "1.5px dashed rgba(23,18,8,0.2)", borderRadius: 10, cursor: uploading ? "wait" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+          {uploading ? <Loader2 size={20} className="animate-spin" style={{ color: "#C41E1E" }} /> : <Upload size={20} style={{ color: "rgba(23,18,8,0.5)" }} />}
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: "#171208", fontWeight: 500 }}>{uploading ? "Uploading…" : "Click to upload"}</span>
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: "rgba(23,18,8,0.5)" }}>{hint}</span>
         </button>
       )}
       <input ref={inputRef} type="file" accept="application/pdf,image/jpeg,image/png" style={{ display: "none" }}
@@ -599,11 +599,11 @@ function ReviewGrid({ form, uploads }: { form: FormData; uploads: Record<DocSlot
     ["Additional certificate", uploads.practice_certificate ? "Uploaded" : "Not provided"],
   ];
   return (
-    <div style={{ border: "1px solid rgba(26,16,8,0.08)", borderRadius: 10, overflow: "hidden" }}>
+    <div style={{ border: "1px solid rgba(23,18,8,0.08)", borderRadius: 10, overflow: "hidden" }}>
       {rows.map(([k, v], i) => (
-        <div key={k} style={{ display: "grid", gridTemplateColumns: "200px 1fr", padding: "10px 14px", background: i % 2 ? "#FCFAF4" : "#fff", fontFamily: "Inter, sans-serif", fontSize: 13, borderTop: i === 0 ? "none" : "1px solid rgba(26,16,8,0.06)" }}>
-          <div style={{ color: "rgba(26,16,8,0.55)", fontWeight: 500 }}>{k}</div>
-          <div style={{ color: "#1A1008" }}>{v}</div>
+        <div key={k} style={{ display: "grid", gridTemplateColumns: "200px 1fr", padding: "10px 14px", background: i % 2 ? "#FCFAF4" : "#fff", fontFamily: "Inter, sans-serif", fontSize: 13, borderTop: i === 0 ? "none" : "1px solid rgba(23,18,8,0.06)" }}>
+          <div style={{ color: "rgba(23,18,8,0.55)", fontWeight: 500 }}>{k}</div>
+          <div style={{ color: "#171208" }}>{v}</div>
         </div>
       ))}
     </div>

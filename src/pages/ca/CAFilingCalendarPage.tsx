@@ -216,16 +216,16 @@ export default function CAFilingCalendarPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
-          <div className="text-[13px] mb-1" style={{ color: "rgba(26,16,8,0.45)" }}>Dashboard / Filing Calendar</div>
+          <div className="text-[13px] mb-1" style={{ color: "rgba(23,18,8,0.45)" }}>Dashboard / Filing Calendar</div>
           <h1 className="text-[28px] font-bold leading-tight" style={{ color: COLORS.ink }}>Filing Calendar</h1>
-          <p className="text-[15px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>All client filings across your portfolio</p>
+          <p className="text-[15px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>All client filings across your portfolio</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex bg-white rounded-md p-0.5" style={{ border: `1px solid ${COLORS.caBorder}` }}>
             {(["Month", "Week", "List"] as const).map((v) => (
               <button key={v} onClick={() => setView(v)}
                 className="px-4 py-1.5 text-xs font-medium rounded transition-colors"
-                style={view === v ? { background: COLORS.red, color: "#FFFFFF" } : { color: "rgba(26,16,8,0.60)" }}>{v}</button>
+                style={view === v ? { background: COLORS.red, color: "#FFFFFF" } : { color: "rgba(23,18,8,0.60)" }}>{v}</button>
             ))}
           </div>
           <SecondaryBtn size="sm" onClick={exportCSV}><span className="inline-flex items-center gap-1.5"><Download size={13} />Export Calendar</span></SecondaryBtn>
@@ -251,7 +251,7 @@ export default function CAFilingCalendarPage() {
             </button>
             {clientPickerOpen && (
               <div className="absolute top-10 left-0 z-20 w-72 max-h-72 overflow-y-auto bg-white rounded-md shadow-lg p-2" style={{ border: `1px solid ${COLORS.caBorder}` }}>
-                {clients.length === 0 && <div className="text-xs p-2" style={{ color: "rgba(26,16,8,0.50)" }}>No clients</div>}
+                {clients.length === 0 && <div className="text-xs p-2" style={{ color: "rgba(23,18,8,0.50)" }}>No clients</div>}
                 {clients.map(c => {
                   const checked = selectedClients.includes(c.id);
                   return (
@@ -323,13 +323,13 @@ export default function CAFilingCalendarPage() {
 
       {/* Body */}
       {loading ? (
-        <Card><div className="flex items-center gap-2 text-sm" style={{ color: "rgba(26,16,8,0.60)" }}><Loader2 size={14} className="animate-spin" /> Loading filings…</div></Card>
+        <Card><div className="flex items-center gap-2 text-sm" style={{ color: "rgba(23,18,8,0.60)" }}><Loader2 size={14} className="animate-spin" /> Loading filings…</div></Card>
       ) : filtered.length === 0 ? (
         <Card>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <CalIcon size={56} style={{ color: "#D4C9A8" }} />
             <h3 className="mt-4 text-[20px] font-bold" style={{ color: COLORS.ink }}>No filings scheduled</h3>
-            <p className="mt-1 text-sm max-w-md" style={{ color: "rgba(26,16,8,0.60)" }}>
+            <p className="mt-1 text-sm max-w-md" style={{ color: "rgba(23,18,8,0.60)" }}>
               All your clients are up to date with their compliance filings.
             </p>
           </div>
@@ -393,9 +393,9 @@ function StatCard({ label, value, color, sub, subColor, link, onClick }: {
 }) {
   return (
     <div className="bg-white rounded-md p-4" style={{ border: `1px solid ${COLORS.caBorder}` }}>
-      <div className="text-[12px] font-medium" style={{ color: "rgba(26,16,8,0.55)" }}>{label}</div>
+      <div className="text-[12px] font-medium" style={{ color: "rgba(23,18,8,0.55)" }}>{label}</div>
       <div className="text-[24px] font-bold leading-tight mt-1 tabular-nums" style={{ color }}>{value}</div>
-      {sub && <div className="text-[12px] mt-0.5" style={{ color: subColor || "rgba(26,16,8,0.55)" }}>{sub}</div>}
+      {sub && <div className="text-[12px] mt-0.5" style={{ color: subColor || "rgba(23,18,8,0.55)" }}>{sub}</div>}
       {link && <button onClick={onClick} className="text-[12px] font-medium mt-1" style={{ color: COLORS.red }}>View →</button>}
     </div>
   );
@@ -415,7 +415,7 @@ function MonthGrid({ cursor, byDate, onCellClick }: { cursor: Date; byDate: Map<
     <Card>
       <div className="grid grid-cols-7 gap-2">
         {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map(d => (
-          <div key={d} className="text-[12px] font-semibold uppercase tracking-wider text-center pb-2" style={{ color: "rgba(26,16,8,0.55)" }}>{d}</div>
+          <div key={d} className="text-[12px] font-semibold uppercase tracking-wider text-center pb-2" style={{ color: "rgba(23,18,8,0.55)" }}>{d}</div>
         ))}
         {cells.map((d, i) => {
           const inMonth = sameMonth(d, cursor);
@@ -432,7 +432,7 @@ function MonthGrid({ cursor, byDate, onCellClick }: { cursor: Date; byDate: Map<
                 cursor: items.length ? "pointer" : "default",
                 opacity: inMonth ? 1 : 0.5,
               }}>
-              <div className="text-[14px] font-semibold mb-1" style={{ color: inMonth ? COLORS.ink : "rgba(26,16,8,0.25)" }}>{d.getDate()}</div>
+              <div className="text-[14px] font-semibold mb-1" style={{ color: inMonth ? COLORS.ink : "rgba(23,18,8,0.25)" }}>{d.getDate()}</div>
               <div className="space-y-1">
                 {visible.map(f => {
                   const meta = typeMeta(f.filing_type);
@@ -467,7 +467,7 @@ function WeekGrid({ cursor, byDate, onCardClick }: { cursor: Date; byDate: Map<s
           const isToday = sameDay(d, today);
           return (
             <div key={fmtKey(d)} className="rounded p-2 min-h-[280px]" style={{ border: `1px solid ${COLORS.divider}`, background: isToday ? "#FFF9E6" : "#FAF7F0" }}>
-              <div className="text-[12px] font-semibold uppercase" style={{ color: "rgba(26,16,8,0.55)" }}>{d.toLocaleDateString("en-IN", { weekday: "short" })}</div>
+              <div className="text-[12px] font-semibold uppercase" style={{ color: "rgba(23,18,8,0.55)" }}>{d.toLocaleDateString("en-IN", { weekday: "short" })}</div>
               <div className="text-[20px] font-bold mb-2" style={{ color: isToday ? COLORS.red : COLORS.ink }}>{d.getDate()}</div>
               <div className="space-y-2">
                 {items.map(f => {
@@ -478,7 +478,7 @@ function WeekGrid({ cursor, byDate, onCardClick }: { cursor: Date; byDate: Map<s
                       className="block w-full text-left bg-white rounded-md p-2 hover:bg-[#F8F6F1]"
                       style={{ borderLeft: `4px solid ${meta.bar}`, border: `1px solid ${COLORS.divider}` }}>
                       <div className="text-[12px] font-semibold" style={{ color: COLORS.ink }}>{f.filing_type}</div>
-                      <div className="text-[11px] truncate" style={{ color: "rgba(26,16,8,0.65)" }}>{f.businesses?.business_name || "-"}</div>
+                      <div className="text-[11px] truncate" style={{ color: "rgba(23,18,8,0.65)" }}>{f.businesses?.business_name || "-"}</div>
                       <div className="mt-1">
                         <Chip tone={f.status === "filed" ? "green" : overdue ? "red" : "amber"}>
                           {f.status === "filed" ? "Filed" : overdue ? "Overdue" : "Pending"}
@@ -487,7 +487,7 @@ function WeekGrid({ cursor, byDate, onCardClick }: { cursor: Date; byDate: Map<s
                     </button>
                   );
                 })}
-                {items.length === 0 && <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.40)" }}>-</div>}
+                {items.length === 0 && <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.40)" }}>-</div>}
               </div>
             </div>
           );
@@ -509,7 +509,7 @@ function ListView({ filings, onMarkFiled, onViewClient }: {
         <thead>
           <tr style={{ background: COLORS.caSurface }}>
             {["Filing Type", "Client", "Due Date", "Status", "Days Left", "Priority", ""].map(h => (
-              <th key={h} className="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.65)" }}>{h}</th>
+              <th key={h} className="text-left px-4 py-3 text-[12px] font-semibold uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.65)" }}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -526,18 +526,18 @@ function ListView({ filings, onMarkFiled, onViewClient }: {
               <tr key={f.id} className="hover:bg-[#FAF7F0]" style={{ borderTop: `1px solid ${COLORS.divider}`, height: 56 }}>
                 <td className="px-4">
                   <div className="text-[14px] font-medium" style={{ color: COLORS.ink }}>{f.filing_type}</div>
-                  <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.50)" }}>{f.filing_name}</div>
+                  <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.50)" }}>{f.filing_name}</div>
                 </td>
                 <td className="px-4">
                   <button onClick={() => onViewClient(f.business_id)} className="text-[14px] font-medium hover:underline" style={{ color: COLORS.ink }}>
                     {f.businesses?.business_name || "-"}
                   </button>
                 </td>
-                <td className="px-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{fmtDate(d)}</td>
+                <td className="px-4 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{fmtDate(d)}</td>
                 <td className="px-4">
                   <Chip tone={isFiled ? "green" : overdue ? "red" : "amber"}>{isFiled ? "Filed" : overdue ? "Overdue" : "Pending"}</Chip>
                 </td>
-                <td className="px-4 text-[14px] font-semibold tabular-nums" style={{ color: isFiled ? "rgba(26,16,8,0.40)" : daysColor }}>
+                <td className="px-4 text-[14px] font-semibold tabular-nums" style={{ color: isFiled ? "rgba(23,18,8,0.40)" : daysColor }}>
                   {isFiled ? "-" : days < 0 ? `${days}d` : `${days}d`}
                 </td>
                 <td className="px-4"><Chip tone={priorityTone as any}>{priority.charAt(0).toUpperCase() + priority.slice(1)}</Chip></td>
@@ -570,7 +570,7 @@ function DayFilingsModal({ date, filings, onClose, onView, onMarkFiled }: {
         <div className="p-6 flex items-start justify-between" style={{ borderBottom: `1px solid ${COLORS.divider}` }}>
           <div>
             <h3 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>Filings Due, {fmtDate(date)}</h3>
-            <div className="text-[14px]" style={{ color: "rgba(26,16,8,0.65)" }}>{filings.length} filing{filings.length !== 1 ? "s" : ""}</div>
+            <div className="text-[14px]" style={{ color: "rgba(23,18,8,0.65)" }}>{filings.length} filing{filings.length !== 1 ? "s" : ""}</div>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-[#F0EBD8]"><X size={18} /></button>
         </div>
@@ -582,7 +582,7 @@ function DayFilingsModal({ date, filings, onClose, onView, onMarkFiled }: {
                 <Chip tone={f.status === "filed" ? "green" : "amber"}>{f.status === "filed" ? "Filed" : "Pending"}</Chip>
               </div>
               <div className="text-[14px] font-semibold" style={{ color: COLORS.ink }}>{f.businesses?.business_name || "-"}</div>
-              <div className="text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{f.filing_name}</div>
+              <div className="text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{f.filing_name}</div>
               <div className="flex items-center gap-2 mt-3">
                 {f.status !== "filed" && <PrimaryBtn size="sm" onClick={() => onMarkFiled(f)}>Mark Filed →</PrimaryBtn>}
                 <GhostLink onClick={() => onView(f)}>View Client</GhostLink>
@@ -615,36 +615,36 @@ function BulkFileModal({ clients, onClose, onSubmit }: {
         <div className="p-6 flex items-start justify-between" style={{ borderBottom: `1px solid ${COLORS.divider}` }}>
           <div>
             <h3 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>Bulk File Returns</h3>
-            <div className="text-[14px]" style={{ color: "rgba(26,16,8,0.65)" }}>File the same return type across multiple clients</div>
+            <div className="text-[14px]" style={{ color: "rgba(23,18,8,0.65)" }}>File the same return type across multiple clients</div>
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-[#F0EBD8]"><X size={18} /></button>
         </div>
         <div className="p-6 overflow-y-auto space-y-4">
           <div>
-            <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.55)" }}>Filing Type</label>
+            <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.55)" }}>Filing Type</label>
             <select value={filingType} onChange={(e) => setFilingType(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-md text-sm bg-white" style={{ border: `1px solid ${COLORS.caBorder}` }}>
               {["GSTR-1", "GSTR-3B", "GSTR-9", "TDS Return", "PF Return", "ESIC Return", "Professional Tax", "Other"].map(t => <option key={t}>{t}</option>)}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.55)" }}>Period</label>
+              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.55)" }}>Period</label>
               <input value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="e.g. March 2026 or Q4 FY 2025-26"
                 className="mt-1 w-full h-10 px-3 rounded-md text-sm bg-white" style={{ border: `1px solid ${COLORS.caBorder}` }} />
             </div>
             <div>
-              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.55)" }}>Due / Filed Date</label>
+              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.55)" }}>Due / Filed Date</label>
               <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
                 className="mt-1 w-full h-10 px-3 rounded-md text-sm bg-white" style={{ border: `1px solid ${COLORS.caBorder}` }} />
             </div>
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.55)" }}>Select Clients ({selected.length}/{clients.length})</label>
+              <label className="text-[12px] font-medium uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.55)" }}>Select Clients ({selected.length}/{clients.length})</label>
               <button onClick={toggleAll} className="text-xs font-medium" style={{ color: COLORS.red }}>{allSelected ? "Deselect all" : "Select all"}</button>
             </div>
             <div className="rounded-md max-h-56 overflow-y-auto" style={{ border: `1px solid ${COLORS.caBorder}` }}>
-              {clients.length === 0 && <div className="text-xs p-3" style={{ color: "rgba(26,16,8,0.50)" }}>No clients available</div>}
+              {clients.length === 0 && <div className="text-xs p-3" style={{ color: "rgba(23,18,8,0.50)" }}>No clients available</div>}
               {clients.map(c => {
                 const checked = selected.includes(c.id);
                 return (

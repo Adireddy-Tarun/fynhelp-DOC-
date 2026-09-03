@@ -25,7 +25,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   billing: "Billing", technical: "Technical", feature_request: "Feature", bug: "Bug", other: "Other",
 };
 const PRIORITY_STYLE: Record<string, { bg: string; color: string; label: string; pulse?: boolean }> = {
-  low:    { bg: "rgba(26,16,8,0.08)",   color: "hsl(var(--fyn-ink) / 0.7)", label: "Low" },
+  low:    { bg: "rgba(23,18,8,0.08)",   color: "hsl(var(--fyn-ink) / 0.7)", label: "Low" },
   medium: { bg: "rgba(24,119,242,0.12)", color: "#0F4FB0", label: "Medium" },
   high:   { bg: "rgba(245,158,11,0.15)", color: "#B45309", label: "High" },
   urgent: { bg: "rgba(196,30,30,0.15)",  color: "#C41E1E", label: "Urgent", pulse: true },
@@ -35,7 +35,7 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }>
   in_progress:       { bg: "rgba(245,158,11,0.15)", color: "#B45309", label: "In Progress" },
   waiting_customer:  { bg: "rgba(139,105,20,0.15)", color: "#8B6914", label: "Waiting Customer" },
   resolved:          { bg: "rgba(16,185,129,0.12)", color: "#0F7B4F", label: "Resolved" },
-  closed:            { bg: "rgba(26,16,8,0.08)",    color: "hsl(var(--fyn-ink) / 0.6)", label: "Closed" },
+  closed:            { bg: "rgba(23,18,8,0.08)",    color: "hsl(var(--fyn-ink) / 0.6)", label: "Closed" },
 };
 const fmtRel = (iso: string) => {
   const ms = Date.now() - new Date(iso).getTime();
@@ -122,7 +122,7 @@ export default function AdminSupportPage() {
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" color="hsl(var(--fyn-ink) / 0.4)" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search ticket #, business, subject…"
               className="w-full pl-9 pr-3 py-2.5 rounded-lg"
-              style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13 }} />
+              style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13 }} />
           </div>
           <FilterSelect value={category} onChange={setCategory} label="Category"
             options={[["all","All"],["billing","Billing"],["technical","Technical"],["feature_request","Feature"],["bug","Bug"],["other","Other"]]} />
@@ -137,7 +137,7 @@ export default function AdminSupportPage() {
         <div className="overflow-x-auto">
           <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+              <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
                 {["Ticket #","Subject","Business","Category","Priority","Status","Created","Updated",""].map((h) => (
                   <th key={h} className="text-left py-2.5 px-2"
                     style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
@@ -153,7 +153,7 @@ export default function AdminSupportPage() {
                 const s = STATUS_STYLE[t.status] ?? STATUS_STYLE.open;
                 const company = (t.business_id && bizMap.get(t.business_id)) || "-";
                 return (
-                  <tr key={t.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
+                  <tr key={t.id} className="hover:bg-[hsl(var(--fyn-ink)/0.03)]" style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }}>
                     <td className="py-3 px-2 font-mono whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{t.ticket_number}</td>
                     <td className="py-3 px-2" style={{ color: "hsl(var(--fyn-ink))" }}>{t.subject}</td>
                     <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.8)" }}>{company}</td>
@@ -193,7 +193,7 @@ function FilterSelect({ value, onChange, label, options }: { value: string; onCh
       </label>
       <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={label}
         className="w-full rounded-lg px-3 py-2.5"
-        style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
+        style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>
         {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>
     </div>

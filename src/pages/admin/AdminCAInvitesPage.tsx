@@ -70,7 +70,7 @@ function Pill({ text, tone }: { text: string; tone: string }) {
 }
 
 const statusTone = (s: string) =>
-  s === "active" ? "#10B981" : s === "invited" ? "#8B6914" : "#6B6257";
+  s === "active" ? "#1F5A46" : s === "invited" ? "#8B6914" : "#6B6257";
 
 export default function AdminCAInvitesPage() {
   const [firms, setFirms] = useState<Firm[]>([]);
@@ -394,7 +394,7 @@ export default function AdminCAInvitesPage() {
                   <td style={{ padding: "10px 6px" }}>
                     <Pill
                       text={f.verification_status ?? (f.is_active ? "active" : "inactive")}
-                      tone={f.verification_status === "approved" ? "#10B981" : "#8B6914"}
+                      tone={f.verification_status === "approved" ? "#1F5A46" : "#8B6914"}
                     />
                   </td>
                 </tr>

@@ -1,7 +1,7 @@
 /**
  * Circuit Ledger animated background for the FYNHelp demo page.
  * Purely decorative, fixed, full viewport, pointer-events: none.
- * Brand colors only: #1A1008, #C41E1E, #F4EDDA, #8B6914.
+ * Brand colors only: #171208, #C41E1E, #F4EDDA, #8B6914.
  */
 export default function CircuitLedgerBackground() {
   const goldNode = (cx: number, cy: number, opacity = 1) => (
@@ -28,7 +28,7 @@ export default function CircuitLedgerBackground() {
           zIndex: 0,
           pointerEvents: "none",
           background:
-            "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(244,237,218,0.012) 3px, rgba(244,237,218,0.012) 4px), #1A1008",
+            "repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(244,237,218,0.012) 3px, rgba(244,237,218,0.012) 4px), #171208",
         }}
       />
 

@@ -13,11 +13,11 @@ import {
 } from "lucide-react";
 import { BlogPost, BLOG_CATEGORIES } from "@/types/blog";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const GOLD = "#8B6914";
 const BEIGE = "#F4EDDA";
-const BORDER = "rgba(26,16,8,0.12)";
+const BORDER = "rgba(23,18,8,0.12)";
 const HEADING = "'Times New Roman', Times, serif";
 const BODY = "Arial, Helvetica, sans-serif";
 const PER_PAGE = 5;
@@ -53,10 +53,10 @@ function statusStyle(status: string, archived: boolean): React.CSSProperties {
     letterSpacing: "0.04em",
     textTransform: "uppercase",
   };
-  if (archived) return { ...base, background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.45)" };
+  if (archived) return { ...base, background: "rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.45)" };
   if (status === "published") return { ...base, background: "rgba(16,185,129,0.12)", color: "#0B7A5A" };
   if (status === "scheduled") return { ...base, background: "rgba(37,99,235,0.10)", color: "#1D4ED8" };
-  return { ...base, background: "transparent", color: "rgba(26,16,8,0.6)", border: "0.5px solid " + BORDER };
+  return { ...base, background: "transparent", color: "rgba(23,18,8,0.6)", border: "0.5px solid " + BORDER };
 }
 
 export default function AdminBlogListPage() {
@@ -287,7 +287,7 @@ export default function AdminBlogListPage() {
                 borderRadius: 8,
                 border: "0.5px solid " + BORDER,
                 background: active ? INK : "#FFFFFF",
-                color: active ? BEIGE : "rgba(26,16,8,0.7)",
+                color: active ? BEIGE : "rgba(23,18,8,0.7)",
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -311,9 +311,9 @@ export default function AdminBlogListPage() {
 
       <div style={{ ...card, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", fontSize: 13, color: "rgba(26,16,8,0.45)" }}>Loading posts</div>
+          <div style={{ padding: 40, textAlign: "center", fontSize: 13, color: "rgba(23,18,8,0.45)" }}>Loading posts</div>
         ) : pageRows.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", fontSize: 13, color: "rgba(26,16,8,0.45)" }}>No posts here yet</div>
+          <div style={{ padding: 40, textAlign: "center", fontSize: 13, color: "rgba(23,18,8,0.45)" }}>No posts here yet</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -322,7 +322,7 @@ export default function AdminBlogListPage() {
                   <input type="checkbox" checked={pageRows.every((p) => selectedIds.includes(p.id))} onChange={toggleAll} />
                 </th>
                 {["Cover", "Title", "Category", "Status", "Author", "Featured", "Date", "Actions"].map((h) => (
-                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(26,16,8,0.5)" }}>{h}</th>
+                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(23,18,8,0.5)" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -341,14 +341,14 @@ export default function AdminBlogListPage() {
                     {p.cover_image_url ? (
                       <img src={p.cover_image_url} alt={p.title} style={{ width: 38, height: 28, objectFit: "cover", borderRadius: 3 }} />
                     ) : (
-                      <div style={{ width: 38, height: 28, borderRadius: 3, background: "rgba(26,16,8,0.08)", display: "grid", placeItems: "center", color: "rgba(26,16,8,0.35)" }}>
+                      <div style={{ width: 38, height: 28, borderRadius: 3, background: "rgba(23,18,8,0.08)", display: "grid", placeItems: "center", color: "rgba(23,18,8,0.35)" }}>
                         <ImageIcon size={12} />
                       </div>
                     )}
                   </td>
                   <td style={{ padding: "10px 12px" }}>
                     <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.3 }}>{p.title}</div>
-                    <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(26,16,8,0.45)" }}>{p.slug}</div>
+                    <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(23,18,8,0.45)" }}>{p.slug}</div>
                   </td>
                   <td style={{ padding: "10px 12px" }}>
                     <span style={{ fontSize: 11, color: RED, background: "rgba(196,30,30,0.08)", padding: "2px 8px", borderRadius: 99 }}>{p.category}</span>
@@ -356,11 +356,11 @@ export default function AdminBlogListPage() {
                   <td style={{ padding: "10px 12px" }}>
                     <span style={statusStyle(p.status, !!p.archived_at)}>{p.archived_at ? "archived" : p.status}</span>
                   </td>
-                  <td style={{ padding: "10px 12px", fontSize: 11, color: "rgba(26,16,8,0.65)" }}>{p.author_name}</td>
+                  <td style={{ padding: "10px 12px", fontSize: 11, color: "rgba(23,18,8,0.65)" }}>{p.author_name}</td>
                   <td style={{ padding: "10px 12px" }}>
-                    <Star size={14} color={p.is_featured ? GOLD : "rgba(26,16,8,0.2)"} fill={p.is_featured ? GOLD : "none"} />
+                    <Star size={14} color={p.is_featured ? GOLD : "rgba(23,18,8,0.2)"} fill={p.is_featured ? GOLD : "none"} />
                   </td>
-                  <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>{formatDate(p.published_at ?? p.created_at)}</td>
+                  <td style={{ padding: "10px 12px", fontFamily: "monospace", fontSize: 11, color: "rgba(23,18,8,0.5)" }}>{formatDate(p.published_at ?? p.created_at)}</td>
                   <td style={{ padding: "10px 12px" }}>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                       <button onClick={() => navigate("/admin/blog/" + p.id + "/edit")} style={{ ...inputStyle, height: 26, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -388,7 +388,7 @@ export default function AdminBlogListPage() {
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, fontSize: 12 }}>
-        <span style={{ color: "rgba(26,16,8,0.55)" }}>
+        <span style={{ color: "rgba(23,18,8,0.55)" }}>
           Page {page} of {totalPages}, {filtered.length} posts
         </span>
         <div style={{ display: "flex", gap: 6 }}>

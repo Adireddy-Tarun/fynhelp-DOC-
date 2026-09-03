@@ -271,7 +271,7 @@ export default function AdminSupportTicketDetailPage() {
   );
 }
 
-function Divider() { return <div className="my-4" style={{ height: 1, background: "rgba(26,16,8,0.08)" }} />; }
+function Divider() { return <div className="my-4" style={{ height: 1, background: "rgba(23,18,8,0.08)" }} />; }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block mb-3">
@@ -283,7 +283,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: [string, string][] }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-lg px-2.5 py-2"
-      style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
+      style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
       {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
     </select>
   );

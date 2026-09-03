@@ -86,7 +86,7 @@ export default function InvestorTab() {
 function Row({ label, value, tone }: { label: string; value: string; tone?: "up" | "down" }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[#6B6B6B]">{label}</span>
+      <span className="text-[rgba(23,18,8,0.62)]">{label}</span>
       <span className="font-mono font-semibold" style={{ color: tone === "up" ? ACCENT.green : tone === "down" ? ACCENT.red : ACCENT.ink }}>{value}</span>
     </div>
   );

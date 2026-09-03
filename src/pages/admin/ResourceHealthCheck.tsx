@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { Card } from "./AdminDashboardPage";
 import { logResourceAction, ResourceAuditAction } from "@/lib/resourceAudit";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
-const BORDER = "rgba(26,16,8,0.12)";
+const BORDER = "rgba(23,18,8,0.12)";
 const BODY = "Arial, Helvetica, sans-serif";
 const GREEN = "#0B7A5A";
 const AMBER = "#8B6914";
@@ -219,7 +219,7 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
             : `${errorCount} broken · ${warnCount} warnings · ${orphans.length} orphan files`}
         </span>
         {ranAt && !scanning && (
-          <span style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)" }}>Last scan {ranAt.toLocaleTimeString()}</span>
+          <span style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.45)" }}>Last scan {ranAt.toLocaleTimeString()}</span>
         )}
         <div className="ml-auto flex items-center gap-2">
           <button
@@ -271,10 +271,10 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
                   {issue.severity === "error" ? "Broken" : "Warning"}
                 </span>
                 {issue.row.is_published && (
-                  <span style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.5)" }}>live on /resources</span>
+                  <span style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.5)" }}>live on /resources</span>
                 )}
               </div>
-              <div style={{ fontFamily: BODY, fontSize: 12, color: "rgba(26,16,8,0.7)", marginTop: 4 }}>{issue.message}</div>
+              <div style={{ fontFamily: BODY, fontSize: 12, color: "rgba(23,18,8,0.7)", marginTop: 4 }}>{issue.message}</div>
 
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <QuickBtn disabled={busyId === issue.row.id} onClick={() => pickFile(issue.row)}>
@@ -321,7 +321,7 @@ export default function ResourceHealthCheck({ onChanged }: { onChanged?: () => v
               </div>
               <div className="flex flex-col gap-1.5">
                 {orphans.map((o) => (
-                  <div key={o} className="flex items-center gap-2" style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(26,16,8,0.7)" }}>
+                  <div key={o} className="flex items-center gap-2" style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(23,18,8,0.7)" }}>
                     <span className="truncate">{o}</span>
                     <QuickBtn disabled={busyId === o} onClick={() => deleteOrphan(o)}>
                       <Trash2 size={12} /> Delete

@@ -35,7 +35,7 @@ export default function RevenueAlertsSection() {
             <div className="flex-1">
               <p className="text-sm font-semibold text-fyn-ink">{r.title}</p>
               {r.description && <p className="text-xs text-[#3D3530] mt-1">{r.description}</p>}
-              {r.recommended_action && <p className="text-xs text-[#6B6B6B] mt-1 italic">→ {r.recommended_action}</p>}
+              {r.recommended_action && <p className="text-xs text-[rgba(23,18,8,0.62)] mt-1 italic">→ {r.recommended_action}</p>}
             </div>
             <button onClick={() => ack(r.id)} className="text-[11px] font-medium px-3 py-1.5 rounded text-white hover:opacity-90 flex-shrink-0" style={{ background: ACCENT.ink }}>Acknowledge</button>
           </div>

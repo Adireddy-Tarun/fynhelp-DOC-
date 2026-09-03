@@ -54,7 +54,7 @@ export function AdminProtected({ children, allowed }: { children?: ReactNode; al
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#F0EBE0" }}>
-        <div className="text-sm" style={{ color: "#1A1008" }}>Checking access…</div>
+        <div className="text-sm" style={{ color: "#171208" }}>Checking access…</div>
       </div>
     );
   }
@@ -336,7 +336,7 @@ export default function AdminLayout() {
                   transition: "background 0.2s ease", minWidth: 44, minHeight: 44,
                   display: "grid", placeItems: "center",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,16,8,0.05)")}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(23,18,8,0.05)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <Menu size={24} />

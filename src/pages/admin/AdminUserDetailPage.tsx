@@ -141,7 +141,7 @@ export default function AdminUserDetailPage() {
 
         {/* Tabs column */}
         <Card style={{ padding: 0 }}>
-          <div className="flex border-b" style={{ borderColor: "rgba(26,16,8,0.08)" }}>
+          <div className="flex border-b" style={{ borderColor: "rgba(23,18,8,0.08)" }}>
             {TABS.map((t) => (
               <button key={t}
                 onClick={() => setTab(t)}
@@ -176,7 +176,7 @@ export default function AdminUserDetailPage() {
             rows={10}
             style={{
               width: "100%", marginTop: 12, padding: 12, borderRadius: 12,
-              border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+              border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
               fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))",
               resize: "vertical", outline: "none",
             }}
@@ -189,8 +189,8 @@ export default function AdminUserDetailPage() {
             disabled={!notes.trim()}
             style={{
               marginTop: 12, height: 40, padding: "0 16px", borderRadius: 10,
-              background: notes.trim() ? "linear-gradient(135deg,#C41E1E,#8B6914)" : "rgba(26,16,8,0.06)",
-              color: notes.trim() ? "#fff" : "rgba(26,16,8,0.4)",
+              background: notes.trim() ? "linear-gradient(135deg,#C41E1E,#8B6914)" : "rgba(23,18,8,0.06)",
+              color: notes.trim() ? "#fff" : "rgba(23,18,8,0.4)",
               border: "none", cursor: notes.trim() ? "pointer" : "not-allowed",
               fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13,
             }}
@@ -220,7 +220,7 @@ export default function AdminUserDetailPage() {
 function Field({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-3"
-      style={{ paddingBottom: 10, borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+      style={{ paddingBottom: 10, borderBottom: "1px solid rgba(23,18,8,0.06)" }}>
       <span className="flex items-center gap-2" style={{ color: "hsl(var(--fyn-ink) / 0.55)", fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
         {icon} {label}
       </span>
@@ -260,7 +260,7 @@ function ActivityTab({ logs }: { logs: any[] }) {
     <ul className="space-y-3">
       {logs.map((l) => (
         <li key={l.id} className="flex items-start gap-3"
-          style={{ paddingBottom: 10, borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+          style={{ paddingBottom: 10, borderBottom: "1px solid rgba(23,18,8,0.06)" }}>
           <span className="grid place-items-center rounded-full text-white shrink-0"
             style={{ width: 28, height: 28, background: "linear-gradient(135deg,#C41E1E,#8B6914)", fontSize: 11 }}>
             {l.action?.[0]?.toUpperCase() ?? "•"}
@@ -312,7 +312,7 @@ function UsageTab() {
                 <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink))" }}>{m.module}</span>
                 <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "hsl(var(--fyn-ink) / 0.7)" }}>{m.usage}%</span>
               </div>
-              <div style={{ height: 6, borderRadius: 3, background: "rgba(26,16,8,0.08)", overflow: "hidden" }}>
+              <div style={{ height: 6, borderRadius: 3, background: "rgba(23,18,8,0.08)", overflow: "hidden" }}>
                 <div style={{ width: `${m.usage}%`, height: "100%", background: "linear-gradient(90deg,#C41E1E,#8B6914)" }} />
               </div>
             </div>
@@ -335,7 +335,7 @@ function TicketsTab({ userId: _userId }: { userId: string }) {
       {tickets.map((t) => (
         <button key={t.id} onClick={() => navigate(`/admin/support/${t.id}`)}
           className="w-full text-left rounded-lg p-4 hover:bg-[hsl(var(--fyn-ink)/0.03)]"
-          style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(26,16,8,0.1)" }}>
+          style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(23,18,8,0.1)" }}>
           <div className="flex items-center justify-between">
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "#8B6914", fontWeight: 600 }}>{t.number}</span>
             <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "hsl(var(--fyn-ink) / 0.55)" }}>{t.created}</span>

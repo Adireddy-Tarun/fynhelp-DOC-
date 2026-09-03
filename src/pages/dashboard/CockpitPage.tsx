@@ -105,7 +105,7 @@ function StatCard({
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="bg-card border border-border rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_12px_30px_rgba(26,16,8,0.10)] transition-shadow"
+      className="bg-card border border-border rounded-lg p-fyn-lg shadow-[0_2px_8px_rgba(23,18,8,0.04)] hover:shadow-[0_12px_30px_rgba(23,18,8,0.10)] transition-shadow"
     >
       <div className="flex items-center gap-fyn-sm mb-fyn-sm">
         <div
@@ -158,13 +158,13 @@ function ModuleCard({ module, locked, onOpen }: { module: Module; locked: boolea
       animate={{ rotateX: tilt.x, rotateY: tilt.y }}
       transition={{ type: "spring", stiffness: 250, damping: 22 }}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-      className="text-left bg-card border border-border rounded-xl p-6 h-full w-full flex flex-col hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(26,16,8,0.04)] hover:shadow-[0_14px_30px_rgba(26,16,8,0.12)] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red"
+      className="text-left bg-card border border-border rounded-xl p-6 h-full w-full flex flex-col hover:border-fyn-red transition-colors shadow-[0_2px_8px_rgba(23,18,8,0.04)] hover:shadow-[0_14px_30px_rgba(23,18,8,0.12)] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-fyn-red"
     >
       <div className="flex items-start justify-between mb-fyn-sm">
         <div
           className="w-11 h-11 rounded-md flex items-center justify-center"
           style={{
-            background: isSoon ? "rgba(26,16,8,0.06)" : "linear-gradient(135deg, hsl(var(--fyn-red) / 0.10) 0%, hsl(var(--fyn-gold) / 0.10) 100%)",
+            background: isSoon ? "rgba(23,18,8,0.06)" : "linear-gradient(135deg, hsl(var(--fyn-red) / 0.10) 0%, hsl(var(--fyn-gold) / 0.10) 100%)",
             color: isSoon ? "hsl(var(--fyn-ink) / 0.40)" : "hsl(var(--fyn-red))",
           }}
         >
@@ -478,9 +478,9 @@ const CockpitPage = () => {
                   <stop offset="100%" stopColor="#DC2626" stopOpacity={0.01} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }}
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "rgba(23,18,8,0.45)" }}
                 interval={Math.max(0, Math.floor(view.cashFlow.length / 8))} />
-              <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }}
+              <YAxis tick={{ fontSize: 11, fill: "rgba(23,18,8,0.45)" }}
                 tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
               <Tooltip
                 contentStyle={{ background: "hsl(var(--foreground))", border: "none", borderRadius: 8, color: "hsl(var(--background))" }}
@@ -521,7 +521,7 @@ const CockpitPage = () => {
       {/* Bottom: Fynny insight + Recent activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-fyn-lg mb-fyn-lg">
         {/* Fynny insight */}
-        <div className="rounded-lg p-fyn-lg bg-card border border-border shadow-[0_12px_30px_rgba(26,16,8,0.18)]">
+        <div className="rounded-lg p-fyn-lg bg-card border border-border shadow-[0_12px_30px_rgba(23,18,8,0.18)]">
           <div className="flex items-start gap-fyn-sm">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
@@ -604,7 +604,7 @@ const CockpitPage = () => {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-fyn-md"
-            style={{ background: "rgba(26,16,8,0.55)", backdropFilter: "blur(6px)" }}
+            style={{ background: "rgba(23,18,8,0.55)", backdropFilter: "blur(6px)" }}
             onClick={() => setShowFynnyChat(false)}
           >
             <motion.div

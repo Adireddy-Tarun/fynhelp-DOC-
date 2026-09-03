@@ -266,11 +266,11 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
                       <stop offset="100%" stopColor="#C41E1E" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
-                  <XAxis dataKey="period" tick={{ fill: "#1A1008", fontSize: 12 }} />
-                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" />
+                  <XAxis dataKey="period" tick={{ fill: "#171208", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
                   <Tooltip
-                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
                     formatter={(v: number) => formatINR(v)}
                   />
                   <Area type="monotone" dataKey="inflow" stroke="#16A34A" fill="url(#inflowFill)" strokeWidth={2} name="Inflow" />
@@ -290,11 +290,11 @@ function LiquidityContent({ data }: { data: LiquidityResponse }) {
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={forecast} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
-                  <XAxis dataKey="month" tick={{ fill: "#1A1008", fontSize: 12 }} />
-                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" />
+                  <XAxis dataKey="month" tick={{ fill: "#171208", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
                   <Tooltip
-                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
                     formatter={(v: number) => formatINR(v)}
                   />
                   <Line type="monotone" dataKey="balance" stroke="#C41E1E" strokeWidth={2.5} dot={{ r: 4, fill: "#C41E1E" }} name="Ending Balance" />
@@ -397,11 +397,11 @@ function CategoryChart({ data, color }: { data: Array<{ category: string; amount
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" horizontal={false} />
-          <XAxis type="number" tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
-          <YAxis dataKey="category" type="category" tick={{ fill: "#1A1008", fontSize: 12 }} width={110} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" horizontal={false} />
+          <XAxis type="number" tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+          <YAxis dataKey="category" type="category" tick={{ fill: "#171208", fontSize: 12 }} width={110} />
           <Tooltip
-            contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+            contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
             formatter={(v: number) => formatINR(v)}
           />
           <Bar dataKey="amount" fill={color} radius={[0, 4, 4, 0]} />

@@ -18,11 +18,11 @@ type Sub = {
 };
 
 const PLAN_COLORS: Record<string, string> = {
-  free_trial: "#8B6914", starter: "#3B82F6", pro: "#10B981", enterprise: "#C41E1E",
+  free_trial: "#8B6914", starter: "#3B82F6", pro: "#1F5A46", enterprise: "#C41E1E",
 };
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   active:    { bg: "rgba(16,185,129,0.15)",  fg: "#0F8F65" },
-  cancelled: { bg: "rgba(26,16,8,0.1)",      fg: "hsl(var(--fyn-ink))" },
+  cancelled: { bg: "rgba(23,18,8,0.1)",      fg: "hsl(var(--fyn-ink))" },
   suspended: { bg: "rgba(196,30,30,0.15)",   fg: "#C41E1E" },
   past_due:  { bg: "rgba(234,140,30,0.15)",  fg: "#C26B00" },
 };
@@ -147,10 +147,10 @@ export default function AdminSubscriptionsPage() {
                   <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-              <XAxis dataKey="m" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontFamily:"DM Sans, sans-serif", fontSize:12 }} />
-              <YAxis stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontFamily:"DM Sans, sans-serif", fontSize:12 }} unit="L" />
-              <Tooltip contentStyle={{ background:"#1A1008", border:"none", borderRadius:8, color:"#fff", fontFamily:"Roboto, sans-serif", fontSize:13 }} formatter={(v: any) => [`₹${v}L`, "MRR"]} />
+              <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
+              <XAxis dataKey="m" stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontFamily:"DM Sans, sans-serif", fontSize:12 }} />
+              <YAxis stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontFamily:"DM Sans, sans-serif", fontSize:12 }} unit="L" />
+              <Tooltip contentStyle={{ background:"#171208", border:"none", borderRadius:8, color:"#fff", fontFamily:"Roboto, sans-serif", fontSize:13 }} formatter={(v: any) => [`₹${v}L`, "MRR"]} />
               <Area type="monotone" dataKey="mrr" stroke="#C41E1E" strokeWidth={3} fill="url(#subsRevenue)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -177,7 +177,7 @@ export default function AdminSubscriptionsPage() {
         <Card style={{ padding: 0, overflow: "hidden" }}>
           <table style={{ width:"100%", borderCollapse:"collapse" }}>
             <thead>
-              <tr style={{ background:"rgba(26,16,8,0.04)" }}>
+              <tr style={{ background:"rgba(23,18,8,0.04)" }}>
                 {["Plan","Users","MRR","Avg/User"].map((h) => (
                   <th key={h} style={th}>{h}</th>
                 ))}
@@ -185,7 +185,7 @@ export default function AdminSubscriptionsPage() {
             </thead>
             <tbody>
               {Object.entries(planDist).map(([k,v]) => (
-                <tr key={k} style={{ borderTop:"1px solid rgba(26,16,8,0.06)" }}>
+                <tr key={k} style={{ borderTop:"1px solid rgba(23,18,8,0.06)" }}>
                   <td style={td}><PlanBadge plan={k} /></td>
                   <td style={td}>{v.count}</td>
                   <td style={td}>{fmtINR(v.mrr)}</td>
@@ -233,7 +233,7 @@ export default function AdminSubscriptionsPage() {
         <div className="overflow-x-auto">
           <table style={{ width:"100%", borderCollapse:"collapse", minWidth: 960 }}>
             <thead>
-              <tr style={{ background:"rgba(26,16,8,0.04)", borderBottom:"2px solid rgba(139,105,20,0.2)" }}>
+              <tr style={{ background:"rgba(23,18,8,0.04)", borderBottom:"2px solid rgba(139,105,20,0.2)" }}>
                 {["User","Business","Plan","Status","MRR","Cycle","Next Billing","Started","Actions"].map((h) => (
                   <th key={h} style={th}>{h}</th>
                 ))}
@@ -243,7 +243,7 @@ export default function AdminSubscriptionsPage() {
               {visible.map((s, i) => (
                 <tr key={s.id} style={{
                   background: i%2 ? "rgba(244,237,218,0.3)" : "#fff",
-                  borderBottom: "1px solid rgba(26,16,8,0.06)",
+                  borderBottom: "1px solid rgba(23,18,8,0.06)",
                 }}>
                   <td style={td}>{s.user_id ? s.user_id.slice(0,8) : "-"}</td>
                   <td style={td}>{s.business_id ? s.business_id.slice(0,8) : "-"}</td>
@@ -284,7 +284,7 @@ function Metric({ label, value, trend, icon }: { label: string; value: string; t
         <span className="grid place-items-center rounded-full"
           style={{ width:48, height:48, background:"linear-gradient(135deg, rgba(196,30,30,0.1), rgba(139,105,20,0.1))" }}>{icon}</span>
         {typeof trend === "number" && (
-          <span style={{ color: trend >= 0 ? "#10B981" : "#DC2626", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:13 }}>
+          <span style={{ color: trend >= 0 ? "#1F5A46" : "#DC2626", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:13 }}>
             {trend > 0 ? "+" : ""}{trend}%
           </span>
         )}
@@ -325,7 +325,7 @@ function ActionsMenu({ onChangePlan, onRefund, onSuspend, onCancel }: { onChange
         <>
           <div className="fixed inset-0 z-10" onClick={()=>setOpen(false)} />
           <div className="absolute right-0 mt-1 z-20 rounded-xl overflow-hidden"
-            style={{ width:200, background:"#fff", border:"1px solid rgba(139,105,20,0.2)", boxShadow:"0 12px 32px rgba(26,16,8,0.15)" }}>
+            style={{ width:200, background:"#fff", border:"1px solid rgba(139,105,20,0.2)", boxShadow:"0 12px 32px rgba(23,18,8,0.15)" }}>
             {[
               { l:"Change Plan",  fn:onChangePlan },
               { l:"Suspend",      fn:onSuspend },
@@ -368,7 +368,7 @@ function ChangePlanModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
       </label>
       <label style={lbl}>Reason</label>
       <textarea value={reason} onChange={(e)=>setReason(e.target.value)} rows={3} placeholder="Why are you changing this plan?"
-        style={{ width:"100%", padding:12, borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", fontFamily:"Roboto, sans-serif", fontSize:14, outline:"none" }} />
+        style={{ width:"100%", padding:12, borderRadius:12, border:"1px solid rgba(23,18,8,0.15)", fontFamily:"Roboto, sans-serif", fontSize:14, outline:"none" }} />
       <div className="flex justify-end gap-3 mt-6">
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <PrimaryBtn onClick={async () => {
@@ -395,7 +395,7 @@ function RefundModal({ sub, onClose }: { sub: Sub; onClose: () => void }) {
       </select>
       <label style={lbl}>Notes</label>
       <textarea value={notes} onChange={(e)=>setNotes(e.target.value)} rows={3} placeholder="Internal notes about refund"
-        style={{ width:"100%", padding:12, borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", fontFamily:"Roboto, sans-serif", fontSize:14, outline:"none" }} />
+        style={{ width:"100%", padding:12, borderRadius:12, border:"1px solid rgba(23,18,8,0.15)", fontFamily:"Roboto, sans-serif", fontSize:14, outline:"none" }} />
       <div className="flex justify-end gap-3 mt-6">
         <SecondaryBtn onClick={onClose}>Cancel</SecondaryBtn>
         <button onClick={async () => {
@@ -417,9 +417,9 @@ function ModalShell({ title, onClose, children }: { title: string; onClose: () =
       <div onClick={(e)=>e.stopPropagation()} className="w-full max-w-[500px]" style={{
         background:"rgba(255,255,255,0.98)", backdropFilter:"blur(20px)",
         borderRadius:20, border:"1px solid rgba(139,105,20,0.2)",
-        boxShadow:"0 24px 60px rgba(26,16,8,0.25)", maxHeight:"90vh", overflow:"auto",
+        boxShadow:"0 24px 60px rgba(23,18,8,0.25)", maxHeight:"90vh", overflow:"auto",
       }}>
-        <div className="flex items-center justify-between p-6" style={{ borderBottom:"1px solid rgba(26,16,8,0.08)" }}>
+        <div className="flex items-center justify-between p-6" style={{ borderBottom:"1px solid rgba(23,18,8,0.08)" }}>
           <h3 style={{ fontFamily:"Oswald, sans-serif", fontWeight:700, fontSize:24, color:"hsl(var(--fyn-ink))" }}>{title}</h3>
           <button onClick={onClose} style={{ background:"transparent", border:"none", cursor:"pointer" }}><X size={22} /></button>
         </div>
@@ -437,9 +437,9 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 const PrimaryBtn = (p: any) => <button {...p} style={{ height:44, padding:"0 22px", borderRadius:12, background:"linear-gradient(135deg,#C41E1E,#8B6914)", color:"#fff", border:"none", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>{p.children}</button>;
-const SecondaryBtn = (p: any) => <button {...p} style={{ height:44, padding:"0 22px", borderRadius:12, background:"transparent", border:"2px solid rgba(26,16,8,0.15)", color:"hsl(var(--fyn-ink))", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>{p.children}</button>;
+const SecondaryBtn = (p: any) => <button {...p} style={{ height:44, padding:"0 22px", borderRadius:12, background:"transparent", border:"2px solid rgba(23,18,8,0.15)", color:"hsl(var(--fyn-ink))", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>{p.children}</button>;
 const lbl: React.CSSProperties = { display:"block", fontFamily:"Roboto, sans-serif", fontSize:13, color:"hsl(var(--fyn-ink) / 0.7)", marginTop:14, marginBottom:6 };
 const th: React.CSSProperties = { padding:"14px 16px", textAlign:"left", fontFamily:"Raleway, sans-serif", fontWeight:600, fontSize:13, color:"hsl(var(--fyn-ink))" };
 const td: React.CSSProperties = { padding:"14px 16px", fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink) / 0.85)" };
-const inputStyle: React.CSSProperties = { height:48, padding:"0 14px 0 38px", borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:15, color:"hsl(var(--fyn-ink))", outline:"none", width:"100%" };
-const selectStyle: React.CSSProperties = { height:48, padding:"0 14px", borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))", minWidth:160 };
+const inputStyle: React.CSSProperties = { height:48, padding:"0 14px 0 38px", borderRadius:12, border:"1px solid rgba(23,18,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:15, color:"hsl(var(--fyn-ink))", outline:"none", width:"100%" };
+const selectStyle: React.CSSProperties = { height:48, padding:"0 14px", borderRadius:12, border:"1px solid rgba(23,18,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))", minWidth:160 };

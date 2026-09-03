@@ -90,7 +90,7 @@ export default function CostTab() {
                   <div key={row.category}>
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="text-fyn-ink">{row.category}</span>
-                      <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(row.total)} <span className="text-[#6B6B6B] text-xs">({pct.toFixed(0)}%)</span></span>
+                      <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(row.total)} <span className="text-[rgba(23,18,8,0.62)] text-xs">({pct.toFixed(0)}%)</span></span>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div className="h-full" style={{ width: `${Math.min(100, pct * 2)}%`, background: `linear-gradient(to right, ${ACCENT.red}, ${ACCENT.redLight})` }} />
@@ -111,7 +111,7 @@ export default function CostTab() {
               <table className="w-full text-sm">
                 <tbody>
                   {rows.map((v) => (
-                    <tr key={v.id} onClick={() => openDrawer("vendor", v.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                    <tr key={v.id} onClick={() => openDrawer("vendor", v.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2 text-xs text-fyn-ink font-medium">{v.name}</td>
                       <td className="py-2 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(v.total)}</td>
                     </tr>
@@ -131,7 +131,7 @@ export default function CostTab() {
           </div>
           <div className="space-y-2">
             <button onClick={() => setSpendOpen(true)} className="w-full text-xs font-medium py-2 rounded-md text-white hover:opacity-90 transition-opacity" style={{ background: ACCENT.red }}>Set Up Spend Controls</button>
-            <div className="grid grid-cols-3 gap-2 text-[11px] text-[#6B6B6B] text-center">
+            <div className="grid grid-cols-3 gap-2 text-[11px] text-[rgba(23,18,8,0.62)] text-center">
               <span>Approval Workflow</span>
               <span>Centralize Procurement</span>
               <span>Audit Last 90 Days</span>

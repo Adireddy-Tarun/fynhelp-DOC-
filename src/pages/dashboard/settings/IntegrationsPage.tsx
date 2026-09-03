@@ -33,15 +33,15 @@ const CARD: React.CSSProperties = {
 
 const SectionTitle = ({ title, sub }: { title: string; sub?: string }) => (
   <>
-    <h2 style={{ fontWeight: 600, fontSize: 16, color: "#1A1008", marginBottom: 4 }}>{title}</h2>
-    {sub && <p style={{ fontWeight: 400, fontSize: 13, color: "rgba(26,16,8,0.55)", marginBottom: 24 }}>{sub}</p>}
+    <h2 style={{ fontWeight: 600, fontSize: 16, color: "#171208", marginBottom: 4 }}>{title}</h2>
+    {sub && <p style={{ fontWeight: 400, fontSize: 13, color: "rgba(23,18,8,0.55)", marginBottom: 24 }}>{sub}</p>}
   </>
 );
 
 const StatusChip = ({ kind }: { kind: "connected" | "disconnected" | "active" }) => {
   const styles = {
     connected: { bg: "#F0FDF4", color: "#166534", border: "#A7F3D0", dot: "#16A34A", label: "CONNECTED" },
-    disconnected: { bg: "#FAF7F0", color: "rgba(26,16,8,0.45)", border: "#D4C9A8", dot: "transparent", label: "NOT CONNECTED" },
+    disconnected: { bg: "#FAF7F0", color: "rgba(23,18,8,0.45)", border: "#D4C9A8", dot: "transparent", label: "NOT CONNECTED" },
     active: { bg: "#EFF6FF", color: "#1E40AF", border: "#BFDBFE", dot: "#3B82F6", label: "ACTIVE" },
   }[kind];
   return (
@@ -79,7 +79,7 @@ const ConnectBtn = ({
   </button>
 );
 
-const GhostBtn = ({ children, onClick, color = "rgba(26,16,8,0.50)" }: { children: React.ReactNode; onClick?: () => void; color?: string }) => (
+const GhostBtn = ({ children, onClick, color = "rgba(23,18,8,0.50)" }: { children: React.ReactNode; onClick?: () => void; color?: string }) => (
   <button
     onClick={onClick}
     style={{
@@ -101,7 +101,7 @@ type LogoSpec =
 const LogoBox = ({ logo }: { logo: LogoSpec }) => (
   <div style={{
     width: 40, height: 40, borderRadius: 8,
-    border: "0.5px solid rgba(26,16,8,0.08)",
+    border: "0.5px solid rgba(23,18,8,0.08)",
     background: "#FFFFFF", padding: 6, flexShrink: 0,
     display: "flex", alignItems: "center", justifyContent: "center",
     marginRight: 8,
@@ -130,8 +130,8 @@ const Row = ({
     <div style={{ display: "flex", alignItems: "center", minHeight: 72, gap: 12 }}>
       <LogoBox logo={logo} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 600, fontSize: 14, color: "#1A1008" }}>{name}</div>
-        <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.50)" }}>{method}</div>
+        <div style={{ fontWeight: 600, fontSize: 14, color: "#171208" }}>{name}</div>
+        <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(23,18,8,0.50)" }}>{method}</div>
         {sub && <div style={{ fontWeight: 500, fontSize: 11, color: "#8B6914", marginTop: 2 }}>{sub}</div>}
         {note && <div style={{ fontWeight: 500, fontSize: 11, color: "#8B6914", marginTop: 4 }}>{note}</div>}
       </div>
@@ -153,13 +153,13 @@ const L = {
   paytm:    { kind: "img", slug: "paytm", color: "00BAF2", alt: "Paytm" } as LogoSpec,
   instamojo: { kind: "icon", Icon: CreditCard, color: "#E83A65" } as LogoSpec,
   razorpayx: { kind: "img", slug: "razorpay", color: "0F1F4D", alt: "RazorpayX" } as LogoSpec,
-  bank:     { kind: "icon", Icon: Landmark, color: "#1A1008" } as LogoSpec,
+  bank:     { kind: "icon", Icon: Landmark, color: "#171208" } as LogoSpec,
   fi:       { kind: "icon", Icon: Landmark, color: "#00C896" } as LogoSpec,
   jupiter:  { kind: "icon", Icon: Landmark, color: "#FF6900" } as LogoSpec,
   shopify:  { kind: "img", slug: "shopify", color: "7AB55C", alt: "Shopify" } as LogoSpec,
   woo:      { kind: "img", slug: "woocommerce", color: "96588A", alt: "WooCommerce" } as LogoSpec,
   amazon:   { kind: "img", slug: "amazon", color: "FF9900", alt: "Amazon" } as LogoSpec,
-  fynd:     { kind: "icon", Icon: FileSpreadsheet, color: "#1A1008" } as LogoSpec,
+  fynd:     { kind: "icon", Icon: FileSpreadsheet, color: "#171208" } as LogoSpec,
   zoho:     { kind: "img", slug: "zoho", color: "E42527", alt: "Zoho" } as LogoSpec,
   hubspot:  { kind: "img", slug: "hubspot", color: "FF7A59", alt: "HubSpot" } as LogoSpec,
   qb:       { kind: "img", slug: "quickbooks", color: "2CA01C", alt: "QuickBooks" } as LogoSpec,
@@ -170,7 +170,7 @@ const L = {
   slack:    { kind: "img", slug: "slack", color: "4A154B", alt: "Slack" } as LogoSpec,
   telegram: { kind: "icon", Icon: Send, color: "#26A5E4" } as LogoSpec,
   whatsapp: { kind: "img", slug: "whatsapp", color: "25D366", alt: "WhatsApp" } as LogoSpec,
-  email:    { kind: "icon", Icon: Mail, color: "#1A1008" } as LogoSpec,
+  email:    { kind: "icon", Icon: Mail, color: "#171208" } as LogoSpec,
   sheets:   { kind: "img", slug: "googlesheets", color: "34A853", alt: "Google Sheets" } as LogoSpec,
   upload:   { kind: "icon", Icon: Upload, color: "#8B6914" } as LogoSpec,
   doc:      { kind: "icon", Icon: FileText, color: "#1E40AF" } as LogoSpec,
@@ -583,7 +583,7 @@ const IntegrationsPage = () => {
     <div style={PAGE_WRAP}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
         <div>
-          <h1 style={{ fontWeight: 700, fontSize: 28, color: "#1A1008", letterSpacing: "-0.02em" }}>Integrations</h1>
+          <h1 style={{ fontWeight: 700, fontSize: 28, color: "#171208", letterSpacing: "-0.02em" }}>Integrations</h1>
           <p style={{ fontWeight: 400, fontSize: 15, color: "#4A4540", marginTop: 6, lineHeight: 1.6 }}>
             Connect FynHelp to your banks, accounting software, payroll tools, and GST systems.
           </p>
@@ -591,7 +591,7 @@ const IntegrationsPage = () => {
         <div style={{ display: "flex", gap: 8, flexShrink: 0, marginTop: 6 }}>
           <span style={{
             background: "#FAF7F0", border: "1px solid #D4C9A8", borderRadius: 100,
-            padding: "4px 12px", fontSize: 12, fontWeight: 600, color: "#1A1008",
+            padding: "4px 12px", fontSize: 12, fontWeight: 600, color: "#171208",
             letterSpacing: "0.01em",
           }}>
             {TOTAL} integrations
@@ -629,10 +629,10 @@ const IntegrationsPage = () => {
           <SectionTitle title={s.title} sub={s.sub} />
           {s.title === "Banking" && (
             <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #F0EBD8" }}>
-              <div style={{ fontWeight: 600, fontSize: 13, color: "#1A1008", marginBottom: 4 }}>
+              <div style={{ fontWeight: 600, fontSize: 13, color: "#171208", marginBottom: 4 }}>
                 Bank Statement Import
               </div>
-              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.55)", marginBottom: 14 }}>
+              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(23,18,8,0.55)", marginBottom: 14 }}>
                 Upload a CSV or Excel export from your bank to import transactions instantly.
               </div>
               <BankStatementImport />

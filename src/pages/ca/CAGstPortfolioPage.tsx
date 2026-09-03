@@ -281,7 +281,7 @@ export default function CAGstPortfolioPage() {
   return (
     <PageWrap>
       <GspLimitationBanner />
-      <div className="text-[13px] mb-2" style={{ color: "rgba(26,16,8,0.45)" }}>
+      <div className="text-[13px] mb-2" style={{ color: "rgba(23,18,8,0.45)" }}>
         Dashboard / GST Portfolio
       </div>
 
@@ -332,7 +332,7 @@ export default function CAGstPortfolioPage() {
             <option value="filing">Sort: Last Filing Date</option>
           </select>
           {filtersActive && <GhostLink onClick={clearFilters}>Clear filters</GhostLink>}
-          <div className="ml-auto text-[12px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+          <div className="ml-auto text-[12px]" style={{ color: "rgba(23,18,8,0.55)" }}>
             {filtered.length} of {clients.length} clients
           </div>
         </div>
@@ -352,7 +352,7 @@ export default function CAGstPortfolioPage() {
           <div className="py-12 text-center">
             <FileText size={40} style={{ color: COLORS.caBorder }} className="mx-auto mb-3" />
             <h4 className="text-[16px] font-semibold mb-1" style={{ color: COLORS.ink }}>No GST data available</h4>
-            <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+            <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.55)" }}>
               {clients.length === 0 ? "Add clients to view portfolio-wide GST health." : "No clients match your filters."}
             </p>
           </div>
@@ -360,7 +360,7 @@ export default function CAGstPortfolioPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
+                <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.50)" }}>
                   <th className="py-2">Client</th>
                   <th className="py-2">GSTIN</th>
                   <th className="py-2">Notice Risk</th>
@@ -381,10 +381,10 @@ export default function CAGstPortfolioPage() {
                     <tr key={r.business_id} className="hover:bg-[#FAF7F0] cursor-pointer" style={{ borderTop: `1px solid ${COLORS.divider}` }} onClick={() => navigate(`/ca/clients/${r.business_id}?tab=GST%20%26%20ITC`)}>
                       <td className="py-3">
                         <div className="font-medium">{r.business_name}</div>
-                        {r.industry && <div className="text-[12px]" style={{ color: "rgba(26,16,8,0.45)" }}>{r.industry}</div>}
+                        {r.industry && <div className="text-[12px]" style={{ color: "rgba(23,18,8,0.45)" }}>{r.industry}</div>}
                       </td>
                       <td className="py-3 group">
-                        <div className="flex items-center gap-1.5 text-[12px] font-mono" style={{ color: "rgba(26,16,8,0.65)" }}>
+                        <div className="flex items-center gap-1.5 text-[12px] font-mono" style={{ color: "rgba(23,18,8,0.65)" }}>
                           <span>{r.gstin || "-"}</span>
                           {r.gstin && (
                             <button onClick={(e) => { e.stopPropagation(); copyGstin(r.gstin!); }} className="opacity-0 group-hover:opacity-100">
@@ -402,7 +402,7 @@ export default function CAGstPortfolioPage() {
                       <td className="py-3 font-semibold" style={{ color: COLORS.green }}>{formatINRCompact(r.itc_safe)}</td>
                       <td className="py-3">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-semibold" style={{ color: r.itc_at_risk > 0 ? COLORS.red : "rgba(26,16,8,0.25)" }}>
+                          <span className="font-semibold" style={{ color: r.itc_at_risk > 0 ? COLORS.red : "rgba(23,18,8,0.25)" }}>
                             {formatINRCompact(r.itc_at_risk)}
                           </span>
                           {r.itc_at_risk > 500000 && <AlertTriangle size={14} style={{ color: COLORS.red }} />}
@@ -412,9 +412,9 @@ export default function CAGstPortfolioPage() {
                         {r.last_filed ? (
                           <>
                             <div>{monthYear(r.last_filed.date)}</div>
-                            <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.45)" }}>{daysAgo(r.last_filed.date)}</div>
+                            <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.45)" }}>{daysAgo(r.last_filed.date)}</div>
                           </>
-                        ) : <span style={{ color: "rgba(26,16,8,0.35)" }}>-</span>}
+                        ) : <span style={{ color: "rgba(23,18,8,0.35)" }}>-</span>}
                       </td>
                       <td className="py-3 text-[13px]">
                         {r.next_due ? (
@@ -422,7 +422,7 @@ export default function CAGstPortfolioPage() {
                             <span className="w-1.5 h-1.5 rounded-full" style={{ background: dueColor }} />
                             <div>
                               <div className="font-medium">{r.next_due.name}</div>
-                              <div className="text-[11px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+                              <div className="text-[11px]" style={{ color: "rgba(23,18,8,0.55)" }}>
                                 {new Date(r.next_due.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                               </div>
                             </div>
@@ -448,7 +448,7 @@ export default function CAGstPortfolioPage() {
         <Card>
           <h4 className="text-[14px] font-semibold mb-4">Top 5 Clients by ITC at Risk</h4>
           {topByRisk.length === 0 ? (
-            <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.50)" }}>No ITC at risk across portfolio.</p>
+            <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.50)" }}>No ITC at risk across portfolio.</p>
           ) : (
             <div className="space-y-3">
               {topByRisk.map((c) => {
@@ -473,7 +473,7 @@ export default function CAGstPortfolioPage() {
         <Card>
           <h4 className="text-[14px] font-semibold mb-4">Top 5 Clients by Notice Risk</h4>
           {topByNotice.length === 0 ? (
-            <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.50)" }}>No data.</p>
+            <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.50)" }}>No data.</p>
           ) : (
             <div className="space-y-3">
               {topByNotice.map((c) => {
@@ -496,18 +496,18 @@ export default function CAGstPortfolioPage() {
 
         <Card>
           <h4 className="text-[14px] font-semibold mb-1">Filing Compliance Rate</h4>
-          <p className="text-[12px] mb-4" style={{ color: "rgba(26,16,8,0.55)" }}>Clients with no overdue/upcoming GSTR pending</p>
+          <p className="text-[12px] mb-4" style={{ color: "rgba(23,18,8,0.55)" }}>Clients with no overdue/upcoming GSTR pending</p>
           <div className="flex flex-col items-center justify-center py-4">
             <div className="text-[56px] font-bold leading-none" style={{ color: filingComplianceRate >= 95 ? COLORS.green : filingComplianceRate >= 85 ? COLORS.amber : COLORS.red }}>
               {filingComplianceRate}%
             </div>
-            <p className="text-[13px] mt-2" style={{ color: "rgba(26,16,8,0.55)" }}>of clients filed on time</p>
+            <p className="text-[13px] mt-2" style={{ color: "rgba(23,18,8,0.55)" }}>of clients filed on time</p>
           </div>
         </Card>
 
         <Card>
           <h4 className="text-[14px] font-semibold mb-1">ITC Risk Breakdown</h4>
-          <p className="text-[12px] mb-4" style={{ color: "rgba(26,16,8,0.55)" }}>Risk across portfolio</p>
+          <p className="text-[12px] mb-4" style={{ color: "rgba(23,18,8,0.55)" }}>Risk across portfolio</p>
           <div className="space-y-2">
             {[
               { label: "Vendor Non-Compliance", pct: 38, color: COLORS.red },
@@ -532,18 +532,18 @@ export default function CAGstPortfolioPage() {
       {/* Vendor health */}
       <Card>
         <h3 className="text-[15px] font-semibold mb-1">Vendor Health Across Portfolio</h3>
-        <p className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>
+        <p className="text-[13px] mb-4" style={{ color: "rgba(23,18,8,0.60)" }}>
           Common vendors across multiple clients.
         </p>
         {loading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 rounded animate-pulse" style={{ background: COLORS.divider }} />)}</div>
         ) : vendors.length === 0 ? (
-          <p className="text-[13px] py-4" style={{ color: "rgba(26,16,8,0.50)" }}>No vendor health data available yet.</p>
+          <p className="text-[13px] py-4" style={{ color: "rgba(23,18,8,0.50)" }}>No vendor health data available yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase" style={{ color: "rgba(26,16,8,0.50)" }}>
+                <tr className="text-left text-[11px] uppercase" style={{ color: "rgba(23,18,8,0.50)" }}>
                   <th className="py-2">GSTIN</th><th className="py-2">Vendor</th>
                   <th className="py-2">Clients</th><th className="py-2">Compliance</th><th className="py-2">Risk</th>
                 </tr>
@@ -641,7 +641,7 @@ function ReconModal({ clients, onClose, caFirmId }: { clients: ClientRow[]; onCl
           <div className="flex items-start justify-between mb-1">
             <div>
               <h2 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>Run Portfolio ITC Reconciliation</h2>
-              <p className="text-[13px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
+              <p className="text-[13px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>
                 Reconcile ITC across selected clients
               </p>
             </div>
@@ -660,20 +660,20 @@ function ReconModal({ clients, onClose, caFirmId }: { clients: ClientRow[]; onCl
                 </div>
                 <div className="rounded-md max-h-[200px] overflow-y-auto" style={{ border: `1px solid ${COLORS.caBorder}` }}>
                   {clients.length === 0 ? (
-                    <p className="p-4 text-[13px]" style={{ color: "rgba(26,16,8,0.50)" }}>No clients available</p>
+                    <p className="p-4 text-[13px]" style={{ color: "rgba(23,18,8,0.50)" }}>No clients available</p>
                   ) : clients.map((c) => (
                     <label key={c.business_id} className="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer hover:bg-[#FAF7F0]" style={{ borderBottom: `1px solid ${COLORS.divider}` }}>
                       <div className="flex items-center gap-2.5 min-w-0">
                         <input type="checkbox" checked={selected.has(c.business_id)} onChange={() => toggle(c.business_id)} />
                         <span className="text-[13px] font-medium truncate">{c.business_name}</span>
                       </div>
-                      <span className="text-[12px] font-semibold whitespace-nowrap" style={{ color: c.itc_at_risk > 0 ? COLORS.red : "rgba(26,16,8,0.40)" }}>
+                      <span className="text-[12px] font-semibold whitespace-nowrap" style={{ color: c.itc_at_risk > 0 ? COLORS.red : "rgba(23,18,8,0.40)" }}>
                         {c.itc_at_risk > 0 ? `${formatINRCompact(c.itc_at_risk)} at risk` : "Safe"}
                       </span>
                     </label>
                   ))}
                 </div>
-                <p className="text-[12px] mt-1.5" style={{ color: "rgba(26,16,8,0.55)" }}>{selected.size} of {clients.length} selected</p>
+                <p className="text-[12px] mt-1.5" style={{ color: "rgba(23,18,8,0.55)" }}>{selected.size} of {clients.length} selected</p>
               </div>
 
               {/* Period */}
@@ -711,7 +711,7 @@ function ReconModal({ clients, onClose, caFirmId }: { clients: ClientRow[]; onCl
             <div className="mt-5">
               <div className="mb-2 flex items-center justify-between text-[13px]">
                 <span className="font-medium">{done ? "Complete" : `Processing… ${progress}%`}</span>
-                <span style={{ color: "rgba(26,16,8,0.55)" }}>{logs.length} of {selected.size}</span>
+                <span style={{ color: "rgba(23,18,8,0.55)" }}>{logs.length} of {selected.size}</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden mb-4" style={{ background: COLORS.divider }}>
                 <div style={{ width: `${progress}%`, background: COLORS.red, height: "100%", transition: "width .3s" }} />
@@ -720,7 +720,7 @@ function ReconModal({ clients, onClose, caFirmId }: { clients: ClientRow[]; onCl
                 {logs.map((l, i) => (
                   <div key={i} style={{ color: l.startsWith("⚠") ? COLORS.red : COLORS.green }}>{l}</div>
                 ))}
-                {running && <div className="flex items-center gap-2" style={{ color: "rgba(26,16,8,0.55)" }}><Loader2 size={12} className="animate-spin" /> Working…</div>}
+                {running && <div className="flex items-center gap-2" style={{ color: "rgba(23,18,8,0.55)" }}><Loader2 size={12} className="animate-spin" /> Working…</div>}
               </div>
             </div>
           )}
