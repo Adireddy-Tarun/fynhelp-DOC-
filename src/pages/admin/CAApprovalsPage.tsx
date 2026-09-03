@@ -42,26 +42,26 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "rejected", label: "Rejected" },
 ];
 
-const TEAL = "#0F6E56";
-const INK = "#1A1A1A";
+const TEAL = "#A93838";
+const INK = "#171208";
 const BORDER = "rgba(26,26,26,0.10)";
 const PAGE_SIZE = 10;
 
 const BADGE: Record<string, { bg: string; fg: string; label: string }> = {
   pending: { bg: "#FDF3DC", fg: "#8A6100", label: "Pending" },
-  approved: { bg: "#E3F5EC", fg: "#0F6E56", label: "Approved" },
+  approved: { bg: "rgba(169,56,56,0.10)", fg: "#A93838", label: "Approved" },
   rejected: { bg: "#FCE8E8", fg: "#A93838", label: "Rejected" },
 };
 
 const LOG_BADGE: Record<string, { bg: string; fg: string }> = {
-  approved: { bg: "#E3F5EC", fg: "#0F6E56" },
-  approve: { bg: "#E3F5EC", fg: "#0F6E56" },
+  approved: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
+  approve: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
   rejected: { bg: "#FCE8E8", fg: "#A93838" },
   reject: { bg: "#FCE8E8", fg: "#A93838" },
   suspended: { bg: "#FDF3DC", fg: "#8A6100" },
   suspend: { bg: "#FDF3DC", fg: "#8A6100" },
-  reactivated: { bg: "#E3F5EC", fg: "#0F6E56" },
-  reactivate: { bg: "#E3F5EC", fg: "#0F6E56" },
+  reactivated: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
+  reactivate: { bg: "rgba(169,56,56,0.10)", fg: "#A93838" },
 };
 
 const ACTION_COLOR: Record<ActionKey, string> = {
@@ -230,7 +230,7 @@ export default function CAApprovalsPage() {
   const btn = (bg: string): React.CSSProperties => ({
     background: bg, color: "#fff", border: "none", borderRadius: 9,
     padding: "9px 16px", fontSize: 13.5, fontWeight: 600, cursor: "pointer",
-    display: "inline-flex", alignItems: "center", gap: 7, fontFamily: "Inter, sans-serif",
+    display: "inline-flex", alignItems: "center", gap: 7, fontFamily: "'Instrument Sans', Inter, sans-serif",
   });
 
   const filtered = useMemo(() => {
@@ -250,7 +250,7 @@ export default function CAApprovalsPage() {
   useEffect(() => { setPage(1); }, [tab, search]);
 
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", color: INK }}>
+    <div style={{ fontFamily: "'Instrument Sans', Inter, sans-serif", color: INK }}>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 700, color: INK, margin: 0 }}>
@@ -281,7 +281,7 @@ export default function CAApprovalsPage() {
           placeholder="Search by firm name, CA name, email, or ICAI number"
           style={{
             width: "100%", height: 40, border: "1px solid rgba(26,26,26,0.15)", borderRadius: 9,
-            fontFamily: "Inter, sans-serif", fontSize: 14, padding: "0 14px 0 36px",
+            fontFamily: "'Instrument Sans', Inter, sans-serif", fontSize: 14, padding: "0 14px 0 36px",
             background: "#FFFFFF", color: INK, outline: "none",
           }}
         />
@@ -365,7 +365,7 @@ export default function CAApprovalsPage() {
                     style={{
                       width: "100%", padding: "10px 12px", borderRadius: 9,
                       border: `1px solid ${reasonError ? "#A93838" : BORDER}`,
-                      fontSize: 13.5, fontFamily: "Inter, sans-serif", color: INK, background: "#FCFBF9",
+                      fontSize: 13.5, fontFamily: "'Instrument Sans', Inter, sans-serif", color: INK, background: "#FCFBF9",
                     }}
                   />
                   {reasonError && <div style={{ color: "#A93838", fontSize: 12, marginTop: 6 }}>{reasonError}</div>}
@@ -434,7 +434,7 @@ export default function CAApprovalsPage() {
                   style={{
                     background: "transparent", color: TEAL, border: `1px solid ${TEAL}`, borderRadius: 9,
                     padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Inter, sans-serif",
+                    display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "'Instrument Sans', Inter, sans-serif",
                   }}
                 >
                   <Clock size={14} /> History
@@ -445,8 +445,8 @@ export default function CAApprovalsPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12 }}>
                   {emailResult.sent ? (
                     <>
-                      <CheckCircle2 size={14} color="#0F6E56" />
-                      <span style={{ fontSize: 12, color: "#0F6E56" }}>Email sent to {f.email}</span>
+                      <CheckCircle2 size={14} color="#A93838" />
+                      <span style={{ fontSize: 12, color: "#A93838" }}>Email sent to {f.email}</span>
                     </>
                   ) : (
                     <>
@@ -505,7 +505,7 @@ export default function CAApprovalsPage() {
             onClick={(e) => e.stopPropagation()}
             style={{
               background: "#FFFFFF", maxWidth: 480, width: "100%", borderRadius: 12, padding: 28,
-              fontFamily: "Inter, sans-serif", color: INK,
+              fontFamily: "'Instrument Sans', Inter, sans-serif", color: INK,
             }}
           >
             <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: TEAL }}>
@@ -559,7 +559,7 @@ export default function CAApprovalsPage() {
           background: "#FFFFFF", zIndex: 40, boxShadow: "-4px 0 24px rgba(0,0,0,0.12)",
           transform: drawerFirm ? "translateX(0)" : "translateX(100%)",
           transition: "transform 240ms ease", overflowY: "auto",
-          fontFamily: "Inter, sans-serif", color: INK,
+          fontFamily: "'Instrument Sans', Inter, sans-serif", color: INK,
           visibility: drawerFirm ? "visible" : "hidden",
         }}
       >
