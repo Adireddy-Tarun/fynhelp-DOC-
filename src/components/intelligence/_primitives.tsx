@@ -16,11 +16,11 @@ export const ACCENT = {
   red: "#A93838",
   redLight: "#C94848",
   gold: "#8B6914",
-  goldLight: "#D4AF37",
-  green: "#10B981",
-  amber: "#F59E0B",
-  gray: "#6B6B6B",
-  ink: "#1A1008",
+  goldLight: "#C9A84C",
+  green: "#1F5A46",
+  amber: "#8B6914",
+  gray: "rgba(23,18,8,0.62)",
+  ink: "#171208",
 } as const;
 
 export const EMPTY = "—";
@@ -56,7 +56,7 @@ export function IntelHeader({ title, sub, actions }: { title: string; sub?: stri
     <header className="flex items-start justify-between gap-4 flex-wrap">
       <div>
         <h1 className="font-serif text-3xl text-fyn-ink font-bold tracking-tight">{title}</h1>
-        {sub && <p className="text-sm text-[#6B6B6B] mt-1 max-w-2xl">{sub}</p>}
+        {sub && <p className="text-sm text-[rgba(23,18,8,0.62)] mt-1 max-w-2xl">{sub}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </header>
@@ -93,7 +93,7 @@ export function IntelCard({
         <div className="flex items-start justify-between mb-4 gap-3">
           <div>
             {title && <h3 className="font-serif text-base text-fyn-ink font-semibold">{title}</h3>}
-            {sub && <p className="text-xs text-[#6B6B6B] mt-0.5">{sub}</p>}
+            {sub && <p className="text-xs text-[rgba(23,18,8,0.62)] mt-0.5">{sub}</p>}
           </div>
           {action}
         </div>
@@ -163,8 +163,8 @@ export function KPI({
       }}
     >
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[#6B6B6B] font-medium">{label}</p>
-        {href && <ArrowUpRight className="w-3.5 h-3.5 text-[#6B6B6B] opacity-0 group-hover:opacity-100 transition-opacity" />}
+        <p className="text-[10px] uppercase tracking-[0.12em] text-[rgba(23,18,8,0.62)] font-medium">{label}</p>
+        {href && <ArrowUpRight className="w-3.5 h-3.5 text-[rgba(23,18,8,0.62)] opacity-0 group-hover:opacity-100 transition-opacity" />}
       </div>
       <p className={cn("font-mono text-2xl text-fyn-ink font-semibold tabular-nums", showEmpty && "text-[#9B9B9B]")}>
         {renderedValue}
@@ -177,7 +177,7 @@ export function KPI({
             {delta}
           </span>
         )}
-        {!showEmpty && sub && <span className="text-xs text-[#6B6B6B]">{sub}</span>}
+        {!showEmpty && sub && <span className="text-xs text-[rgba(23,18,8,0.62)]">{sub}</span>}
         {showEmpty && <span className="text-xs text-[#9B9B9B]">{emptySub}</span>}
       </div>
     </Wrap>
@@ -224,11 +224,11 @@ export function EmptyState({
       : cta;
   return (
     <div className="text-center py-10 px-4">
-      <div className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-3 text-[#6B6B6B]" style={{ background: "rgba(26,16,8,0.04)" }}>
+      <div className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-3 text-[rgba(23,18,8,0.62)]" style={{ background: "rgba(26,16,8,0.04)" }}>
         {icon}
       </div>
       <p className="font-serif text-sm text-fyn-ink font-semibold">{title}</p>
-      <p className="text-xs text-[#6B6B6B] mt-1 max-w-xs mx-auto">{description}</p>
+      <p className="text-xs text-[rgba(23,18,8,0.62)] mt-1 max-w-xs mx-auto">{description}</p>
       {resolvedCta && (
         <Link
           to={resolvedCta.href}
@@ -313,7 +313,7 @@ export function LiveTimestamp() {
     return () => clearInterval(t);
   }, []);
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] text-[#6B6B6B]">
+    <span className="inline-flex items-center gap-1.5 text-[11px] text-[rgba(23,18,8,0.62)]">
       <RefreshCw className="w-3 h-3 fyn-slow-spin" />
       Live · Updated {mins === 0 ? "just now" : `${mins} min ago`}
     </span>

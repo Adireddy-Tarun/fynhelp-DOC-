@@ -10,21 +10,21 @@
 @layer base {
   :root {
     /* Core palette */
-    --fyn-ink: 24 53% 7%;
-    --fyn-red: 0 73% 44%;
-    --fyn-beige: 40 52% 91%;
+    --fyn-ink: 38 49% 6%;
+    --fyn-red: 0 50% 44%;
+    --fyn-beige: 40 33% 93%;
     --fyn-gold: 38 74% 31%;
 
     /* Ink scale */
-    --fyn-ink-95: 24 53% 7% / 0.95;
-    --fyn-ink-80: 24 53% 7% / 0.8;
-    --fyn-ink-60: 24 53% 7% / 0.6;
-    --fyn-ink-45: 24 53% 7% / 0.45;
-    --fyn-ink-40: 24 53% 7% / 0.4;
-    --fyn-ink-20: 24 53% 7% / 0.2;
-    --fyn-ink-10: 24 53% 7% / 0.1;
-    --fyn-ink-05: 24 53% 7% / 0.05;
-    --fyn-ink-02: 24 53% 7% / 0.02;
+    --fyn-ink-95: 38 49% 6% / 0.95;
+    --fyn-ink-80: 38 49% 6% / 0.8;
+    --fyn-ink-60: 38 49% 6% / 0.6;
+    --fyn-ink-45: 38 49% 6% / 0.45;
+    --fyn-ink-40: 38 49% 6% / 0.4;
+    --fyn-ink-20: 38 49% 6% / 0.2;
+    --fyn-ink-10: 38 49% 6% / 0.1;
+    --fyn-ink-05: 38 49% 6% / 0.05;
+    --fyn-ink-02: 38 49% 6% / 0.02;
 
     /* Type scale */
     --fyn-type-display: 48px;
@@ -77,30 +77,30 @@
     --chart-5: 300 60% 26%;
 
     /* Shadcn tokens — BEIGE intelligence theme (spec: bg #EFE8D8 / card #FFFFFF / red #A93838) */
-    --background: 40 38% 89%;            /* #EFE8D8 */
-    --foreground: 24 53% 7%;             /* #1A1008 */
-    --card: 0 0% 100%;                   /* #FFFFFF */
-    --card-foreground: 24 53% 7%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 53% 7%;
+    --background: 40 33% 93%;            /* #F2EEE7 home cream */
+    --foreground: 38 49% 6%;             /* #171208 home ink */
+    --card: 40 100% 99%;                 /* #FFFDF9 home card */
+    --card-foreground: 38 49% 6%;
+    --popover: 40 100% 99%;
+    --popover-foreground: 38 49% 6%;
     --primary: 0 50% 44%;                /* #A93838 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 38% 84%;
-    --secondary-foreground: 24 53% 7%;
-    --muted: 40 38% 92%;
-    --muted-foreground: 0 0% 42%;        /* #6B6B6B */
+    --secondary: 40 25% 90%;             /* #EBE6DD */
+    --secondary-foreground: 38 49% 6%;
+    --muted: 40 25% 90%;
+    --muted-foreground: 38 49% 6% / 0.62;
     --accent: 38 74% 31%;                /* #8B6914 gold */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 50% 44%;
     --destructive-foreground: 0 0% 100%;
-    --border: 24 53% 7% / 0.08;
-    --input: 24 53% 7% / 0.08;
+    --border: 38 49% 6% / 0.09;
+    --input: 38 49% 6% / 0.09;
     --ring: 0 50% 44%;
     --radius: 0.5rem;
 
     /* Override fyn-beige-card to pure white so FynCard primitive renders on white surface */
-    --fyn-beige: 40 38% 89%;
-    --fyn-beige-card: 0 0% 100%;
+    --fyn-beige: 40 33% 93%;
+    --fyn-beige-card: 40 100% 99%;
     --fyn-red: 0 50% 44%;
     --fyn-red-mid: 0 50% 44%;
     --fyn-red-dark: 0 50% 36%;
@@ -205,7 +205,7 @@ html.dark {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+    font-family: "Instrument Sans", "Inter", system-ui, -apple-system, sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -214,33 +214,33 @@ html.dark {
   h1,
   h2,
   h3 {
-    font-family: "Space Grotesk", "DM Sans", sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: "Instrument Sans", "Inter", sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.035em;
   }
   h4,
   h5,
   h6 {
-    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
   button {
-    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
   label {
-    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 500;
   }
   th,
   thead {
-    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 600;
   }
   nav a {
-    font-family: "Space Grotesk", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 500;
     letter-spacing: 0.02em;
   }
@@ -250,12 +250,12 @@ html.dark {
   footer span,
   footer li,
   footer div {
-    font-family: "DM Sans", system-ui, sans-serif;
+    font-family: "Instrument Sans", "Inter", system-ui, sans-serif;
   }
   [class*="badge"],
   .fyn-badge,
   [data-badge] {
-    font-family: "Plus Jakarta Sans Variable", "DM Sans", sans-serif;
+    font-family: "Instrument Sans", "Inter", sans-serif;
     font-weight: 600;
   }
   .font-mono,
