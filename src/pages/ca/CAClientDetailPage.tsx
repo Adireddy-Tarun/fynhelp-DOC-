@@ -525,6 +525,35 @@ export default function CAClientDetailPage() {
     ];
   }, [compliance]);
 
+  const closeChecklist = useMemo(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthLabel = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
+    const thisMonthEvents = compliance.filter((c: any) => {
+      const d = c.due_date ? new Date(c.due_date) : null;
+      return !!d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    return [
+      {
+        label: "Bank statement uploaded",
+        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && new Date(t.date) >= monthStart).length > 0,
+      },
+      {
+        label: "ITC reconciled",
+        done: itc.filter((r: any) => r.match_status === "matched").length > 0,
+      },
+      {
+        label: "Compliance events filed",
+        done: thisMonthEvents.length > 0 && thisMonthEvents.every((c: any) => c.status === "filed"),
+      },
+      {
+        label: "MIS report generated",
+        done: reports.filter((r: any) => (r.period ?? "").includes(monthLabel)).length > 0,
+      },
+    ];
+  }, [txns, itc, compliance, reports]);
+
+
   if (loading) return <CAEmpty title="Loading client…" />;
   if (!client) return <CAEmpty title="Client not found" hint="This client may have been removed." />;
 
