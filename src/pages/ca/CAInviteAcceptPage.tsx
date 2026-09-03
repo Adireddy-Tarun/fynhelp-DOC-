@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CA, CACard, CAHeading, CAButton, CABadge } from "@/components/ca/portalUi";
+import FynLogo from "@/components/FynLogo";
 
 interface InviteInfo {
   firm_name: string;
@@ -71,11 +72,9 @@ export default function CAInviteAcceptPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: CA.bg }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: CA.page }}>
       <CACard style={{ width: "100%", maxWidth: 480, padding: 34 }}>
-        <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>
-          Fyn<span style={{ color: CA.teal }}>Help</span>
-        </div>
+        <FynLogo variant="dark" size="sm" />
 
         {loading ? (
           <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 20 }}>Checking invitation…</p>

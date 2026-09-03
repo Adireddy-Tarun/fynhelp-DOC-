@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
+import FynLogo from "@/components/FynLogo";
 
 export default function CARegisterPage() {
   const navigate = useNavigate();
@@ -103,11 +104,9 @@ export default function CARegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: CA.bg }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: CA.page }}>
       <CACard style={{ width: "100%", maxWidth: 560, padding: 36 }}>
-        <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>
-          Fyn<span style={{ color: CA.teal }}>Help</span>
-        </div>
+        <FynLogo variant="dark" size="sm" />
         <div style={{ fontFamily: CA.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.teal, marginTop: 2 }}>
           CA Portal
         </div>

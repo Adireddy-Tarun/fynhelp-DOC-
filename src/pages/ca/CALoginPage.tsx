@@ -7,6 +7,7 @@ import { authErrorMessage } from "@/lib/authErrors";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { C } from "@/components/site/siteTheme";
+import FynLogo from "@/components/FynLogo";
 import BackHomeLink from "@/components/BackHomeLink";
 
 const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
@@ -135,9 +136,7 @@ export default function CALoginPage() {
           background: `radial-gradient(80% 120% at 100% 0%, rgba(226,103,63,.34), transparent 60%), linear-gradient(140deg, #7C1F20 0%, ${C.maroonDeep} 62%, #350B0E 100%)`,
         }}
       >
-        <div style={{ fontFamily: sans, fontSize: 20, fontWeight: 700, letterSpacing: "-0.02em" }}>
-          Fyn<span style={{ color: C.coral }}>Help</span>
-        </div>
+        <FynLogo variant="light" size="sm" />
         <div>
           <div
             style={{
