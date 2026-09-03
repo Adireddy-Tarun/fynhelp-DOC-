@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "@/lib/router-compat";
 import {
   LayoutGrid, Users, Bell, Settings, LogOut,
   Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, ShieldCheck,
-  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug,
+  BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug, Inbox, CheckCheck,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -20,6 +20,15 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
       { label: "Portfolio", path: "/ca/dashboard", icon: LayoutGrid, badge: "urgent" },
       { label: "Exceptions", path: "/ca/exceptions", icon: AlertTriangle, badge: "urgent" },
       { label: "Alert Monitor", path: "/ca/notifications", icon: Bell, badge: "unread" },
+    ],
+  },
+  {
+    group: "Workflow",
+    links: [
+      { label: "Intake", path: "/ca/intake/inbox", icon: Inbox },
+      { label: "Review queue", path: "/ca/intake/review", icon: CheckCheck },
+      { label: "Reconciliation", path: "/ca/reconciliation", icon: Scale },
+      { label: "Exceptions", path: "/ca/exceptions", icon: AlertTriangle },
     ],
   },
   {
@@ -44,7 +53,6 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
   {
     group: "Process",
     links: [
-      { label: "Reconciliation", path: "/ca/reconciliation", icon: Scale },
       { label: "Working papers", path: "/ca/working-papers", icon: FileStack },
       { label: "Reports", path: "/ca/reports", icon: FileText },
       { label: "Evidence vault", path: "/ca/vault", icon: Archive },
@@ -73,11 +81,8 @@ export default function CASidebar({
   onNavigate,
   drawer = false,
 }: {
-  /** Drawer visibility on compact screens. */
   open?: boolean;
-  /** Called after a nav link is tapped, so the drawer can close. */
   onNavigate?: () => void;
-  /** Render as an off-canvas drawer instead of a fixed desktop rail. */
   drawer?: boolean;
 }) {
   const { firmId, firmName, caName } = useCAPortal();
@@ -112,7 +117,6 @@ export default function CASidebar({
         const businessIds = (clients ?? [])
           .map((c) => c.business_id)
           .filter((id): id is string => !!id);
-
         let overdue = 0;
         if (businessIds.length > 0) {
           const { count } = await supabase
@@ -123,18 +127,14 @@ export default function CASidebar({
             .lt("due_date", today);
           overdue = count ?? 0;
         }
-
         const { count: mismatched } = await supabase
           .from("ca_itc_records")
           .select("id", { count: "exact", head: true })
           .eq("ca_firm_id", firmId)
           .eq("match_status", "mismatched")
           .eq("is_demo", false);
-
         if (!cancelled) setUrgentCount(overdue + (mismatched ?? 0));
-      } catch {
-        /* silent */
-      }
+      } catch { /* silent */ }
     })();
     return () => { cancelled = true; };
   }, [firmId]);
@@ -171,37 +171,22 @@ export default function CASidebar({
       <nav style={{ padding: "6px 12px", flex: 1, overflowY: "auto" }}>
         {GROUPS.map(({ group, links }) => (
           <div key={group} style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                fontFamily: CA.sans,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: CA.faint,
-                padding: "6px 12px 4px",
-              }}
-            >
+            <div style={{ fontFamily: CA.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.faint, padding: "6px 12px 4px" }}>
               {group}
             </div>
             {links.map(({ label, path, icon: Icon, badge }) => {
               const count = badge === "urgent" ? urgentCount : badge === "unread" ? unread : 0;
               return (
                 <NavLink
-                  key={path}
+                  key={group + path + label}
                   to={path}
                   className="ca-nav-link"
                   end={path === "/ca/clients"}
                   onClick={onNavigate}
                   style={({ isActive }) => ({
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "8px 12px",
-                    borderRadius: 9,
-                    marginBottom: 1,
-                    fontFamily: CA.sans,
-                    fontSize: 13,
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "8px 12px", borderRadius: 9, marginBottom: 1,
+                    fontFamily: CA.sans, fontSize: 13,
                     fontWeight: isActive ? 600 : 500,
                     color: isActive ? C.maroon : CA.ink,
                     background: isActive ? "rgba(169,56,56,0.08)" : "transparent",
@@ -211,13 +196,7 @@ export default function CASidebar({
                   <Icon size={15} />
                   <span style={{ flex: 1 }}>{label}</span>
                   {count > 0 && (
-                    <span
-                      style={{
-                        fontFamily: CA.mono, fontSize: 10.5, fontWeight: 700, color: C.onDark,
-                        fontVariantNumeric: "tabular-nums",
-                        background: C.maroon, borderRadius: 999, padding: "1px 7px",
-                      }}
-                    >
+                    <span style={{ fontFamily: CA.mono, fontSize: 10.5, fontWeight: 700, color: C.onDark, fontVariantNumeric: "tabular-nums", background: C.maroon, borderRadius: 999, padding: "1px 7px" }}>
                       {count}
                     </span>
                   )}
@@ -230,11 +209,7 @@ export default function CASidebar({
 
       <button
         onClick={signOut}
-        style={{
-          display: "flex", alignItems: "center", gap: 10, margin: "0 12px 18px",
-          padding: "9px 12px", borderRadius: 9, background: "transparent", border: "none",
-          fontFamily: CA.sans, fontSize: 13, color: CA.muted, cursor: "pointer",
-        }}
+        style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 12px 18px", padding: "9px 12px", borderRadius: 9, background: "transparent", border: "none", fontFamily: CA.sans, fontSize: 13, color: CA.muted, cursor: "pointer" }}
       >
         <LogOut size={15} /> Sign out
       </button>
