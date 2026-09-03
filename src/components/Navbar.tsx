@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
 import { Menu, X, ChevronDown, Bell, Search, User, LogOut } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
 
@@ -13,10 +13,6 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
-
-  const isActive = (path: string) => location.pathname === path;
-
   return (
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">

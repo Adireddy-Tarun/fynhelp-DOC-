@@ -13,6 +13,8 @@ import {
   Link2,
   Activity,
   FileText,
+  FileSearch,
+  FileStack,
   Building2,
   LineChart,
   Bell,
@@ -329,10 +331,10 @@ function HowItWorks() {
                   STEP {s.n}
                 </div>
                 <h3 className="mt-1.5 text-xl font-bold" style={{ ...serif, color: DARK }}>
-                  {s.t}
+                  {s.title}
                 </h3>
                 <p className="mt-2 text-[15px]" style={{ color: "rgba(23,18,8,0.65)" }}>
-                  {s.d}
+                  {s.desc}
                 </p>
               </div>
             ))}
