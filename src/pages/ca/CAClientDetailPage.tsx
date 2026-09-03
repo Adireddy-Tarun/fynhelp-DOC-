@@ -42,7 +42,7 @@ interface Client {
   llpin: string | null;
 }
 
-const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "3-Way Match", "Documents", "Reports", "Deductions"] as const;
+const TABS = ["Documents", "Reconcile", "GST and ITC", "Compliance", "Close", "Reports", "Deductions"] as const;
 type Tab = typeof TABS[number];
 
 function Metric({ label, value }: { label: string; value: string }) {
