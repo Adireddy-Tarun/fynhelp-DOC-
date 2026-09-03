@@ -3,14 +3,14 @@ import { ReactNode } from "react";
 
 export const COLORS = {
   ink: "#171208",
-  red: "#C41E1E",
-  beige: "#F4EDDA",
+  red: "#A93838",
+  beige: "#F2EEE7",
   gold: "#8B6914",
-  caSurface: "#F8F6F1",
-  caBorder: "#D4C9A8",
-  pageBg: "#F0EBE0",
-  divider: "#F0EBD8",
-  green: "#16A34A",
+  caSurface: "#FFFDF9",
+  caBorder: "rgba(23,18,8,0.09)",
+  pageBg: "#F2EEE7",
+  divider: "rgba(23,18,8,0.09)",
+  green: "#1F5A46",
   greenSoft: "#4ADE80",
   amber: "#F59E0B",
   amberSoft: "#FCD34D",
@@ -40,7 +40,7 @@ export function Card({ children, className = "", dark = false, style }: { childr
     <div
       className={`rounded-md p-6 ${className}`}
       style={{
-        background: dark ? COLORS.ink : "#FFFFFF",
+        background: dark ? COLORS.ink : "#FFFDF9",
         border: dark ? "none" : `1px solid ${COLORS.caBorder}`,
         color: dark ? "#FFFFFF" : COLORS.ink,
         ...style,

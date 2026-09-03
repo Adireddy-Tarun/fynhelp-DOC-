@@ -7,6 +7,7 @@ import { formatINR, formatINRFull } from "@/lib/indian-format";
 
 export const CA = {
   bg: "#F2EEE7",
+  page: "#F2EEE7",
   card: "#FFFDF9",
   ink: "#171208",
   muted: "rgba(23,18,8,0.62)",
@@ -20,7 +21,7 @@ export const CA = {
   red: "#A93838",
   green: "#1F5A46",
   serif: "'Fraunces', Georgia, serif",
-  sans: "'Instrument Sans', Inter, system-ui, sans-serif",
+  sans: "'Instrument Sans','Inter',system-ui,sans-serif",
   mono: "'JetBrains Mono', 'SF Mono', Menlo, monospace",
 };
 
@@ -126,8 +127,8 @@ export function CAButton({
 }) {
   const variants: Record<string, CSSProperties> = {
     primary: { background: CA.teal, color: "#fff", border: "none" },
-    ghost: { background: "#fff", color: CA.ink, border: `0.5px solid ${CA.line}` },
-    danger: { background: "#fff", color: CA.red, border: `0.5px solid rgba(179,38,30,0.35)` },
+    ghost: { background: CA.card, color: CA.ink, border: `0.5px solid ${CA.line}` },
+    danger: { background: CA.card, color: CA.red, border: `0.5px solid rgba(179,38,30,0.35)` },
   };
   return (
     <button
@@ -170,7 +171,7 @@ export const caInputStyle: CSSProperties = {
   padding: "0 12px",
   borderRadius: 9,
   border: `0.5px solid ${CA.line}`,
-  background: "#fff",
+  background: CA.card,
   fontFamily: CA.sans,
   fontSize: 14,
   color: CA.ink,
