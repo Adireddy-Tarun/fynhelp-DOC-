@@ -42,7 +42,7 @@ interface Client {
   llpin: string | null;
 }
 
-const TABS = ["Overview", "GST & ITC", "TDS", "Compliance", "Bank", "3-Way Match", "Documents", "Reports", "Deductions"] as const;
+const TABS = ["Documents", "Reconcile", "GST and ITC", "Compliance", "Close", "Reports", "Deductions"] as const;
 type Tab = typeof TABS[number];
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -59,7 +59,7 @@ export default function CAClientDetailPage() {
   const navigate = useNavigate();
   const { firmId, userId } = useCAPortal();
   const [client, setClient] = useState<Client | null>(null);
-  const [tab, setTab] = useState<Tab>("Overview");
+  const [tab, setTab] = useState<Tab>("Documents");
   const [loading, setLoading] = useState(true);
 
   // Tab data
@@ -525,6 +525,35 @@ export default function CAClientDetailPage() {
     ];
   }, [compliance]);
 
+  const closeChecklist = useMemo(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthLabel = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
+    const thisMonthEvents = compliance.filter((c: any) => {
+      const d = c.due_date ? new Date(c.due_date) : null;
+      return !!d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    return [
+      {
+        label: "Bank statement uploaded",
+        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && new Date(t.date) >= monthStart).length > 0,
+      },
+      {
+        label: "ITC reconciled",
+        done: itc.filter((r: any) => r.match_status === "matched").length > 0,
+      },
+      {
+        label: "Compliance events filed",
+        done: thisMonthEvents.length > 0 && thisMonthEvents.every((c: any) => c.status === "filed"),
+      },
+      {
+        label: "MIS report generated",
+        done: reports.filter((r: any) => (r.period ?? "").includes(monthLabel)).length > 0,
+      },
+    ];
+  }, [txns, itc, compliance, reports]);
+
+
   if (loading) return <CAEmpty title="Loading client…" />;
   if (!client) return <CAEmpty title="Client not found" hint="This client may have been removed." />;
 
@@ -554,6 +583,29 @@ export default function CAClientDetailPage() {
         <CABadge tone={statusTone(client.client_status)}>{client.client_status ?? "—"}</CABadge>
       </div>
 
+      <div style={{
+        background: CA.card, border: "1px solid rgba(23,18,8,0.09)", borderRadius: 12,
+        padding: "12px 16px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+        gap: 12, marginTop: 12, marginBottom: 0,
+      }}>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Cash position</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{inr(liquidity?.cash_position)}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Runway</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4 }}>{liquidity?.runway_months != null ? `${liquidity.runway_months} months` : "—"}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Monthly burn</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 16, fontWeight: 600, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{inr(liquidity?.burn_rate_current)}</div>
+        </div>
+        <div>
+          <div style={{ fontFamily: CA.sans, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: CA.faint, fontWeight: 700 }}>Health</div>
+          <div style={{ marginTop: 4 }}><CABadge tone={healthTone(liquidity?.health_status)}>{liquidity?.health_status ?? "no data"}</CABadge></div>
+        </div>
+      </div>
+
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
         {TABS.map((t) => (
           <button
@@ -578,20 +630,14 @@ export default function CAClientDetailPage() {
           </CACard>
         )}
 
-        {tab === "Overview" && (
+        {tab === "Documents" && (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-            <Metric label="Cash position" value={inr(liquidity?.cash_position)} />
-            <Metric label="Runway (months)" value={liquidity?.runway_months != null ? String(liquidity.runway_months) : "—"} />
-            <Metric label="Monthly burn" value={inr(liquidity?.burn_rate_current)} />
-            <CACard style={{ padding: "14px 16px" }}>
-              <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>Health</div>
-              <div style={{ marginTop: 8 }}><CABadge tone={healthTone(liquidity?.health_status)}>{liquidity?.health_status ?? "no data"}</CABadge></div>
-            </CACard>
-            <Metric label="MRR" value={inr(revenue?.mrr)} />
-            <Metric label="ARR" value={inr(revenue?.arr)} />
-            <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
-            <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
+            {businessId && firmId && <ClientDocumentsTab firmId={firmId} businessId={businessId} />}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 20 }}>
+              <Metric label="MRR" value={inr(revenue?.mrr)} />
+              <Metric label="ARR" value={inr(revenue?.arr)} />
+              <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
+              <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
             {firmId && businessId && <ClientIntelligenceCard firmId={firmId} businessId={businessId} />}
             {firmId && clientId && (
@@ -605,8 +651,44 @@ export default function CAClientDetailPage() {
           </>
         )}
 
-        {tab === "Documents" && businessId && firmId && (
-          <ClientDocumentsTab firmId={firmId} businessId={businessId} />
+        {tab === "Close" && (
+          <CACard style={{ padding: 20, maxWidth: 620 }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>Close readiness</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
+              {closeChecklist.filter((i) => i.done).length} of 4 steps complete
+            </div>
+            <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+              {closeChecklist.map((item) => (
+                <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span
+                    style={{
+                      width: 18, height: 18, borderRadius: 999, display: "inline-flex",
+                      alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      background: item.done ? "rgba(31,90,70,0.12)" : "rgba(23,18,8,0.06)",
+                      color: item.done ? "#1F5A46" : CA.faint, fontSize: 11, fontWeight: 700,
+                    }}
+                  >
+                    {item.done ? "✓" : ""}
+                  </span>
+                  <span style={{ fontFamily: CA.sans, fontSize: 13.5, color: item.done ? CA.ink : CA.muted }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 18 }}>
+              <input
+                type="month"
+                value={misPeriodInput}
+                onChange={(e) => setMisPeriodInput(e.target.value)}
+                style={{ ...caInputStyle, width: 170, height: 38 }}
+                aria-label="MIS period"
+              />
+              <CAButton onClick={generateMis} disabled={!businessId || misBusy}>
+                {misBusy ? "Building…" : "Generate MIS for this client"}
+              </CAButton>
+            </div>
+          </CACard>
         )}
 
         {tab === "Deductions" && businessId && firmId && (
@@ -615,7 +697,7 @@ export default function CAClientDetailPage() {
 
 
 
-        {tab === "GST & ITC" && (
+        {tab === "GST and ITC" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
               <Metric label="Total ITC claimed" value={inr(itcTotals.claimed)} />
@@ -701,7 +783,7 @@ export default function CAClientDetailPage() {
 
         )}
 
-        {tab === "TDS" && (
+        {tab === "Compliance" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
               <Metric label="TDS deducted" value={inr(tdsTotals.deducted)} />
@@ -790,12 +872,12 @@ export default function CAClientDetailPage() {
           </>
         )}
 
-        {tab === "3-Way Match" && (
-          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
-        )}
-
-        {tab === "Bank" && (
+        {tab === "Reconcile" && (
           <>
+          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
+          <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: CA.faint, marginTop: 20, marginBottom: 10 }}>
+            Bank transactions
+          </div>
           {seedCount > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: CA.sans, fontSize: 13, color: CA.ink, cursor: "pointer" }}>
