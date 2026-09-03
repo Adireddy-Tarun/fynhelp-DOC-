@@ -7,6 +7,7 @@ import { authErrorMessage } from "@/lib/authErrors";
 import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { C } from "@/components/site/siteTheme";
+import BackHomeLink from "@/components/BackHomeLink";
 
 const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
 const serif = "'Fraunces',Georgia,serif";
@@ -115,6 +116,7 @@ export default function CALoginPage() {
       }}
       className="ca-login-root"
     >
+      <BackHomeLink />
       <style>{`
         @media (max-width: 860px) { .ca-login-root { grid-template-columns: 1fr !important; } .ca-login-side { display: none !important; } }
         .ca-login-input:focus { border-color: ${C.maroon} !important; box-shadow: 0 0 0 3px rgba(169,56,56,0.12); }
