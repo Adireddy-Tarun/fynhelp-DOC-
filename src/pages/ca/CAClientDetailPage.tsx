@@ -790,12 +790,12 @@ export default function CAClientDetailPage() {
           </>
         )}
 
-        {tab === "3-Way Match" && (
-          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
-        )}
-
-        {tab === "Bank" && (
+        {tab === "Reconcile" && (
           <>
+          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
+          <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: CA.faint, marginTop: 20, marginBottom: 10 }}>
+            Bank transactions
+          </div>
           {seedCount > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: CA.sans, fontSize: 13, color: CA.ink, cursor: "pointer" }}>
