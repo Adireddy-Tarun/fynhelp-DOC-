@@ -1,50 +1,130 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Bell, Search, User, LogOut } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  Store,
+  Briefcase,
+  PlayCircle,
+  FileSearch,
+  GitCompareArrows,
+  PenLine,
+  Send,
+  Rocket,
+  ShoppingBag,
+  Factory,
+  ShieldCheck,
+  LayoutDashboard,
+  FileStack,
+  MessageSquare,
+  Tag,
+} from "lucide-react";
+import FynLogo from "@/components/FynLogo";
+import { supabase } from "@/integrations/supabase/client";
+import { isAdminEmail } from "@/lib/adminEmails";
 
-export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const location = useLocation();
-  const user = null;
-  const hasNotifications = false;
-  const hasAlerts = false;
+const NAV_HEIGHT = 76;
 
-  const isActive = (path: string) => location.pathname.startsWith(path);
+const CREAM = "#EFE8D8";
+const CARD = "#FFFFFF";
+const DARK = "#171208";
+const RED = "#A93838";
+const RED_TINT = "#A9383814";
+const SOFT = "#F5EFE2";
 
-  const navItems = [
-    { label: "Home", path: "/" },
-    { label: "Explore", path: "/explore" },
-    { label: "Notifications", path: "/notifications" },
-    { label: "Alerts", path: "/alerts" },
-    { label: "Settings", path: "/settings" },
-  ];
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
 
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <FynLogo className="h-8 w-8" />
-          <span className="text-lg font-semibold">FynHelp</span>
-        </Link>
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
 
-        <div className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm text-foreground/80 hover:text-foreground">Home</Link>
-          <Link to="/explore" className="text-sm text-foreground/80 hover:text-foreground">Explore</Link>
-          <Link to="/notifications" className="text-sm text-foreground/80 hover:text-foreground">Notifications</Link>
-          <Link to="/alerts" className="text-sm text-foreground/80 hover:text-foreground">Alerts</Link>
-          <Link to="/settings" className="text-sm text-foreground/80 hover:text-foreground">Settings</Link>
-        </div>
+const NAV_HEIGHT_PX = 76;
 
-        <div className="hidden md:flex items-center gap-3">
-          {user ? (
-            <button className="text-sm text-foreground/80 hover:text-foreground">
-              Sign out
-            </button>
-          ) : (
-            <Link to="/login" className="text-sm text-foreground/80 hover:text-foreground">Sign in</Link>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
+const CREAM2 = "#EFE8D8";
+
+const NAV_ITEMS = [
+  { label: "Home", href: "/" },
+  { label: "Explore", href: "/explore" },
+  { label: "Notifications", href: "/notifications" },
+  { label: "Alerts", href: "/alerts" },
+  { label: "Settings", href: "/settings" },
+];
+
+const PRODUCT_MODULES = [
+  { key: "extract", icon: FileSearch, label: "Extract", desc: "Documents to structured lines" },
+  { key: "recon", icon: GitCompareArrows, label: "Recon", desc: "Bank matched to ledger" },
+  { key: "narrate", icon: PenLine, label: "Narrate", desc: "Drafts with sources attached" },
+  { key: "chaser", icon: Send, label: "Chaser", desc: "Polite follow-ups that send themselves" },
+];
+
+const CA_PRACTICE = [
+  { icon: FileSearch, label: "Extract", desc: "Documents to structured lines" },
+  { icon: GitCompareArrows, label: "Recon", desc: "Bank matched to ledger" },
+  { icon: PenLine, label: "Narrate", desc: "Drafts with sources attached" },
+  { icon: Send, label: "Chaser", desc: "Polite follow-ups that send themselves" },
+];
+
+const PRODUCT_USECASES = [
+  { icon: Rocket, label: "Startups", desc: "Fast setup for growing teams" },
+  { icon: ShoppingBag, label: "D2C", desc: "Track revenue and cash flow" },
+  { icon: Factory, label: "Manufacturing", desc: "Monitor production costs" },
+  { icon: ShieldCheck, label: "Compliance", desc: "GST and TDS tracking" },
+];
+
+const TOP_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+const NAV_BAR_HEIGHT = 76;
+
+const NAV_ITEMS_FALLBACK = [
+  { label: "Home", href: "/" },
+  { label: "Explore", href: "/explore" },
+  { label: "Notifications", href: "/notifications" },
+  { label: "Alerts", href: "/alerts" },
+  { label: "Settings", href: "/settings" },
+];
+
+const CREAM3 = "#EFE8D8";
+
+const PRODUCT_MODULES_FALLBACK = [
+  { key: "extract", icon: FileSearch, label: "Extract", desc: "Documents to structured lines" },
+  { key: "recon", icon: GitCompareArrows, label: "Recon", desc: "Bank matched to ledger" },
+  { key: "narrate", icon: PenLine, label: "Narrate", desc: "Drafts with sources attached" },
+  { key: "chaser", icon: Send, label: "Chaser", desc: "Polite follow-ups that send themselves" },
+];
+
+const CREAM4 = "#EFE8D8";
+
+const CA_PRACTICE_FALLBACK = [
+  { icon: FileSearch, label: "Extract", desc: "Documents to structured lines" },
+  { icon: GitCompareArrows, label: "Recon", desc: "Bank matched to ledger" },
+  { icon: PenLine, label: "Narrate", desc: "Drafts with sources attached" },
+  { icon: Send, label: "Chaser", desc: "Polite follow-ups that send themselves" },
+];
+
+const CA_PRACTICE_ITEMS = [
+  { icon: FileSearch, label: "Extract", desc: "Documents to structured lines" },
+  { icon: GitCompareArrows, label: "Recon", desc: "Bank matched to ledger" },
+  { icon: PenLine, label: "Narrate", desc: "Drafts with sources attached" },
+  { icon: Send, label: "Chaser", desc: "Polite follow-ups that send themselves" },
+];
+
+const TOP_LINKS_LIST = [
+  { label: "Home", href: "/" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+export default function CA_PRACTICE_MENU() {
+  return null;
 }
