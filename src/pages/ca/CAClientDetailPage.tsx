@@ -578,20 +578,14 @@ export default function CAClientDetailPage() {
           </CACard>
         )}
 
-        {tab === "Overview" && (
+        {tab === "Documents" && (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
-            <Metric label="Cash position" value={inr(liquidity?.cash_position)} />
-            <Metric label="Runway (months)" value={liquidity?.runway_months != null ? String(liquidity.runway_months) : "—"} />
-            <Metric label="Monthly burn" value={inr(liquidity?.burn_rate_current)} />
-            <CACard style={{ padding: "14px 16px" }}>
-              <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint }}>Health</div>
-              <div style={{ marginTop: 8 }}><CABadge tone={healthTone(liquidity?.health_status)}>{liquidity?.health_status ?? "no data"}</CABadge></div>
-            </CACard>
-            <Metric label="MRR" value={inr(revenue?.mrr)} />
-            <Metric label="ARR" value={inr(revenue?.arr)} />
-            <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
-            <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
+            {businessId && firmId && <ClientDocumentsTab firmId={firmId} businessId={businessId} />}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 20 }}>
+              <Metric label="MRR" value={inr(revenue?.mrr)} />
+              <Metric label="ARR" value={inr(revenue?.arr)} />
+              <Metric label="Customers" value={revenue?.customer_count != null ? String(revenue.customer_count) : "—"} />
+              <Metric label="Churn rate" value={revenue?.churn_rate != null ? `${revenue.churn_rate}%` : "—"} />
             </div>
             {firmId && businessId && <ClientIntelligenceCard firmId={firmId} businessId={businessId} />}
             {firmId && clientId && (
@@ -605,8 +599,44 @@ export default function CAClientDetailPage() {
           </>
         )}
 
-        {tab === "Documents" && businessId && firmId && (
-          <ClientDocumentsTab firmId={firmId} businessId={businessId} />
+        {tab === "Close" && (
+          <CACard style={{ padding: 20, maxWidth: 620 }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>Close readiness</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
+              {closeChecklist.filter((i) => i.done).length} of 4 steps complete
+            </div>
+            <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+              {closeChecklist.map((item) => (
+                <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span
+                    style={{
+                      width: 18, height: 18, borderRadius: 999, display: "inline-flex",
+                      alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      background: item.done ? "rgba(31,90,70,0.12)" : "rgba(23,18,8,0.06)",
+                      color: item.done ? "#1F5A46" : CA.faint, fontSize: 11, fontWeight: 700,
+                    }}
+                  >
+                    {item.done ? "✓" : ""}
+                  </span>
+                  <span style={{ fontFamily: CA.sans, fontSize: 13.5, color: item.done ? CA.ink : CA.muted }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 18 }}>
+              <input
+                type="month"
+                value={misPeriodInput}
+                onChange={(e) => setMisPeriodInput(e.target.value)}
+                style={{ ...caInputStyle, width: 170, height: 38 }}
+                aria-label="MIS period"
+              />
+              <CAButton onClick={generateMis} disabled={!businessId || misBusy}>
+                {misBusy ? "Building…" : "Generate MIS for this client"}
+              </CAButton>
+            </div>
+          </CACard>
         )}
 
         {tab === "Deductions" && businessId && firmId && (
@@ -615,7 +645,7 @@ export default function CAClientDetailPage() {
 
 
 
-        {tab === "GST & ITC" && (
+        {tab === "GST and ITC" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
               <Metric label="Total ITC claimed" value={inr(itcTotals.claimed)} />
