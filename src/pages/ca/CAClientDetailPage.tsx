@@ -59,7 +59,7 @@ export default function CAClientDetailPage() {
   const navigate = useNavigate();
   const { firmId, userId } = useCAPortal();
   const [client, setClient] = useState<Client | null>(null);
-  const [tab, setTab] = useState<Tab>("Overview");
+  const [tab, setTab] = useState<Tab>("Documents");
   const [loading, setLoading] = useState(true);
 
   // Tab data
