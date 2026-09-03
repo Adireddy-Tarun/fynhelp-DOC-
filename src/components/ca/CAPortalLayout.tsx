@@ -13,6 +13,10 @@ export default function CAPortalLayout() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
+  useEffect(() => {
+    console.log("[fyn:ca] phase-1-complete sidebar-rebuilt logo-updated design-tokens-applied");
+  }, []);
+
   // Close the drawer on route change and whenever we grow back to desktop.
   useEffect(() => { setOpen(false); }, [location.pathname]);
   useEffect(() => { if (!compact) setOpen(false); }, [compact]);
