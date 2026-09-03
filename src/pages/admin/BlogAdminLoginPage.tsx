@@ -1,3 +1,4 @@
+import BackHomeLink from "@/components/BackHomeLink";
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "@/lib/router-compat";
 import { Eye, EyeOff } from "lucide-react";
@@ -71,6 +72,7 @@ export default function BlogAdminLoginPage() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", background: INK }}>
+      <BackHomeLink />
       <div
         className="hidden lg:flex"
         style={{ width: "40%", minHeight: "100vh", background: "#1A1008", flexDirection: "column", justifyContent: "space-between", padding: "48px" }}

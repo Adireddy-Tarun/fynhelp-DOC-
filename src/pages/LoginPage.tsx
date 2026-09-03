@@ -1,3 +1,4 @@
+import BackHomeLink from "@/components/BackHomeLink";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "@/lib/router-compat";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
@@ -179,6 +180,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-fyn-beige">
+      <BackHomeLink />
       {/* Left dark panel */}
       <div className="bg-fyn-ink p-12 flex flex-col justify-center">
         <FynLogo variant="light" />

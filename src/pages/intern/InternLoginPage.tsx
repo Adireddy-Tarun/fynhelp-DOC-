@@ -1,3 +1,4 @@
+import BackHomeLink from "@/components/BackHomeLink";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { Eye, EyeOff } from "lucide-react";
@@ -54,6 +55,7 @@ export default function InternLoginPage() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", background: "#F4EDDA" }}>
+      <BackHomeLink />
       <div
         style={{
           flex: "1 1 50%",
