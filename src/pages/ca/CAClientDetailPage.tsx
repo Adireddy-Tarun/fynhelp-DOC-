@@ -701,7 +701,7 @@ export default function CAClientDetailPage() {
 
         )}
 
-        {tab === "TDS" && (
+        {tab === "Compliance" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
               <Metric label="TDS deducted" value={inr(tdsTotals.deducted)} />
