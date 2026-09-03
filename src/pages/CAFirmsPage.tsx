@@ -31,7 +31,7 @@ import Layout from "@/components/Layout";
 
 const CREAM = "#EFE8D8";
 const CARD = "#FFFFFF";
-const DARK = "#1A1008";
+const DARK = "#171208";
 const RED = "#A93838";
 const RED_TINT = "#A9383814";
 const SOFT = "#F5EFE2";
@@ -76,7 +76,7 @@ function Hero() {
 
           <p
             className="mt-7 max-w-xl text-[17px] leading-relaxed"
-            style={{ color: "rgba(26,16,8,0.72)" }}
+            style={{ color: "rgba(23,18,8,0.72)" }}
           >
             Every month, your best people spend weeks pulling client data, assembling reports, and
             chasing reconciliations. FynHelp automates the grunt work — so your firm can take on
@@ -100,7 +100,7 @@ function Hero() {
             </a>
           </div>
 
-          <p className="mt-8 text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>
+          <p className="mt-8 text-sm" style={{ color: "rgba(23,18,8,0.55)" }}>
             Built for accounting firms managing 30–150 business clients
           </p>
         </motion.div>
@@ -130,11 +130,11 @@ function DashboardMock() {
   return (
     <div
       className="rounded-xl border p-5"
-      style={{ background: CARD, borderColor: "rgba(26,16,8,0.08)", boxShadow: "0 30px 60px -30px rgba(26,16,8,0.25)" }}
+      style={{ background: CARD, borderColor: "rgba(23,18,8,0.08)", boxShadow: "0 30px 60px -30px rgba(23,18,8,0.25)" }}
     >
-      <div className="flex items-center justify-between pb-4 border-b" style={{ borderColor: "rgba(26,16,8,0.08)" }}>
+      <div className="flex items-center justify-between pb-4 border-b" style={{ borderColor: "rgba(23,18,8,0.08)" }}>
         <div>
-          <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "rgba(26,16,8,0.5)" }}>
+          <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "rgba(23,18,8,0.5)" }}>
             Portfolio
           </div>
           <div className="text-lg font-semibold" style={{ ...serif, color: DARK }}>
@@ -156,7 +156,7 @@ function DashboardMock() {
           { l: "Pending", v: "2" },
         ].map((s) => (
           <div key={s.l} className="rounded-md p-3" style={{ background: SOFT }}>
-            <div className="text-[10px] uppercase tracking-wider font-semibold" style={{ color: "rgba(26,16,8,0.5)" }}>
+            <div className="text-[10px] uppercase tracking-wider font-semibold" style={{ color: "rgba(23,18,8,0.5)" }}>
               {s.l}
             </div>
             <div className="mt-1 text-xl font-bold tabular-nums" style={{ ...serif, color: DARK }}>
@@ -180,9 +180,9 @@ function DashboardMock() {
               className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
               style={{
                 color:
-                  r.tone === "ok" ? "#0f6b3f" : r.tone === "warn" ? RED : "rgba(26,16,8,0.55)",
+                  r.tone === "ok" ? "#0f6b3f" : r.tone === "warn" ? RED : "rgba(23,18,8,0.55)",
                 background:
-                  r.tone === "ok" ? "#0f6b3f14" : r.tone === "warn" ? RED_TINT : "rgba(26,16,8,0.06)",
+                  r.tone === "ok" ? "#0f6b3f14" : r.tone === "warn" ? RED_TINT : "rgba(23,18,8,0.06)",
               }}
             >
               {r.state}
@@ -331,7 +331,7 @@ function HowItWorks() {
                 <h3 className="mt-1.5 text-xl font-bold" style={{ ...serif, color: DARK }}>
                   {s.t}
                 </h3>
-                <p className="mt-2 text-[15px]" style={{ color: "rgba(26,16,8,0.65)" }}>
+                <p className="mt-2 text-[15px]" style={{ color: "rgba(23,18,8,0.65)" }}>
                   {s.d}
                 </p>
               </div>
@@ -376,7 +376,7 @@ function Features() {
               viewport={{ once: true, margin: "-80px" }}
               variants={fadeUp}
               className="p-8 rounded-lg border"
-              style={{ background: CARD, borderColor: "rgba(26,16,8,0.08)" }}
+              style={{ background: CARD, borderColor: "rgba(23,18,8,0.08)" }}
             >
               <div
                 className="w-12 h-12 rounded-md flex items-center justify-center"
@@ -387,7 +387,7 @@ function Features() {
               <h3 className="mt-5 text-2xl font-bold" style={{ ...serif, color: DARK }}>
                 {it.t}
               </h3>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "rgba(26,16,8,0.7)" }}>
+              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: "rgba(23,18,8,0.7)" }}>
                 {it.d}
               </p>
             </motion.div>
@@ -441,7 +441,7 @@ function Quotes() {
               </p>
               <p
                 className="mt-6 text-[11px] font-bold tracking-[0.18em] uppercase"
-                style={{ color: "rgba(26,16,8,0.6)" }}
+                style={{ color: "rgba(23,18,8,0.6)" }}
               >
                 {q.who}
               </p>
@@ -490,7 +490,7 @@ function LeadForm() {
   const label = "block text-[12px] font-semibold mb-1.5";
   const field =
     "w-full h-11 px-3 rounded-md border bg-white text-[14px] outline-hidden focus:ring-2";
-  const fieldStyle = { borderColor: "rgba(26,16,8,0.12)", color: DARK } as const;
+  const fieldStyle = { borderColor: "rgba(23,18,8,0.12)", color: DARK } as const;
 
   return (
     <section id="early-access" style={{ background: RED }}>
@@ -526,7 +526,7 @@ function LeadForm() {
               <h3 className="mt-4 text-2xl font-bold" style={{ ...serif, color: DARK }}>
                 Spot reserved.
               </h3>
-              <p className="mt-2 text-[15px]" style={{ color: "rgba(26,16,8,0.7)" }}>
+              <p className="mt-2 text-[15px]" style={{ color: "rgba(23,18,8,0.7)" }}>
                 We'll reach out within 48 hours to set up your firm.
               </p>
             </div>
@@ -586,7 +586,7 @@ function LeadForm() {
               >
                 {submitting ? "Reserving…" : <>Reserve My Spot <ArrowRight size={18} /></>}
               </button>
-              <p className="text-center text-xs" style={{ color: "rgba(26,16,8,0.55)" }}>
+              <p className="text-center text-xs" style={{ color: "rgba(23,18,8,0.55)" }}>
                 No commitment. No credit card. We'll reach out within 48 hours.
               </p>
             </form>

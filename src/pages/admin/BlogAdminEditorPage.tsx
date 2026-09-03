@@ -5,11 +5,11 @@ import { toast } from "sonner";
 import { Plus, Edit2, Archive, RotateCcw, Trash2, X, Eye, LogOut } from "lucide-react";
 import { useBlogAdmin } from "@/contexts/BlogAdminContext";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const BEIGE = "#F4EDDA";
 const GOLD = "#8B6914";
-const BORDER = "rgba(26,16,8,0.08)";
+const BORDER = "rgba(23,18,8,0.08)";
 
 const CATEGORIES = ["GST", "Cash flow", "MSME", "Startup finance", "Compliance", "CA resources", "Hiring"];
 
@@ -172,7 +172,7 @@ export default function BlogAdminEditorPage() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: "100vh", background: BEIGE, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.5)" }}>
+      <div style={{ minHeight: "100vh", background: BEIGE, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.5)" }}>
         Checking permissions…
       </div>
     );
@@ -190,13 +190,13 @@ export default function BlogAdminEditorPage() {
   const PostTable = ({ rows, actions }: { rows: BlogPost[]; actions: (p: BlogPost) => React.ReactNode }) => (
     <div style={{ background: "white", border: "1px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
       {rows.length === 0 ? (
-        <div style={{ padding: "32px 20px", textAlign: "center", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>No posts here yet.</div>
+        <div style={{ padding: "32px 20px", textAlign: "center", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>No posts here yet.</div>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: BEIGE }}>
               {["Title", "Category", "Views", "Date", "Actions"].map((h) => (
-                <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(26,16,8,0.5)", borderBottom: "1px solid " + BORDER }}>{h}</th>
+                <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(23,18,8,0.5)", borderBottom: "1px solid " + BORDER }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -205,15 +205,15 @@ export default function BlogAdminEditorPage() {
               <tr key={p.id} style={{ borderTop: i > 0 ? "1px solid " + BORDER : "none" }}>
                 <td style={{ padding: "12px 14px" }}>
                   <div style={{ fontFamily: "Georgia, serif", fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.3, marginBottom: 2 }}>{p.title}</div>
-                  <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "rgba(26,16,8,0.4)" }}>{p.slug}</div>
+                  <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "rgba(23,18,8,0.4)" }}>{p.slug}</div>
                 </td>
                 <td style={{ padding: "12px 14px" }}>
                   <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 500, color: RED, background: "rgba(196,30,30,0.08)", padding: "3px 10px", borderRadius: 99 }}>{p.category}</span>
                 </td>
-                <td style={{ padding: "12px 14px", fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: "rgba(26,16,8,0.65)" }}>
+                <td style={{ padding: "12px 14px", fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: "rgba(23,18,8,0.65)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 5 }}><Eye size={12} /> {(p.views ?? 0).toLocaleString("en-IN")}</div>
                 </td>
-                <td style={{ padding: "12px 14px", fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{formatDate(p.published_at ?? p.created_at)}</td>
+                <td style={{ padding: "12px 14px", fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: "rgba(23,18,8,0.5)" }}>{formatDate(p.published_at ?? p.created_at)}</td>
                 <td style={{ padding: "12px 14px" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{actions(p)}</div>
                 </td>
@@ -227,7 +227,7 @@ export default function BlogAdminEditorPage() {
 
   const ActionBtn = ({ onClick, icon, label, variant = "ghost" }: { onClick: () => void; icon: React.ReactNode; label: string; variant?: "ghost" | "red" | "gold" }) => {
     const bg = variant === "red" ? RED : variant === "gold" ? GOLD : "transparent";
-    const color = variant !== "ghost" ? "white" : "rgba(26,16,8,0.65)";
+    const color = variant !== "ghost" ? "white" : "rgba(23,18,8,0.65)";
     return (
       <button onClick={onClick} title={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 10px", borderRadius: 7, border: "1px solid " + BORDER, background: bg, color, fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
         {icon} {label}
@@ -241,12 +241,12 @@ export default function BlogAdminEditorPage() {
       <div style={{ background: "white", borderBottom: "1px solid " + BORDER, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <Link to="/" style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 20, color: INK, textDecoration: "none" }}>FYNHelp</Link>
-          <span style={{ color: "rgba(26,16,8,0.25)", fontSize: 14 }}>/</span>
+          <span style={{ color: "rgba(23,18,8,0.25)", fontSize: 14 }}>/</span>
           <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: GOLD, textTransform: "uppercase", letterSpacing: "0.06em" }}>Blog Admin</span>
         </div>
         <button
           onClick={handleSignOut}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "transparent", border: "1px solid " + BORDER, borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 500, color: "rgba(26,16,8,0.7)", cursor: "pointer" }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "transparent", border: "1px solid " + BORDER, borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 500, color: "rgba(23,18,8,0.7)", cursor: "pointer" }}
         >
           <LogOut size={14} /> Sign out
         </button>
@@ -265,7 +265,7 @@ export default function BlogAdminEditorPage() {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: "center", padding: 48, fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>Loading posts…</div>
+            <div style={{ textAlign: "center", padding: 48, fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>Loading posts…</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
               <div>
@@ -296,61 +296,61 @@ export default function BlogAdminEditorPage() {
       </div>
 
       {modalOpen && (
-        <div onClick={() => setModalOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div onClick={() => setModalOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "white", borderRadius: 12, width: "100%", maxWidth: 700, maxHeight: "90vh", overflowY: "auto", padding: 28, position: "relative" }}>
-            <button onClick={() => setModalOpen(false)} style={{ position: "absolute", top: 14, right: 14, background: "transparent", border: "none", cursor: "pointer", color: "rgba(26,16,8,0.4)" }}><X size={18} /></button>
+            <button onClick={() => setModalOpen(false)} style={{ position: "absolute", top: 14, right: 14, background: "transparent", border: "none", cursor: "pointer", color: "rgba(23,18,8,0.4)" }}><X size={18} /></button>
             <h2 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: INK, margin: "0 0 20px 0" }}>{editId ? "Edit post" : "Create new post"}</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[{ label: "Title", key: "title" }, { label: "Slug (URL)", key: "slug" }].map((field) => (
                 <div key={field.key}>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>{field.label}</label>
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>{field.label}</label>
                   <input type="text" value={(form as any)[field.key]}
                     onChange={(e) => {
                       const val = e.target.value;
                       setForm((f) => ({ ...f, [field.key]: val, ...(field.key === "title" && !editId ? { slug: slugify(val) } : {}) }));
                     }}
-                    style={{ width: "100%", height: 40, padding: "0 12px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, color: INK, outline: "none", boxSizing: "border-box" }} />
+                    style={{ width: "100%", height: 40, padding: "0 12px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, color: INK, outline: "none", boxSizing: "border-box" }} />
                 </div>
               ))}
               <div>
-                <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>Category</label>
-                <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={{ width: "100%", height: 40, padding: "0 12px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, color: INK, outline: "none" }}>
+                <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>Category</label>
+                <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={{ width: "100%", height: 40, padding: "0 12px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, color: INK, outline: "none" }}>
                   {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               {["excerpt", "content"].map((key) => (
                 <div key={key}>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>
                     {key === "excerpt" ? "Excerpt (max 300 characters)" : "Content (separate paragraphs with a blank line)"}
                   </label>
                   <textarea value={(form as any)[key]} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                     rows={key === "content" ? 14 : 3}
                     maxLength={key === "excerpt" ? 300 : undefined}
-                    style={{ width: "100%", padding: "10px 12px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: key === "content" ? "Georgia, serif" : "Inter, sans-serif", fontSize: 14, color: INK, outline: "none", resize: "vertical", lineHeight: 1.6, boxSizing: "border-box" }} />
+                    style={{ width: "100%", padding: "10px 12px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: key === "content" ? "Georgia, serif" : "Inter, sans-serif", fontSize: 14, color: INK, outline: "none", resize: "vertical", lineHeight: 1.6, boxSizing: "border-box" }} />
                 </div>
               ))}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 80px", gap: 12 }}>
                 <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>Author name</label>
-                  <input type="text" value={form.author_name} onChange={(e) => setForm((f) => ({ ...f, author_name: e.target.value }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>Author name</label>
+                  <input type="text" value={form.author_name} onChange={(e) => setForm((f) => ({ ...f, author_name: e.target.value }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>Author role</label>
-                  <input type="text" value={form.author_role} onChange={(e) => setForm((f) => ({ ...f, author_role: e.target.value }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>Author role</label>
+                  <input type="text" value={form.author_role} onChange={(e) => setForm((f) => ({ ...f, author_role: e.target.value }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>Tags (comma-separated)</label>
-                  <input type="text" value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="GST, Startup, Tax" style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>Tags (comma-separated)</label>
+                  <input type="text" value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="GST, Startup, Tax" style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(26,16,8,0.65)", display: "block", marginBottom: 5 }}>Min read</label>
-                  <input type="number" min={1} max={60} value={form.reading_time_minutes} onChange={(e) => setForm((f) => ({ ...f, reading_time_minutes: Number(e.target.value) }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(23,18,8,0.65)", display: "block", marginBottom: 5 }}>Min read</label>
+                  <input type="number" min={1} max={60} value={form.reading_time_minutes} onChange={(e) => setForm((f) => ({ ...f, reading_time_minutes: Number(e.target.value) }))} style={{ width: "100%", height: 38, padding: "0 10px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: INK, outline: "none", boxSizing: "border-box" }} />
                 </div>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22, paddingTop: 16, borderTop: "1px solid rgba(26,16,8,0.08)" }}>
-              <button onClick={() => setModalOpen(false)} style={{ padding: "9px 18px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", cursor: "pointer" }}>Cancel</button>
-              <button onClick={() => handleSave(false)} disabled={saving} style={{ padding: "9px 18px", border: "1px solid rgba(26,16,8,0.2)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, color: INK, cursor: "pointer" }}>Save as draft</button>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22, paddingTop: 16, borderTop: "1px solid rgba(23,18,8,0.08)" }}>
+              <button onClick={() => setModalOpen(false)} style={{ padding: "9px 18px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.65)", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => handleSave(false)} disabled={saving} style={{ padding: "9px 18px", border: "1px solid rgba(23,18,8,0.2)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, color: INK, cursor: "pointer" }}>Save as draft</button>
               <button onClick={() => handleSave(true)} disabled={saving} style={{ padding: "9px 20px", background: RED, color: "white", border: "none", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>{saving ? "Saving…" : "Publish now"}</button>
             </div>
           </div>
@@ -358,12 +358,12 @@ export default function BlogAdminEditorPage() {
       )}
 
       {deleteId && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.7)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.7)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: "white", borderRadius: 12, padding: 28, maxWidth: 400, width: "calc(100% - 32px)" }}>
             <h3 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: INK, margin: "0 0 10px 0" }}>Delete this post?</h3>
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.65)", marginBottom: 22 }}>This action is permanent and cannot be undone. The post and all its data will be removed.</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.65)", marginBottom: 22 }}>This action is permanent and cannot be undone. The post and all its data will be removed.</p>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 18px", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 18px", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 8, background: "transparent", fontFamily: "Inter, sans-serif", fontSize: 14, cursor: "pointer" }}>Cancel</button>
               <button onClick={handleDelete} style={{ padding: "9px 18px", background: RED, color: "white", border: "none", borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Delete permanently</button>
             </div>
           </div>

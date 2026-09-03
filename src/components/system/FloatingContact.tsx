@@ -25,7 +25,7 @@ export default function FloatingContact() {
       rel="noreferrer noopener"
       style={{
         display: "flex", alignItems: "center", gap: 10, padding: "9px 10px",
-        borderRadius: 10, textDecoration: "none", color: "#1A1008",
+        borderRadius: 10, textDecoration: "none", color: "#171208",
       }}
       onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F2EC")}
       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -38,7 +38,7 @@ export default function FloatingContact() {
       </span>
       <span>
         <span style={{ display: "block", fontSize: 13, fontWeight: 500 }}>{label}</span>
-        <span style={{ display: "block", fontSize: 11, color: "rgba(26,16,8,0.55)" }}>{sub}</span>
+        <span style={{ display: "block", fontSize: 11, color: "rgba(23,18,8,0.55)" }}>{sub}</span>
       </span>
     </a>
   );
@@ -50,11 +50,11 @@ export default function FloatingContact() {
           style={{
             position: "absolute", bottom: 56, right: 0, width: 240,
             background: "#FFFFFF", borderRadius: 14, padding: 6,
-            border: "1px solid rgba(26,16,8,0.08)",
-            boxShadow: "0 16px 40px rgba(26,16,8,0.16)",
+            border: "1px solid rgba(23,18,8,0.08)",
+            boxShadow: "0 16px 40px rgba(23,18,8,0.16)",
           }}
         >
-          <div style={{ padding: "8px 10px 6px", fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(26,16,8,0.45)" }}>
+          <div style={{ padding: "8px 10px 6px", fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase", color: "rgba(23,18,8,0.45)" }}>
             Talk to us
           </div>
           {item(WHATSAPP, MessageCircle, "WhatsApp", "Fastest response")}

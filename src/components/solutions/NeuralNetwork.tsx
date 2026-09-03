@@ -789,7 +789,7 @@ export default function NeuralNetwork() {
                   width: 18,
                   height: 18,
                   borderRadius: "50%",
-                  background: isLive ? "#10B981" : "#9CA3AF",
+                  background: isLive ? "#1F5A46" : "#9CA3AF",
                   border: "3px solid #FFFFFF",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
                   zIndex: 1,
@@ -1162,7 +1162,7 @@ function InfoCard({ module: m, onAction, onClose, style, showClose }: InfoCardPr
           lineHeight: 1.2,
         }}>{m.name}</h3>
         <span style={{
-          background: isLive ? "#10B981" : "#6B7280",
+          background: isLive ? "#1F5A46" : "#6B7280",
           color: "#FFFFFF",
           padding: "6px 14px",
           borderRadius: 16,
@@ -1217,7 +1217,7 @@ function InfoCard({ module: m, onAction, onClose, style, showClose }: InfoCardPr
             fontWeight: 500, fontSize: 14, color: "#1A1A1A",
             lineHeight: 1.6, marginBottom: 8,
           }}>
-            <Check size={16} color="#10B981" strokeWidth={2.5} style={{ marginTop: 3, flexShrink: 0 }} />
+            <Check size={16} color="#1F5A46" strokeWidth={2.5} style={{ marginTop: 3, flexShrink: 0 }} />
             <span>{mt}</span>
           </li>
         ))}

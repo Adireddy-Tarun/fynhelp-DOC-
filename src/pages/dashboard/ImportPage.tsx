@@ -901,7 +901,7 @@ export default function ImportPage() {
                   className="bg-white text-left p-4 transition-all"
                   style={{
                     borderRadius: 12,
-                    border: selected ? "2px solid #C41E1E" : "1px solid rgba(26,16,8,0.08)",
+                    border: selected ? "2px solid #C41E1E" : "1px solid rgba(23,18,8,0.08)",
                     outline: "none",
                   }}
                 >
@@ -910,8 +910,8 @@ export default function ImportPage() {
                   <div
                     className="inline-block text-xs px-3 py-1 rounded"
                     style={{
-                      background: selected ? "#C41E1E" : "rgba(26,16,8,0.05)",
-                      color: selected ? "#FFFFFF" : "#1A1008",
+                      background: selected ? "#C41E1E" : "rgba(23,18,8,0.05)",
+                      color: selected ? "#FFFFFF" : "#171208",
                       fontFamily: "Inter, sans-serif",
                       fontWeight: 500,
                     }}
@@ -932,7 +932,7 @@ export default function ImportPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
               <div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally Prime</div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#171208", marginBottom: 8 }}>Tally Prime</div>
                 {[
                   "Gateway of Tally",
                   "Display More Reports",
@@ -945,12 +945,12 @@ export default function ImportPage() {
                 ].map((step, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
                     <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 22, flexShrink: 0 }}>{i + 1}.</span>
-                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.75)", lineHeight: 1.4 }}>{step}</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.75)", lineHeight: 1.4 }}>{step}</span>
                   </div>
                 ))}
               </div>
               <div>
-                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#1A1008", marginBottom: 8 }}>Tally ERP 9</div>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#171208", marginBottom: 8 }}>Tally ERP 9</div>
                 {[
                   "Gateway of Tally",
                   "Display",
@@ -963,7 +963,7 @@ export default function ImportPage() {
                 ].map((step, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
                     <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 22, flexShrink: 0 }}>{i + 1}.</span>
-                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.75)", lineHeight: 1.4 }}>{step}</span>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.75)", lineHeight: 1.4 }}>{step}</span>
                   </div>
                 ))}
               </div>
@@ -993,7 +993,7 @@ export default function ImportPage() {
             ].map((step, i) => (
               <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
                 <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "#C41E1E", fontWeight: 600, minWidth: 22, flexShrink: 0 }}>{i + 1}.</span>
-                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.75)", lineHeight: 1.4 }}>{step}</span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.75)", lineHeight: 1.4 }}>{step}</span>
               </div>
             ))}
           </div>
@@ -1016,7 +1016,7 @@ export default function ImportPage() {
             className="bg-white cursor-pointer flex flex-col items-center justify-center text-center px-6 py-10 transition-colors"
             style={{
               borderRadius: 12,
-              border: `2px dashed ${dragOver ? "#C41E1E" : "rgba(26,16,8,0.15)"}`,
+              border: `2px dashed ${dragOver ? "#C41E1E" : "rgba(23,18,8,0.15)"}`,
             }}
           >
             <Upload className="w-8 h-8 mb-3" style={{ color: "#8B6914" }} />
@@ -1036,7 +1036,7 @@ export default function ImportPage() {
           </div>
 
           {file && (
-            <div className="mt-3 bg-white p-4 flex items-center gap-3" style={{ borderRadius: 12, border: "1px solid rgba(26,16,8,0.08)" }}>
+            <div className="mt-3 bg-white p-4 flex items-center gap-3" style={{ borderRadius: 12, border: "1px solid rgba(23,18,8,0.08)" }}>
               <FileText className="w-5 h-5 text-fyn-ink/60" />
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-fyn-ink font-medium truncate" style={{ fontFamily: "Inter, sans-serif" }}>{file.name}</div>
@@ -1064,8 +1064,8 @@ export default function ImportPage() {
           )}
 
           {rawRows.length > 0 && !isXMLFile && (
-            <div className="mt-3 bg-white overflow-hidden" style={{ borderRadius: 12, border: "1px solid rgba(26,16,8,0.08)" }}>
-              <div className="px-4 py-2 text-[11px] tracking-widest" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace", borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+            <div className="mt-3 bg-white overflow-hidden" style={{ borderRadius: 12, border: "1px solid rgba(23,18,8,0.08)" }}>
+              <div className="px-4 py-2 text-[11px] tracking-widest" style={{ color: "#8B6914", fontFamily: "'JetBrains Mono', monospace", borderBottom: "1px solid rgba(23,18,8,0.06)" }}>
                 PREVIEW — FIRST {Math.max(0, rawRows.length - 1)} ROWS
               </div>
               <div className="overflow-x-auto">
@@ -1073,7 +1073,7 @@ export default function ImportPage() {
                   <thead>
                     <tr>
                       {rawRows[0].map((h, i) => (
-                        <th key={i} className="text-left px-3 py-2 text-fyn-ink/70 font-semibold whitespace-nowrap" style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>{h}</th>
+                        <th key={i} className="text-left px-3 py-2 text-fyn-ink/70 font-semibold whitespace-nowrap" style={{ borderBottom: "1px solid rgba(23,18,8,0.06)" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -1081,7 +1081,7 @@ export default function ImportPage() {
                     {rawRows.slice(1).map((r, ri) => (
                       <tr key={ri}>
                         {r.map((c, ci) => (
-                          <td key={ci} className="px-3 py-2 text-fyn-ink/80 whitespace-nowrap" style={{ borderBottom: "1px solid rgba(26,16,8,0.04)" }}>{c}</td>
+                          <td key={ci} className="px-3 py-2 text-fyn-ink/80 whitespace-nowrap" style={{ borderBottom: "1px solid rgba(23,18,8,0.04)" }}>{c}</td>
                         ))}
                       </tr>
                     ))}
@@ -1124,7 +1124,7 @@ export default function ImportPage() {
                       width: "100%", height: 36, padding: "0 10px",
                       border: `1px solid ${required && !tallyColumnMap[key] ? "rgba(196,30,30,0.4)" : "rgba(146,64,14,0.3)"}`,
                       borderRadius: 8, fontFamily: "Inter, sans-serif", fontSize: 13,
-                      color: "#1A1008", background: "white", outline: "none",
+                      color: "#171208", background: "white", outline: "none",
                     }}
                   >
                     <option value="">Not mapped</option>
@@ -1149,11 +1149,11 @@ export default function ImportPage() {
                     <tbody>
                       {mapperPreview.map((p, i) => (
                         <tr key={i} style={{ borderTop: "1px solid rgba(146,64,14,0.12)" }}>
-                          <td style={{ padding: "7px 10px", color: "#1A1008", whiteSpace: "nowrap" }}>{p.raw || "—"}</td>
+                          <td style={{ padding: "7px 10px", color: "#171208", whiteSpace: "nowrap" }}>{p.raw || "—"}</td>
                           <td style={{
                             padding: "7px 10px", textAlign: "right",
                             fontFamily: "'JetBrains Mono', monospace",
-                            color: p.parsed < 0 ? "#C41E1E" : "#10B981",
+                            color: p.parsed < 0 ? "#C41E1E" : "#1F5A46",
                           }}>
                             {p.parsed < 0 ? "−" : "+"}{Math.abs(p.parsed).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
@@ -1213,7 +1213,7 @@ export default function ImportPage() {
                 <span>Inserting rows</span>
                 <span>{progress.done} / {progress.total}</span>
               </div>
-              <div style={{ height: 4, background: "rgba(26,16,8,0.08)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ height: 4, background: "rgba(23,18,8,0.08)", borderRadius: 2, overflow: "hidden" }}>
                 <div
                   style={{
                     height: "100%",
@@ -1236,23 +1236,23 @@ export default function ImportPage() {
                 </span>
               </div>
               {skippedInfo.reasons.length > 0 && (
-                <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(26,16,8,0.65)", lineHeight: 1.5, paddingLeft: 16 }}>
+                <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "rgba(23,18,8,0.65)", lineHeight: 1.5, paddingLeft: 16 }}>
                   {skippedInfo.reasons.map((r, i) => <li key={i}>{r}</li>)}
                   {skippedInfo.count > skippedInfo.reasons.length && (
                     <li>...and {skippedInfo.count - skippedInfo.reasons.length} more</li>
                   )}
                 </ul>
               )}
-              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 6 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(23,18,8,0.45)", marginTop: 6 }}>
                 Skipped rows had unrecognised dates, zero amounts, or empty content. All valid rows were imported successfully.
               </div>
             </div>
           )}
 
           {result && (
-            <div className="mt-6 bg-white p-6" style={{ borderRadius: 12, border: "1px solid rgba(16,185,129,0.3)", borderLeft: "4px solid #10B981" }}>
+            <div className="mt-6 bg-white p-6" style={{ borderRadius: 12, border: "1px solid rgba(16,185,129,0.3)", borderLeft: "4px solid #1F5A46" }}>
               <div className="flex items-center gap-2 mb-5">
-                <CheckCircle2 className="w-6 h-6" style={{ color: "#10B981" }} />
+                <CheckCircle2 className="w-6 h-6" style={{ color: "#1F5A46" }} />
                 <h2 className="text-xl text-fyn-ink" style={{ fontFamily: "Georgia, serif" }}>Import complete</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

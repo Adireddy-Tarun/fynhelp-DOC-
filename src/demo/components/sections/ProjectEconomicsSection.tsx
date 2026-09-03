@@ -22,19 +22,19 @@ export default function ProjectEconomicsSection() {
       <IntelCard title="Project Economics" sub="Per-project gross margin">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[rgba(26,16,8,0.08)]">
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Project</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Client</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Quoted</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Margin</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
+            <tr className="border-b border-[rgba(23,18,8,0.08)]">
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Project</th>
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Client</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Quoted</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Margin</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r: any) => (
-              <tr key={r.id} onClick={() => setOpen(r)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+              <tr key={r.id} onClick={() => setOpen(r)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                 <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.project_name}</td>
-                <td className="py-2.5 text-xs text-[#6B6B6B]">{r.client_name ?? "—"}</td>
+                <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.client_name ?? "—"}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(Number(r.quoted_amount))}</td>
                 <td className="py-2.5 text-right"><Badge tone={marginTone(Number(r.gross_margin_pct))}>{fmtPct(Number(r.gross_margin_pct), 0)}</Badge></td>
                 <td className="py-2.5 text-right"><Badge tone={statusTone[r.status] ?? "gray"}>{r.status}</Badge></td>
@@ -42,8 +42,8 @@ export default function ProjectEconomicsSection() {
             ))}
           </tbody>
         </table>
-        <div className="mt-3 pt-3 border-t border-[rgba(26,16,8,0.08)] flex justify-between text-sm">
-          <span className="text-[#6B6B6B]">Average project margin</span>
+        <div className="mt-3 pt-3 border-t border-[rgba(23,18,8,0.08)] flex justify-between text-sm">
+          <span className="text-[rgba(23,18,8,0.62)]">Average project margin</span>
           <span className="font-mono font-semibold text-fyn-ink">{fmtPct(avgMargin, 1)}</span>
         </div>
       </IntelCard>
@@ -63,7 +63,7 @@ export default function ProjectEconomicsSection() {
                 <Row label="Status" value={open.status} />
                 <Row label="Start" value={open.start_date ?? "—"} />
                 <Row label="End" value={open.end_date ?? "—"} />
-                {open.notes && <p className="text-xs text-[#6B6B6B] pt-2 border-t border-[rgba(26,16,8,0.08)]">{open.notes}</p>}
+                {open.notes && <p className="text-xs text-[rgba(23,18,8,0.62)] pt-2 border-t border-[rgba(23,18,8,0.08)]">{open.notes}</p>}
               </div>
             </>
           )}
@@ -75,6 +75,6 @@ export default function ProjectEconomicsSection() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between"><span className="text-[#6B6B6B]">{label}</span><span className="font-mono text-fyn-ink font-semibold">{value}</span></div>
+    <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">{label}</span><span className="font-mono text-fyn-ink font-semibold">{value}</span></div>
   );
 }

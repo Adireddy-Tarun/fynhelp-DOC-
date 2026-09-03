@@ -31,11 +31,11 @@ import {
   X,
 } from "lucide-react";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const GOLD = "#8B6914";
 const BEIGE = "#F4EDDA";
-const BORDER = "rgba(26,16,8,0.12)";
+const BORDER = "rgba(23,18,8,0.12)";
 const HEADING = "'Times New Roman', Times, serif";
 const BODY = "Arial, Helvetica, sans-serif";
 
@@ -324,7 +324,7 @@ export default function AdminBlogEditorPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button onClick={() => navigate("/admin/content")} style={{ ...field, width: "auto", cursor: "pointer" }}>Back to posts</button>
-          <span style={{ fontSize: 11, color: "rgba(26,16,8,0.55)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <span style={{ fontSize: 11, color: "rgba(23,18,8,0.55)", display: "inline-flex", alignItems: "center", gap: 5 }}>
             {autosaveState === "saving" ? (
               <>
                 <Loader2 size={12} className="animate-spin" /> Saving
@@ -354,7 +354,7 @@ export default function AdminBlogEditorPage() {
               style={{ width: "100%", border: "none", outline: "none", fontFamily: HEADING, fontSize: 19, fontWeight: 700, color: INK, background: "transparent" }}
             />
             <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(26,16,8,0.45)" }}>fynhelp.com/blog/</span>
+              <span style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(23,18,8,0.45)" }}>fynhelp.com/blog/</span>
               <input
                 value={slug}
                 onChange={(e) => {
@@ -406,7 +406,7 @@ export default function AdminBlogEditorPage() {
             <div style={{ minHeight: 280, padding: "14px 16px", overflowY: "auto", lineHeight: 1.85, fontFamily: BODY, fontSize: 14 }}>
               <EditorContent editor={editor} />
             </div>
-            <div style={{ display: "flex", gap: 16, padding: "8px 16px", borderTop: "0.5px solid " + BORDER, fontSize: 11, color: "rgba(26,16,8,0.55)" }}>
+            <div style={{ display: "flex", gap: 16, padding: "8px 16px", borderTop: "0.5px solid " + BORDER, fontSize: 11, color: "rgba(23,18,8,0.55)" }}>
               <span>{words} words</span>
               <span>{readTime} min read</span>
               <span>{contentText.length} characters</span>
@@ -451,7 +451,7 @@ export default function AdminBlogEditorPage() {
               }}
               style={{ ...field, resize: "vertical" }}
             />
-            <div style={{ fontSize: 10, color: "rgba(26,16,8,0.45)", marginBottom: 10 }}>{excerpt.length} of 500 characters</div>
+            <div style={{ fontSize: 10, color: "rgba(23,18,8,0.45)", marginBottom: 10 }}>{excerpt.length} of 500 characters</div>
             <label style={labelStyle}>Author name</label>
             <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} style={{ ...field, marginBottom: 10 }} />
             <label style={labelStyle}>Tags</label>
@@ -519,14 +519,14 @@ export default function AdminBlogEditorPage() {
             </div>
             <label style={labelStyle}>SEO title</label>
             <input value={seoTitle} maxLength={60} onChange={(e) => setSeoTitle(e.target.value)} style={field} />
-            <div style={{ fontSize: 10, color: "rgba(26,16,8,0.45)", marginBottom: 10 }}>{seoTitle.length} of 60 characters</div>
+            <div style={{ fontSize: 10, color: "rgba(23,18,8,0.45)", marginBottom: 10 }}>{seoTitle.length} of 60 characters</div>
             <label style={labelStyle}>Meta description</label>
             <textarea value={seoDescription} maxLength={160} rows={3} onChange={(e) => setSeoDescription(e.target.value)} style={{ ...field, resize: "vertical" }} />
-            <div style={{ fontSize: 10, color: "rgba(26,16,8,0.45)", marginBottom: 10 }}>{seoDescription.length} of 160 characters</div>
+            <div style={{ fontSize: 10, color: "rgba(23,18,8,0.45)", marginBottom: 10 }}>{seoDescription.length} of 160 characters</div>
             <div style={{ border: "0.5px solid " + BORDER, borderRadius: 8, padding: 10, marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: "#0B7A5A" }}>fynhelp.com/blog/{slug}</div>
               <div style={{ fontSize: 13, color: "#1A0DAB", lineHeight: 1.3 }}>{seoTitle || title || "Post title"}</div>
-              <div style={{ fontSize: 11, color: "rgba(26,16,8,0.55)" }}>{seoDescription || "Meta description preview"}</div>
+              <div style={{ fontSize: 11, color: "rgba(23,18,8,0.55)" }}>{seoDescription || "Meta description preview"}</div>
             </div>
             <label style={labelStyle}>Social share image URL</label>
             <input value={ogImage} onChange={(e) => setOgImage(e.target.value)} style={field} />

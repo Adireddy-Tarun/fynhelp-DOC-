@@ -65,7 +65,7 @@ export default function WaitlistPage() {
         {submitted ? (
           <section className="mx-auto" style={{ maxWidth: 720 }}>
             <div
-              className="relative overflow-hidden rounded-3xl border border-fyn-ink/10 bg-white shadow-[0_20px_60px_rgba(26,16,8,0.10)] p-8 md:p-12 text-center"
+              className="relative overflow-hidden rounded-3xl border border-fyn-ink/10 bg-white shadow-[0_20px_60px_rgba(23,18,8,0.10)] p-8 md:p-12 text-center"
             >
               <div
                 aria-hidden

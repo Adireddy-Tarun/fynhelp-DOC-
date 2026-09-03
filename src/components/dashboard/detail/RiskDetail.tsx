@@ -13,7 +13,7 @@ function RiskHeatmap({ likelihood, impact }: { likelihood: number; impact: numbe
         const row = 5 - Math.floor(idx / 5); // impact
         const sev = col * row; // 1..25
         const here = col === likelihood && row === impact;
-        const bg = sev >= 15 ? "#A93838" : sev >= 9 ? "#D97706" : sev >= 4 ? "#8B6914" : "#10B981";
+        const bg = sev >= 15 ? "#A93838" : sev >= 9 ? "#D97706" : sev >= 4 ? "#8B6914" : "#1F5A46";
         return (
           <div
             key={idx}
@@ -21,7 +21,7 @@ function RiskHeatmap({ likelihood, impact }: { likelihood: number; impact: numbe
             style={{
               background: bg,
               opacity: here ? 1 : 0.18,
-              outline: here ? "2px solid #1A1008" : "none",
+              outline: here ? "2px solid #171208" : "none",
             }}
             title={`L${col} × I${row} = ${sev}`}
           />

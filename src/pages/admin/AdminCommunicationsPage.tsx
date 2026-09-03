@@ -112,7 +112,7 @@ export default function AdminCommunicationsPage() {
                   background: c.status === "connected"
                     ? "linear-gradient(135deg, #C41E1E 0%, #8B6914 100%)"
                     : "transparent",
-                  border: c.status === "connected" ? "none" : "1px solid rgba(26,16,8,0.18)",
+                  border: c.status === "connected" ? "none" : "1px solid rgba(23,18,8,0.18)",
                   color: c.status === "connected" ? "#FFFFFF" : "hsl(var(--fyn-ink) / 0.75)",
                   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                 }}
@@ -140,7 +140,7 @@ export default function AdminCommunicationsPage() {
           <div className="overflow-x-auto">
             <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+                <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
                   {["Time", "Platform", "Action", "Recipients", ""].map((h) => (
                     <th key={h} className="text-left py-2.5 px-2"
                       style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink) / 0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>
@@ -154,7 +154,7 @@ export default function AdminCommunicationsPage() {
                   const meta = PLATFORM_META[row.platform];
                   const recipients = row.details?.sent ?? row.details?.total ?? "-";
                   return (
-                    <tr key={row.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }}>
+                    <tr key={row.id} style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }}>
                       <td className="py-3 px-2 whitespace-nowrap" style={{ color: "hsl(var(--fyn-ink) / 0.7)" }}>{new Date(row.created_at).toLocaleString("en-IN")}</td>
                       <td className="py-3 px-2">
                         <span style={{ padding: "3px 9px", borderRadius: 6, fontWeight: 600, fontSize: 11, background: meta.bg, color: meta.color }}>{meta.label}</span>
@@ -199,7 +199,7 @@ function StatusBadge({ status }: { status: string }) {
     sent:      { bg: "rgba(16,185,129,0.12)", color: "#0F7B4F" },
     scheduled: { bg: "rgba(24,119,242,0.12)", color: "#0F4FB0" },
     failed:    { bg: "rgba(196,30,30,0.12)",  color: "#C41E1E" },
-    draft:     { bg: "rgba(26,16,8,0.08)",    color: "hsl(var(--fyn-ink) / 0.7)" },
+    draft:     { bg: "rgba(23,18,8,0.08)",    color: "hsl(var(--fyn-ink) / 0.7)" },
   };
   const m = map[status] ?? map.draft;
   return (
@@ -286,10 +286,10 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
     : "New WhatsApp Message";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(23,18,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl rounded-2xl overflow-hidden"
         style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)", maxHeight: "90vh", overflowY: "auto" }}>
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
           <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 22, color: "hsl(var(--fyn-ink))" }}>{title}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-[hsl(var(--fyn-ink)/0.05)]"><X size={18} /></button>
         </div>
@@ -298,7 +298,7 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
           {(platform === "whatsapp" || platform === "email") && (
             <Field label="Audience">
               <select value={audience} onChange={(e) => setAudience(e.target.value)} className="w-full rounded-lg px-3 py-2.5"
-                style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }}>
+                style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }}>
                 <option value="all_users">All users</option>
                 <option value="pro_users">Pro users</option>
                 <option value="trial_users">Trial users (ending soon)</option>
@@ -329,12 +329,12 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
               <Field label="Subject">
                 <input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full rounded-lg px-3 py-2.5"
                   placeholder="Your trial is ending in 3 days"
-                  style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+                  style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
               </Field>
               <Field label="Preheader">
                 <input value={preheader} onChange={(e) => setPreheader(e.target.value.slice(0, 140))} className="w-full rounded-lg px-3 py-2.5"
                   placeholder="Don't lose access to your financial data"
-                  style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
+                  style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14 }} />
                 <div className="mt-1" style={{ fontSize: 11, color: "hsl(var(--fyn-ink) / 0.5)" }}>{preheader.length}/140 characters</div>
               </Field>
             </>
@@ -356,7 +356,7 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
                   : "Write your email body…"
               }
               className="w-full rounded-lg px-3 py-2.5 resize-y"
-              style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.5 }}
+              style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 14, lineHeight: 1.5 }}
             />
             <div className="mt-1 text-right" style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: content.length > max * 0.95 ? "#C41E1E" : content.length > max * 0.85 ? "#B45309" : "hsl(var(--fyn-ink) / 0.5)" }}>
               {content.length} / {max}
@@ -374,7 +374,7 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
           </Field>
 
           {platform === "email" && previewOpen && (
-            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(26,16,8,0.12)" }}>
+            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(23,18,8,0.12)" }}>
               <div className="px-4 py-2" style={{ background: "rgba(244,237,218,0.6)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
                 Preview — {subject || "(no subject)"}
               </div>
@@ -385,21 +385,21 @@ function ComposeModal({ platform, onClose }: { platform: Platform; onClose: () =
         </div>
 
 
-        <div className="flex items-center justify-between gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
+        <div className="flex items-center justify-between gap-3 px-6 py-4" style={{ borderTop: "1px solid rgba(23,18,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
           <div className="flex gap-2">
             {platform === "email" && (
               <>
-                <button onClick={() => setPreviewOpen((p) => !p)} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
+                <button onClick={() => setPreviewOpen((p) => !p)} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))" }}>
                   {previewOpen ? "Hide Preview" : "Preview"}
                 </button>
-                <button onClick={sendTest} disabled={sending} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))", opacity: sending ? 0.6 : 1 }}>Send Test</button>
+                <button onClick={sendTest} disabled={sending} className="px-3 py-2 rounded-lg" style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "hsl(var(--fyn-ink))", opacity: sending ? 0.6 : 1 }}>Send Test</button>
               </>
             )}
           </div>
 
           <div className="flex gap-3">
             <button onClick={onClose} className="px-4 py-2 rounded-lg"
-              style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
+              style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>
               Cancel
             </button>
             <button onClick={send} disabled={sending} className="flex items-center gap-2 px-5 py-2 rounded-lg text-white"
@@ -444,9 +444,9 @@ const SETUP_STEPS: Record<Platform, { title: string; steps: string[] }> = {
 function SetupModal({ platform, onClose }: { platform: Platform; onClose: () => void }) {
   const info = SETUP_STEPS[platform];
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(23,18,8,0.5)", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}>
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
           <h2 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 20, color: "hsl(var(--fyn-ink))" }}>
             {info.title} — not connected
           </h2>
@@ -463,8 +463,8 @@ function SetupModal({ platform, onClose }: { platform: Platform; onClose: () => 
             Email Blast is live today and can reach the same audiences.
           </div>
         </div>
-        <div className="flex justify-end px-6 py-4" style={{ borderTop: "1px solid rgba(26,16,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
-          <button onClick={onClose} className="px-4 py-2 rounded-lg" style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Close</button>
+        <div className="flex justify-end px-6 py-4" style={{ borderTop: "1px solid rgba(23,18,8,0.08)", background: "rgba(244,237,218,0.4)" }}>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg" style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>Close</button>
         </div>
       </div>
     </div>

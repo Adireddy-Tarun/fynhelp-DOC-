@@ -51,7 +51,7 @@ export default function HrTab() {
                     <div key={r.department}>
                       <div className="flex items-center justify-between text-sm mb-1">
                         <span className="text-fyn-ink">{r.department}</span>
-                        <span className="font-mono text-fyn-ink font-semibold">{r.count} <span className="text-[#6B6B6B] text-xs">({pct.toFixed(0)}%)</span></span>
+                        <span className="font-mono text-fyn-ink font-semibold">{r.count} <span className="text-[rgba(23,18,8,0.62)] text-xs">({pct.toFixed(0)}%)</span></span>
                       </div>
                       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full" style={{ width: `${pct * 2}%`, background: `linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})` }} />
@@ -66,11 +66,11 @@ export default function HrTab() {
 
         <IntelCard title="Compensation Summary">
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Monthly Payroll</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.payroll)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Annual CTC</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.ctc * 12)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Average Salary</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.avgSalary)}</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Headcount Growth (YoY)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
-            <div className="flex justify-between"><span className="text-[#6B6B6B]">Attrition (TTM)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Monthly Payroll</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.payroll)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Annual CTC</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.ctc * 12)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Average Salary</span><span className="font-mono font-semibold text-fyn-ink">{fmtCompact(m.avgSalary)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Headcount Growth (YoY)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
+            <div className="flex justify-between"><span className="text-[rgba(23,18,8,0.62)]">Attrition (TTM)</span><span className="font-mono font-semibold text-fyn-ink">—</span></div>
           </div>
         </IntelCard>
       </div>
@@ -81,24 +81,24 @@ export default function HrTab() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Name</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Department</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Designation</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Salary</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">CTC</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Joined</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Name</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Department</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Designation</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Salary</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">CTC</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((e) => (
-                    <tr key={e.id} onClick={() => openDrawer("employee", e.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                    <tr key={e.id} onClick={() => openDrawer("employee", e.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{e.name}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{e.department ?? "—"}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{e.designation ?? "—"}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{e.department ?? "—"}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{e.designation ?? "—"}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(e.salary))}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(e.cost_to_company))}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{e.joining_date?.slice(0, 10) ?? "—"}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3">{e.joining_date?.slice(0, 10) ?? "—"}</td>
                     </tr>
                   ))}
                 </tbody>

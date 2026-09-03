@@ -89,10 +89,10 @@ const PayablesPage = () => {
       <DashboardLayout>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 110 }} />
+            <div key={i} className="rounded-lg animate-pulse" style={{ background: "rgba(23,18,8,0.06)", height: 110 }} />
           ))}
         </div>
-        <div className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 380 }} />
+        <div className="rounded-lg animate-pulse" style={{ background: "rgba(23,18,8,0.06)", height: 380 }} />
       </DashboardLayout>
     );
   }
@@ -100,14 +100,14 @@ const PayablesPage = () => {
   if (!payables || payables.length === 0) {
     return (
       <DashboardLayout>
-        <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+        <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)" }}>
           <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 64, height: 64, background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", boxShadow: "inset 0 -2px 0 0 #C41E1E", color: "#C41E1E" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
               <path d="M4 4h16v16H4zM4 9h16M9 4v16" />
             </svg>
           </div>
           <h2 className="font-serif text-fyn-ink" style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>No Vendor Bills</h2>
-          <p style={{ fontSize: 14, color: "rgba(26,16,8,0.60)", marginBottom: 20 }}>
+          <p style={{ fontSize: 14, color: "rgba(23,18,8,0.60)", marginBottom: 20 }}>
             Upload expense CSV to track payables
           </p>
           <button
@@ -133,21 +133,21 @@ const PayablesPage = () => {
     <DashboardLayout>
       {/* SUMMARY */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Payables</p>
           <p className="fyn-metric" style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             ₹{totalPayables.toLocaleString("en-IN")}
           </p>
           <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>{payables.length} bills outstanding</p>
         </div>
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Overdue</p>
           <p className="fyn-metric" style={{ color: overdueAmount > 0 ? "#F87171" : "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             ₹{overdueAmount.toLocaleString("en-IN")}
           </p>
           <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, marginTop: 4 }}>{overduePayables.length} bills</p>
         </div>
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Due This Week</p>
           <p className="fyn-metric" style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             {dueSoon.length}
@@ -157,7 +157,7 @@ const PayablesPage = () => {
       </div>
 
       {/* TABLE */}
-      <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+      <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Vendor Bills</h3>
         </div>
@@ -168,7 +168,7 @@ const PayablesPage = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search vendor or invoice…"
             className="outline-hidden flex-1 min-w-[160px]"
-            style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }}
+            style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)", borderRadius: 4, fontSize: 13 }}
           />
           <div className="flex gap-1 flex-wrap">
             {([
@@ -182,9 +182,9 @@ const PayablesPage = () => {
                 onClick={() => setStatusFilter(key)}
                 style={{
                   fontSize: 13, padding: "6px 12px", borderRadius: 4,
-                  background: statusFilter === key ? "#1A1008" : "#FFFFFF",
-                  color: statusFilter === key ? "#FFFFFF" : "rgba(26,16,8,0.60)",
-                  border: statusFilter === key ? "none" : "1px solid rgba(26,16,8,0.10)",
+                  background: statusFilter === key ? "#171208" : "#FFFFFF",
+                  color: statusFilter === key ? "#FFFFFF" : "rgba(23,18,8,0.60)",
+                  border: statusFilter === key ? "none" : "1px solid rgba(23,18,8,0.10)",
                 }}
               >
                 {label}
@@ -194,16 +194,16 @@ const PayablesPage = () => {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="py-12 text-center" style={{ fontSize: 14, color: "rgba(26,16,8,0.50)" }}>
+          <div className="py-12 text-center" style={{ fontSize: 14, color: "rgba(23,18,8,0.50)" }}>
             No bills match the current filter.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
+                <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.10)" }}>
                   {["Vendor", "Invoice #", "Due Date", "Amount", "Outstanding", "Status"].map((h, i) => (
-                    <th key={h} className={`py-2 ${i >= 3 && i <= 4 ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
+                    <th key={h} className={`py-2 ${i >= 3 && i <= 4 ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(23,18,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -215,19 +215,19 @@ const PayablesPage = () => {
                     <tr
                       key={p.id}
                       style={{
-                        borderBottom: "1px solid rgba(26,16,8,0.06)",
+                        borderBottom: "1px solid rgba(23,18,8,0.06)",
                         background: overdue ? "#FDEAEA" : i % 2 === 0 ? "#FFFFFF" : "#FAF7F0",
                       }}
                     >
-                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{p.vendor_name}</td>
-                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{p.invoice_number || "-"}</td>
-                      <td className="py-3" style={{ fontSize: 13, color: overdue ? "#C41E1E" : "rgba(26,16,8,0.60)", fontWeight: overdue ? 600 : 400 }}>
+                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#171208" }}>{p.vendor_name}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(23,18,8,0.60)" }}>{p.invoice_number || "-"}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: overdue ? "#C41E1E" : "rgba(23,18,8,0.60)", fontWeight: overdue ? 600 : 400 }}>
                         {p.due_date ? new Date(p.due_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-"}
                       </td>
-                      <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, color: "rgba(26,16,8,0.80)" }}>
+                      <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, color: "rgba(23,18,8,0.80)" }}>
                         {formatINR(Number(p.amount || 0))}
                       </td>
-                      <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: overdue ? "#C41E1E" : "#1A1008" }}>
+                      <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: overdue ? "#C41E1E" : "#171208" }}>
                         {formatINR(Number(p.outstanding || 0))}
                       </td>
                       <td className="py-3">

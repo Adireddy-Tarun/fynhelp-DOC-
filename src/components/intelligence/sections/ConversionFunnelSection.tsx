@@ -37,10 +37,10 @@ export default function ConversionFunnelSection() {
           );
         })}
       </div>
-      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-[rgba(26,16,8,0.08)] text-xs">
-        <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Avg Days to Convert</p><p className="font-mono text-base text-fyn-ink font-semibold">{latest.avg_days_to_convert}d</p></div>
-        <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Best Channel</p><p className="text-fyn-ink font-medium">{latest.best_channel ?? "—"}</p></div>
-        <div><p className="text-[10px] uppercase tracking-wider text-[#6B6B6B]">Worst Channel</p><p className="text-fyn-ink font-medium">{latest.worst_channel ?? "—"}</p></div>
+      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-[rgba(23,18,8,0.08)] text-xs">
+        <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Avg Days to Convert</p><p className="font-mono text-base text-fyn-ink font-semibold">{latest.avg_days_to_convert}d</p></div>
+        <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Best Channel</p><p className="text-fyn-ink font-medium">{latest.best_channel ?? "—"}</p></div>
+        <div><p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)]">Worst Channel</p><p className="text-fyn-ink font-medium">{latest.worst_channel ?? "—"}</p></div>
       </div>
     </IntelCard>
   );

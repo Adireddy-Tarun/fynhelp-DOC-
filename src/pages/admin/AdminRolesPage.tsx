@@ -17,10 +17,10 @@ const ROLE_CATALOG: { role: string; label: string; blurb: string; tone: string }
   { role: "admin", label: "Admin", blurb: "Broad admin access without CEO view or role management.", tone: "#A93838" },
   { role: "ops_admin", label: "Ops Admin", blurb: "Day-to-day operations: users, billing, content, approvals.", tone: "#8B6914" },
   { role: "support_agent", label: "Support Agent", blurb: "Support tickets and user lookups only.", tone: "#8B6914" },
-  { role: "analyst", label: "Analyst", blurb: "Read-only analytics and monitoring dashboards.", tone: "#10B981" },
-  { role: "blog_admin", label: "Blog Admin", blurb: "Blog authoring and publishing.", tone: "#10B981" },
-  { role: "intern", label: "Intern", blurb: "Limited content assistance. Lowest elevated role.", tone: "#10B981" },
-  { role: "moderator", label: "Moderator", blurb: "Community moderation.", tone: "#10B981" },
+  { role: "analyst", label: "Analyst", blurb: "Read-only analytics and monitoring dashboards.", tone: "#1F5A46" },
+  { role: "blog_admin", label: "Blog Admin", blurb: "Blog authoring and publishing.", tone: "#1F5A46" },
+  { role: "intern", label: "Intern", blurb: "Limited content assistance. Lowest elevated role.", tone: "#1F5A46" },
+  { role: "moderator", label: "Moderator", blurb: "Community moderation.", tone: "#1F5A46" },
   { role: "user", label: "User", blurb: "Standard product access. No admin surface.", tone: "#6B6257" },
 ];
 
@@ -162,7 +162,7 @@ export default function AdminRolesPage() {
         </div>
         <button
           onClick={() => setOnlyAdmins((v) => !v)}
-          style={{ ...body, borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", border: "1px solid hsl(var(--fyn-gold) / 0.35)", background: onlyAdmins ? "#1A1008" : "#fff", color: onlyAdmins ? "#fff" : "hsl(var(--fyn-ink))" }}
+          style={{ ...body, borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", border: "1px solid hsl(var(--fyn-gold) / 0.35)", background: onlyAdmins ? "#171208" : "#fff", color: onlyAdmins ? "#fff" : "hsl(var(--fyn-ink))" }}
         >
           {onlyAdmins ? "Showing role holders" : "Showing all users"}
         </button>

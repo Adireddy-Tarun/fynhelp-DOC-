@@ -60,11 +60,11 @@ function StatusBadge({ row }: { row: DocRow }) {
         <AlertCircle size={12} /> Failed
       </span>;
     case "not_applicable":
-      return <span title={row.parse_error || ""} style={{ ...base, background: "#F5F5F4", color: "rgba(26,16,8,0.55)", border: "1px solid #E7E5E4", cursor: "help" }}>
+      return <span title={row.parse_error || ""} style={{ ...base, background: "#F5F5F4", color: "rgba(23,18,8,0.55)", border: "1px solid #E7E5E4", cursor: "help" }}>
         Not supported
       </span>;
     default:
-      return <span style={{ ...base, background: "#F5F5F4", color: "rgba(26,16,8,0.55)", border: "1px solid #E7E5E4" }}>
+      return <span style={{ ...base, background: "#F5F5F4", color: "rgba(23,18,8,0.55)", border: "1px solid #E7E5E4" }}>
         Pending
       </span>;
   }
@@ -231,10 +231,10 @@ export default function BankStatementImport() {
               <Upload size={20} color="#8B6914" />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 14, color: "#1A1008" }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: "#171208" }}>
                 Drop a bank statement here or click to browse
               </div>
-              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.55)", marginTop: 2 }}>
+              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(23,18,8,0.55)", marginTop: 2 }}>
                 CSV, XLSX or XLS · up to 10MB
               </div>
             </div>
@@ -248,10 +248,10 @@ export default function BankStatementImport() {
               <FileSpreadsheet size={20} color="#166534" />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: 14, color: "#1A1008", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: "#171208", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {file.name}
               </div>
-              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.55)" }}>
+              <div style={{ fontWeight: 400, fontSize: 12, color: "rgba(23,18,8,0.55)" }}>
                 {humanSize(file.size)}
               </div>
             </div>
@@ -262,7 +262,7 @@ export default function BankStatementImport() {
                 style={{
                   background: "transparent", border: "none", cursor: "pointer",
                   width: 28, height: 28, borderRadius: 6, display: "flex",
-                  alignItems: "center", justifyContent: "center", color: "rgba(26,16,8,0.55)",
+                  alignItems: "center", justifyContent: "center", color: "rgba(23,18,8,0.55)",
                 }}
               >
                 <X size={16} />
@@ -288,13 +288,13 @@ export default function BankStatementImport() {
 
       {history.data && history.data.length > 0 && (
         <div style={{ marginTop: 18 }}>
-          <div style={{ fontWeight: 600, fontSize: 12, color: "rgba(26,16,8,0.55)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          <div style={{ fontWeight: 600, fontSize: 12, color: "rgba(23,18,8,0.55)", marginBottom: 8, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             Recent imports
           </div>
           <div style={{ border: "1px solid #F0EBD8", borderRadius: 8, overflow: "hidden" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ background: "#FAF7F0", color: "rgba(26,16,8,0.55)", fontWeight: 600, fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+                <tr style={{ background: "#FAF7F0", color: "rgba(23,18,8,0.55)", fontWeight: 600, fontSize: 11, letterSpacing: "0.04em", textTransform: "uppercase" }}>
                   <th style={{ textAlign: "left", padding: "8px 12px" }}>File</th>
                   <th style={{ textAlign: "left", padding: "8px 12px" }}>Uploaded</th>
                   <th style={{ textAlign: "left", padding: "8px 12px" }}>Status</th>
@@ -303,10 +303,10 @@ export default function BankStatementImport() {
               <tbody>
                 {history.data.map((r) => (
                   <tr key={r.id} style={{ borderTop: "1px solid #F0EBD8" }}>
-                    <td style={{ padding: "10px 12px", color: "#1A1008", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "10px 12px", color: "#171208", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {r.file_name}
                     </td>
-                    <td style={{ padding: "10px 12px", color: "rgba(26,16,8,0.55)" }}>
+                    <td style={{ padding: "10px 12px", color: "rgba(23,18,8,0.55)" }}>
                       {new Date(r.created_at).toLocaleString()}
                     </td>
                     <td style={{ padding: "10px 12px" }}>

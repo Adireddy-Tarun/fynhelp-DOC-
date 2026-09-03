@@ -66,7 +66,7 @@ export default function AdminAnalyticsPage() {
         <PageHeader title="Analytics" subtitle="Live insights into growth, revenue, and engagement" />
         <select value={range} onChange={(e) => setRange(e.target.value)}
           style={{
-            height: 44, padding: "0 14px", borderRadius: 12, border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+            height: 44, padding: "0 14px", borderRadius: 12, border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
             fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))",
           }}>
           <option value="30d">Last 30 days</option>
@@ -89,7 +89,7 @@ export default function AdminAnalyticsPage() {
                         <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                    <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
                     <XAxis dataKey="date" tickLine={false} axisLine={false} style={{ fontSize: 11 }} interval={4} />
                     <YAxis tickLine={false} axisLine={false} style={{ fontSize: 12 }} allowDecimals={false} />
                     <Tooltip contentStyle={tipStyle} />
@@ -113,7 +113,7 @@ export default function AdminAnalyticsPage() {
                         <stop offset="100%" stopColor="#C41E1E" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                    <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
                     <XAxis dataKey="month" tickLine={false} axisLine={false} style={{ fontSize: 11 }} />
                     <YAxis tickLine={false} axisLine={false} style={{ fontSize: 12 }} tickFormatter={(v) => v >= 1000 ? `₹${Math.round(v / 1000)}K` : `₹${v}`} />
                     <Tooltip contentStyle={tipStyle} formatter={(v: any) => [`₹${Number(v).toLocaleString("en-IN")}`, "MRR"]} />
@@ -168,6 +168,6 @@ function Skel() {
 }
 
 const subTitle: React.CSSProperties = { fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 16, color: "hsl(var(--fyn-ink))", marginBottom: 8 };
-const tipStyle: React.CSSProperties = { background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 13 };
+const tipStyle: React.CSSProperties = { background: "#171208", border: "none", borderRadius: 8, color: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 13 };
 const primaryBtn: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: 12, background: "linear-gradient(135deg,#C41E1E,#8B6914)", color: "#fff", border: "none", cursor: "pointer", fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 14 };
-const secondaryBtn: React.CSSProperties = { ...primaryBtn, background: "transparent", color: "hsl(var(--fyn-ink))", border: "2px solid rgba(26,16,8,0.15)" };
+const secondaryBtn: React.CSSProperties = { ...primaryBtn, background: "transparent", color: "hsl(var(--fyn-ink))", border: "2px solid rgba(23,18,8,0.15)" };

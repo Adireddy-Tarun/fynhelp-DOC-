@@ -119,7 +119,7 @@ const CashFlowPage = () => {
     const outflow = payload.find((p: any) => p.dataKey === "outflow")?.value || 0;
     const net = inflow - outflow;
     return (
-      <div style={{ background: "#1A1008", borderRadius: 8, padding: "12px 16px", border: "none" }}>
+      <div style={{ background: "#171208", borderRadius: 8, padding: "12px 16px", border: "none" }}>
         <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 6 }}>{label}</p>
         <p style={{ color: "#4ADE80", fontSize: 14, fontWeight: 600 }}>In: ₹{inflow.toLocaleString("en-IN")}</p>
         <p style={{ color: "#F87171", fontSize: 14, fontWeight: 600 }}>Out: ₹{outflow.toLocaleString("en-IN")}</p>
@@ -134,10 +134,10 @@ const CashFlowPage = () => {
       <DashboardLayout>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 120 }} />
+            <div key={i} className="rounded-lg animate-pulse" style={{ background: "rgba(23,18,8,0.06)", height: 120 }} />
           ))}
         </div>
-        <div className="rounded-lg animate-pulse" style={{ background: "rgba(26,16,8,0.06)", height: 380 }} />
+        <div className="rounded-lg animate-pulse" style={{ background: "rgba(23,18,8,0.06)", height: 380 }} />
       </DashboardLayout>
     );
   }
@@ -146,14 +146,14 @@ const CashFlowPage = () => {
   if (isEmpty) {
     return (
       <DashboardLayout>
-        <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+        <div className="rounded-lg p-12 text-center" style={{ background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)" }}>
           <div className="mx-auto mb-6 flex items-center justify-center" style={{ width: 64, height: 64, background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", boxShadow: "inset 0 -2px 0 0 #C41E1E", color: "#C41E1E" }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" shapeRendering="crispEdges">
               <path d="M3 3v18h18M7 14l4-4 4 4 6-6" />
             </svg>
           </div>
           <h2 className="font-serif text-fyn-ink" style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>No Cash Flow Data</h2>
-          <p style={{ fontSize: 14, color: "rgba(26,16,8,0.60)", marginBottom: 20 }}>
+          <p style={{ fontSize: 14, color: "rgba(23,18,8,0.60)", marginBottom: 20 }}>
             Upload your bank statements to see cash flow analysis
           </p>
           <Link
@@ -172,15 +172,15 @@ const CashFlowPage = () => {
     <DashboardLayout>
       {/* TOP METRICS, current month real data */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Inflow (This Month)</p>
           <p style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹{totalInflow.toLocaleString("en-IN")}</p>
         </div>
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Total Outflow (This Month)</p>
           <p style={{ color: "#FFFFFF", fontSize: 28, fontWeight: 700, marginTop: 4 }}>₹{totalOutflow.toLocaleString("en-IN")}</p>
         </div>
-        <div className="rounded-lg" style={{ background: "#1A1008", padding: "20px 24px" }}>
+        <div className="rounded-lg" style={{ background: "#171208", padding: "20px 24px" }}>
           <p style={{ color: "rgba(255,255,255,0.50)", fontSize: 12, fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase" }}>Net Cash Flow</p>
           <p style={{ color: netCashFlow >= 0 ? "#16A34A" : "#F87171", fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             {netCashFlow >= 0 ? "+" : ""}₹{netCashFlow.toLocaleString("en-IN")}
@@ -189,7 +189,7 @@ const CashFlowPage = () => {
       </div>
 
       {/* CHART */}
-      <div className="rounded-lg p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+      <div className="rounded-lg p-5 mb-6" style={{ background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink font-sans" style={{ fontSize: 15, fontWeight: 600 }}>Monthly Cash Flow, Last 12 Months</h3>
           <div className="flex gap-1">
@@ -201,7 +201,7 @@ const CashFlowPage = () => {
                 style={{
                   fontSize: 13, padding: "4px 12px", borderRadius: 4,
                   background: activePeriod === p ? "#C41E1E" : "transparent",
-                  color: activePeriod === p ? "#FFFFFF" : "rgba(26,16,8,0.40)",
+                  color: activePeriod === p ? "#FFFFFF" : "rgba(23,18,8,0.40)",
                 }}
               >{p}</button>
             ))}
@@ -219,12 +219,12 @@ const CashFlowPage = () => {
                 <stop offset="100%" stopColor="#DC2626" stopOpacity={0.01} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} />
-            <YAxis tick={{ fontSize: 11, fill: "rgba(26,16,8,0.45)" }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "rgba(23,18,8,0.45)" }} />
+            <YAxis tick={{ fontSize: 11, fill: "rgba(23,18,8,0.45)" }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="inflow" stroke="#16A34A" strokeWidth={2} fill="url(#cfGreen)" />
             <Area type="monotone" dataKey="outflow" stroke="#DC2626" strokeWidth={2} fill="url(#cfRed)" />
-            <Area type="monotone" dataKey="net" stroke="#1A1008" strokeWidth={2} fill="none" />
+            <Area type="monotone" dataKey="net" stroke="#171208" strokeWidth={2} fill="none" />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex gap-6 mt-3">
@@ -235,13 +235,13 @@ const CashFlowPage = () => {
             <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#DC2626" }} /> Outflow
           </span>
           <span className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 500 }}>
-            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#1A1008" }} /> Net
+            <span className="inline-block w-4 h-4 rounded-sm" style={{ background: "#171208" }} /> Net
           </span>
         </div>
       </div>
 
       {/* TRANSACTIONS */}
-      <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)" }}>
+      <div className="rounded-lg p-5" style={{ background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-fyn-ink font-serif" style={{ fontSize: 15 }}>Transactions</h3>
         </div>
@@ -252,7 +252,7 @@ const CashFlowPage = () => {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search description..."
             className="outline-hidden flex-1 min-w-[160px]"
-            style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(26,16,8,0.10)", borderRadius: 4, fontSize: 13 }}
+            style={{ height: 36, padding: "0 12px", background: "#FFFFFF", border: "1px solid rgba(23,18,8,0.10)", borderRadius: 4, fontSize: 13 }}
           />
           <div className="flex gap-1">
             {(["all", "in", "out"] as const).map((d) => (
@@ -261,9 +261,9 @@ const CashFlowPage = () => {
                 onClick={() => setDirFilter(d)}
                 style={{
                   fontSize: 13, padding: "6px 12px", borderRadius: 4,
-                  background: dirFilter === d ? "#1A1008" : "#FFFFFF",
-                  color: dirFilter === d ? "#FFFFFF" : "rgba(26,16,8,0.60)",
-                  border: dirFilter === d ? "none" : "1px solid rgba(26,16,8,0.10)",
+                  background: dirFilter === d ? "#171208" : "#FFFFFF",
+                  color: dirFilter === d ? "#FFFFFF" : "rgba(23,18,8,0.60)",
+                  border: dirFilter === d ? "none" : "1px solid rgba(23,18,8,0.10)",
                 }}
               >
                 {d === "all" ? "All" : d === "in" ? "Money In" : "Money Out"}
@@ -273,16 +273,16 @@ const CashFlowPage = () => {
         </div>
 
         {filteredTxns.length === 0 ? (
-          <div className="py-12 text-center" style={{ fontSize: 14, color: "rgba(26,16,8,0.50)" }}>
+          <div className="py-12 text-center" style={{ fontSize: 14, color: "rgba(23,18,8,0.50)" }}>
             No transactions match the current filter.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.10)" }}>
+                <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.10)" }}>
                   {["Date", "Description", "Category", "Counterparty", "Amount"].map((h) => (
-                    <th key={h} className={`py-2 ${h === "Amount" ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
+                    <th key={h} className={`py-2 ${h === "Amount" ? "text-right" : "text-left"}`} style={{ fontSize: 12, color: "rgba(23,18,8,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -293,16 +293,16 @@ const CashFlowPage = () => {
                   return (
                     <tr
                       key={t.id}
-                      style={{ borderBottom: "1px solid rgba(26,16,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
+                      style={{ borderBottom: "1px solid rgba(23,18,8,0.06)", background: i % 2 === 0 ? "#FFFFFF" : "#FAF7F0" }}
                     >
-                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.60)" }}>{dateLabel}</td>
-                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#1A1008" }}>{t.description || "-"}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(23,18,8,0.60)" }}>{dateLabel}</td>
+                      <td className="py-3" style={{ fontSize: 14, fontWeight: 500, color: "#171208" }}>{t.description || "-"}</td>
                       <td className="py-3">
                         {t.category ? (
                           <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 100, background: "#F1F5F9", color: "#475569" }}>{t.category}</span>
-                        ) : <span style={{ fontSize: 12, color: "rgba(26,16,8,0.30)" }}>-</span>}
+                        ) : <span style={{ fontSize: 12, color: "rgba(23,18,8,0.30)" }}>-</span>}
                       </td>
-                      <td className="py-3" style={{ fontSize: 13, color: "rgba(26,16,8,0.50)" }}>{t.counterparty || "-"}</td>
+                      <td className="py-3" style={{ fontSize: 13, color: "rgba(23,18,8,0.50)" }}>{t.counterparty || "-"}</td>
                       <td className="py-3 text-right fyn-metric" style={{ fontSize: 14, fontWeight: 600, color: isIn ? "#16A34A" : "#DC2626" }}>
                         {isIn ? "+" : "-"}{formatINR(Number(t.amount))}
                       </td>

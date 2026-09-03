@@ -17,15 +17,15 @@ const ACTION_COLORS: Record<string, { bg: string; fg: string }> = {
   view: { bg: "rgba(59,130,246,0.1)", fg: "#3B82F6" },
   update: { bg: "rgba(139,105,20,0.1)", fg: "#8B6914" },
   delete: { bg: "rgba(196,30,30,0.1)", fg: "#C41E1E" },
-  create: { bg: "rgba(16,185,129,0.1)", fg: "#10B981" },
+  create: { bg: "rgba(16,185,129,0.1)", fg: "#1F5A46" },
   login: { bg: "rgba(59,130,246,0.1)", fg: "#3B82F6" },
-  grant: { bg: "rgba(16,185,129,0.1)", fg: "#10B981" },
+  grant: { bg: "rgba(16,185,129,0.1)", fg: "#1F5A46" },
   revoke: { bg: "rgba(196,30,30,0.1)", fg: "#C41E1E" },
 };
 
 function colorFor(action: string) {
   const k = Object.keys(ACTION_COLORS).find((p) => action?.toLowerCase().includes(p));
-  return k ? ACTION_COLORS[k] : { bg: "rgba(26,16,8,0.06)", fg: "hsl(var(--fyn-ink))" };
+  return k ? ACTION_COLORS[k] : { bg: "rgba(23,18,8,0.06)", fg: "hsl(var(--fyn-ink))" };
 }
 
 export default function AdminAuditLogsPage() {
@@ -105,7 +105,7 @@ export default function AdminAuditLogsPage() {
               placeholder="Search action, admin, target…"
               style={{
                 width: "100%", height: 48, padding: "0 14px 0 38px", borderRadius: 12,
-                border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+                border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
                 fontFamily: "Roboto, sans-serif", fontSize: 15, color: "hsl(var(--fyn-ink))", outline: "none",
               }}
             />
@@ -113,7 +113,7 @@ export default function AdminAuditLogsPage() {
           <select value={type} onChange={(e) => setType(e.target.value)}
             style={{
               height: 48, padding: "0 14px", borderRadius: 12,
-              border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+              border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
               fontFamily: "Roboto, sans-serif", fontSize: 14, color: "hsl(var(--fyn-ink))", minWidth: 200,
             }}>
             <option value="all">All actions</option>
@@ -126,7 +126,7 @@ export default function AdminAuditLogsPage() {
         <div className="overflow-x-auto">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "rgba(26,16,8,0.04)", borderBottom: "2px solid rgba(139,105,20,0.2)" }}>
+              <tr style={{ background: "rgba(23,18,8,0.04)", borderBottom: "2px solid rgba(139,105,20,0.2)" }}>
                 {["Timestamp","Admin","Action","Target","IP","Details"].map((h) => (
                   <th key={h} style={{ padding: 16, textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14, color: "hsl(var(--fyn-ink))" }}>{h}</th>
                 ))}
@@ -143,7 +143,7 @@ export default function AdminAuditLogsPage() {
                   <tr key={l.id} onClick={() => setOpen(l)}
                     style={{
                       background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff",
-                      borderBottom: "1px solid rgba(26,16,8,0.06)",
+                      borderBottom: "1px solid rgba(23,18,8,0.06)",
                       borderLeft: `4px solid ${c.fg}`,
                       cursor: "pointer",
                     }}>
@@ -178,10 +178,10 @@ export default function AdminAuditLogsPage() {
             style={{
               background: "rgba(255,255,255,0.98)", backdropFilter: "blur(20px)",
               borderRadius: 20, border: "1px solid rgba(139,105,20,0.2)",
-              boxShadow: "0 24px 60px rgba(26,16,8,0.25)", maxHeight: "85vh", overflow: "auto",
+              boxShadow: "0 24px 60px rgba(23,18,8,0.25)", maxHeight: "85vh", overflow: "auto",
             }}>
             <div className="flex items-start justify-between p-6"
-              style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+              style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
               <div>
                 <h3 style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 24, color: "hsl(var(--fyn-ink))" }}>
                   Audit Log Detail
@@ -205,17 +205,17 @@ export default function AdminAuditLogsPage() {
                   Details
                 </div>
                 <pre style={{
-                  background: "#1A1008", color: "#F4EDDA", borderRadius: 12, padding: 16,
+                  background: "#171208", color: "#F4EDDA", borderRadius: 12, padding: 16,
                   fontFamily: "JetBrains Mono, monospace", fontSize: 12, overflow: "auto",
                 }}>{JSON.stringify(open.details ?? {}, null, 2)}</pre>
               </div>
             </div>
             <div className="flex justify-end p-6"
-              style={{ borderTop: "1px solid rgba(26,16,8,0.08)" }}>
+              style={{ borderTop: "1px solid rgba(23,18,8,0.08)" }}>
               <button onClick={() => setOpen(null)}
                 style={{
                   height: 44, padding: "0 22px", borderRadius: 12, background: "transparent",
-                  border: "2px solid rgba(26,16,8,0.15)", color: "hsl(var(--fyn-ink))",
+                  border: "2px solid rgba(23,18,8,0.15)", color: "hsl(var(--fyn-ink))",
                   fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer",
                 }}>Close</button>
             </div>
@@ -229,7 +229,7 @@ export default function AdminAuditLogsPage() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[140px,1fr] gap-3 items-start"
-      style={{ paddingBottom: 10, borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+      style={{ paddingBottom: 10, borderBottom: "1px solid rgba(23,18,8,0.06)" }}>
       <span style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.55)" }}>{label}</span>
       <span style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 500, fontSize: 13, color: "hsl(var(--fyn-ink))", wordBreak: "break-all" }}>{value}</span>
     </div>

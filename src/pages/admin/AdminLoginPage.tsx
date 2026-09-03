@@ -109,7 +109,7 @@ export default function AdminLoginPage() {
       {/* Branding side */}
       <div
         className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden"
-        style={{ width: "40%", background: "linear-gradient(160deg, #1A1008 0%, #2A1A0F 100%)" }}
+        style={{ width: "40%", background: "linear-gradient(160deg, #171208 0%, #2A1A0F 100%)" }}
       >
         <div
           aria-hidden
@@ -315,7 +315,7 @@ export default function AdminLoginPage() {
 
 const inputStyle: React.CSSProperties = {
   width: "100%", height: 52, padding: "0 16px", borderRadius: 12,
-  border: "1px solid rgba(26,16,8,0.15)", background: "#fff",
+  border: "1px solid rgba(23,18,8,0.15)", background: "#fff",
   fontFamily: "Roboto, sans-serif", fontSize: 16, color: "hsl(var(--fyn-ink))",
   outline: "none",
 };

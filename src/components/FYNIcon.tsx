@@ -3,7 +3,7 @@ import React from "react";
 /**
  * FYNIcon, custom SVG icon system for FynHelp.
  * Indian SME-themed designs using brand palette:
- *   --fyn-ink #1A1008, --fyn-red #C41E1E, --fyn-gold #8B6914, --fyn-beige #F4EDDA
+ *   --fyn-ink #171208, --fyn-red #C41E1E, --fyn-gold #8B6914, --fyn-beige #F4EDDA
  *
  * Usage: <FYNIcon name="getting-started" size={32} />
  */
@@ -28,7 +28,7 @@ interface Props {
   animated?: boolean; // adds hover micro-animation
 }
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const GOLD = "#8B6914";
 const BEIGE = "#F4EDDA";

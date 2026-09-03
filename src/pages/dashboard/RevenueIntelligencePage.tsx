@@ -259,11 +259,11 @@ function RevenueContent({
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trend} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
-                  <XAxis dataKey="month" tick={{ fill: "#1A1008", fontSize: 12 }} />
-                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" />
+                  <XAxis dataKey="month" tick={{ fill: "#171208", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
                   <Tooltip
-                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
                     formatter={(v: number, name: string) => name === "MRR" ? formatINR(v) : v}
                     labelFormatter={(l) => `Month: ${l}`}
                   />
@@ -283,11 +283,11 @@ function RevenueContent({
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={plans} layout="vertical" margin={{ top: 4, right: 48, left: 8, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" horizontal={false} />
-                  <XAxis type="number" tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
-                  <YAxis dataKey="plan" type="category" tick={{ fill: "#1A1008", fontSize: 12 }} width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" horizontal={false} />
+                  <XAxis type="number" tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <YAxis dataKey="plan" type="category" tick={{ fill: "#171208", fontSize: 12 }} width={120} />
                   <Tooltip
-                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
                     formatter={(v: number, _n, p: any) => [`${formatINR(v)} (${(p.payload.percentage || 0).toFixed(1)}%)`, "MRR"]}
                   />
                   <Bar dataKey="mrr" fill="#8B6914" radius={[0, 4, 4, 0]} />

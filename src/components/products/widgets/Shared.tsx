@@ -7,7 +7,7 @@ export const FYN = {
   white: "#FFFFFF",
   beige: "#FAFAF8",
   gray: "#6B7280",
-  green: "#10B981",
+  green: "#1F5A46",
   grayDev: "#9CA3AF",
 };
 

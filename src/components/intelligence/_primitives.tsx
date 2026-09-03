@@ -79,14 +79,14 @@ export function IntelCard({
   action?: ReactNode;
   tone?: HealthTone;
 }) {
-  const borderLeft = tone === "neutral" ? "1px solid rgba(26,16,8,0.08)" : `3px solid ${toneBorder[tone]}`;
+  const borderLeft = tone === "neutral" ? "1px solid rgba(23,18,8,0.08)" : `3px solid ${toneBorder[tone]}`;
   return (
     <div
       className={cn("bg-white rounded-lg p-5 fyn-card-hover", tone !== "neutral" && tonePulseClass[tone], className)}
       style={{
-        border: "1px solid rgba(26,16,8,0.08)",
+        border: "1px solid rgba(23,18,8,0.08)",
         borderLeft,
-        boxShadow: "0 2px 8px rgba(26,16,8,0.06)",
+        boxShadow: "0 2px 8px rgba(23,18,8,0.06)",
       }}
     >
       {(title || action) && (
@@ -139,7 +139,7 @@ export function KPI({
   const Wrap: any = href ? Link : "div";
 
   const showEmpty = !!isEmpty;
-  const borderLeft = tone === "neutral" || showEmpty ? "1px solid rgba(26,16,8,0.08)" : `3px solid ${toneBorder[tone]}`;
+  const borderLeft = tone === "neutral" || showEmpty ? "1px solid rgba(23,18,8,0.08)" : `3px solid ${toneBorder[tone]}`;
   const pulseClass = !showEmpty && tone !== "neutral" ? tonePulseClass[tone] : "";
 
   const renderedValue: ReactNode = showEmpty
@@ -157,9 +157,9 @@ export function KPI({
         href && "cursor-pointer",
       )}
       style={{
-        border: "1px solid rgba(26,16,8,0.08)",
+        border: "1px solid rgba(23,18,8,0.08)",
         borderLeft,
-        boxShadow: "0 2px 8px rgba(26,16,8,0.06)",
+        boxShadow: "0 2px 8px rgba(23,18,8,0.06)",
       }}
     >
       <div className="flex items-center justify-between mb-2">
@@ -224,7 +224,7 @@ export function EmptyState({
       : cta;
   return (
     <div className="text-center py-10 px-4">
-      <div className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-3 text-[rgba(23,18,8,0.62)]" style={{ background: "rgba(26,16,8,0.04)" }}>
+      <div className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-3 text-[rgba(23,18,8,0.62)]" style={{ background: "rgba(23,18,8,0.04)" }}>
         {icon}
       </div>
       <p className="font-serif text-sm text-fyn-ink font-semibold">{title}</p>
@@ -337,9 +337,9 @@ export const CHART = {
   redGrad: { id: "redGrad", from: ACCENT.redLight, to: ACCENT.red },
   goldGrad: { id: "goldGrad", from: ACCENT.goldLight, to: ACCENT.gold },
   axis: "#9B9B9B",
-  grid: "rgba(26,16,8,0.06)",
+  grid: "rgba(23,18,8,0.06)",
   tooltipBg: "#FFFFFF",
-  tooltipBorder: "rgba(26,16,8,0.1)",
+  tooltipBorder: "rgba(23,18,8,0.1)",
 } as const;
 
 // Render as a standalone hidden SVG so the gradient <defs> are guaranteed

@@ -229,7 +229,7 @@ const CompliancePage = () => {
     const diff = daysBetween(due, todayStr);
     return {
       label: "Pending",
-      color: "#1A1008",
+      color: "#171208",
       rule: "status ≠ filed AND due_date ≥ today",
       detail: `Not yet filed; ${diff === 0 ? "due today" : `due in ${diff} day${diff === 1 ? "" : "s"}`}.`,
     };
@@ -704,12 +704,12 @@ const CompliancePage = () => {
                   const html = `<!doctype html><html><head><meta charset="utf-8" />
                     <title>Compliance reasons, ${escapeHtml(bucketLabel[breakdownFilter])}, ${today}</title>
                     <style>
-                      body { font-family: Inter, system-ui, -apple-system, sans-serif; color: #1A1008; padding: 24px; }
+                      body { font-family: Inter, system-ui, -apple-system, sans-serif; color: #171208; padding: 24px; }
                       h1 { font-family: Georgia, serif; font-size: 20px; margin: 0 0 4px; }
-                      .meta { color: rgba(26,16,8,0.6); font-size: 12px; margin-bottom: 16px; }
+                      .meta { color: rgba(23,18,8,0.6); font-size: 12px; margin-bottom: 16px; }
                       table { width: 100%; border-collapse: collapse; font-size: 11px; }
-                      th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(26,16,8,0.1); vertical-align: top; }
-                      th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(26,16,8,0.5); }
+                      th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(23,18,8,0.1); vertical-align: top; }
+                      th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: rgba(23,18,8,0.5); }
                       code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; }
                       .lbl { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
                       @media print { body { padding: 12mm; } }
@@ -779,7 +779,7 @@ const CompliancePage = () => {
               { key: "on-time" as const, label: "On time", count: onTimeCount, color: "#1A6B3C" },
               { key: "late" as const, label: "Filed late", count: lateCount, color: "#8B5A00" },
               { key: "overdue" as const, label: "Overdue", count: overdueCount, color: "#C41E1E" },
-              { key: "pending" as const, label: "Pending", count: pendingCount, color: "#1A1008" },
+              { key: "pending" as const, label: "Pending", count: pendingCount, color: "#171208" },
               ...(unknownCount > 0 ? [{ key: "unknown" as const, label: "Unknown", count: unknownCount, color: "#475569" }] : []),
             ].map((b) => {
               const active = breakdownFilter === b.key;
@@ -988,17 +988,17 @@ const CompliancePage = () => {
           </FynLabel>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
-              <XAxis dataKey="month" stroke="#1A1008" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" />
+              <XAxis dataKey="month" stroke="#171208" fontSize={12} />
               <YAxis
                 domain={[0, 100]}
                 tickFormatter={(v) => `${v}%`}
-                stroke="#1A1008"
+                stroke="#171208"
                 fontSize={12}
               />
               <Tooltip
                 formatter={(v) => (v == null ? "No filings" : `${v}%`)}
-                contentStyle={{ background: "hsl(var(--background))", border: "1px solid rgba(26,16,8,0.1)" }}
+                contentStyle={{ background: "hsl(var(--background))", border: "1px solid rgba(23,18,8,0.1)" }}
               />
               <Legend />
               <Line

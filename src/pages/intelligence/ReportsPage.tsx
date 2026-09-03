@@ -82,7 +82,7 @@ const FORMAT_BADGE_COLORS: Record<string, { bg: string; fg: string }> = {
   pdf:   { bg: "rgba(169,56,56,0.08)", fg: "#A93838" },
   excel: { bg: "rgba(16,185,129,0.10)", fg: "#0B7A52" },
   json:  { bg: "rgba(139,105,20,0.10)", fg: "#8B6914" },
-  csv:   { bg: "rgba(26,16,8,0.06)",    fg: "#1A1008" },
+  csv:   { bg: "rgba(23,18,8,0.06)",    fg: "#171208" },
 };
 
 
@@ -121,7 +121,7 @@ function ReportCard({
       className="fyn-report-card"
       style={{
         background: "#FFFFFF",
-        border: "1px solid rgba(26,16,8,0.06)",
+        border: "1px solid rgba(23,18,8,0.06)",
         borderRadius: 12,
         padding: 14,
         display: "flex",
@@ -131,7 +131,7 @@ function ReportCard({
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(26,16,8,0.08)";
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(23,18,8,0.08)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
@@ -152,7 +152,7 @@ function ReportCard({
         <div style={{ fontSize: 12, fontWeight: 500, color: ACCENT.ink }}>{r.name}</div>
         {r.badge && <GovtBadge kind={r.badge} />}
       </div>
-      <div style={{ fontSize: 11, color: "#6B6B6B", lineHeight: 1.4, flex: 1 }}>{r.description}</div>
+      <div style={{ fontSize: 11, color: "rgba(23,18,8,0.62)", lineHeight: 1.4, flex: 1 }}>{r.description}</div>
       <button
         onClick={onClick}
         disabled={pending}
@@ -226,7 +226,7 @@ function GenerateModal({
       role="dialog" aria-modal="true"
       onClick={onClose}
       style={{
-        position: "fixed", inset: 0, background: "rgba(26,16,8,0.5)",
+        position: "fixed", inset: 0, background: "rgba(23,18,8,0.5)",
         zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
       }}
     >
@@ -241,7 +241,7 @@ function GenerateModal({
           <h3 style={{ fontSize: 16, fontWeight: 600, color: ACCENT.ink, fontFamily: "'Space Grotesk', sans-serif", margin: 0 }}>
             Generate {report.name}
           </h3>
-          <button onClick={onClose} aria-label="Close" style={{ background: "transparent", border: "none", cursor: "pointer", color: "#6B6B6B", padding: 4 }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: "transparent", border: "none", cursor: "pointer", color: "rgba(23,18,8,0.62)", padding: 4 }}>
             <X size={16} />
           </button>
         </div>
@@ -266,7 +266,7 @@ function GenerateModal({
             <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT.red, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
               Financial Year
             </div>
-            <select value={fy} onChange={(e) => setFy(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(26,16,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
+            <select value={fy} onChange={(e) => setFy(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(23,18,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
               <option>FY 2026-27</option>
               <option>FY 2025-26</option>
               <option>FY 2024-25</option>
@@ -278,7 +278,7 @@ function GenerateModal({
               <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT.red, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 Month
               </div>
-              <select value={month} onChange={(e) => setMonth(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(26,16,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
+              <select value={month} onChange={(e) => setMonth(e.target.value)} style={{ width: "100%", fontSize: 12, padding: "6px 8px", borderRadius: 6, border: "1px solid rgba(23,18,8,0.15)", background: "#FFF", color: ACCENT.ink }}>
                 {MONTHS.map((m) => <option key={m}>{m}</option>)}
               </select>
             </div>
@@ -381,7 +381,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
           <h1 style={{ fontSize: 18, fontWeight: 500, color: ACCENT.ink, fontFamily: "'Space Grotesk', sans-serif" }}>
             CFO Reports
           </h1>
-          <p style={{ fontSize: 13, color: "#6B6B6B", marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: "rgba(23,18,8,0.62)", marginTop: 4 }}>
             Generate and download financial reports for your business
           </p>
         </div>
@@ -424,7 +424,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
                 key={i}
                 style={{
                   height: 36, borderRadius: 6,
-                  background: "linear-gradient(90deg, rgba(26,16,8,0.04), rgba(26,16,8,0.08), rgba(26,16,8,0.04))",
+                  background: "linear-gradient(90deg, rgba(23,18,8,0.04), rgba(23,18,8,0.08), rgba(23,18,8,0.04))",
                   backgroundSize: "200% 100%",
                   animation: "fyn-shimmer 1.4s ease-in-out infinite",
                 }}
@@ -433,7 +433,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
             <style>{`@keyframes fyn-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
           </div>
         ) : reports.length === 0 ? (
-          <div style={{ padding: 24, fontSize: 13, color: "#6B6B6B", textAlign: "center" }}>
+          <div style={{ padding: 24, fontSize: 13, color: "rgba(23,18,8,0.62)", textAlign: "center" }}>
             No reports generated yet. Generate your first report above.
           </div>
         ) : (
@@ -452,7 +452,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
                         letterSpacing: "0.05em",
                         fontWeight: 600,
                         padding: "10px 12px",
-                        borderBottom: "1px solid rgba(26,16,8,0.06)",
+                        borderBottom: "1px solid rgba(23,18,8,0.06)",
                       }}
                     >
                       {h}
@@ -466,7 +466,7 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
                   const c = FORMAT_BADGE_COLORS[fmt] ?? FORMAT_BADGE_COLORS.pdf;
                   return (
                     <tr key={r.id}>
-                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: ACCENT.ink, fontWeight: 500 }}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(23,18,8,0.06)", color: ACCENT.ink, fontWeight: 500 }}>
                         {r.report_name}
                         {r.status === "generating" && (
                           <span style={{ marginLeft: 8, fontSize: 10, color: ACCENT.gold, fontStyle: "italic" }}>
@@ -474,20 +474,20 @@ function ReportsContent({ mode }: { mode: IntelligenceMode }) {
                           </span>
                         )}
                       </td>
-                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.62)" }}>
                         {formatDate(r.generated_at)}
                       </td>
-                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)", color: "#6B6B6B" }}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.62)" }}>
                         {r.generated_by || "—"}
                       </td>
-                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)" }}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(23,18,8,0.06)" }}>
                         <span style={{
                           fontSize: 10, fontWeight: 600, letterSpacing: "0.04em",
                           background: c.bg, color: c.fg,
                           padding: "2px 6px", borderRadius: 4, textTransform: "uppercase",
                         }}>{fmt}</span>
                       </td>
-                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(26,16,8,0.06)" }}>
+                      <td style={{ padding: "10px 12px", borderBottom: "0.5px solid rgba(23,18,8,0.06)" }}>
                         <button
                           onClick={() => handleDownload(r)}
                           disabled={r.status !== "completed" || downloading === r.id}

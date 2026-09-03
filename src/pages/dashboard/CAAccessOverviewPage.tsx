@@ -94,10 +94,10 @@ export default function CAAccessOverviewPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <header>
-          <h1 className="text-2xl font-bold" style={{ color: "#1A1008", fontFamily: "Inter" }}>
+          <h1 className="text-2xl font-bold" style={{ color: "#171208", fontFamily: "Inter" }}>
             CA Firm Access
           </h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
+          <p className="text-sm mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>
             Chartered Accountant firms that currently have access to your business data.
           </p>
         </header>
@@ -110,7 +110,7 @@ export default function CAAccessOverviewPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-16 mt-2" />
             ) : (
-              <div className="text-3xl font-bold mt-1" style={{ color: "#1A1008" }}>
+              <div className="text-3xl font-bold mt-1" style={{ color: "#171208" }}>
                 {rows.length}
               </div>
             )}
@@ -122,7 +122,7 @@ export default function CAAccessOverviewPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-16 mt-2" />
             ) : (
-              <div className="text-3xl font-bold mt-1" style={{ color: "#1A1008" }}>
+              <div className="text-3xl font-bold mt-1" style={{ color: "#171208" }}>
                 {rows.filter((r) => r.access_level === "data_entry").length}
               </div>
             )}
@@ -134,7 +134,7 @@ export default function CAAccessOverviewPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-16 mt-2" />
             ) : (
-              <div className="text-3xl font-bold mt-1" style={{ color: "#1A1008" }}>
+              <div className="text-3xl font-bold mt-1" style={{ color: "#171208" }}>
                 {rows.filter((r) => r.access_level !== "data_entry").length}
               </div>
             )}
@@ -144,7 +144,7 @@ export default function CAAccessOverviewPage() {
         <Card className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <ShieldCheck size={18} style={{ color: "#8B6914" }} />
-            <h2 className="text-base font-semibold" style={{ color: "#1A1008" }}>
+            <h2 className="text-base font-semibold" style={{ color: "#171208" }}>
               Firms with access
             </h2>
           </div>
@@ -158,11 +158,11 @@ export default function CAAccessOverviewPage() {
 
           {!isLoading && rows.length === 0 && (
             <div className="text-center py-10">
-              <Briefcase size={28} className="mx-auto mb-2" style={{ color: "rgba(26,16,8,0.30)" }} />
-              <p className="text-sm" style={{ color: "rgba(26,16,8,0.60)" }}>
+              <Briefcase size={28} className="mx-auto mb-2" style={{ color: "rgba(23,18,8,0.30)" }} />
+              <p className="text-sm" style={{ color: "rgba(23,18,8,0.60)" }}>
                 No CA firms currently have access to your business.
               </p>
-              <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.45)" }}>
+              <p className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.45)" }}>
                 When a CA firm requests access and you approve it, they'll appear here.
               </p>
             </div>
@@ -186,7 +186,7 @@ export default function CAAccessOverviewPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>
+                        <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>
                           {firm?.firm_name ?? "Chartered Accountant firm"}
                         </h3>
                         {firm?.is_verified && (
@@ -204,25 +204,25 @@ export default function CAAccessOverviewPage() {
                           {accessLabel[row.access_level ?? ""] ?? row.access_level ?? "Access"}
                         </span>
                       </div>
-                      <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>
+                      <p className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>
                         {firm?.membership_number ? `M.No. ${firm.membership_number}` : ""}
                         {firm?.membership_number && (firm?.city || firm?.state) ? " · " : ""}
                         {firm?.city ?? ""}{firm?.city && firm?.state ? ", " : ""}{firm?.state ?? ""}
                       </p>
                       {(firm?.email || firm?.phone) && (
-                        <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.55)" }}>
+                        <p className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.55)" }}>
                           {firm?.email}
                           {firm?.email && firm?.phone ? " · " : ""}
                           {firm?.phone}
                         </p>
                       )}
-                      <p className="text-[12px] mt-2" style={{ color: "rgba(26,16,8,0.50)" }}>
+                      <p className="text-[12px] mt-2" style={{ color: "rgba(23,18,8,0.50)" }}>
                         Access granted {formatDate(row.granted_at)}
                       </p>
                       {row.notes && (
                         <blockquote
                           className="text-[12px] mt-2 pl-3 border-l-2 italic"
-                          style={{ borderColor: "#D4C9A8", color: "rgba(26,16,8,0.65)" }}
+                          style={{ borderColor: "#D4C9A8", color: "rgba(23,18,8,0.65)" }}
                         >
                           {row.notes}
                         </blockquote>
@@ -240,7 +240,7 @@ export default function CAAccessOverviewPage() {
           style={{ background: "#FAF7F0", border: "1px solid #E0D9C8" }}
         >
           <Info size={16} className="flex-shrink-0 mt-0.5" style={{ color: "#8B6914" }} />
-          <p className="text-[13px]" style={{ color: "rgba(26,16,8,0.70)" }}>
+          <p className="text-[13px]" style={{ color: "rgba(23,18,8,0.70)" }}>
             To revoke a CA firm's access, contact the firm directly or visit{" "}
             <a href="/dashboard/settings/ca-access" className="underline font-medium" style={{ color: "#C41E1E" }}>
               Settings → CA Access

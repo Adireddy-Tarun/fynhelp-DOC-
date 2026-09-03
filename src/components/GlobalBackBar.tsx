@@ -83,7 +83,7 @@ export default function GlobalBackBar() {
       style={{
         height: 44,
         background: "#EDE4CB",
-        borderBottom: "1px solid rgba(26,16,8,0.10)",
+        borderBottom: "1px solid rgba(23,18,8,0.10)",
         top: 72,
         backdropFilter: "blur(8px)",
         zIndex: 10,
@@ -127,7 +127,7 @@ export default function GlobalBackBar() {
           </button>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 18, background: "rgba(26,16,8,0.15)", margin: "0 4px" }} />
+          <div style={{ width: 1, height: 18, background: "rgba(23,18,8,0.15)", margin: "0 4px" }} />
 
           {/* Home button */}
           <Link
@@ -165,10 +165,10 @@ export default function GlobalBackBar() {
             return (
               <span key={i} className="flex items-center" style={{ gap: 6 }}>
                 {i > 0 && (
-                  <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(26,16,8,0.25)" }}>/</span>
+                  <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(23,18,8,0.25)" }}>/</span>
                 )}
                 {isLast ? (
-                  <span className="text-secondary-foreground font-serif" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "rgba(26,16,8,0.70)" }}>
+                  <span className="text-secondary-foreground font-serif" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: 12, color: "rgba(23,18,8,0.70)" }}>
                     {seg.label}
                   </span>
                 ) : (
@@ -177,11 +177,11 @@ export default function GlobalBackBar() {
                     className="text-secondary-foreground font-serif"
                     style={{
                       fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: 12,
-                      color: "rgba(26,16,8,0.45)", textDecoration: "none",
+                      color: "rgba(23,18,8,0.45)", textDecoration: "none",
                       transition: "color 150ms",
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(26,16,8,0.70)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(26,16,8,0.45)"; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(23,18,8,0.70)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(23,18,8,0.45)"; }}
                   >
                     {seg.label}
                   </Link>

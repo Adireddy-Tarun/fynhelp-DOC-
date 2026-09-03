@@ -76,9 +76,9 @@ export default function AdminAIMonitoringPage() {
 
   const responseBuckets = useMemo(() => {
     const b = [
-      { b: "0-1s", v: 0, c: "#10B981" },
-      { b: "1-2s", v: 0, c: "#10B981" },
-      { b: "2-3s", v: 0, c: "#10B981" },
+      { b: "0-1s", v: 0, c: "#1F5A46" },
+      { b: "1-2s", v: 0, c: "#1F5A46" },
+      { b: "2-3s", v: 0, c: "#1F5A46" },
       { b: "3-5s", v: 0, c: "#EAC43C" },
       { b: "5-10s", v: 0, c: "#EAC43C" },
       { b: "10s+", v: 0, c: "#C41E1E" },
@@ -141,7 +141,7 @@ export default function AdminAIMonitoringPage() {
                     <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
                 <XAxis dataKey="d" tickLine={false} axisLine={false} style={{ fontSize: 11 }} />
                 <YAxis yAxisId="left" tickLine={false} axisLine={false} style={{ fontSize: 11 }} />
                 <YAxis yAxisId="right" orientation="right" tickLine={false} axisLine={false} style={{ fontSize: 11 }} unit="$" />
@@ -162,13 +162,13 @@ export default function AdminAIMonitoringPage() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ background: "rgba(26,16,8,0.04)" }}>
+                <tr style={{ background: "rgba(23,18,8,0.04)" }}>
                   {["User ID", "Queries", "Avg Time", "Total Cost"].map((h) => <th key={h} style={th}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {topUsers.map((u, i) => (
-                  <tr key={u.user} style={{ borderTop: "1px solid rgba(26,16,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
+                  <tr key={u.user} style={{ borderTop: "1px solid rgba(23,18,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
                     <td style={{ ...td, fontFamily: "JetBrains Mono, monospace" }}>{u.user.slice(0, 12)}…</td>
                     <td style={td}>{u.queries.toLocaleString("en-IN")}</td>
                     <td style={td}>{(u.totalMs / u.queries / 1000).toFixed(1)}s</td>
@@ -191,7 +191,7 @@ export default function AdminAIMonitoringPage() {
               ) : (
                 <ResponsiveContainer>
                   <BarChart data={responseBuckets}>
-                    <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
+                    <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
                     <XAxis dataKey="b" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
                     <YAxis tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
                     <Tooltip contentStyle={tip} />
@@ -213,7 +213,7 @@ export default function AdminAIMonitoringPage() {
                   <ResponsiveContainer>
                     <PieChart>
                       <Pie dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={105} data={successPie.data}>
-                        {["#10B981", "#C41E1E", "#EAC43C"].map((c, i) => <Cell key={i} fill={c} />)}
+                        {["#1F5A46", "#C41E1E", "#EAC43C"].map((c, i) => <Cell key={i} fill={c} />)}
                       </Pie>
                       <Legend />
                       <Tooltip />
@@ -237,13 +237,13 @@ export default function AdminAIMonitoringPage() {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ background: "rgba(26,16,8,0.04)" }}>
+                <tr style={{ background: "rgba(23,18,8,0.04)" }}>
                   {["Timestamp", "User", "Status", "Error", "Response Time"].map((h) => <th key={h} style={th}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {recentErrors.map((l, i) => (
-                  <tr key={l.id} style={{ borderTop: "1px solid rgba(26,16,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
+                  <tr key={l.id} style={{ borderTop: "1px solid rgba(23,18,8,0.06)", background: i % 2 ? "rgba(244,237,218,0.3)" : "#fff" }}>
                     <td style={td}>{new Date(l.created_at).toLocaleString("en-IN")}</td>
                     <td style={{ ...td, fontFamily: "JetBrains Mono, monospace" }}>{l.user_id ? l.user_id.slice(0, 8) + "…" : "-"}</td>
                     <td style={td}>{l.status}</td>
@@ -285,6 +285,6 @@ function Skel() { return <div className="w-full h-full animate-pulse rounded-lg"
 
 const h3Style: React.CSSProperties = { fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))", marginBottom: 16 };
 const h4Style: React.CSSProperties = { fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 15, color: "hsl(var(--fyn-ink))", marginBottom: 8 };
-const tip: React.CSSProperties = { background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 13 };
+const tip: React.CSSProperties = { background: "#171208", border: "none", borderRadius: 8, color: "#fff", fontFamily: "Roboto, sans-serif", fontSize: 13 };
 const th: React.CSSProperties = { padding: "14px 16px", textAlign: "left", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" };
 const td: React.CSSProperties = { padding: "12px 16px", fontFamily: "Roboto, sans-serif", fontSize: 13.5, color: "hsl(var(--fyn-ink) / 0.85)" };

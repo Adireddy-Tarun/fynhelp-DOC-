@@ -59,7 +59,7 @@ export default function InternLoginPage() {
       <div
         style={{
           flex: "1 1 50%",
-          background: "#1A1008",
+          background: "#171208",
           padding: "64px 56px",
           display: "flex",
           flexDirection: "column",
@@ -101,14 +101,14 @@ export default function InternLoginPage() {
             padding: 32,
           }}
         >
-          <div style={{ fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700, color: "#1A1008" }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700, color: "#171208" }}>
             Sign in
           </div>
           <p
             style={{
               fontFamily: "Inter, sans-serif",
               fontSize: 13,
-              color: "rgba(26,16,8,0.6)",
+              color: "rgba(23,18,8,0.6)",
               marginTop: 6,
               marginBottom: 24,
             }}
@@ -147,7 +147,7 @@ export default function InternLoginPage() {
                 background: "transparent",
                 border: "none",
                 cursor: "pointer",
-                color: "rgba(26,16,8,0.5)",
+                color: "rgba(23,18,8,0.5)",
                 padding: 6,
               }}
               aria-label={showPw ? "Hide password" : "Show password"}
@@ -202,7 +202,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "Inter, sans-serif",
   fontSize: 12,
   fontWeight: 600,
-  color: "rgba(26,16,8,0.7)",
+  color: "rgba(23,18,8,0.7)",
   marginBottom: 6,
   textTransform: "uppercase",
   letterSpacing: 0.4,
@@ -211,11 +211,11 @@ const labelStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
-  border: "1px solid rgba(26,16,8,0.15)",
+  border: "1px solid rgba(23,18,8,0.15)",
   borderRadius: 8,
   fontFamily: "Inter, sans-serif",
   fontSize: 14,
-  color: "#1A1008",
+  color: "#171208",
   background: "#fff",
   outline: "none",
 };

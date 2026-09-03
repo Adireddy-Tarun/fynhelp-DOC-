@@ -14,7 +14,7 @@ const C = {
   text: "#E5E7EB",
   textDim: "rgba(229,231,235,0.6)",
   textMuted: "rgba(229,231,235,0.4)",
-  success: "#10B981",
+  success: "#1F5A46",
   ai: "#C41E1E",
 };
 

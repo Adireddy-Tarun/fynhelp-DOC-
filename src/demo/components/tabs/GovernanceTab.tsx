@@ -36,12 +36,12 @@ export default function GovernanceTab() {
           <div className="flex flex-col items-center py-2">
             <div className="relative w-32 h-32">
               <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(26,16,8,0.08)" strokeWidth="10" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(23,18,8,0.08)" strokeWidth="10" />
                 <circle cx="50" cy="50" r="42" fill="none" stroke={ACCENT.green} strokeWidth="10" strokeDasharray={`${(riskScore / 100) * 263.9} 263.9`} strokeLinecap="round" />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <p className="font-mono text-2xl font-bold text-fyn-ink">{riskScore}</p>
-                <p className="text-[10px] text-[#6B6B6B]">/ 100</p>
+                <p className="text-[10px] text-[rgba(23,18,8,0.62)]">/ 100</p>
               </div>
             </div>
             <Badge tone="green">Low Risk</Badge>
@@ -56,10 +56,10 @@ export default function GovernanceTab() {
             { label: "Operational Risk", value: "Stable", tone: "green" as const, level: "Low" },
             { label: "Regulatory Risk", value: "1 open", tone: "amber" as const, level: "Medium" },
           ].map((r) => (
-            <div key={r.label} className="flex items-center justify-between py-2 border-b border-[rgba(26,16,8,0.06)] last:border-0 text-sm">
+            <div key={r.label} className="flex items-center justify-between py-2 border-b border-[rgba(23,18,8,0.06)] last:border-0 text-sm">
               <span className="text-fyn-ink">{r.label}</span>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-[#6B6B6B]">{r.value}</span>
+                <span className="font-mono text-xs text-[rgba(23,18,8,0.62)]">{r.value}</span>
                 <Badge tone={r.tone}>{r.level}</Badge>
               </div>
             </div>
@@ -110,7 +110,7 @@ function ProgressRow({ label, pct }: { label: string; pct: number }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[#6B6B6B] text-xs">{label}</span>
+        <span className="text-[rgba(23,18,8,0.62)] text-xs">{label}</span>
         <span className="font-mono text-xs font-semibold text-fyn-ink">{pct}%</span>
       </div>
       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">

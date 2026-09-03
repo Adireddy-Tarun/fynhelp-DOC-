@@ -136,8 +136,8 @@ const AuditReadinessPage = () => {
                 className="flex items-center justify-center w-6 h-6 rounded-full"
                 style={{
                   background: item.completed ? "#16A34A" : "transparent",
-                  border: item.completed ? "none" : "1.5px solid #1A100833",
-                  color: item.completed ? "#FFFFFF" : "#1A100866",
+                  border: item.completed ? "none" : "1.5px solid #17120833",
+                  color: item.completed ? "#FFFFFF" : "#17120866",
                 }}
               >
                 {item.completed ? (
@@ -149,7 +149,7 @@ const AuditReadinessPage = () => {
               <span
                 className="text-sm"
                 style={{
-                  color: item.completed ? "#1A1008" : "#1A100899",
+                  color: item.completed ? "#171208" : "#17120899",
                   textDecoration: item.completed ? "none" : "none",
                   fontWeight: item.completed ? 500 : 400,
                 }}

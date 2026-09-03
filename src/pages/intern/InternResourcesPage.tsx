@@ -57,7 +57,7 @@ export default function InternResourcesPage() {
   if (!authed) {
     return (
       <div style={{ minHeight: "100vh", background: "#F4EDDA", display: "grid", placeItems: "center" }}>
-        <div style={{ fontFamily: "Inter, sans-serif", color: "rgba(26,16,8,0.6)" }}>Loading…</div>
+        <div style={{ fontFamily: "Inter, sans-serif", color: "rgba(23,18,8,0.6)" }}>Loading…</div>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function InternResourcesPage() {
         style={{
           height: 56,
           background: "#fff",
-          borderBottom: "1px solid rgba(26,16,8,0.08)",
+          borderBottom: "1px solid rgba(23,18,8,0.08)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -76,10 +76,10 @@ export default function InternResourcesPage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008" }}>
+          <span style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#171208" }}>
             FYNHelp
           </span>
-          <span style={{ color: "rgba(26,16,8,0.3)" }}>/</span>
+          <span style={{ color: "rgba(23,18,8,0.3)" }}>/</span>
           <span
             style={{
               fontFamily: "Inter, sans-serif",
@@ -98,11 +98,11 @@ export default function InternResourcesPage() {
           style={{
             padding: "8px 14px",
             background: "transparent",
-            border: "1px solid rgba(26,16,8,0.15)",
+            border: "1px solid rgba(23,18,8,0.15)",
             borderRadius: 8,
             fontFamily: "Inter, sans-serif",
             fontSize: 13,
-            color: "#1A1008",
+            color: "#171208",
             cursor: "pointer",
           }}
         >
@@ -123,7 +123,7 @@ export default function InternResourcesPage() {
         >
           Intern portal
         </div>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 700, color: "#1A1008", margin: "4px 0 24px" }}>
+        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 700, color: "#171208", margin: "4px 0 24px" }}>
           Resource Manager
         </h1>
 
@@ -144,7 +144,7 @@ export default function InternResourcesPage() {
                 style={{
                   padding: "8px 16px",
                   background: active ? "#A93838" : "transparent",
-                  color: active ? "#fff" : "rgba(26,16,8,0.6)",
+                  color: active ? "#fff" : "rgba(23,18,8,0.6)",
                   border: "none",
                   borderRadius: 8,
                   fontFamily: "Inter, sans-serif",
@@ -171,7 +171,7 @@ export default function InternResourcesPage() {
 // ============= shared ui =============
 const cardStyle: React.CSSProperties = {
   background: "#fff",
-  border: "1px solid rgba(26,16,8,0.08)",
+  border: "1px solid rgba(23,18,8,0.08)",
   borderRadius: 12,
   overflow: "hidden",
 };
@@ -181,18 +181,18 @@ const thStyle: React.CSSProperties = {
   fontFamily: "Inter, sans-serif",
   fontSize: 11,
   fontWeight: 700,
-  color: "rgba(26,16,8,0.5)",
+  color: "rgba(23,18,8,0.5)",
   textTransform: "uppercase",
   letterSpacing: 0.6,
-  borderBottom: "1px solid rgba(26,16,8,0.06)",
-  background: "rgba(26,16,8,0.02)",
+  borderBottom: "1px solid rgba(23,18,8,0.06)",
+  background: "rgba(23,18,8,0.02)",
 };
 const tdStyle: React.CSSProperties = {
   padding: "14px 16px",
   fontFamily: "Inter, sans-serif",
   fontSize: 13,
-  color: "#1A1008",
-  borderBottom: "1px solid rgba(26,16,8,0.05)",
+  color: "#171208",
+  borderBottom: "1px solid rgba(23,18,8,0.05)",
 };
 const redBtn: React.CSSProperties = {
   padding: "9px 14px",
@@ -208,8 +208,8 @@ const redBtn: React.CSSProperties = {
 const ghostBtn: React.CSSProperties = {
   padding: "6px 10px",
   background: "transparent",
-  color: "#1A1008",
-  border: "1px solid rgba(26,16,8,0.15)",
+  color: "#171208",
+  border: "1px solid rgba(23,18,8,0.15)",
   borderRadius: 6,
   fontFamily: "Inter, sans-serif",
   fontSize: 12,
@@ -218,11 +218,11 @@ const ghostBtn: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
-  border: "1px solid rgba(26,16,8,0.15)",
+  border: "1px solid rgba(23,18,8,0.15)",
   borderRadius: 8,
   fontFamily: "Inter, sans-serif",
   fontSize: 14,
-  color: "#1A1008",
+  color: "#171208",
   background: "#fff",
   outline: "none",
   boxSizing: "border-box",
@@ -232,7 +232,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "Inter, sans-serif",
   fontSize: 12,
   fontWeight: 600,
-  color: "rgba(26,16,8,0.7)",
+  color: "rgba(23,18,8,0.7)",
   marginBottom: 6,
   marginTop: 12,
 };
@@ -244,7 +244,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(26,16,8,0.5)",
+        background: "rgba(23,18,8,0.5)",
         display: "grid",
         placeItems: "center",
         zIndex: 50,
@@ -277,8 +277,8 @@ function Badge({ on }: { on: boolean }) {
         borderRadius: 999,
         fontSize: 11,
         fontWeight: 600,
-        background: on ? "rgba(16,185,129,0.12)" : "rgba(26,16,8,0.08)",
-        color: on ? "#10B981" : "rgba(26,16,8,0.5)",
+        background: on ? "rgba(16,185,129,0.12)" : "rgba(23,18,8,0.08)",
+        color: on ? "#1F5A46" : "rgba(23,18,8,0.5)",
       }}
     >
       {on ? "Published" : "Draft"}
@@ -312,7 +312,7 @@ function VideosTab() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.6)" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.6)" }}>
           {rows.length} video{rows.length === 1 ? "" : "s"}
         </div>
         <button style={redBtn} onClick={() => setModal({})}>+ Add Video</button>
@@ -332,7 +332,7 @@ function VideosTab() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(26,16,8,0.4)" }} colSpan={6}>
+                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(23,18,8,0.4)" }} colSpan={6}>
                   No videos yet.
                 </td>
               </tr>
@@ -428,7 +428,7 @@ function VideoModal({
 
   return (
     <Modal onClose={onClose}>
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#171208" }}>
         {initial.id ? "Edit video" : "New video"}
       </div>
       <label style={labelStyle}>Step</label>
@@ -447,7 +447,7 @@ function VideoModal({
       <input style={inputStyle} value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
       <label style={labelStyle}>Thumbnail</label>
       <input type="file" accept="image/*" onChange={(e) => onThumb(e.target.files?.[0])} />
-      {uploading && <div style={{ fontSize: 12, color: "rgba(26,16,8,0.5)", marginTop: 6 }}>Uploading…</div>}
+      {uploading && <div style={{ fontSize: 12, color: "rgba(23,18,8,0.5)", marginTop: 6 }}>Uploading…</div>}
       {form.thumbnail_url && (
         <img src={form.thumbnail_url} alt="" style={{ marginTop: 8, maxHeight: 100, borderRadius: 6 }} />
       )}
@@ -489,7 +489,7 @@ function TemplatesTab() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.6)" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.6)" }}>
           {rows.length} template{rows.length === 1 ? "" : "s"}
         </div>
         <button style={redBtn} onClick={() => setModal({})}>+ Add Template</button>
@@ -508,7 +508,7 @@ function TemplatesTab() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(26,16,8,0.4)" }} colSpan={5}>
+                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(23,18,8,0.4)" }} colSpan={5}>
                   No templates yet.
                 </td>
               </tr>
@@ -613,7 +613,7 @@ function TemplateModal({
 
   return (
     <Modal onClose={onClose}>
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#171208" }}>
         {initial.id ? "Edit template" : "New template"}
       </div>
 
@@ -631,8 +631,8 @@ function TemplateModal({
         <>
           <label style={labelStyle}>File</label>
           <input type="file" onChange={(e) => onFile(e.target.files?.[0])} />
-          {uploading && <div style={{ fontSize: 12, color: "rgba(26,16,8,0.5)", marginTop: 6 }}>Uploading…</div>}
-          {form.file_path && <div style={{ fontSize: 12, color: "rgba(26,16,8,0.6)", marginTop: 6 }}>Path: {form.file_path}</div>}
+          {uploading && <div style={{ fontSize: 12, color: "rgba(23,18,8,0.5)", marginTop: 6 }}>Uploading…</div>}
+          {form.file_path && <div style={{ fontSize: 12, color: "rgba(23,18,8,0.6)", marginTop: 6 }}>Path: {form.file_path}</div>}
         </>
       ) : (
         <>
@@ -689,7 +689,7 @@ function GlossaryTab() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.6)" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.6)" }}>
           {rows.length} term{rows.length === 1 ? "" : "s"}
         </div>
         <button style={redBtn} onClick={() => setModal({})}>+ Add Term</button>
@@ -707,7 +707,7 @@ function GlossaryTab() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(26,16,8,0.4)" }} colSpan={4}>
+                <td style={{ ...tdStyle, textAlign: "center", color: "rgba(23,18,8,0.4)" }} colSpan={4}>
                   No terms yet.
                 </td>
               </tr>
@@ -803,7 +803,7 @@ function GlossaryModal({
 
   return (
     <Modal onClose={onClose}>
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#171208" }}>
         {initial.id ? "Edit term" : "New term"}
       </div>
       <label style={labelStyle}>Term</label>
@@ -968,7 +968,7 @@ function BlogTab() {
 
   const PostSection = ({ title, rows, actions }: { title: string; rows: any[]; actions: (p: any) => React.ReactNode }) => (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ fontFamily: "Georgia, serif", fontSize: 16, fontWeight: 700, color: "#1A1008", marginBottom: 10 }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: 16, fontWeight: 700, color: "#171208", marginBottom: 10 }}>
         {title} ({rows.length})
       </div>
       <div style={cardStyle}>
@@ -985,16 +985,16 @@ function BlogTab() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ ...tdStyle, textAlign: "center", color: "rgba(26,16,8,0.4)" }}>
+                <td colSpan={5} style={{ ...tdStyle, textAlign: "center", color: "rgba(23,18,8,0.4)" }}>
                   No posts here yet.
                 </td>
               </tr>
             ) : (
               rows.map((p, i) => (
-                <tr key={p.id} style={{ borderTop: i > 0 ? "1px solid rgba(26,16,8,0.05)" : "none" }}>
+                <tr key={p.id} style={{ borderTop: i > 0 ? "1px solid rgba(23,18,8,0.05)" : "none" }}>
                   <td style={tdStyle}>
-                    <div style={{ fontFamily: "Georgia, serif", fontSize: 13, fontWeight: 600, color: "#1A1008" }}>{p.title}</div>
-                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(26,16,8,0.4)", marginTop: 2 }}>{p.slug}</div>
+                    <div style={{ fontFamily: "Georgia, serif", fontSize: 13, fontWeight: 600, color: "#171208" }}>{p.title}</div>
+                    <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(23,18,8,0.4)", marginTop: 2 }}>{p.slug}</div>
                   </td>
                   <td style={tdStyle}>
                     <span style={{ fontSize: 11, fontWeight: 600, color: "#C41E1E", background: "rgba(196,30,30,0.08)", padding: "3px 8px", borderRadius: 99 }}>
@@ -1002,7 +1002,7 @@ function BlogTab() {
                     </span>
                   </td>
                   <td style={{ ...tdStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 12 }}>{p.views}</td>
-                  <td style={{ ...tdStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>
+                  <td style={{ ...tdStyle, fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "rgba(23,18,8,0.5)" }}>
                     {formatDate(p.published_at ?? p.created_at)}
                   </td>
                   <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>
@@ -1020,14 +1020,14 @@ function BlogTab() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(26,16,8,0.6)" }}>
+        <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "rgba(23,18,8,0.6)" }}>
           {posts.length} total posts
         </div>
         <button style={redBtn} onClick={openCreate}>+ New Post</button>
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: 48, fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+        <div style={{ textAlign: "center", padding: 48, fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>
           Loading posts...
         </div>
       ) : (
@@ -1067,9 +1067,9 @@ function BlogTab() {
       )}
 
       {modal && (
-        <div onClick={() => setModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div onClick={() => setModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.6)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 680, maxHeight: "90vh", overflowY: "auto", padding: 28 }}>
-            <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1A1008", marginBottom: 18 }}>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700, color: "#171208", marginBottom: 18 }}>
               {editId ? "Edit post" : "Create new post"}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1117,7 +1117,7 @@ function BlogTab() {
                 </div>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(26,16,8,0.08)" }}>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(23,18,8,0.08)" }}>
               <button style={ghostBtn} onClick={() => setModal(false)}>Cancel</button>
               <button style={{ ...ghostBtn, fontWeight: 600 }} disabled={saving} onClick={() => handleSave(false)}>Save draft</button>
               <button style={redBtn} disabled={saving} onClick={() => handleSave(true)}>{saving ? "Saving..." : "Publish"}</button>
@@ -1127,10 +1127,10 @@ function BlogTab() {
       )}
 
       {deleteId && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(26,16,8,0.6)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.6)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: "#fff", borderRadius: 12, padding: 28, maxWidth: 400, width: "calc(100% - 32px)" }}>
-            <div style={{ fontFamily: "Georgia, serif", fontSize: 18, fontWeight: 700, color: "#1A1008", marginBottom: 8 }}>Delete this post?</div>
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(26,16,8,0.6)", marginBottom: 20 }}>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: 18, fontWeight: 700, color: "#171208", marginBottom: 8 }}>Delete this post?</div>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(23,18,8,0.6)", marginBottom: 20 }}>
               This is permanent and cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>

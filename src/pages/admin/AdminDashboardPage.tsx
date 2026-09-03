@@ -20,7 +20,7 @@ const fmtINR = (n: number) =>
 
 const PLAN_COLORS: Record<string, string> = {
   trial: "#94A3B8", free_trial: "#94A3B8",
-  starter: "#3B82F6", pro: "#10B981", enterprise: "#8B4513",
+  starter: "#3B82F6", pro: "#1F5A46", enterprise: "#8B4513",
 };
 
 type Live = {
@@ -220,9 +220,9 @@ export default function AdminDashboardPage() {
                       <stop offset="100%" stopColor="#8B6914" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-                  <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                  <YAxis stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} allowDecimals={false} />
+                  <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
+                  <XAxis dataKey="month" stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <YAxis stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} allowDecimals={false} />
                   <Tooltip contentStyle={tipStyle} />
                   <Area type="monotone" dataKey="users" stroke="#C41E1E" strokeWidth={2} fill="url(#adminUserGrowth)" />
                 </AreaChart>
@@ -244,9 +244,9 @@ export default function AdminDashboardPage() {
             ) : (
               <ResponsiveContainer>
                 <BarChart data={d.revenueByPlan}>
-                  <CartesianGrid stroke="rgba(26,16,8,0.06)" vertical={false} />
-                  <XAxis dataKey="plan" stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={fmtINR} stroke="rgba(26,16,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <CartesianGrid stroke="rgba(23,18,8,0.06)" vertical={false} />
+                  <XAxis dataKey="plan" stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={fmtINR} stroke="rgba(23,18,8,0.5)" tickLine={false} axisLine={false} style={{ fontSize: 12 }} />
                   <Tooltip formatter={(v: number) => fmtINR(v)} contentStyle={tipStyle} />
                   <Bar dataKey="revenue" fill="#8B6914" radius={[6, 6, 0, 0]} />
                 </BarChart>
@@ -355,7 +355,7 @@ export default function AdminDashboardPage() {
           <EmptyState icon={Activity} title="No activity yet" hint="Admin actions will be logged here as they happen." />
         ) : d.recentActivity.map((a, i) => (
           <div key={a.id} className="flex items-start gap-4 px-5 py-4"
-            style={{ borderBottom: i < d.recentActivity.length - 1 ? "1px solid rgba(26,16,8,0.05)" : "none" }}>
+            style={{ borderBottom: i < d.recentActivity.length - 1 ? "1px solid rgba(23,18,8,0.05)" : "none" }}>
             <span className="grid place-items-center rounded-full text-white shrink-0"
               style={{ width: 32, height: 32, background: "linear-gradient(135deg,#C41E1E,#8B6914)" }}>
               <Activity size={14} />
@@ -385,7 +385,7 @@ const sectionTitle: React.CSSProperties = {
   fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 20, color: "hsl(var(--fyn-ink))",
 };
 const tipStyle: React.CSSProperties = {
-  background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
+  background: "#171208", border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
 };
 
 export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
@@ -409,7 +409,7 @@ export function Card({ children, style, className }: { children: React.ReactNode
       style={{
         background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px) saturate(110%)",
         borderRadius: 20, border: "1px solid rgba(139,105,20,0.15)",
-        boxShadow: "0 8px 32px rgba(26,16,8,0.08)", padding: 24, ...style,
+        boxShadow: "0 8px 32px rgba(23,18,8,0.08)", padding: 24, ...style,
       }}>{children}</div>
   );
 }
@@ -466,7 +466,7 @@ function MetricCard({ icon, label, value, trend, trendLabel }: {
 }
 
 function TrendBadge({ value }: { value: number }) {
-  const color = value > 0 ? "#10B981" : value < 0 ? "#DC2626" : "rgba(26,16,8,0.5)";
+  const color = value > 0 ? "#1F5A46" : value < 0 ? "#DC2626" : "rgba(23,18,8,0.5)";
   const Icon = value > 0 ? ArrowUp : value < 0 ? ArrowDown : ArrowRight;
   return (
     <span className="flex items-center gap-1" style={{ color, fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>

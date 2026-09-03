@@ -70,12 +70,12 @@ export default function AdminFeatureFlagsPage() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" color="hsl(var(--fyn-ink) / 0.4)" />
             <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search flags…"
               style={{ width:"100%", height:48, padding:"0 14px 0 38px", borderRadius:12,
-                border:"1px solid rgba(26,16,8,0.15)", background:"#fff",
+                border:"1px solid rgba(23,18,8,0.15)", background:"#fff",
                 fontFamily:"Roboto, sans-serif", fontSize:15, color:"hsl(var(--fyn-ink))", outline:"none" }} />
           </div>
           <select value={filter} onChange={(e)=>setFilter(e.target.value as any)}
             style={{ height:48, padding:"0 14px", borderRadius:12,
-              border:"1px solid rgba(26,16,8,0.15)", background:"#fff",
+              border:"1px solid rgba(23,18,8,0.15)", background:"#fff",
               fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))", minWidth:180 }}>
             <option value="all">All Flags</option>
             <option value="enabled">Enabled Only</option>
@@ -109,7 +109,7 @@ function FlagCard({ f, onToggle, onEdit }: { f: Flag; onToggle: () => void; onEd
   const seg = SEGMENT_LABEL[f.target_segment] ?? SEGMENT_LABEL.all;
   return (
     <Card style={{
-      padding: 24, borderLeft: `4px solid ${f.enabled ? "#10B981" : "rgba(26,16,8,0.2)"}`,
+      padding: 24, borderLeft: `4px solid ${f.enabled ? "#1F5A46" : "rgba(23,18,8,0.2)"}`,
     }}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
@@ -138,10 +138,10 @@ function FlagCard({ f, onToggle, onEdit }: { f: Flag; onToggle: () => void; onEd
                 <span>Rollout</span>
                 <span style={{ fontWeight:700, color:"hsl(var(--fyn-ink))" }}>{f.rollout_percentage}%</span>
               </div>
-              <div style={{ width:"100%", height:8, borderRadius:999, background:"rgba(26,16,8,0.08)" }}>
+              <div style={{ width:"100%", height:8, borderRadius:999, background:"rgba(23,18,8,0.08)" }}>
                 <div style={{
                   width:`${f.rollout_percentage}%`, height:"100%", borderRadius:999,
-                  background:"linear-gradient(90deg, #10B981, #0F8F65)",
+                  background:"linear-gradient(90deg, #1F5A46, #0F8F65)",
                   transition:"width 0.3s ease",
                 }} />
               </div>
@@ -162,7 +162,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: () => void }) {
     <button onClick={onChange} aria-pressed={on}
       style={{
         width:60, height:32, borderRadius:999, position:"relative", border:"none", cursor:"pointer",
-        background: on ? "linear-gradient(135deg,#10B981,#0F8F65)" : "rgba(26,16,8,0.18)",
+        background: on ? "linear-gradient(135deg,#1F5A46,#0F8F65)" : "rgba(23,18,8,0.18)",
         transition:"background 0.25s ease",
       }}>
       <span style={{
@@ -209,9 +209,9 @@ function FlagModal({ flag, onClose, onSaved }: { flag: Flag | null; onClose: () 
       <div onClick={(e)=>e.stopPropagation()} className="w-full max-w-[600px]" style={{
         background:"rgba(255,255,255,0.98)", backdropFilter:"blur(20px)",
         borderRadius:20, border:"1px solid rgba(139,105,20,0.2)",
-        boxShadow:"0 24px 60px rgba(26,16,8,0.25)", maxHeight:"90vh", overflow:"auto",
+        boxShadow:"0 24px 60px rgba(23,18,8,0.25)", maxHeight:"90vh", overflow:"auto",
       }}>
-        <div className="flex items-center justify-between p-6" style={{ borderBottom:"1px solid rgba(26,16,8,0.08)" }}>
+        <div className="flex items-center justify-between p-6" style={{ borderBottom:"1px solid rgba(23,18,8,0.08)" }}>
           <h3 style={{ fontFamily:"Oswald, sans-serif", fontWeight:700, fontSize:24, color:"hsl(var(--fyn-ink))" }}>
             {flag ? "Edit Feature Flag" : "Add Feature Flag"}
           </h3>
@@ -261,9 +261,9 @@ function FlagModal({ flag, onClose, onSaved }: { flag: Flag | null; onClose: () 
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-3 p-6" style={{ borderTop:"1px solid rgba(26,16,8,0.08)" }}>
+        <div className="flex justify-end gap-3 p-6" style={{ borderTop:"1px solid rgba(23,18,8,0.08)" }}>
           <button onClick={onClose}
-            style={{ height:44, padding:"0 22px", borderRadius:12, background:"transparent", border:"2px solid rgba(26,16,8,0.15)", color:"hsl(var(--fyn-ink))", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>
+            style={{ height:44, padding:"0 22px", borderRadius:12, background:"transparent", border:"2px solid rgba(23,18,8,0.15)", color:"hsl(var(--fyn-ink))", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 }}>
             Cancel
           </button>
           <button onClick={save} disabled={saving || !name.trim()}
@@ -278,4 +278,4 @@ function FlagModal({ flag, onClose, onSaved }: { flag: Flag | null; onClose: () 
 
 const primaryBtn: React.CSSProperties = { display:"inline-flex", alignItems:"center", gap:8, height:44, padding:"0 18px", borderRadius:12, background:"linear-gradient(135deg,#C41E1E,#8B6914)", color:"#fff", border:"none", cursor:"pointer", fontFamily:"DM Sans, sans-serif", fontWeight:600, fontSize:14 };
 const lbl: React.CSSProperties = { display:"block", fontFamily:"Roboto, sans-serif", fontSize:13, color:"hsl(var(--fyn-ink) / 0.7)", marginBottom:6 };
-const input: React.CSSProperties = { width:"100%", height:48, padding:"0 14px", borderRadius:12, border:"1px solid rgba(26,16,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))", outline:"none" };
+const input: React.CSSProperties = { width:"100%", height:48, padding:"0 14px", borderRadius:12, border:"1px solid rgba(23,18,8,0.15)", background:"#fff", fontFamily:"Roboto, sans-serif", fontSize:14, color:"hsl(var(--fyn-ink))", outline:"none" };

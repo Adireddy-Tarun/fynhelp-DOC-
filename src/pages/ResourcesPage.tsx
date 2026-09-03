@@ -266,7 +266,7 @@ const STYLES = `
   .rs-blog-cover { position: relative; aspect-ratio: 16 / 9; background: ${C.panel}; border-bottom: 1px solid ${C.border}; overflow: hidden; }
   .rs-blog-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.8,.3,1); }
   .rs-blog-card:hover .rs-blog-cover img { transform: scale(1.04); }
-  .rs-blog-cover .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Clash Display', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(26,16,8,0.28); background: linear-gradient(135deg, ${C.panel} 0%, ${C.bg} 100%); }
+  .rs-blog-cover .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Clash Display', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(23,18,8,0.28); background: linear-gradient(135deg, ${C.panel} 0%, ${C.bg} 100%); }
   .rs-blog-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .rs-blog-pill { display: inline-flex; align-items: center; padding: 4px 11px; border-radius: 100px; background: rgba(184,51,58,0.10); color: ${C.red}; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
   .rs-blog-dot { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: ${C.muted}; font-variant-numeric: tabular-nums; }

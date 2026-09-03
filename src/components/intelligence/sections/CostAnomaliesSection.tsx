@@ -65,7 +65,7 @@ export default function CostAnomaliesSection() {
               <div
                 key={a.id}
                 className="rounded-lg bg-white px-4 py-3"
-                style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `4px solid ${sev.color}`, opacity: a.is_acknowledged ? 0.55 : 1 }}
+                style={{ border: "1px solid rgba(23,18,8,0.08)", borderLeft: `4px solid ${sev.color}`, opacity: a.is_acknowledged ? 0.55 : 1 }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">

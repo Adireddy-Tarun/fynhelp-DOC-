@@ -18,7 +18,7 @@ export default function FxExposureSection() {
   if (mode === "live" && rows.length === 0 && !isLoading) {
     return (
       <IntelCard title="FX Exposure">
-        <p className="text-sm text-[#6B6B6B] py-4 text-center">No FX exposure detected</p>
+        <p className="text-sm text-[rgba(23,18,8,0.62)] py-4 text-center">No FX exposure detected</p>
       </IntelCard>
     );
   }
@@ -33,19 +33,19 @@ export default function FxExposureSection() {
       <IntelCard title="USD Vendors & Clients" sub="Foreign-currency exposure">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[rgba(26,16,8,0.08)]">
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vendor / Client</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Type</th>
-              <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">CCY</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Monthly (INR)</th>
-              <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
+            <tr className="border-b border-[rgba(23,18,8,0.08)]">
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Vendor / Client</th>
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Type</th>
+              <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">CCY</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Monthly (INR)</th>
+              <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+              <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                 <td className="py-2.5 text-xs text-fyn-ink font-medium">{r.vendor_or_client}</td>
-                <td className="py-2.5 text-xs text-[#6B6B6B] capitalize">{r.exposure_type}</td>
+                <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] capitalize">{r.exposure_type}</td>
                 <td className="py-2.5 text-xs font-mono text-fyn-ink">{r.currency}</td>
                 <td className="py-2.5 text-right font-mono text-xs text-fyn-ink font-semibold">{fmtCompact(Number(r.monthly_amount_inr))}</td>
                 <td className="py-2.5 text-right"><Badge tone={r.hedged ? "green" : "gold"}>{r.hedged ? "Hedged" : "Unhedged"}</Badge></td>

@@ -20,7 +20,7 @@ export default function SettlementsSection() {
   if (liveEmpty) {
     return (
       <IntelCard title="Payment Settlements" sub="Razorpay, UPI & gateway pipeline">
-        <p className="text-sm text-[#6B6B6B] py-4 text-center">Connect Razorpay to see settlement tracking</p>
+        <p className="text-sm text-[rgba(23,18,8,0.62)] py-4 text-center">Connect Razorpay to see settlement tracking</p>
       </IntelCard>
     );
   }

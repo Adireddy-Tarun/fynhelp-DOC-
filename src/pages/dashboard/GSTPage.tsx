@@ -84,7 +84,7 @@ const bucketMeta: Record<Bucket, { label: string; color: string }> = {
   "on-time": { label: "On time", color: "#1A6B3C" },
   late: { label: "Filed late", color: "#8B5A00" },
   overdue: { label: "Overdue", color: "#C41E1E" },
-  pending: { label: "Pending", color: "#1A1008" },
+  pending: { label: "Pending", color: "#171208" },
   unknown: { label: "Unknown", color: "#475569" },
 };
 
@@ -662,17 +662,17 @@ const GSTPage = () => {
                     <stop offset="100%" stopColor="#1A6B3C" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1A100815" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#1A1008" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#1A1008" }} tickFormatter={(v) => formatINR(v)} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#17120815" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#171208" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#171208" }} tickFormatter={(v) => formatINR(v)} />
                 <RTooltip
-                  contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
+                  contentStyle={{ background: "#171208", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
                   formatter={(v: any, name: string) => [formatINR(Number(v)), name]}
                 />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Area type="monotone" dataKey="output_tax" stackId="1" stroke="#C41E1E" fill="url(#outputGrad)" name="Output Tax" />
                 <Area type="monotone" dataKey="input_tax" stackId="2" stroke="#1A6B3C" fill="url(#inputGrad)" name="Input Tax (ITC)" />
-                <Line type="monotone" dataKey="net_liability" stroke="#1A1008" strokeWidth={2} dot={{ r: 3 }} name="Net Liability" />
+                <Line type="monotone" dataKey="net_liability" stroke="#171208" strokeWidth={2} dot={{ r: 3 }} name="Net Liability" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -684,11 +684,11 @@ const GSTPage = () => {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={taxData.forecast} margin={{ top: 5, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1A100815" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#1A1008" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#1A1008" }} tickFormatter={(v) => formatINR(v)} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#17120815" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#171208" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#171208" }} tickFormatter={(v) => formatINR(v)} />
                 <RTooltip
-                  contentStyle={{ background: "#1A1008", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
+                  contentStyle={{ background: "#171208", border: "none", borderRadius: 8, color: "#fff", fontSize: 12 }}
                   formatter={(v: any, _n, p: any) => [`${formatINR(Number(v))} (${p?.payload?.confidence})`, "Estimate"]}
                 />
                 <Line type="monotone" dataKey="estimated_liability" stroke="#8B6914" strokeWidth={2} strokeDasharray="6 4" dot={{ r: 5, fill: "#8B6914" }} />
@@ -720,11 +720,11 @@ const GSTPage = () => {
                 className="bg-fyn-beige-dark border border-fyn-ink-10 rounded-lg p-5 text-left hover:border-fyn-ink/30 transition-colors flex items-center gap-5"
               >
                 <svg width="92" height="92" viewBox="0 0 92 92">
-                  <circle cx="46" cy="46" r="36" stroke="#1A100815" strokeWidth="8" fill="none" />
+                  <circle cx="46" cy="46" r="36" stroke="#17120815" strokeWidth="8" fill="none" />
                   <circle cx="46" cy="46" r="36" stroke={color} strokeWidth="8" fill="none"
                     strokeDasharray={`${(circ * r) / 100} ${circ}`} strokeLinecap="round"
                     transform="rotate(-90 46 46)" />
-                  <text x="46" y="51" textAnchor="middle" fontSize="18" fontWeight="700" fill="#1A1008" fontFamily="JetBrains Mono, monospace">{r}%</text>
+                  <text x="46" y="51" textAnchor="middle" fontSize="18" fontWeight="700" fill="#171208" fontFamily="JetBrains Mono, monospace">{r}%</text>
                 </svg>
                 <div>
                   <p className="text-fyn-ink font-serif text-lg">{c.label}</p>

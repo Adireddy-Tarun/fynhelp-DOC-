@@ -18,7 +18,7 @@ export default function BankTxnDetail({ id, onClose }: { id: string; onClose: ()
 
       <DrawerHeader
         title={
-          <span className={isCredit ? "text-[#10B981]" : "text-fyn-red"}>
+          <span className={isCredit ? "text-[#1F5A46]" : "text-fyn-red"}>
             {isCredit ? "+" : "−"}{formatINR(Number(t.amount))}
           </span>
         }

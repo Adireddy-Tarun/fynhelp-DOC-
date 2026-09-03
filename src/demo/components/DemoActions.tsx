@@ -112,11 +112,11 @@ export function ScenarioPlannerDialog({
           <SliderRow label="New hires" value={hires} onChange={setHires} min={0} max={10} unit="" />
 
           <div className="rounded-md p-4" style={{ background: "rgba(169,56,56,0.06)", border: "1px solid rgba(169,56,56,0.15)" }}>
-            <p className="text-[11px] uppercase tracking-wider text-[#6B6B6B] mb-1">Projected Runway</p>
+            <p className="text-[11px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] mb-1">Projected Runway</p>
             <p className="font-mono text-3xl font-semibold text-fyn-ink">
               {Number.isFinite(newRunway) ? `${newRunway.toFixed(1)} mo` : "∞"}
             </p>
-            <p className="text-xs text-[#6B6B6B] mt-1">
+            <p className="text-xs text-[rgba(23,18,8,0.62)] mt-1">
               vs base {Number.isFinite(baseRunwayMonths) ? `${baseRunwayMonths.toFixed(1)} mo` : "—"} ·
               new burn {fmtCompact(Math.max(0, newBurn))}/mo
             </p>
@@ -124,7 +124,7 @@ export function ScenarioPlannerDialog({
         </div>
 
         <DialogFooter>
-          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(26,16,8,0.15)] text-fyn-ink">Close</button>
+          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(23,18,8,0.15)] text-fyn-ink">Close</button>
           <button
             onClick={() => { toast.success("Scenario saved"); onOpenChange(false); }}
             className="text-sm px-3 py-1.5 rounded text-white"
@@ -169,12 +169,12 @@ export function OptimizeScheduleDialog({ open, onOpenChange }: { open: boolean; 
           ].map((t) => (
             <li key={t.h} className="rounded-md p-3" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
               <p className="font-medium text-fyn-ink">{t.h}</p>
-              <p className="text-xs text-[#6B6B6B] mt-0.5">{t.s}</p>
+              <p className="text-xs text-[rgba(23,18,8,0.62)] mt-0.5">{t.s}</p>
             </li>
           ))}
         </ul>
         <DialogFooter>
-          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(26,16,8,0.15)] text-fyn-ink">Dismiss</button>
+          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(23,18,8,0.15)] text-fyn-ink">Dismiss</button>
           <button
             onClick={() => { toast.success("Optimizations applied to schedule"); onOpenChange(false); }}
             className="text-sm px-3 py-1.5 rounded text-white"
@@ -206,7 +206,7 @@ export function SpendControlsDialog({ open, onOpenChange }: { open: boolean; onO
           <ToggleRow label="Monthly budget alerts" value={alerts} onChange={setAlerts} />
         </div>
         <DialogFooter>
-          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(26,16,8,0.15)] text-fyn-ink">Cancel</button>
+          <button onClick={() => onOpenChange(false)} className="text-sm px-3 py-1.5 rounded border border-[rgba(23,18,8,0.15)] text-fyn-ink">Cancel</button>
           <button
             onClick={() => { toast.success("Spend controls saved"); onOpenChange(false); }}
             className="text-sm px-3 py-1.5 rounded text-white"
@@ -222,7 +222,7 @@ export function SpendControlsDialog({ open, onOpenChange }: { open: boolean; onO
 
 function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="flex items-center justify-between rounded-md p-3" style={{ background: "rgba(26,16,8,0.03)" }}>
+    <div className="flex items-center justify-between rounded-md p-3" style={{ background: "rgba(23,18,8,0.03)" }}>
       <span className="text-sm text-fyn-ink">{label}</span>
       <Switch checked={value} onCheckedChange={onChange} />
     </div>
@@ -245,10 +245,10 @@ export function HrmsDialog({ open, onOpenChange }: { open: boolean; onOpenChange
               key={p}
               onClick={() => toast.info(`${p} integration coming soon`)}
               className="rounded-md p-4 text-left hover:bg-[rgba(169,56,56,0.04)] transition-colors"
-              style={{ border: "1px solid rgba(26,16,8,0.1)" }}
+              style={{ border: "1px solid rgba(23,18,8,0.1)" }}
             >
               <p className="font-medium text-fyn-ink">{p}</p>
-              <p className="text-[11px] text-[#6B6B6B] mt-1">Coming Soon</p>
+              <p className="text-[11px] text-[rgba(23,18,8,0.62)] mt-1">Coming Soon</p>
             </button>
           ))}
         </div>
@@ -277,7 +277,7 @@ export function GstFilingDialog({
         </DialogHeader>
         <ul className="space-y-2 py-2">
           {items.map((it, i) => (
-            <li key={it.label} className="flex items-center gap-3 rounded-md p-2 cursor-pointer hover:bg-[rgba(26,16,8,0.03)]" onClick={() => toggle(i)}>
+            <li key={it.label} className="flex items-center gap-3 rounded-md p-2 cursor-pointer hover:bg-[rgba(23,18,8,0.03)]" onClick={() => toggle(i)}>
               <Checkbox checked={it.done} onCheckedChange={() => toggle(i)} />
               <span className={cn("text-sm", it.done ? "line-through text-[#9B9B9B]" : "text-fyn-ink")}>{it.label}</span>
             </li>
@@ -314,7 +314,7 @@ export function ReconcileButton({ label }: { label: string }) {
       className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded"
       style={{
         background: state === "done" ? "rgba(16,185,129,0.1)" : "rgba(169,56,56,0.08)",
-        color: state === "done" ? "#10B981" : "#A93838",
+        color: state === "done" ? "#1F5A46" : "#A93838",
       }}
     >
       {state === "loading" && <Loader2 className="w-3 h-3 animate-spin" />}
@@ -344,7 +344,7 @@ export function HeaderToolbar() {
     <div className="flex items-center gap-1.5">
       <button
         onClick={onRefresh}
-        className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded border border-[rgba(26,16,8,0.1)] text-fyn-ink hover:bg-[rgba(26,16,8,0.04)]"
+        className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded border border-[rgba(23,18,8,0.1)] text-fyn-ink hover:bg-[rgba(23,18,8,0.04)]"
       >
         <RefreshCw className={cn("w-3.5 h-3.5", spinning && "animate-spin")} />
         Refresh
@@ -397,7 +397,7 @@ export function DrawerRow({
     <tr
       onClick={() => open(kind, id)}
       className={cn(
-        "border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors",
+        "border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors",
         className,
       )}
     >
@@ -413,14 +413,14 @@ export function ExpandableRow({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <tr onClick={() => setOpen((v) => !v)} className="border-b border-[rgba(26,16,8,0.06)] cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+      <tr onClick={() => setOpen((v) => !v)} className="border-b border-[rgba(23,18,8,0.06)] cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
         {summary}
-        <td className="py-2.5 text-right pr-2 text-[#6B6B6B]">
+        <td className="py-2.5 text-right pr-2 text-[rgba(23,18,8,0.62)]">
           <ChevronRight className={cn("w-3.5 h-3.5 inline transition-transform", open && "rotate-90")} />
         </td>
       </tr>
       {open && (
-        <tr className="bg-[rgba(26,16,8,0.02)]">
+        <tr className="bg-[rgba(23,18,8,0.02)]">
           <td colSpan={columns} className="px-4 py-3">{detail}</td>
         </tr>
       )}

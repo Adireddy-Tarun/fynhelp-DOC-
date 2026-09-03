@@ -122,12 +122,12 @@ const PayrollPlannerPage = () => {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.1)" />
-                <XAxis dataKey="month" stroke="rgba(26,16,8,0.5)" fontSize={12} />
-                <YAxis stroke="rgba(26,16,8,0.5)" fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.1)" />
+                <XAxis dataKey="month" stroke="rgba(23,18,8,0.5)" fontSize={12} />
+                <YAxis stroke="rgba(23,18,8,0.5)" fontSize={12} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
                 <Tooltip
                   formatter={(v: number) => formatINR(v)}
-                  contentStyle={{ background: "#1A1008", border: "none", borderRadius: 6, color: "#fff" }}
+                  contentStyle={{ background: "#171208", border: "none", borderRadius: 6, color: "#fff" }}
                 />
                 <Line type="monotone" dataKey="payroll" stroke="#C41E1E" strokeWidth={2} dot={{ r: 4, fill: "#C41E1E" }} />
               </LineChart>

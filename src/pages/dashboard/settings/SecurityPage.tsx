@@ -8,8 +8,8 @@ const BORDER = "#E0D9C8";
 const Card = ({ title, sub, danger, children }: { title: string; sub?: string; danger?: boolean; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6 animate-fade-in"
     style={{ borderColor: danger ? RED : BORDER }}>
-    <h3 className="font-semibold text-[15px]" style={{ color: danger ? RED : "#1A1008" }}>{title}</h3>
-    {sub && <p className="text-[12px] mt-1" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>}
+    <h3 className="font-semibold text-[15px]" style={{ color: danger ? RED : "#171208" }}>{title}</h3>
+    {sub && <p className="text-[12px] mt-1" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</p>}
     <div className="mt-4 space-y-4">{children}</div>
   </div>
 );
@@ -25,7 +25,7 @@ const passwordStrength = (pw: string): { label: string; pct: number; color: stri
 };
 
 const EmptyState = ({ children }: { children: React.ReactNode }) => (
-  <div className="p-6 rounded-md text-[13px] text-center" style={{ background: "#FAF7F0", color: "rgba(26,16,8,0.6)" }}>{children}</div>
+  <div className="p-6 rounded-md text-[13px] text-center" style={{ background: "#FAF7F0", color: "rgba(23,18,8,0.6)" }}>{children}</div>
 );
 
 const SecurityPage = () => {
@@ -59,8 +59,8 @@ const SecurityPage = () => {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Security & Password</h2>
-      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Manage password, 2FA, sessions and API keys.</p>
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#171208" }}>Security & Password</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.60)" }}>Manage password, 2FA, sessions and API keys.</p>
 
       <Card title="Change Password">
         <input type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputCls} style={{ borderColor: BORDER }} />

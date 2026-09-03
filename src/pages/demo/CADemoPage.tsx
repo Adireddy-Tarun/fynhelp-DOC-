@@ -16,7 +16,7 @@ export default function CADemoPage() {
   }, [navigate]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#1A1008", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
+    <div style={{ minHeight: "100vh", background: "#171208", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontFamily: "Georgia, serif", fontWeight: 700, fontSize: 28, color: "#F4EDDA" }}>FYNHelp</div>
       <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 500, color: "#8B6914", textTransform: "uppercase", letterSpacing: "0.1em" }}>CA Partner Portal</div>
       <div style={{ width: 200, height: 2, background: "rgba(244,237,218,0.12)", borderRadius: 1, marginTop: 8, overflow: "hidden" }}>

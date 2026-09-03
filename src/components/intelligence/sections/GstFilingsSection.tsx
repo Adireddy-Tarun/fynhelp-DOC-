@@ -35,7 +35,7 @@ export default function GstFilingsSection() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {["Filings", "Tax payable", "Input credit", "Overdue"].map((l) => (
-              <div key={l} className="rounded-lg bg-white px-4 py-3" style={{ border: "1px solid rgba(26,16,8,0.08)" }}>
+              <div key={l} className="rounded-lg bg-white px-4 py-3" style={{ border: "1px solid rgba(23,18,8,0.08)" }}>
                 <p className="text-[11px] uppercase tracking-wide text-fyn-ink/50">{l}</p>
                 <p className="font-mono text-xl text-fyn-ink tabular-nums mt-1">{l === "Filings" || l === "Overdue" ? "0" : "₹0"}</p>
               </div>
@@ -60,7 +60,7 @@ export default function GstFilingsSection() {
               {rows.map((f) => {
                 const s = statusOf(f.status, f.due_date);
                 return (
-                  <tr key={f.id} className="border-t border-[rgba(26,16,8,0.06)]">
+                  <tr key={f.id} className="border-t border-[rgba(23,18,8,0.06)]">
                     <td className="py-2.5 text-fyn-ink font-medium">{f.return_type}</td>
                     <td className="py-2.5 text-fyn-ink/70">{f.filing_period}</td>
                     <td className="py-2.5 text-fyn-ink/70 font-mono tabular-nums">

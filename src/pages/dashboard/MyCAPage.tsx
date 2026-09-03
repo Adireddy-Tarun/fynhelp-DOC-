@@ -6,10 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Send, FileText, Download, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const BEIGE = "#F4EDDA";
-const BORDER = "rgba(26,16,8,0.08)";
+const BORDER = "rgba(23,18,8,0.08)";
 const GOLD = "#8B6914";
 const GREEN = "#166534";
 const AMBER = "#92400E";
@@ -305,10 +305,10 @@ export default function MyCAPage() {
         <h1 style={{ fontFamily: "Georgia, serif", fontSize: 24, fontWeight: 500, marginBottom: 8 }}>
           No CA connected
         </h1>
-        <p style={{ fontSize: 14, color: "rgba(26,16,8,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
+        <p style={{ fontSize: 14, color: "rgba(23,18,8,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
           Your chartered accountant has not connected to your FYNHelp account yet. Share your business profile with your CA and ask them to connect via the FYNHelp CA Partner Portal.
         </p>
-        <div style={{ background: BEIGE, border: "0.5px solid " + BORDER, borderRadius: 10, padding: "16px 20px", fontSize: 13, color: "rgba(26,16,8,0.7)" }}>
+        <div style={{ background: BEIGE, border: "0.5px solid " + BORDER, borderRadius: 10, padding: "16px 20px", fontSize: 13, color: "rgba(23,18,8,0.7)" }}>
           Your CA needs your registered email address to connect their firm to your account.
         </div>
       </div>
@@ -322,14 +322,14 @@ export default function MyCAPage() {
   return (
     <div style={{ padding: "32px", minHeight: "100vh", background: BEIGE, fontFamily: "Inter, sans-serif" }}>
 
-      <div style={{ marginBottom: 8, fontSize: 12, color: "rgba(26,16,8,0.4)", letterSpacing: "0.02em" }}>
+      <div style={{ marginBottom: 8, fontSize: 12, color: "rgba(23,18,8,0.4)", letterSpacing: "0.02em" }}>
         Dashboard / My CA
       </div>
 
       <h1 style={{ fontFamily: "Georgia, serif", fontSize: 26, fontWeight: 500, color: INK, marginBottom: 4, lineHeight: 1.2 }}>
         Your CA Partner
       </h1>
-      <p style={{ fontSize: 14, color: "rgba(26,16,8,0.55)", marginBottom: 28 }}>
+      <p style={{ fontSize: 14, color: "rgba(23,18,8,0.55)", marginBottom: 28 }}>
         Track filings, access documents, and message your CA from one place.
       </p>
 
@@ -343,7 +343,7 @@ export default function MyCAPage() {
               {caFirm.firm_name}
             </div>
             {caFirm.ca_name && (
-              <div style={{ fontSize: 14, color: "rgba(26,16,8,0.65)", marginBottom: 2 }}>
+              <div style={{ fontSize: 14, color: "rgba(23,18,8,0.65)", marginBottom: 2 }}>
                 {caFirm.ca_name}
               </div>
             )}
@@ -359,7 +359,7 @@ export default function MyCAPage() {
                 Ref: {caFirm.client_reference_code}
               </div>
             )}
-            <div style={{ fontSize: 12, color: "rgba(26,16,8,0.45)" }}>
+            <div style={{ fontSize: 12, color: "rgba(23,18,8,0.45)" }}>
               Connected {caFirm.granted_at ? formatDate(caFirm.granted_at) : "recently"}
             </div>
           </div>
@@ -372,7 +372,7 @@ export default function MyCAPage() {
             { label: "Shared Documents", value: String(documents.length), color: INK },
           ].map(m => (
             <div key={m.label} style={{ background: BEIGE, borderRadius: 8, padding: "12px 16px" }}>
-              <div style={{ fontSize: 11, color: "rgba(26,16,8,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+              <div style={{ fontSize: 11, color: "rgba(23,18,8,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
                 {m.label}
               </div>
               <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 22, fontWeight: 500, color: m.color }}>
@@ -396,7 +396,7 @@ export default function MyCAPage() {
               border: "none",
               borderBottom: activeTab === t ? "2px solid " + RED : "2px solid transparent",
               background: "transparent",
-              color: activeTab === t ? RED : "rgba(26,16,8,0.5)",
+              color: activeTab === t ? RED : "rgba(23,18,8,0.5)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
@@ -417,7 +417,7 @@ export default function MyCAPage() {
       {activeTab === "compliance" && (
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
           {compliance.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>
               No compliance events have been added by your CA yet.
             </div>
           ) : (
@@ -425,7 +425,7 @@ export default function MyCAPage() {
               <thead>
                 <tr style={{ background: BEIGE }}>
                   {["Filing type", "Period", "Due date", "Status", "Penalty"].map(h => (
-                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(26,16,8,0.5)", borderBottom: "0.5px solid " + BORDER }}>
+                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(23,18,8,0.5)", borderBottom: "0.5px solid " + BORDER }}>
                       {h}
                     </th>
                   ))}
@@ -440,13 +440,13 @@ export default function MyCAPage() {
                         <span style={{ fontSize: 13, fontWeight: 500, color: INK }}>{c.event_type}</span>
                       </div>
                     </td>
-                    <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(26,16,8,0.65)" }}>{c.filing_period}</td>
+                    <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(23,18,8,0.65)" }}>{c.filing_period}</td>
                     <td style={{ padding: "12px 16px" }}>
                       <div style={{ fontSize: 13, color: statusColor(c.status, c.due_date), fontWeight: c.status !== "filed" && daysUntil(c.due_date) <= 7 ? 600 : 400 }}>
                         {formatDate(c.due_date)}
                       </div>
                       {c.status !== "filed" && (
-                        <div style={{ fontSize: 11, color: "rgba(26,16,8,0.4)", marginTop: 2 }}>
+                        <div style={{ fontSize: 11, color: "rgba(23,18,8,0.4)", marginTop: 2 }}>
                           {daysUntil(c.due_date) < 0
                             ? Math.abs(daysUntil(c.due_date)) + " days overdue"
                             : daysUntil(c.due_date) + " days left"}
@@ -466,7 +466,7 @@ export default function MyCAPage() {
                         {c.status === "filed" ? "Filed" : daysUntil(c.due_date) < 0 ? "Overdue" : "Pending"}
                       </span>
                     </td>
-                    <td style={{ padding: "12px 16px", fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: c.penalty_amount > 0 ? RED : "rgba(26,16,8,0.35)" }}>
+                    <td style={{ padding: "12px 16px", fontFamily: "JetBrains Mono, monospace", fontSize: 13, color: c.penalty_amount > 0 ? RED : "rgba(23,18,8,0.35)" }}>
                       {c.penalty_amount > 0 ? "Rs " + c.penalty_amount.toLocaleString("en-IN") : "-"}
                     </td>
                   </tr>
@@ -481,15 +481,15 @@ export default function MyCAPage() {
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
           {documents.length === 0 ? (
             <div style={{ padding: "48px 24px", textAlign: "center" }}>
-              <FileText size={32} style={{ color: "rgba(26,16,8,0.2)", margin: "0 auto 12px" }} />
-              <div style={{ fontSize: 14, color: "rgba(26,16,8,0.4)" }}>No documents shared by your CA yet.</div>
+              <FileText size={32} style={{ color: "rgba(23,18,8,0.2)", margin: "0 auto 12px" }} />
+              <div style={{ fontSize: 14, color: "rgba(23,18,8,0.4)" }}>No documents shared by your CA yet.</div>
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: BEIGE }}>
                   {["Document", "Type", "Period", "Size", "Shared on", ""].map(h => (
-                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(26,16,8,0.5)", borderBottom: "0.5px solid " + BORDER }}>
+                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(23,18,8,0.5)", borderBottom: "0.5px solid " + BORDER }}>
                       {h}
                     </th>
                   ))}
@@ -504,17 +504,17 @@ export default function MyCAPage() {
                         <span style={{ fontSize: 13, fontWeight: 500, color: INK }}>{doc.original_filename}</span>
                       </div>
                       {doc.description && (
-                        <div style={{ fontSize: 12, color: "rgba(26,16,8,0.45)", marginTop: 3, paddingLeft: 24 }}>{doc.description}</div>
+                        <div style={{ fontSize: 12, color: "rgba(23,18,8,0.45)", marginTop: 3, paddingLeft: 24 }}>{doc.description}</div>
                       )}
                     </td>
-                    <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(26,16,8,0.6)", textTransform: "capitalize" }}>
+                    <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(23,18,8,0.6)", textTransform: "capitalize" }}>
                       {doc.document_type.replace(/_/g, " ")}
                     </td>
-                    <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(26,16,8,0.65)" }}>{doc.filing_period || "-"}</td>
-                    <td style={{ padding: "12px 16px", fontSize: 12, fontFamily: "JetBrains Mono, monospace", color: "rgba(26,16,8,0.5)" }}>
+                    <td style={{ padding: "12px 16px", fontSize: 13, color: "rgba(23,18,8,0.65)" }}>{doc.filing_period || "-"}</td>
+                    <td style={{ padding: "12px 16px", fontSize: 12, fontFamily: "JetBrains Mono, monospace", color: "rgba(23,18,8,0.5)" }}>
                       {formatSize(doc.file_size_bytes)}
                     </td>
-                    <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>{formatDate(doc.created_at)}</td>
+                    <td style={{ padding: "12px 16px", fontSize: 12, color: "rgba(23,18,8,0.5)" }}>{formatDate(doc.created_at)}</td>
                     <td style={{ padding: "12px 16px", textAlign: "right" }}>
                       <button
                         onClick={() => downloadDocument(doc)}
@@ -534,7 +534,7 @@ export default function MyCAPage() {
       {activeTab === "reports" && (
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
           {reports.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>
               Your CA has not shared any reports with you yet.
             </div>
           ) : (
@@ -546,7 +546,7 @@ export default function MyCAPage() {
                     <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
                       {r.report?.report_name ?? r.report?.report_type ?? "Report"}
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "rgba(23,18,8,0.45)", marginTop: 2 }}>
                       {[r.report?.period, "Shared " + formatDate(r.created_at)].filter(Boolean).join(" · ")}
                       {r.note ? " · " + r.note : ""}
                     </div>
@@ -567,7 +567,7 @@ export default function MyCAPage() {
       {activeTab === "invoices" && (
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden" }}>
           {invoices.length === 0 ? (
-            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(26,16,8,0.4)" }}>
+            <div style={{ padding: "48px 24px", textAlign: "center", fontSize: 14, color: "rgba(23,18,8,0.4)" }}>
               No invoices from your CA yet.
             </div>
           ) : (
@@ -579,7 +579,7 @@ export default function MyCAPage() {
                     <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
                       {inv.invoice_number ?? "Invoice"} {inv.period ? "· " + inv.period : ""}
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(26,16,8,0.45)", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "rgba(23,18,8,0.45)", marginTop: 2 }}>
                       {paid
                         ? "Paid " + (inv.paid_at ? formatDate(inv.paid_at) : "")
                         : inv.due_date ? "Due " + formatDate(inv.due_date) : "Payment pending"}
@@ -608,12 +608,12 @@ export default function MyCAPage() {
 
       {activeTab === "messages" && (
         <div style={{ background: "white", border: "0.5px solid " + BORDER, borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", height: 480 }}>
-          <div style={{ padding: "12px 16px", borderBottom: "0.5px solid " + BORDER, fontSize: 12, color: "rgba(26,16,8,0.4)", fontWeight: 500 }}>
+          <div style={{ padding: "12px 16px", borderBottom: "0.5px solid " + BORDER, fontSize: 12, color: "rgba(23,18,8,0.4)", fontWeight: 500 }}>
             Conversation with {caFirm.firm_name}
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
             {messages.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "32px 0", fontSize: 13, color: "rgba(26,16,8,0.4)" }}>
+              <div style={{ textAlign: "center", padding: "32px 0", fontSize: 13, color: "rgba(23,18,8,0.4)" }}>
                 No messages yet. Send your CA a message below.
               </div>
             ) : (
@@ -646,7 +646,7 @@ export default function MyCAPage() {
               onChange={e => setNewMessage(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               placeholder="Type a message to your CA..."
-              style={{ flex: 1, height: 40, padding: "0 14px", fontSize: 13, border: "0.5px solid rgba(26,16,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", outline: "none", background: BEIGE }}
+              style={{ flex: 1, height: 40, padding: "0 14px", fontSize: 13, border: "0.5px solid rgba(23,18,8,0.15)", borderRadius: 8, fontFamily: "Inter, sans-serif", outline: "none", background: BEIGE }}
             />
             <button
               onClick={sendMessage}

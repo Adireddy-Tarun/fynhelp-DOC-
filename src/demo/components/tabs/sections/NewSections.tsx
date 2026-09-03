@@ -77,9 +77,9 @@ export function CohortRetentionSection() {
               <table className="text-xs">
                 <thead>
                   <tr>
-                    <th className="text-left text-[10px] uppercase text-[#6B6B6B] font-medium pr-3 py-1">Cohort</th>
+                    <th className="text-left text-[10px] uppercase text-[rgba(23,18,8,0.62)] font-medium pr-3 py-1">Cohort</th>
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <th key={i} className="text-center text-[10px] uppercase text-[#6B6B6B] font-medium px-2 py-1">M{i}</th>
+                      <th key={i} className="text-center text-[10px] uppercase text-[rgba(23,18,8,0.62)] font-medium px-2 py-1">M{i}</th>
                     ))}
                   </tr>
                 </thead>
@@ -122,8 +122,8 @@ export function CohortRetentionSection() {
               const last = rows[rows.length - 1];
               const label = new Date(month + "-01").toLocaleString("en", { month: "short", year: "2-digit" });
               return (
-                <div key={month} className="flex justify-between text-sm py-1.5 border-b border-[rgba(26,16,8,0.06)] last:border-0">
-                  <span className="text-[#6B6B6B]">{label}</span>
+                <div key={month} className="flex justify-between text-sm py-1.5 border-b border-[rgba(23,18,8,0.06)] last:border-0">
+                  <span className="text-[rgba(23,18,8,0.62)]">{label}</span>
                   <span className="font-mono text-fyn-ink font-semibold">{c.fmt(Number(last?.[c.key] ?? 0))}</span>
                 </div>
               );
@@ -176,7 +176,7 @@ export function SalesPipelineSection() {
             return (
               <div key={f.stage}>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-fyn-ink">{f.stage} <span className="text-[#6B6B6B] text-xs">({f.count})</span></span>
+                  <span className="text-fyn-ink">{f.stage} <span className="text-[rgba(23,18,8,0.62)] text-xs">({f.count})</span></span>
                   <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(f.value)}</span>
                 </div>
                 <AnimatedBar pct={(f.value / max) * 100} delay={i * 80} height={10} color={`linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})`} />
@@ -191,26 +191,26 @@ export function SalesPipelineSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Deal</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Customer</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Stage</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Prob.</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Close</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Owner</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Deal</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Customer</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Stage</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Value</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Prob.</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Close</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Owner</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((d) => (
-                    <tr key={d.id} onClick={() => openDrawer("deal", d.id)} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
+                    <tr key={d.id} onClick={() => openDrawer("deal", d.id)} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row cursor-pointer hover:bg-[rgba(169,56,56,0.04)] transition-colors">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{d.deal_name}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{d.customer_name}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{d.customer_name}</td>
                       <td className="py-2.5"><Badge tone={stageTone[d.stage] ?? "gray"}>{d.stage}</Badge></td>
                       <td className="py-2.5 text-right font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(Number(d.deal_value))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(d.probability)}%</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(d.close_date)}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{d.owner_name}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{Number(d.probability)}%</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3">{fmtDate(d.close_date)}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{d.owner_name}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -231,7 +231,7 @@ export function RevenueBreakdownSection({ active, setActive }: { active: "produc
     <IntelCard title="Revenue Breakdown" action={
       <div className="flex gap-1 text-xs bg-slate-100 rounded-md p-0.5">
         {(["product", "segment", "channel"] as const).map((b) => (
-          <button key={b} onClick={() => setActive(b)} className={`px-2.5 py-1 rounded capitalize ${active === b ? "bg-white text-fyn-ink font-medium shadow-xs" : "text-[#6B6B6B]"}`}>By {b}</button>
+          <button key={b} onClick={() => setActive(b)} className={`px-2.5 py-1 rounded capitalize ${active === b ? "bg-white text-fyn-ink font-medium shadow-xs" : "text-[rgba(23,18,8,0.62)]"}`}>By {b}</button>
         ))}
       </div>
     }>
@@ -244,7 +244,7 @@ export function RevenueBreakdownSection({ active, setActive }: { active: "produc
                 <div key={r.id}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-fyn-ink">{r.category_name}</span>
-                    <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(Number(r.revenue_amount))} <span className="text-[#6B6B6B] text-xs">({pct.toFixed(0)}%)</span></span>
+                    <span className="font-mono text-fyn-ink font-semibold">{fmtCompact(Number(r.revenue_amount))} <span className="text-[rgba(23,18,8,0.62)] text-xs">({pct.toFixed(0)}%)</span></span>
                   </div>
                   <AnimatedBar pct={pct} delay={i * 80} height={8} color={`linear-gradient(to right, ${ACCENT.gold}, ${ACCENT.goldLight})`} />
                 </div>
@@ -282,26 +282,26 @@ export function DeferredRevenueSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Customer</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Contract</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Collected</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Recognized</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Deferred</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Unbilled</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Method</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Customer</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Contract</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Collected</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Recognized</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Deferred</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Unbilled</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Method</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.customer_name}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.contract_value))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(r.collected))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(r.recognized))}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(r.collected))}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(r.recognized))}</td>
                       <td className="py-2.5 text-right font-mono text-xs font-semibold text-fyn-ink">{fmtCompact(Number(r.deferred_balance))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(r.unbilled_revenue))}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3 capitalize">{r.recognition_method}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(r.unbilled_revenue))}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3 capitalize">{r.recognition_method}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -348,34 +348,34 @@ export function SubscriptionAuditSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vendor</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Product</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Cost/mo</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Licenses</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Utilization</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Action</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Savings</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Vendor</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Product</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Cost/mo</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Licenses</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Utilization</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Action</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Savings</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.vendor}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.product}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.product}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.monthly_cost))}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3 font-mono">{r.licenses_used}/{r.licenses_purchased}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3 font-mono">{r.licenses_used}/{r.licenses_purchased}</td>
                       <td className="py-2.5 w-32">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div className="h-full" style={{ width: `${Math.min(100, Number(r.utilization_pct))}%`, background: Number(r.utilization_pct) >= 80 ? ACCENT.green : Number(r.utilization_pct) >= 50 ? ACCENT.gold : ACCENT.red }} />
                           </div>
-                          <span className="font-mono text-[11px] text-[#6B6B6B] w-8 text-right">{Number(r.utilization_pct).toFixed(0)}%</span>
+                          <span className="font-mono text-[11px] text-[rgba(23,18,8,0.62)] w-8 text-right">{Number(r.utilization_pct).toFixed(0)}%</span>
                         </div>
                       </td>
                       <td className="py-2.5"><Badge tone={statusTone[r.status] ?? "gray"}>{r.status}</Badge></td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.action}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.action}</td>
                       <td className="py-2.5 text-right font-mono text-xs font-semibold text-emerald-600">{Number(r.potential_savings) > 0 ? fmtCompact(Number(r.potential_savings)) : "—"}</td>
                     </tr>
                   ))}
@@ -402,16 +402,16 @@ export function ContractRenewalsSection() {
                 const days = daysUntil(r.end_date);
                 const urgent = days <= 60 && days >= 0;
                 return (
-                  <div key={r.id} className="p-4 rounded-lg fyn-card-hover" style={{ background: urgent ? "rgba(212,175,55,0.08)" : "#FBF9F4", border: `1px solid ${urgent ? "rgba(212,175,55,0.4)" : "rgba(26,16,8,0.08)"}` }}>
+                  <div key={r.id} className="p-4 rounded-lg fyn-card-hover" style={{ background: urgent ? "rgba(212,175,55,0.08)" : "#FBF9F4", border: `1px solid ${urgent ? "rgba(212,175,55,0.4)" : "rgba(23,18,8,0.08)"}` }}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-fyn-ink text-sm">{r.vendor_name}</p>
-                        <p className="font-mono text-xs text-[#6B6B6B] mt-0.5">{fmtCompact(Number(r.annual_value))} / yr</p>
+                        <p className="font-mono text-xs text-[rgba(23,18,8,0.62)] mt-0.5">{fmtCompact(Number(r.annual_value))} / yr</p>
                       </div>
                       <Badge tone={r.auto_renew ? "green" : "amber"}>{r.auto_renew ? "Auto-renew" : "Manual"}</Badge>
                     </div>
                     <div className="flex justify-between items-end mt-3">
-                      <span className="text-xs text-[#6B6B6B]">Ends {fmtDate(r.end_date)}</span>
+                      <span className="text-xs text-[rgba(23,18,8,0.62)]">Ends {fmtDate(r.end_date)}</span>
                       <span className={`font-mono text-xs font-semibold ${urgent ? "text-amber-600" : "text-fyn-ink"}`}>
                         {days < 0 ? `${Math.abs(days)}d ago` : `in ${days}d`}
                       </span>
@@ -456,22 +456,22 @@ export function EwayBillSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Bill #</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Invoice</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Date</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">From → To</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Value</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
-                    <th className="text-center text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Compliant</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Bill #</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Invoice</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Date</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">From → To</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Value</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Status</th>
+                    <th className="text-center text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Compliant</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 font-mono text-xs text-fyn-ink">{r.bill_number}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.invoice_number}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.document_date)}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.invoice_number}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{fmtDate(r.document_date)}</td>
                       <td className="py-2.5 text-xs text-fyn-ink">{r.from_location} → {r.to_location}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.value))}</td>
                       <td className="py-2.5 pl-3"><Badge tone={r.status === "active" ? "green" : r.status === "expired" ? "amber" : "gray"}>{r.status}</Badge></td>
@@ -513,23 +513,23 @@ export function HsnMasterSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Code</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Description</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Type</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">GST Rate</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Usage</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Status</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Code</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Description</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Type</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">GST Rate</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Usage</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 font-mono text-xs text-fyn-ink font-semibold">{r.code}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.description}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.description}</td>
                       <td className="py-2.5"><Badge tone={r.code_type === "goods" ? "gold" : "amber"}>{r.code_type}</Badge></td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.gst_rate)}%</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{r.usage_count}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{r.usage_count}</td>
                       <td className="py-2.5 pl-3"><Badge tone={r.validation_status === "valid" ? "green" : "gold"}>{r.validation_status}</Badge></td>
                     </tr>
                   ))}
@@ -562,7 +562,7 @@ export function TaxPlanningSection() {
               <ul className="space-y-2 text-sm">
                 {(Array.isArray(latest.strategies) ? latest.strategies : []).map((s: any, i: number) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className={s.status === "completed" ? "text-emerald-600" : s.status === "active" ? "text-emerald-600" : s.status === "planned" ? "text-amber-600" : "text-[#6B6B6B]"}>
+                    <span className={s.status === "completed" ? "text-emerald-600" : s.status === "active" ? "text-emerald-600" : s.status === "planned" ? "text-amber-600" : "text-[rgba(23,18,8,0.62)]"}>
                       {s.status === "completed" || s.status === "active" ? "✓" : "○"}
                     </span>
                     <div className="flex-1">
@@ -648,12 +648,12 @@ export function RiskRegisterSection() {
           <div className="flex flex-col items-center py-2">
             <div className="relative w-28 h-28">
               <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(26,16,8,0.08)" strokeWidth="10" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(23,18,8,0.08)" strokeWidth="10" />
                 <circle cx="50" cy="50" r="42" fill="none" stroke={avg > 70 ? ACCENT.red : avg >= 50 ? ACCENT.gold : ACCENT.green} strokeWidth="10" strokeDasharray={`${(avg / 100) * 263.9} 263.9`} strokeLinecap="round" />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <p className="font-mono text-xl font-bold text-fyn-ink">{avg.toFixed(0)}</p>
-                <p className="text-[10px] text-[#6B6B6B]">/ 100</p>
+                <p className="text-[10px] text-[rgba(23,18,8,0.62)]">/ 100</p>
               </div>
             </div>
             <Badge tone={sevTone(avg)}>{avg > 70 ? "Critical" : avg >= 50 ? "High" : avg >= 30 ? "Medium" : "Low"}</Badge>
@@ -664,12 +664,12 @@ export function RiskRegisterSection() {
             {(d) => (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {d.map((r) => (
-                  <div key={r.id} onClick={() => openDrawer("risk", r.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+                  <div key={r.id} onClick={() => openDrawer("risk", r.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(23,18,8,0.08)", borderLeft: `3px solid ${sevTone(Number(r.risk_score)) === "red" ? ACCENT.red : sevTone(Number(r.risk_score)) === "gold" ? ACCENT.gold : sevTone(Number(r.risk_score)) === "amber" ? ACCENT.amber : ACCENT.green}`, boxShadow: "0 2px 8px rgba(23,18,8,0.06)" }}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <p className="font-semibold text-fyn-ink text-sm leading-tight">{r.risk_name}</p>
                       <Badge tone={sevTone(Number(r.risk_score))}>{Number(r.risk_score).toFixed(0)}</Badge>
                     </div>
-                    <p className="text-[11px] text-[#6B6B6B] mb-2">{r.risk_category} · Likelihood {r.likelihood}/5 × Impact {r.impact}/5</p>
+                    <p className="text-[11px] text-[rgba(23,18,8,0.62)] mb-2">{r.risk_category} · Likelihood {r.likelihood}/5 × Impact {r.impact}/5</p>
                     <div className="flex justify-between items-end">
                       <span className="font-mono text-xs text-fyn-ink">{Number(r.current_exposure) > 0 ? fmtCompact(Number(r.current_exposure)) : "—"}</span>
                       <Badge tone={mitTone(r.mitigation_status)}>{r.mitigation_status.replace("_", " ")}</Badge>
@@ -711,17 +711,17 @@ export function InsuranceSection() {
         {(rows) => (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {rows.map((p) => (
-              <div key={p.id} onClick={() => openDrawer("insurance", p.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(26,16,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(26,16,8,0.06)" }}>
+              <div key={p.id} onClick={() => openDrawer("insurance", p.id)} className="p-4 bg-white rounded-lg fyn-card-hover cursor-pointer" style={{ border: "1px solid rgba(23,18,8,0.08)", borderLeft: `3px solid ${p.is_adequate ? ACCENT.green : ACCENT.gold}`, boxShadow: "0 2px 8px rgba(23,18,8,0.06)" }}>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <Badge tone="gold">{p.policy_type}</Badge>
                   {!p.is_adequate && <AlertTriangle className="w-4 h-4 text-amber-600" />}
                 </div>
                 <p className="font-semibold text-fyn-ink text-sm">{p.provider}</p>
                 <p className="font-mono text-xl text-fyn-ink font-bold mt-1">{fmtCompact(Number(p.coverage_amount))}</p>
-                <p className="text-[11px] text-[#6B6B6B]">coverage</p>
-                <div className="mt-3 pt-3 border-t border-[rgba(26,16,8,0.08)] flex justify-between text-xs">
-                  <span className="text-[#6B6B6B]">Premium <span className="font-mono text-fyn-ink">{fmtCompact(Number(p.annual_premium))}/yr</span></span>
-                  <span className="text-[#6B6B6B]">Exp {fmtDate(p.expiry_date)}</span>
+                <p className="text-[11px] text-[rgba(23,18,8,0.62)]">coverage</p>
+                <div className="mt-3 pt-3 border-t border-[rgba(23,18,8,0.08)] flex justify-between text-xs">
+                  <span className="text-[rgba(23,18,8,0.62)]">Premium <span className="font-mono text-fyn-ink">{fmtCompact(Number(p.annual_premium))}/yr</span></span>
+                  <span className="text-[rgba(23,18,8,0.62)]">Exp {fmtDate(p.expiry_date)}</span>
                 </div>
               </div>
             ))}
@@ -770,15 +770,15 @@ export function EsopSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Employee</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Grant Date</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Options</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Vested</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Strike</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Fair Value</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Cliff</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Employee</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Grant Date</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Options</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Vested</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Strike</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Fair Value</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Cliff</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -788,15 +788,15 @@ export function EsopSection() {
                       <tr
                         key={r.id}
                         onClick={() => empId && openDrawer("employee", empId)}
-                        className={`border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row ${empId ? "cursor-pointer hover:bg-[rgba(169,56,56,0.04)]" : ""} transition-colors`}
+                        className={`border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row ${empId ? "cursor-pointer hover:bg-[rgba(169,56,56,0.04)]" : ""} transition-colors`}
                       >
                         <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.employee_name}</td>
-                        <td className="py-2.5 text-xs text-[#6B6B6B]">{fmtDate(r.grant_date)}</td>
+                        <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{fmtDate(r.grant_date)}</td>
                         <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{Number(r.total_options).toLocaleString("en-IN")}</td>
-                        <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
+                        <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{Number(r.vested_options).toLocaleString("en-IN")}</td>
                         <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.strike_price}</td>
                         <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">₹{r.current_fair_value}</td>
-                        <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.cliff_date)}</td>
+                        <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3">{fmtDate(r.cliff_date)}</td>
                         <td className="py-2.5"><Badge tone="green">{r.status}</Badge></td>
                       </tr>
                     );
@@ -839,26 +839,26 @@ export function HiringPipelineSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Position</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Department</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Priority</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Budget</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Candidates</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3">Target Join</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Position</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Department</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Priority</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Budget</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Candidates</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3">Target Join</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.position}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.department}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.department}</td>
                       <td className="py-2.5"><Badge tone={prioTone[r.priority] ?? "gray"}>{r.priority}</Badge></td>
                       <td className="py-2.5"><Badge tone={r.status === "offer" ? "green" : r.status === "interviewing" ? "gold" : "gray"}>{r.status}</Badge></td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.budget))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{r.candidates_count}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B] pl-3">{fmtDate(r.target_join_date)}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{r.candidates_count}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)] pl-3">{fmtDate(r.target_join_date)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -897,30 +897,30 @@ export function CompBenchmarksSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(26,16,8,0.08)]">
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Role</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Dept</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Internal</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">P50</th>
-                    <th className="text-right text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">P75</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2 pl-3 w-48">Position</th>
-                    <th className="text-left text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium py-2">Status</th>
+                  <tr className="border-b border-[rgba(23,18,8,0.08)]">
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Role</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Dept</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Internal</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">P50</th>
+                    <th className="text-right text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">P75</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2 pl-3 w-48">Position</th>
+                    <th className="text-left text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium py-2">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.id} className="border-b border-[rgba(26,16,8,0.06)] last:border-0 fyn-row">
+                    <tr key={r.id} className="border-b border-[rgba(23,18,8,0.06)] last:border-0 fyn-row">
                       <td className="py-2.5 text-xs font-medium text-fyn-ink">{r.role}</td>
-                      <td className="py-2.5 text-xs text-[#6B6B6B]">{r.department}</td>
+                      <td className="py-2.5 text-xs text-[rgba(23,18,8,0.62)]">{r.department}</td>
                       <td className="py-2.5 text-right font-mono text-xs text-fyn-ink">{fmtCompact(Number(r.internal_ctc))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(r.market_50th))}</td>
-                      <td className="py-2.5 text-right font-mono text-xs text-[#6B6B6B]">{fmtCompact(Number(r.market_75th))}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(r.market_50th))}</td>
+                      <td className="py-2.5 text-right font-mono text-xs text-[rgba(23,18,8,0.62)]">{fmtCompact(Number(r.market_75th))}</td>
                       <td className="py-2.5 pl-3">
                         <div className="relative h-2 bg-slate-100 rounded-full">
                           <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-200 via-amber-200 to-red-200 rounded-full" />
                           <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white" style={{ left: `${Math.min(95, Math.max(0, Number(r.percentile_position)))}%`, background: ACCENT.ink, transform: "translate(-50%, -50%)" }} />
                         </div>
-                        <p className="text-[10px] text-[#6B6B6B] mt-1 font-mono">P{Number(r.percentile_position).toFixed(0)}</p>
+                        <p className="text-[10px] text-[rgba(23,18,8,0.62)] mt-1 font-mono">P{Number(r.percentile_position).toFixed(0)}</p>
                       </td>
                       <td className="py-2.5"><Badge tone={compTone[r.competitiveness] ?? "gray"}>{r.competitiveness.replace("_", " ")}</Badge></td>
                     </tr>

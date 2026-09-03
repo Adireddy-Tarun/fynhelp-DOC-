@@ -154,7 +154,7 @@ const ReceivablesPage = () => {
           </p>
           <p
             className="text-[28px] font-bold mt-1 font-sans"
-            style={{ color: overdue.length > 0 ? "#C41E1E" : "#1A1008" }}
+            style={{ color: overdue.length > 0 ? "#C41E1E" : "#171208" }}
           >
             {overdue.length}
           </p>

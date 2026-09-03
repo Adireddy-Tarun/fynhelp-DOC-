@@ -3,15 +3,15 @@ import { toast } from "sonner";
 
 const Card = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => (
   <div className="bg-card border rounded-lg p-6 mb-6" style={{ borderColor: "#E0D9C8" }}>
-    <h3 className="font-semibold text-[15px]" style={{ color: "#1A1008" }}>{title}</h3>
-    {sub && <p className="text-[12px] mt-1 mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>{sub}</p>}
+    <h3 className="font-semibold text-[15px]" style={{ color: "#171208" }}>{title}</h3>
+    {sub && <p className="text-[12px] mt-1 mb-4" style={{ color: "rgba(23,18,8,0.60)" }}>{sub}</p>}
     <div className="mt-4 space-y-4">{children}</div>
   </div>
 );
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div>
-    <label className="block text-[13px] font-medium mb-1.5" style={{ color: "#1A1008" }}>{label}</label>
+    <label className="block text-[13px] font-medium mb-1.5" style={{ color: "#171208" }}>{label}</label>
     {children}
   </div>
 );
@@ -33,8 +33,8 @@ const LanguagePage = () => {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#1A1008" }}>Language & Region</h2>
-      <p className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.60)" }}>Set your preferred language, timezone and number formats.</p>
+      <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: "#171208" }}>Language & Region</h2>
+      <p className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.60)" }}>Set your preferred language, timezone and number formats.</p>
 
       <Card title="Language">
         <Field label="Display language">

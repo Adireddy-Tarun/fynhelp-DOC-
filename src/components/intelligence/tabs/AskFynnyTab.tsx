@@ -236,14 +236,14 @@ export default function AskFynnyTab() {
   return (
     <div className="grid lg:grid-cols-[1fr_280px] gap-4">
       <IntelCard className="!p-0" title={undefined}>
-        <div className="px-5 py-3 border-b border-[rgba(26,16,8,0.08)] flex items-center justify-between">
+        <div className="px-5 py-3 border-b border-[rgba(23,18,8,0.08)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${ACCENT.red}, ${ACCENT.redLight})` }}>
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
               <p className="font-serif text-base font-semibold text-fyn-ink">FYNNY — Virtual CFO</p>
-              <p className="text-[11px] text-[#6B6B6B]">Powered by FYNNY · All data encrypted</p>
+              <p className="text-[11px] text-[rgba(23,18,8,0.62)]">Powered by FYNNY · All data encrypted</p>
             </div>
           </div>
           <Badge tone="green">● ONLINE</Badge>
@@ -255,7 +255,7 @@ export default function AskFynnyTab() {
               <div className="max-w-[80%] flex flex-col gap-1.5 items-start">
                 <div
                   className={`px-3.5 py-2.5 rounded-lg text-sm leading-relaxed ${m.role === "user" ? "text-white self-end" : "text-fyn-ink"}`}
-                  style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(26,16,8,0.04)" }}
+                  style={m.role === "user" ? { background: ACCENT.red } : { background: "rgba(23,18,8,0.04)" }}
                 >
                   {renderText(m.text)}
                 </div>
@@ -274,14 +274,14 @@ export default function AskFynnyTab() {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="px-3.5 py-2.5 rounded-lg text-sm text-fyn-ink flex items-center gap-2" style={{ background: "rgba(26,16,8,0.04)" }}>
+              <div className="px-3.5 py-2.5 rounded-lg text-sm text-fyn-ink flex items-center gap-2" style={{ background: "rgba(23,18,8,0.04)" }}>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Thinking…
               </div>
             </div>
           )}
         </div>
 
-        <div className="p-3 border-t border-[rgba(26,16,8,0.08)] flex gap-2">
+        <div className="p-3 border-t border-[rgba(23,18,8,0.08)] flex gap-2">
           <input
             ref={inputRef}
             value={input}
@@ -290,7 +290,7 @@ export default function AskFynnyTab() {
             placeholder="Ask FYNNY anything…"
             disabled={loading}
             className="flex-1 px-3 py-2 text-sm bg-white rounded-md focus:outline-hidden focus:ring-2 disabled:opacity-60"
-            style={{ border: "1px solid rgba(26,16,8,0.12)" }}
+            style={{ border: "1px solid rgba(23,18,8,0.12)" }}
           />
           <button onClick={() => send(input)} disabled={loading || !input.trim()} className="px-3 rounded-md text-white disabled:opacity-50" style={{ background: ACCENT.red }}>
             <Send className="w-4 h-4" />
@@ -307,7 +307,7 @@ export default function AskFynnyTab() {
                 onClick={() => send(p)}
                 disabled={loading}
                 className="w-full text-left text-xs px-3 py-2 rounded-md text-fyn-ink transition-colors disabled:opacity-60"
-                style={{ background: "rgba(26,16,8,0.04)" }}
+                style={{ background: "rgba(23,18,8,0.04)" }}
               >
                 {p}
               </button>

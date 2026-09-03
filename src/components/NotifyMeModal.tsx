@@ -66,7 +66,7 @@ export default function NotifyMeModal({ open, initialModuleId, onClose }: Props)
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ background: "rgba(26,16,8,0.60)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(23,18,8,0.60)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -74,7 +74,7 @@ export default function NotifyMeModal({ open, initialModuleId, onClose }: Props)
     >
       <div
         className="relative bg-[#F9F7F4] rounded-xl p-8 max-w-[460px] w-full mx-4"
-        style={{ boxShadow: "0 24px 64px rgba(26,16,8,0.20)" }}
+        style={{ boxShadow: "0 24px 64px rgba(23,18,8,0.20)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <button

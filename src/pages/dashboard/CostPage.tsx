@@ -237,11 +237,11 @@ function CostContent({
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trend} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" />
-                  <XAxis dataKey="month" tick={{ fill: "#1A1008", fontSize: 12 }} />
-                  <YAxis tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" />
+                  <XAxis dataKey="month" tick={{ fill: "#171208", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
                   <Tooltip
-                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+                    contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
                     formatter={(v: number) => [
                       `${formatINR(v)}${trendAvg > 0 ? ` (${(((v - trendAvg) / trendAvg) * 100).toFixed(0)}% vs avg)` : ""}`,
                       "Spend",
@@ -511,11 +511,11 @@ function CategoryChart({
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 56, left: 8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(26,16,8,0.08)" horizontal={false} />
-          <XAxis type="number" tick={{ fill: "#1A1008", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
-          <YAxis dataKey="category" type="category" tick={{ fill: "#1A1008", fontSize: 12 }} width={130} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(23,18,8,0.08)" horizontal={false} />
+          <XAxis type="number" tick={{ fill: "#171208", fontSize: 12 }} tickFormatter={(v) => formatINR(v)} />
+          <YAxis dataKey="category" type="category" tick={{ fill: "#171208", fontSize: 12 }} width={130} />
           <Tooltip
-            contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(26,16,8,0.12)", borderRadius: 8 }}
+            contentStyle={{ background: "#FBF7EC", border: "1px solid rgba(23,18,8,0.12)", borderRadius: 8 }}
             formatter={(v: number, _n, p: any) => {
               const pct = p.payload.percentage != null ? ` (${num(p.payload.percentage).toFixed(1)}%)` : "";
               const extra = tooltipExtra ? tooltipExtra(p) : "";
@@ -526,7 +526,7 @@ function CategoryChart({
             label={{ position: "right", formatter: (v: number) => {
               const total = data.reduce((s, d) => s + d.amount, 0);
               return total > 0 ? `${((v / total) * 100).toFixed(0)}%` : "";
-            }, fill: "#1A1008", fontSize: 11 }}
+            }, fill: "#171208", fontSize: 11 }}
           />
         </BarChart>
       </ResponsiveContainer>

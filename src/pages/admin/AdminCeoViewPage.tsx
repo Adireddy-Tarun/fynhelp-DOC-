@@ -43,7 +43,7 @@ const PRIORITY_STYLE: Record<Query["priority"], { bg: string; fg: string }> = {
   urgent: { bg: "rgba(196,30,30,0.15)", fg: "#C41E1E" },
   high:   { bg: "rgba(251,191,36,0.18)", fg: "#B45309" },
   medium: { bg: "rgba(59,130,246,0.15)", fg: "#1D4ED8" },
-  low:    { bg: "rgba(26,16,8,0.08)",   fg: "rgba(26,16,8,0.6)" },
+  low:    { bg: "rgba(23,18,8,0.08)",   fg: "rgba(23,18,8,0.6)" },
 };
 
 function timeAgo(iso: string) {
@@ -164,7 +164,7 @@ export default function AdminCeoViewPage() {
       <Card style={{ padding: 0 }}>
         <div className="grid lg:grid-cols-3" style={{ minHeight: 480 }}>
           {/* Query list */}
-          <div className="lg:col-span-2 p-5 space-y-3" style={{ borderRight: "1px solid rgba(26,16,8,0.08)" }}>
+          <div className="lg:col-span-2 p-5 space-y-3" style={{ borderRight: "1px solid rgba(23,18,8,0.08)" }}>
             {customerQueries.length === 0 && (
               <div className="p-8 text-center" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.5)" }}>
                 No open tickets right now.
@@ -178,14 +178,14 @@ export default function AdminCeoViewPage() {
                   className="p-4 rounded-xl cursor-pointer transition-all"
                   style={{
                     background: isSel ? "rgba(139,105,20,0.1)" : "rgba(255,255,255,0.6)",
-                    border: `1px solid ${isSel ? "rgba(139,105,20,0.35)" : "rgba(26,16,8,0.1)"}`,
+                    border: `1px solid ${isSel ? "rgba(139,105,20,0.35)" : "rgba(23,18,8,0.1)"}`,
                   }}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span style={{ background: ps.bg, color: ps.fg, padding: "2px 8px", borderRadius: 4, fontFamily: "DM Sans, sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: 0.4 }}>
                         {q.priority.toUpperCase()}
                       </span>
-                      <span style={{ background: "rgba(26,16,8,0.06)", color: "hsl(var(--fyn-ink) / 0.7)", padding: "2px 8px", borderRadius: 4, fontFamily: "Roboto, sans-serif", fontSize: 11, textTransform: "capitalize" }}>
+                      <span style={{ background: "rgba(23,18,8,0.06)", color: "hsl(var(--fyn-ink) / 0.7)", padding: "2px 8px", borderRadius: 4, fontFamily: "Roboto, sans-serif", fontSize: 11, textTransform: "capitalize" }}>
                         {q.type}
                       </span>
                     </div>
@@ -218,22 +218,22 @@ export default function AdminCeoViewPage() {
                   placeholder="Type your response..."
                   rows={8}
                   className="w-full rounded-lg px-3 py-2.5 mb-3 resize-none"
-                  style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, lineHeight: 1.5, background: "#fff" }}
+                  style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Roboto, sans-serif", fontSize: 13, lineHeight: 1.5, background: "#fff" }}
                 />
                 <button
                   onClick={() => handleSend(selectedQuery)}
                   disabled={!replyText.trim()}
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg"
                   style={{
-                    background: replyText.trim() ? "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" : "rgba(26,16,8,0.1)",
-                    color: replyText.trim() ? "#fff" : "rgba(26,16,8,0.4)",
+                    background: replyText.trim() ? "linear-gradient(135deg,#C41E1E 0%,#8B6914 100%)" : "rgba(23,18,8,0.1)",
+                    color: replyText.trim() ? "#fff" : "rgba(23,18,8,0.4)",
                     border: "none", cursor: replyText.trim() ? "pointer" : "not-allowed",
                     fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 14,
                   }}
                 >
                   <Send size={16} /> Open Ticket to Reply
                 </button>
-                <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(26,16,8,0.1)" }}>
+                <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(23,18,8,0.1)" }}>
                   <button
                     onClick={() => toast.info("Escalated to support team")}
                     className="w-full py-2 rounded-lg"
@@ -247,7 +247,7 @@ export default function AdminCeoViewPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-8 rounded-xl text-center" style={{ background: "rgba(26,16,8,0.03)", border: "1px solid rgba(26,16,8,0.08)" }}>
+              <div className="p-8 rounded-xl text-center" style={{ background: "rgba(23,18,8,0.03)", border: "1px solid rgba(23,18,8,0.08)" }}>
                 <MessageCircle size={48} color="hsl(var(--fyn-ink) / 0.3)" style={{ margin: "0 auto 16px" }} />
                 <p style={{ fontFamily: "Roboto, sans-serif", fontSize: 13, color: "hsl(var(--fyn-ink) / 0.5)" }}>
                   Select a query to reply

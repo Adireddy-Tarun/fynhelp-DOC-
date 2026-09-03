@@ -94,7 +94,7 @@ export default function WaitlistStatsWidget() {
           <div className="space-y-3">
             {recent.map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-2 py-2"
-                style={{ borderBottom: "1px solid rgba(26,16,8,0.06)" }}>
+                style={{ borderBottom: "1px solid rgba(23,18,8,0.06)" }}>
                 <div className="min-w-0">
                   <div style={{
                     fontFamily: "Roboto, sans-serif", fontWeight: 500, fontSize: 13,

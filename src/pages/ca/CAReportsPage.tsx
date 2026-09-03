@@ -22,7 +22,7 @@ const TEMPLATES: {
   { id: "payroll", name: "Payroll Summary", desc: "Monthly payroll breakdown, statutory compliance, and attrition analysis", Icon: Users, bg: "#CCFBF1", fg: "#0F766E" },
   { id: "cash_forecast", name: "Cash Flow Forecast", desc: "90-day cash flow projection with scenario analysis and runway forecast", Icon: TrendingUp, bg: "#E0E7FF", fg: "#3730A3" },
   { id: "portfolio", name: "Portfolio Analytics", desc: "Portfolio-wide metrics, client health scores, and performance trends", Icon: PieChart, bg: "#FFEDD5", fg: "#9A3412" },
-  { id: "custom", name: "Custom Report", desc: "Build a custom report by selecting specific sections and metrics", Icon: Settings2, bg: "#F3F0E6", fg: "rgba(26,16,8,0.65)" },
+  { id: "custom", name: "Custom Report", desc: "Build a custom report by selecting specific sections and metrics", Icon: Settings2, bg: "#F3F0E6", fg: "rgba(23,18,8,0.65)" },
 ];
 
 const SECTIONS_BY_TEMPLATE: Record<TemplateId, { id: string; label: string; default: boolean }[]> = {
@@ -212,7 +212,7 @@ export default function CAReportsPage() {
       {/* Templates */}
       <div className="mb-2">
         <h2 className="text-[18px] font-semibold" style={{ color: COLORS.ink }}>Report Templates</h2>
-        <p className="text-[14px]" style={{ color: "rgba(26,16,8,0.65)" }}>Choose a template to get started</p>
+        <p className="text-[14px]" style={{ color: "rgba(23,18,8,0.65)" }}>Choose a template to get started</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
         {TEMPLATES.map(t => (
@@ -226,7 +226,7 @@ export default function CAReportsPage() {
               <t.Icon size={26} />
             </div>
             <div className="text-[16px] font-semibold mb-1" style={{ color: COLORS.ink }}>{t.name}</div>
-            <p className="text-[13px] mb-4 line-clamp-2 min-h-[34px]" style={{ color: "rgba(26,16,8,0.65)" }}>{t.desc}</p>
+            <p className="text-[13px] mb-4 line-clamp-2 min-h-[34px]" style={{ color: "rgba(23,18,8,0.65)" }}>{t.desc}</p>
             <div className="text-[13px] font-medium group-hover:underline" style={{ color: COLORS.red }}>Generate →</div>
           </button>
         ))}
@@ -246,16 +246,16 @@ export default function CAReportsPage() {
             </div>
           ) : reports.length === 0 ? (
             <div className="text-center py-12">
-              <FileText size={40} className="mx-auto mb-3" style={{ color: "rgba(26,16,8,0.30)" }} />
+              <FileText size={40} className="mx-auto mb-3" style={{ color: "rgba(23,18,8,0.30)" }} />
               <div className="text-[15px] font-semibold mb-1">No reports generated yet</div>
-              <div className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.60)" }}>Generate your first report to get started</div>
+              <div className="text-[13px] mb-4" style={{ color: "rgba(23,18,8,0.60)" }}>Generate your first report to get started</div>
               <PrimaryBtn onClick={openBlank}>Generate Report</PrimaryBtn>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
+                  <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.50)" }}>
                     <th className="py-2 pr-4">Report Type</th>
                     <th className="py-2 pr-4">Client</th>
                     <th className="py-2 pr-4">Period</th>
@@ -279,10 +279,10 @@ export default function CAReportsPage() {
                             {sharedIds.has(r.id) && <Chip tone="green">Shared</Chip>}
                           </div>
                         </td>
-                        <td className="py-3 pr-4 text-[13px]">{r.business?.business_name || (r.business_id ? "-" : <em style={{ color: "rgba(26,16,8,0.55)" }}>Portfolio-wide</em>)}</td>
+                        <td className="py-3 pr-4 text-[13px]">{r.business?.business_name || (r.business_id ? "-" : <em style={{ color: "rgba(23,18,8,0.55)" }}>Portfolio-wide</em>)}</td>
                         <td className="py-3 pr-4 text-[13px]">{periodLabel(r.period, r.period_start, r.period_end)}</td>
-                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{fmtDateTime(r.created_at)}</td>
-                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>
+                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{fmtDateTime(r.created_at)}</td>
+                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>
                           {r.generated_by_user_id === user?.id ? "You" : "-"}
                         </td>
                         <td className="py-3 pr-4">
@@ -340,14 +340,14 @@ export default function CAReportsPage() {
           </div>
 
           {schedules.length === 0 ? (
-            <div className="text-center py-8 text-[13px]" style={{ color: "rgba(26,16,8,0.55)" }}>
+            <div className="text-center py-8 text-[13px]" style={{ color: "rgba(23,18,8,0.55)" }}>
               No schedules yet. Automate recurring reports by adding one.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(26,16,8,0.50)" }}>
+                  <tr className="text-left text-[11px] uppercase tracking-wider" style={{ color: "rgba(23,18,8,0.50)" }}>
                     <th className="py-2 pr-4">Report Type</th>
                     <th className="py-2 pr-4">Frequency</th>
                     <th className="py-2 pr-4">Clients</th>
@@ -371,8 +371,8 @@ export default function CAReportsPage() {
                         </td>
                         <td className="py-3 pr-4 text-[13px] capitalize">{s.frequency}{s.day_of_month ? ` (day ${s.day_of_month})` : ""}</td>
                         <td className="py-3 pr-4 text-[13px]">{s.scope === "all" ? "All clients" : `${clientCount} clients`}</td>
-                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{s.last_generated_at ? fmtDateTime(s.last_generated_at) : "Never"}</td>
-                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(26,16,8,0.65)" }}>{s.next_generation_at ? fmtDateTime(s.next_generation_at) : "-"}</td>
+                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{s.last_generated_at ? fmtDateTime(s.last_generated_at) : "Never"}</td>
+                        <td className="py-3 pr-4 text-[13px]" style={{ color: "rgba(23,18,8,0.65)" }}>{s.next_generation_at ? fmtDateTime(s.next_generation_at) : "-"}</td>
                         <td className="py-3 pr-4">
                           <ScheduleToggle schedule={s} onChange={loadAll} />
                         </td>
@@ -557,7 +557,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
             >
               {TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
-            <div className="mt-2 flex items-center gap-2 text-[12px]" style={{ color: "rgba(26,16,8,0.65)" }}>
+            <div className="mt-2 flex items-center gap-2 text-[12px]" style={{ color: "rgba(23,18,8,0.65)" }}>
               <div className="w-7 h-7 rounded flex items-center justify-center" style={{ background: meta.bg, color: meta.fg }}><meta.Icon size={13} /></div>
               {meta.desc}
             </div>
@@ -576,7 +576,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
               <Radio name="scope" value="multiple" current={scope} onChange={setScope as any} label="Multiple Clients" />
               {scope === "multiple" && (
                 <div className="ml-6 max-w-md max-h-40 overflow-y-auto border rounded p-2 space-y-1" style={{ borderColor: COLORS.caBorder }}>
-                  {clients.length === 0 ? <div className="text-xs text-center py-2" style={{ color: "rgba(26,16,8,0.55)" }}>No clients</div> :
+                  {clients.length === 0 ? <div className="text-xs text-center py-2" style={{ color: "rgba(23,18,8,0.55)" }}>No clients</div> :
                     clients.map(c => (
                       <label key={c.business_id} className="flex items-center gap-2 text-sm">
                         <input
@@ -606,7 +606,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
             {period === "custom" && (
               <div className="flex gap-2 mt-2">
                 <input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className="h-9 px-2 rounded text-sm" style={{ border: `1px solid ${COLORS.caBorder}` }} />
-                <span className="self-center text-xs" style={{ color: "rgba(26,16,8,0.55)" }}>to</span>
+                <span className="self-center text-xs" style={{ color: "rgba(23,18,8,0.55)" }}>to</span>
                 <input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className="h-9 px-2 rounded text-sm" style={{ border: `1px solid ${COLORS.caBorder}` }} />
               </div>
             )}
@@ -691,7 +691,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={delivery.email_client} onChange={(e) => setDelivery(p => ({ ...p, email_client: e.target.checked }))} disabled={scope !== "single"} />
-                Email to client {scope !== "single" && <span className="text-[11px]" style={{ color: "rgba(26,16,8,0.45)" }}>(single client only)</span>}
+                Email to client {scope !== "single" && <span className="text-[11px]" style={{ color: "rgba(23,18,8,0.45)" }}>(single client only)</span>}
               </label>
               {delivery.email_client && scope === "single" && (
                 <div className="ml-6 space-y-1.5">
@@ -716,7 +716,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
           <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: COLORS.caSurface }}>
             <div className="h-full transition-all" style={{ width: `${progress}%`, background: COLORS.red }} />
           </div>
-          <div className="text-[12px] mt-2" style={{ color: "rgba(26,16,8,0.55)" }}>{progress}% complete · ~{Math.max(1, Math.round((100 - progress) / 50))} min remaining</div>
+          <div className="text-[12px] mt-2" style={{ color: "rgba(23,18,8,0.55)" }}>{progress}% complete · ~{Math.max(1, Math.round((100 - progress) / 50))} min remaining</div>
         </div>
       )}
 
@@ -724,13 +724,13 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
         <div className="py-8 text-center">
           <CheckCircle2 size={48} className="mx-auto mb-3" style={{ color: COLORS.green }} />
           <div className="text-[18px] font-semibold mb-2">Report generated successfully!</div>
-          <div className="text-[13px] mb-6" style={{ color: "rgba(26,16,8,0.65)" }}>Your {meta.name} is ready.</div>
+          <div className="text-[13px] mb-6" style={{ color: "rgba(23,18,8,0.65)" }}>Your {meta.name} is ready.</div>
           <div className="flex gap-2 justify-center">
             <PrimaryBtn onClick={() => { toast.success("Download started"); }}><Download size={14} className="inline -mt-0.5 mr-1" />Download Report</PrimaryBtn>
             <SecondaryBtn onClick={() => toast.info("Opening preview...")}><Eye size={14} className="inline -mt-0.5 mr-1" />View Online</SecondaryBtn>
             <SecondaryBtn onClick={() => { setDone(false); setGenerating(false); setProgress(0); }}>Generate Another</SecondaryBtn>
           </div>
-          <button onClick={() => { onDone(); onClose(); }} className="mt-4 text-[13px] underline" style={{ color: "rgba(26,16,8,0.55)" }}>Close</button>
+          <button onClick={() => { onDone(); onClose(); }} className="mt-4 text-[13px] underline" style={{ color: "rgba(23,18,8,0.55)" }}>Close</button>
         </div>
       )}
 
@@ -738,7 +738,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
         <div className="py-8 text-center">
           <AlertCircle size={40} className="mx-auto mb-3" style={{ color: COLORS.red }} />
           <div className="text-[15px] font-semibold mb-2">Report generation failed</div>
-          <div className="text-[13px] mb-4" style={{ color: "rgba(26,16,8,0.65)" }}>{error}</div>
+          <div className="text-[13px] mb-4" style={{ color: "rgba(23,18,8,0.65)" }}>{error}</div>
           <div className="flex gap-2 justify-center">
             <PrimaryBtn onClick={() => { setError(null); handleGenerate(); }}>Retry</PrimaryBtn>
             <SecondaryBtn onClick={onClose}>Close</SecondaryBtn>
@@ -914,7 +914,7 @@ function ModalShell({ title, sub, onClose, children, maxWidth = 700 }: { title: 
         <div className="flex items-start justify-between p-6 border-b sticky top-0 bg-white rounded-t-xl z-10" style={{ borderColor: COLORS.divider }}>
           <div>
             <h2 className="text-[22px] font-bold" style={{ color: COLORS.ink }}>{title}</h2>
-            {sub && <p className="text-[13px] mt-1" style={{ color: "rgba(26,16,8,0.65)" }}>{sub}</p>}
+            {sub && <p className="text-[13px] mt-1" style={{ color: "rgba(23,18,8,0.65)" }}>{sub}</p>}
           </div>
           <button onClick={onClose} className="p-1 rounded hover:bg-[#F3F0E6]"><X size={18} /></button>
         </div>
@@ -928,7 +928,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
   return (
     <div>
       <div className="text-[13px] font-semibold mb-2" style={{ color: COLORS.ink }}>
-        <span className="text-[11px] uppercase tracking-wider mr-2" style={{ color: "rgba(26,16,8,0.45)" }}>Step {n}</span>
+        <span className="text-[11px] uppercase tracking-wider mr-2" style={{ color: "rgba(23,18,8,0.45)" }}>Step {n}</span>
         {title}
       </div>
       {children}
@@ -945,5 +945,5 @@ function Radio({ name, value, current, onChange, label }: { name: string; value:
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12px] font-medium mb-1.5" style={{ color: "rgba(26,16,8,0.75)" }}>{children}</div>;
+  return <div className="text-[12px] font-medium mb-1.5" style={{ color: "rgba(23,18,8,0.75)" }}>{children}</div>;
 }

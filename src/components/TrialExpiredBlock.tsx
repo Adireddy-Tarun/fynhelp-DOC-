@@ -3,7 +3,7 @@ import { Lock, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const RED = "#A93838";
-const INK = "#1A1008";
+const INK = "#171208";
 const BEIGE = "#EFE8D8";
 const BORDER = "#E0D9C8";
 
@@ -29,7 +29,7 @@ export default function TrialExpiredBlock() {
         >
           Your free trial has ended
         </h1>
-        <p className="text-[15px] leading-relaxed mb-8" style={{ color: "rgba(26,16,8,0.7)" }}>
+        <p className="text-[15px] leading-relaxed mb-8" style={{ color: "rgba(23,18,8,0.7)" }}>
           Thanks for trying FynHelp. Upgrade to a paid plan to keep using your dashboard,
           reports, GST intelligence and Fynny AI.
         </p>
@@ -54,7 +54,7 @@ export default function TrialExpiredBlock() {
         <a
           href="mailto:support@fynhelp.com?subject=FynHelp%20trial%20upgrade"
           className="mt-6 inline-flex items-center justify-center gap-2 text-[13px]"
-          style={{ color: "rgba(26,16,8,0.6)" }}
+          style={{ color: "rgba(23,18,8,0.6)" }}
         >
           <MessageCircle className="w-4 h-4" />
           Contact support

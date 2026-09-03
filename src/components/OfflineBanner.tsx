@@ -8,7 +8,7 @@ export default function OfflineBanner() {
       role="status"
       aria-live="polite"
       style={{
-        background: "#1A1008",
+        background: "#171208",
         color: "#F4EDDA",
         padding: "8px 16px",
         textAlign: "center",

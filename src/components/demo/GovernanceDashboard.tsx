@@ -145,7 +145,7 @@ export function GovernanceDashboard({ data }: GovernanceDashboardProps) {
               className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: colors.warning.main }}
             >
-              <AlertTriangle size={24} color="#1A1008" />
+              <AlertTriangle size={24} color="#171208" />
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold" style={{ color: colors.text.primary }}>

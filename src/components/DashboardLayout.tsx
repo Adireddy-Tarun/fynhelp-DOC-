@@ -44,7 +44,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   if (!authReady || (trial.loading && !skipGates)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "#EFE8D8" }}>
-        <div className="text-sm" style={{ color: "rgba(26,16,8,0.55)" }}>Loading…</div>
+        <div className="text-sm" style={{ color: "rgba(23,18,8,0.55)" }}>Loading…</div>
       </div>
     );
   }

@@ -20,8 +20,8 @@ export default function AdvanceTaxSection() {
       )}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {rows.map((r: any) => (
-          <div key={r.id} className="rounded-lg p-3" style={{ border: "1px solid rgba(26,16,8,0.08)", background: "#fff" }}>
-            <p className="text-[10px] uppercase tracking-wider text-[#6B6B6B] font-medium">Q{r.instalment_number} · {Number(r.cumulative_pct)}% cumulative</p>
+          <div key={r.id} className="rounded-lg p-3" style={{ border: "1px solid rgba(23,18,8,0.08)", background: "#fff" }}>
+            <p className="text-[10px] uppercase tracking-wider text-[rgba(23,18,8,0.62)] font-medium">Q{r.instalment_number} · {Number(r.cumulative_pct)}% cumulative</p>
             <p className="font-mono text-sm text-fyn-ink mt-1">{new Date(r.due_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</p>
             <p className="font-mono text-lg text-fyn-ink font-semibold mt-1">{fmtCompact(Number(r.amount_due))}</p>
             <div className="mt-2"><Badge tone={tone[r.status] ?? "gray"}>{r.status}</Badge></div>

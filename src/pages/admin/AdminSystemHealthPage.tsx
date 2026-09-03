@@ -84,7 +84,7 @@ export default function AdminSystemHealthPage() {
           onClick={refresh}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 rounded-lg disabled:opacity-50"
-          style={{ border: "1px solid rgba(26,16,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}
+          style={{ border: "1px solid rgba(23,18,8,0.15)", fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 13, color: "hsl(var(--fyn-ink))" }}
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
         </button>

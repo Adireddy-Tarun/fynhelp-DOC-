@@ -136,7 +136,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#1A1008",
+        background: "#171208",
         color: "#F4EDDA",
         position: "relative",
         overflow: "hidden",
@@ -180,7 +180,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         }
         .fyn-input::placeholder { color: rgba(244,237,218,0.2); }
         .fyn-select { appearance: none; cursor: pointer; }
-        .fyn-select option { background:#1A1008; color:#F4EDDA; }
+        .fyn-select option { background:#171208; color:#F4EDDA; }
 
         .fyn-btn-primary {
           width: 100%; padding: 13px;
@@ -208,7 +208,7 @@ function DemoGate({ onAccess }: { onAccess: () => void }) {
         }
 
         .metric-card {
-          background: rgba(26,16,8,0.85);
+          background: rgba(23,18,8,0.85);
           border: 1px solid rgba(244,237,218,0.08);
           border-radius: 14px; padding: 18px 20px;
           backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);

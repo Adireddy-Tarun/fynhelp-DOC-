@@ -28,11 +28,11 @@ import { validateUpload } from "@/lib/uploadPolicy";
 
 
 
-const INK = "#1A1008";
+const INK = "#171208";
 const RED = "#C41E1E";
 const GOLD = "#8B6914";
 const BEIGE = "#F4EDDA";
-const BORDER = "rgba(26,16,8,0.12)";
+const BORDER = "rgba(23,18,8,0.12)";
 const HEADING = "'Times New Roman', Times, serif";
 const BODY = "Arial, Helvetica, sans-serif";
 
@@ -291,7 +291,7 @@ export default function AdminContentPage() {
               fontFamily: "Raleway, sans-serif",
               fontWeight: 600,
               fontSize: 14,
-              color: tab === t ? INK : "rgba(26,16,8,0.5)",
+              color: tab === t ? INK : "rgba(23,18,8,0.5)",
               borderBottom: tab === t ? `3px solid ${GOLD}` : "3px solid transparent",
               marginBottom: -1,
             }}
@@ -356,7 +356,7 @@ export default function AdminContentPage() {
 
           <ResourceActivityLog resources={resources.map((r) => ({ id: r.id, title: r.title }))} />
           {lastResRefreshed && (
-            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.45)", marginTop: -8 }}>
               Last updated: {lastResRefreshed.toLocaleTimeString()}
             </div>
           )}
@@ -380,15 +380,15 @@ export default function AdminContentPage() {
           <Card>
             <Table headers={["Title", "Format", "File", "Status", "Created", "Actions"]}>
               {resLoading && (
-                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>Loading…</td></tr>
               )}
               {!resLoading && filteredResources.length === 0 && (
-                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No resources yet.</td></tr>
+                <tr><td colSpan={6} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>No resources yet.</td></tr>
               )}
               {!resLoading && filteredResources.map((r) => (
-                <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+                <tr key={r.id} style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }} className="hover:bg-[rgba(23,18,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
-                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.format ?? "—"}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)" }}>{r.format ?? "—"}</td>
                   <td className="py-3 px-2" style={{ fontSize: 11 }}>
                     {r.file_path || r.file_url || r.external_url ? (
                       <span style={{ color: "#0B7A5A", fontWeight: 700 }}>Attached</span>
@@ -397,7 +397,7 @@ export default function AdminContentPage() {
                     )}
                   </td>
                   <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
-                  <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(26,16,8,0.6)", fontFamily: "monospace", fontSize: 11 }}>
+                  <td className="py-3 px-2 whitespace-nowrap" style={{ color: "rgba(23,18,8,0.6)", fontFamily: "monospace", fontSize: 11 }}>
                     {new Date(r.created_at).toLocaleDateString("en-IN")}
                   </td>
                   <td className="py-3 px-2">
@@ -433,7 +433,7 @@ export default function AdminContentPage() {
             archivedCount={glossary.filter((g) => !!g.archived_at).length}
           />
           {lastGlossRefreshed && (
-            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+            <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.45)", marginTop: -8 }}>
               Last updated: {lastGlossRefreshed.toLocaleTimeString()}
             </div>
           )}
@@ -457,18 +457,18 @@ export default function AdminContentPage() {
           <Card>
             <Table headers={["Term", "Short definition", "Order", "Status", "Actions"]}>
               {glossLoading && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>Loading…</td></tr>
               )}
               {!glossLoading && filteredGlossary.length === 0 && (
-                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No glossary terms yet.</td></tr>
+                <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>No glossary terms yet.</td></tr>
               )}
               {!glossLoading && filteredGlossary.map((g) => (
-                <tr key={g.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+                <tr key={g.id} style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }} className="hover:bg-[rgba(23,18,8,0.03)]">
                   <td className="py-3 px-2" style={{ color: INK, fontWeight: 700 }}>{g.term}</td>
-                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.8)" }}>
+                  <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.8)" }}>
                     {(g.short_definition ?? "").length > 80 ? `${g.short_definition.slice(0, 80)}…` : g.short_definition}
                   </td>
-                  <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{g.sort_order ?? 0}</td>
+                  <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{g.sort_order ?? 0}</td>
                   <td className="py-3 px-2"><PubBadge published={g.is_published} /></td>
                   <td className="py-3 px-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -671,7 +671,7 @@ function BlogSection() {
         <Stat label="Avg read time" value={`${analytics.avgRead} min`} />
       </div>
       {lastRefreshed && (
-        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.45)", marginTop: -8 }}>
           Last updated: {lastRefreshed.toLocaleTimeString()}
         </div>
       )}
@@ -795,30 +795,30 @@ function BlogSection() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={9} style={{ padding: 24, textAlign: "center", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+              <tr><td colSpan={9} style={{ padding: 24, textAlign: "center", fontSize: 12, color: "rgba(23,18,8,0.5)" }}>Loading…</td></tr>
             )}
             {!loading && pageRows.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: 24, textAlign: "center", fontSize: 12, color: "rgba(26,16,8,0.5)" }}>No posts found.</td></tr>
+              <tr><td colSpan={9} style={{ padding: 24, textAlign: "center", fontSize: 12, color: "rgba(23,18,8,0.5)" }}>No posts found.</td></tr>
             )}
             {!loading && pageRows.map((p) => (
               <tr
                 key={p.id}
                 style={{ borderTop: `0.5px solid ${BORDER}` }}
-                className="hover:bg-[rgba(26,16,8,0.03)]"
+                className="hover:bg-[rgba(23,18,8,0.03)]"
               >
                 <Td><input type="checkbox" checked={selectedIds.includes(p.id)} onChange={() => toggle(p.id)} /></Td>
                 <Td>
                   {p.cover_image_url ? (
                     <img src={p.cover_image_url} alt={p.title} style={{ width: 38, height: 28, objectFit: "cover", borderRadius: 3 }} />
                   ) : (
-                    <div style={{ width: 38, height: 28, borderRadius: 3, background: "rgba(26,16,8,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <ImageIcon size={12} color="rgba(26,16,8,0.35)" />
+                    <div style={{ width: 38, height: 28, borderRadius: 3, background: "rgba(23,18,8,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <ImageIcon size={12} color="rgba(23,18,8,0.35)" />
                     </div>
                   )}
                 </Td>
                 <Td>
                   <div style={{ fontSize: 12, fontWeight: 700, color: INK }}>{p.title}</div>
-                  <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(26,16,8,0.45)" }}>/{p.slug}</div>
+                  <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(23,18,8,0.45)" }}>/{p.slug}</div>
                 </Td>
                 <Td>
                   <span style={{ fontSize: 11, color: RED, background: "rgba(196,30,30,0.08)", padding: "2px 8px", borderRadius: 99 }}>
@@ -826,12 +826,12 @@ function BlogSection() {
                   </span>
                 </Td>
                 <Td><StatusBadge post={p} /></Td>
-                <Td><span style={{ fontSize: 11, color: "rgba(26,16,8,0.65)" }}>{p.author_name}</span></Td>
+                <Td><span style={{ fontSize: 11, color: "rgba(23,18,8,0.65)" }}>{p.author_name}</span></Td>
                 <Td>
-                  <Star size={14} color={p.is_featured ? GOLD : "rgba(26,16,8,0.2)"} fill={p.is_featured ? GOLD : "none"} />
+                  <Star size={14} color={p.is_featured ? GOLD : "rgba(23,18,8,0.2)"} fill={p.is_featured ? GOLD : "none"} />
                 </Td>
                 <Td>
-                  <span style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(26,16,8,0.5)" }}>
+                  <span style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(23,18,8,0.5)" }}>
                     {new Date(p.published_at ?? p.created_at).toLocaleDateString("en-IN")}
                   </span>
                 </Td>
@@ -894,7 +894,7 @@ function BlogSection() {
       />
 
       <div className="flex items-center justify-between">
-        <span style={{ fontSize: 12, color: "rgba(26,16,8,0.55)", fontFamily: BODY }}>
+        <span style={{ fontSize: 12, color: "rgba(23,18,8,0.55)", fontFamily: BODY }}>
           Page {page} of {totalPages}, {filtered.length} posts
         </span>
         <div className="flex gap-2">
@@ -1043,7 +1043,7 @@ function ResourceModal({
           >
             <Upload size={13} /> {uploading ? "Uploading…" : filePath ? "Replace file" : "Upload file"}
           </button>
-          <span style={{ fontFamily: BODY, fontSize: 11, color: filePath ? "#0B7A5A" : "rgba(26,16,8,0.5)" }}>
+          <span style={{ fontFamily: BODY, fontSize: 11, color: filePath ? "#0B7A5A" : "rgba(23,18,8,0.5)" }}>
             {filePath ?? "No file attached — download will fail"}
           </span>
           {filePath && (
@@ -1193,8 +1193,8 @@ function ModalActions({ saving, onCancel, onSave }: { saving: boolean; onCancel:
 function LiveDot() {
   return (
     <div className="flex items-center justify-end">
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: BODY, fontSize: 10, color: "#10B981", fontWeight: 700 }}>
-        <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10B981", animation: "fyn-blog-live-pulse 1.6s ease-out infinite" }} />
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: BODY, fontSize: 10, color: "#1F5A46", fontWeight: 700 }}>
+        <span style={{ width: 7, height: 7, borderRadius: 999, background: "#1F5A46", animation: "fyn-blog-live-pulse 1.6s ease-out infinite" }} />
         Live
         <style>{`@keyframes fyn-blog-live-pulse { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.55)} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }`}</style>
       </span>
@@ -1218,19 +1218,19 @@ function PubBadge({ published }: { published: boolean }) {
   return published ? (
     <span style={{ ...s, background: "rgba(16,185,129,0.12)", color: "#0B7A5A" }}>Published</span>
   ) : (
-    <span style={{ ...s, background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.45)" }}>Draft</span>
+    <span style={{ ...s, background: "rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.45)" }}>Draft</span>
   );
 }
 
 function StatusBadge({ post }: { post: BlogPost }) {
   const s: React.CSSProperties = { fontSize: 10, fontWeight: 700, textTransform: "uppercase", padding: "2px 8px", borderRadius: 99 };
   if (post.archived_at)
-    return <span style={{ ...s, background: "rgba(26,16,8,0.06)", color: "rgba(26,16,8,0.45)" }}>Archived</span>;
+    return <span style={{ ...s, background: "rgba(23,18,8,0.06)", color: "rgba(23,18,8,0.45)" }}>Archived</span>;
   if (post.status === "published")
     return <span style={{ ...s, background: "rgba(16,185,129,0.12)", color: "#0B7A5A" }}>Published</span>;
   if (post.status === "scheduled")
     return <span style={{ ...s, background: "rgba(37,99,235,0.10)", color: "#1D4ED8" }}>Scheduled</span>;
-  return <span style={{ ...s, border: `0.5px solid ${BORDER}`, color: "rgba(26,16,8,0.6)" }}>Draft</span>;
+  return <span style={{ ...s, border: `0.5px solid ${BORDER}`, color: "rgba(23,18,8,0.6)" }}>Draft</span>;
 }
 
 const rowBtnStyle: React.CSSProperties = {
@@ -1271,7 +1271,7 @@ function Th({ children, style }: { children?: React.ReactNode; style?: React.CSS
   return (
     <th
       className="text-left py-2 px-2"
-      style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(26,16,8,0.5)", ...style }}
+      style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgba(23,18,8,0.5)", ...style }}
     >
       {children}
     </th>
@@ -1287,10 +1287,10 @@ function Table({ headers, children }: { headers: string[]; children: React.React
     <div className="overflow-x-auto">
       <table className="w-full" style={{ fontFamily: "Roboto, sans-serif", fontSize: 13 }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid rgba(26,16,8,0.08)" }}>
+          <tr style={{ borderBottom: "1px solid rgba(23,18,8,0.08)" }}>
             {headers.map((h) => (
               <th key={h} className="text-left py-2.5 px-2"
-                style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "rgba(26,16,8,0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
+                style={{ fontFamily: "Raleway, sans-serif", fontWeight: 600, fontSize: 12, color: "rgba(23,18,8,0.6)", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -1304,7 +1304,7 @@ function AdminModal({ title, onClose, children }: { title: string; onClose: () =
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(23,18,8,0.5)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >
       <div
@@ -1352,7 +1352,7 @@ function ViewToggle({
               fontSize: 12,
               fontWeight: 700,
               background: on ? RED : "transparent",
-              color: on ? "#FFFFFF" : "rgba(26,16,8,0.65)",
+              color: on ? "#FFFFFF" : "rgba(23,18,8,0.65)",
             }}
           >
             {o.key === "archived" ? <Archive size={12} /> : null}
@@ -1368,7 +1368,7 @@ function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfir
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: "rgba(26,16,8,0.5)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(23,18,8,0.5)", backdropFilter: "blur(4px)" }}
       onClick={onCancel}
     >
       <div
@@ -1377,7 +1377,7 @@ function ConfirmDelete({ label, onConfirm, onCancel }: { label: string; onConfir
         style={{ background: "#FFFFFF", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
       >
         <h4 style={{ fontFamily: HEADING, fontWeight: 700, fontSize: 17, color: INK }}>Delete this {label}?</h4>
-        <p style={{ fontFamily: BODY, fontSize: 13, color: "rgba(26,16,8,0.65)", marginTop: 6 }}>
+        <p style={{ fontFamily: BODY, fontSize: 13, color: "rgba(23,18,8,0.65)", marginTop: 6 }}>
           This cannot be undone.
         </p>
         <div className="flex justify-end gap-2 mt-5">
@@ -1489,7 +1489,7 @@ function VideosSection() {
         archivedCount={rows.filter((r) => !!r.archived_at).length}
       />
       {lastRefreshed && (
-        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(26,16,8,0.45)", marginTop: -8 }}>
+        <div style={{ fontFamily: BODY, fontSize: 10, color: "rgba(23,18,8,0.45)", marginTop: -8 }}>
           Last updated: {lastRefreshed.toLocaleTimeString()}
         </div>
       )}
@@ -1513,17 +1513,17 @@ function VideosSection() {
       <Card>
         <Table headers={["Title", "Step", "Category", "Duration", "Link", "Order", "Status", "Actions"]}>
           {loading && (
-            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>Loading…</td></tr>
+            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>Loading…</td></tr>
           )}
           {!loading && filtered.length === 0 && (
-            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(26,16,8,0.5)" }}>No videos yet.</td></tr>
+            <tr><td colSpan={8} style={{ padding: 24, textAlign: "center", color: "rgba(23,18,8,0.5)" }}>No videos yet.</td></tr>
           )}
           {!loading && filtered.map((r) => (
-            <tr key={r.id} style={{ borderBottom: "1px solid rgba(26,16,8,0.05)" }} className="hover:bg-[rgba(26,16,8,0.03)]">
+            <tr key={r.id} style={{ borderBottom: "1px solid rgba(23,18,8,0.05)" }} className="hover:bg-[rgba(23,18,8,0.03)]">
               <td className="py-3 px-2" style={{ color: INK, fontWeight: 600 }}>{r.title}</td>
-              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontSize: 11, fontWeight: 700 }}>{r.step}</td>
-              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)" }}>{r.category || "—"}</td>
-              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.duration}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)", fontSize: 11, fontWeight: 700 }}>{r.step}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)" }}>{r.category || "—"}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.duration}</td>
               <td className="py-3 px-2" style={{ fontSize: 11 }}>
                 {r.video_url ? (
                   <a href={r.video_url} target="_blank" rel="noreferrer" style={{ color: "#0B7A5A", fontWeight: 700 }} className="inline-flex items-center gap-1">
@@ -1533,7 +1533,7 @@ function VideosSection() {
                   <span style={{ color: GOLD, fontWeight: 700 }}>Coming soon</span>
                 )}
               </td>
-              <td className="py-3 px-2" style={{ color: "rgba(26,16,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.sort_order ?? 0}</td>
+              <td className="py-3 px-2" style={{ color: "rgba(23,18,8,0.7)", fontFamily: "monospace", fontSize: 11 }}>{r.sort_order ?? 0}</td>
               <td className="py-3 px-2"><PubBadge published={r.is_published} /></td>
               <td className="py-3 px-2">
                 <div className="flex items-center gap-1.5 flex-wrap">

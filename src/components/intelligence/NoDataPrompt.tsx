@@ -29,7 +29,7 @@ export default function NoDataPrompt({
         <button
           onClick={() => navigate("/dashboard/integrations")}
           className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-md text-fyn-ink bg-white"
-          style={{ border: "1px solid rgba(26,16,8,0.15)" }}
+          style={{ border: "1px solid rgba(23,18,8,0.15)" }}
         >
           <Plug className="w-3.5 h-3.5" /> Connect Zoho / Tally
         </button>

@@ -47,17 +47,17 @@ export default function CAVerificationPendingPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F4EDDA", padding: "60px 20px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <div style={{ background: "#fff", border: "0.5px solid rgba(26,16,8,0.08)", borderRadius: 12, padding: 32 }}>
+        <div style={{ background: "#fff", border: "0.5px solid rgba(23,18,8,0.08)", borderRadius: 12, padding: 32 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#C41E1E", fontWeight: 700 }}>Verification</div>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 30, color: "#1A1008", marginTop: 8 }}>Application under review</h1>
-          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14.5, color: "rgba(26,16,8,0.7)", lineHeight: 1.6, marginTop: 8 }}>
+          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 30, color: "#171208", marginTop: 8 }}>Application under review</h1>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14.5, color: "rgba(23,18,8,0.7)", lineHeight: 1.6, marginTop: 8 }}>
             Our compliance team is reviewing your ICAI credentials. This typically takes 1 to 2 business days.
           </p>
 
           {refCode && (
-            <div style={{ marginTop: 20, padding: "14px 16px", background: "#FCFAF4", border: "1px solid rgba(26,16,8,0.1)", borderRadius: 10 }}>
-              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(26,16,8,0.55)", fontWeight: 600 }}>Application reference</div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, color: "#1A1008", marginTop: 4 }}>{refCode}</div>
+            <div style={{ marginTop: 20, padding: "14px 16px", background: "#FCFAF4", border: "1px solid rgba(23,18,8,0.1)", borderRadius: 10 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(23,18,8,0.55)", fontWeight: 600 }}>Application reference</div>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, color: "#171208", marginTop: 4 }}>{refCode}</div>
             </div>
           )}
 
@@ -80,12 +80,12 @@ export default function CAVerificationPendingPage() {
                     {s.state === "done" ? <Check size={14} /> :
                      s.state === "current" ? <Loader2 size={12} className="animate-spin" /> :
                      s.state === "error" ? <span style={{ fontSize: 14, fontWeight: 700 }}>!</span> :
-                     <span style={{ width: 6, height: 6, background: "rgba(26,16,8,0.35)", borderRadius: "50%" }} />}
+                     <span style={{ width: 6, height: 6, background: "rgba(23,18,8,0.35)", borderRadius: "50%" }} />}
                   </div>
-                  {i < steps.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 24, background: "rgba(26,16,8,0.1)" }} />}
+                  {i < steps.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 24, background: "rgba(23,18,8,0.1)" }} />}
                 </div>
                 <div style={{ padding: "2px 0 24px" }}>
-                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, color: "#1A1008" }}>{s.label}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600, color: "#171208" }}>{s.label}</div>
                 </div>
               </div>
             ))}
@@ -97,7 +97,7 @@ export default function CAVerificationPendingPage() {
               {checking ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />} Check status
             </button>
             <a href="mailto:support@fynhelp.com"
-              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "12px 18px", background: "transparent", color: "#1A1008", border: "1px solid rgba(26,16,8,0.15)", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
+              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "12px 18px", background: "transparent", color: "#171208", border: "1px solid rgba(23,18,8,0.15)", borderRadius: 10, fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
               <LifeBuoy size={14} /> Contact support
             </a>
           </div>
