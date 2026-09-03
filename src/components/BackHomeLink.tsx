@@ -21,7 +21,7 @@ export default function BackHomeLink() {
         gap: 8,
         padding: "8px 14px",
         borderRadius: 999,
-        background: C.cream,
+        background: C.card,
         border: `1px solid ${C.line}`,
         color: C.ink,
         fontFamily: "'Instrument Sans','Inter',system-ui,sans-serif",
