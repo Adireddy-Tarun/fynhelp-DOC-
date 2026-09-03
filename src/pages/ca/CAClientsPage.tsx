@@ -288,7 +288,12 @@ export default function CAClientsPage() {
 
   return (
     <div>
-      <CAHeading>Clients</CAHeading>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <CAHeading>Clients</CAHeading>
+        <CAButton onClick={() => navigate("/ca/clients/add")} style={{ padding: "9px 16px", fontSize: 13 }}>
+          Add client
+        </CAButton>
+      </div>
 
       <div style={{ display: "flex", gap: 12, marginTop: 18, alignItems: "center" }}>
         <input
