@@ -493,7 +493,7 @@ export default function CADashboardPage() {
                   Risk score: {firmBrainData.risk_score ?? "—"}
                 </CABadge>
               </div>
-              <p style={{ fontFamily: CA.sans, fontSize: 13.5, lineHeight: 1.6, color: CA.body, marginTop: 12 }}>
+              <p style={{ fontFamily: CA.sans, fontSize: 13.5, lineHeight: 1.6, color: CA.muted, marginTop: 12 }}>
                 {firmBrainData.narrative}
               </p>
               <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, marginTop: 8 }}>
