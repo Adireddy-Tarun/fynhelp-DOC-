@@ -217,6 +217,9 @@ type Store = {
   setChaseStatus: (id: string, status: Chase["status"], note?: string) => void;
   clientName: (id: string) => string;
   clientTxns: (clientId: string) => Txn[];
+  matchedTxns: (clientId: string) => Txn[];
+  signOffReport: (reportId: string, by: string) => void;
+  requestCorrection: (reportId: string, note: string) => void;
   period: string;
   setPeriod: (p: string) => void;
   role: Role;
