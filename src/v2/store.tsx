@@ -98,6 +98,26 @@ export type Chase = {
 
 export type ReconResult = { matched: number; exceptions: number; bank: number; at: string };
 
+export type Activity = { id: string; clientId: string; at: string; text: string; agent?: AgentKey };
+
+export type Role = "Partner" | "Junior";
+
+/** The monthly close cycle every client moves through. */
+export const CLOSE_STAGES = ["Documents", "Review", "Recon", "Exceptions", "MIS"] as const;
+export type CloseStage = (typeof CLOSE_STAGES)[number];
+
+export type CloseStep = { stage: CloseStage; done: boolean; detail: string };
+
+export type CloseState = {
+  steps: CloseStep[];
+  percent: number;
+  stage: CloseStage;
+  /** The single most useful thing to do next for this client. */
+  next: { label: string; why: string; tab: string; action?: "recon" | "mis" | "upload" };
+};
+
+export const PERIODS = ["August 2026", "July 2026", "June 2026", "May 2026"];
+
 export type AgentRun = {
   id: string;
   agent: AgentKey;
@@ -192,6 +212,13 @@ type Store = {
   setChaseStatus: (id: string, status: Chase["status"], note?: string) => void;
   clientName: (id: string) => string;
   clientTxns: (clientId: string) => Txn[];
+  period: string;
+  setPeriod: (p: string) => void;
+  role: Role;
+  setRole: (r: Role) => void;
+  activity: Activity[];
+  activityFor: (clientId: string) => Activity[];
+  closeStateFor: (clientId: string) => CloseState;
 };
 
 
@@ -213,6 +240,13 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Store["session"]>(null);
   const [firm, setFirm] = useState<Firm | null>(null);
   const [onboarded, setOnboarded] = useState(false);
+  const [period, setPeriod] = useState(PERIODS[0]);
+  const [role, setRole] = useState<Role>("Junior");
+  const [activity, setActivity] = useState<Activity[]>([
+    { id: "a1", clientId: "c1", at: iso(3), text: "HDFC-statement-Aug.csv collected and read", agent: "extract" },
+    { id: "a2", clientId: "c2", at: iso(5), text: "GSTR2B-Aug.xml arrived from Gmail", agent: "extract" },
+    { id: "a3", clientId: "c3", at: iso(1), text: "purchase-bills-Aug.pdf arrived on WhatsApp", agent: "extract" },
+  ]);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Sign in state survives a refresh so the journey is not restarted every time.
@@ -220,10 +254,12 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = JSON.parse(raw) as { session: Store["session"]; firm: Firm | null; onboarded: boolean };
+        const saved = JSON.parse(raw) as { session: Store["session"]; firm: Firm | null; onboarded: boolean; role?: Role; period?: string };
         setSession(saved.session ?? null);
         setFirm(saved.firm ?? null);
         setOnboarded(Boolean(saved.onboarded));
+        if (saved.role) setRole(saved.role);
+        if (saved.period) setPeriod(saved.period);
       }
     } catch {
       /* first visit, nothing saved yet */
@@ -234,11 +270,11 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, firm, onboarded }));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, firm, onboarded, role, period }));
     } catch {
       /* storage unavailable, the app still works for this session */
     }
-  }, [hydrated, session, firm, onboarded]);
+  }, [hydrated, session, firm, onboarded, role, period]);
 
   const signIn = useCallback((name: string, email: string) => setSession({ name, email }), []);
   const signOut = useCallback(() => { setSession(null); setFirm(null); setOnboarded(false); }, []);
@@ -246,6 +282,11 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     setFirm((p) => ({ name: "", partnerName: "", email: "", city: "", frn: "", gmailConnected: false, ...(p ?? {}), ...patch }));
   }, []);
   const completeOnboarding = useCallback(() => setOnboarded(true), []);
+
+  /** Every meaningful thing that happens to a client is written to its timeline. */
+  const log = useCallback((clientId: string, text: string, agent?: AgentKey) => {
+    setActivity((p) => [{ id: uid(), clientId, at: today(), text, agent }, ...p]);
+  }, []);
 
 
   /** Advance a visible agent run one step at a time, then finish. */
