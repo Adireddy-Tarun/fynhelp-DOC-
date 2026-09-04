@@ -192,7 +192,15 @@ const SEED_EXCEPTIONS: Exception[] = [
   { id: "e1", clientId: "c1", reason: "Amount mismatch", amount: 248000, date: iso(9), narration: "NEFT ABC ENTERPRISES", candidates: ["Invoice INV/2211 — ₹2,47,500"], status: "open" },
   { id: "e2", clientId: "c3", reason: "No candidate", amount: -18450, date: iso(4), narration: "UPI VINAYAK PRINT", candidates: [], status: "open" },
   { id: "e3", clientId: "c2", reason: "Date gap", amount: 91500, date: iso(12), narration: "RTGS SRI BALAJI TRADERS", candidates: ["Invoice INV/882 — 08 days earlier"], status: "open" },
+  { id: "e4", clientId: "c6", reason: "Duplicate suspect", amount: 325000, date: iso(8), narration: "Client retainer — Lumen Media", candidates: ["Identical credit on the same date"], status: "open" },
+  { id: "e5", clientId: "c6", reason: "Missing counterparty", amount: -62000, date: iso(5), narration: "IMPS transfer to unknown payee", candidates: [], status: "open" },
 ];
+
+/** Kaveri Engineering is the clean client: recon done, MIS ready for the partner. */
+const KAVERI_BANK = 7;
+const SEED_RECON: Record<string, ReconResult> = {
+  c4: { matched: KAVERI_BANK, exceptions: 0, bank: KAVERI_BANK, at: iso(2) },
+};
 
 const SEED_CHASES: Chase[] = [
   { id: "h1", clientId: "c2", type: "Missing purchase bills", contact: "Nisha Rao", phone: "919845567788", due: iso(-2), note: "August purchase bills for 6 vendors still pending.", followUps: 1, status: "Following Up", timeline: [
