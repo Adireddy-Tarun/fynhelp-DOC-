@@ -17,8 +17,13 @@ import {
   ShieldCheck,
   LayoutDashboard,
   FileStack,
-  MessageSquare,
-  Tag,
+  Brain,
+  CalendarCheck,
+  FileCheck,
+  AlertTriangle,
+  Users,
+  BarChart3,
+  FileText,
 } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,17 +125,25 @@ const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
 ];
 
 const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }[] = [
-  { icon: LayoutDashboard, label: "Portfolio dashboard",             href: "/ca-firms", desc: "All clients, one view" },
-  { icon: FileStack,       label: "ITC reconciliation and bulk preparation", href: "/ca-firms", desc: "Prepare returns in batches, reconcile ITC" },
-  { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
-  { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
+  { icon: FileSearch,       label: "Document intake",       href: "/ca-firms", desc: "workflow" },
+  { icon: GitCompareArrows, label: "Reconciliation",         href: "/ca-firms", desc: "workflow" },
+  { icon: AlertTriangle,    label: "Exception queue",        href: "/ca-firms", desc: "workflow" },
+  { icon: Send,             label: "Chaser automation",      href: "/ca-firms", desc: "workflow" },
+  { icon: CalendarCheck,    label: "Compliance calendar",    href: "/ca-firms", desc: "workflow" },
+  { icon: FileCheck,        label: "Month-end close",        href: "/ca-firms", desc: "workflow" },
+  { icon: LayoutDashboard,  label: "Portfolio dashboard",    href: "/ca-firms", desc: "intelligence" },
+  { icon: Brain,            label: "Learning brain",         href: "/ca-firms", desc: "intelligence" },
+  { icon: BarChart3,        label: "Practice analytics",     href: "/ca-firms", desc: "intelligence" },
+  { icon: FileText,         label: "MIS reports",            href: "/ca-firms", desc: "intelligence" },
+  { icon: Users,            label: "Client portal",          href: "/ca-firms", desc: "intelligence" },
+  { icon: ShieldCheck,      label: "Audit trail",            href: "/ca-firms", desc: "intelligence" },
 ];
 
 const CA_PREVIEW_STATS: ModuleStat[] = [
-  { label: "Active Clients",       value: "48",     sub: "↑ 3 new this month", tone: "neutral" },
-  { label: "Filings Due This Week",value: "12",     sub: "GSTR-3B 8 · GSTR-1 4", tone: "warning" },
-  { label: "Critical Alerts",      value: "5",      sub: "Across 4 clients", tone: "critical" },
-  { label: "ITC at Risk",          value: "₹8.4L",  sub: "Across 6 clients", tone: "warning" },
+  { label: "Active clients",        value: "48",    sub: "3 new this month",       tone: "neutral"  },
+  { label: "Filings this week",     value: "12",    sub: "GSTR-3B 8 · GSTR-1 4",  tone: "warning"  },
+  { label: "Exceptions open",       value: "5",     sub: "Ranked by rupee impact", tone: "critical" },
+  { label: "ITC at risk",           value: "₹8.4L", sub: "Across 6 clients",       tone: "warning"  },
 ];
 
 const TOP_LINKS: { label: string; href: string }[] = [
@@ -433,26 +446,50 @@ const Navbar = () => {
       }}
     >
       <div className="max-w-[1400px] mx-auto px-14 py-10 grid grid-cols-[1fr_400px] gap-14">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/50 mb-4">
-            For your practice
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {CA_PRACTICE.map((c) => (
-              <Link
-                key={c.label}
-                to={c.href}
-                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
-              >
-                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
-                  <c.icon size={16} />
-                </span>
-                <span className="flex flex-col">
+        <div className="grid grid-cols-[1fr_1fr] gap-8">
+          <div>
+            <div className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-fyn-ink/35 mb-3">
+              Workflow
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {CA_PRACTICE.filter((c) => c.desc === "workflow").map((c) => (
+                <Link
+                  key={c.label}
+                  to={c.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+                >
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-md"
+                    style={{ background: "rgba(169,56,56,0.09)", color: "#A93838" }}
+                  >
+                    <c.icon size={16} />
+                  </span>
                   <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
-                  <span className="text-[13.5px] text-fyn-ink/60">{c.desc}</span>
-                </span>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-fyn-ink/35 mb-3">
+              Intelligence
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {CA_PRACTICE.filter((c) => c.desc === "intelligence").map((c) => (
+                <Link
+                  key={c.label}
+                  to={c.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+                >
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-md"
+                    style={{ background: "rgba(139,105,20,0.09)", color: "#8B6914" }}
+                  >
+                    <c.icon size={16} />
+                  </span>
+                  <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -462,7 +499,7 @@ const Navbar = () => {
             title="Portfolio"
             sub="Live snapshot"
             stats={CA_PREVIEW_STATS}
-            footer="Client health · Filings · ITC recon"
+            footer="393 auto-matched · 1 open"
             ctaLabel="Explore CA portal"
             ctaHref="/ca-firms"
           />
@@ -677,7 +714,10 @@ const Navbar = () => {
             </button>
             {mCA && (
               <div className="pl-3 pb-2 border-b border-white/5 flex flex-col">
-                {CA_PRACTICE.map((c) => (
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  Workflow
+                </div>
+                {CA_PRACTICE.filter((c) => c.desc === "workflow").map((c) => (
                   <Link
                     key={c.label}
                     to={c.href}
@@ -685,6 +725,20 @@ const Navbar = () => {
                     className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
                   >
                     <c.icon size={16} className="text-fyn-red" />
+                    {c.label}
+                  </Link>
+                ))}
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  Intelligence
+                </div>
+                {CA_PRACTICE.filter((c) => c.desc === "intelligence").map((c) => (
+                  <Link
+                    key={c.label}
+                    to={c.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
+                  >
+                    <c.icon size={16} className="text-fyn-gold" />
                     {c.label}
                   </Link>
                 ))}
