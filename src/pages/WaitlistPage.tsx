@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@/lib/router-compat";
 import Layout from "@/components/Layout";
-import WaitlistForm from "@/components/WaitlistForm";
+import CAWaitlistForm from "@/components/CAWaitlistForm";
 import {
   Rocket,
   Clock,
