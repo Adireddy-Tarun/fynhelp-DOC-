@@ -28,6 +28,15 @@ export default function OnboardingPage() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
+  /** One click into the sample practice, so the whole product can be explored immediately. */
+  const demoLogin = () => {
+    signIn("Prajwal Vakode", "partner@mehtaassociates.in");
+    saveFirm({ name: "Mehta and Associates", partnerName: "Prajwal Vakode", email: "partner@mehtaassociates.in", city: "Bengaluru", frn: "012345S", gmailConnected: true });
+    completeOnboarding();
+    toast.success("Sample practice loaded");
+    navigate({ to: "/v2" });
+  };
+
   const submitAccount = (e: React.FormEvent) => {
     e.preventDefault();
     signIn(account.name.trim(), account.email.trim());
