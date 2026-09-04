@@ -197,6 +197,8 @@ type Store = {
 
 const Ctx = createContext<Store | null>(null);
 const uid = () => Math.random().toString(36).slice(2, 9);
+const STORAGE_KEY = "fynhelp.v2.session";
+
 
 export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState<Client[]>(SEED_CLIENTS);
