@@ -72,5 +72,7 @@ export const notifyWaitlistLead = createServerFn({ method: "POST" })
       console.error(`[waitlist-notify] Resend failed [${response.status}]: ${body}`);
       return { sent: false };
     }
-    return { sent: true };
+    const body = await response.json();
+    console.log("[waitlist-notify] Resend success", body.id);
+    return { sent: true, id: body.id };
   });
