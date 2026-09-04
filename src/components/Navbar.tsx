@@ -714,7 +714,10 @@ const Navbar = () => {
             </button>
             {mCA && (
               <div className="pl-3 pb-2 border-b border-white/5 flex flex-col">
-                {CA_PRACTICE.map((c) => (
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  Workflow
+                </div>
+                {CA_PRACTICE.filter((c) => c.desc === "workflow").map((c) => (
                   <Link
                     key={c.label}
                     to={c.href}
@@ -722,6 +725,20 @@ const Navbar = () => {
                     className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
                   >
                     <c.icon size={16} className="text-fyn-red" />
+                    {c.label}
+                  </Link>
+                ))}
+                <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/40 mt-3 mb-1">
+                  Intelligence
+                </div>
+                {CA_PRACTICE.filter((c) => c.desc === "intelligence").map((c) => (
+                  <Link
+                    key={c.label}
+                    to={c.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 py-2.5 text-white/80 text-[14px]"
+                  >
+                    <c.icon size={16} className="text-fyn-gold" />
                     {c.label}
                   </Link>
                 ))}
