@@ -163,6 +163,14 @@ const SEED_CHASES: Chase[] = [
 ];
 
 type Store = {
+  hydrated: boolean;
+  session: { name: string; email: string } | null;
+  firm: Firm | null;
+  onboarded: boolean;
+  signIn: (name: string, email: string) => void;
+  signOut: () => void;
+  saveFirm: (patch: Partial<Firm>) => void;
+  completeOnboarding: () => void;
   clients: Client[];
   docs: Doc[];
   review: ReviewItem[];
@@ -174,17 +182,18 @@ type Store = {
   runsFor: (target: string) => AgentRun[];
   addClient: (c: Omit<Client, "id">) => Client;
   updateClient: (id: string, patch: Partial<Client>) => void;
-  addDoc: (name: string, clientId: string) => void;
+  addDoc: (name: string, clientId: string, source?: Doc["source"]) => void;
   resolveReview: (id: string, status: "confirmed" | "discarded", patch?: Txn) => void;
   setExceptionStatus: (id: string, status: Exception["status"]) => void;
   runRecon: (clientId: string, onDone?: (r: ReconResult) => void) => void;
-  generateReport: (clientId: string, period: string, onDone: (r: Report) => void) => void;
+  generateReport: (clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => void;
   addChase: (c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => void;
   sendFollowUp: (id: string, channel: "Email" | "WhatsApp") => void;
   setChaseStatus: (id: string, status: Chase["status"], note?: string) => void;
   clientName: (id: string) => string;
   clientTxns: (clientId: string) => Txn[];
 };
+
 
 const Ctx = createContext<Store | null>(null);
 const uid = () => Math.random().toString(36).slice(2, 9);
