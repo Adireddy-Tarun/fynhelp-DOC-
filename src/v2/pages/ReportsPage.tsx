@@ -5,15 +5,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Plus } from "lucide-react";
 import { Card, EmptyState, Modal, PageHeader, V, formatDate, formatINR } from "../ui";
 import { AgentStatusBadge, ProcessingCard } from "../agents";
-import { useV2 } from "../store";
+import { REPORT_TEMPLATES, ReportTemplate, useV2 } from "../store";
 
 const PERIODS = ["August 2026", "July 2026", "June 2026", "Q1 FY 2026-27"];
+
+const TEMPLATE_HINT: Record<ReportTemplate, string> = {
+  "Monthly MIS": "Revenue, expenses, variances and the transactions behind them.",
+  "Bank Reconciliation Summary": "Credits, debits and high value lines with every bank row listed.",
+  "Key Variances": "Only the movement against the prior period.",
+  "Working Paper": "Everything above in one file, laid out for the audit file.",
+};
 
 export default function ReportsPage() {
   const { reports, clients, clientName, generateReport, runs } = useV2();
   const [open, setOpen] = useState(false);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
   const [period, setPeriod] = useState(PERIODS[0]);
+  const [template, setTemplate] = useState<ReportTemplate>(REPORT_TEMPLATES[0]);
   const navigate = useNavigate();
 
   const narrateRuns = runs.filter((r) => r.agent === "narrate");
@@ -21,12 +29,13 @@ export default function ReportsPage() {
   const generate = () => {
     if (!clientId) { toast.error("Add a client first"); return; }
     setOpen(false);
-    toast.success("Narrate agent is preparing the MIS");
-    generateReport(clientId, period, (r) => {
-      toast.success("MIS ready");
+    toast.success("Narrate agent is preparing the report");
+    generateReport(clientId, period, template, (r) => {
+      toast.success(`${r.template} ready`);
       navigate({ to: "/v2/reports/$reportId", params: { reportId: r.id } });
     });
   };
+
 
   return (
     <>
@@ -94,6 +103,27 @@ export default function ReportsPage() {
               {PERIODS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
+          <div>
+            <label className="v2-label">Template</label>
+            <div style={{ display: "grid", gap: 8 }}>
+              {REPORT_TEMPLATES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTemplate(t)}
+                  style={{
+                    textAlign: "left", padding: "11px 13px", borderRadius: 13, cursor: "pointer",
+                    border: `1px solid ${template === t ? V.ink : V.line}`,
+                    background: template === t ? "rgba(20,20,20,.03)" : "transparent",
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t}</div>
+                  <div style={{ fontSize: 12, color: V.muted, marginTop: 2 }}>{TEMPLATE_HINT[t]}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button className="v2-btn v2-btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
             <button className="v2-btn v2-btn-primary" onClick={generate}>Generate</button>

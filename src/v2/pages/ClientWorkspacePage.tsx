@@ -87,7 +87,7 @@ export default function ClientWorkspacePage() {
               <button className="v2-btn v2-btn-primary" disabled={reconRunning} onClick={() => { runRecon(client.id, (r) => toast.success(`Recon complete. Matched ${r.matched}, exceptions ${r.exceptions}.`)); toast.success("Recon agent is matching transactions"); }}>
                 Run recon
               </button>
-              <button className="v2-btn v2-btn-ghost" onClick={() => { generateReport(client.id, "Current period", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>
+              <button className="v2-btn v2-btn-ghost" onClick={() => { generateReport(client.id, "Current period", "Monthly MIS", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>
                 Generate MIS
               </button>
               <Link className="v2-btn v2-btn-ghost" to="/v2/documents">Upload documents</Link>
@@ -206,7 +206,7 @@ export default function ClientWorkspacePage() {
 
       {tab === "mis" && (
         cReports.length === 0 ? (
-          <EmptyState title="No MIS yet" description="Generate a report for this client and every figure will stay linked to its transactions." action={<button className="v2-btn v2-btn-primary" onClick={() => { generateReport(client.id, "Current period", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>Generate MIS</button>} />
+          <EmptyState title="No MIS yet" description="Generate a report for this client and every figure will stay linked to its transactions." action={<button className="v2-btn v2-btn-primary" onClick={() => { generateReport(client.id, "Current period", "Monthly MIS", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>Generate MIS</button>} />
         ) : (
           <Card style={{ padding: 0 }} className="v2-scroll">
             <table className="v2-table">

@@ -35,6 +35,7 @@ import { Route as V2IndexRouteImport } from './routes/v2/index'
 import { Route as V2ChaserRouteImport } from './routes/v2/chaser'
 import { Route as V2DocumentsRouteImport } from './routes/v2/documents'
 import { Route as V2ExceptionsRouteImport } from './routes/v2/exceptions'
+import { Route as V2OnboardingRouteImport } from './routes/v2/onboarding'
 import { Route as V2ReviewRouteImport } from './routes/v2/review'
 import { Route as V2SettingsRouteImport } from './routes/v2/settings'
 import { Route as AdminAuthAdminProtectedRouteImport } from './routes/_adminAuth/admin/_protected'
@@ -347,6 +348,11 @@ const V2DocumentsRoute = V2DocumentsRouteImport.update({
 const V2ExceptionsRoute = V2ExceptionsRouteImport.update({
   id: '/exceptions',
   path: '/exceptions',
+  getParentRoute: () => V2Route,
+} as any)
+const V2OnboardingRoute = V2OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => V2Route,
 } as any)
 const V2ReviewRoute = V2ReviewRouteImport.update({
@@ -1423,6 +1429,7 @@ export interface FileRoutesByFullPath {
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/onboarding': typeof V2OnboardingRoute
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
   '/v2/': typeof V2IndexRoute
@@ -1633,6 +1640,7 @@ export interface FileRoutesByTo {
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/onboarding': typeof V2OnboardingRoute
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
   '/v2': typeof V2IndexRoute
@@ -1847,6 +1855,7 @@ export interface FileRoutesById {
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/onboarding': typeof V2OnboardingRoute
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
   '/_main/': typeof MainIndexRoute
@@ -2061,6 +2070,7 @@ export interface FileRouteTypes {
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
+    | '/v2/onboarding'
     | '/v2/review'
     | '/v2/settings'
     | '/v2/'
@@ -2271,6 +2281,7 @@ export interface FileRouteTypes {
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
+    | '/v2/onboarding'
     | '/v2/review'
     | '/v2/settings'
     | '/v2'
@@ -2484,6 +2495,7 @@ export interface FileRouteTypes {
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
+    | '/v2/onboarding'
     | '/v2/review'
     | '/v2/settings'
     | '/_main/'
@@ -2879,6 +2891,13 @@ declare module '@tanstack/react-router' {
       path: '/exceptions'
       fullPath: '/v2/exceptions'
       preLoaderRoute: typeof V2ExceptionsRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/onboarding': {
+      id: '/v2/onboarding'
+      path: '/onboarding'
+      fullPath: '/v2/onboarding'
+      preLoaderRoute: typeof V2OnboardingRouteImport
       parentRoute: typeof V2Route
     }
     '/v2/review': {
@@ -4699,6 +4718,7 @@ interface V2RouteChildren {
   V2ChaserRoute: typeof V2ChaserRoute
   V2DocumentsRoute: typeof V2DocumentsRoute
   V2ExceptionsRoute: typeof V2ExceptionsRoute
+  V2OnboardingRoute: typeof V2OnboardingRoute
   V2ReviewRoute: typeof V2ReviewRoute
   V2SettingsRoute: typeof V2SettingsRoute
   V2IndexRoute: typeof V2IndexRoute
@@ -4712,6 +4732,7 @@ const V2RouteChildren: V2RouteChildren = {
   V2ChaserRoute: V2ChaserRoute,
   V2DocumentsRoute: V2DocumentsRoute,
   V2ExceptionsRoute: V2ExceptionsRoute,
+  V2OnboardingRoute: V2OnboardingRoute,
   V2ReviewRoute: V2ReviewRoute,
   V2SettingsRoute: V2SettingsRoute,
   V2IndexRoute: V2IndexRoute,

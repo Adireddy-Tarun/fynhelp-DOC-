@@ -4,7 +4,7 @@
  * Every number shown in the product is derived from rows that live here, so a
  * figure can always be traced back to its source transactions.
  */
-import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef } from "react";
+import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef, useEffect } from "react";
 import type { AgentKey } from "./agents";
 
 export type Txn = { date: string; particulars: string; amount: number };
@@ -55,12 +55,33 @@ export type Report = {
   id: string;
   clientId: string;
   period: string;
+  template: ReportTemplate;
   generated: string;
   revenue: number;
   expenses: number;
   sources: { revenue: Txn[]; expenses: Txn[] };
   insights: { text: string; source: string }[];
+  variances: { label: string; current: number; prior: number }[];
+  bankSummary: { label: string; value: number; rows: Txn[] }[];
 };
+
+export const REPORT_TEMPLATES = [
+  "Monthly MIS",
+  "Bank Reconciliation Summary",
+  "Key Variances",
+  "Working Paper",
+] as const;
+export type ReportTemplate = (typeof REPORT_TEMPLATES)[number];
+
+export type Firm = {
+  name: string;
+  partnerName: string;
+  email: string;
+  city: string;
+  frn: string;
+  gmailConnected: boolean;
+};
+
 
 export type Chase = {
   id: string;
@@ -142,6 +163,14 @@ const SEED_CHASES: Chase[] = [
 ];
 
 type Store = {
+  hydrated: boolean;
+  session: { name: string; email: string } | null;
+  firm: Firm | null;
+  onboarded: boolean;
+  signIn: (name: string, email: string) => void;
+  signOut: () => void;
+  saveFirm: (patch: Partial<Firm>) => void;
+  completeOnboarding: () => void;
   clients: Client[];
   docs: Doc[];
   review: ReviewItem[];
@@ -153,11 +182,11 @@ type Store = {
   runsFor: (target: string) => AgentRun[];
   addClient: (c: Omit<Client, "id">) => Client;
   updateClient: (id: string, patch: Partial<Client>) => void;
-  addDoc: (name: string, clientId: string) => void;
+  addDoc: (name: string, clientId: string, source?: Doc["source"]) => void;
   resolveReview: (id: string, status: "confirmed" | "discarded", patch?: Txn) => void;
   setExceptionStatus: (id: string, status: Exception["status"]) => void;
   runRecon: (clientId: string, onDone?: (r: ReconResult) => void) => void;
-  generateReport: (clientId: string, period: string, onDone: (r: Report) => void) => void;
+  generateReport: (clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => void;
   addChase: (c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => void;
   sendFollowUp: (id: string, channel: "Email" | "WhatsApp") => void;
   setChaseStatus: (id: string, status: Chase["status"], note?: string) => void;
@@ -165,8 +194,11 @@ type Store = {
   clientTxns: (clientId: string) => Txn[];
 };
 
+
 const Ctx = createContext<Store | null>(null);
 const uid = () => Math.random().toString(36).slice(2, 9);
+const STORAGE_KEY = "fynhelp.v2.session";
+
 
 export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState<Client[]>(SEED_CLIENTS);
@@ -177,7 +209,44 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
   const [runs, setRuns] = useState<AgentRun[]>([]);
   const [recon, setRecon] = useState<Record<string, ReconResult>>({});
+  const [hydrated, setHydrated] = useState(false);
+  const [session, setSession] = useState<Store["session"]>(null);
+  const [firm, setFirm] = useState<Firm | null>(null);
+  const [onboarded, setOnboarded] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Sign in state survives a refresh so the journey is not restarted every time.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { session: Store["session"]; firm: Firm | null; onboarded: boolean };
+        setSession(saved.session ?? null);
+        setFirm(saved.firm ?? null);
+        setOnboarded(Boolean(saved.onboarded));
+      }
+    } catch {
+      /* first visit, nothing saved yet */
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, firm, onboarded }));
+    } catch {
+      /* storage unavailable, the app still works for this session */
+    }
+  }, [hydrated, session, firm, onboarded]);
+
+  const signIn = useCallback((name: string, email: string) => setSession({ name, email }), []);
+  const signOut = useCallback(() => { setSession(null); setFirm(null); setOnboarded(false); }, []);
+  const saveFirm = useCallback((patch: Partial<Firm>) => {
+    setFirm((p) => ({ name: "", partnerName: "", email: "", city: "", frn: "", gmailConnected: false, ...(p ?? {}), ...patch }));
+  }, []);
+  const completeOnboarding = useCallback(() => setOnboarded(true), []);
+
 
   /** Advance a visible agent run one step at a time, then finish. */
   const startRun = useCallback(
@@ -210,9 +279,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** Workflow A — upload, Extract agent works, rows land, low confidence goes to Review. */
-  const addDoc = useCallback((name: string, clientId: string) => {
+  const addDoc = useCallback((name: string, clientId: string, source: Doc["source"] = "Manual") => {
     const docId = uid();
-    setDocs((p) => [{ id: docId, name, clientId, source: "Manual", status: "Processing", date: today(), rows: [] }, ...p]);
+    setDocs((p) => [{ id: docId, name, clientId, source, status: "Processing", date: today(), rows: [] }, ...p]);
+
 
     startRun("extract", name, ["Reading file", "Classifying rows", "Scoring confidence"], docId, () => {
       const rows: Txn[] = [
@@ -279,23 +349,41 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, [startRun, docs, exceptions]);
 
   /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
-  const generateReport = useCallback((clientId: string, period: string, onDone: (r: Report) => void) => {
-    startRun("narrate", `MIS for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
+  const generateReport = useCallback((clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => {
+    startRun("narrate", `${template} for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
       const rows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
       const revenueRows = rows.filter((r) => r.amount > 0);
       const expenseRows = rows.filter((r) => r.amount < 0);
       const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
       const expenses = expenseRows.reduce((s, r) => s + Math.abs(r.amount), 0);
       const biggest = [...expenseRows].sort((a, b) => a.amount - b.amount)[0];
+      // Prior period comparison uses the older half of the same transaction set,
+      // so a variance can always be traced to rows that exist in the product.
+      const half = Math.max(1, Math.ceil(rows.length / 2));
+      const priorRows = rows.slice(half);
+      const priorRevenue = priorRows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
+      const priorExpenses = priorRows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
+      const largeRows = rows.filter((r) => Math.abs(r.amount) >= 100000);
       const created: Report = {
-        id: uid(), clientId, period, generated: today(), revenue, expenses,
+        id: uid(), clientId, period, template, generated: today(), revenue, expenses,
         sources: { revenue: revenueRows, expenses: expenseRows },
+        variances: [
+          { label: "Revenue", current: revenue, prior: priorRevenue },
+          { label: "Expenses", current: expenses, prior: priorExpenses },
+          { label: "Net position", current: revenue - expenses, prior: priorRevenue - priorExpenses },
+        ],
+        bankSummary: [
+          { label: "Credits in bank", value: revenue, rows: revenueRows },
+          { label: "Debits in bank", value: expenses, rows: expenseRows },
+          { label: "High value lines above one lakh", value: largeRows.length, rows: largeRows },
+        ],
         insights: [
           { text: revenue > expenses
               ? `Collections exceeded outflow this period, leaving a surplus of ₹${(revenue - expenses).toLocaleString("en-IN")}.`
               : `Outflow ran ahead of collections by ₹${(expenses - revenue).toLocaleString("en-IN")} this period.`,
             source: `${revenueRows.length} credits and ${expenseRows.length} debits` },
           ...(biggest ? [{ text: `The single largest outflow was ${biggest.particulars}.`, source: `1 transaction dated ${biggest.date}` }] : []),
+          ...(largeRows.length ? [{ text: `${largeRows.length} transactions crossed one lakh rupees and were checked line by line.`, source: `${largeRows.length} high value transactions` }] : []),
         ],
       };
       setReports((p) => [created, ...p]);
@@ -303,6 +391,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       onDone(created);
     });
   }, [startRun, docs]);
+
 
   const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => {
     setChases((p) => [
@@ -332,12 +421,14 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<Store>(() => ({
+    hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding,
     clients, docs, review, exceptions, reports, chases, runs, recon,
     runsFor: (target: string) => runs.filter((r) => r.target === target),
     addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
     addChase, sendFollowUp, setChaseStatus, clientTxns,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
-  }), [clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+  }), [hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
