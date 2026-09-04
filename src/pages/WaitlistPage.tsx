@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@/lib/router-compat";
 import Layout from "@/components/Layout";
-import WaitlistForm from "@/components/WaitlistForm";
+import CAWaitlistForm from "@/components/CAWaitlistForm";
 import {
   Rocket,
   Clock,
@@ -158,7 +158,7 @@ export default function WaitlistPage() {
               </header>
 
               <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-xs p-6 md:p-8">
-                <WaitlistForm onSuccess={() => setSubmitted(true)} />
+                <CAWaitlistForm />
               </div>
             </div>
           </>
