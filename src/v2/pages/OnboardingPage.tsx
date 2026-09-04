@@ -8,7 +8,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Check, Mail, UploadCloud, UserPlus } from "lucide-react";
-import { V, formatINR } from "../ui";
+import { V } from "../ui";
 import { AgentStatusBadge } from "../agents";
 import { ENTITY_TYPES, useV2 } from "../store";
 
@@ -180,7 +180,7 @@ export default function OnboardingPage() {
                       <UploadCloud size={20} />
                     </div>
                     <div style={{ fontSize: 14.5, fontWeight: 600 }}>Click to upload a statement or bills</div>
-                    <div style={{ fontSize: 12.5, color: V.body, marginTop: 5 }}>CSV, XML or PDF. Sample sizes up to {formatINR(0).slice(0, 0)}any length.</div>
+                    <div style={{ fontSize: 12.5, color: V.body, marginTop: 5 }}>CSV, XML or PDF.</div>
                     <input ref={fileRef} type="file" accept=".csv,.xml,.pdf" hidden onChange={(e) => upload(e.target.files)} />
                   </div>
                   <button className="v2-btn v2-btn-ghost" style={{ justifySelf: "start" }} onClick={finish}>Skip and explore the portfolio</button>
