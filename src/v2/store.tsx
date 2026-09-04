@@ -242,6 +242,14 @@ const SEED_CHASES: Chase[] = [
     { at: iso(5), text: "Second reminder sent", agent: "chaser" },
     { at: iso(4), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" },
   ] },
+  { id: "h3", clientId: "c6", type: "Missing invoice", contact: "Sohini Dutta", phone: "919830445566", due: iso(-4), note: "Retainer invoice for the duplicate credit is still awaited.", followUps: 0, status: "Open", timeline: [
+    { at: iso(2), text: "Chase created", agent: "chaser" },
+  ] },
+  { id: "h4", clientId: "c4", type: "Missing bank statement", contact: "Latha Kaveri", phone: "919894112233", due: iso(6), note: "August SBI statement.", followUps: 1, status: "Resolved", timeline: [
+    { at: iso(9), text: "Chase created", agent: "chaser" },
+    { at: iso(6), text: "Email follow up sent", agent: "chaser" },
+    { at: iso(4), text: "Document received (SBI-statement-Aug.csv). Chase closed automatically.", agent: "chaser" },
+  ] },
 ];
 
 type Store = {
