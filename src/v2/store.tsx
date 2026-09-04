@@ -163,6 +163,23 @@ const SEED_DOCS: Doc[] = [
     { date: iso(3), particulars: "Courier charges — Delhivery", amount: -96400 },
   ] },
   { id: "d4", name: "ICICI-statement-Jul.csv", clientId: "c3", source: "Manual", status: "Failed", date: iso(11), rows: [] },
+  { id: "d5", name: "SBI-statement-Aug.csv", clientId: "c4", source: "Gmail", status: "Parsed", date: iso(4), rows: [
+    { date: iso(14), particulars: "RTGS Bharat Forge Components", amount: 486000 },
+    { date: iso(12), particulars: "NEFT Coimbatore Castings", amount: 214500 },
+    { date: iso(10), particulars: "Wages payout August", amount: -268000 },
+    { date: iso(9), particulars: "Electricity board — factory unit", amount: -74800 },
+    { date: iso(7), particulars: "Steel purchase — Annai Metals", amount: -152300 },
+  ] },
+  { id: "d6", name: "sales-register-Aug.xlsx", clientId: "c4", source: "Manual", status: "Parsed", date: iso(4), rows: [
+    { date: iso(13), particulars: "Invoice KEW/441 — Bharat Forge", amount: 486000 },
+    { date: iso(11), particulars: "Invoice KEW/442 — Coimbatore Castings", amount: 214500 },
+  ] },
+  { id: "d7", name: "Axis-statement-Aug.csv", clientId: "c6", source: "WhatsApp", status: "Parsed", date: iso(2), rows: [
+    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
+    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
+    { date: iso(6), particulars: "Studio rent August", amount: -145000 },
+    { date: iso(5), particulars: "IMPS transfer to unknown payee", amount: -62000 },
+  ] },
 ];
 
 const SEED_REVIEW: ReviewItem[] = [
