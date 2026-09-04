@@ -14,6 +14,7 @@ export default function DocumentsPage() {
   const [open, setOpen] = useState<string | null>(null);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
   const [drag, setDrag] = useState(false);
+  const [source, setSource] = useState<Doc["source"]>("Manual");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const active = docs.find((d) => d.id === open) ?? null;
@@ -22,8 +23,8 @@ export default function DocumentsPage() {
   const upload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     if (!clientId) { toast.error("Add a client before uploading"); return; }
-    Array.from(files).forEach((f) => addDoc(f.name, clientId));
-    toast.success("Extract agent is reading your document");
+    Array.from(files).forEach((f) => addDoc(f.name, clientId, source));
+    toast.success(`Extract agent is reading your ${source === "Manual" ? "upload" : source + " document"}`);
   };
 
   const list = docs.filter((d) => tab === "All" || d.status === tab);
@@ -61,6 +62,18 @@ export default function DocumentsPage() {
           <select className="v2-input" style={{ width: "auto", minWidth: 220 }} value={clientId} onChange={(e) => setClientId(e.target.value)} onClick={(e) => e.stopPropagation()}>
             {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
+          <span style={{ fontSize: 12.5, color: V.muted }}>arrived through</span>
+          <div style={{ display: "flex", gap: 6 }}>
+            {(["Manual", "Gmail", "WhatsApp"] as const).map((s) => (
+              <button
+                key={s}
+                className={`v2-btn ${source === s ? "v2-btn-primary" : "v2-btn-ghost"}`}
+                onClick={() => setSource(s)}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
