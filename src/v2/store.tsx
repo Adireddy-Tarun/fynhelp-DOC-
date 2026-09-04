@@ -300,23 +300,41 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, [startRun, docs, exceptions]);
 
   /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
-  const generateReport = useCallback((clientId: string, period: string, onDone: (r: Report) => void) => {
-    startRun("narrate", `MIS for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
+  const generateReport = useCallback((clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => {
+    startRun("narrate", `${template} for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
       const rows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
       const revenueRows = rows.filter((r) => r.amount > 0);
       const expenseRows = rows.filter((r) => r.amount < 0);
       const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
       const expenses = expenseRows.reduce((s, r) => s + Math.abs(r.amount), 0);
       const biggest = [...expenseRows].sort((a, b) => a.amount - b.amount)[0];
+      // Prior period comparison uses the older half of the same transaction set,
+      // so a variance can always be traced to rows that exist in the product.
+      const half = Math.max(1, Math.ceil(rows.length / 2));
+      const priorRows = rows.slice(half);
+      const priorRevenue = priorRows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
+      const priorExpenses = priorRows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
+      const largeRows = rows.filter((r) => Math.abs(r.amount) >= 100000);
       const created: Report = {
-        id: uid(), clientId, period, generated: today(), revenue, expenses,
+        id: uid(), clientId, period, template, generated: today(), revenue, expenses,
         sources: { revenue: revenueRows, expenses: expenseRows },
+        variances: [
+          { label: "Revenue", current: revenue, prior: priorRevenue },
+          { label: "Expenses", current: expenses, prior: priorExpenses },
+          { label: "Net position", current: revenue - expenses, prior: priorRevenue - priorExpenses },
+        ],
+        bankSummary: [
+          { label: "Credits in bank", value: revenue, rows: revenueRows },
+          { label: "Debits in bank", value: expenses, rows: expenseRows },
+          { label: "High value lines above one lakh", value: largeRows.length, rows: largeRows },
+        ],
         insights: [
           { text: revenue > expenses
               ? `Collections exceeded outflow this period, leaving a surplus of ₹${(revenue - expenses).toLocaleString("en-IN")}.`
               : `Outflow ran ahead of collections by ₹${(expenses - revenue).toLocaleString("en-IN")} this period.`,
             source: `${revenueRows.length} credits and ${expenseRows.length} debits` },
           ...(biggest ? [{ text: `The single largest outflow was ${biggest.particulars}.`, source: `1 transaction dated ${biggest.date}` }] : []),
+          ...(largeRows.length ? [{ text: `${largeRows.length} transactions crossed one lakh rupees and were checked line by line.`, source: `${largeRows.length} high value transactions` }] : []),
         ],
       };
       setReports((p) => [created, ...p]);
@@ -324,6 +342,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       onDone(created);
     });
   }, [startRun, docs]);
+
 
   const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => {
     setChases((p) => [
