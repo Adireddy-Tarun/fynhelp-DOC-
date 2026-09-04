@@ -125,10 +125,18 @@ const PRODUCT_USECASES: { icon: IconType; label: string; href: string }[] = [
 ];
 
 const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }[] = [
-  { icon: LayoutDashboard, label: "Portfolio dashboard",             href: "/ca-firms", desc: "All clients, one view" },
-  { icon: FileStack,       label: "ITC reconciliation and bulk preparation", href: "/ca-firms", desc: "Prepare returns in batches, reconcile ITC" },
-  { icon: MessageSquare,   label: "Client messaging",                 href: "/ca-firms", desc: "In-context, per client" },
-  { icon: Tag,             label: "Partner pricing",                  href: "/ca-firms", desc: "Volume discounts for firms" },
+  { icon: FileSearch,       label: "Document intake",       href: "/ca-firms", desc: "workflow" },
+  { icon: GitCompareArrows, label: "Reconciliation",         href: "/ca-firms", desc: "workflow" },
+  { icon: AlertTriangle,    label: "Exception queue",        href: "/ca-firms", desc: "workflow" },
+  { icon: Send,             label: "Chaser automation",      href: "/ca-firms", desc: "workflow" },
+  { icon: CalendarCheck,    label: "Compliance calendar",    href: "/ca-firms", desc: "workflow" },
+  { icon: FileCheck,        label: "Month-end close",        href: "/ca-firms", desc: "workflow" },
+  { icon: LayoutDashboard,  label: "Portfolio dashboard",    href: "/ca-firms", desc: "intelligence" },
+  { icon: Brain,            label: "Learning brain",         href: "/ca-firms", desc: "intelligence" },
+  { icon: BarChart3,        label: "Practice analytics",     href: "/ca-firms", desc: "intelligence" },
+  { icon: FileText,         label: "MIS reports",            href: "/ca-firms", desc: "intelligence" },
+  { icon: Users,            label: "Client portal",          href: "/ca-firms", desc: "intelligence" },
+  { icon: ShieldCheck,      label: "Audit trail",            href: "/ca-firms", desc: "intelligence" },
 ];
 
 const CA_PREVIEW_STATS: ModuleStat[] = [
