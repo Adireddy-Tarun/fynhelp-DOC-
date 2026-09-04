@@ -202,6 +202,35 @@ const SEED_RECON: Record<string, ReconResult> = {
   c4: { matched: KAVERI_BANK, exceptions: 0, bank: KAVERI_BANK, at: iso(2) },
 };
 
+const KAVERI_ROWS: Txn[] = SEED_DOCS.filter((d) => d.clientId === "c4").flatMap((d) => d.rows);
+const KAVERI_REV = KAVERI_ROWS.filter((r) => r.amount > 0);
+const KAVERI_EXP = KAVERI_ROWS.filter((r) => r.amount < 0);
+const kRevenue = KAVERI_REV.reduce((s, r) => s + r.amount, 0);
+const kExpenses = KAVERI_EXP.reduce((s, r) => s + Math.abs(r.amount), 0);
+
+const SEED_REPORTS: Report[] = [
+  {
+    id: "rep-kaveri", clientId: "c4", period: PERIODS[0], template: "Monthly MIS", generated: iso(1), excluded: 0,
+    revenue: kRevenue, expenses: kExpenses,
+    sources: { revenue: KAVERI_REV, expenses: KAVERI_EXP },
+    variances: [
+      { label: "Revenue", current: kRevenue, prior: 612000 },
+      { label: "Expenses", current: kExpenses, prior: 431000 },
+      { label: "Net position", current: kRevenue - kExpenses, prior: 181000 },
+    ],
+    bankSummary: [
+      { label: "Credits in bank", value: kRevenue, rows: KAVERI_REV },
+      { label: "Debits in bank", value: kExpenses, rows: KAVERI_EXP },
+      { label: "High value lines above one lakh", value: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000).length, rows: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000) },
+    ],
+    insights: [
+      { text: `Collections stayed ahead of outflow, leaving a surplus of ₹${(kRevenue - kExpenses).toLocaleString("en-IN")}.`, source: `${KAVERI_REV.length} credits and ${KAVERI_EXP.length} debits` },
+      { text: "Wages remained the single largest outflow for the month.", source: "1 transaction, wages payout August" },
+      { text: "Every bank line was matched, so nothing was left out of these figures.", source: `${KAVERI_ROWS.length} matched transactions` },
+    ],
+  },
+];
+
 const SEED_CHASES: Chase[] = [
   { id: "h1", clientId: "c2", type: "Missing purchase bills", contact: "Nisha Rao", phone: "919845567788", due: iso(-2), note: "August purchase bills for 6 vendors still pending.", followUps: 1, status: "Following Up", timeline: [
     { at: iso(5), text: "Chase created", agent: "chaser" },
