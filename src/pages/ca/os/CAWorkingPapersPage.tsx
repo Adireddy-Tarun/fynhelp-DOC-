@@ -27,6 +27,7 @@ interface PaperRow {
 }
 
 export default function CAWorkingPapersPage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAWorkingPapersPage mounted"); }, []);
   const { firmId } = useCAPortal();
   const { can, role, isLoading: roleLoading } = useCARole();
   const { clients } = useCAClientOptions();

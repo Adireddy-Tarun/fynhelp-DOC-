@@ -19,6 +19,7 @@ interface DocRow {
 }
 
 export default function CAEvidenceVaultPage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAVaultPage mounted"); }, []);
   const { firmId } = useCAPortal();
   const { clients } = useCAClientOptions();
   const [rows, setRows] = useState<DocRow[]>([]);

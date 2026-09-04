@@ -35,6 +35,7 @@ const DAY = 86_400_000;
 const daysOverdue = (due: string) => Math.max(0, Math.floor((Date.now() - new Date(due).getTime()) / DAY));
 
 export default function CAChaserQueuePage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAChaserPage mounted"); }, []);
   const { firmId, firmName, userId } = useCAPortal();
   const { byBusiness: intel } = useFirmClientIntelligence(firmId);
   const { can, role, isLoading: roleLoading } = useCARole();

@@ -3556,6 +3556,8 @@ export type Database = {
           report_name: string | null
           report_type: string
           sent_to: string | null
+          signed_off_at: string | null
+          signed_off_by: string | null
           status: string | null
         }
         Insert: {
@@ -3574,6 +3576,8 @@ export type Database = {
           report_name?: string | null
           report_type: string
           sent_to?: string | null
+          signed_off_at?: string | null
+          signed_off_by?: string | null
           status?: string | null
         }
         Update: {
@@ -3592,6 +3596,8 @@ export type Database = {
           report_name?: string | null
           report_type?: string
           sent_to?: string | null
+          signed_off_at?: string | null
+          signed_off_by?: string | null
           status?: string | null
         }
         Relationships: [

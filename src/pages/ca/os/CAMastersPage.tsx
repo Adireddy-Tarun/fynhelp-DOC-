@@ -38,6 +38,7 @@ const TABS: { key: Tab; label: string }[] = [
 
 
 export default function CAMastersPage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAMastersPage mounted"); }, []);
   const { firmId, userId } = useCAPortal();
   const { can } = useCARole();
   const { clients } = useCAClientOptions();

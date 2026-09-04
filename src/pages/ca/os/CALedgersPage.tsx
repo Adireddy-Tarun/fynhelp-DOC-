@@ -33,6 +33,7 @@ const TYPE_TONE: Record<string, "teal" | "amber" | "green" | "red" | "grey"> = {
 };
 
 export default function CALedgersPage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CALedgersPage mounted"); }, []);
   const { firmId } = useCAPortal();
   const { can } = useCARole();
   const { clients } = useCAClientOptions();
