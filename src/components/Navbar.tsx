@@ -446,26 +446,50 @@ const Navbar = () => {
       }}
     >
       <div className="max-w-[1400px] mx-auto px-14 py-10 grid grid-cols-[1fr_400px] gap-14">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fyn-ink/50 mb-4">
-            For your practice
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {CA_PRACTICE.map((c) => (
-              <Link
-                key={c.label}
-                to={c.href}
-                className="flex items-start gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
-              >
-                <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md bg-fyn-red/10 text-fyn-red">
-                  <c.icon size={16} />
-                </span>
-                <span className="flex flex-col">
+        <div className="grid grid-cols-[1fr_1fr] gap-8">
+          <div>
+            <div className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-fyn-ink/35 mb-3">
+              Workflow
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {CA_PRACTICE.filter((c) => c.desc === "workflow").map((c) => (
+                <Link
+                  key={c.label}
+                  to={c.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+                >
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-md"
+                    style={{ background: "rgba(169,56,56,0.09)", color: "#A93838" }}
+                  >
+                    <c.icon size={16} />
+                  </span>
                   <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
-                  <span className="text-[13.5px] text-fyn-ink/60">{c.desc}</span>
-                </span>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-fyn-ink/35 mb-3">
+              Intelligence
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {CA_PRACTICE.filter((c) => c.desc === "intelligence").map((c) => (
+                <Link
+                  key={c.label}
+                  to={c.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-fyn-ink/5 transition-colors"
+                >
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-md"
+                    style={{ background: "rgba(139,105,20,0.09)", color: "#8B6914" }}
+                  >
+                    <c.icon size={16} />
+                  </span>
+                  <span className="text-[15px] font-semibold text-fyn-ink">{c.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
