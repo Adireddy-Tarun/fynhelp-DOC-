@@ -170,6 +170,32 @@ export default function CAReportsPage() {
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [caFirm?.id]);
 
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAReportsPage mounted"); }, []);
+
+  /** Partner or manager sign-off on a generated report. */
+  const handleSignOff = async (r: ReportRow) => {
+    if (!user?.id || !caFirm?.id) return;
+    setSigningId(r.id);
+    const signedAt = new Date().toISOString();
+    const { error } = await supabase
+      .from("ca_reports_log")
+      .update({ signed_off_by: user.id, signed_off_at: signedAt })
+      .eq("id", r.id);
+    setSigningId(null);
+    if (error) { toast.error(error.message); return; }
+    setReports(prev => prev.map(x => (x.id === r.id ? { ...x, signed_off_by: user.id, signed_off_at: signedAt } : x)));
+    await logCAAudit({
+      firmId: caFirm.id,
+      businessId: r.business_id,
+      entityType: "ca_reports_log",
+      entityId: r.id,
+      action: "report_signed_off",
+      actorRole: role,
+      detail: { report_type: r.report_type, period: r.period },
+    });
+    toast.success("Report signed off");
+  };
+
   const openTemplate = (id: TemplateId) => { setPresetTemplate(id); setGenOpen(true); };
   const openBlank = () => { setPresetTemplate(null); setGenOpen(true); };
 
