@@ -470,7 +470,12 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Rules pass", "Flagging exceptions"], clientId, () => {
       const bank = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
       const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
-      const unresolved = bank.filter((r) => Math.abs(r.amount) > 500000).slice(0, 1);
+      // Idempotent: a bank line that already sits in the exception queue is never flagged twice.
+      const known = exceptions.filter((e) => e.clientId === clientId);
+      const unresolved = bank
+        .filter((r) => Math.abs(r.amount) > 500000)
+        .filter((r) => !known.some((e) => e.date === r.date && Math.abs(e.amount) === Math.abs(r.amount)))
+        .slice(0, 1);
       const created: Exception[] = unresolved.map((r) => ({
         id: uid(), clientId, reason: "Amount mismatch" as const, amount: r.amount, date: r.date,
         narration: r.particulars, candidates: ["Closest book entry differs by ₹1,200"], status: "open" as const,
