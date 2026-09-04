@@ -499,7 +499,7 @@ const Navbar = () => {
             title="Portfolio"
             sub="Live snapshot"
             stats={CA_PREVIEW_STATS}
-            footer="Client health · Filings · ITC recon"
+            footer="393 auto-matched · 1 open"
             ctaLabel="Explore CA portal"
             ctaHref="/ca-firms"
           />
