@@ -55,12 +55,33 @@ export type Report = {
   id: string;
   clientId: string;
   period: string;
+  template: ReportTemplate;
   generated: string;
   revenue: number;
   expenses: number;
   sources: { revenue: Txn[]; expenses: Txn[] };
   insights: { text: string; source: string }[];
+  variances: { label: string; current: number; prior: number }[];
+  bankSummary: { label: string; value: number; rows: Txn[] }[];
 };
+
+export const REPORT_TEMPLATES = [
+  "Monthly MIS",
+  "Bank Reconciliation Summary",
+  "Key Variances",
+  "Working Paper",
+] as const;
+export type ReportTemplate = (typeof REPORT_TEMPLATES)[number];
+
+export type Firm = {
+  name: string;
+  partnerName: string;
+  email: string;
+  city: string;
+  frn: string;
+  gmailConnected: boolean;
+};
+
 
 export type Chase = {
   id: string;
