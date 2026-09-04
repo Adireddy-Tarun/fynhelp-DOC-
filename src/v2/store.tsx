@@ -207,7 +207,44 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
   const [runs, setRuns] = useState<AgentRun[]>([]);
   const [recon, setRecon] = useState<Record<string, ReconResult>>({});
+  const [hydrated, setHydrated] = useState(false);
+  const [session, setSession] = useState<Store["session"]>(null);
+  const [firm, setFirm] = useState<Firm | null>(null);
+  const [onboarded, setOnboarded] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Sign in state survives a refresh so the journey is not restarted every time.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { session: Store["session"]; firm: Firm | null; onboarded: boolean };
+        setSession(saved.session ?? null);
+        setFirm(saved.firm ?? null);
+        setOnboarded(Boolean(saved.onboarded));
+      }
+    } catch {
+      /* first visit, nothing saved yet */
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, firm, onboarded }));
+    } catch {
+      /* storage unavailable, the app still works for this session */
+    }
+  }, [hydrated, session, firm, onboarded]);
+
+  const signIn = useCallback((name: string, email: string) => setSession({ name, email }), []);
+  const signOut = useCallback(() => { setSession(null); setFirm(null); setOnboarded(false); }, []);
+  const saveFirm = useCallback((patch: Partial<Firm>) => {
+    setFirm((p) => ({ name: "", partnerName: "", email: "", city: "", frn: "", gmailConnected: false, ...(p ?? {}), ...patch }));
+  }, []);
+  const completeOnboarding = useCallback(() => setOnboarded(true), []);
+
 
   /** Advance a visible agent run one step at a time, then finish. */
   const startRun = useCallback(
