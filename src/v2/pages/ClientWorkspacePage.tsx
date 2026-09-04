@@ -4,12 +4,13 @@ import { Link, useParams } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import { Badge, Card, EmptyState, PageHeader, Stat, Tabs, V, formatDate, formatINR } from "../ui";
-import { AgentStatusBadge, AnimatedCounter, ProcessingCard } from "../agents";
+import { AgentStatusBadge, AgentTimeline, AnimatedCounter, ProcessingCard } from "../agents";
 import { useV2 } from "../store";
+import { CloseProgress, NextAction } from "../components/CloseProgress";
 
 export default function ClientWorkspacePage() {
   const { clientId } = useParams({ from: "/v2/clients/$clientId" });
-  const { clients, docs, exceptions, reports, chases, review, runs, recon, runRecon, generateReport } = useV2();
+  const { clients, docs, exceptions, reports, chases, review, runs, recon, runRecon, generateReport, period, closeStateFor, activityFor } = useV2();
   const client = clients.find((c) => c.id === clientId);
   const [tab, setTab] = useState("overview");
 
@@ -27,6 +28,24 @@ export default function ClientWorkspacePage() {
   const cEx = exceptions.filter((e) => e.clientId === client.id && e.status === "open");
   const cReview = review.filter((r) => r.clientId === client.id && r.status === "open");
   const cReports = reports.filter((r) => r.clientId === client.id);
+  const close = closeStateFor(client.id);
+  const timeline = activityFor(client.id);
+
+  const runNext = () => {
+    if (close.next.action === "recon") {
+      runRecon(client.id, (r) => toast.success(`Recon complete. Matched ${r.matched}, exceptions ${r.exceptions}.`));
+      toast.success("Recon agent is matching transactions");
+      setTab("recon");
+      return;
+    }
+    if (close.next.action === "mis") {
+      generateReport(client.id, period, "Monthly MIS", () => toast.success(`${period} MIS ready`));
+      toast.success("Narrate agent is preparing the MIS");
+      setTab("mis");
+      return;
+    }
+    setTab(close.next.tab);
+  };
   const cChases = chases.filter((c) => c.clientId === client.id && c.status !== "Resolved");
   const bankRows = cDocs.flatMap((d) => d.rows);
   const clientRuns = runs.filter((r) => r.target === client.id);
@@ -47,7 +66,7 @@ export default function ClientWorkspacePage() {
       </Link>
       <PageHeader
         title={client.name}
-        subtitle={`${client.entityType}${client.gstin ? ` · ${client.gstin}` : ""}`}
+        subtitle={`${client.entityType}${client.gstin ? ` · ${client.gstin}` : ""} · closing ${period}`}
         action={<Badge tone={status.tone}>{status.label}</Badge>}
       />
 
@@ -70,11 +89,18 @@ export default function ClientWorkspacePage() {
           { value: "recon", label: "Recon" },
           { value: "mis", label: "MIS", count: cReports.length },
           { value: "chaser", label: "Chaser", count: cChases.length },
+          { value: "activity", label: "Activity", count: timeline.length },
         ]}
       />
 
       {tab === "overview" && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <div style={{ marginBottom: 18 }}>
+            <NextAction state={close} onGo={runNext} />
+          </div>
+          <Card style={{ marginBottom: 18 }}>
+            <CloseProgress state={close} />
+          </Card>
           <div className="v2-grid-cards" style={{ marginBottom: 18 }}>
             <Stat label="Documents" value={<AnimatedCounter value={cDocs.length} />} hint="Collected so far" />
             <Stat label="Awaiting review" value={<AnimatedCounter value={cReview.length} />} hint="Low confidence rows" />
@@ -87,7 +113,7 @@ export default function ClientWorkspacePage() {
               <button className="v2-btn v2-btn-primary" disabled={reconRunning} onClick={() => { runRecon(client.id, (r) => toast.success(`Recon complete. Matched ${r.matched}, exceptions ${r.exceptions}.`)); toast.success("Recon agent is matching transactions"); }}>
                 Run recon
               </button>
-              <button className="v2-btn v2-btn-ghost" onClick={() => { generateReport(client.id, "Current period", "Monthly MIS", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>
+              <button className="v2-btn v2-btn-ghost" onClick={() => { generateReport(client.id, period, "Monthly MIS", () => toast.success(`${period} MIS ready`)); toast.success("Narrate agent is preparing the MIS"); }}>
                 Generate MIS
               </button>
               <Link className="v2-btn v2-btn-ghost" to="/v2/documents">Upload documents</Link>
@@ -206,7 +232,7 @@ export default function ClientWorkspacePage() {
 
       {tab === "mis" && (
         cReports.length === 0 ? (
-          <EmptyState title="No MIS yet" description="Generate a report for this client and every figure will stay linked to its transactions." action={<button className="v2-btn v2-btn-primary" onClick={() => { generateReport(client.id, "Current period", "Monthly MIS", () => toast.success("MIS ready")); toast.success("Narrate agent is preparing the MIS"); }}>Generate MIS</button>} />
+          <EmptyState title="No MIS yet" description="Generate a report for this client and every figure will stay linked to its transactions." action={<button className="v2-btn v2-btn-primary" onClick={() => { generateReport(client.id, period, "Monthly MIS", () => toast.success(`${period} MIS ready`)); toast.success("Narrate agent is preparing the MIS"); }}>Generate MIS</button>} />
         ) : (
           <Card style={{ padding: 0 }} className="v2-scroll">
             <table className="v2-table">
@@ -245,6 +271,16 @@ export default function ClientWorkspacePage() {
               </Card>
             ))}
           </div>
+        )
+      )}
+      {tab === "activity" && (
+        timeline.length === 0 ? (
+          <EmptyState title="Nothing has happened yet" description="Every document read, row confirmed, recon run and report generated for this client is recorded here." />
+        ) : (
+          <Card>
+            <h3 style={{ fontSize: 15, marginBottom: 14 }}>What happened on this client</h3>
+            <AgentTimeline items={timeline.map((a) => ({ at: a.at, text: a.text, agent: a.agent }))} />
+          </Card>
         )
       )}
     </>
