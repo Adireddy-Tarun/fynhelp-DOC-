@@ -305,10 +305,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [docs, setDocs] = useState<Doc[]>(SEED_DOCS);
   const [review, setReview] = useState<ReviewItem[]>(SEED_REVIEW);
   const [exceptions, setExceptions] = useState<Exception[]>(SEED_EXCEPTIONS);
-  const [reports, setReports] = useState<Report[]>([]);
+  const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
   const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
   const [runs, setRuns] = useState<AgentRun[]>([]);
-  const [recon, setRecon] = useState<Record<string, ReconResult>>({});
+  const [recon, setRecon] = useState<Record<string, ReconResult>>(SEED_RECON);
   const [hydrated, setHydrated] = useState(false);
   const [session, setSession] = useState<Store["session"]>(null);
   const [firm, setFirm] = useState<Firm | null>(null);
