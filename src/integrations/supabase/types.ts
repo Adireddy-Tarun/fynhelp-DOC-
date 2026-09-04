@@ -7578,46 +7578,73 @@ export type Database = {
       }
       waitlist: {
         Row: {
+          client_entities: string | null
           company_name: string
           company_size: string
           company_type: string
           created_at: string
           email: string
+          hear_about: string | null
           id: string
           is_converted: boolean
+          landing_page: string | null
           location: string
+          month_end_pain: string | null
           name: string
           phone: string
           position: number
+          referrer: string | null
+          role: string | null
           updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
+          client_entities?: string | null
           company_name: string
           company_size: string
           company_type: string
           created_at?: string
           email: string
+          hear_about?: string | null
           id?: string
           is_converted?: boolean
+          landing_page?: string | null
           location: string
+          month_end_pain?: string | null
           name: string
           phone: string
           position: number
+          referrer?: string | null
+          role?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
+          client_entities?: string | null
           company_name?: string
           company_size?: string
           company_type?: string
           created_at?: string
           email?: string
+          hear_about?: string | null
           id?: string
           is_converted?: boolean
+          landing_page?: string | null
           location?: string
+          month_end_pain?: string | null
           name?: string
           phone?: string
           position?: number
+          referrer?: string | null
+          role?: string | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: []
       }
