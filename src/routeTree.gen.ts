@@ -31,6 +31,7 @@ import { Route as MainSecurityRouteImport } from './routes/_main/security'
 import { Route as MainSignupRouteImport } from './routes/_main/signup'
 import { Route as MainUseCasesRouteImport } from './routes/_main/use-cases'
 import { Route as MainWaitlistRouteImport } from './routes/_main/waitlist'
+import { Route as V2IndexRouteImport } from './routes/v2/index'
 import { Route as AdminAuthAdminProtectedRouteImport } from './routes/_adminAuth/admin/_protected'
 import { Route as AdminAuthAdminLoginRouteImport } from './routes/_adminAuth/admin/login'
 import { Route as BlogAdminBlogAdminIndexRouteImport } from './routes/_blogAdmin/blog-admin/index'
@@ -318,6 +319,11 @@ const MainWaitlistRoute = MainWaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
   getParentRoute: () => MainRoute,
+} as any)
+const V2IndexRoute = V2IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => V2Route,
 } as any)
 const AdminAuthAdminProtectedRoute = AdminAuthAdminProtectedRouteImport.update({
   id: '/admin/_protected',
@@ -1345,7 +1351,7 @@ const AdminAuthAdminProtectedBlogPostIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
-  '/v2': typeof V2Route
+  '/v2': typeof V2RouteWithChildren
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
@@ -1360,6 +1366,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/v2/': typeof V2IndexRoute
   '/admin': typeof AdminAuthAdminProtectedRouteWithChildren
   '/admin/login': typeof AdminAuthAdminLoginRoute
   '/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
@@ -1546,7 +1553,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
-  '/v2': typeof V2Route
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
@@ -1561,6 +1567,7 @@ export interface FileRoutesByTo {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/v2': typeof V2IndexRoute
   '/admin/login': typeof AdminAuthAdminLoginRoute
   '/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
   '/blog-admin/login': typeof BlogAdminBlogAdminLoginRoute
@@ -1749,7 +1756,7 @@ export interface FileRoutesById {
   '/_caAuth': typeof CaAuthRouteWithChildren
   '/_internalAdmin': typeof InternalAdminRouteWithChildren
   '/_main': typeof MainRouteWithChildren
-  '/v2': typeof V2Route
+  '/v2': typeof V2RouteWithChildren
   '/_main/_demoGate': typeof MainDemoGateRouteWithChildren
   '/_main/about': typeof MainAboutRoute
   '/_main/ca-firms': typeof MainCaFirmsRoute
@@ -1766,6 +1773,7 @@ export interface FileRoutesById {
   '/_main/use-cases': typeof MainUseCasesRoute
   '/_main/waitlist': typeof MainWaitlistRoute
   '/_main/': typeof MainIndexRoute
+  '/v2/': typeof V2IndexRoute
   '/_adminAuth/admin/_protected': typeof AdminAuthAdminProtectedRouteWithChildren
   '/_adminAuth/admin/login': typeof AdminAuthAdminLoginRoute
   '/_blogAdmin/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
@@ -1969,6 +1977,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/v2/'
     | '/admin'
     | '/admin/login'
     | '/blog-admin/editor'
@@ -2155,7 +2164,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/v2'
     | '/about'
     | '/ca-firms'
     | '/community'
@@ -2170,6 +2178,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/v2'
     | '/admin/login'
     | '/blog-admin/editor'
     | '/blog-admin/login'
@@ -2374,6 +2383,7 @@ export interface FileRouteTypes {
     | '/_main/use-cases'
     | '/_main/waitlist'
     | '/_main/'
+    | '/v2/'
     | '/_adminAuth/admin/_protected'
     | '/_adminAuth/admin/login'
     | '/_blogAdmin/blog-admin/editor'
@@ -2565,7 +2575,7 @@ export interface RootRouteChildren {
   CaAuthRoute: typeof CaAuthRouteWithChildren
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
-  V2Route: typeof V2Route
+  V2Route: typeof V2RouteWithChildren
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
   ApiPublicCaBrainDeductionLearningRoute: typeof ApiPublicCaBrainDeductionLearningRoute
@@ -2734,6 +2744,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/waitlist'
       preLoaderRoute: typeof MainWaitlistRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/v2/': {
+      id: '/v2/'
+      path: '/'
+      fullPath: '/v2/'
+      preLoaderRoute: typeof V2IndexRouteImport
+      parentRoute: typeof V2Route
     }
     '/_adminAuth/admin/_protected': {
       id: '/_adminAuth/admin/_protected'
@@ -4507,13 +4524,23 @@ const MainRouteChildren: MainRouteChildren = {
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
 
+interface V2RouteChildren {
+  V2IndexRoute: typeof V2IndexRoute
+}
+
+const V2RouteChildren: V2RouteChildren = {
+  V2IndexRoute: V2IndexRoute,
+}
+
+const V2RouteWithChildren = V2Route._addFileChildren(V2RouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AdminAuthRoute: AdminAuthRouteWithChildren,
   BlogAdminRoute: BlogAdminRouteWithChildren,
   CaAuthRoute: CaAuthRouteWithChildren,
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
-  V2Route: V2Route,
+  V2Route: V2RouteWithChildren,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,
   ApiPublicCaBrainDeductionLearningRoute:
