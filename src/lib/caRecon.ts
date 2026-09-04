@@ -10,6 +10,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { logCAAudit } from "@/lib/caAudit";
+import { signalBrain } from "@/lib/caBrainSignals";
 
 export interface BankLine {
   id: string;
@@ -303,6 +304,14 @@ export async function acceptMatch(
       partial: s.partial,
       rationale: s.rationale,
     },
+  });
+
+  void signalBrain(ctx.firmId, ctx.businessId, "recon_match_accepted", {
+    pass: s.pass,
+    confidence: s.confidence,
+    partial: s.partial,
+    amount: s.bank.amount,
+    counterpart_kind: s.counterpartKind,
   });
 
   return { ok: true };
