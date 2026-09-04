@@ -59,7 +59,7 @@ export const notifyWaitlistLead = createServerFn({ method: "POST" })
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: "FynHelp Waitlist <onboarding@resend.dev>",
+        from: "FynHelp Waitlist <waitlist@fynhelp.com>",
         to: RECIPIENTS,
         reply_to: data.email,
         subject: `Waitlist: ${data.full_name} — ${data.firm_name}`,
