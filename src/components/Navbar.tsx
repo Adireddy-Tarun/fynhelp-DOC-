@@ -17,8 +17,13 @@ import {
   ShieldCheck,
   LayoutDashboard,
   FileStack,
-  MessageSquare,
-  Tag,
+  Brain,
+  CalendarCheck,
+  FileCheck,
+  AlertTriangle,
+  Users,
+  BarChart3,
+  FileText,
 } from "lucide-react";
 import FynLogo from "@/components/FynLogo";
 import { supabase } from "@/integrations/supabase/client";
