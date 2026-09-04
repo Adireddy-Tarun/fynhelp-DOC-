@@ -43,7 +43,7 @@ export type ReviewItem = {
 export type Exception = {
   id: string;
   clientId: string;
-  reason: "Amount mismatch" | "Date gap" | "No candidate" | "Duplicate";
+  reason: "Amount mismatch" | "Date gap" | "No candidate" | "Duplicate suspect" | "Missing counterparty";
   amount: number;
   date: string;
   narration: string;
