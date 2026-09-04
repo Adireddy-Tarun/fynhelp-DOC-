@@ -420,12 +420,14 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<Store>(() => ({
+    hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding,
     clients, docs, review, exceptions, reports, chases, runs, recon,
     runsFor: (target: string) => runs.filter((r) => r.target === target),
     addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
     addChase, sendFollowUp, setChaseStatus, clientTxns,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
-  }), [clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+  }), [hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
