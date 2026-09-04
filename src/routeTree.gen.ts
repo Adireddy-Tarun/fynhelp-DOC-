@@ -14,6 +14,7 @@ import { Route as BlogAdminRouteImport } from './routes/_blogAdmin'
 import { Route as CaAuthRouteImport } from './routes/_caAuth'
 import { Route as InternalAdminRouteImport } from './routes/_internalAdmin'
 import { Route as MainRouteImport } from './routes/_main'
+import { Route as V2RouteImport } from './routes/v2'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainDemoGateRouteImport } from './routes/_main/_demoGate'
 import { Route as MainAboutRouteImport } from './routes/_main/about'
@@ -232,6 +233,11 @@ const InternalAdminRoute = InternalAdminRouteImport.update({
 } as any)
 const MainRoute = MainRouteImport.update({
   id: '/_main',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2Route = V2RouteImport.update({
+  id: '/v2',
+  path: '/v2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainIndexRoute = MainIndexRouteImport.update({
@@ -1339,6 +1345,7 @@ const AdminAuthAdminProtectedBlogPostIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
+  '/v2': typeof V2Route
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
@@ -1539,6 +1546,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
+  '/v2': typeof V2Route
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
@@ -1741,6 +1749,7 @@ export interface FileRoutesById {
   '/_caAuth': typeof CaAuthRouteWithChildren
   '/_internalAdmin': typeof InternalAdminRouteWithChildren
   '/_main': typeof MainRouteWithChildren
+  '/v2': typeof V2Route
   '/_main/_demoGate': typeof MainDemoGateRouteWithChildren
   '/_main/about': typeof MainAboutRoute
   '/_main/ca-firms': typeof MainCaFirmsRoute
@@ -1945,6 +1954,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/v2'
     | '/about'
     | '/ca-firms'
     | '/community'
@@ -2145,6 +2155,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/v2'
     | '/about'
     | '/ca-firms'
     | '/community'
@@ -2346,6 +2357,7 @@ export interface FileRouteTypes {
     | '/_caAuth'
     | '/_internalAdmin'
     | '/_main'
+    | '/v2'
     | '/_main/_demoGate'
     | '/_main/about'
     | '/_main/ca-firms'
@@ -2553,6 +2565,7 @@ export interface RootRouteChildren {
   CaAuthRoute: typeof CaAuthRouteWithChildren
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
+  V2Route: typeof V2Route
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
   ApiPublicCaBrainDeductionLearningRoute: typeof ApiPublicCaBrainDeductionLearningRoute
@@ -2601,6 +2614,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof MainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2': {
+      id: '/v2'
+      path: '/v2'
+      fullPath: '/v2'
+      preLoaderRoute: typeof V2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_main/': {
@@ -4493,6 +4513,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaAuthRoute: CaAuthRouteWithChildren,
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
+  V2Route: V2Route,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,
   ApiPublicCaBrainDeductionLearningRoute:
