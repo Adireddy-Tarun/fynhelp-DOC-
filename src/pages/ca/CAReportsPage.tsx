@@ -129,6 +129,9 @@ type ClientOpt = { business_id: string; business_name: string };
 // ───────── Main page ─────────
 export default function CAReportsPage() {
   const { caFirm, user } = useCAAuth();
+  const { role } = useCARole();
+  const canSignOff = role === "partner" || role === "manager";
+  const [signingId, setSigningId] = useState<string | null>(null);
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [schedules, setSchedules] = useState<ScheduleRow[]>([]);
   const [clients, setClients] = useState<ClientOpt[]>([]);
