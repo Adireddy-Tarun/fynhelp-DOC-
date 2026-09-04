@@ -28,6 +28,15 @@ export default function OnboardingPage() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
+  /** One click into the sample practice, so the whole product can be explored immediately. */
+  const demoLogin = () => {
+    signIn("Prajwal Vakode", "partner@mehtaassociates.in");
+    saveFirm({ name: "Mehta and Associates", partnerName: "Prajwal Vakode", email: "partner@mehtaassociates.in", city: "Bengaluru", frn: "012345S", gmailConnected: true });
+    completeOnboarding();
+    toast.success("Sample practice loaded");
+    navigate({ to: "/v2" });
+  };
+
   const submitAccount = (e: React.FormEvent) => {
     e.preventDefault();
     signIn(account.name.trim(), account.email.trim());
@@ -103,7 +112,13 @@ export default function OnboardingPage() {
               <Field label="Full name"><input className="v2-input" required value={account.name} onChange={(e) => setAccount({ ...account, name: e.target.value })} placeholder="Prajwal Vakode" /></Field>
               <Field label="Work email"><input className="v2-input" type="email" required value={account.email} onChange={(e) => setAccount({ ...account, email: e.target.value })} placeholder="you@firm.com" /></Field>
               <Field label="Password"><input className="v2-input" type="password" required minLength={6} value={account.password} onChange={(e) => setAccount({ ...account, password: e.target.value })} placeholder="At least six characters" /></Field>
-              <button className="v2-btn v2-btn-primary" type="submit" style={{ justifySelf: "start" }}>Create account</button>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <button className="v2-btn v2-btn-primary" type="submit">Create account</button>
+                <button className="v2-btn v2-btn-ghost" type="button" onClick={demoLogin}>Explore with sample data</button>
+              </div>
+              <p style={{ fontSize: 12.5, color: V.muted, margin: 0 }}>
+                Exploring drops you straight into a practice with six sample clients, so you can see every screen already alive.
+              </p>
             </form>
           )}
 

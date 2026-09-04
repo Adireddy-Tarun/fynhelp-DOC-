@@ -43,7 +43,7 @@ export type ReviewItem = {
 export type Exception = {
   id: string;
   clientId: string;
-  reason: "Amount mismatch" | "Date gap" | "No candidate" | "Duplicate";
+  reason: "Amount mismatch" | "Date gap" | "No candidate" | "Duplicate suspect" | "Missing counterparty";
   amount: number;
   date: string;
   narration: string;
@@ -141,6 +141,9 @@ const SEED_CLIENTS: Client[] = [
   { id: "c1", name: "Sundar Textiles Pvt Ltd", entityType: "Private Limited", gstin: "27AABCS1429B1ZP", contactName: "Ramesh Sundar", email: "ramesh@sundartextiles.in", phone: "919820011223", lastMis: iso(6) },
   { id: "c2", name: "Aarna Foods LLP", entityType: "LLP", gstin: "29AAFAA7391K1Z2", contactName: "Nisha Rao", email: "nisha@aarnafoods.in", phone: "919845567788", lastMis: iso(21) },
   { id: "c3", name: "Verve D2C Retail", entityType: "Private Limited", gstin: "36AAECV1122M1ZL", contactName: "Karthik Iyer", email: "karthik@vervedtc.com", phone: "919701234567", lastMis: iso(2) },
+  { id: "c4", name: "Kaveri Engineering Works", entityType: "Partnership", gstin: "33AAGFK5580R1ZQ", contactName: "Latha Kaveri", email: "latha@kaveriengg.in", phone: "919894112233", lastMis: iso(1) },
+  { id: "c5", name: "Mehr Consulting Proprietorship", entityType: "Proprietorship", gstin: "07AJXPM4412Q1Z8", contactName: "Mehr Ahluwalia", email: "mehr@mehrconsulting.in", phone: "919810099887" },
+  { id: "c6", name: "Northlight Studios Pvt Ltd", entityType: "Private Limited", gstin: "19AAFCN8821L1ZR", contactName: "Sohini Dutta", email: "sohini@northlightstudios.in", phone: "919830445566", lastMis: iso(34) },
 ];
 
 const SEED_DOCS: Doc[] = [
@@ -160,6 +163,23 @@ const SEED_DOCS: Doc[] = [
     { date: iso(3), particulars: "Courier charges — Delhivery", amount: -96400 },
   ] },
   { id: "d4", name: "ICICI-statement-Jul.csv", clientId: "c3", source: "Manual", status: "Failed", date: iso(11), rows: [] },
+  { id: "d5", name: "SBI-statement-Aug.csv", clientId: "c4", source: "Gmail", status: "Parsed", date: iso(4), rows: [
+    { date: iso(14), particulars: "RTGS Bharat Forge Components", amount: 486000 },
+    { date: iso(12), particulars: "NEFT Coimbatore Castings", amount: 214500 },
+    { date: iso(10), particulars: "Wages payout August", amount: -268000 },
+    { date: iso(9), particulars: "Electricity board — factory unit", amount: -74800 },
+    { date: iso(7), particulars: "Steel purchase — Annai Metals", amount: -152300 },
+  ] },
+  { id: "d6", name: "sales-register-Aug.xlsx", clientId: "c4", source: "Manual", status: "Parsed", date: iso(4), rows: [
+    { date: iso(13), particulars: "Invoice KEW/441 — Bharat Forge", amount: 486000 },
+    { date: iso(11), particulars: "Invoice KEW/442 — Coimbatore Castings", amount: 214500 },
+  ] },
+  { id: "d7", name: "Axis-statement-Aug.csv", clientId: "c6", source: "WhatsApp", status: "Parsed", date: iso(2), rows: [
+    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
+    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
+    { date: iso(6), particulars: "Studio rent August", amount: -145000 },
+    { date: iso(5), particulars: "IMPS transfer to unknown payee", amount: -62000 },
+  ] },
 ];
 
 const SEED_REVIEW: ReviewItem[] = [
@@ -172,6 +192,43 @@ const SEED_EXCEPTIONS: Exception[] = [
   { id: "e1", clientId: "c1", reason: "Amount mismatch", amount: 248000, date: iso(9), narration: "NEFT ABC ENTERPRISES", candidates: ["Invoice INV/2211 — ₹2,47,500"], status: "open" },
   { id: "e2", clientId: "c3", reason: "No candidate", amount: -18450, date: iso(4), narration: "UPI VINAYAK PRINT", candidates: [], status: "open" },
   { id: "e3", clientId: "c2", reason: "Date gap", amount: 91500, date: iso(12), narration: "RTGS SRI BALAJI TRADERS", candidates: ["Invoice INV/882 — 08 days earlier"], status: "open" },
+  { id: "e4", clientId: "c6", reason: "Duplicate suspect", amount: 325000, date: iso(8), narration: "Client retainer — Lumen Media", candidates: ["Identical credit on the same date"], status: "open" },
+  { id: "e5", clientId: "c6", reason: "Missing counterparty", amount: -62000, date: iso(5), narration: "IMPS transfer to unknown payee", candidates: [], status: "open" },
+];
+
+/** Kaveri Engineering is the clean client: recon done, MIS ready for the partner. */
+const KAVERI_BANK = 7;
+const SEED_RECON: Record<string, ReconResult> = {
+  c4: { matched: KAVERI_BANK, exceptions: 0, bank: KAVERI_BANK, at: iso(2) },
+};
+
+const KAVERI_ROWS: Txn[] = SEED_DOCS.filter((d) => d.clientId === "c4").flatMap((d) => d.rows);
+const KAVERI_REV = KAVERI_ROWS.filter((r) => r.amount > 0);
+const KAVERI_EXP = KAVERI_ROWS.filter((r) => r.amount < 0);
+const kRevenue = KAVERI_REV.reduce((s, r) => s + r.amount, 0);
+const kExpenses = KAVERI_EXP.reduce((s, r) => s + Math.abs(r.amount), 0);
+
+const SEED_REPORTS: Report[] = [
+  {
+    id: "rep-kaveri", clientId: "c4", period: PERIODS[0], template: "Monthly MIS", generated: iso(1), excluded: 0,
+    revenue: kRevenue, expenses: kExpenses,
+    sources: { revenue: KAVERI_REV, expenses: KAVERI_EXP },
+    variances: [
+      { label: "Revenue", current: kRevenue, prior: 612000 },
+      { label: "Expenses", current: kExpenses, prior: 431000 },
+      { label: "Net position", current: kRevenue - kExpenses, prior: 181000 },
+    ],
+    bankSummary: [
+      { label: "Credits in bank", value: kRevenue, rows: KAVERI_REV },
+      { label: "Debits in bank", value: kExpenses, rows: KAVERI_EXP },
+      { label: "High value lines above one lakh", value: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000).length, rows: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000) },
+    ],
+    insights: [
+      { text: `Collections stayed ahead of outflow, leaving a surplus of ₹${(kRevenue - kExpenses).toLocaleString("en-IN")}.`, source: `${KAVERI_REV.length} credits and ${KAVERI_EXP.length} debits` },
+      { text: "Wages remained the single largest outflow for the month.", source: "1 transaction, wages payout August" },
+      { text: "Every bank line was matched, so nothing was left out of these figures.", source: `${KAVERI_ROWS.length} matched transactions` },
+    ],
+  },
 ];
 
 const SEED_CHASES: Chase[] = [
@@ -184,6 +241,14 @@ const SEED_CHASES: Chase[] = [
     { at: iso(7), text: "First reminder sent", agent: "chaser" },
     { at: iso(5), text: "Second reminder sent", agent: "chaser" },
     { at: iso(4), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" },
+  ] },
+  { id: "h3", clientId: "c6", type: "Missing invoice", contact: "Sohini Dutta", phone: "919830445566", due: iso(-4), note: "Retainer invoice for the duplicate credit is still awaited.", followUps: 0, status: "Open", timeline: [
+    { at: iso(2), text: "Chase created", agent: "chaser" },
+  ] },
+  { id: "h4", clientId: "c4", type: "Missing bank statement", contact: "Latha Kaveri", phone: "919894112233", due: iso(6), note: "August SBI statement.", followUps: 1, status: "Resolved", timeline: [
+    { at: iso(9), text: "Chase created", agent: "chaser" },
+    { at: iso(6), text: "Email follow up sent", agent: "chaser" },
+    { at: iso(4), text: "Document received (SBI-statement-Aug.csv). Chase closed automatically.", agent: "chaser" },
   ] },
 ];
 
@@ -240,10 +305,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [docs, setDocs] = useState<Doc[]>(SEED_DOCS);
   const [review, setReview] = useState<ReviewItem[]>(SEED_REVIEW);
   const [exceptions, setExceptions] = useState<Exception[]>(SEED_EXCEPTIONS);
-  const [reports, setReports] = useState<Report[]>([]);
+  const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
   const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
   const [runs, setRuns] = useState<AgentRun[]>([]);
-  const [recon, setRecon] = useState<Record<string, ReconResult>>({});
+  const [recon, setRecon] = useState<Record<string, ReconResult>>(SEED_RECON);
   const [hydrated, setHydrated] = useState(false);
   const [session, setSession] = useState<Store["session"]>(null);
   const [firm, setFirm] = useState<Firm | null>(null);
@@ -405,7 +470,12 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Rules pass", "Flagging exceptions"], clientId, () => {
       const bank = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
       const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
-      const unresolved = bank.filter((r) => Math.abs(r.amount) > 500000).slice(0, 1);
+      // Idempotent: a bank line that already sits in the exception queue is never flagged twice.
+      const known = exceptions.filter((e) => e.clientId === clientId);
+      const unresolved = bank
+        .filter((r) => Math.abs(r.amount) > 500000)
+        .filter((r) => !known.some((e) => e.date === r.date && Math.abs(e.amount) === Math.abs(r.amount)))
+        .slice(0, 1);
       const created: Exception[] = unresolved.map((r) => ({
         id: uid(), clientId, reason: "Amount mismatch" as const, amount: r.amount, date: r.date,
         narration: r.particulars, candidates: ["Closest book entry differs by ₹1,200"], status: "open" as const,
