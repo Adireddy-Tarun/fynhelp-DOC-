@@ -7,6 +7,7 @@ import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { CA, CABadge, CACard, CAButton, CAEmpty, caInputStyle } from "@/components/ca/portalUi";
 import { ModuleHeader, PermissionNotice, StatStrip, StateChip } from "@/components/ca/os/primitives";
+import { logCAAudit } from "@/lib/caAudit";
 import {
   computeReadiness,
   periodLabel,
@@ -17,6 +18,27 @@ import {
   type ClosePeriodRow,
   type CloseReadiness,
 } from "@/lib/caClose";
+
+/** Logs a completed close checklist once per client per period. */
+async function logCloseComplete(firmId: string, businessId: string, period: string, score: number) {
+  const entityId = `${businessId}:${period}`;
+  const { data: seen } = await supabase
+    .from("ca_audit_events")
+    .select("id")
+    .eq("ca_firm_id", firmId)
+    .eq("action", "close_step_completed")
+    .eq("entity_id", entityId)
+    .limit(1);
+  if ((seen ?? []).length) return;
+  await logCAAudit({
+    firmId,
+    businessId,
+    entityType: "close_period",
+    entityId,
+    action: "close_step_completed",
+    detail: { period, score },
+  });
+}
 
 export default function CAClosePage() {
   useEffect(() => { console.log("[fyn:ca:os-complete] CAClosePage mounted"); }, []);
@@ -60,6 +82,7 @@ export default function CAClosePage() {
     try {
       const result = await computeReadiness(firmId, businessId, period);
       setReadiness(result);
+      if (result.checks.every((c) => c.passed)) await logCloseComplete(firmId, businessId, period, result.score);
       const saved = await saveReadiness(firmId, businessId, result);
       setRow(saved);
       await loadHistory();
