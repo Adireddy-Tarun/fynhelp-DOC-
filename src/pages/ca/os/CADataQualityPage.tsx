@@ -26,6 +26,7 @@ const SEV: Record<string, "red" | "amber" | "grey"> = { high: "red", medium: "am
 const FILTERS = ["all", "duplicate", "anomaly", "missing_field", "uncategorised"] as const;
 
 export default function CADataQualityPage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CADataQualityPage mounted"); }, []);
   const { firmId, userId } = useCAPortal();
   const { can } = useCARole();
   const { clients } = useCAClientOptions();

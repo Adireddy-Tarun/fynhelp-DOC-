@@ -19,6 +19,7 @@ import {
 } from "@/lib/caClose";
 
 export default function CAClosePage() {
+  useEffect(() => { console.log("[fyn:ca:os-complete] CAClosePage mounted"); }, []);
   const { firmId } = useCAPortal();
   const { can, role, isLoading: roleLoading } = useCARole();
   const { clients, isLoading: clientsLoading } = useCAClientOptions();
