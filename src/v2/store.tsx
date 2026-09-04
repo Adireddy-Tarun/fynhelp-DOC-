@@ -536,7 +536,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       { stage: "Review", done: parsed.length > 0 && openReview.length === 0, detail: openReview.length ? `${openReview.length} rows to confirm` : "All rows confirmed" },
       { stage: "Recon", done: Boolean(reconRun), detail: reconRun ? `${reconRun.matched} of ${reconRun.bank} matched` : "Not run for this period" },
       { stage: "Exceptions", done: Boolean(reconRun) && openEx.length === 0, detail: openEx.length ? `${openEx.length} to clear` : "Nothing unmatched" },
-      { stage: "MIS", done: mis.length > 0, detail: mis.length ? `${mis.length} report ready` : "Not generated yet" },
+      { stage: "MIS", done: mis.some((r) => r.signedOff), detail: mis.some((r) => r.signedOff) ? "Signed off by the partner" : mis.length ? "Waiting for partner sign off" : "Not generated yet" },
     ];
 
     const firstOpen = steps.find((s) => !s.done);
