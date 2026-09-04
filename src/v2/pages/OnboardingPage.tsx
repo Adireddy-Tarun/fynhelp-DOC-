@@ -60,7 +60,9 @@ export default function OnboardingPage() {
 
   const finish = () => {
     completeOnboarding();
-    navigate({ to: "/v2" });
+    // Land inside the client, where the next best action is already waiting.
+    if (clientId) navigate({ to: "/v2/clients/$clientId", params: { clientId } });
+    else navigate({ to: "/v2" });
   };
 
   return (
@@ -167,7 +169,7 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                   <AgentStatusBadge agent="extract" active label="Extracting your first document" />
-                  <button className="v2-btn v2-btn-primary" style={{ justifySelf: "start" }} onClick={finish}>Open my portfolio</button>
+                  <button className="v2-btn v2-btn-primary" style={{ justifySelf: "start" }} onClick={finish}>Open the client workspace</button>
                 </div>
               ) : (
                 <>

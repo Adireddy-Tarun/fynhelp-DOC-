@@ -23,6 +23,13 @@ export default function ReviewPage() {
     setOpen(null);
   };
 
+  const confident = list.filter((r) => r.confidence >= 0.7);
+
+  const confirmConfident = () => {
+    confident.forEach((r) => resolveReview(r.id, "confirmed"));
+    toast.success(`${confident.length} high confidence row${confident.length > 1 ? "s" : ""} confirmed`);
+  };
+
   const tone = (c: number): Tone => (c >= 0.7 ? "warn" : "bad");
 
   return (
@@ -33,11 +40,16 @@ export default function ReviewPage() {
         action={<AgentStatusBadge agent="extract" label={`${list.length} awaiting review`} />}
       />
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <select className="v2-input" style={{ width: "auto", minWidth: 220 }} value={client} onChange={(e) => setClient(e.target.value)}>
           <option value="all">All clients</option>
           {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
+        {confident.length > 0 && (
+          <button className="v2-btn v2-btn-ghost" onClick={confirmConfident}>
+            Confirm {confident.length} row{confident.length > 1 ? "s" : ""} above 70 percent
+          </button>
+        )}
       </div>
 
       {list.length === 0 ? (

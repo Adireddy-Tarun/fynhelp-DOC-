@@ -5,10 +5,11 @@ import { Users, Plus } from "lucide-react";
 import { Badge, Card, EmptyState, PageHeader, Stat, V, formatDate, Tone } from "../ui";
 import { AgentStatusBadge, AnimatedCounter, ProcessingCard } from "../agents";
 import { useV2 } from "../store";
+import { CloseProgress } from "../components/CloseProgress";
 import AddClientModal from "../components/AddClientModal";
 
 export default function PortfolioPage() {
-  const { clients, review, exceptions, chases, runs } = useV2();
+  const { clients, review, exceptions, chases, runs, period, role, closeStateFor } = useV2();
   const [adding, setAdding] = useState(false);
 
   const openEx = exceptions.filter((e) => e.status === "open");
@@ -19,7 +20,9 @@ export default function PortfolioPage() {
     <>
       <PageHeader
         title="Portfolio"
-        subtitle="Which clients need attention right now."
+        subtitle={role === "Partner"
+          ? `Where every client stands in the ${period} close.`
+          : `What needs you today across the ${period} close.`}
         action={<button className="v2-btn v2-btn-primary" onClick={() => setAdding(true)}><Plus size={15} /> Add client</button>}
       />
 
@@ -80,6 +83,11 @@ export default function PortfolioPage() {
                           <Badge tone={status.tone}>{status.label}</Badge>
                         </div>
                         <div style={{ fontSize: 12, color: V.muted, marginTop: 4 }}>{c.entityType}</div>
+                        <div style={{ marginTop: 14 }}><CloseProgress state={closeStateFor(c.id)} compact /></div>
+                        <div style={{ marginTop: 12, background: V.gray, borderRadius: 12, padding: "10px 12px" }}>
+                          <div style={{ fontSize: 10, letterSpacing: ".13em", textTransform: "uppercase", color: V.muted, fontWeight: 700 }}>Next</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, marginTop: 3 }}>{closeStateFor(c.id).next.label}</div>
+                        </div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 10, marginTop: 16 }}>
                           {[
                             { k: "Exceptions", v: ex },
