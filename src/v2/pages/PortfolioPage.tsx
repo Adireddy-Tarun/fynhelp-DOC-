@@ -9,7 +9,7 @@ import { CloseProgress } from "../components/CloseProgress";
 import AddClientModal from "../components/AddClientModal";
 
 export default function PortfolioPage() {
-  const { clients, review, exceptions, chases, runs, period, role, closeStateFor } = useV2();
+  const { clients, docs, review, exceptions, chases, runs, period, role, closeStateFor } = useV2();
   const [adding, setAdding] = useState(false);
 
   const openEx = exceptions.filter((e) => e.status === "open");
@@ -62,7 +62,10 @@ export default function PortfolioPage() {
                 const ex = openEx.filter((e) => e.clientId === c.id).length;
                 const rv = openRev.filter((r) => r.clientId === c.id).length;
                 const ch = openChase.filter((h) => h.clientId === c.id).length;
-                const status: { label: string; tone: Tone } = ex > 0
+                const started = docs.some((d) => d.clientId === c.id);
+                const status: { label: string; tone: Tone } = !started
+                  ? { label: "Not started", tone: "neutral" }
+                  : ex > 0
                   ? { label: "Needs attention", tone: "bad" }
                   : rv > 0 || ch > 0
                     ? { label: "Ready for review", tone: "warn" }
