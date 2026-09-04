@@ -331,6 +331,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
         { date: iso(1), particulars: "Vendor payment — packaging", amount: -12800 },
       ];
       setDocs((p) => p.map((d) => (d.id === docId ? { ...d, status: "Parsed", rows } : d)));
+      log(clientId, `${name} read. ${rows.length} rows extracted, 1 row needs review.`, "extract");
       setReview((p) => [
         {
           id: uid(), clientId, docName: name,
@@ -349,11 +350,15 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
         ),
       );
     });
-  }, [startRun]);
+  }, [startRun, log]);
 
   const resolveReview = useCallback((id: string, status: "confirmed" | "discarded", patch?: Txn) => {
-    setReview((p) => p.map((r) => (r.id === id ? { ...r, status, suggestion: patch ?? r.suggestion } : r)));
-  }, []);
+    setReview((p) => {
+      const item = p.find((r) => r.id === id);
+      if (item) log(item.clientId, `Review item from ${item.docName} ${status === "confirmed" ? "confirmed" : "discarded"}.`, "extract");
+      return p.map((r) => (r.id === id ? { ...r, status, suggestion: patch ?? r.suggestion } : r));
+    });
+  }, [log]);
 
   const setExceptionStatus = useCallback((id: string, status: Exception["status"]) => {
     setExceptions((p) => p.map((e) => (e.id === id ? { ...e, status } : e)));
@@ -363,7 +368,9 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       const r = p[ex.clientId];
       return { ...p, [ex.clientId]: { ...r, matched: r.matched + 1, exceptions: Math.max(0, r.exceptions - 1) } };
     });
-  }, [exceptions]);
+    const ex = exceptions.find((e) => e.id === id);
+    if (ex) log(ex.clientId, `Exception "${ex.narration}" ${status}.`, "recon");
+  }, [exceptions, log]);
 
   const clientTxns = useCallback((clientId: string) => docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows), [docs]);
 
@@ -385,9 +392,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
         at: today(),
       };
       setRecon((p) => ({ ...p, [clientId]: result }));
+      log(clientId, `Recon run. ${result.matched} of ${result.bank} bank lines matched, ${result.exceptions} exceptions left.`, "recon");
       onDone?.(result);
     });
-  }, [startRun, docs, exceptions]);
+  }, [startRun, docs, exceptions, log]);
 
   /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
   const generateReport = useCallback((clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => {
@@ -429,9 +437,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       };
       setReports((p) => [created, ...p]);
       setClients((p) => p.map((c) => (c.id === clientId ? { ...c, lastMis: today() } : c)));
+      log(clientId, `${template} generated for ${period}.`, "narrate");
       onDone(created);
     });
-  }, [startRun, docs]);
+  }, [startRun, docs, log]);
 
 
   const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => {
@@ -439,7 +448,8 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       { ...c, id: uid(), status: "Open", followUps: 0, timeline: [{ at: today(), text: "Chase created", agent: "chaser" }] },
       ...p,
     ]);
-  }, []);
+    log(c.clientId, `Chase created for ${c.type}.`, "chaser");
+  }, [log]);
 
   /** Workflow D — follow ups escalate after the second unanswered nudge. */
   const sendFollowUp = useCallback((id: string, channel: "Email" | "WhatsApp") => {
@@ -461,6 +471,52 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     setChases((p) => p.map((c) => (c.id === id ? { ...c, status, timeline: [...c.timeline, { at: today(), text: note ?? `Marked ${status.toLowerCase()}`, agent: "chaser" }] } : c)));
   }, []);
 
+  const activityFor = useCallback((clientId: string) => activity.filter((a) => a.clientId === clientId), [activity]);
+
+  /**
+   * Close progress for one client. The stages mirror how a CA firm actually
+   * closes a month, and the next action is the single most useful step left.
+   */
+  const closeStateFor = useCallback((clientId: string): CloseState => {
+    const cDocs = docs.filter((d) => d.clientId === clientId);
+    const parsed = cDocs.filter((d) => d.status === "Parsed");
+    const openReview = review.filter((r) => r.clientId === clientId && r.status === "open");
+    const openEx = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
+    const openChase = chases.filter((c) => c.clientId === clientId && c.status !== "Resolved");
+    const reconRun = recon[clientId];
+    const mis = reports.filter((r) => r.clientId === clientId && r.period === period);
+
+    const steps: CloseStep[] = [
+      { stage: "Documents", done: parsed.length > 0 && openChase.length === 0, detail: openChase.length ? `${openChase.length} still being chased` : `${parsed.length} documents read` },
+      { stage: "Review", done: parsed.length > 0 && openReview.length === 0, detail: openReview.length ? `${openReview.length} rows to confirm` : "All rows confirmed" },
+      { stage: "Recon", done: Boolean(reconRun), detail: reconRun ? `${reconRun.matched} of ${reconRun.bank} matched` : "Not run for this period" },
+      { stage: "Exceptions", done: Boolean(reconRun) && openEx.length === 0, detail: openEx.length ? `${openEx.length} to clear` : "Nothing unmatched" },
+      { stage: "MIS", done: mis.length > 0, detail: mis.length ? `${mis.length} report ready` : "Not generated yet" },
+    ];
+
+    const firstOpen = steps.find((s) => !s.done);
+    const percent = Math.round((steps.filter((s) => s.done).length / steps.length) * 100);
+
+    let next: CloseState["next"];
+    if (!firstOpen) {
+      next = { label: "Send the MIS to the partner", why: "Everything for this period is closed and every figure links to its source.", tab: "mis" };
+    } else if (firstOpen.stage === "Documents") {
+      next = openChase.length
+        ? { label: "Follow up on pending documents", why: `${openChase.length} item${openChase.length > 1 ? "s are" : " is"} still with the client.`, tab: "chaser" }
+        : { label: "Upload the first document", why: "Nothing has been collected for this client yet.", tab: "documents", action: "upload" };
+    } else if (firstOpen.stage === "Review") {
+      next = { label: `Confirm ${openReview.length} extracted row${openReview.length > 1 ? "s" : ""}`, why: "The Extract agent was unsure about these. Recon needs them confirmed first.", tab: "review" };
+    } else if (firstOpen.stage === "Recon") {
+      next = { label: "Run recon for this period", why: "Bank and books have not been matched yet.", tab: "recon", action: "recon" };
+    } else if (firstOpen.stage === "Exceptions") {
+      next = { label: `Clear ${openEx.length} exception${openEx.length > 1 ? "s" : ""}`, why: "Only matched transactions are allowed into the MIS.", tab: "exceptions" };
+    } else {
+      next = { label: `Generate the ${period} MIS`, why: "Recon is clean, so the numbers can be trusted.", tab: "mis", action: "mis" };
+    }
+
+    return { steps, percent, stage: firstOpen ? firstOpen.stage : "MIS", next };
+  }, [docs, review, exceptions, chases, recon, reports, period]);
+
   const value = useMemo<Store>(() => ({
     hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding,
     clients, docs, review, exceptions, reports, chases, runs, recon,
@@ -468,7 +524,8 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
     addChase, sendFollowUp, setChaseStatus, clientTxns,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
-  }), [hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+    period, setPeriod, role, setRole, activity, activityFor, closeStateFor,
+  }), [period, role, activity, activityFor, closeStateFor, hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
 
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
