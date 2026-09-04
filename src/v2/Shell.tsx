@@ -4,6 +4,7 @@ import {
   LayoutGrid, Users, FileText, ListChecks, AlertTriangle, Send, BarChart3, Settings, Menu, X,
 } from "lucide-react";
 import { V, V2_STYLES } from "./ui";
+import { AGENT_STYLES } from "./agents";
 import { V2StoreProvider } from "./store";
 
 const NAV = [
@@ -37,7 +38,7 @@ export default function V2Shell() {
 
   return (
     <V2StoreProvider>
-      <style>{V2_STYLES}</style>
+      <style>{V2_STYLES + AGENT_STYLES}</style>
       <div className="v2" style={{ minHeight: "100vh", display: "flex" }}>
         {open && (
           <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(20,20,20,.3)", zIndex: 55 }} />
