@@ -12,6 +12,7 @@ const TEMPLATE_HINT: Record<ReportTemplate, string> = {
   "Bank Reconciliation Summary": "Credits, debits and high value lines with every bank row listed.",
   "Key Variances": "Only the movement against the prior period.",
   "Working Paper": "Everything above in one file, laid out for the audit file.",
+  "Exception and Review Summary": "Internal record of what was queried, corrected and left out.",
 };
 
 export default function ReportsPage() {
