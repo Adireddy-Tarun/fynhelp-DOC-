@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { COLORS, PageWrap, PageHeader, Card, PrimaryBtn, SecondaryBtn, GhostLink, Chip } from "@/components/ca/ui";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import { useCARole } from "@/hooks/useCARole";
+import { logCAAudit } from "@/lib/caAudit";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
