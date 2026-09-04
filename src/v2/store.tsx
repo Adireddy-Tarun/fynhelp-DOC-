@@ -4,7 +4,7 @@
  * Every number shown in the product is derived from rows that live here, so a
  * figure can always be traced back to its source transactions.
  */
-import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef } from "react";
+import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef, useEffect } from "react";
 import type { AgentKey } from "./agents";
 
 export type Txn = { date: string; particulars: string; amount: number };
