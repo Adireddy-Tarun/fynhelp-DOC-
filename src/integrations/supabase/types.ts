@@ -1060,6 +1060,39 @@ export type Database = {
           },
         ]
       }
+      ca_brain_events: {
+        Row: {
+          actor_id: string | null
+          business_id: string | null
+          ca_firm_id: string
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+        }
+        Relationships: []
+      }
       ca_bulk_filing_jobs: {
         Row: {
           ca_firm_id: string
