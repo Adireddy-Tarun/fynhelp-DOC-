@@ -103,6 +103,27 @@ export default function ReportsPage() {
               {PERIODS.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
+          <div>
+            <label className="v2-label">Template</label>
+            <div style={{ display: "grid", gap: 8 }}>
+              {REPORT_TEMPLATES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTemplate(t)}
+                  style={{
+                    textAlign: "left", padding: "11px 13px", borderRadius: 13, cursor: "pointer",
+                    border: `1px solid ${template === t ? V.ink : V.line}`,
+                    background: template === t ? "rgba(20,20,20,.03)" : "transparent",
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t}</div>
+                  <div style={{ fontSize: 12, color: V.muted, marginTop: 2 }}>{TEMPLATE_HINT[t]}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button className="v2-btn v2-btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
             <button className="v2-btn v2-btn-primary" onClick={generate}>Generate</button>
