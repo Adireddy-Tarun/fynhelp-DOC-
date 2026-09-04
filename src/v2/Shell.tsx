@@ -5,7 +5,10 @@ import {
 } from "lucide-react";
 import { V, V2_STYLES } from "./ui";
 import { AGENT_STYLES } from "./agents";
-import { V2StoreProvider, useV2 } from "./store";
+import { PERIODS, V2StoreProvider, useV2 } from "./store";
+
+/** Partners live in Portfolio and MIS. Juniors also work the queues. */
+const PARTNER_NAV = ["/v2", "/v2/clients", "/v2/reports", "/v2/settings"];
 
 const NAV = [
   { to: "/v2", label: "Portfolio", icon: LayoutGrid, exact: true },
@@ -41,7 +44,7 @@ export default function V2Shell() {
 
 function ShellBody() {
   const [open, setOpen] = useState(false);
-  const { hydrated, session, onboarded, firm, signOut } = useV2();
+  const { hydrated, session, onboarded, firm, signOut, period, setPeriod, role, setRole, review, exceptions, chases } = useV2();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const title =
@@ -49,6 +52,12 @@ function ShellBody() {
     (pathname.startsWith("/v2/clients/") ? "Client workspace" : pathname.startsWith("/v2/reports/") ? "MIS report" : "FynHelp");
 
   const onboarding = pathname === "/v2/onboarding";
+
+  const COUNTS: Record<string, number> = {
+    "/v2/review": review.filter((r) => r.status === "open").length,
+    "/v2/exceptions": exceptions.filter((e) => e.status === "open").length,
+    "/v2/chaser": chases.filter((c) => c.status !== "Resolved").length,
+  };
 
   useEffect(() => {
     if (!hydrated) return;
@@ -94,8 +103,27 @@ function ShellBody() {
             <button className="v2-btn v2-btn-quiet" style={{ display: "none" }} onClick={() => setOpen(false)}><X size={15} /></button>
           </div>
 
+          <div style={{ padding: "0 8px 14px" }}>
+            <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: V.muted, fontWeight: 700, marginBottom: 6 }}>Working as</div>
+            <div style={{ display: "flex", gap: 4, background: V.gray, padding: 3, borderRadius: 999 }}>
+              {(["Partner", "Junior"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  style={{
+                    flex: 1, border: 0, cursor: "pointer", borderRadius: 999, padding: "6px 0", fontSize: 12, fontWeight: 600,
+                    fontFamily: "inherit", background: role === r ? V.card : "transparent", color: role === r ? V.ink : V.muted,
+                    boxShadow: role === r ? "0 1px 3px rgba(20,20,20,.10)" : "none",
+                  }}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <nav className="v2-nav" style={{ flex: 1, overflowY: "auto" }}>
-            {NAV.map(({ to, label, icon: Icon, ...rest }) => (
+            {NAV.filter((n) => role === "Junior" || PARTNER_NAV.includes(n.to)).map(({ to, label, icon: Icon, ...rest }) => (
               <Link
                 key={to}
                 to={to}
@@ -104,6 +132,9 @@ function ShellBody() {
               >
                 <Icon size={16} />
                 <span>{label}</span>
+                {COUNTS[to] !== undefined && COUNTS[to] > 0 && (
+                  <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, background: V.beige, borderRadius: 999, padding: "1px 7px" }}>{COUNTS[to]}</span>
+                )}
               </Link>
             ))}
           </nav>
@@ -130,9 +161,18 @@ function ShellBody() {
               <h2 className="truncate" style={{ fontSize: 16, fontWeight: 600 }}>{title}</h2>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <label className="v2-hide-sm" style={{ fontSize: 11.5, color: V.muted }}>Period</label>
+              <select
+                className="v2-input"
+                style={{ width: "auto", padding: "7px 10px", fontSize: 12.5 }}
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+              >
+                {PERIODS.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
               <div style={{ textAlign: "right", lineHeight: 1.25 }} className="v2-hide-sm">
                 <div style={{ fontSize: 12.5, fontWeight: 600 }}>{session?.name || "Partner"}</div>
-                <div style={{ fontSize: 11, color: V.muted }}>{firm?.name || "Your firm"}</div>
+                <div style={{ fontSize: 11, color: V.muted }}>{role} · {firm?.name || "Your firm"}</div>
               </div>
               <div style={{ width: 34, height: 34, borderRadius: 999, background: V.beige, display: "grid", placeItems: "center", fontSize: 12.5, fontWeight: 700 }}>{(session?.name || "F").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}</div>
             </div>
