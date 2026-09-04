@@ -104,6 +104,8 @@ type ReportRow = {
   created_at: string;
   generated_by_user_id: string | null;
   file_path: string | null;
+  signed_off_by?: string | null;
+  signed_off_at?: string | null;
   business?: { business_name: string } | null;
 };
 
