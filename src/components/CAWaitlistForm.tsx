@@ -121,7 +121,7 @@ export default function CAWaitlistForm() {
           referrer: attr.referrer || "",
           landing_page: attr.landing_page || "",
         },
-      }).catch(() => {});
+      }).catch((err) => { console.error("[waitlist] notify error", err); });
 
       setSubmitted(true);
       setForm(initial);
