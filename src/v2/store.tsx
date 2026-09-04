@@ -279,9 +279,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** Workflow A — upload, Extract agent works, rows land, low confidence goes to Review. */
-  const addDoc = useCallback((name: string, clientId: string) => {
+  const addDoc = useCallback((name: string, clientId: string, source: Doc["source"] = "Manual") => {
     const docId = uid();
-    setDocs((p) => [{ id: docId, name, clientId, source: "Manual", status: "Processing", date: today(), rows: [] }, ...p]);
+    setDocs((p) => [{ id: docId, name, clientId, source, status: "Processing", date: today(), rows: [] }, ...p]);
+
 
     startRun("extract", name, ["Reading file", "Classifying rows", "Scoring confidence"], docId, () => {
       const rows: Txn[] = [
