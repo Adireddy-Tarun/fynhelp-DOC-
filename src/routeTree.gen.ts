@@ -14,6 +14,7 @@ import { Route as BlogAdminRouteImport } from './routes/_blogAdmin'
 import { Route as CaAuthRouteImport } from './routes/_caAuth'
 import { Route as InternalAdminRouteImport } from './routes/_internalAdmin'
 import { Route as MainRouteImport } from './routes/_main'
+import { Route as V2RouteImport } from './routes/v2'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainDemoGateRouteImport } from './routes/_main/_demoGate'
 import { Route as MainAboutRouteImport } from './routes/_main/about'
@@ -30,6 +31,12 @@ import { Route as MainSecurityRouteImport } from './routes/_main/security'
 import { Route as MainSignupRouteImport } from './routes/_main/signup'
 import { Route as MainUseCasesRouteImport } from './routes/_main/use-cases'
 import { Route as MainWaitlistRouteImport } from './routes/_main/waitlist'
+import { Route as V2IndexRouteImport } from './routes/v2/index'
+import { Route as V2ChaserRouteImport } from './routes/v2/chaser'
+import { Route as V2DocumentsRouteImport } from './routes/v2/documents'
+import { Route as V2ExceptionsRouteImport } from './routes/v2/exceptions'
+import { Route as V2ReviewRouteImport } from './routes/v2/review'
+import { Route as V2SettingsRouteImport } from './routes/v2/settings'
 import { Route as AdminAuthAdminProtectedRouteImport } from './routes/_adminAuth/admin/_protected'
 import { Route as AdminAuthAdminLoginRouteImport } from './routes/_adminAuth/admin/login'
 import { Route as BlogAdminBlogAdminIndexRouteImport } from './routes/_blogAdmin/blog-admin/index'
@@ -93,6 +100,10 @@ import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api
 import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
 import { Route as ApiPublicCaInvoicePaymentWebhookRouteImport } from './routes/api/public/ca-invoice-payment-webhook'
 import { Route as SharedMisTokenRouteImport } from './routes/shared.mis.$token'
+import { Route as V2ClientsIndexRouteImport } from './routes/v2/clients.index'
+import { Route as V2ClientsClientIdRouteImport } from './routes/v2/clients.$clientId'
+import { Route as V2ReportsIndexRouteImport } from './routes/v2/reports.index'
+import { Route as V2ReportsReportIdRouteImport } from './routes/v2/reports.$reportId'
 import { Route as AdminAuthAdminProtectedIndexRouteImport } from './routes/_adminAuth/admin/_protected/index'
 import { Route as AdminAuthAdminProtectedAiCreditsRouteImport } from './routes/_adminAuth/admin/_protected/ai-credits'
 import { Route as AdminAuthAdminProtectedAiMonitoringRouteImport } from './routes/_adminAuth/admin/_protected/ai-monitoring'
@@ -234,6 +245,11 @@ const MainRoute = MainRouteImport.update({
   id: '/_main',
   getParentRoute: () => rootRouteImport,
 } as any)
+const V2Route = V2RouteImport.update({
+  id: '/v2',
+  path: '/v2',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainIndexRoute = MainIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -312,6 +328,36 @@ const MainWaitlistRoute = MainWaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
   getParentRoute: () => MainRoute,
+} as any)
+const V2IndexRoute = V2IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ChaserRoute = V2ChaserRouteImport.update({
+  id: '/chaser',
+  path: '/chaser',
+  getParentRoute: () => V2Route,
+} as any)
+const V2DocumentsRoute = V2DocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ExceptionsRoute = V2ExceptionsRouteImport.update({
+  id: '/exceptions',
+  path: '/exceptions',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ReviewRoute = V2ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => V2Route,
+} as any)
+const V2SettingsRoute = V2SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => V2Route,
 } as any)
 const AdminAuthAdminProtectedRoute = AdminAuthAdminProtectedRouteImport.update({
   id: '/admin/_protected',
@@ -646,6 +692,26 @@ const SharedMisTokenRoute = SharedMisTokenRouteImport.update({
   id: '/shared/mis/$token',
   path: '/shared/mis/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const V2ClientsIndexRoute = V2ClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ClientsClientIdRoute = V2ClientsClientIdRouteImport.update({
+  id: '/clients/$clientId',
+  path: '/clients/$clientId',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ReportsIndexRoute = V2ReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => V2Route,
+} as any)
+const V2ReportsReportIdRoute = V2ReportsReportIdRouteImport.update({
+  id: '/reports/$reportId',
+  path: '/reports/$reportId',
+  getParentRoute: () => V2Route,
 } as any)
 const AdminAuthAdminProtectedIndexRoute =
   AdminAuthAdminProtectedIndexRouteImport.update({
@@ -1339,6 +1405,7 @@ const AdminAuthAdminProtectedBlogPostIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
+  '/v2': typeof V2RouteWithChildren
   '/about': typeof MainAboutRoute
   '/ca-firms': typeof MainCaFirmsRoute
   '/community': typeof MainCommunityRoute
@@ -1353,6 +1420,12 @@ export interface FileRoutesByFullPath {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/v2/chaser': typeof V2ChaserRoute
+  '/v2/documents': typeof V2DocumentsRoute
+  '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/review': typeof V2ReviewRoute
+  '/v2/settings': typeof V2SettingsRoute
+  '/v2/': typeof V2IndexRoute
   '/admin': typeof AdminAuthAdminProtectedRouteWithChildren
   '/admin/login': typeof AdminAuthAdminLoginRoute
   '/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
@@ -1412,10 +1485,14 @@ export interface FileRoutesByFullPath {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
+  '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
+  '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
   '/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/intern/': typeof BlogAdminInternIndexRoute
   '/blog/': typeof MainBlogIndexRoute
   '/dashboard/': typeof MainDashboardIndexRoute
+  '/v2/clients/': typeof V2ClientsIndexRoute
+  '/v2/reports/': typeof V2ReportsIndexRoute
   '/admin/ai-credits': typeof AdminAuthAdminProtectedAiCreditsRoute
   '/admin/ai-monitoring': typeof AdminAuthAdminProtectedAiMonitoringRoute
   '/admin/analytics': typeof AdminAuthAdminProtectedAnalyticsRoute
@@ -1553,6 +1630,12 @@ export interface FileRoutesByTo {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/v2/chaser': typeof V2ChaserRoute
+  '/v2/documents': typeof V2DocumentsRoute
+  '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/review': typeof V2ReviewRoute
+  '/v2/settings': typeof V2SettingsRoute
+  '/v2': typeof V2IndexRoute
   '/admin/login': typeof AdminAuthAdminLoginRoute
   '/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
   '/blog-admin/login': typeof BlogAdminBlogAdminLoginRoute
@@ -1609,10 +1692,14 @@ export interface FileRoutesByTo {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
+  '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
+  '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
   '/blog-admin': typeof BlogAdminBlogAdminIndexRoute
   '/intern': typeof BlogAdminInternIndexRoute
   '/blog': typeof MainBlogIndexRoute
   '/dashboard': typeof MainDashboardIndexRoute
+  '/v2/clients': typeof V2ClientsIndexRoute
+  '/v2/reports': typeof V2ReportsIndexRoute
   '/admin/ai-credits': typeof AdminAuthAdminProtectedAiCreditsRoute
   '/admin/ai-monitoring': typeof AdminAuthAdminProtectedAiMonitoringRoute
   '/admin/analytics': typeof AdminAuthAdminProtectedAnalyticsRoute
@@ -1741,6 +1828,7 @@ export interface FileRoutesById {
   '/_caAuth': typeof CaAuthRouteWithChildren
   '/_internalAdmin': typeof InternalAdminRouteWithChildren
   '/_main': typeof MainRouteWithChildren
+  '/v2': typeof V2RouteWithChildren
   '/_main/_demoGate': typeof MainDemoGateRouteWithChildren
   '/_main/about': typeof MainAboutRoute
   '/_main/ca-firms': typeof MainCaFirmsRoute
@@ -1756,7 +1844,13 @@ export interface FileRoutesById {
   '/_main/signup': typeof MainSignupRoute
   '/_main/use-cases': typeof MainUseCasesRoute
   '/_main/waitlist': typeof MainWaitlistRoute
+  '/v2/chaser': typeof V2ChaserRoute
+  '/v2/documents': typeof V2DocumentsRoute
+  '/v2/exceptions': typeof V2ExceptionsRoute
+  '/v2/review': typeof V2ReviewRoute
+  '/v2/settings': typeof V2SettingsRoute
   '/_main/': typeof MainIndexRoute
+  '/v2/': typeof V2IndexRoute
   '/_adminAuth/admin/_protected': typeof AdminAuthAdminProtectedRouteWithChildren
   '/_adminAuth/admin/login': typeof AdminAuthAdminLoginRoute
   '/_blogAdmin/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
@@ -1816,10 +1910,14 @@ export interface FileRoutesById {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
+  '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
+  '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
   '/_blogAdmin/blog-admin/': typeof BlogAdminBlogAdminIndexRoute
   '/_blogAdmin/intern/': typeof BlogAdminInternIndexRoute
   '/_main/blog/': typeof MainBlogIndexRoute
   '/_main/dashboard/': typeof MainDashboardIndexRoute
+  '/v2/clients/': typeof V2ClientsIndexRoute
+  '/v2/reports/': typeof V2ReportsIndexRoute
   '/_adminAuth/admin/_protected/ai-credits': typeof AdminAuthAdminProtectedAiCreditsRoute
   '/_adminAuth/admin/_protected/ai-monitoring': typeof AdminAuthAdminProtectedAiMonitoringRoute
   '/_adminAuth/admin/_protected/analytics': typeof AdminAuthAdminProtectedAnalyticsRoute
@@ -1945,6 +2043,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/v2'
     | '/about'
     | '/ca-firms'
     | '/community'
@@ -1959,6 +2058,12 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/v2/chaser'
+    | '/v2/documents'
+    | '/v2/exceptions'
+    | '/v2/review'
+    | '/v2/settings'
+    | '/v2/'
     | '/admin'
     | '/admin/login'
     | '/blog-admin/editor'
@@ -2018,10 +2123,14 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/shared/mis/$token'
+    | '/v2/clients/$clientId'
+    | '/v2/reports/$reportId'
     | '/blog-admin/'
     | '/intern/'
     | '/blog/'
     | '/dashboard/'
+    | '/v2/clients/'
+    | '/v2/reports/'
     | '/admin/ai-credits'
     | '/admin/ai-monitoring'
     | '/admin/analytics'
@@ -2159,6 +2268,12 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/v2/chaser'
+    | '/v2/documents'
+    | '/v2/exceptions'
+    | '/v2/review'
+    | '/v2/settings'
+    | '/v2'
     | '/admin/login'
     | '/blog-admin/editor'
     | '/blog-admin/login'
@@ -2215,10 +2330,14 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/shared/mis/$token'
+    | '/v2/clients/$clientId'
+    | '/v2/reports/$reportId'
     | '/blog-admin'
     | '/intern'
     | '/blog'
     | '/dashboard'
+    | '/v2/clients'
+    | '/v2/reports'
     | '/admin/ai-credits'
     | '/admin/ai-monitoring'
     | '/admin/analytics'
@@ -2346,6 +2465,7 @@ export interface FileRouteTypes {
     | '/_caAuth'
     | '/_internalAdmin'
     | '/_main'
+    | '/v2'
     | '/_main/_demoGate'
     | '/_main/about'
     | '/_main/ca-firms'
@@ -2361,7 +2481,13 @@ export interface FileRouteTypes {
     | '/_main/signup'
     | '/_main/use-cases'
     | '/_main/waitlist'
+    | '/v2/chaser'
+    | '/v2/documents'
+    | '/v2/exceptions'
+    | '/v2/review'
+    | '/v2/settings'
     | '/_main/'
+    | '/v2/'
     | '/_adminAuth/admin/_protected'
     | '/_adminAuth/admin/login'
     | '/_blogAdmin/blog-admin/editor'
@@ -2421,10 +2547,14 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/shared/mis/$token'
+    | '/v2/clients/$clientId'
+    | '/v2/reports/$reportId'
     | '/_blogAdmin/blog-admin/'
     | '/_blogAdmin/intern/'
     | '/_main/blog/'
     | '/_main/dashboard/'
+    | '/v2/clients/'
+    | '/v2/reports/'
     | '/_adminAuth/admin/_protected/ai-credits'
     | '/_adminAuth/admin/_protected/ai-monitoring'
     | '/_adminAuth/admin/_protected/analytics'
@@ -2553,6 +2683,7 @@ export interface RootRouteChildren {
   CaAuthRoute: typeof CaAuthRouteWithChildren
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
+  V2Route: typeof V2RouteWithChildren
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
   ApiPublicCaBrainDeductionLearningRoute: typeof ApiPublicCaBrainDeductionLearningRoute
@@ -2601,6 +2732,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof MainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2': {
+      id: '/v2'
+      path: '/v2'
+      fullPath: '/v2'
+      preLoaderRoute: typeof V2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_main/': {
@@ -2714,6 +2852,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/waitlist'
       preLoaderRoute: typeof MainWaitlistRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/v2/': {
+      id: '/v2/'
+      path: '/'
+      fullPath: '/v2/'
+      preLoaderRoute: typeof V2IndexRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/chaser': {
+      id: '/v2/chaser'
+      path: '/chaser'
+      fullPath: '/v2/chaser'
+      preLoaderRoute: typeof V2ChaserRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/documents': {
+      id: '/v2/documents'
+      path: '/documents'
+      fullPath: '/v2/documents'
+      preLoaderRoute: typeof V2DocumentsRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/exceptions': {
+      id: '/v2/exceptions'
+      path: '/exceptions'
+      fullPath: '/v2/exceptions'
+      preLoaderRoute: typeof V2ExceptionsRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/review': {
+      id: '/v2/review'
+      path: '/review'
+      fullPath: '/v2/review'
+      preLoaderRoute: typeof V2ReviewRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/settings': {
+      id: '/v2/settings'
+      path: '/settings'
+      fullPath: '/v2/settings'
+      preLoaderRoute: typeof V2SettingsRouteImport
+      parentRoute: typeof V2Route
     }
     '/_adminAuth/admin/_protected': {
       id: '/_adminAuth/admin/_protected'
@@ -3155,6 +3335,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/shared/mis/$token'
       preLoaderRoute: typeof SharedMisTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/v2/clients/': {
+      id: '/v2/clients/'
+      path: '/clients'
+      fullPath: '/v2/clients/'
+      preLoaderRoute: typeof V2ClientsIndexRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/clients/$clientId': {
+      id: '/v2/clients/$clientId'
+      path: '/clients/$clientId'
+      fullPath: '/v2/clients/$clientId'
+      preLoaderRoute: typeof V2ClientsClientIdRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/reports/': {
+      id: '/v2/reports/'
+      path: '/reports'
+      fullPath: '/v2/reports/'
+      preLoaderRoute: typeof V2ReportsIndexRouteImport
+      parentRoute: typeof V2Route
+    }
+    '/v2/reports/$reportId': {
+      id: '/v2/reports/$reportId'
+      path: '/reports/$reportId'
+      fullPath: '/v2/reports/$reportId'
+      preLoaderRoute: typeof V2ReportsReportIdRouteImport
+      parentRoute: typeof V2Route
     }
     '/_adminAuth/admin/_protected/': {
       id: '/_adminAuth/admin/_protected/'
@@ -4487,12 +4695,41 @@ const MainRouteChildren: MainRouteChildren = {
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
 
+interface V2RouteChildren {
+  V2ChaserRoute: typeof V2ChaserRoute
+  V2DocumentsRoute: typeof V2DocumentsRoute
+  V2ExceptionsRoute: typeof V2ExceptionsRoute
+  V2ReviewRoute: typeof V2ReviewRoute
+  V2SettingsRoute: typeof V2SettingsRoute
+  V2IndexRoute: typeof V2IndexRoute
+  V2ClientsClientIdRoute: typeof V2ClientsClientIdRoute
+  V2ReportsReportIdRoute: typeof V2ReportsReportIdRoute
+  V2ClientsIndexRoute: typeof V2ClientsIndexRoute
+  V2ReportsIndexRoute: typeof V2ReportsIndexRoute
+}
+
+const V2RouteChildren: V2RouteChildren = {
+  V2ChaserRoute: V2ChaserRoute,
+  V2DocumentsRoute: V2DocumentsRoute,
+  V2ExceptionsRoute: V2ExceptionsRoute,
+  V2ReviewRoute: V2ReviewRoute,
+  V2SettingsRoute: V2SettingsRoute,
+  V2IndexRoute: V2IndexRoute,
+  V2ClientsClientIdRoute: V2ClientsClientIdRoute,
+  V2ReportsReportIdRoute: V2ReportsReportIdRoute,
+  V2ClientsIndexRoute: V2ClientsIndexRoute,
+  V2ReportsIndexRoute: V2ReportsIndexRoute,
+}
+
+const V2RouteWithChildren = V2Route._addFileChildren(V2RouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AdminAuthRoute: AdminAuthRouteWithChildren,
   BlogAdminRoute: BlogAdminRouteWithChildren,
   CaAuthRoute: CaAuthRouteWithChildren,
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
+  V2Route: V2RouteWithChildren,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,
   ApiPublicCaBrainDeductionLearningRoute:
