@@ -5,15 +5,23 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Plus } from "lucide-react";
 import { Card, EmptyState, Modal, PageHeader, V, formatDate, formatINR } from "../ui";
 import { AgentStatusBadge, ProcessingCard } from "../agents";
-import { useV2 } from "../store";
+import { REPORT_TEMPLATES, ReportTemplate, useV2 } from "../store";
 
 const PERIODS = ["August 2026", "July 2026", "June 2026", "Q1 FY 2026-27"];
+
+const TEMPLATE_HINT: Record<ReportTemplate, string> = {
+  "Monthly MIS": "Revenue, expenses, variances and the transactions behind them.",
+  "Bank Reconciliation Summary": "Credits, debits and high value lines with every bank row listed.",
+  "Key Variances": "Only the movement against the prior period.",
+  "Working Paper": "Everything above in one file, laid out for the audit file.",
+};
 
 export default function ReportsPage() {
   const { reports, clients, clientName, generateReport, runs } = useV2();
   const [open, setOpen] = useState(false);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
   const [period, setPeriod] = useState(PERIODS[0]);
+  const [template, setTemplate] = useState<ReportTemplate>(REPORT_TEMPLATES[0]);
   const navigate = useNavigate();
 
   const narrateRuns = runs.filter((r) => r.agent === "narrate");
@@ -21,12 +29,13 @@ export default function ReportsPage() {
   const generate = () => {
     if (!clientId) { toast.error("Add a client first"); return; }
     setOpen(false);
-    toast.success("Narrate agent is preparing the MIS");
-    generateReport(clientId, period, (r) => {
-      toast.success("MIS ready");
+    toast.success("Narrate agent is preparing the report");
+    generateReport(clientId, period, template, (r) => {
+      toast.success(`${r.template} ready`);
       navigate({ to: "/v2/reports/$reportId", params: { reportId: r.id } });
     });
   };
+
 
   return (
     <>
