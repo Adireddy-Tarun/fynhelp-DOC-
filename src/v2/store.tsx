@@ -1,9 +1,13 @@
 /**
  * FynHelp v2 dashboard — local prototype store.
- * All data lives in React state (seeded with realistic sample data) so the
- * flows work end to end before any backend wiring happens.
+ * Holds client data plus the live "agent run" state that drives the agentic UI.
+ * Every number shown in the product is derived from rows that live here, so a
+ * figure can always be traced back to its source transactions.
  */
-import { createContext, useContext, useMemo, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef } from "react";
+import type { AgentKey } from "./agents";
+
+export type Txn = { date: string; particulars: string; amount: number };
 
 export type Client = {
   id: string;
@@ -23,7 +27,7 @@ export type Doc = {
   source: "Manual" | "Gmail" | "WhatsApp";
   status: "Processing" | "Parsed" | "Failed";
   date: string;
-  rows: { date: string; particulars: string; amount: number }[];
+  rows: Txn[];
 };
 
 export type ReviewItem = {
@@ -31,7 +35,7 @@ export type ReviewItem = {
   clientId: string;
   docName: string;
   rawText: string;
-  suggestion: { date: string; particulars: string; amount: number };
+  suggestion: Txn;
   confidence: number;
   status: "open" | "confirmed" | "discarded";
 };
@@ -54,6 +58,7 @@ export type Report = {
   generated: string;
   revenue: number;
   expenses: number;
+  sources: { revenue: Txn[]; expenses: Txn[] };
   insights: { text: string; source: string }[];
 };
 
@@ -65,12 +70,26 @@ export type Chase = {
   phone: string;
   due: string;
   note: string;
+  followUps: number;
   status: "Open" | "Following Up" | "Escalated" | "Resolved";
-  timeline: { at: string; text: string }[];
+  timeline: { at: string; text: string; agent?: AgentKey }[];
+};
+
+export type ReconResult = { matched: number; exceptions: number; bank: number; at: string };
+
+export type AgentRun = {
+  id: string;
+  agent: AgentKey;
+  title: string;
+  steps: string[];
+  current: number;
+  /** entity this run belongs to: doc id, client id or report id */
+  target: string;
 };
 
 const now = new Date();
 const iso = (daysAgo: number) => new Date(now.getTime() - daysAgo * 864e5).toISOString().slice(0, 10);
+const today = () => iso(0);
 
 const SEED_CLIENTS: Client[] = [
   { id: "c1", name: "Sundar Textiles Pvt Ltd", entityType: "Private Limited", gstin: "27AABCS1429B1ZP", contactName: "Ramesh Sundar", email: "ramesh@sundartextiles.in", phone: "919820011223", lastMis: iso(6) },
@@ -82,20 +101,25 @@ const SEED_DOCS: Doc[] = [
   { id: "d1", name: "HDFC-statement-Aug.csv", clientId: "c1", source: "Manual", status: "Parsed", date: iso(3), rows: [
     { date: iso(9), particulars: "NEFT ABC ENTERPRISES", amount: 248000 },
     { date: iso(8), particulars: "UPI SWIGGY ORDER", amount: -1290 },
+    { date: iso(7), particulars: "RTGS MEHTA WEAVERS", amount: 176500 },
     { date: iso(6), particulars: "SALARY PAYOUT AUG", amount: -412000 },
   ] },
   { id: "d2", name: "GSTR2B-Aug.xml", clientId: "c2", source: "Gmail", status: "Parsed", date: iso(5), rows: [
     { date: iso(12), particulars: "Sri Balaji Traders — INV/882", amount: 91500 },
-    { date: iso(11), particulars: "Metro Packaging — INV/1180", amount: 43200 },
+    { date: iso(11), particulars: "Metro Packaging — INV/1180", amount: -43200 },
   ] },
-  { id: "d3", name: "purchase-bills-Aug.pdf", clientId: "c3", source: "WhatsApp", status: "Processing", date: iso(1), rows: [] },
+  { id: "d3", name: "purchase-bills-Aug.pdf", clientId: "c3", source: "WhatsApp", status: "Parsed", date: iso(1), rows: [
+    { date: iso(5), particulars: "Marketplace payout — Amazon", amount: 812000 },
+    { date: iso(4), particulars: "UPI VINAYAK PRINT", amount: -18450 },
+    { date: iso(3), particulars: "Courier charges — Delhivery", amount: -96400 },
+  ] },
   { id: "d4", name: "ICICI-statement-Jul.csv", clientId: "c3", source: "Manual", status: "Failed", date: iso(11), rows: [] },
 ];
 
 const SEED_REVIEW: ReviewItem[] = [
   { id: "r1", clientId: "c1", docName: "HDFC-statement-Aug.csv", rawText: "NEFT/ABC ENTRPRSES/CR/248000.00/REF9931", suggestion: { date: iso(9), particulars: "ABC Enterprises — sales receipt", amount: 248000 }, confidence: 0.62, status: "open" },
-  { id: "r2", clientId: "c3", docName: "purchase-bills-Aug.pdf", rawText: "M/s Vinayak Print Solutons  Bill No 4417  Rs. 18,450/- incl GST", suggestion: { date: iso(4), particulars: "Vinayak Print Solutions — printing", amount: 18450 }, confidence: 0.54, status: "open" },
-  { id: "r3", clientId: "c2", docName: "GSTR2B-Aug.xml", rawText: "METRO PACKAGNG INV1180 43,200", suggestion: { date: iso(11), particulars: "Metro Packaging — packaging material", amount: 43200 }, confidence: 0.71, status: "open" },
+  { id: "r2", clientId: "c3", docName: "purchase-bills-Aug.pdf", rawText: "M/s Vinayak Print Solutons  Bill No 4417  Rs. 18,450/- incl GST", suggestion: { date: iso(4), particulars: "Vinayak Print Solutions — printing", amount: -18450 }, confidence: 0.54, status: "open" },
+  { id: "r3", clientId: "c2", docName: "GSTR2B-Aug.xml", rawText: "METRO PACKAGNG INV1180 43,200", suggestion: { date: iso(11), particulars: "Metro Packaging — packaging material", amount: -43200 }, confidence: 0.71, status: "open" },
 ];
 
 const SEED_EXCEPTIONS: Exception[] = [
@@ -104,19 +128,17 @@ const SEED_EXCEPTIONS: Exception[] = [
   { id: "e3", clientId: "c2", reason: "Date gap", amount: 91500, date: iso(12), narration: "RTGS SRI BALAJI TRADERS", candidates: ["Invoice INV/882 — 08 days earlier"], status: "open" },
 ];
 
-const SEED_REPORTS: Report[] = [
-  { id: "m1", clientId: "c3", period: "August 2026", generated: iso(2), revenue: 4820000, expenses: 3610000, insights: [
-    { text: "Revenue grew 12 percent over July, led by marketplace payouts.", source: "42 matched bank credits" },
-    { text: "Logistics cost rose 18 percent while orders rose 9 percent.", source: "17 courier invoices" },
-  ] },
-  { id: "m2", clientId: "c1", period: "August 2026", generated: iso(6), revenue: 2680000, expenses: 2310000, insights: [
-    { text: "Payroll is 41 percent of total outflow this month.", source: "1 salary batch, 34 employees" },
-  ] },
-];
-
 const SEED_CHASES: Chase[] = [
-  { id: "h1", clientId: "c2", type: "Missing purchase bills", contact: "Nisha Rao", phone: "919845567788", due: iso(-2), note: "August purchase bills for 6 vendors still pending.", status: "Following Up", timeline: [{ at: iso(5), text: "Chase created" }, { at: iso(3), text: "Reminder sent on WhatsApp" }] },
-  { id: "h2", clientId: "c1", type: "Bank statement", contact: "Ramesh Sundar", phone: "919820011223", due: iso(4), note: "September statement not received.", status: "Escalated", timeline: [{ at: iso(10), text: "Chase created" }, { at: iso(7), text: "Reminder sent" }, { at: iso(4), text: "Escalated to partner" }] },
+  { id: "h1", clientId: "c2", type: "Missing purchase bills", contact: "Nisha Rao", phone: "919845567788", due: iso(-2), note: "August purchase bills for 6 vendors still pending.", followUps: 1, status: "Following Up", timeline: [
+    { at: iso(5), text: "Chase created", agent: "chaser" },
+    { at: iso(3), text: "Reminder sent on WhatsApp", agent: "chaser" },
+  ] },
+  { id: "h2", clientId: "c1", type: "Bank statement", contact: "Ramesh Sundar", phone: "919820011223", due: iso(4), note: "September statement not received.", followUps: 2, status: "Escalated", timeline: [
+    { at: iso(10), text: "Chase created", agent: "chaser" },
+    { at: iso(7), text: "First reminder sent", agent: "chaser" },
+    { at: iso(5), text: "Second reminder sent", agent: "chaser" },
+    { at: iso(4), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" },
+  ] },
 ];
 
 type Store = {
@@ -126,19 +148,24 @@ type Store = {
   exceptions: Exception[];
   reports: Report[];
   chases: Chase[];
+  runs: AgentRun[];
+  recon: Record<string, ReconResult>;
+  runsFor: (target: string) => AgentRun[];
   addClient: (c: Omit<Client, "id">) => Client;
   updateClient: (id: string, patch: Partial<Client>) => void;
   addDoc: (name: string, clientId: string) => void;
-  resolveReview: (id: string, status: "confirmed" | "discarded", patch?: ReviewItem["suggestion"]) => void;
+  resolveReview: (id: string, status: "confirmed" | "discarded", patch?: Txn) => void;
   setExceptionStatus: (id: string, status: Exception["status"]) => void;
-  addReport: (clientId: string, period: string) => Report;
-  addChase: (c: Omit<Chase, "id" | "timeline" | "status">) => void;
+  runRecon: (clientId: string, onDone?: (r: ReconResult) => void) => void;
+  generateReport: (clientId: string, period: string, onDone: (r: Report) => void) => void;
+  addChase: (c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => void;
+  sendFollowUp: (id: string, channel: "Email" | "WhatsApp") => void;
   setChaseStatus: (id: string, status: Chase["status"], note?: string) => void;
   clientName: (id: string) => string;
+  clientTxns: (clientId: string) => Txn[];
 };
 
 const Ctx = createContext<Store | null>(null);
-
 const uid = () => Math.random().toString(36).slice(2, 9);
 
 export function V2StoreProvider({ children }: { children: ReactNode }) {
@@ -146,8 +173,31 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   const [docs, setDocs] = useState<Doc[]>(SEED_DOCS);
   const [review, setReview] = useState<ReviewItem[]>(SEED_REVIEW);
   const [exceptions, setExceptions] = useState<Exception[]>(SEED_EXCEPTIONS);
-  const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
+  const [reports, setReports] = useState<Report[]>([]);
   const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
+  const [runs, setRuns] = useState<AgentRun[]>([]);
+  const [recon, setRecon] = useState<Record<string, ReconResult>>({});
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  /** Advance a visible agent run one step at a time, then finish. */
+  const startRun = useCallback(
+    (agent: AgentKey, title: string, steps: string[], target: string, onDone: () => void, stepMs = 850) => {
+      const id = uid();
+      setRuns((p) => [...p, { id, agent, title, steps, current: 0, target }]);
+      steps.forEach((_, i) => {
+        timers.current.push(
+          setTimeout(() => setRuns((p) => p.map((r) => (r.id === id ? { ...r, current: i + 1 } : r))), stepMs * (i + 1)),
+        );
+      });
+      timers.current.push(
+        setTimeout(() => {
+          setRuns((p) => p.filter((r) => r.id !== id));
+          onDone();
+        }, stepMs * (steps.length + 0.4)),
+      );
+    },
+    [],
+  );
 
   const addClient = useCallback((c: Omit<Client, "id">) => {
     const created: Client = { ...c, id: uid() };
@@ -159,54 +209,135 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     setClients((p) => p.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   }, []);
 
+  /** Workflow A — upload, Extract agent works, rows land, low confidence goes to Review. */
   const addDoc = useCallback((name: string, clientId: string) => {
-    const id = uid();
-    setDocs((p) => [{ id, name, clientId, source: "Manual", status: "Processing", date: iso(0), rows: [] }, ...p]);
-    setTimeout(() => {
-      setDocs((p) => p.map((d) => (d.id === id ? {
-        ...d,
-        status: "Parsed",
-        rows: [
-          { date: iso(2), particulars: "Opening balance carried forward", amount: 0 },
-          { date: iso(1), particulars: "UPI collection — retail", amount: 34500 },
-        ],
-      } : d)));
-    }, 2200);
-  }, []);
+    const docId = uid();
+    setDocs((p) => [{ id: docId, name, clientId, source: "Manual", status: "Processing", date: today(), rows: [] }, ...p]);
 
-  const resolveReview = useCallback((id: string, status: "confirmed" | "discarded", patch?: ReviewItem["suggestion"]) => {
+    startRun("extract", name, ["Reading file", "Classifying rows", "Scoring confidence"], docId, () => {
+      const rows: Txn[] = [
+        { date: iso(2), particulars: "UPI collection — retail counter", amount: 34500 },
+        { date: iso(1), particulars: "Vendor payment — packaging", amount: -12800 },
+      ];
+      setDocs((p) => p.map((d) => (d.id === docId ? { ...d, status: "Parsed", rows } : d)));
+      setReview((p) => [
+        {
+          id: uid(), clientId, docName: name,
+          rawText: "UPI/COLLCTN RETAIL CNTR/CR/34,500.00",
+          suggestion: { date: iso(2), particulars: "Retail counter collection", amount: 34500 },
+          confidence: 0.58, status: "open",
+        },
+        ...p,
+      ]);
+      // Workflow D closing rule: a document arriving resolves an open chase for that client.
+      setChases((p) =>
+        p.map((c) =>
+          c.clientId === clientId && c.status !== "Resolved"
+            ? { ...c, status: "Resolved", timeline: [...c.timeline, { at: today(), text: `Document received (${name}). Chase closed automatically.`, agent: "chaser" as AgentKey }] }
+            : c,
+        ),
+      );
+    });
+  }, [startRun]);
+
+  const resolveReview = useCallback((id: string, status: "confirmed" | "discarded", patch?: Txn) => {
     setReview((p) => p.map((r) => (r.id === id ? { ...r, status, suggestion: patch ?? r.suggestion } : r)));
   }, []);
 
   const setExceptionStatus = useCallback((id: string, status: Exception["status"]) => {
     setExceptions((p) => p.map((e) => (e.id === id ? { ...e, status } : e)));
+    setRecon((p) => {
+      const ex = exceptions.find((e) => e.id === id);
+      if (!ex || !p[ex.clientId]) return p;
+      const r = p[ex.clientId];
+      return { ...p, [ex.clientId]: { ...r, matched: r.matched + 1, exceptions: Math.max(0, r.exceptions - 1) } };
+    });
+  }, [exceptions]);
+
+  const clientTxns = useCallback((clientId: string) => docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows), [docs]);
+
+  /** Workflow B — Recon agent, three passes, unmatched lines become exceptions. */
+  const runRecon = useCallback((clientId: string, onDone?: (r: ReconResult) => void) => {
+    startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Flagging exceptions"], clientId, () => {
+      const bank = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
+      const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
+      const unresolved = bank.filter((r) => Math.abs(r.amount) > 500000).slice(0, 1);
+      const created: Exception[] = unresolved.map((r) => ({
+        id: uid(), clientId, reason: "Amount mismatch" as const, amount: r.amount, date: r.date,
+        narration: r.particulars, candidates: ["Closest book entry differs by ₹1,200"], status: "open" as const,
+      }));
+      if (created.length) setExceptions((p) => [...created, ...p]);
+      const result: ReconResult = {
+        bank: bank.length,
+        matched: Math.max(0, bank.length - open.length - created.length),
+        exceptions: open.length + created.length,
+        at: today(),
+      };
+      setRecon((p) => ({ ...p, [clientId]: result }));
+      onDone?.(result);
+    });
+  }, [startRun, docs, exceptions]);
+
+  /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
+  const generateReport = useCallback((clientId: string, period: string, onDone: (r: Report) => void) => {
+    startRun("narrate", `MIS for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
+      const rows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
+      const revenueRows = rows.filter((r) => r.amount > 0);
+      const expenseRows = rows.filter((r) => r.amount < 0);
+      const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
+      const expenses = expenseRows.reduce((s, r) => s + Math.abs(r.amount), 0);
+      const biggest = [...expenseRows].sort((a, b) => a.amount - b.amount)[0];
+      const created: Report = {
+        id: uid(), clientId, period, generated: today(), revenue, expenses,
+        sources: { revenue: revenueRows, expenses: expenseRows },
+        insights: [
+          { text: revenue > expenses
+              ? `Collections exceeded outflow this period, leaving a surplus of ₹${(revenue - expenses).toLocaleString("en-IN")}.`
+              : `Outflow ran ahead of collections by ₹${(expenses - revenue).toLocaleString("en-IN")} this period.`,
+            source: `${revenueRows.length} credits and ${expenseRows.length} debits` },
+          ...(biggest ? [{ text: `The single largest outflow was ${biggest.particulars}.`, source: `1 transaction dated ${biggest.date}` }] : []),
+        ],
+      };
+      setReports((p) => [created, ...p]);
+      setClients((p) => p.map((c) => (c.id === clientId ? { ...c, lastMis: today() } : c)));
+      onDone(created);
+    });
+  }, [startRun, docs]);
+
+  const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => {
+    setChases((p) => [
+      { ...c, id: uid(), status: "Open", followUps: 0, timeline: [{ at: today(), text: "Chase created", agent: "chaser" }] },
+      ...p,
+    ]);
   }, []);
 
-  const addReport = useCallback((clientId: string, period: string) => {
-    const created: Report = {
-      id: uid(), clientId, period, generated: iso(0),
-      revenue: 1850000 + Math.round(Math.random() * 2500000),
-      expenses: 1400000 + Math.round(Math.random() * 1800000),
-      insights: [{ text: "Generated from matched transactions for the selected period.", source: "Matched ledger" }],
-    };
-    setReports((p) => [created, ...p]);
-    setClients((p) => p.map((c) => (c.id === clientId ? { ...c, lastMis: created.generated } : c)));
-    return created;
-  }, []);
-
-  const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status">) => {
-    setChases((p) => [{ ...c, id: uid(), status: "Open", timeline: [{ at: iso(0), text: "Chase created" }] }, ...p]);
+  /** Workflow D — follow ups escalate after the second unanswered nudge. */
+  const sendFollowUp = useCallback((id: string, channel: "Email" | "WhatsApp") => {
+    setChases((p) =>
+      p.map((c) => {
+        if (c.id !== id || c.status === "Resolved") return c;
+        const followUps = c.followUps + 1;
+        const status: Chase["status"] = followUps >= 2 ? "Escalated" : "Following Up";
+        const entries = [{ at: today(), text: `${channel} follow up sent`, agent: "chaser" as AgentKey }];
+        if (status === "Escalated" && c.status !== "Escalated") {
+          entries.push({ at: today(), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" as AgentKey });
+        }
+        return { ...c, followUps, status, timeline: [...c.timeline, ...entries] };
+      }),
+    );
   }, []);
 
   const setChaseStatus = useCallback((id: string, status: Chase["status"], note?: string) => {
-    setChases((p) => p.map((c) => (c.id === id ? { ...c, status, timeline: [...c.timeline, { at: iso(0), text: note ?? `Marked ${status.toLowerCase()}` }] } : c)));
+    setChases((p) => p.map((c) => (c.id === id ? { ...c, status, timeline: [...c.timeline, { at: today(), text: note ?? `Marked ${status.toLowerCase()}`, agent: "chaser" }] } : c)));
   }, []);
 
   const value = useMemo<Store>(() => ({
-    clients, docs, review, exceptions, reports, chases,
-    addClient, updateClient, addDoc, resolveReview, setExceptionStatus, addReport, addChase, setChaseStatus,
+    clients, docs, review, exceptions, reports, chases, runs, recon,
+    runsFor: (target: string) => runs.filter((r) => r.target === target),
+    addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
+    addChase, sendFollowUp, setChaseStatus, clientTxns,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
-  }), [clients, docs, review, exceptions, reports, chases, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, addReport, addChase, setChaseStatus]);
+  }), [clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

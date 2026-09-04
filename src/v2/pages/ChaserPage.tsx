@@ -1,42 +1,61 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Send, Plus, MessageCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Send, Plus, MessageCircle, Mail } from "lucide-react";
 import { Badge, Card, Drawer, EmptyState, Modal, PageHeader, Tone, V, formatDate } from "../ui";
+import { AgentStatusBadge, AgentTimeline } from "../agents";
 import { Chase, useV2 } from "../store";
 
 const TONE: Record<Chase["status"], Tone> = { Open: "info", "Following Up": "warn", Escalated: "bad", Resolved: "good" };
-const TYPES = ["Bank statement", "Missing purchase bills", "Sales invoices", "GST confirmation", "Other"];
+const TYPES = ["Missing bank statement", "Missing invoice", "Overdue receivable", "GST confirmation", "Custom"];
+const FILTERS = ["All", "Open", "Following Up", "Escalated", "Resolved"] as const;
 
 export default function ChaserPage() {
-  const { chases, clients, clientName, addChase, setChaseStatus } = useV2();
+  const { chases, clients, clientName, addChase, sendFollowUp, setChaseStatus } = useV2();
   const [creating, setCreating] = useState(false);
-  const [open, setOpen] = useState<Chase | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [form, setForm] = useState({ clientId: clients[0]?.id ?? "", type: TYPES[0], contact: "", phone: "", due: "", note: "" });
 
-  const active = open ? chases.find((c) => c.id === open.id) ?? open : null;
+  const active = chases.find((c) => c.id === openId) ?? null;
+  const list = chases.filter((c) => filter === "All" || c.status === filter);
 
   const create = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.clientId || !form.contact.trim()) return;
     addChase(form);
     setCreating(false);
-    toast.success("Chase item created");
+    toast.success("Chase item created. Status is Open.");
   };
 
-  const waLink = (c: Chase) =>
-    `https://wa.me/${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-      `Hello ${c.contact}, a gentle reminder from your accounts team regarding ${c.type.toLowerCase()} for ${clientName(c.clientId)}. Whenever convenient, could you please share it. Thank you.`,
-    )}`;
+  const message = (c: Chase) =>
+    `Hello ${c.contact}, a gentle reminder from your accounts team regarding ${c.type.toLowerCase()} for ${clientName(c.clientId)}. Whenever convenient, could you please share it. Thank you.`;
+
+  const waLink = (c: Chase) => `https://wa.me/${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(message(c))}`;
 
   return (
     <>
       <PageHeader
         title="Chaser"
-        subtitle="Polite follow ups, tracked to closure."
+        subtitle="Polite follow ups, tracked to closure. Two unanswered nudges and it escalates."
         action={<button className="v2-btn v2-btn-primary" onClick={() => setCreating(true)}><Plus size={15} /> Create chase item</button>}
       />
 
-      {chases.length === 0 ? (
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            className="v2-btn"
+            onClick={() => setFilter(f)}
+            style={{ background: filter === f ? V.ink : V.card, color: filter === f ? "#fff" : V.body, borderColor: filter === f ? V.ink : V.line, padding: "8px 15px", fontSize: 12.5 }}
+          >
+            {f}
+            <span style={{ opacity: 0.6 }}>{f === "All" ? chases.length : chases.filter((c) => c.status === f).length}</span>
+          </button>
+        ))}
+      </div>
+
+      {list.length === 0 ? (
         <EmptyState
           icon={<Send size={22} />}
           title="Nothing to chase"
@@ -45,21 +64,41 @@ export default function ChaserPage() {
         />
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
-          {chases.map((c) => (
-            <Card
-              key={c.id}
-              onClick={() => setOpen(c)}
-              style={{ cursor: "pointer", borderColor: c.status === "Escalated" ? "rgba(169,56,56,.35)" : V.line }}
-            >
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 12, alignItems: "center" }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14.5 }}>{c.type}</div>
-                  <div style={{ fontSize: 12.5, color: V.body, marginTop: 4 }}>{clientName(c.clientId)} · {c.contact} · due {formatDate(c.due)}</div>
-                </div>
-                <Badge tone={TONE[c.status]}>{c.status}</Badge>
-              </div>
-            </Card>
-          ))}
+          <AnimatePresence initial={false}>
+            {list.map((c) => (
+              <motion.div
+                key={c.id}
+                layout
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: 30 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card
+                  hover
+                  onClick={() => setOpenId(c.id)}
+                  style={{
+                    cursor: "pointer",
+                    borderColor: c.status === "Escalated" ? "rgba(169,56,56,.4)" : V.line,
+                    background: c.status === "Escalated" ? "rgba(169,56,56,.03)" : V.card,
+                  }}
+                >
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 12, alignItems: "center" }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14.5 }}>{c.type}</div>
+                      <div style={{ fontSize: 12.5, color: V.body, marginTop: 4 }}>
+                        {clientName(c.clientId)} · {c.contact} · due {formatDate(c.due)} · {c.followUps} follow {c.followUps === 1 ? "up" : "ups"}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      {c.status !== "Resolved" && <AgentStatusBadge agent="chaser" active={c.status === "Following Up"} label="Chaser" />}
+                      <Badge tone={TONE[c.status]}>{c.status}</Badge>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
@@ -102,7 +141,7 @@ export default function ChaserPage() {
         </form>
       </Modal>
 
-      <Drawer open={!!active} onClose={() => setOpen(null)} title={active?.type ?? ""}>
+      <Drawer open={!!active} onClose={() => setOpenId(null)} title={active?.type ?? ""}>
         {active && (
           <div style={{ display: "grid", gap: 18 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -112,35 +151,47 @@ export default function ChaserPage() {
             </div>
             {active.note && <p style={{ fontSize: 13.5, color: V.body, lineHeight: 1.6, margin: 0 }}>{active.note}</p>}
 
-            {active.phone && (
-              <div>
-                <label className="v2-label">WhatsApp message</label>
-                <div style={{ background: V.gray, borderRadius: 12, padding: 14, fontSize: 13, lineHeight: 1.6 }}>
-                  Hello {active.contact}, a gentle reminder from your accounts team regarding {active.type.toLowerCase()} for {clientName(active.clientId)}. Whenever convenient, could you please share it. Thank you.
-                </div>
-                <a className="v2-btn v2-btn-primary" style={{ marginTop: 12 }} href={waLink(active)} target="_blank" rel="noreferrer">
-                  <MessageCircle size={15} /> Send WhatsApp
-                </a>
+            {active.status === "Escalated" && (
+              <div style={{ background: "rgba(169,56,56,.07)", border: "1px solid rgba(169,56,56,.25)", borderRadius: 14, padding: 14, fontSize: 13, color: V.maroon }}>
+                Two follow ups went unanswered. This item is with the partner now.
               </div>
             )}
 
             <div>
-              <label className="v2-label">Activity</label>
-              <div style={{ display: "grid", gap: 10 }}>
-                {active.timeline.map((t, i) => (
-                  <div key={i} style={{ display: "flex", gap: 10, fontSize: 13 }}>
-                    <span className="num" style={{ color: V.muted, minWidth: 90 }}>{formatDate(t.at)}</span>
-                    <span>{t.text}</span>
-                  </div>
-                ))}
+              <label className="v2-label">Message the client receives</label>
+              <div style={{ background: V.gray, borderRadius: 12, padding: 14, fontSize: 13, lineHeight: 1.6 }}>{message(active)}</div>
+              <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+                {active.phone && active.status !== "Resolved" && (
+                  <a
+                    className="v2-btn v2-btn-primary"
+                    href={waLink(active)}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => { sendFollowUp(active.id, "WhatsApp"); toast.success("Follow up logged on the timeline"); }}
+                  >
+                    <MessageCircle size={15} /> Send WhatsApp
+                  </a>
+                )}
+                {active.status !== "Resolved" && (
+                  <button className="v2-btn v2-btn-ghost" onClick={() => { sendFollowUp(active.id, "Email"); toast.success("Email follow up sent"); }}>
+                    <Mail size={15} /> Send email follow up
+                  </button>
+                )}
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button className="v2-btn v2-btn-ghost" onClick={() => { setChaseStatus(active.id, "Following Up", "Follow up sent"); toast.success("Marked as following up"); }}>Following up</button>
-              <button className="v2-btn v2-btn-ghost" onClick={() => { setChaseStatus(active.id, "Escalated", "Escalated to partner"); toast.success("Escalated"); }}>Escalate</button>
-              <button className="v2-btn v2-btn-primary" onClick={() => { setChaseStatus(active.id, "Resolved", "Document received"); toast.success("Chase resolved"); }}>Resolve</button>
+            <div>
+              <label className="v2-label">Activity</label>
+              <AgentTimeline items={active.timeline.map((t) => ({ ...t, at: formatDate(t.at) }))} />
             </div>
+
+            {active.status === "Resolved" ? (
+              <div style={{ fontSize: 13, color: V.green }}>Resolved. The Chaser agent has stopped for this item.</div>
+            ) : (
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <button className="v2-btn v2-btn-primary" onClick={() => { setChaseStatus(active.id, "Resolved", "Document received. Chase closed."); toast.success("Chase resolved"); }}>Mark resolved</button>
+              </div>
+            )}
           </div>
         )}
       </Drawer>
