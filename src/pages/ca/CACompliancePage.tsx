@@ -16,6 +16,7 @@ import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
 import { penaltyEstimate } from "@/lib/caPenalty";
 import { useFirmClientIntelligence, filingRiskBand, lateSharePct } from "@/hooks/useCAIntelligence";
+import { signalBrain } from "@/lib/caBrainSignals";
 
 const DAY = 86_400_000;
 type TabKey = "upcoming" | "overdue" | "filed";
@@ -163,6 +164,14 @@ export default function CACompliancePage() {
     setBusyId(null);
     if (error) toast.error(error.message);
     else {
+      const daysLate = e.due_date && new Date(e.due_date) < new Date()
+        ? Math.floor((Date.now() - new Date(e.due_date).getTime()) / DAY)
+        : 0;
+      void signalBrain(firmId, e.business_id, "compliance_filed", {
+        event_type: e.event_type,
+        days_late: daysLate,
+        period: e.filing_period,
+      });
       toast.success(`${e.event_type} ${e.filing_period} marked as filed`);
       void load();
     }

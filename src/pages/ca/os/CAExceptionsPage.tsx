@@ -8,6 +8,7 @@ import { CA, CACard, CAButton, CABadge, caInputStyle, inr, dateIN } from "@/comp
 import { ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { REASON_LABELS, type ReasonCode } from "@/lib/caRecon";
 import { logCAAudit } from "@/lib/caAudit";
+import { signalBrain } from "@/lib/caBrainSignals";
 
 interface ExceptionRow {
   id: string;
@@ -71,6 +72,12 @@ export default function CAExceptionsPage() {
       action: "exception_resolved",
       actorRole: role,
       detail: { note, reason_code: r.reason_code },
+    });
+    void signalBrain(firmId, r.business_id, "exception_resolved", {
+      reason_code: r.reason_code,
+      severity: r.severity,
+      amount: r.amount,
+      days_open: Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86_400_000),
     });
     toast.success("Resolved and logged");
     void load();
