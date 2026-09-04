@@ -24,7 +24,9 @@ const esc = (s: string) =>
 export const notifyWaitlistLead = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => leadSchema.parse(data))
   .handler(async ({ data }) => {
+    console.log("[waitlist-notify] invoked for", data.email);
     const apiKey = process.env["RESEND_API_KEY"];
+    console.log("[waitlist-notify] key present?", !!apiKey, "prefix", apiKey?.slice(0, 6));
     if (!apiKey) {
       console.error("[waitlist-notify] RESEND_API_KEY is not configured");
       return { sent: false };
