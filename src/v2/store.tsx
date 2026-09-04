@@ -544,7 +544,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
 
     let next: CloseState["next"];
     if (!firstOpen) {
-      next = { label: "Send the MIS to the partner", why: "Everything for this period is closed and every figure links to its source.", tab: "mis" };
+      next = { label: "This period is closed", why: "The partner has signed off and every figure still links to its source.", tab: "mis" };
     } else if (firstOpen.stage === "Documents") {
       next = openChase.length
         ? { label: "Follow up on pending documents", why: `${openChase.length} item${openChase.length > 1 ? "s are" : " is"} still with the client.`, tab: "chaser" }
@@ -556,7 +556,9 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     } else if (firstOpen.stage === "Exceptions") {
       next = { label: `Clear ${openEx.length} exception${openEx.length > 1 ? "s" : ""}`, why: "Only matched transactions are allowed into the MIS.", tab: "exceptions" };
     } else {
-      next = { label: `Generate the ${period} MIS`, why: "Recon is clean, so the numbers can be trusted.", tab: "mis", action: "mis" };
+      next = mis.length
+        ? { label: "Send the MIS to the partner for sign off", why: "The report is ready and waiting for a partner to accept it.", tab: "mis" }
+        : { label: `Generate the ${period} MIS`, why: "Recon is clean, so the numbers can be trusted.", tab: "mis", action: "mis" };
     }
 
     return { steps, percent, stage: firstOpen ? firstOpen.stage : "MIS", next };
