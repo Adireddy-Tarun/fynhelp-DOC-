@@ -158,7 +158,7 @@ export default function WaitlistPage() {
               </header>
 
               <div className="bg-white rounded-2xl border border-fyn-ink/10 shadow-xs p-6 md:p-8">
-                <WaitlistForm onSuccess={() => setSubmitted(true)} />
+                <CAWaitlistForm />
               </div>
             </div>
           </>
