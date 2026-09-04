@@ -328,6 +328,17 @@ export default function CAReportsPage() {
                             <Chip tone="green">Completed</Chip>
                           )}
                         </td>
+                        <td className="py-3 pr-4">
+                          {r.signed_off_at ? (
+                            <Chip tone="green">Signed off{r.signed_off_by === user?.id ? " by you" : ""}</Chip>
+                          ) : canSignOff ? (
+                            <SecondaryBtn size="sm" onClick={() => handleSignOff(r)} disabled={signingId === r.id}>
+                              {signingId === r.id ? "Signing..." : "Sign off"}
+                            </SecondaryBtn>
+                          ) : (
+                            <Chip tone="amber">Awaiting sign-off</Chip>
+                          )}
+                        </td>
                         <td className="py-3 text-right relative">
                           <button
                             onClick={() => setActionMenu(actionMenu === r.id ? null : r.id)}
