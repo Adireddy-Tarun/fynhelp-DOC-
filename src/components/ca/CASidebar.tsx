@@ -4,6 +4,7 @@ import {
   LayoutGrid, Users, Bell, Settings, LogOut,
   Archive, Scale, AlertTriangle, CalendarCheck, FileStack, ListTodo, BellRing, ShieldCheck,
   BarChart3, Receipt, FileText, UserCog, MonitorSmartphone, Plug, Inbox, CheckCheck,
+  Brain, TrendingUp, CreditCard,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -59,17 +60,27 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
     ],
   },
   {
+    group: "Intelligence",
+    links: [
+      { label: "Practice analytics", path: "/ca/practice-analytics", icon: BarChart3 },
+      { label: "Portfolio health", path: "/ca/portfolio-health", icon: TrendingUp },
+      { label: "Brain insights", path: "/ca/revenue", icon: Brain },
+    ],
+  },
+  {
     group: "Data",
     links: [
       { label: "Integrations", path: "/ca/integrations", icon: Plug },
+      { label: "Ledgers", path: "/ca/ledgers", icon: FileStack },
+      { label: "Data quality", path: "/ca/data-quality", icon: ShieldCheck },
     ],
   },
   {
     group: "Firm",
     links: [
+      { label: "Billing", path: "/ca/billing", icon: CreditCard },
       { label: "Users and Roles", path: "/ca/users", icon: UserCog },
       { label: "Client portal", path: "/ca/client-portal", icon: MonitorSmartphone },
-      { label: "Practice analytics", path: "/ca/practice-analytics", icon: BarChart3 },
       { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck },
       { label: "Settings", path: "/ca/settings", icon: Settings },
     ],
