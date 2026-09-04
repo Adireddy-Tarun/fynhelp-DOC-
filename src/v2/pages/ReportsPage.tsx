@@ -5,9 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Plus } from "lucide-react";
 import { Card, EmptyState, Modal, PageHeader, V, formatDate, formatINR } from "../ui";
 import { AgentStatusBadge, ProcessingCard } from "../agents";
-import { REPORT_TEMPLATES, ReportTemplate, useV2 } from "../store";
-
-const PERIODS = ["August 2026", "July 2026", "June 2026", "Q1 FY 2026-27"];
+import { PERIODS, REPORT_TEMPLATES, ReportTemplate, useV2 } from "../store";
 
 const TEMPLATE_HINT: Record<ReportTemplate, string> = {
   "Monthly MIS": "Revenue, expenses, variances and the transactions behind them.",
@@ -17,10 +15,10 @@ const TEMPLATE_HINT: Record<ReportTemplate, string> = {
 };
 
 export default function ReportsPage() {
-  const { reports, clients, clientName, generateReport, runs } = useV2();
+  const { reports, clients, clientName, generateReport, runs, period: currentPeriod } = useV2();
   const [open, setOpen] = useState(false);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
-  const [period, setPeriod] = useState(PERIODS[0]);
+  const [period, setPeriod] = useState(currentPeriod);
   const [template, setTemplate] = useState<ReportTemplate>(REPORT_TEMPLATES[0]);
   const navigate = useNavigate();
 
@@ -41,7 +39,7 @@ export default function ReportsPage() {
     <>
       <PageHeader
         title="MIS and Reports"
-        subtitle="Narrate agent. Every number stays linked to the transactions behind it."
+        subtitle={`Narrate agent. Every number stays linked to the transactions behind it. Current period ${currentPeriod}.`}
         action={<button className="v2-btn v2-btn-primary" onClick={() => setOpen(true)}><Plus size={15} /> Generate MIS</button>}
       />
 
@@ -63,7 +61,7 @@ export default function ReportsPage() {
       ) : reports.length > 0 && (
         <Card style={{ padding: 0 }} className="v2-scroll">
           <table className="v2-table">
-            <thead><tr><th>Client</th><th>Period</th><th>Revenue</th><th>Expenses</th><th>Generated</th></tr></thead>
+            <thead><tr><th>Client</th><th>Period</th><th>Template</th><th>Revenue</th><th>Expenses</th><th>Generated</th></tr></thead>
             <tbody>
               <AnimatePresence initial={false}>
                 {reports.map((r) => (
@@ -77,6 +75,7 @@ export default function ReportsPage() {
                   >
                     <td style={{ fontWeight: 600 }}>{clientName(r.clientId)}</td>
                     <td style={{ color: V.body }}>{r.period}</td>
+                    <td style={{ color: V.body }}>{r.template}</td>
                     <td className="num" style={{ color: V.green }}>{formatINR(r.revenue)}</td>
                     <td className="num" style={{ color: V.maroon }}>{formatINR(r.expenses)}</td>
                     <td className="num" style={{ color: V.body }}>{formatDate(r.generated)}</td>
