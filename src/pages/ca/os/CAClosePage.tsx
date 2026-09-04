@@ -10,6 +10,7 @@ import { ModuleHeader, PermissionNotice, StatStrip, StateChip } from "@/componen
 import { logCAAudit } from "@/lib/caAudit";
 import {
   computeReadiness,
+  isCloseReady,
   periodLabel,
   recentPeriods,
   reopenPeriod,
@@ -53,6 +54,7 @@ export default function CAClosePage() {
   const [row, setRow] = useState<ClosePeriodRow | null>(null);
   const [history, setHistory] = useState<ClosePeriodRow[]>([]);
   const [running, setRunning] = useState(false);
+  const [portfolioReady, setPortfolioReady] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!businessId && clients.length) setBusinessId(clients[0].business_id);
@@ -85,6 +87,7 @@ export default function CAClosePage() {
       if (result.checks.every((c) => c.passed)) await logCloseComplete(firmId, businessId, period, result.score);
       const saved = await saveReadiness(firmId, businessId, result);
       setRow(saved);
+      setPortfolioReady(await isCloseReady(firmId, businessId));
       await loadHistory();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not compute readiness");
@@ -153,6 +156,11 @@ export default function CAClosePage() {
             {running ? "Checking…" : "Run readiness check"}
           </CAButton>
           {isSignedOff && <CABadge tone="green">Signed off</CABadge>}
+          {portfolioReady !== null && (
+            <CABadge tone={portfolioReady ? "green" : "amber"}>
+              {portfolioReady ? "Counted as close ready on the dashboard" : "Not yet counted as close ready"}
+            </CABadge>
+          )}
         </div>
       </CACard>
 
