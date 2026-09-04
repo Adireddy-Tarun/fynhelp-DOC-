@@ -21,20 +21,20 @@ import {
 
 /** Logs a completed close checklist once per client per period. */
 async function logCloseComplete(firmId: string, businessId: string, period: string, score: number) {
-  const entityId = `${businessId}:${period}`;
   const { data: seen } = await supabase
     .from("ca_audit_events")
     .select("id")
     .eq("ca_firm_id", firmId)
+    .eq("business_id", businessId)
     .eq("action", "close_step_completed")
-    .eq("entity_id", entityId)
+    .eq("detail->>period", period)
     .limit(1);
   if ((seen ?? []).length) return;
   await logCAAudit({
     firmId,
     businessId,
     entityType: "close_period",
-    entityId,
+    entityId: businessId,
     action: "close_step_completed",
     detail: { period, score },
   });
