@@ -14,6 +14,7 @@ import {
   type CAExtraction,
   type ExtractionRow,
 } from "@/lib/caIntake";
+import { signalOcrCorrection } from "@/lib/caBrainSignals";
 
 const FIELDS: Record<string, string[]> = {
   bank: ["date", "description", "amount", "direction"],
@@ -65,6 +66,13 @@ export default function CAReviewQueuePage() {
     setBusy(false);
     if (!res.ok) return toast.error(res.error ?? "Could not post");
     toast.success(`${res.posted} rows posted to the ledger`);
+    void signalOcrCorrection(
+      active.ca_firm_id,
+      active.business_id,
+      active.classification,
+      active.confidence ?? null,
+      draft.length,
+    );
     setActiveId(null);
     void load();
   };

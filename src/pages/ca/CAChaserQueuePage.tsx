@@ -12,6 +12,7 @@ import { CA, CACard, CAButton, CABadge, CAEmpty, caTd, caTh, dateIN } from "@/co
 import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
 import { useFirmClientIntelligence, DOW } from "@/hooks/useCAIntelligence";
+import { signalBrain } from "@/lib/caBrainSignals";
 
 interface RequestRow {
   id: string;
@@ -158,11 +159,61 @@ export default function CAChaserQueuePage() {
       businessId: r.business_id,
       entityType: "document_request",
       entityId: r.id,
-      action: "chase_sent",
+      action: "chaser_sent",
       actorRole: role,
       detail: { title: r.title, period: r.period, days_overdue: daysOverdue(r.due_date), channel: c?.client_email ? "email" : "portal" },
     });
     return true;
+  };
+
+  /** Client came back — record the reply and teach the brain. */
+  const onMarkReplied = async (r: RequestRow) => {
+    if (!firmId) return;
+    setBusy(r.id);
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from("ca_document_requests")
+      .update({ status: "responded", updated_at: nowIso })
+      .eq("id", r.id)
+      .eq("ca_firm_id", firmId);
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    const c = clients.get(r.business_id);
+    void signalBrain(firmId, r.business_id, "chaser_replied", {
+      channel: c?.client_email ? "email" : "portal",
+      days_to_reply: r.last_chased_at
+        ? Math.floor((Date.now() - new Date(r.last_chased_at).getTime()) / DAY)
+        : 0,
+      subject: r.title,
+    });
+    await logCAAudit({
+      firmId,
+      businessId: r.business_id,
+      entityType: "document_request",
+      entityId: r.id,
+      action: "chaser_replied",
+      actorRole: role,
+      detail: { title: r.title, period: r.period },
+    });
+    toast.success("Reply recorded");
+    void load();
+  };
+
+  /** Deliberately not chasing this round — logged so the queue stays honest. */
+  const onSkip = async (r: RequestRow) => {
+    if (!firmId) return;
+    const reason = window.prompt("Why is this chase being skipped?");
+    if (!reason) return;
+    await logCAAudit({
+      firmId,
+      businessId: r.business_id,
+      entityType: "document_request",
+      entityId: r.id,
+      action: "chaser_skipped",
+      actorRole: role,
+      detail: { title: r.title, period: r.period, reason, days_overdue: daysOverdue(r.due_date) },
+    });
+    toast.success("Skip logged");
   };
 
   const onChase = async (r: RequestRow) => {
@@ -299,6 +350,14 @@ export default function CAChaserQueuePage() {
                         <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                           <CAButton onClick={() => void onChase(r)} disabled={busy === r.id}>
                             {busy === r.id ? "Chasing…" : "Chase now"}
+                          </CAButton>
+                          {r.last_chased_at && (
+                            <CAButton variant="ghost" onClick={() => void onMarkReplied(r)} disabled={busy === r.id}>
+                              Mark replied
+                            </CAButton>
+                          )}
+                          <CAButton variant="ghost" onClick={() => void onSkip(r)}>
+                            Skip
                           </CAButton>
                           <a
                             href={whatsappHref(r)}

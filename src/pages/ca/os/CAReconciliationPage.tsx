@@ -46,8 +46,14 @@ export default function CAReconciliationPage() {
   /** Learned date window from the client's intelligence row; defaults when unset. */
   const reconOpts = useMemo(
     () => ({
-      exactWindowDays: clientIntel?.match_preferences?.date_window_days ?? 3,
-      fuzzyWindowDays: Math.min(28, (clientIntel?.match_preferences?.date_window_days ?? 3) * 7),
+      exactWindowDays:
+        clientIntel?.match_preferences?.exact_window_days ??
+        clientIntel?.match_preferences?.date_window_days ??
+        3,
+      fuzzyWindowDays:
+        clientIntel?.match_preferences?.fuzzy_window_days ??
+        Math.min(28, (clientIntel?.match_preferences?.date_window_days ?? 3) * 7),
+      partPaymentFloor: clientIntel?.match_preferences?.part_payment_floor ?? 0.1,
     }),
     [clientIntel],
   );

@@ -44,7 +44,8 @@ export default function CAEvidenceVaultPage() {
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
 
   const openDoc = async (r: DocRow) => {
-    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(r.storage_path, 120);
+    if (!r.storage_path) return toast.error("No file stored for this record");
+    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(r.storage_path, 300);
     if (error || !data?.signedUrl) return toast.error(error?.message ?? "Could not open document");
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
@@ -97,13 +98,17 @@ export default function CAEvidenceVaultPage() {
             </span>,
             DOC_CLASS_LABELS[r.document_type as CADocClass] ?? r.document_type,
             r.filing_period ?? "—",
-            <CAButton key="o" variant="ghost" onClick={() => openDoc(r)}>
-              Open
-            </CAButton>,
+            r.storage_path ? (
+              <CAButton key="o" variant="ghost" onClick={() => openDoc(r)}>
+                Open
+              </CAButton>
+            ) : (
+              <span key="o" style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>No file</span>
+            ),
           ])}
         />
         <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginTop: 12 }}>
-          Links expire after two minutes and are never public.
+          Links expire after five minutes and are never public.
         </div>
       </CACard>
     </div>

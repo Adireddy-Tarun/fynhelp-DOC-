@@ -32,6 +32,33 @@ export interface CloseReadiness {
 }
 
 
+/**
+ * A client is close-ready when all four conditions hold. The same definition
+ * is used by the close module so the portfolio count and the per-client view
+ * never disagree.
+ */
+export async function isCloseReady(firmId: string, businessId: string): Promise<boolean> {
+  const head = { count: "exact" as const, head: true };
+  const today = new Date().toISOString().slice(0, 10);
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  const from = monthStart.toISOString().slice(0, 10);
+
+  const [overdue, bankLines, itcMatched, mis] = await Promise.all([
+    supabase.from("ca_compliance_events").select("id", head).eq("business_id", businessId).neq("status", "filed").lt("due_date", today),
+    supabase.from("bank_transactions").select("id", head).eq("business_id", businessId).gte("date", from),
+    supabase.from("ca_itc_records").select("id", head).eq("ca_firm_id", firmId).eq("business_id", businessId).eq("match_status", "matched"),
+    supabase.from("ca_reports_log").select("id", head).eq("ca_firm_id", firmId).eq("business_id", businessId).gte("created_at", `${from}T00:00:00Z`),
+  ]);
+
+  return (
+    (overdue.count ?? 0) === 0 &&
+    (bankLines.count ?? 0) > 0 &&
+    (itcMatched.count ?? 0) > 0 &&
+    (mis.count ?? 0) > 0
+  );
+}
+
 /** First and last instant of a YYYY-MM period, as ISO dates. */
 export function periodRange(period: string): { from: string; to: string } {
   const [y, m] = period.split("-").map(Number);

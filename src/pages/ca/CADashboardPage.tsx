@@ -8,6 +8,7 @@ import {
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
 import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
+import { isCloseReady } from "@/lib/caClose";
 
 interface ClientRow {
   id: string;
@@ -75,6 +76,7 @@ export default function CADashboardPage() {
 
   useEffect(() => {
     console.log("[fyn:ca:portal-rebuild] v2 complete — zones 1-4 active, tab order updated, brain connected");
+    console.log("[fyn:brain:wired] signals 1-5 active, recon opts personalized, chaser brain-suggested");
   }, []);
 
   useEffect(() => {
@@ -179,8 +181,32 @@ export default function CADashboardPage() {
           }));
         }),
       );
+      // Reconciliation / ITC / TDS exceptions raised by the engines.
+      const { data: engineExc } = await supabase
+        .from("ca_exceptions")
+        .select("id, business_id, source, reason_code, amount, status, created_at")
+        .eq("ca_firm_id", firmId)
+        .neq("status", "resolved")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      const byBusiness = new Map(enriched.filter((c) => c.business_id).map((c) => [c.business_id as string, c]));
+      const engineRows = ((engineExc as any[]) ?? []).map((e): ExceptionRow => {
+        const c = byBusiness.get(String(e.business_id));
+        return {
+          key: `exc:${e.id}`,
+          clientName: c?.client_name ?? "Unknown client",
+          clientId: c?.id ?? null,
+          type: String(e.reason_code ?? e.source ?? "Exception"),
+          amount: Number(e.amount ?? 0),
+          daysOpen: Math.max(0, Math.floor((Date.now() - new Date(e.created_at).getTime()) / 86400000)),
+          path: c?.id ? `/ca/clients/${c.id}` : "/ca/exceptions",
+        };
+      });
+
       if (cancelled) return;
-      setExceptions(rowsPerClient.flat().sort((a, b) => b.amount - a.amount).slice(0, 8));
+      setExceptions(
+        [...rowsPerClient.flat(), ...engineRows].sort((a, b) => b.amount - a.amount).slice(0, 8),
+      );
 
       console.log("[fyn:ca] portfolio mount", { firmId, clientCount: enriched.length });
     })();
@@ -243,16 +269,8 @@ export default function CADashboardPage() {
         .filter((r) => (r.client_status ?? "").toLowerCase() === "active" && r.business_id)
         .map((r) => r.business_id as string);
 
-      let ready = 0;
-      for (const bid of activeIds) {
-        const { count } = await supabase
-          .from("ca_compliance_events")
-          .select("id", { count: "exact", head: true })
-          .eq("business_id", bid)
-          .neq("status", "filed")
-          .lt("due_date", today);
-        if ((count ?? 0) === 0) ready += 1;
-      }
+      const flags = await Promise.all(activeIds.map((bid) => isCloseReady(firmId, bid)));
+      const ready = flags.filter(Boolean).length;
 
       if (cancelled) return;
       setOverdueCount(overdue ?? 0);
