@@ -57,6 +57,10 @@ export type Report = {
   period: string;
   template: ReportTemplate;
   generated: string;
+  /** Rows deliberately excluded because recon could not match them. */
+  excluded: number;
+  signedOff?: { by: string; at: string };
+  correction?: { note: string; at: string };
   revenue: number;
   expenses: number;
   sources: { revenue: Txn[]; expenses: Txn[] };
@@ -70,6 +74,7 @@ export const REPORT_TEMPLATES = [
   "Bank Reconciliation Summary",
   "Key Variances",
   "Working Paper",
+  "Exception and Review Summary",
 ] as const;
 export type ReportTemplate = (typeof REPORT_TEMPLATES)[number];
 
@@ -380,9 +385,21 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
 
   const clientTxns = useCallback((clientId: string) => docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows), [docs]);
 
+  /**
+   * Only transactions the Recon agent could match are allowed into an MIS.
+   * A row sitting in the exception queue is unmatched and is excluded by rule.
+   */
+  const matchedTxns = useCallback((clientId: string) => {
+    const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
+    return docs
+      .filter((d) => d.clientId === clientId)
+      .flatMap((d) => d.rows)
+      .filter((r) => !open.some((e) => e.date === r.date && Math.abs(e.amount) === Math.abs(r.amount)));
+  }, [docs, exceptions]);
+
   /** Workflow B — Recon agent, three passes, unmatched lines become exceptions. */
   const runRecon = useCallback((clientId: string, onDone?: (r: ReconResult) => void) => {
-    startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Flagging exceptions"], clientId, () => {
+    startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Rules pass", "Flagging exceptions"], clientId, () => {
       const bank = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
       const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
       const unresolved = bank.filter((r) => Math.abs(r.amount) > 500000).slice(0, 1);
@@ -403,10 +420,29 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     });
   }, [startRun, docs, exceptions, log]);
 
+  /** Stage 7 — the partner either accepts the MIS or sends it back. */
+  const signOffReport = useCallback((reportId: string, by: string) => {
+    setReports((p) => p.map((r) => {
+      if (r.id !== reportId) return r;
+      log(r.clientId, `${by} signed off the ${r.template} for ${r.period}.`, "narrate");
+      return { ...r, signedOff: { by, at: today() }, correction: undefined };
+    }));
+  }, [log]);
+
+  const requestCorrection = useCallback((reportId: string, note: string) => {
+    setReports((p) => p.map((r) => {
+      if (r.id !== reportId) return r;
+      log(r.clientId, `Correction requested on the ${r.template} for ${r.period}. ${note}`, "narrate");
+      return { ...r, correction: { note, at: today() }, signedOff: undefined };
+    }));
+  }, [log]);
+
   /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
   const generateReport = useCallback((clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => {
     startRun("narrate", `${template} for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
-      const rows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
+      const allRows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
+      const rows = matchedTxns(clientId);
+      const excluded = allRows.length - rows.length;
       const revenueRows = rows.filter((r) => r.amount > 0);
       const expenseRows = rows.filter((r) => r.amount < 0);
       const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
@@ -420,7 +456,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       const priorExpenses = priorRows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
       const largeRows = rows.filter((r) => Math.abs(r.amount) >= 100000);
       const created: Report = {
-        id: uid(), clientId, period, template, generated: today(), revenue, expenses,
+        id: uid(), clientId, period, template, generated: today(), excluded, revenue, expenses,
         sources: { revenue: revenueRows, expenses: expenseRows },
         variances: [
           { label: "Revenue", current: revenue, prior: priorRevenue },
@@ -528,10 +564,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
     clients, docs, review, exceptions, reports, chases, runs, recon,
     runsFor: (target: string) => runs.filter((r) => r.target === target),
     addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
-    addChase, sendFollowUp, setChaseStatus, clientTxns,
+    addChase, sendFollowUp, setChaseStatus, clientTxns, matchedTxns, signOffReport, requestCorrection,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
     period, setPeriod, role, setRole, activity, activityFor, closeStateFor,
-  }), [period, role, activity, activityFor, closeStateFor, hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
+  }), [matchedTxns, signOffReport, requestCorrection, period, role, activity, activityFor, closeStateFor, hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
 
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
