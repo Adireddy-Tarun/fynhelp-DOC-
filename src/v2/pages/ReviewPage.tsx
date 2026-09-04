@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { Badge, Card, Drawer, EmptyState, PageHeader, Tone, V, formatDate, formatINR } from "../ui";
+import { AgentStatusBadge } from "../agents";
 import { ReviewItem, useV2 } from "../store";
 
 export default function ReviewPage() {
@@ -17,7 +19,7 @@ export default function ReviewPage() {
   const confirm = (edited: boolean) => {
     if (!open) return;
     resolveReview(open.id, "confirmed", edited ? draft : undefined);
-    toast.success(edited ? "Edited and confirmed" : "Item confirmed");
+    toast.success(edited ? "Edited and confirmed. Row is now a transaction." : "Confirmed. Row is now a transaction.");
     setOpen(null);
   };
 
@@ -25,7 +27,11 @@ export default function ReviewPage() {
 
   return (
     <>
-      <PageHeader title="Review Queue" subtitle="Only the rows the extract agent was unsure about." />
+      <PageHeader
+        title="Review Queue"
+        subtitle="Only the rows the Extract agent was not confident about. Nothing here is a transaction yet."
+        action={<AgentStatusBadge agent="extract" label={`${list.length} awaiting review`} />}
+      />
 
       <div style={{ marginBottom: 16 }}>
         <select className="v2-input" style={{ width: "auto", minWidth: 220 }} value={client} onChange={(e) => setClient(e.target.value)}>
@@ -45,15 +51,26 @@ export default function ReviewPage() {
           <table className="v2-table">
             <thead><tr><th>Client</th><th>Document</th><th>Raw text</th><th>Suggestion</th><th>Confidence</th></tr></thead>
             <tbody>
-              {list.map((r) => (
-                <tr key={r.id} className="clickable" onClick={() => openItem(r)}>
-                  <td style={{ fontWeight: 600 }}>{clientName(r.clientId)}</td>
-                  <td style={{ color: V.body }}>{r.docName}</td>
-                  <td style={{ color: V.muted, fontSize: 12.5, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.rawText}</td>
-                  <td>{r.suggestion.particulars}</td>
-                  <td><Badge tone={tone(r.confidence)}>{Math.round(r.confidence * 100)} percent</Badge></td>
-                </tr>
-              ))}
+              <AnimatePresence initial={false}>
+                {list.map((r) => (
+                  <motion.tr
+                    key={r.id}
+                    layout
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 32, backgroundColor: "rgba(31,90,70,0.08)" }}
+                    transition={{ duration: 0.32, ease: "easeOut" }}
+                    className="clickable"
+                    onClick={() => openItem(r)}
+                  >
+                    <td style={{ fontWeight: 600 }}>{clientName(r.clientId)}</td>
+                    <td style={{ color: V.body }}>{r.docName}</td>
+                    <td style={{ color: V.muted, fontSize: 12.5, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.rawText}</td>
+                    <td>{r.suggestion.particulars}</td>
+                    <td><Badge tone={tone(r.confidence)}>{Math.round(r.confidence * 100)} percent</Badge></td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </Card>
@@ -62,6 +79,7 @@ export default function ReviewPage() {
       <Drawer open={!!open} onClose={() => setOpen(null)} title="Review extraction">
         {open && (
           <div style={{ display: "grid", gap: 18 }}>
+            <AgentStatusBadge agent="extract" label={`Extract confidence ${Math.round(open.confidence * 100)} percent`} />
             <div>
               <label className="v2-label">Original raw text</label>
               <div className="num" style={{ background: V.gray, borderRadius: 12, padding: 14, fontSize: 13, lineHeight: 1.6 }}>{open.rawText}</div>
@@ -83,7 +101,7 @@ export default function ReviewPage() {
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="v2-btn v2-btn-primary" onClick={() => confirm(false)}>Confirm</button>
-              <button className="v2-btn v2-btn-ghost" onClick={() => confirm(true)}>Edit and confirm</button>
+              <button className="v2-btn v2-btn-ghost" onClick={() => confirm(true)}>Save and confirm</button>
               <button
                 className="v2-btn v2-btn-ghost"
                 onClick={() => { resolveReview(open.id, "discarded"); toast.success("Item discarded"); setOpen(null); }}

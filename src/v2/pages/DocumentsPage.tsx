@@ -1,31 +1,40 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import { FileText, UploadCloud } from "lucide-react";
 import { Badge, Card, Drawer, EmptyState, PageHeader, Tabs, Tone, V, formatDate, formatINR } from "../ui";
+import { AgentStatusBadge, ProcessingCard, RowSkeleton } from "../agents";
 import { Doc, useV2 } from "../store";
 
 const TONE: Record<Doc["status"], Tone> = { Processing: "info", Parsed: "good", Failed: "bad" };
 
 export default function DocumentsPage() {
-  const { docs, clients, clientName, addDoc } = useV2();
+  const { docs, clients, clientName, addDoc, runs } = useV2();
   const [tab, setTab] = useState("All");
-  const [open, setOpen] = useState<Doc | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
   const [clientId, setClientId] = useState(clients[0]?.id ?? "");
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const active = docs.find((d) => d.id === open) ?? null;
+  const extractRuns = runs.filter((r) => r.agent === "extract");
 
   const upload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     if (!clientId) { toast.error("Add a client before uploading"); return; }
     Array.from(files).forEach((f) => addDoc(f.name, clientId));
-    toast.success(files.length === 1 ? "Document uploaded" : `${files.length} documents uploaded`);
+    toast.success("Extract agent is reading your document");
   };
 
   const list = docs.filter((d) => tab === "All" || d.status === tab);
 
   return (
     <>
-      <PageHeader title="Documents" subtitle="Extract agent. Upload once, we classify and pull the rows." />
+      <PageHeader
+        title="Documents"
+        subtitle="Extract agent. Upload once, we classify the file and pull every row."
+        action={<AgentStatusBadge agent="extract" active={extractRuns.length > 0} label={extractRuns.length ? "Extracting" : "Extract"} />}
+      />
 
       <Card
         style={{ padding: 0, marginBottom: 20, borderStyle: "dashed", borderColor: drag ? V.ink : V.line, background: drag ? V.gray : V.card }}
@@ -55,6 +64,14 @@ export default function DocumentsPage() {
         </div>
       )}
 
+      <div style={{ display: "grid", gap: 12, marginBottom: extractRuns.length ? 18 : 0 }}>
+        <AnimatePresence>
+          {extractRuns.map((r) => (
+            <ProcessingCard key={r.id} agent="extract" title={r.title} steps={r.steps} current={r.current} />
+          ))}
+        </AnimatePresence>
+      </div>
+
       <Tabs
         value={tab}
         onChange={setTab}
@@ -71,44 +88,59 @@ export default function DocumentsPage() {
           icon={<FileText size={22} />}
           title="No documents here yet"
           description="Upload a bank statement or a set of bills and the extract agent will classify and read them for you."
-          action={<button className="v2-btn v2-btn-primary" onClick={() => fileRef.current?.click()}><UploadCloud size={15} /> Upload a document</button>}
         />
       ) : (
         <Card style={{ padding: 0 }} className="v2-scroll">
           <table className="v2-table">
-            <thead><tr><th>File</th><th>Client</th><th>Source</th><th>Status</th><th>Date</th></tr></thead>
+            <thead><tr><th>File</th><th>Client</th><th>Source</th><th>Status</th><th>Rows</th><th>Date</th></tr></thead>
             <tbody>
-              {list.map((d) => (
-                <tr key={d.id} className="clickable" onClick={() => setOpen(d)}>
-                  <td style={{ fontWeight: 600 }}>{d.name}</td>
-                  <td style={{ color: V.body }}>{clientName(d.clientId)}</td>
-                  <td style={{ color: V.body }}>{d.source}</td>
-                  <td><Badge tone={TONE[d.status]}>{d.status}</Badge></td>
-                  <td className="num" style={{ color: V.body }}>{formatDate(d.date)}</td>
-                </tr>
-              ))}
+              <AnimatePresence initial={false}>
+                {list.map((d) => (
+                  <motion.tr
+                    key={d.id}
+                    layout
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.28 }}
+                    className="clickable"
+                    onClick={() => setOpen(d.id)}
+                  >
+                    <td style={{ fontWeight: 600 }}>{d.name}</td>
+                    <td style={{ color: V.body }}>{clientName(d.clientId)}</td>
+                    <td style={{ color: V.body }}>{d.source}</td>
+                    <td>
+                      {d.status === "Processing"
+                        ? <AgentStatusBadge agent="extract" active label="Extracting" />
+                        : <Badge tone={TONE[d.status]}>{d.status}</Badge>}
+                    </td>
+                    <td className="num" style={{ color: V.body }}>{d.rows.length}</td>
+                    <td className="num" style={{ color: V.body }}>{formatDate(d.date)}</td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </Card>
       )}
 
-      <Drawer open={!!open} onClose={() => setOpen(null)} title={open?.name ?? ""}>
-        {open && (
+      <Drawer open={!!active} onClose={() => setOpen(null)} title={active?.name ?? ""}>
+        {active && (
           <>
             <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-              <Badge tone={TONE[open.status]}>{open.status}</Badge>
-              <Badge>{clientName(open.clientId)}</Badge>
-              <Badge>{open.source}</Badge>
+              <Badge tone={TONE[active.status]}>{active.status}</Badge>
+              <Badge>{clientName(active.clientId)}</Badge>
+              <Badge>{active.source}</Badge>
             </div>
-            {open.rows.length === 0 ? (
-              <p style={{ fontSize: 13.5, color: V.body }}>
-                {open.status === "Processing" ? "Extraction is still running. Rows appear here as soon as it finishes." : "No rows were extracted from this file."}
-              </p>
+            {active.status === "Processing" ? (
+              <RowSkeleton rows={4} />
+            ) : active.rows.length === 0 ? (
+              <p style={{ fontSize: 13.5, color: V.body }}>No rows were extracted from this file.</p>
             ) : (
-              <table className="v2-table">
+              <motion.table className="v2-table" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
                 <thead><tr><th>Date</th><th>Particulars</th><th style={{ textAlign: "right" }}>Amount</th></tr></thead>
                 <tbody>
-                  {open.rows.map((r, i) => (
+                  {active.rows.map((r, i) => (
                     <tr key={i}>
                       <td className="num">{formatDate(r.date)}</td>
                       <td>{r.particulars}</td>
@@ -116,7 +148,7 @@ export default function DocumentsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </motion.table>
             )}
           </>
         )}
