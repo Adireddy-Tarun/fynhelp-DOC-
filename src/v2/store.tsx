@@ -342,6 +342,12 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
         ...p,
       ]);
       // Workflow D closing rule: a document arriving resolves an open chase for that client.
+      setChases((prev) => {
+        if (prev.some((c) => c.clientId === clientId && c.status !== "Resolved")) {
+          log(clientId, `Chase closed automatically because ${name} arrived.`, "chaser");
+        }
+        return prev;
+      });
       setChases((p) =>
         p.map((c) =>
           c.clientId === clientId && c.status !== "Resolved"
