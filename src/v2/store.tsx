@@ -141,6 +141,9 @@ const SEED_CLIENTS: Client[] = [
   { id: "c1", name: "Sundar Textiles Pvt Ltd", entityType: "Private Limited", gstin: "27AABCS1429B1ZP", contactName: "Ramesh Sundar", email: "ramesh@sundartextiles.in", phone: "919820011223", lastMis: iso(6) },
   { id: "c2", name: "Aarna Foods LLP", entityType: "LLP", gstin: "29AAFAA7391K1Z2", contactName: "Nisha Rao", email: "nisha@aarnafoods.in", phone: "919845567788", lastMis: iso(21) },
   { id: "c3", name: "Verve D2C Retail", entityType: "Private Limited", gstin: "36AAECV1122M1ZL", contactName: "Karthik Iyer", email: "karthik@vervedtc.com", phone: "919701234567", lastMis: iso(2) },
+  { id: "c4", name: "Kaveri Engineering Works", entityType: "Partnership", gstin: "33AAGFK5580R1ZQ", contactName: "Latha Kaveri", email: "latha@kaveriengg.in", phone: "919894112233", lastMis: iso(1) },
+  { id: "c5", name: "Mehr Consulting Proprietorship", entityType: "Proprietorship", gstin: "07AJXPM4412Q1Z8", contactName: "Mehr Ahluwalia", email: "mehr@mehrconsulting.in", phone: "919810099887" },
+  { id: "c6", name: "Northlight Studios Pvt Ltd", entityType: "Private Limited", gstin: "19AAFCN8821L1ZR", contactName: "Sohini Dutta", email: "sohini@northlightstudios.in", phone: "919830445566", lastMis: iso(34) },
 ];
 
 const SEED_DOCS: Doc[] = [
