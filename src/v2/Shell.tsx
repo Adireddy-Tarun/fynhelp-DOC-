@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutGrid, Users, FileText, ListChecks, AlertTriangle, Send, BarChart3, Settings, Menu, X,
+  LayoutGrid, Users, FileText, ListChecks, AlertTriangle, Send, BarChart3, Settings, Menu, X, LogOut,
 } from "lucide-react";
 import { V, V2_STYLES } from "./ui";
 import { AGENT_STYLES } from "./agents";
-import { V2StoreProvider } from "./store";
+import { V2StoreProvider, useV2 } from "./store";
 
 const NAV = [
   { to: "/v2", label: "Portfolio", icon: LayoutGrid, exact: true },
@@ -30,15 +30,49 @@ const TITLES: Record<string, string> = {
 };
 
 export default function V2Shell() {
+  return (
+    <V2StoreProvider>
+      <style>{V2_STYLES + AGENT_STYLES}</style>
+      <ShellBody />
+    </>
+  );
+}
+
+function ShellBody() {
   const [open, setOpen] = useState(false);
+  const { hydrated, session, onboarded, firm, signOut } = useV2();
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const title =
     TITLES[pathname] ??
     (pathname.startsWith("/v2/clients/") ? "Client workspace" : pathname.startsWith("/v2/reports/") ? "MIS report" : "FynHelp");
 
+  const onboarding = pathname === "/v2/onboarding";
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if ((!session || !onboarded) && !onboarding) navigate({ to: "/v2/onboarding" });
+    if (session && onboarded && onboarding) navigate({ to: "/v2" });
+  }, [hydrated, session, onboarded, onboarding, navigate]);
+
+  if (!hydrated) {
+    return (
+      <div className="v2" style={{ minHeight: "100vh", display: "grid", placeItems: "center", color: V.muted, fontSize: 13 }}>
+        Loading your workspace
+      </div>
+    );
+  }
+
+  if (onboarding) {
+    return (
+      <div className="v2" style={{ minHeight: "100vh", padding: "48px 20px" }}>
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
-    <V2StoreProvider>
-      <style>{V2_STYLES + AGENT_STYLES}</style>
+    <>
       <div className="v2" style={{ minHeight: "100vh", display: "flex" }}>
         {open && (
           <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(20,20,20,.3)", zIndex: 55 }} />
@@ -54,7 +88,7 @@ export default function V2Shell() {
           <div style={{ padding: "0 8px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>FynHelp</div>
-              <div style={{ fontSize: 10.5, letterSpacing: ".16em", textTransform: "uppercase", color: V.muted, marginTop: 3 }}>Practice OS</div>
+              <div style={{ fontSize: 10.5, letterSpacing: ".16em", textTransform: "uppercase", color: V.muted, marginTop: 3 }}>{firm?.name || "Practice OS"}</div>
             </div>
             <button className="v2-btn v2-btn-quiet" style={{ display: "none" }} onClick={() => setOpen(false)}><X size={15} /></button>
           </div>
@@ -74,7 +108,9 @@ export default function V2Shell() {
           </nav>
 
           <div style={{ borderTop: `1px solid ${V.line}`, paddingTop: 14, fontSize: 11.5, color: V.muted, padding: "14px 8px 0" }}>
-            Version 2 preview
+            <button className="v2-btn v2-btn-quiet" onClick={() => { signOut(); navigate({ to: "/v2/onboarding" }); }}>
+              <LogOut size={14} /> Sign out
+            </button>
           </div>
         </aside>
 
@@ -94,10 +130,10 @@ export default function V2Shell() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ textAlign: "right", lineHeight: 1.25 }} className="v2-hide-sm">
-                <div style={{ fontSize: 12.5, fontWeight: 600 }}>Prajwal Vakode</div>
-                <div style={{ fontSize: 11, color: V.muted }}>Partner</div>
+                <div style={{ fontSize: 12.5, fontWeight: 600 }}>{session?.name || "Partner"}</div>
+                <div style={{ fontSize: 11, color: V.muted }}>{firm?.name || "Your firm"}</div>
               </div>
-              <div style={{ width: 34, height: 34, borderRadius: 999, background: V.beige, display: "grid", placeItems: "center", fontSize: 12.5, fontWeight: 700 }}>PV</div>
+              <div style={{ width: 34, height: 34, borderRadius: 999, background: V.beige, display: "grid", placeItems: "center", fontSize: 12.5, fontWeight: 700 }}>{(session?.name || "F").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}</div>
             </div>
           </header>
 
@@ -111,6 +147,6 @@ export default function V2Shell() {
         @media (max-width:900px){ .v2-mobile-only { display:inline-flex; } }
         @media (max-width:560px){ .v2-hide-sm { display:none; } }
       `}</style>
-    </V2StoreProvider>
+    </>
   );
 }
