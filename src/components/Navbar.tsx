@@ -140,10 +140,10 @@ const CA_PRACTICE: { icon: IconType; label: string; href: string; desc: string }
 ];
 
 const CA_PREVIEW_STATS: ModuleStat[] = [
-  { label: "Active Clients",       value: "48",     sub: "↑ 3 new this month", tone: "neutral" },
-  { label: "Filings Due This Week",value: "12",     sub: "GSTR-3B 8 · GSTR-1 4", tone: "warning" },
-  { label: "Critical Alerts",      value: "5",      sub: "Across 4 clients", tone: "critical" },
-  { label: "ITC at Risk",          value: "₹8.4L",  sub: "Across 6 clients", tone: "warning" },
+  { label: "Active clients",        value: "48",    sub: "3 new this month",       tone: "neutral"  },
+  { label: "Filings this week",     value: "12",    sub: "GSTR-3B 8 · GSTR-1 4",  tone: "warning"  },
+  { label: "Exceptions open",       value: "5",     sub: "Ranked by rupee impact", tone: "critical" },
+  { label: "ITC at risk",           value: "₹8.4L", sub: "Across 6 clients",       tone: "warning"  },
 ];
 
 const TOP_LINKS: { label: string; href: string }[] = [
