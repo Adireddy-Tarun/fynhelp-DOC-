@@ -34,9 +34,10 @@ export default function V2Shell() {
     <V2StoreProvider>
       <style>{V2_STYLES + AGENT_STYLES}</style>
       <ShellBody />
-    </>
+    </V2StoreProvider>
   );
 }
+
 
 function ShellBody() {
   const [open, setOpen] = useState(false);
