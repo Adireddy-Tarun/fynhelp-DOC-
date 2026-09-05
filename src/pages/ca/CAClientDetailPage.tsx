@@ -769,7 +769,9 @@ export default function CAClientDetailPage() {
               </CAButton>
             </div>
           </CACard>
+          </>
         )}
+
 
         {tab === "Deductions" && businessId && firmId && (
           <ClientDeductionsTab firmId={firmId} businessId={businessId} clientId={clientId ?? null} userId={userId} />
