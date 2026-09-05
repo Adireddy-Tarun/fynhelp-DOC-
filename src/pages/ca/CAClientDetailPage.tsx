@@ -272,9 +272,13 @@ export default function CAClientDetailPage() {
       .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
       .order("due_date", { ascending: true });
     if (error) console.warn("[fyn:ca] ca_compliance_events", error);
-    setCompliance(data ?? []);
-    console.log("[fyn:ca] tab.compliance", businessId, data?.length ?? 0);
-  }, [businessId, firmId]);
+    const filtered = (data ?? []).filter((e: any) => {
+      if (!e.due_date) return true;
+      return e.due_date >= periodStart && e.due_date <= periodEnd;
+    });
+    setCompliance(filtered);
+    console.log("[fyn:ca] tab.compliance", businessId, filtered.length);
+  }, [businessId, firmId, periodStart, periodEnd]);
 
   const loadTxns = useCallback(async (page: number) => {
     if (!businessId) return;
@@ -297,11 +301,17 @@ export default function CAClientDetailPage() {
         }));
       }
       if (error) throw new Error(error);
-      const pageRows = (data ?? []).slice(page * 100, page * 100 + 100);
+      const inPeriod = (data ?? []).filter((t: any) => {
+        if (!t.date) return true;
+        const d = String(t.date).slice(0, 10);
+        return d >= periodStart && d <= periodEnd;
+      });
+      const pageRows = inPeriod.slice(page * 100, page * 100 + 100);
       setTxns((prev) => (page === 0 ? pageRows : [...prev, ...pageRows]));
       console.log("[fyn:ca] tab.bank_transactions", businessId, pageRows.length);
     } catch (e) { console.warn("[fyn:ca] bank_transactions", e); }
-  }, [businessId]);
+  }, [businessId, periodStart, periodEnd]);
+
 
   const loadReports = useCallback(async () => {
     if (!businessId || !firmId) return;
