@@ -337,7 +337,8 @@ export default function CAClientDetailPage() {
   useEffect(() => {
     if (!businessId) return;
     loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0); loadGstrUploads();
-  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
+  }, [businessId, activePeriod, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
+
 
   // ---- Actions ----
   const uploadGstr2b = async (file: File) => {
