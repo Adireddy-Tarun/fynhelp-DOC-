@@ -54,6 +54,7 @@ export function useCARole(): CARoleState {
   const [role, setRole] = useState<CARole | null>(null);
   const [permissions, setPermissions] = useState<CAPermission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasICAI, setHasICAI] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) {
