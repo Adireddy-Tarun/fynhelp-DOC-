@@ -305,7 +305,69 @@ export default function CADashboardPage() {
     return () => { cancelled = true; };
   }, [firmId]);
 
+  // First-run onboarding detection from real data
+  useEffect(() => {
+    if (!firmId || loading) return;
+    let cancelled = false;
+
+    if (clients.length === 0) {
+      setIsFirstRun(true);
+      setOnboardingStep(1);
+      return;
+    }
+
+    const checkDocs = async () => {
+      const businessIds = clients
+        .filter((c) => c.business_id)
+        .map((c) => c.business_id as string);
+      if (businessIds.length === 0) {
+        if (!cancelled) { setIsFirstRun(true); setOnboardingStep(2); }
+        return;
+      }
+
+      const { count } = await supabase
+        .from("ca_document_extractions")
+        .select("id", { count: "exact", head: true })
+        .in("business_id", businessIds)
+        .eq("ca_firm_id", firmId);
+      if (cancelled) return;
+      if (!count || count === 0) {
+        setIsFirstRun(true);
+        setOnboardingStep(2);
+        return;
+      }
+
+      const { count: pending } = await supabase
+        .from("ca_document_extractions")
+        .select("id", { count: "exact", head: true })
+        .in("business_id", businessIds)
+        .eq("ca_firm_id", firmId)
+        .eq("review_state", "needs_review");
+      if (cancelled) return;
+      if (pending && pending > 0) {
+        setIsFirstRun(true);
+        setOnboardingStep(3);
+        return;
+      }
+
+      setIsFirstRun(false);
+      setOnboardingStep(4);
+      try {
+        void supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: null,
+          event_type: "onboarding_complete",
+          payload: { client_count: clients.length, completed_at: new Date().toISOString() },
+        });
+      } catch { /* non-blocking */ }
+    };
+
+    void checkDocs();
+    return () => { cancelled = true; };
+  }, [firmId, clients, loading]);
+
   const total = clients.length;
+
   const active = clients.filter((c) => (c.client_status ?? "").toLowerCase() === "active").length;
 
   const actionsToday = dueToday.length + overdueCount;
