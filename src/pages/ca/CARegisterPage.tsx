@@ -13,7 +13,7 @@ export default function CARegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     caName: "", email: "", password: "", firmName: "",
-    icai: "", phone: "", city: "", state: "",
+    phone: "", city: "", state: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
