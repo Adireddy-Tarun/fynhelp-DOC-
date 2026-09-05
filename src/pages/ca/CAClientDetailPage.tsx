@@ -727,8 +727,13 @@ export default function CAClientDetailPage() {
         )}
 
         {tab === "Close" && (
+          <>
+          <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>
+            Close readiness — {periodLabel}
+          </div>
           <CACard style={{ padding: 20, maxWidth: 620 }}>
             <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>Close readiness</div>
+
             <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
               {closeChecklist.filter((i) => i.done).length} of 4 steps complete
             </div>
