@@ -148,8 +148,22 @@ export default function CAClientDetailPage() {
     }
   };
 
+  const [activePeriod, setActivePeriod] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  const periodStart = `${activePeriod}-01`;
+  const periodEnd = (() => {
+    const [y, m] = activePeriod.split("-").map(Number);
+    const last = new Date(y, m, 0).getDate();
+    return `${activePeriod}-${String(last).padStart(2, "0")}`;
+  })();
+  const periodLabel = new Date(Number(activePeriod.split("-")[0]), Number(activePeriod.split("-")[1]) - 1, 1)
+    .toLocaleString("en-IN", { month: "long", year: "numeric" });
+
   const [mis, setMis] = useState<MisReport | null>(null);
-  const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
+  const [misPeriodInput, setMisPeriodInput] = useState(activePeriod);
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
   const [uploadingGstr, setUploadingGstr] = useState(false);
   const [gstrPeriod, setGstrPeriod] = useState(() => {
@@ -157,7 +171,28 @@ export default function CAClientDetailPage() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
 
+  useEffect(() => { setMisPeriodInput(activePeriod); }, [activePeriod]);
+
+  useEffect(() => {
+    console.log(`[fyn:ca] period-selector active — period=${activePeriod}`);
+  }, [activePeriod]);
+
+
   const businessId = client?.business_id ?? null;
+
+  useEffect(() => {
+    if (!firmId || !businessId) return;
+    try {
+      void supabase.from("ca_brain_events").insert({
+        ca_firm_id: firmId,
+        business_id: businessId,
+        event_type: "period_selected",
+        payload: { period: activePeriod, client_id: clientId },
+      });
+    } catch { /* non-blocking */ }
+  }, [activePeriod, firmId, businessId, clientId]);
+
+
 
   useEffect(() => {
     if (!clientId || !firmId) return;
@@ -211,9 +246,13 @@ export default function CAClientDetailPage() {
       .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
       .order("invoice_date", { ascending: false });
     if (error) console.warn("[fyn:ca] ca_itc_records", error);
-    setItc(data ?? []);
-    console.log("[fyn:ca] tab.itc", businessId, data?.length ?? 0);
-  }, [businessId, firmId]);
+    const [py, pm] = activePeriod.split("-");
+    const itcPeriodStr = `${pm}${py}`;
+    const rows = (data ?? []).filter((r: any) => !r.filing_period || r.filing_period === itcPeriodStr);
+    setItc(rows);
+    console.log("[fyn:ca] tab.itc", businessId, rows.length);
+  }, [businessId, firmId, activePeriod]);
+
 
   const loadTds = useCallback(async () => {
     if (!businessId || !firmId) return;
@@ -233,9 +272,13 @@ export default function CAClientDetailPage() {
       .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
       .order("due_date", { ascending: true });
     if (error) console.warn("[fyn:ca] ca_compliance_events", error);
-    setCompliance(data ?? []);
-    console.log("[fyn:ca] tab.compliance", businessId, data?.length ?? 0);
-  }, [businessId, firmId]);
+    const filtered = (data ?? []).filter((e: any) => {
+      if (!e.due_date) return true;
+      return e.due_date >= periodStart && e.due_date <= periodEnd;
+    });
+    setCompliance(filtered);
+    console.log("[fyn:ca] tab.compliance", businessId, filtered.length);
+  }, [businessId, firmId, periodStart, periodEnd]);
 
   const loadTxns = useCallback(async (page: number) => {
     if (!businessId) return;
@@ -258,11 +301,17 @@ export default function CAClientDetailPage() {
         }));
       }
       if (error) throw new Error(error);
-      const pageRows = (data ?? []).slice(page * 100, page * 100 + 100);
+      const inPeriod = (data ?? []).filter((t: any) => {
+        if (!t.date) return true;
+        const d = String(t.date).slice(0, 10);
+        return d >= periodStart && d <= periodEnd;
+      });
+      const pageRows = inPeriod.slice(page * 100, page * 100 + 100);
       setTxns((prev) => (page === 0 ? pageRows : [...prev, ...pageRows]));
       console.log("[fyn:ca] tab.bank_transactions", businessId, pageRows.length);
     } catch (e) { console.warn("[fyn:ca] bank_transactions", e); }
-  }, [businessId]);
+  }, [businessId, periodStart, periodEnd]);
+
 
   const loadReports = useCallback(async () => {
     if (!businessId || !firmId) return;
@@ -288,7 +337,8 @@ export default function CAClientDetailPage() {
   useEffect(() => {
     if (!businessId) return;
     loadItc(); loadTds(); loadCompliance(); loadReports(); loadTxns(0); loadGstrUploads();
-  }, [businessId, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
+  }, [businessId, activePeriod, loadItc, loadTds, loadCompliance, loadReports, loadTxns, loadGstrUploads]);
+
 
   // ---- Actions ----
   const uploadGstr2b = async (file: File) => {
@@ -526,17 +576,16 @@ export default function CAClientDetailPage() {
   }, [compliance]);
 
   const closeChecklist = useMemo(() => {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthLabel = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
+    const monthLabel = new Date(Number(activePeriod.split("-")[0]), Number(activePeriod.split("-")[1]) - 1, 1)
+      .toLocaleString("en-IN", { month: "short", year: "numeric" });
     const thisMonthEvents = compliance.filter((c: any) => {
-      const d = c.due_date ? new Date(c.due_date) : null;
-      return !!d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      const d = c.due_date ? String(c.due_date).slice(0, 7) : null;
+      return d === activePeriod;
     });
     return [
       {
         label: "Bank statement uploaded",
-        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && new Date(t.date) >= monthStart).length > 0,
+        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && String(t.date).slice(0, 10) >= periodStart).length > 0,
       },
       {
         label: "ITC reconciled",
@@ -551,7 +600,8 @@ export default function CAClientDetailPage() {
         done: reports.filter((r: any) => (r.period ?? "").includes(monthLabel)).length > 0,
       },
     ];
-  }, [txns, itc, compliance, reports]);
+  }, [txns, itc, compliance, reports, activePeriod, periodStart, periodEnd]);
+
 
 
   if (loading) return <CAEmpty title="Loading client…" />;
@@ -606,6 +656,31 @@ export default function CAClientDetailPage() {
         </div>
       </div>
 
+      <div style={{
+        display: "flex", alignItems: "center", gap: 12, marginTop: 14, marginBottom: 0,
+        padding: "10px 16px", background: CA.card,
+        border: "1px solid rgba(23,18,8,0.09)", borderRadius: 10, flexWrap: "wrap",
+      }}>
+        <span style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.faint }}>
+          Period
+        </span>
+        <input
+          type="month"
+          value={activePeriod}
+          onChange={(e) => { if (e.target.value) setActivePeriod(e.target.value); }}
+          style={{ ...caInputStyle, width: 160, height: 34, fontSize: 13 }}
+          aria-label="Select period"
+        />
+        <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink }}>
+          {periodLabel}
+        </span>
+        <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginLeft: "auto" }}>
+          {periodStart} to {periodEnd}
+        </span>
+      </div>
+
+
+
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
         {TABS.map((t) => (
           <button
@@ -652,8 +727,13 @@ export default function CAClientDetailPage() {
         )}
 
         {tab === "Close" && (
+          <>
+          <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>
+            Close readiness — {periodLabel}
+          </div>
           <CACard style={{ padding: 20, maxWidth: 620 }}>
             <div style={{ fontFamily: CA.serif, fontSize: 16, fontWeight: 700, color: CA.ink }}>Close readiness</div>
+
             <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 4 }}>
               {closeChecklist.filter((i) => i.done).length} of 4 steps complete
             </div>
@@ -689,7 +769,9 @@ export default function CAClientDetailPage() {
               </CAButton>
             </div>
           </CACard>
+          </>
         )}
+
 
         {tab === "Deductions" && businessId && firmId && (
           <ClientDeductionsTab firmId={firmId} businessId={businessId} clientId={clientId ?? null} userId={userId} />

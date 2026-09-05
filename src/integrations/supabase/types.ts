@@ -1531,6 +1531,69 @@ export type Database = {
           },
         ]
       }
+      ca_client_periods: {
+        Row: {
+          ca_firm_id: string
+          client_id: string
+          close_step_1: boolean
+          close_step_2: boolean
+          close_step_3: boolean
+          close_step_4: boolean
+          created_at: string
+          id: string
+          period: string
+          period_end: string
+          period_start: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id: string
+          close_step_1?: boolean
+          close_step_2?: boolean
+          close_step_3?: boolean
+          close_step_4?: boolean
+          created_at?: string
+          id?: string
+          period: string
+          period_end: string
+          period_start: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string
+          close_step_1?: boolean
+          close_step_2?: boolean
+          close_step_3?: boolean
+          close_step_4?: boolean
+          created_at?: string
+          id?: string
+          period?: string
+          period_end?: string
+          period_start?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_client_periods_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_client_periods_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "ca_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_client_users: {
         Row: {
           business_id: string
