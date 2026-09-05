@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { COLORS, PageWrap, PageHeader, Card, PrimaryBtn, SecondaryBtn, GhostLink, Chip } from "@/components/ca/ui";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { useCARole } from "@/hooks/useCARole";
+import { ICAIGate } from "@/components/ca/ICAIGate";
 import { logCAAudit } from "@/lib/caAudit";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -129,7 +130,9 @@ type ClientOpt = { business_id: string; business_name: string };
 // ───────── Main page ─────────
 export default function CAReportsPage() {
   const { caFirm, user } = useCAAuth();
-  const { role } = useCARole();
+  const { role, hasICAI, setHasICAI } = useCARole();
+  const [showICAIGate, setShowICAIGate] = useState(false);
+  const [pendingSignOffRow, setPendingSignOffRow] = useState<ReportRow | null>(null);
   const canSignOff = role === "partner" || role === "manager";
   const [signingId, setSigningId] = useState<string | null>(null);
   const [reports, setReports] = useState<ReportRow[]>([]);
@@ -332,7 +335,14 @@ export default function CAReportsPage() {
                           {r.signed_off_at ? (
                             <Chip tone="green">Signed off{r.signed_off_by === user?.id ? " by you" : ""}</Chip>
                           ) : canSignOff ? (
-                            <SecondaryBtn size="sm" onClick={() => handleSignOff(r)} disabled={signingId === r.id}>
+                            <SecondaryBtn
+                              size="sm"
+                              onClick={() => {
+                                if (!hasICAI) { setPendingSignOffRow(r); setShowICAIGate(true); return; }
+                                handleSignOff(r);
+                              }}
+                              disabled={signingId === r.id}
+                            >
                               {signingId === r.id ? "Signing..." : "Sign off"}
                             </SecondaryBtn>
                           ) : (
@@ -451,6 +461,18 @@ export default function CAReportsPage() {
           caFirmId={caFirm?.id || ""}
           onClose={() => setScheduleOpen(false)}
           onSaved={() => { setScheduleOpen(false); loadAll(); }}
+        />
+      )}
+      {showICAIGate && (
+        <ICAIGate
+          actionLabel="Signing off a report"
+          onUnlocked={() => {
+            setShowICAIGate(false);
+            setHasICAI(true);
+            if (pendingSignOffRow) handleSignOff(pendingSignOffRow);
+            setPendingSignOffRow(null);
+          }}
+          onCancel={() => { setShowICAIGate(false); setPendingSignOffRow(null); }}
         />
       )}
     </PageWrap>

@@ -13,6 +13,7 @@ import { useCARole } from "@/hooks/useCARole";
 import { CA, CABadge, CACard, CAButton, CAEmpty, caTd, caTh, dateIN, inr, type Tone } from "@/components/ca/portalUi";
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
+import { ICAIGate } from "@/components/ca/ICAIGate";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
 import { penaltyEstimate } from "@/lib/caPenalty";
 import { useFirmClientIntelligence, filingRiskBand, lateSharePct } from "@/hooks/useCAIntelligence";
@@ -50,7 +51,8 @@ const daysFromToday = (due: string) => Math.round((new Date(due).getTime() - sta
 export default function CACompliancePage() {
   const { firmId, userId } = useCAPortal();
   const { byBusiness: intel } = useFirmClientIntelligence(firmId);
-  const { can } = useCARole();
+  const { can, hasICAI, setHasICAI } = useCARole();
+  const [icaiGateEvent, setIcaiGateEvent] = useState<EventRow | null>(null);
   const navigate = useNavigate();
   const prepare = useServerFn(autoPrepareReturn);
 
@@ -300,7 +302,10 @@ export default function CACompliancePage() {
                               </CAButton>
                             )}
                             {can("process") && (
-                              <CAButton disabled={busyId === e.id} onClick={() => void onMarkFiled(e)}>
+                              <CAButton
+                                disabled={busyId === e.id}
+                                onClick={() => { if (!hasICAI) { setIcaiGateEvent(e); return; } void onMarkFiled(e); }}
+                              >
                                 Mark filed
                               </CAButton>
                             )}
@@ -315,6 +320,13 @@ export default function CACompliancePage() {
           </div>
         )}
       </CACard>
+      {icaiGateEvent && (
+        <ICAIGate
+          actionLabel="Filing a compliance return"
+          onUnlocked={() => { const e = icaiGateEvent; setIcaiGateEvent(null); setHasICAI(true); void onMarkFiled(e); }}
+          onCancel={() => setIcaiGateEvent(null)}
+        />
+      )}
     </div>
   );
 }

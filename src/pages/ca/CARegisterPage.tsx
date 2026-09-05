@@ -13,7 +13,7 @@ export default function CARegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     caName: "", email: "", password: "", firmName: "",
-    icai: "", phone: "", city: "", state: "",
+    phone: "", city: "", state: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -70,8 +70,7 @@ export default function CARegisterPage() {
           user_id: userId,
           firm_name: form.firmName.trim(),
           ca_name: form.caName.trim(),
-          icai_membership_number: form.icai.trim(),
-          membership_number: form.icai.trim(),
+          membership_number: "",
           phone: form.phone.trim(),
           email: form.email.trim(),
           city: form.city.trim(),
@@ -112,7 +111,7 @@ export default function CARegisterPage() {
         </div>
         <CAHeading size={26} style={{ marginTop: 18 }}>Register your firm</CAHeading>
         <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 6 }}>
-          Create a practice account — for CAs, accountants, and articleship holders.
+          For CA firms, accountants, articleship holders, and accounting practices.
         </p>
 
         <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
@@ -151,9 +150,6 @@ export default function CARegisterPage() {
               </div>
             </CAField>
 
-            <CAField label="ICAI membership number (optional)">
-              <input style={caInputStyle} value={form.icai} onChange={set("icai")} placeholder="123456" />
-            </CAField>
             <CAField label="Phone" error={errors.phone}>
               <input style={caInputStyle} value={form.phone} onChange={set("phone")} placeholder="9876543210" />
             </CAField>

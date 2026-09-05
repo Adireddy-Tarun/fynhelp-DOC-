@@ -16,6 +16,8 @@ import {
 } from "@/components/ca/portalUi";
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
+import { ICAIGate } from "@/components/ca/ICAIGate";
+import { useCARole } from "@/hooks/useCARole";
 import { logCAAudit } from "@/lib/caAudit";
 import { Upload } from "lucide-react";
 
@@ -113,6 +115,8 @@ export default function CAItcReconPage() {
   const [uploading, setUploading] = useState(false);
   const [logging, setLogging] = useState(false);
   const [filter, setFilter] = useState<"all" | Verdict>("all");
+  const { hasICAI, setHasICAI } = useCARole();
+  const [icaiGateOpen, setIcaiGateOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const period = periodLabel(month);
@@ -285,13 +289,23 @@ export default function CAItcReconPage() {
   return (
     <div>
       <GspLimitationBanner />
+      {icaiGateOpen && (
+        <ICAIGate
+          actionLabel="Approving ITC reconciliation"
+          onUnlocked={() => { setIcaiGateOpen(false); setHasICAI(true); void logExceptions(); }}
+          onCancel={() => setIcaiGateOpen(false)}
+        />
+      )}
       <ModuleHeader
         title="ITC reconciliation"
         subtitle="Upload the GSTR-2B download for a period and match it line by line against the purchase register. Anything that does not reconcile becomes an exception."
         right={
           <div style={{ display: "flex", gap: 8 }}>
             <CAButton variant="ghost" onClick={exportCsv} disabled={!visible.length}>Export CSV</CAButton>
-            <CAButton onClick={logExceptions} disabled={logging || !records.length}>
+            <CAButton
+              onClick={() => { if (!hasICAI) { setIcaiGateOpen(true); return; } void logExceptions(); }}
+              disabled={logging || !records.length}
+            >
               {logging ? "Logging…" : "Log exceptions"}
             </CAButton>
           </div>
