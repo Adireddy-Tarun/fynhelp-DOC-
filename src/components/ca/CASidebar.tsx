@@ -12,7 +12,7 @@ import { CA } from "./portalUi";
 import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
 
-type NavItem = { label: string; path: string; icon: typeof LayoutGrid; badge?: "urgent" | "unread" };
+type NavItem = { label: string; path: string; icon: typeof LayoutGrid; badge?: "urgent" | "unread"; roleRequired?: "admin" };
 
 const GROUPS: { group: string; links: NavItem[] }[] = [
   {
@@ -46,7 +46,7 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
     links: [
       { label: "Filing calendar", path: "/ca/filing-calendar", icon: CalendarCheck },
       { label: "GST portfolio", path: "/ca/gst-portfolio", icon: Receipt },
-      { label: "ITC recon", path: "/ca/itc-recon", icon: Scale },
+      { label: "ITC recon", path: "/ca/itc-recon", icon: Scale, roleRequired: "admin" },
       { label: "TDS tracker", path: "/ca/tds-tracker", icon: FileText },
       { label: "Compliance", path: "/ca/compliance", icon: ShieldCheck },
     ],
@@ -78,10 +78,10 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
   {
     group: "Firm",
     links: [
-      { label: "Billing", path: "/ca/billing", icon: CreditCard },
-      { label: "Users and Roles", path: "/ca/users", icon: UserCog },
+      { label: "Billing", path: "/ca/billing", icon: CreditCard, roleRequired: "admin" },
+      { label: "Users and Roles", path: "/ca/users", icon: UserCog, roleRequired: "admin" },
       { label: "Client portal", path: "/ca/client-portal", icon: MonitorSmartphone },
-      { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck },
+      { label: "Audit trail", path: "/ca/audit-trail", icon: ShieldCheck, roleRequired: "admin" },
       { label: "Settings", path: "/ca/settings", icon: Settings },
     ],
   },
@@ -96,7 +96,8 @@ export default function CASidebar({
   onNavigate?: () => void;
   drawer?: boolean;
 }) {
-  const { firmId, firmName, caName } = useCAPortal();
+  const { firmId, firmName, caName, caRole } = useCAPortal();
+  const isAdmin = caRole === "admin" || caRole === "partner";
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
   const [urgentCount, setUrgentCount] = useState(0);
@@ -185,7 +186,7 @@ export default function CASidebar({
             <div style={{ fontFamily: CA.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.faint, padding: "6px 12px 4px" }}>
               {group}
             </div>
-            {links.map(({ label, path, icon: Icon, badge }) => {
+            {links.filter((l) => !l.roleRequired || isAdmin).map(({ label, path, icon: Icon, badge }) => {
               const count = badge === "urgent" ? urgentCount : badge === "unread" ? unread : 0;
               return (
                 <NavLink
