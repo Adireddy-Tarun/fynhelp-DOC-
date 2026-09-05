@@ -656,6 +656,31 @@ export default function CAClientDetailPage() {
         </div>
       </div>
 
+      <div style={{
+        display: "flex", alignItems: "center", gap: 12, marginTop: 14, marginBottom: 0,
+        padding: "10px 16px", background: CA.card,
+        border: "1px solid rgba(23,18,8,0.09)", borderRadius: 10, flexWrap: "wrap",
+      }}>
+        <span style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.faint }}>
+          Period
+        </span>
+        <input
+          type="month"
+          value={activePeriod}
+          onChange={(e) => { if (e.target.value) setActivePeriod(e.target.value); }}
+          style={{ ...caInputStyle, width: 160, height: 34, fontSize: 13 }}
+          aria-label="Select period"
+        />
+        <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink }}>
+          {periodLabel}
+        </span>
+        <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginLeft: "auto" }}>
+          {periodStart} to {periodEnd}
+        </span>
+      </div>
+
+
+
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
         {TABS.map((t) => (
           <button
