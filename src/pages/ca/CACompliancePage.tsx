@@ -13,6 +13,7 @@ import { useCARole } from "@/hooks/useCARole";
 import { CA, CABadge, CACard, CAButton, CAEmpty, caTd, caTh, dateIN, inr, type Tone } from "@/components/ca/portalUi";
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
+import { ICAIGate } from "@/components/ca/ICAIGate";
 import { autoPrepareReturn } from "@/lib/caCompliance.functions";
 import { penaltyEstimate } from "@/lib/caPenalty";
 import { useFirmClientIntelligence, filingRiskBand, lateSharePct } from "@/hooks/useCAIntelligence";

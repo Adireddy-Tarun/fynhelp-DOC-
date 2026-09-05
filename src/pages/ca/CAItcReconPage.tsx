@@ -289,6 +289,13 @@ export default function CAItcReconPage() {
   return (
     <div>
       <GspLimitationBanner />
+      {icaiGateOpen && (
+        <ICAIGate
+          actionLabel="Approving ITC reconciliation"
+          onUnlocked={() => { setIcaiGateOpen(false); setHasICAI(true); void logExceptions(); }}
+          onCancel={() => setIcaiGateOpen(false)}
+        />
+      )}
       <ModuleHeader
         title="ITC reconciliation"
         subtitle="Upload the GSTR-2B download for a period and match it line by line against the purchase register. Anything that does not reconcile becomes an exception."

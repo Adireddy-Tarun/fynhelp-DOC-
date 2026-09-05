@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { COLORS, PageWrap, PageHeader, Card, PrimaryBtn, SecondaryBtn, GhostLink, Chip } from "@/components/ca/ui";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { useCARole } from "@/hooks/useCARole";
+import { ICAIGate } from "@/components/ca/ICAIGate";
 import { logCAAudit } from "@/lib/caAudit";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -460,6 +461,18 @@ export default function CAReportsPage() {
           caFirmId={caFirm?.id || ""}
           onClose={() => setScheduleOpen(false)}
           onSaved={() => { setScheduleOpen(false); loadAll(); }}
+        />
+      )}
+      {showICAIGate && (
+        <ICAIGate
+          actionLabel="Signing off a report"
+          onUnlocked={() => {
+            setShowICAIGate(false);
+            setHasICAI(true);
+            if (pendingSignOffRow) handleSignOff(pendingSignOffRow);
+            setPendingSignOffRow(null);
+          }}
+          onCancel={() => { setShowICAIGate(false); setPendingSignOffRow(null); }}
         />
       )}
     </PageWrap>
