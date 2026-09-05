@@ -44,6 +44,9 @@ export interface CARoleState {
   can: (p: CAPermission) => boolean;
   isLoading: boolean;
   refresh: () => Promise<void>;
+  /** True when the firm has a practising CA's ICAI membership number on file. */
+  hasICAI: boolean;
+  setHasICAI: (v: boolean) => void;
 }
 
 export function useCARole(): CARoleState {

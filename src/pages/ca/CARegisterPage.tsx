@@ -111,7 +111,7 @@ export default function CARegisterPage() {
         </div>
         <CAHeading size={26} style={{ marginTop: 18 }}>Register your firm</CAHeading>
         <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 6 }}>
-          Create a practice account — for CAs, accountants, and articleship holders.
+          For CA firms, accountants, articleship holders, and accounting practices.
         </p>
 
         <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
