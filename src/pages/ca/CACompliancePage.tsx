@@ -320,6 +320,13 @@ export default function CACompliancePage() {
           </div>
         )}
       </CACard>
+      {icaiGateEvent && (
+        <ICAIGate
+          actionLabel="Filing a compliance return"
+          onUnlocked={() => { const e = icaiGateEvent; setIcaiGateEvent(null); setHasICAI(true); void onMarkFiled(e); }}
+          onCancel={() => setIcaiGateEvent(null)}
+        />
+      )}
     </div>
   );
 }
