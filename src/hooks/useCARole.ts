@@ -65,7 +65,11 @@ export function useCARole(): CARoleState {
     }
     setIsLoading(true);
     try {
-      const { data: roleData } = await supabase.rpc("ca_member_role", { _firm_id: firmId });
+      const [{ data: roleData }, { data: firm }] = await Promise.all([
+        supabase.rpc("ca_member_role", { _firm_id: firmId }),
+        supabase.from("ca_firms").select("icai_membership_number").eq("id", firmId).maybeSingle(),
+      ]);
+      setHasICAI(!!(firm?.icai_membership_number?.trim()));
       const resolved = (roleData as CARole | null) ?? null;
       setRole(resolved);
       if (resolved) {
@@ -91,5 +95,5 @@ export function useCARole(): CARoleState {
     [permissions],
   );
 
-  return { role, permissions, can, isLoading, refresh: load };
+  return { role, permissions, can, isLoading, refresh: load, hasICAI, setHasICAI };
 }
