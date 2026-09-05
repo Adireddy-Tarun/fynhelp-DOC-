@@ -7,6 +7,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { validateUpload } from "@/lib/uploadPolicy";
 import { logCAAudit } from "@/lib/caAudit";
+import { normaliseAmount, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
 
 export type CADocClass = "bank" | "invoice" | "expense" | "challan" | "other";
 
@@ -87,6 +88,91 @@ export function scoreConfidence(docType: "bank" | "invoice" | "expense", rows: E
   // small penalty for single-row extractions of multi-row document types
   const volumeFactor = docType === "bank" && rows.length < 3 ? 0.9 : 1;
   return Math.round(completeness * volumeFactor * 100) / 100;
+}
+
+/**
+ * Parse a CSV bank statement using the deterministic bank parser.
+ * Rows come back in the same shape as the OCR extractor.
+ */
+export async function parseBankCSV(file: File): Promise<{ rows: ExtractionRow[]; error: string | null }> {
+  try {
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length < 2) return { rows: [], error: "CSV has fewer than 2 rows" };
+
+    const sep = text.includes("\t") ? "\t" : text.includes("|") ? "|" : ",";
+    let headerIdx = 0;
+    for (let i = 0; i < Math.min(10, lines.length); i++) {
+      if (lines[i].split(sep).length >= 3) { headerIdx = i; break; }
+    }
+    const clean = (c: string) => c.replace(/^["']|["']$/g, "").trim();
+    const headers = lines[headerIdx].split(sep).map(clean);
+    const dataLines = lines.slice(headerIdx + 1).filter((l) => l.trim().length > 0);
+    const dataRows = dataLines.map((l) => l.split(sep).map(clean));
+    const sampleRawRows = dataRows.slice(0, 10);
+
+    const detected = detectAmountPattern(headers, sampleRawRows);
+    const dateIdx = headers.findIndex((h) => /date|dt|value date|transaction date/i.test(h));
+    const descIdx = headers.findIndex((h) => /description|narration|particular|remarks|details|memo|note/i.test(h));
+
+    const rows: ExtractionRow[] = [];
+    for (const cols of dataRows) {
+      if (cols.length < 2) continue;
+      const rawDate = dateIdx >= 0 ? cols[dateIdx] : "";
+      const rawDesc = descIdx >= 0 ? cols[descIdx] : cols[1] ?? "";
+      const rawAmount = detected.amountIdx >= 0 ? cols[detected.amountIdx] : undefined;
+      const rawType = detected.typeIdx >= 0 ? cols[detected.typeIdx] : undefined;
+      const rawDebit = detected.debitIdx >= 0 ? cols[detected.debitIdx] : undefined;
+      const rawCredit = detected.creditIdx >= 0 ? cols[detected.creditIdx] : undefined;
+
+      const signed = normaliseAmount(rawAmount, rawType, rawDebit, rawCredit);
+      if (signed === 0 && !rawDate) continue;
+
+      rows.push({
+        date: rawDate,
+        description: rawDesc,
+        amount: Math.abs(signed),
+        direction: signed < 0 ? "debit" : "credit",
+      });
+    }
+    logParsePattern("csv-intake", detected, rows as Array<{ date?: string; description?: string; amount: number }>);
+    return { rows, error: rows.length === 0 ? "No parseable rows found in CSV" : null };
+  } catch (e) {
+    return { rows: [], error: e instanceof Error ? e.message : "CSV parse failed" };
+  }
+}
+
+/** Parse a Tally XML export into the OCR extractor row shape. */
+export async function parseTallyXML(file: File): Promise<{ rows: ExtractionRow[]; error: string | null }> {
+  try {
+    const text = await file.text();
+    const doc = new DOMParser().parseFromString(text, "text/xml");
+    const vouchers = Array.from(doc.querySelectorAll("VOUCHER"));
+    if (vouchers.length === 0) return { rows: [], error: "No VOUCHER elements found in XML" };
+
+    const rows: ExtractionRow[] = [];
+    for (const v of vouchers) {
+      const date = v.querySelector("DATE")?.textContent?.trim() ?? "";
+      const narration =
+        v.querySelector("NARRATION")?.textContent?.trim() ??
+        v.querySelector("VOUCHERTYPENAME")?.textContent?.trim() ??
+        "";
+      const ledgerEntries = Array.from(v.querySelectorAll("ALLLEDGERENTRIES\\.LIST, LEDGERENTRIES\\.LIST"));
+      for (const entry of ledgerEntries) {
+        const amount = parseFloat(entry.querySelector("AMOUNT")?.textContent?.trim() ?? "0");
+        if (!Number.isFinite(amount) || amount === 0) continue;
+        rows.push({
+          date: /^\d{8}$/.test(date) ? `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}` : date,
+          description: narration,
+          amount: Math.abs(amount),
+          direction: amount < 0 ? "debit" : "credit",
+        });
+      }
+    }
+    return { rows, error: rows.length === 0 ? "No parseable entries in Tally XML" : null };
+  } catch (e) {
+    return { rows: [], error: e instanceof Error ? e.message : "XML parse failed" };
+  }
 }
 
 function fileToBase64(file: File): Promise<string> {
@@ -172,12 +258,24 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
     return { ok: false, error: docErr.message };
   }
 
+  const isCsv = file.type === "text/csv" || file.name.toLowerCase().endsWith(".csv");
+  const isXml = file.name.toLowerCase().endsWith(".xml");
   const docType = extractableDocType(classification);
   let rows: ExtractionRow[] = [];
   let confidence = 0;
   let errorMessage: string | null = null;
 
-  if (docType) {
+  if (isCsv) {
+    const parsed = await parseBankCSV(file);
+    rows = parsed.rows;
+    errorMessage = parsed.error;
+    confidence = rows.length > 0 ? scoreConfidence("bank", rows) : 0;
+  } else if (isXml) {
+    const parsed = await parseTallyXML(file);
+    rows = parsed.rows;
+    errorMessage = parsed.error;
+    confidence = rows.length > 0 ? scoreConfidence("bank", rows) : 0;
+  } else if (docType) {
     try {
       const dataUrl = await fileToBase64(file);
       const { data, error } = await supabase.functions.invoke("extract-document-ai", {
@@ -193,8 +291,13 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
       errorMessage = e instanceof Error ? e.message : "Extraction failed";
     }
   } else {
-    errorMessage = "No extractor for this document class — needs manual classification";
+    // Unsupported file type — store and route to review for manual classification
+    errorMessage = null;
+    rows = [];
+    confidence = 0;
   }
+
+  console.log(`[fyn:extract] csv-path=${isCsv} xml-path=${isXml} rows=${rows.length} confidence=${confidence}`);
 
   const reviewState = errorMessage
     ? "failed"
@@ -279,6 +382,7 @@ export async function postExtraction(
       balance: 0,
       source_document_id: extraction.document_id,
       source_reference: `ca_extraction:${extraction.id}`,
+      source_type: "manual",
     }));
     const { error: e, data: inserted } = await supabase.from("bank_transactions").insert(payload).select("id");
     error = e?.message ?? null;
