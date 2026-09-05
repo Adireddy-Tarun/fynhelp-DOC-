@@ -246,9 +246,13 @@ export default function CAClientDetailPage() {
       .eq("business_id", businessId).eq("ca_firm_id", firmId).eq("is_demo", false)
       .order("invoice_date", { ascending: false });
     if (error) console.warn("[fyn:ca] ca_itc_records", error);
-    setItc(data ?? []);
-    console.log("[fyn:ca] tab.itc", businessId, data?.length ?? 0);
-  }, [businessId, firmId]);
+    const [py, pm] = activePeriod.split("-");
+    const itcPeriodStr = `${pm}${py}`;
+    const rows = (data ?? []).filter((r: any) => !r.filing_period || r.filing_period === itcPeriodStr);
+    setItc(rows);
+    console.log("[fyn:ca] tab.itc", businessId, rows.length);
+  }, [businessId, firmId, activePeriod]);
+
 
   const loadTds = useCallback(async () => {
     if (!businessId || !firmId) return;
