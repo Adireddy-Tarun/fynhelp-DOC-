@@ -150,9 +150,6 @@ export default function CARegisterPage() {
               </div>
             </CAField>
 
-            <CAField label="ICAI membership number (optional)">
-              <input style={caInputStyle} value={form.icai} onChange={set("icai")} placeholder="123456" />
-            </CAField>
             <CAField label="Phone" error={errors.phone}>
               <input style={caInputStyle} value={form.phone} onChange={set("phone")} placeholder="9876543210" />
             </CAField>
