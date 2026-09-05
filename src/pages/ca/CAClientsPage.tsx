@@ -379,7 +379,23 @@ export default function CAClientsPage() {
                         <CABadge tone="red">{dueReminders[r.business_id]} due</CABadge>
                       )}
                     </span>
+                    <div style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, marginTop: 4 }}>
+                      {new Date().toLocaleString("en-IN", { month: "short", year: "numeric" })} · Active period
+                    </div>
+                    <div style={{ display: "flex", gap: 4, marginTop: 6, alignItems: "center" }}>
+                      {["Intake", "Recon", "Compliance", "MIS"].map((step) => (
+                        <div
+                          key={step}
+                          title={step}
+                          style={{ width: 6, height: 6, borderRadius: 999, background: "rgba(23,18,8,0.12)" }}
+                        />
+                      ))}
+                      <span style={{ fontFamily: CA.sans, fontSize: 10.5, color: CA.faint, marginLeft: 6, fontWeight: 400 }}>
+                        Open to see close progress
+                      </span>
+                    </div>
                   </td>
+
 
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
