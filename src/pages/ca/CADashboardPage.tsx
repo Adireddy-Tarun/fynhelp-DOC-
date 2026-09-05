@@ -405,7 +405,15 @@ export default function CADashboardPage() {
 
   return (
     <div>
+      {isFirstRun && onboardingStep > 0 && onboardingStep < 4 && (
+        <CAOnboardingBanner
+          step={onboardingStep as 1 | 2 | 3 | 4}
+          firmId={firmId ?? ""}
+          firstClientId={clients[0]?.id ?? null}
+        />
+      )}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>
+
         <CAHeading>Portfolio</CAHeading>
         <span style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>
           Intelligence updated {timeAgo(firmIntel?.brain_last_run_at ?? brainLastRunAt)}
