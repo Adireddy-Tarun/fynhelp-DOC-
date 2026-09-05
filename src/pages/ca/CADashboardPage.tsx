@@ -73,6 +73,10 @@ export default function CADashboardPage() {
   const [closeReady, setCloseReady] = useState({ ready: 0, total: 0 });
   const [firmBrainData, setFirmBrainData] = useState<FirmBrain | null>(null);
   const [exceptions, setExceptions] = useState<ExceptionRow[]>([]);
+  const [isFirstRun, setIsFirstRun] = useState(false);
+  // 0 = not first run, 1 = no clients, 2 = has client no docs, 3 = has docs needs review, 4 = complete
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+
 
   useEffect(() => {
     console.log("[fyn:ca:portal-rebuild] v2 complete — zones 1-4 active, tab order updated, brain connected");
