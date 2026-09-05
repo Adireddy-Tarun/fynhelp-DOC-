@@ -116,24 +116,36 @@ export default function CAReviewQueuePage() {
       />
 
       <CACard style={{ padding: 20, marginBottom: 20 }}>
-        <QueueTable
-          columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", ""]}
-          empty="Queue is clear"
-          emptyHint="Every extraction has been reviewed or auto-accepted."
-          rows={items.map((i) => [
-            dateIN(i.created_at),
-            nameFor(i.business_id),
-            i.original_filename ?? "—",
-            DOC_CLASS_LABELS[i.classification as CADocClass] ?? i.classification,
-            String((i.extracted?.rows ?? []).length),
-            <ConfidenceChip key="c" value={i.confidence} />,
-            <StateChip key="s" value={i.review_state} />,
-            <CAButton key="o" variant="ghost" onClick={() => setActiveId(i.id === activeId ? null : i.id)}>
-              {i.id === activeId ? "Close" : "Review"}
-            </CAButton>,
-          ])}
-        />
+        {items.length === 0 ? (
+          <div style={{ padding: "28px 24px", textAlign: "center" }}>
+            <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: "#1F5A46", marginBottom: 6 }}>
+              Review queue is clear
+            </div>
+            <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
+              All extracted documents are either posted to the ledger or awaiting upload. High confidence extractions post automatically, only items that need a human check appear here.
+            </p>
+          </div>
+        ) : (
+          <QueueTable
+            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", ""]}
+            empty="Queue is clear"
+            emptyHint="Every extraction has been reviewed or auto-accepted."
+            rows={items.map((i) => [
+              dateIN(i.created_at),
+              nameFor(i.business_id),
+              i.original_filename ?? "—",
+              DOC_CLASS_LABELS[i.classification as CADocClass] ?? i.classification,
+              String((i.extracted?.rows ?? []).length),
+              <ConfidenceChip key="c" value={i.confidence} />,
+              <StateChip key="s" value={i.review_state} />,
+              <CAButton key="o" variant="ghost" onClick={() => setActiveId(i.id === activeId ? null : i.id)}>
+                {i.id === activeId ? "Close" : "Review"}
+              </CAButton>,
+            ])}
+          />
+        )}
       </CACard>
+
 
       {active && (
         <CACard style={{ padding: 20 }}>

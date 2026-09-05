@@ -7,6 +7,8 @@ import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh, caTd, caNum,
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
+import { CAOnboardingBanner } from "@/components/ca/CAOnboardingBanner";
+
 import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
 import { isCloseReady } from "@/lib/caClose";
 
@@ -73,6 +75,10 @@ export default function CADashboardPage() {
   const [closeReady, setCloseReady] = useState({ ready: 0, total: 0 });
   const [firmBrainData, setFirmBrainData] = useState<FirmBrain | null>(null);
   const [exceptions, setExceptions] = useState<ExceptionRow[]>([]);
+  const [isFirstRun, setIsFirstRun] = useState(false);
+  // 0 = not first run, 1 = no clients, 2 = has client no docs, 3 = has docs needs review, 4 = complete
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+
 
   useEffect(() => {
     console.log("[fyn:ca:portal-rebuild] v2 complete — zones 1-4 active, tab order updated, brain connected");
@@ -301,7 +307,69 @@ export default function CADashboardPage() {
     return () => { cancelled = true; };
   }, [firmId]);
 
+  // First-run onboarding detection from real data
+  useEffect(() => {
+    if (!firmId || loading) return;
+    let cancelled = false;
+
+    if (clients.length === 0) {
+      setIsFirstRun(true);
+      setOnboardingStep(1);
+      return;
+    }
+
+    const checkDocs = async () => {
+      const businessIds = clients
+        .filter((c) => c.business_id)
+        .map((c) => c.business_id as string);
+      if (businessIds.length === 0) {
+        if (!cancelled) { setIsFirstRun(true); setOnboardingStep(2); }
+        return;
+      }
+
+      const { count } = await supabase
+        .from("ca_document_extractions")
+        .select("id", { count: "exact", head: true })
+        .in("business_id", businessIds)
+        .eq("ca_firm_id", firmId);
+      if (cancelled) return;
+      if (!count || count === 0) {
+        setIsFirstRun(true);
+        setOnboardingStep(2);
+        return;
+      }
+
+      const { count: pending } = await supabase
+        .from("ca_document_extractions")
+        .select("id", { count: "exact", head: true })
+        .in("business_id", businessIds)
+        .eq("ca_firm_id", firmId)
+        .eq("review_state", "needs_review");
+      if (cancelled) return;
+      if (pending && pending > 0) {
+        setIsFirstRun(true);
+        setOnboardingStep(3);
+        return;
+      }
+
+      setIsFirstRun(false);
+      setOnboardingStep(4);
+      try {
+        void supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: null,
+          event_type: "onboarding_complete",
+          payload: { client_count: clients.length, completed_at: new Date().toISOString() },
+        });
+      } catch { /* non-blocking */ }
+    };
+
+    void checkDocs();
+    return () => { cancelled = true; };
+  }, [firmId, clients, loading]);
+
   const total = clients.length;
+
   const active = clients.filter((c) => (c.client_status ?? "").toLowerCase() === "active").length;
 
   const actionsToday = dueToday.length + overdueCount;
@@ -339,7 +407,15 @@ export default function CADashboardPage() {
 
   return (
     <div>
+      {isFirstRun && onboardingStep > 0 && onboardingStep < 4 && (
+        <CAOnboardingBanner
+          step={onboardingStep as 1 | 2 | 3 | 4}
+          firmId={firmId ?? ""}
+          firstClientId={clients[0]?.id ?? null}
+        />
+      )}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>
+
         <CAHeading>Portfolio</CAHeading>
         <span style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.faint }}>
           Intelligence updated {timeAgo(firmIntel?.brain_last_run_at ?? brainLastRunAt)}
@@ -474,7 +550,26 @@ export default function CADashboardPage() {
           {loading ? (
             <CACard><CAEmpty title="Loading portfolio…" /></CACard>
           ) : clients.length === 0 ? (
-            <CACard><CAEmpty title="No clients yet" hint="Add your first client to start tracking their financial health." /></CACard>
+            <>
+              <CACard>
+                <CAEmpty
+                  title="No clients yet"
+                  hint="Add a client using the button below. Once added, upload their bank statement from the Intake inbox to begin."
+                />
+              </CACard>
+              <div style={{ marginTop: 12 }}>
+                <button
+                  onClick={() => navigate("/ca/clients/add")}
+                  style={{
+                    background: "#A93838", color: "#F7F1E6", border: "none", borderRadius: 10,
+                    padding: "10px 20px", fontFamily: CA.sans, fontSize: 13.5, fontWeight: 600, cursor: "pointer",
+                  }}
+                >
+                  Add first client
+                </button>
+              </div>
+            </>
+
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
               {clients.map((c) => {

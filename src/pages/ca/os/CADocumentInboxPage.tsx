@@ -149,23 +149,42 @@ export default function CADocumentInboxPage() {
       </CACard>
 
       <CACard style={{ padding: 20 }}>
-        <QueueTable
-          columns={["Received", "Client", "Document", "Class", "Confidence", "State"]}
-          empty="No documents yet"
-          emptyHint="Upload a file above, or raise a request so the client can send it themselves."
-          rows={rows.map((r) => [
-            dateIN(r.created_at),
-            nameFor(r.business_id),
-            <div key="f">
-              <div style={{ fontWeight: 600 }}>{r.original_filename ?? "—"}</div>
-              {r.error_message && <div style={{ fontSize: 11.5, color: CA.red }}>{r.error_message}</div>}
-            </div>,
-            DOC_CLASS_LABELS[r.classification as CADocClass] ?? r.classification,
-            <ConfidenceChip key="c" value={r.confidence} />,
-            <StateChip key="s" value={r.review_state} />,
-          ])}
-        />
+        {rows.length === 0 ? (
+          <div style={{
+            padding: "32px 24px", textAlign: "center",
+            border: "2px dashed rgba(169,56,56,0.20)", borderRadius: 14,
+            background: "rgba(169,56,56,0.02)",
+          }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 18, fontWeight: 700, color: CA.ink, marginBottom: 8 }}>
+              Upload your first document
+            </div>
+            <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, lineHeight: 1.65, maxWidth: 440, margin: "0 auto 20px" }}>
+              Upload a bank statement in CSV or PDF, an invoice, or an expense bill for this client. The system reads it automatically. High confidence extractions post to the ledger immediately. Low confidence items come to the Review queue for a quick check.
+            </p>
+            <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>
+              Supported formats: HDFC, ICICI, SBI, Axis and Kotak bank CSVs, Tally XML, generic CSV, PDF invoices and bills
+            </div>
+          </div>
+        ) : (
+          <QueueTable
+            columns={["Received", "Client", "Document", "Class", "Confidence", "State"]}
+            empty="No documents yet"
+            emptyHint="Upload a file above, or raise a request so the client can send it themselves."
+            rows={rows.map((r) => [
+              dateIN(r.created_at),
+              nameFor(r.business_id),
+              <div key="f">
+                <div style={{ fontWeight: 600 }}>{r.original_filename ?? "—"}</div>
+                {r.error_message && <div style={{ fontSize: 11.5, color: CA.red }}>{r.error_message}</div>}
+              </div>,
+              DOC_CLASS_LABELS[r.classification as CADocClass] ?? r.classification,
+              <ConfidenceChip key="c" value={r.confidence} />,
+              <StateChip key="s" value={r.review_state} />,
+            ])}
+          />
+        )}
       </CACard>
+
 
       <div style={{ marginTop: 14 }}>
         <CAButton variant="ghost" onClick={() => void load()}>
