@@ -7,6 +7,8 @@ import {
   CA, CACard, CAHeading, CABadge, healthTone, inr, dateIN, CAEmpty, caTh, caTd, caNum,
 } from "@/components/ca/portalUi";
 import { CATasksSummaryCard } from "@/components/ca/CATasksSummaryCard";
+import { CAOnboardingBanner } from "@/components/ca/CAOnboardingBanner";
+
 import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
 import { isCloseReady } from "@/lib/caClose";
 
