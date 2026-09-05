@@ -38,6 +38,11 @@ export default function CAVerificationPendingPage() {
 
   useEffect(() => { loadStatus(); /* eslint-disable-next-line */ }, [user?.id]);
 
+  // Signups are auto-approved now: anyone already approved goes straight to the portal.
+  useEffect(() => {
+    if (caFirm?.is_verified) navigate("/ca/dashboard");
+  }, [caFirm?.is_verified]); // eslint-disable-line
+
   const steps = [
     { label: "Application submitted", state: "done" as const },
     { label: status === "rejected" ? "Verification could not be completed" : "Document verification in progress", state: status === "rejected" ? "error" as const : "current" as const },

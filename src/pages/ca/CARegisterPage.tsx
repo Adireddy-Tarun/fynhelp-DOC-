@@ -28,7 +28,7 @@ export default function CARegisterPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email address";
     if (form.password.length < 8) e.password = "Password must be at least 8 characters";
     if (!form.firmName.trim()) e.firmName = "Firm name is required";
-    if (!form.icai.trim()) e.icai = "ICAI membership number is required";
+    
     if (!/^\d{10}$/.test(form.phone.replace(/\D/g, ""))) e.phone = "Enter a 10-digit phone number";
     if (!form.city.trim()) e.city = "City is required";
     if (!form.state.trim()) e.state = "State is required";
@@ -76,8 +76,8 @@ export default function CARegisterPage() {
           email: form.email.trim(),
           city: form.city.trim(),
           state: form.state.trim(),
-          is_verified: false,
-          verification_status: "pending",
+          is_verified: true,
+          verification_status: "approved",
           onboarding_step: 1,
         })
         .select("id")
@@ -108,11 +108,11 @@ export default function CARegisterPage() {
       <CACard style={{ width: "100%", maxWidth: 560, padding: 36 }}>
         <FynLogo variant="dark" size="sm" />
         <div style={{ fontFamily: CA.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: CA.teal, marginTop: 2 }}>
-          CA Portal
+          Practice Portal
         </div>
         <CAHeading size={26} style={{ marginTop: 18 }}>Register your firm</CAHeading>
         <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, marginTop: 6 }}>
-          Create a CA partner account to manage your client portfolio.
+          Create a practice account — for CAs, accountants, and articleship holders.
         </p>
 
         <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
@@ -151,7 +151,7 @@ export default function CARegisterPage() {
               </div>
             </CAField>
 
-            <CAField label="ICAI membership number" error={errors.icai}>
+            <CAField label="ICAI membership number (optional)">
               <input style={caInputStyle} value={form.icai} onChange={set("icai")} placeholder="123456" />
             </CAField>
             <CAField label="Phone" error={errors.phone}>
@@ -172,7 +172,7 @@ export default function CARegisterPage() {
           )}
 
           <CAButton type="submit" disabled={loading || !captcha} style={{ height: 46, fontSize: 14 }}>
-            {loading ? "Creating account…" : "Create CA account"}
+            {loading ? "Creating account…" : "Create account"}
           </CAButton>
         </form>
 
