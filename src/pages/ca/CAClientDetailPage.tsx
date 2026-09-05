@@ -576,17 +576,16 @@ export default function CAClientDetailPage() {
   }, [compliance]);
 
   const closeChecklist = useMemo(() => {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthLabel = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
+    const monthLabel = new Date(Number(activePeriod.split("-")[0]), Number(activePeriod.split("-")[1]) - 1, 1)
+      .toLocaleString("en-IN", { month: "short", year: "numeric" });
     const thisMonthEvents = compliance.filter((c: any) => {
-      const d = c.due_date ? new Date(c.due_date) : null;
-      return !!d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      const d = c.due_date ? String(c.due_date).slice(0, 7) : null;
+      return d === activePeriod;
     });
     return [
       {
         label: "Bank statement uploaded",
-        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && new Date(t.date) >= monthStart).length > 0,
+        done: txns.filter((t: any) => t.source_type !== "seed" && t.date && String(t.date).slice(0, 10) >= periodStart).length > 0,
       },
       {
         label: "ITC reconciled",
@@ -601,7 +600,8 @@ export default function CAClientDetailPage() {
         done: reports.filter((r: any) => (r.period ?? "").includes(monthLabel)).length > 0,
       },
     ];
-  }, [txns, itc, compliance, reports]);
+  }, [txns, itc, compliance, reports, activePeriod, periodStart, periodEnd]);
+
 
 
   if (loading) return <CAEmpty title="Loading client…" />;
