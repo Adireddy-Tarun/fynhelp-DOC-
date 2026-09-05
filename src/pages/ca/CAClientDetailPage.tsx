@@ -181,6 +181,20 @@ export default function CAClientDetailPage() {
   const businessId = client?.business_id ?? null;
 
   useEffect(() => {
+    if (!firmId || !businessId) return;
+    try {
+      void supabase.from("ca_brain_events").insert({
+        ca_firm_id: firmId,
+        business_id: businessId,
+        event_type: "period_selected",
+        payload: { period: activePeriod, client_id: clientId },
+      });
+    } catch { /* non-blocking */ }
+  }, [activePeriod, firmId, businessId, clientId]);
+
+
+
+  useEffect(() => {
     if (!clientId || !firmId) return;
     (async () => {
       setLoading(true);
