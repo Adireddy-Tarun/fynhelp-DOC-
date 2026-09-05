@@ -50,7 +50,8 @@ const daysFromToday = (due: string) => Math.round((new Date(due).getTime() - sta
 export default function CACompliancePage() {
   const { firmId, userId } = useCAPortal();
   const { byBusiness: intel } = useFirmClientIntelligence(firmId);
-  const { can } = useCARole();
+  const { can, hasICAI, setHasICAI } = useCARole();
+  const [icaiGateEvent, setIcaiGateEvent] = useState<EventRow | null>(null);
   const navigate = useNavigate();
   const prepare = useServerFn(autoPrepareReturn);
 
@@ -300,7 +301,10 @@ export default function CACompliancePage() {
                               </CAButton>
                             )}
                             {can("process") && (
-                              <CAButton disabled={busyId === e.id} onClick={() => void onMarkFiled(e)}>
+                              <CAButton
+                                disabled={busyId === e.id}
+                                onClick={() => { if (!hasICAI) { setIcaiGateEvent(e); return; } void onMarkFiled(e); }}
+                              >
                                 Mark filed
                               </CAButton>
                             )}
