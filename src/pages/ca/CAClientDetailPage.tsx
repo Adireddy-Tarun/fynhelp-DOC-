@@ -148,14 +148,35 @@ export default function CAClientDetailPage() {
     }
   };
 
+  const [activePeriod, setActivePeriod] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  const periodStart = `${activePeriod}-01`;
+  const periodEnd = (() => {
+    const [y, m] = activePeriod.split("-").map(Number);
+    const last = new Date(y, m, 0).getDate();
+    return `${activePeriod}-${String(last).padStart(2, "0")}`;
+  })();
+  const periodLabel = new Date(Number(activePeriod.split("-")[0]), Number(activePeriod.split("-")[1]) - 1, 1)
+    .toLocaleString("en-IN", { month: "long", year: "numeric" });
+
   const [mis, setMis] = useState<MisReport | null>(null);
-  const [misPeriodInput, setMisPeriodInput] = useState(() => new Date().toISOString().slice(0, 7));
+  const [misPeriodInput, setMisPeriodInput] = useState(activePeriod);
   const [gstrUploads, setGstrUploads] = useState<any[]>([]);
   const [uploadingGstr, setUploadingGstr] = useState(false);
   const [gstrPeriod, setGstrPeriod] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
+
+  useEffect(() => { setMisPeriodInput(activePeriod); }, [activePeriod]);
+
+  useEffect(() => {
+    console.log(`[fyn:ca] period-selector active — period=${activePeriod}`);
+  }, [activePeriod]);
+
 
   const businessId = client?.business_id ?? null;
 
