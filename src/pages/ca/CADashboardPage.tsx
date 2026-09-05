@@ -540,7 +540,26 @@ export default function CADashboardPage() {
           {loading ? (
             <CACard><CAEmpty title="Loading portfolio…" /></CACard>
           ) : clients.length === 0 ? (
-            <CACard><CAEmpty title="No clients yet" hint="Add your first client to start tracking their financial health." /></CACard>
+            <>
+              <CACard>
+                <CAEmpty
+                  title="No clients yet"
+                  hint="Add a client using the button below. Once added, upload their bank statement from the Intake inbox to begin."
+                />
+              </CACard>
+              <div style={{ marginTop: 12 }}>
+                <button
+                  onClick={() => navigate("/ca/clients/add")}
+                  style={{
+                    background: "#A93838", color: "#F7F1E6", border: "none", borderRadius: 10,
+                    padding: "10px 20px", fontFamily: CA.sans, fontSize: 13.5, fontWeight: 600, cursor: "pointer",
+                  }}
+                >
+                  Add first client
+                </button>
+              </div>
+            </>
+
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
               {clients.map((c) => {
