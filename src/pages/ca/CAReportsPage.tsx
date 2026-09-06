@@ -449,18 +449,6 @@ export default function CAReportsPage() {
           onSaved={() => { setScheduleOpen(false); loadAll(); }}
         />
       )}
-      {showICAIGate && (
-        <ICAIGate
-          actionLabel="Signing off a report"
-          onUnlocked={() => {
-            setShowICAIGate(false);
-            setHasICAI(true);
-            if (pendingSignOffRow) handleSignOff(pendingSignOffRow);
-            setPendingSignOffRow(null);
-          }}
-          onCancel={() => { setShowICAIGate(false); setPendingSignOffRow(null); }}
-        />
-      )}
     </PageWrap>
   );
 }
