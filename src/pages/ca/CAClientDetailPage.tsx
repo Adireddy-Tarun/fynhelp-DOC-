@@ -260,7 +260,21 @@ export default function CAClientDetailPage() {
         .eq("ca_firm_id", firmId)
         .eq("parent_id", clientId);
       setSubCount(count ?? 0);
+      // Restore the last period this client was worked on.
+      const { data: lastPeriod } = await supabase
+        .from("ca_client_periods")
+        .select("period")
+        .eq("ca_firm_id", firmId)
+        .eq("client_id", clientId)
+        .eq("status", "active")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lastPeriod?.period && /^\d{4}-\d{2}$/.test(lastPeriod.period)) {
+        setActivePeriod(lastPeriod.period);
+      }
       console.log("[fyn:ca] client detail mount", { clientId, business_id: (data as Client)?.business_id ?? null });
+
     })();
   }, [clientId, firmId]);
 
