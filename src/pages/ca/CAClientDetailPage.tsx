@@ -1392,7 +1392,7 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
         </Section>
 
         <Section title="Exceptions">
-          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} />
+          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} ids={report.source_txn_ids?.exceptions} rowLabel="Open exceptions" />
           <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
         </Section>
 
