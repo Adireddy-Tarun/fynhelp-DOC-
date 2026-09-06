@@ -220,6 +220,25 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   const policyError = validateUpload("ca-client-documents", file);
   if (policyError) return { ok: false, error: policyError };
 
+  // Block posting into a period the firm has already closed.
+  try {
+    const periodKey = input.period ? input.period.slice(0, 7) : null;
+    if (periodKey && input.clientId) {
+      const { data: periodRecord } = await supabase
+        .from("ca_client_periods")
+        .select("status")
+        .eq("ca_firm_id", firmId)
+        .eq("client_id", input.clientId)
+        .eq("period", periodKey)
+        .maybeSingle();
+      if (periodRecord?.status === "closed") {
+        return { ok: false, error: `Period ${periodKey} is closed. Switch to an open period to upload documents.` };
+      }
+    }
+  } catch { /* non-blocking check */ }
+
+
+
   const classification = input.classification ?? guessClassification(file.name);
   const period = input.period ?? null;
   const path = storagePathFor(firmId, businessId, period, file.name);
