@@ -342,9 +342,10 @@ export default function CAChaserQueuePage() {
                       onChange={() => setSelected(allSelected ? new Set() : new Set(sorted.map((r) => r.id)))}
                     />
                   </th>
-                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", "Predicted response", ""].map((h) => (
+                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", "Predicted response", "History", ""].map((h) => (
                     <th key={h} style={caTh}>{h}</th>
                   ))}
+
                 </tr>
               </thead>
               <tbody>
