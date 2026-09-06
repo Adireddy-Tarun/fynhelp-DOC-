@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 
 export interface CAClientOption {
+  id: string;
   business_id: string;
   client_name: string;
   client_reference_code: string | null;
