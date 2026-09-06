@@ -139,10 +139,12 @@ export default function CADocumentInboxPage() {
         file,
         firmId,
         businessId,
+        clientId: clients.find((c) => c.business_id === businessId)?.id ?? null,
         clientReferenceCode: businessId.slice(0, 8).toUpperCase(),
         period: period || null,
         classification: cls,
       });
+
       if (!res.ok) {
         toast.error(`${file.name}: ${res.error}`);
       } else if (res.reviewState === "auto_accepted") {
