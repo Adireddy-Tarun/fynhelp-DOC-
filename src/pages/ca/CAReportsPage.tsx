@@ -128,11 +128,8 @@ type ClientOpt = { business_id: string; business_name: string };
 // ───────── Main page ─────────
 export default function CAReportsPage() {
   const { caFirm, user } = useCAAuth();
-  const { role, hasICAI, setHasICAI } = useCARole();
-  const [showICAIGate, setShowICAIGate] = useState(false);
-  const [pendingSignOffRow, setPendingSignOffRow] = useState<ReportRow | null>(null);
-  const canSignOff = role === "partner" || role === "manager";
-  const [signingId, setSigningId] = useState<string | null>(null);
+  const [caRole, setCaRole] = useState<string | null>(null);
+  const canSignOff = caRole === "admin" || caRole === "manager";
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [schedules, setSchedules] = useState<ScheduleRow[]>([]);
   const [clients, setClients] = useState<ClientOpt[]>([]);
