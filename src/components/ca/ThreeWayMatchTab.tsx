@@ -58,7 +58,7 @@ function isoDate(v: unknown): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
 }
 
-export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: string | null; businessId: string | null }) {
+export default function ThreeWayMatchTab({ firmId, businessId, periodStart, periodEnd }: { firmId: string | null; businessId: string | null; periodStart?: string; periodEnd?: string }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [ran, setRan] = useState(false);
@@ -66,6 +66,7 @@ export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: strin
   const run = useCallback(async () => {
     if (!firmId || !businessId) return;
     setLoading(true);
+    console.log(`[fyn:recon] period-scoped periodStart=${periodStart ?? "none"} periodEnd=${periodEnd ?? "none"}`);
     const [extRes, bankRes] = await Promise.all([
       supabase
         .from("ca_document_extractions")
@@ -73,12 +74,16 @@ export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: strin
         .eq("business_id", businessId)
         .eq("ca_firm_id", firmId)
         .eq("classification", "invoice")
-        .eq("review_state", "posted"),
+        .eq("review_state", "posted")
+        .gte("created_at", periodStart ? `${periodStart}T00:00:00Z` : "2000-01-01T00:00:00Z")
+        .lte("created_at", periodEnd ? `${periodEnd}T23:59:59Z` : new Date().toISOString()),
       supabase
         .from("bank_transactions")
         .select("id, date, amount, description, type")
         .eq("business_id", businessId)
         .eq("type", "credit")
+        .gte("date", periodStart ?? "2000-01-01")
+        .lte("date", periodEnd ?? new Date().toISOString().slice(0, 10))
         .order("date", { ascending: false })
         .limit(1000),
     ]);
@@ -181,7 +186,7 @@ export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: strin
         total_received: credits.reduce((s, c) => s + c.amount, 0),
       },
     });
-  }, [firmId, businessId]);
+  }, [firmId, businessId, periodStart, periodEnd]);
 
   useEffect(() => { void run(); }, [run]);
 
@@ -226,6 +231,12 @@ export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: strin
         <Card label="Outstanding receivables" value={inr(totals.outstanding)} tone={CA.red} />
         <Card label="Timing gaps" value={String(totals.gaps)} />
       </div>
+
+      {periodStart && periodEnd && (
+        <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginBottom: 8 }}>
+          Showing reconciliation for {periodStart} to {periodEnd}
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <CAButton onClick={run} disabled={loading}>{loading ? "Matching…" : "Re-run match"}</CAButton>

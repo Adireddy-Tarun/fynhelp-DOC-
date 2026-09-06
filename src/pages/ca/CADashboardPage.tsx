@@ -78,6 +78,84 @@ export default function CADashboardPage() {
   const [isFirstRun, setIsFirstRun] = useState(false);
   // 0 = not first run, 1 = no clients, 2 = has client no docs, 3 = has docs needs review, 4 = complete
   const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [nbaMap, setNbaMap] = useState<Record<string, { action: string; path: string; tone: "red" | "gold" | "teal" }>>({});
+
+  useEffect(() => {
+    if (!clients.length || !firmId) return;
+    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    let cancelled = false;
+
+    const compute = async () => {
+      const businessIds = clients.filter((c) => c.business_id).map((c) => c.business_id as string);
+      if (!businessIds.length) return;
+
+      let exceptions: { business_id: string; status: string; amount: number }[] = [];
+      let compliance: { business_id: string; status: string; due_date: string; event_type: string }[] = [];
+      const recentTxns = new Set<string>();
+      const pendingChasers = new Set<string>();
+
+      try {
+        const excRes = await supabase
+          .from("ca_exceptions").select("business_id, status, amount")
+          .eq("ca_firm_id", firmId).neq("status", "resolved");
+        exceptions = ((excRes.data ?? []) as unknown as typeof exceptions);
+      } catch { /* silent */ }
+
+      try {
+        const compRes = await supabase
+          .from("ca_compliance_events").select("business_id, status, due_date, event_type")
+          .eq("ca_firm_id", firmId).in("business_id", businessIds).neq("status", "filed").lte("due_date", in3Days);
+        compliance = ((compRes.data ?? []) as unknown as typeof compliance);
+      } catch { /* silent */ }
+
+      try {
+        const txnRes = await supabase
+          .from("bank_transactions").select("business_id, date")
+          .in("business_id", businessIds)
+          .gte("date", new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10))
+          .limit(500);
+        for (const t of (txnRes.data ?? []) as { business_id: string }[]) recentTxns.add(t.business_id);
+      } catch { /* silent */ }
+
+      try {
+        const chaserRes = await (supabase as unknown as { from: (t: string) => any })
+          .from("ca_chasers").select("business_id, status")
+          .in("business_id", businessIds).eq("status", "pending").limit(200);
+        for (const c of ((chaserRes?.data ?? []) as { business_id: string }[])) pendingChasers.add(c.business_id);
+      } catch { /* table may not exist */ }
+
+      const map: Record<string, { action: string; path: string; tone: "red" | "gold" | "teal" }> = {};
+      const now = new Date();
+      for (const c of clients) {
+        const bid = c.business_id;
+        if (!bid) continue;
+
+        const topException = exceptions
+          .filter((e) => e.business_id === bid)
+          .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))[0];
+        const overdueCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) < now);
+        const upcomingCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) >= now);
+
+        if (topException && (topException.amount ?? 0) > 10000) {
+          map[c.id] = { action: `Resolve exception — ${inr(topException.amount)} at risk`, path: "/ca/exceptions", tone: "red" };
+        } else if (overdueCompliance.length > 0) {
+          map[c.id] = { action: `File overdue ${overdueCompliance[0]!.event_type ?? "return"}`, path: `/ca/clients/${c.id}`, tone: "red" };
+        } else if (!recentTxns.has(bid)) {
+          map[c.id] = { action: "Upload bank statement — no transactions this month", path: "/ca/intake/inbox", tone: "gold" };
+        } else if (pendingChasers.has(bid)) {
+          map[c.id] = { action: "Send pending chaser", path: "/ca/chaser", tone: "gold" };
+        } else if (upcomingCompliance.length > 0) {
+          map[c.id] = { action: `File ${upcomingCompliance[0]!.event_type ?? "return"} by ${upcomingCompliance[0]!.due_date}`, path: `/ca/clients/${c.id}`, tone: "teal" };
+        }
+      }
+      if (cancelled) return;
+      setNbaMap(map);
+      console.log(`[fyn:nba] computed ${Object.keys(map).length} next-best-actions for ${firmId}`);
+    };
+    void compute();
+    return () => { cancelled = true; };
+  }, [clients, firmId]);
+
 
 
   useEffect(() => {
@@ -584,6 +662,37 @@ export default function CADashboardPage() {
                       <div style={{ marginTop: 12 }}>
                         <CABadge tone={ws.tone}>{ws.label}</CABadge>
                       </div>
+                      {nbaMap[c.id] && (
+                        <div style={{ marginTop: 8 }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const nba = nbaMap[c.id]!;
+                              navigate(nba.path);
+                              try {
+                                if (firmId) {
+                                  void supabase.from("ca_brain_events").insert({
+                                    ca_firm_id: firmId,
+                                    business_id: c.business_id ?? undefined,
+                                    event_type: "nba_clicked",
+                                    payload: { action: nba.action, tone: nba.tone, client_id: c.id },
+                                  });
+                                }
+                              } catch { /* non-blocking */ }
+                            }}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6, width: "100%",
+                              background: nbaMap[c.id]!.tone === "red" ? "rgba(169,56,56,0.08)" : nbaMap[c.id]!.tone === "gold" ? "rgba(139,105,20,0.08)" : "rgba(31,90,70,0.08)",
+                              border: `1px solid ${nbaMap[c.id]!.tone === "red" ? "rgba(169,56,56,0.20)" : nbaMap[c.id]!.tone === "gold" ? "rgba(139,105,20,0.18)" : "rgba(31,90,70,0.18)"}`,
+                              borderRadius: 8, padding: "7px 10px", cursor: "pointer", textAlign: "left",
+                              fontFamily: CA.sans, fontSize: 12, fontWeight: 600,
+                              color: nbaMap[c.id]!.tone === "red" ? "#A93838" : nbaMap[c.id]!.tone === "gold" ? "#8B6914" : "#1F5A46",
+                            }}
+                          >
+                            {nbaMap[c.id]!.action}
+                          </button>
+                        </div>
+                      )}
                       <div style={{ marginTop: 12, fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
                         Next GST due: {c.next_gst_due ? `${dateIN(c.next_gst_due)}${c.next_gst_type ? ` · ${c.next_gst_type}` : ""}` : "—"}
                       </div>

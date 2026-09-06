@@ -113,6 +113,10 @@ export interface ReconOptions {
   fuzzyWindowDays?: number;
   /** Treat a bank credit under this share of the invoice as a part payment. */
   partPaymentFloor?: number;
+  /** Hard period boundary — nothing before this date participates. */
+  periodStart?: string;
+  /** Hard period boundary — nothing after this date participates. */
+  periodEnd?: string;
 }
 
 export function reconcile(
@@ -124,17 +128,36 @@ export function reconcile(
   const exactWindow = opts.exactWindowDays ?? 3;
   const fuzzyWindow = opts.fuzzyWindowDays ?? 21;
   const partFloor = opts.partPaymentFloor ?? 0.1;
+  const ps = opts.periodStart ?? null;
+  const pe = opts.periodEnd ?? null;
+
+  if (ps || pe) {
+    console.log(`[fyn:recon] period-scoped periodStart=${ps ?? "none"} periodEnd=${pe ?? "none"}`);
+  }
 
   const suggestions: MatchSuggestion[] = [];
   const unmatched: UnmatchedLine[] = [];
   const usedInvoices = new Set<string>();
   const usedExpenses = new Set<string>();
 
-  const openInvoices = invoices.filter((i) => i.outstanding_amount > 0);
-  const openExpenses = expenses.filter((e) => e.payment_status !== "paid");
+  const openInvoices = invoices.filter((i) => {
+    if (i.outstanding_amount <= 0) return false;
+    if (ps && i.invoice_date < ps) return false;
+    if (pe && i.invoice_date > pe) return false;
+    return true;
+  });
+  const openExpenses = expenses.filter((e) => {
+    if (e.payment_status === "paid") return false;
+    if (ps && e.date < ps) return false;
+    if (pe && e.date > pe) return false;
+    return true;
+  });
 
   for (const line of bank) {
     if (line.reconciled || line.source_reference?.startsWith("recon:")) continue;
+    if (ps && line.date < ps) continue;
+    if (pe && line.date > pe) continue;
+
 
     const isCredit = line.type.toLowerCase() === "credit";
     const candidates = isCredit

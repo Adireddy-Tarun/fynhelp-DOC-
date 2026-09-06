@@ -177,6 +177,8 @@ export default function CAClientDetailPage() {
     console.log(`[fyn:ca] period-selector active — period=${activePeriod}`);
   }, [activePeriod]);
 
+  const [clientNba, setClientNba] = useState<{ action: string; path: string; tone: string } | null>(null);
+
 
   const businessId = client?.business_id ?? null;
 
@@ -191,6 +193,38 @@ export default function CAClientDetailPage() {
       });
     } catch { /* non-blocking */ }
   }, [activePeriod, firmId, businessId, clientId]);
+
+  useEffect(() => {
+    if (!businessId || !firmId) return;
+    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    let cancelled = false;
+    (async () => {
+      try {
+        const [excRes, compRes, txnRes] = await Promise.all([
+          supabase.from("ca_exceptions").select("amount, status").eq("ca_firm_id", firmId).eq("business_id", businessId).neq("status", "resolved").order("amount", { ascending: false }).limit(1),
+          supabase.from("ca_compliance_events").select("status, due_date, event_type").eq("ca_firm_id", firmId).eq("business_id", businessId).neq("status", "filed").lte("due_date", in3Days).order("due_date", { ascending: true }).limit(1),
+          supabase.from("bank_transactions").select("id").eq("business_id", businessId).gte("date", periodStart).limit(1),
+        ]);
+        if (cancelled) return;
+        const topException = excRes.data?.[0] as { amount: number; status: string } | undefined;
+        const nextCompliance = compRes.data?.[0] as { due_date: string; event_type: string; status: string } | undefined;
+        const hasTxns = (txnRes.data?.length ?? 0) > 0;
+
+        if (topException && topException.amount > 10000) {
+          setClientNba({ action: `Resolve exception — ₹${Math.round(topException.amount).toLocaleString("en-IN")} at risk`, path: "/ca/exceptions", tone: "#A93838" });
+        } else if (nextCompliance && new Date(nextCompliance.due_date) < new Date()) {
+          setClientNba({ action: `File overdue ${nextCompliance.event_type} — was due ${nextCompliance.due_date}`, path: `/ca/clients/${clientId}`, tone: "#A93838" });
+        } else if (!hasTxns) {
+          setClientNba({ action: "No bank transactions this period — upload a bank statement", path: "/ca/intake/inbox", tone: "#8B6914" });
+        } else if (nextCompliance) {
+          setClientNba({ action: `File ${nextCompliance.event_type} by ${nextCompliance.due_date}`, path: `/ca/clients/${clientId}`, tone: "#1F5A46" });
+        } else {
+          setClientNba(null);
+        }
+      } catch { setClientNba(null); }
+    })();
+    return () => { cancelled = true; };
+  }, [businessId, firmId, periodStart, clientId]);
 
 
 
@@ -679,6 +713,28 @@ export default function CAClientDetailPage() {
         </span>
       </div>
 
+      {clientNba && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12, marginTop: 10,
+          padding: "10px 16px", borderRadius: 10,
+          background: `${clientNba.tone}14`,
+          border: `1px solid ${clientNba.tone}30`,
+        }}>
+          <span style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: clientNba.tone, flexShrink: 0 }}>
+            Next action
+          </span>
+          <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink, flex: 1 }}>
+            {clientNba.action}
+          </span>
+          <button
+            onClick={() => navigate(clientNba.path)}
+            style={{ background: clientNba.tone, color: "#F7F1E6", border: "none", borderRadius: 8, padding: "6px 14px", fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+          >
+            Go
+          </button>
+        </div>
+      )}
+
 
 
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
@@ -956,7 +1012,22 @@ export default function CAClientDetailPage() {
 
         {tab === "Reconcile" && (
           <>
-          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
+          <div style={{
+            background: "rgba(139,105,20,0.07)", border: "1px solid rgba(139,105,20,0.20)",
+            borderRadius: 10, padding: "10px 14px", marginBottom: 14,
+            display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+          }}>
+            <span style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 700, color: "#8B6914", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              Period scope
+            </span>
+            <span style={{ fontFamily: CA.mono, fontSize: 13, color: CA.ink }}>
+              {periodStart} to {periodEnd}
+            </span>
+            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}>
+              Only transactions and documents within this period are matched. Change period using the selector above.
+            </span>
+          </div>
+          <ThreeWayMatchTab firmId={firmId} businessId={businessId} periodStart={periodStart} periodEnd={periodEnd} />
           <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: CA.faint, marginTop: 20, marginBottom: 10 }}>
             Bank transactions
           </div>
