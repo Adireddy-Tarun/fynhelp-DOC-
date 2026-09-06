@@ -26,18 +26,20 @@ export function useCAClientOptions() {
       setIsLoading(true);
       const { data } = await supabase
         .from("ca_clients")
-        .select("business_id, client_name, client_email")
+        .select("id, business_id, client_name, client_email")
         .eq("ca_firm_id", firmId)
         .order("client_name");
-      const rows = (data ?? []) as { business_id: string | null; client_name: string; client_email: string | null }[];
+      const rows = (data ?? []) as { id: string; business_id: string | null; client_name: string; client_email: string | null }[];
       const mapped = rows
         .filter((r) => !!r.business_id)
         .map((r) => ({
+          id: r.id,
           business_id: r.business_id as string,
           client_name: r.client_name,
           client_reference_code: null as string | null,
           client_email: r.client_email,
         }));
+
       if (!cancelled) {
         setClients(mapped);
         setIsLoading(false);
