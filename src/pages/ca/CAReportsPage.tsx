@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { COLORS, PageWrap, PageHeader, Card, PrimaryBtn, SecondaryBtn, GhostLink, Chip } from "@/components/ca/ui";
 import { useCAAuth } from "@/contexts/CAAuthContext";
-import { useCARole } from "@/hooks/useCARole";
-import { ICAIGate } from "@/components/ca/ICAIGate";
 import { logCAAudit } from "@/lib/caAudit";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -130,11 +128,8 @@ type ClientOpt = { business_id: string; business_name: string };
 // ───────── Main page ─────────
 export default function CAReportsPage() {
   const { caFirm, user } = useCAAuth();
-  const { role, hasICAI, setHasICAI } = useCARole();
-  const [showICAIGate, setShowICAIGate] = useState(false);
-  const [pendingSignOffRow, setPendingSignOffRow] = useState<ReportRow | null>(null);
-  const canSignOff = role === "partner" || role === "manager";
-  const [signingId, setSigningId] = useState<string | null>(null);
+  const [caRole, setCaRole] = useState<string | null>(null);
+  const canSignOff = caRole === "admin" || caRole === "manager";
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [schedules, setSchedules] = useState<ScheduleRow[]>([]);
   const [clients, setClients] = useState<ClientOpt[]>([]);
@@ -173,31 +168,23 @@ export default function CAReportsPage() {
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [caFirm?.id]);
 
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from("ca_firm_members")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .limit(1)
+        .maybeSingle();
+      setCaRole(data?.role ?? null);
+    };
+    fetchRole();
+  }, [user?.id]);
+
   useEffect(() => { console.log("[fyn:ca:os-complete] CAReportsPage mounted"); }, []);
 
-  /** Partner or manager sign-off on a generated report. */
-  const handleSignOff = async (r: ReportRow) => {
-    if (!user?.id || !caFirm?.id) return;
-    setSigningId(r.id);
-    const signedAt = new Date().toISOString();
-    const { error } = await supabase
-      .from("ca_reports_log")
-      .update({ signed_off_by: user.id, signed_off_at: signedAt })
-      .eq("id", r.id);
-    setSigningId(null);
-    if (error) { toast.error(error.message); return; }
-    setReports(prev => prev.map(x => (x.id === r.id ? { ...x, signed_off_by: user.id, signed_off_at: signedAt } : x)));
-    await logCAAudit({
-      firmId: caFirm.id,
-      businessId: r.business_id,
-      entityType: "ca_reports_log",
-      entityId: r.id,
-      action: "report_signed_off",
-      actorRole: role,
-      detail: { report_type: r.report_type, period: r.period },
-    });
-    toast.success("Report signed off");
-  };
 
   const openTemplate = (id: TemplateId) => { setPresetTemplate(id); setGenOpen(true); };
   const openBlank = () => { setPresetTemplate(null); setGenOpen(true); };
@@ -334,19 +321,18 @@ export default function CAReportsPage() {
                         <td className="py-3 pr-4">
                           {r.signed_off_at ? (
                             <Chip tone="green">Signed off{r.signed_off_by === user?.id ? " by you" : ""}</Chip>
-                          ) : canSignOff ? (
-                            <SecondaryBtn
-                              size="sm"
-                              onClick={() => {
-                                if (!hasICAI) { setPendingSignOffRow(r); setShowICAIGate(true); return; }
-                                handleSignOff(r);
-                              }}
-                              disabled={signingId === r.id}
-                            >
-                              {signingId === r.id ? "Signing..." : "Sign off"}
-                            </SecondaryBtn>
                           ) : (
-                            <Chip tone="amber">Awaiting sign-off</Chip>
+                            <>
+                              {canSignOff && (
+                                <MISSignOffButton
+                                  report={r}
+                                  firmId={caFirm?.id || ""}
+                                  userId={user?.id || ""}
+                                  onSigned={loadAll}
+                                />
+                              )}
+                              {!canSignOff && <Chip tone="amber">Sign-off requires Manager or Admin role</Chip>}
+                            </>
                           )}
                         </td>
                         <td className="py-3 text-right relative">
@@ -463,19 +449,96 @@ export default function CAReportsPage() {
           onSaved={() => { setScheduleOpen(false); loadAll(); }}
         />
       )}
-      {showICAIGate && (
-        <ICAIGate
-          actionLabel="Signing off a report"
-          onUnlocked={() => {
-            setShowICAIGate(false);
-            setHasICAI(true);
-            if (pendingSignOffRow) handleSignOff(pendingSignOffRow);
-            setPendingSignOffRow(null);
-          }}
-          onCancel={() => { setShowICAIGate(false); setPendingSignOffRow(null); }}
-        />
-      )}
     </PageWrap>
+  );
+}
+
+// ───────── MIS Sign-off button ─────────
+function MISSignOffButton({
+  report,
+  firmId,
+  userId,
+  onSigned,
+}: {
+  report: ReportRow;
+  firmId: string;
+  userId: string;
+  onSigned: () => void;
+}) {
+  const [notes, setNotes] = useState("");
+  const [history, setHistory] = useState<{ id: string; signed_off_at: string; notes: string | null; signed_off_by: string; full_name: string | null }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadHistory = async () => {
+    if (!firmId || !report.business_id) return;
+    const { data } = await supabase
+      .from("ca_mis_signoffs")
+      .select("id, signed_off_at, notes, signed_off_by")
+      .eq("ca_firm_id", firmId)
+      .eq("client_id", report.business_id)
+      .eq("period_id", report.period ?? "")
+      .order("signed_off_at", { ascending: false });
+    const rows = (data || []) as { id: string; signed_off_at: string; notes: string | null; signed_off_by: string }[];
+    const userIds = Array.from(new Set(rows.map(r => r.signed_off_by).filter(Boolean)));
+    let nameMap: Record<string, string> = {};
+    if (userIds.length > 0) {
+      const { data: prof } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
+      nameMap = Object.fromEntries(((prof || []) as any[]).map((p: any) => [p.id, p.full_name]));
+    }
+    setHistory(rows.map(r => ({ ...r, full_name: nameMap[r.signed_off_by] || null })));
+  };
+
+  useEffect(() => {
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firmId, report.business_id, report.period]);
+
+  const handleSignOff = async () => {
+    if (!firmId || !userId || !report.business_id) return;
+    setLoading(true);
+    const { error } = await supabase.from("ca_mis_signoffs").insert({
+      ca_firm_id: firmId,
+      client_id: report.business_id,
+      period_id: report.period,
+      report_type: "MIS",
+      signed_off_by: userId,
+      notes: notes.trim() || null,
+    });
+    setLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("MIS report signed off successfully");
+    setNotes("");
+    await loadHistory();
+    onSigned();
+  };
+
+  return (
+    <div className="space-y-2">
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Sign-off notes (optional)"
+        rows={2}
+        className="w-full px-2 py-1.5 rounded text-xs resize-none"
+        style={{ border: `1px solid ${COLORS.caBorder}` }}
+      />
+      <SecondaryBtn size="sm" onClick={handleSignOff} disabled={loading}>
+        {loading ? "Signing..." : "Sign off"}
+      </SecondaryBtn>
+      {history.length > 0 && (
+        <div className="mt-2 space-y-1.5">
+          <div className="text-[11px] font-medium" style={{ color: "rgba(23,18,8,0.55)" }}>Sign-off history</div>
+          {history.map((h) => (
+            <div key={h.id} className="text-[11px]" style={{ color: "rgba(23,18,8,0.65)" }}>
+              <span className="font-medium">{h.full_name || "Unknown"}</span>
+              {" · "}
+              {fmtDateTime(h.signed_off_at)}
+              {h.notes && <span> · {h.notes}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

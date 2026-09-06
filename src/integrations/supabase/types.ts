@@ -3267,6 +3267,60 @@ export type Database = {
           },
         ]
       }
+      ca_mis_signoffs: {
+        Row: {
+          ca_firm_id: string
+          client_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          period_id: string | null
+          report_type: string
+          signed_off_at: string
+          signed_off_by: string
+          updated_at: string
+        }
+        Insert: {
+          ca_firm_id: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_id?: string | null
+          report_type?: string
+          signed_off_at?: string
+          signed_off_by: string
+          updated_at?: string
+        }
+        Update: {
+          ca_firm_id?: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_id?: string | null
+          report_type?: string
+          signed_off_at?: string
+          signed_off_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_mis_signoffs_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ca_mis_signoffs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_notification_outbox: {
         Row: {
           attempts: number
