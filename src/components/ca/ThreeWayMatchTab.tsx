@@ -232,6 +232,12 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
         <Card label="Timing gaps" value={String(totals.gaps)} />
       </div>
 
+      {periodStart && periodEnd && (
+        <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginBottom: 8 }}>
+          Showing reconciliation for {periodStart} to {periodEnd}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <CAButton onClick={run} disabled={loading}>{loading ? "Matching…" : "Re-run match"}</CAButton>
         <CAButton variant="ghost" onClick={exportCsv}>Export CSV</CAButton>
