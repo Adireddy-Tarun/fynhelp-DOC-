@@ -530,7 +530,7 @@ function MISSignOffButton({
           <div className="text-[11px] font-medium" style={{ color: "rgba(23,18,8,0.55)" }}>Sign-off history</div>
           {history.map((h) => (
             <div key={h.id} className="text-[11px]" style={{ color: "rgba(23,18,8,0.65)" }}>
-              <span className="font-medium">{h.profiles?.full_name || "Unknown"}</span>
+              <span className="font-medium">{h.full_name || "Unknown"}</span>
               {" · "}
               {fmtDateTime(h.signed_off_at)}
               {h.notes && <span> · {h.notes}</span>}
