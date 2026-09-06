@@ -198,7 +198,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period, days_overdue: daysOverdue(r.due_date), channel: c?.client_email ? "email" : "portal" },
     });
+    await logChaserEvent(r, "sent", c?.client_email ? "Email sent" : "Chase recorded in the portal");
     return true;
+
   };
 
   /** Client came back — record the reply and teach the brain. */
