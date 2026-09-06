@@ -1533,7 +1533,7 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>MIS — {report.period}</div>
+            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>{templateLabel} — {report.period}</div>
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 4 }}>{report.client_name}</div>
           </div>
           <button aria-label="Close" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted }}>
@@ -1548,24 +1548,36 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Gross profit" value={inr(report.gross_profit)} />
         </Section>
 
-        <Section title="GST summary">
-          <Row label="GST collected" value={inr(report.gst_collected)} />
-          <Row label="GST paid" value={inr(report.gst_paid)} />
-        </Section>
+        {reportType === "variance_report" && (
+          <Section title="Variance indicators">
+            <Row label="Expense to revenue ratio" value={report.revenue ? `${Math.round((report.expenses / report.revenue) * 100)}%` : "No revenue recorded"} />
+            <Row label="Margin" value={report.revenue ? `${Math.round((report.gross_profit / report.revenue) * 100)}%` : "No revenue recorded"} />
+            <Row label="Unreconciled amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
+          </Section>
+        )}
 
-        <Section title="ITC status">
-          <Row label="ITC available" value={inr(report.itc_available)} />
-          <Row label="ITC claimed" value={inr(report.itc_claimed)} />
-          <Row label="ITC balance" value={inr(report.itc_balance)} />
-        </Section>
+        {reportType !== "bank_rec_summary" && reportType !== "variance_report" && (
+          <>
+            <Section title="GST summary">
+              <Row label="GST collected" value={inr(report.gst_collected)} />
+              <Row label="GST paid" value={inr(report.gst_paid)} />
+            </Section>
 
-        <Section title="Compliance status">
-          <Row label="Filed" value={String(report.compliance_summary.filed)} />
-          <Row label="Pending" value={String(report.compliance_summary.pending)} />
-          <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
-        </Section>
+            <Section title="ITC status">
+              <Row label="ITC available" value={inr(report.itc_available)} />
+              <Row label="ITC claimed" value={inr(report.itc_claimed)} />
+              <Row label="ITC balance" value={inr(report.itc_balance)} />
+            </Section>
 
-        <Section title="Exceptions">
+            <Section title="Compliance status">
+              <Row label="Filed" value={String(report.compliance_summary.filed)} />
+              <Row label="Pending" value={String(report.compliance_summary.pending)} />
+              <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
+            </Section>
+          </>
+        )}
+
+        <Section title={reportType === "bank_rec_summary" ? "Unmatched items" : "Exceptions"}>
           <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} ids={report.source_txn_ids?.exceptions} rowLabel="Open exceptions" />
           <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
         </Section>
@@ -1574,6 +1586,18 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Posted documents" value={String(report.data_quality.doc_count)} />
           <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
         </Section>
+
+        {reportType === "working_paper" && (
+          <Section title="Preparer notes">
+            <textarea
+              value={preparerNotes}
+              onChange={(e) => setPreparerNotes(e.target.value)}
+              placeholder="Notes for the reviewer — assumptions, open items, sampling basis."
+              style={{ ...caInputStyle, width: "100%", minHeight: 90, padding: 10, fontFamily: CA.sans, fontSize: 13, resize: "vertical" }}
+            />
+          </Section>
+        )}
+
 
         {drilldownIds && (
           <div style={{ marginTop: 16, background: CA.card, borderRadius: 10, border: "1px solid rgba(23,18,8,0.09)", padding: 14 }}>
