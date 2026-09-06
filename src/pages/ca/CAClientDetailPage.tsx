@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import { useParams, useNavigate } from "@/lib/router-compat";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,12 +179,36 @@ export default function CAClientDetailPage() {
   }, [activePeriod]);
 
   const [clientNba, setClientNba] = useState<{ action: string; path: string; tone: string } | null>(null);
+  const [closingPeriod, setClosingPeriod] = useState(false);
 
 
   const businessId = client?.business_id ?? null;
 
   useEffect(() => {
-    if (!firmId || !businessId) return;
+    if (!firmId || !businessId || !clientId) return;
+    void (async () => {
+      // Never reopen a period the firm has already closed.
+      const { data: existing } = await supabase
+        .from("ca_client_periods")
+        .select("status")
+        .eq("ca_firm_id", firmId)
+        .eq("client_id", clientId)
+        .eq("period", activePeriod)
+        .maybeSingle();
+      if (existing?.status === "closed") return;
+      await supabase.from("ca_client_periods").upsert({
+        ca_firm_id: firmId,
+        client_id: clientId,
+        business_id: businessId,
+        period: activePeriod,
+        period_start: periodStart,
+        period_end: periodEnd,
+        status: "active",
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "ca_firm_id,client_id,period" });
+      console.log(`[fyn:period] persisted ${activePeriod} for client ${clientId}`);
+    })();
+
     try {
       void supabase.from("ca_brain_events").insert({
         ca_firm_id: firmId,
@@ -192,7 +217,8 @@ export default function CAClientDetailPage() {
         payload: { period: activePeriod, client_id: clientId },
       });
     } catch { /* non-blocking */ }
-  }, [activePeriod, firmId, businessId, clientId]);
+  }, [activePeriod, firmId, businessId, clientId, periodStart, periodEnd]);
+
 
   useEffect(() => {
     if (!businessId || !firmId) return;
@@ -246,7 +272,21 @@ export default function CAClientDetailPage() {
         .eq("ca_firm_id", firmId)
         .eq("parent_id", clientId);
       setSubCount(count ?? 0);
+      // Restore the last period this client was worked on.
+      const { data: lastPeriod } = await supabase
+        .from("ca_client_periods")
+        .select("period")
+        .eq("ca_firm_id", firmId)
+        .eq("client_id", clientId)
+        .eq("status", "active")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lastPeriod?.period && /^\d{4}-\d{2}$/.test(lastPeriod.period)) {
+        setActivePeriod(lastPeriod.period);
+      }
       console.log("[fyn:ca] client detail mount", { clientId, business_id: (data as Client)?.business_id ?? null });
+
     })();
   }, [clientId, firmId]);
 
@@ -636,6 +676,36 @@ export default function CAClientDetailPage() {
     ];
   }, [txns, itc, compliance, reports, activePeriod, periodStart, periodEnd]);
 
+  const handleClosePeriod = async () => {
+    if (!firmId || !clientId || !businessId) return;
+    if (!window.confirm(`Close ${periodLabel}? No new transactions can be posted to this period after closing.`)) return;
+    setClosingPeriod(true);
+    const { error } = await supabase.from("ca_client_periods").upsert({
+      ca_firm_id: firmId,
+      client_id: clientId,
+      business_id: businessId,
+      period: activePeriod,
+      period_start: periodStart,
+      period_end: periodEnd,
+      status: "closed",
+      close_step_1: closeChecklist[0].done,
+      close_step_2: closeChecklist[1].done,
+      close_step_3: closeChecklist[2].done,
+      close_step_4: closeChecklist[3].done,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "ca_firm_id,client_id,period" });
+    setClosingPeriod(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${periodLabel} closed. Switch to the next period to continue posting.`);
+    void supabase.from("ca_brain_events").insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      event_type: "period_closed",
+      payload: { period: activePeriod },
+    });
+  };
+
+
 
 
   if (loading) return <CAEmpty title="Loading client…" />;
@@ -823,7 +893,20 @@ export default function CAClientDetailPage() {
               <CAButton onClick={generateMis} disabled={!businessId || misBusy}>
                 {misBusy ? "Building…" : "Generate MIS for this client"}
               </CAButton>
+              <CAButton
+                variant="ghost"
+                onClick={handleClosePeriod}
+                disabled={closingPeriod || closeChecklist.filter((i) => i.done).length < 4}
+              >
+                {closingPeriod ? "Closing…" : "Close this period"}
+              </CAButton>
             </div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginTop: 6 }}>
+              {closeChecklist.filter((i) => i.done).length < 4
+                ? "Complete all 4 steps before closing the period."
+                : "All steps complete. Safe to close."}
+            </div>
+
           </CACard>
           </>
         )}
@@ -1322,6 +1405,24 @@ export default function CAClientDetailPage() {
 }
 
 function MisModal({ report, onClose }: { report: MisReport; onClose: () => void }) {
+  const [drilldownIds, setDrilldownIds] = useState<string[] | null>(null);
+  const [drilldownLabel, setDrilldownLabel] = useState("");
+  const [drilldownTxns, setDrilldownTxns] = useState<any[]>([]);
+  const [loadingDrill, setLoadingDrill] = useState(false);
+
+  const drilldown = async (ids: string[] | undefined, label: string) => {
+    if (!ids || ids.length === 0) return;
+    setDrilldownLabel(label);
+    setDrilldownIds(ids);
+    setLoadingDrill(true);
+    const { data } = await supabase
+      .from("bank_transactions")
+      .select("id, date, description, amount, type, source_reference")
+      .in("id", ids.slice(0, 50));
+    setDrilldownTxns(data ?? []);
+    setLoadingDrill(false);
+  };
+
   const download = () => {
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1332,12 +1433,64 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
     URL.revokeObjectURL(url);
   };
 
-  const Row = ({ label, value }: { label: string; value: string }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `0.5px solid ${CA.line}` }}>
+  const downloadExcel = () => {
+    const rows = [
+      ["FynHelp MIS Report", "", "", ""],
+      ["Client", report.client_name, "Period", report.period],
+      ["Generated", new Date(report.generated_at).toLocaleString("en-IN"), "", ""],
+      ["", "", "", ""],
+      ["Revenue and Expenses", "", "", ""],
+      ["Revenue", report.revenue, "", ""],
+      ["Expenses", report.expenses, "", ""],
+      ["Gross Profit", report.gross_profit, "", ""],
+      ["", "", "", ""],
+      ["GST Summary", "", "", ""],
+      ["GST Collected", report.gst_collected, "", ""],
+      ["GST Paid", report.gst_paid, "", ""],
+      ["", "", "", ""],
+      ["ITC Status", "", "", ""],
+      ["ITC Available", report.itc_available, "", ""],
+      ["ITC Claimed", report.itc_claimed, "", ""],
+      ["ITC Balance", report.itc_balance, "", ""],
+      ["", "", "", ""],
+      ["Compliance", "", "", ""],
+      ["Filed", report.compliance_summary.filed, "", ""],
+      ["Pending", report.compliance_summary.pending, "", ""],
+      ["Overdue", report.compliance_summary.overdue, "", ""],
+      ["", "", "", ""],
+      ["Exceptions", "", "", ""],
+      ["Open count", report.exceptions_summary.open_count, "", ""],
+      ["Amount at risk", report.exceptions_summary.amount_at_risk, "", ""],
+      ["", "", "", ""],
+      ["Data Quality", "", "", ""],
+      ["Documents posted", report.data_quality.doc_count, "", ""],
+      ["Avg confidence", `${report.data_quality.confidence_avg}%`, "", ""],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{ wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "MIS");
+    XLSX.writeFile(wb, `MIS-${report.client_name.replace(/\s+/g, "-")}-${report.period.replace(/\s+/g, "-")}.xlsx`);
+  };
+
+  const Row = ({ label, value, ids, rowLabel }: { label: string; value: string; ids?: string[]; rowLabel?: string }) => (
+    <div
+      onClick={ids?.length ? () => void drilldown(ids, rowLabel ?? label) : undefined}
+      style={{
+        display: "flex", justifyContent: "space-between", padding: "7px 0",
+        borderBottom: `0.5px solid ${CA.line}`,
+        cursor: ids?.length ? "pointer" : "default",
+        borderRadius: ids?.length ? 4 : 0,
+      }}
+    >
       <span style={{ fontSize: 12.5, color: CA.muted }}>{label}</span>
-      <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+        {ids?.length ? <span style={{ fontSize: 11, color: CA.teal, fontWeight: 600 }}>View</span> : null}
+      </div>
     </div>
   );
+
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div style={{ marginTop: 16 }}>
@@ -1368,8 +1521,9 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
         </div>
 
         <Section title="Revenue & expenses">
-          <Row label="Revenue" value={inr(report.revenue)} />
-          <Row label="Expenses" value={inr(report.expenses)} />
+          <Row label="Revenue" value={inr(report.revenue)} ids={report.source_txn_ids?.revenue} rowLabel="Revenue transactions" />
+          <Row label="Expenses" value={inr(report.expenses)} ids={report.source_txn_ids?.expenses} rowLabel="Expense transactions" />
+
           <Row label="Gross profit" value={inr(report.gross_profit)} />
         </Section>
 
@@ -1391,7 +1545,7 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
         </Section>
 
         <Section title="Exceptions">
-          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} />
+          <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} ids={report.source_txn_ids?.exceptions} rowLabel="Open exceptions" />
           <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
         </Section>
 
@@ -1400,10 +1554,50 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
         </Section>
 
+        {drilldownIds && (
+          <div style={{ marginTop: 16, background: CA.card, borderRadius: 10, border: "1px solid rgba(23,18,8,0.09)", padding: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: CA.faint }}>{drilldownLabel}</div>
+              <button aria-label="Close details" onClick={() => { setDrilldownIds(null); setDrilldownTxns([]); }} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted, fontSize: 18 }}>
+                <X size={16} aria-hidden="true" />
+              </button>
+            </div>
+            {loadingDrill ? (
+              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>Loading…</div>
+            ) : drilldownTxns.length === 0 ? (
+              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>No transactions found.</div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead><tr>
+                  <th style={caTh}>Date</th><th style={caTh}>Description</th>
+                  <th style={{ ...caTh, textAlign: "right" }}>Amount</th><th style={caTh}>Source</th>
+                </tr></thead>
+                <tbody>
+                  {drilldownTxns.map((t: any) => (
+                    <tr key={t.id}>
+                      <td style={caTd}>{dateIN(t.date)}</td>
+                      <td style={caTd}>{t.description ?? "—"}</td>
+                      <td style={{ ...caNum, color: t.type === "debit" ? CA.red : CA.green }}>{inr(Math.abs(Number(t.amount)))}</td>
+                      <td style={caTd}><span style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint }}>{t.source_reference ?? "—"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {drilldownIds.length > 50 && (
+              <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginTop: 8 }}>
+                Showing first 50 of {drilldownIds.length} transactions.
+              </div>
+            )}
+          </div>
+        )}
+
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
           <CAButton variant="ghost" onClick={onClose}>Close</CAButton>
           <CAButton onClick={download}>Download JSON</CAButton>
+          <CAButton onClick={downloadExcel}>Download Excel</CAButton>
         </div>
+
       </div>
     </div>
   );
