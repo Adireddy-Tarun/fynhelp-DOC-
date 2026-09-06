@@ -321,19 +321,18 @@ export default function CAReportsPage() {
                         <td className="py-3 pr-4">
                           {r.signed_off_at ? (
                             <Chip tone="green">Signed off{r.signed_off_by === user?.id ? " by you" : ""}</Chip>
-                          ) : canSignOff ? (
-                            <SecondaryBtn
-                              size="sm"
-                              onClick={() => {
-                                if (!hasICAI) { setPendingSignOffRow(r); setShowICAIGate(true); return; }
-                                handleSignOff(r);
-                              }}
-                              disabled={signingId === r.id}
-                            >
-                              {signingId === r.id ? "Signing..." : "Sign off"}
-                            </SecondaryBtn>
                           ) : (
-                            <Chip tone="amber">Awaiting sign-off</Chip>
+                            <>
+                              {canSignOff && (
+                                <MISSignOffButton
+                                  report={r}
+                                  firmId={caFirm?.id || ""}
+                                  userId={user?.id || ""}
+                                  onSigned={loadAll}
+                                />
+                              )}
+                              {!canSignOff && <Chip tone="amber">Sign-off requires Manager or Admin role</Chip>}
+                            </>
                           )}
                         </td>
                         <td className="py-3 text-right relative">
