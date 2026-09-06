@@ -1533,6 +1533,7 @@ export type Database = {
       }
       ca_client_periods: {
         Row: {
+          business_id: string | null
           ca_firm_id: string
           client_id: string
           close_step_1: boolean
@@ -1548,6 +1549,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          business_id?: string | null
           ca_firm_id: string
           client_id: string
           close_step_1?: boolean
@@ -1563,6 +1565,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          business_id?: string | null
           ca_firm_id?: string
           client_id?: string
           close_step_1?: boolean
