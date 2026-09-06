@@ -1216,9 +1216,18 @@ export default function CAClientDetailPage() {
                 style={{ ...caInputStyle, width: 170, height: 38 }}
                 aria-label="MIS period"
               />
+              <select
+                style={{ ...caInputStyle, width: 200, height: 38 }}
+                value={misTemplate}
+                onChange={(e) => setMisTemplate(e.target.value as typeof misTemplate)}
+                aria-label="MIS template"
+              >
+                {MIS_TEMPLATES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
               <CAButton variant="ghost" onClick={generateMis} disabled={!businessId || misBusy}>
                 {misBusy ? "Building…" : "Generate MIS"}
               </CAButton>
+
             </div>
 
             {subCount > 0 && (
