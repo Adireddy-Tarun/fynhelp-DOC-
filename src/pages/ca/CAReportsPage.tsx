@@ -175,7 +175,7 @@ export default function CAReportsPage() {
         .from("ca_firm_members")
         .select("role")
         .eq("user_id", user.id)
-        .eq("status", "active")
+        .eq("is_active", true)
         .limit(1)
         .maybeSingle();
       setCaRole(data?.role ?? null);
