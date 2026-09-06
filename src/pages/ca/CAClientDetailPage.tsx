@@ -1430,6 +1430,10 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
   const [drilldownLabel, setDrilldownLabel] = useState("");
   const [drilldownTxns, setDrilldownTxns] = useState<any[]>([]);
   const [loadingDrill, setLoadingDrill] = useState(false);
+  const [preparerNotes, setPreparerNotes] = useState("");
+  const reportType = report.report_type ?? "monthly_mis";
+  const templateLabel = MIS_TEMPLATES.find((t) => t.value === reportType)?.label ?? "MIS";
+
 
   const drilldown = async (ids: string[] | undefined, label: string) => {
     if (!ids || ids.length === 0) return;
