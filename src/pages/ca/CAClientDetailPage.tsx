@@ -177,6 +177,8 @@ export default function CAClientDetailPage() {
     console.log(`[fyn:ca] period-selector active — period=${activePeriod}`);
   }, [activePeriod]);
 
+  const [clientNba, setClientNba] = useState<{ action: string; path: string; tone: string } | null>(null);
+
 
   const businessId = client?.business_id ?? null;
 
