@@ -427,7 +427,33 @@ export default function CAChaserQueuePage() {
                         </span>
                       </td>
                     </tr>
+                    {timelineChaser === r.id && (
+                      <tr key={`timeline-${r.id}`}>
+                        <td colSpan={12} style={{ padding: "0 14px 12px", background: "rgba(23,18,8,0.02)" }}>
+                          {loadingTimeline ? (
+                            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>Loading…</span>
+                          ) : timelineEvents.length === 0 ? (
+                            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>No events recorded yet.</span>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 10 }}>
+                              {timelineEvents.map((e, i) => (
+                                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                                  <div style={{ width: 8, height: 8, borderRadius: 999, background: e.event_type.includes("escalat") ? "#A93838" : e.event_type.includes("resolv") ? "#1F5A46" : "#8B6914", marginTop: 5, flexShrink: 0 }} />
+                                  <div>
+                                    <span style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 600, color: CA.ink, textTransform: "capitalize" }}>{e.event_type.replace(/_/g, " ")}</span>
+                                    {e.note && <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}> — {e.note}</span>}
+                                    <span style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, marginLeft: 8 }}>{dateIN(e.created_at)}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
+
                 })}
               </tbody>
             </table>
