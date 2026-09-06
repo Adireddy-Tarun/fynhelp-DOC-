@@ -491,8 +491,10 @@ export default function CAClientDetailPage() {
     setMisBusy(true);
     try {
       const report = await runMis({
-        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label },
+        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label, report_type: misTemplate },
       });
+      console.log(`[fyn:mis] template=${misTemplate} generated for ${businessId}`);
+
       setMis(report);
       await loadReports();
       toast.success(`MIS for ${label} generated`);
