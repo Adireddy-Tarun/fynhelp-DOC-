@@ -46,6 +46,14 @@ interface Client {
 const TABS = ["Documents", "Reconcile", "GST and ITC", "Compliance", "Close", "Reports", "Deductions"] as const;
 type Tab = typeof TABS[number];
 
+const MIS_TEMPLATES = [
+  { value: "monthly_mis", label: "Monthly MIS" },
+  { value: "bank_rec_summary", label: "Bank Rec Summary" },
+  { value: "variance_report", label: "Variance Report" },
+  { value: "working_paper", label: "Working Paper" },
+] as const;
+
+
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <CACard style={{ padding: "14px 16px" }}>
@@ -77,6 +85,8 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
+  const [misTemplate, setMisTemplate] = useState<"monthly_mis" | "bank_rec_summary" | "variance_report" | "working_paper">("monthly_mis");
+
   const [hideDemo, setHideDemoState] = useState<boolean>(() => {
     try { return window.localStorage.getItem("hide_seed_transactions") === "1"; } catch { return false; }
   });
@@ -491,8 +501,10 @@ export default function CAClientDetailPage() {
     setMisBusy(true);
     try {
       const report = await runMis({
-        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label },
+        data: { firm_id: firmId, business_id: businessId, client_id: clientId ?? null, period: label, report_type: misTemplate },
       });
+      console.log(`[fyn:mis] template=${misTemplate} generated for ${businessId}`);
+
       setMis(report);
       await loadReports();
       toast.success(`MIS for ${label} generated`);
@@ -1204,9 +1216,18 @@ export default function CAClientDetailPage() {
                 style={{ ...caInputStyle, width: 170, height: 38 }}
                 aria-label="MIS period"
               />
+              <select
+                style={{ ...caInputStyle, width: 200, height: 38 }}
+                value={misTemplate}
+                onChange={(e) => setMisTemplate(e.target.value as typeof misTemplate)}
+                aria-label="MIS template"
+              >
+                {MIS_TEMPLATES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
               <CAButton variant="ghost" onClick={generateMis} disabled={!businessId || misBusy}>
                 {misBusy ? "Building…" : "Generate MIS"}
               </CAButton>
+
             </div>
 
             {subCount > 0 && (
@@ -1409,6 +1430,10 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
   const [drilldownLabel, setDrilldownLabel] = useState("");
   const [drilldownTxns, setDrilldownTxns] = useState<any[]>([]);
   const [loadingDrill, setLoadingDrill] = useState(false);
+  const [preparerNotes, setPreparerNotes] = useState("");
+  const reportType = report.report_type ?? "monthly_mis";
+  const templateLabel = MIS_TEMPLATES.find((t) => t.value === reportType)?.label ?? "MIS";
+
 
   const drilldown = async (ids: string[] | undefined, label: string) => {
     if (!ids || ids.length === 0) return;
@@ -1512,7 +1537,7 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>MIS — {report.period}</div>
+            <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700 }}>{templateLabel} — {report.period}</div>
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 4 }}>{report.client_name}</div>
           </div>
           <button aria-label="Close" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted }}>
@@ -1527,24 +1552,36 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Gross profit" value={inr(report.gross_profit)} />
         </Section>
 
-        <Section title="GST summary">
-          <Row label="GST collected" value={inr(report.gst_collected)} />
-          <Row label="GST paid" value={inr(report.gst_paid)} />
-        </Section>
+        {reportType === "variance_report" && (
+          <Section title="Variance indicators">
+            <Row label="Expense to revenue ratio" value={report.revenue ? `${Math.round((report.expenses / report.revenue) * 100)}%` : "No revenue recorded"} />
+            <Row label="Margin" value={report.revenue ? `${Math.round((report.gross_profit / report.revenue) * 100)}%` : "No revenue recorded"} />
+            <Row label="Unreconciled amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
+          </Section>
+        )}
 
-        <Section title="ITC status">
-          <Row label="ITC available" value={inr(report.itc_available)} />
-          <Row label="ITC claimed" value={inr(report.itc_claimed)} />
-          <Row label="ITC balance" value={inr(report.itc_balance)} />
-        </Section>
+        {reportType !== "bank_rec_summary" && reportType !== "variance_report" && (
+          <>
+            <Section title="GST summary">
+              <Row label="GST collected" value={inr(report.gst_collected)} />
+              <Row label="GST paid" value={inr(report.gst_paid)} />
+            </Section>
 
-        <Section title="Compliance status">
-          <Row label="Filed" value={String(report.compliance_summary.filed)} />
-          <Row label="Pending" value={String(report.compliance_summary.pending)} />
-          <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
-        </Section>
+            <Section title="ITC status">
+              <Row label="ITC available" value={inr(report.itc_available)} />
+              <Row label="ITC claimed" value={inr(report.itc_claimed)} />
+              <Row label="ITC balance" value={inr(report.itc_balance)} />
+            </Section>
 
-        <Section title="Exceptions">
+            <Section title="Compliance status">
+              <Row label="Filed" value={String(report.compliance_summary.filed)} />
+              <Row label="Pending" value={String(report.compliance_summary.pending)} />
+              <Row label="Overdue" value={String(report.compliance_summary.overdue)} />
+            </Section>
+          </>
+        )}
+
+        <Section title={reportType === "bank_rec_summary" ? "Unmatched items" : "Exceptions"}>
           <Row label="Open exceptions" value={String(report.exceptions_summary.open_count)} ids={report.source_txn_ids?.exceptions} rowLabel="Open exceptions" />
           <Row label="Amount at risk" value={inr(report.exceptions_summary.amount_at_risk)} />
         </Section>
@@ -1553,6 +1590,18 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Posted documents" value={String(report.data_quality.doc_count)} />
           <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
         </Section>
+
+        {reportType === "working_paper" && (
+          <Section title="Preparer notes">
+            <textarea
+              value={preparerNotes}
+              onChange={(e) => setPreparerNotes(e.target.value)}
+              placeholder="Notes for the reviewer — assumptions, open items, sampling basis."
+              style={{ ...caInputStyle, width: "100%", minHeight: 90, padding: 10, fontFamily: CA.sans, fontSize: 13, resize: "vertical" }}
+            />
+          </Section>
+        )}
+
 
         {drilldownIds && (
           <div style={{ marginTop: 16, background: CA.card, borderRadius: 10, border: "1px solid rgba(23,18,8,0.09)", padding: 14 }}>

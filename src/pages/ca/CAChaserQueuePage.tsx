@@ -3,7 +3,7 @@
  * how long the client has kept the firm waiting. Chases send a real email,
  * record a client message and increment the chaser counter.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
@@ -45,6 +45,41 @@ export default function CAChaserQueuePage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [timelineChaser, setTimelineChaser] = useState<string | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<{ event_type: string; note: string | null; actor_id: string | null; created_at: string }[]>([]);
+  const [loadingTimeline, setLoadingTimeline] = useState(false);
+
+  /** One timeline open at a time — clicking the open row collapses it. */
+  const loadTimeline = async (chaserId: string) => {
+    if (timelineChaser === chaserId) { setTimelineChaser(null); return; }
+    setTimelineChaser(chaserId);
+    setLoadingTimeline(true);
+    const { data } = await supabase
+      .from("ca_chaser_events")
+      .select("event_type, note, actor_id, created_at")
+      .eq("chaser_id", chaserId)
+      .order("created_at", { ascending: true });
+    const events = (data ?? []) as { event_type: string; note: string | null; actor_id: string | null; created_at: string }[];
+    setTimelineEvents(events);
+    setLoadingTimeline(false);
+    console.log(`[fyn:chaser] timeline loaded ${events.length} events for ${chaserId}`);
+  };
+
+  /** Non-blocking chase history entry. */
+  const logChaserEvent = async (r: RequestRow, eventType: string, note: string) => {
+    if (!firmId) return;
+    try {
+      await supabase.from("ca_chaser_events").insert({
+        chaser_id: r.id,
+        ca_firm_id: firmId,
+        business_id: r.business_id,
+        event_type: eventType,
+        actor_id: userId ?? null,
+        note,
+      });
+    } catch { /* history must never block the action */ }
+  };
+
 
   const load = useCallback(async () => {
     if (!firmId) {
@@ -163,7 +198,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period, days_overdue: daysOverdue(r.due_date), channel: c?.client_email ? "email" : "portal" },
     });
+    await logChaserEvent(r, "sent", c?.client_email ? "Email sent" : "Chase recorded in the portal");
     return true;
+
   };
 
   /** Client came back — record the reply and teach the brain. */
@@ -195,7 +232,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period },
     });
+    await logChaserEvent(r, "replied", "Marked replied manually");
     toast.success("Reply recorded");
+
     void load();
   };
 
@@ -213,7 +252,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period, reason, days_overdue: daysOverdue(r.due_date) },
     });
+    await logChaserEvent(r, "skipped", `Skipped by user — ${reason}`);
     toast.success("Skip logged");
+
   };
 
   const onChase = async (r: RequestRow) => {
@@ -301,9 +342,10 @@ export default function CAChaserQueuePage() {
                       onChange={() => setSelected(allSelected ? new Set() : new Set(sorted.map((r) => r.id)))}
                     />
                   </th>
-                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", "Predicted response", ""].map((h) => (
+                  {["Client", "Request", "Period", "Documents", "Due", "Overdue", "Last chased", "Chases", "Predicted response", "History", ""].map((h) => (
                     <th key={h} style={caTh}>{h}</th>
                   ))}
+
                 </tr>
               </thead>
               <tbody>
@@ -311,7 +353,9 @@ export default function CAChaserQueuePage() {
                   const c = clients.get(r.business_id);
                   const od = daysOverdue(r.due_date);
                   return (
-                    <tr key={r.id}>
+                    <Fragment key={r.id}>
+                    <tr>
+
                       <td style={caTd}>
                         <input
                           type="checkbox"
@@ -346,7 +390,16 @@ export default function CAChaserQueuePage() {
                           );
                         })()}
                       </td>
+                      <td style={caTd}>
+                        <button
+                          onClick={() => void loadTimeline(r.id)}
+                          style={{ background: "none", border: "none", color: CA.teal, fontFamily: CA.sans, fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                        >
+                          {timelineChaser === r.id ? "Hide" : "Timeline"}
+                        </button>
+                      </td>
                       <td style={{ ...caTd, textAlign: "right", whiteSpace: "nowrap" }}>
+
                         <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                           <CAButton onClick={() => void onChase(r)} disabled={busy === r.id}>
                             {busy === r.id ? "Chasing…" : "Chase now"}
@@ -376,7 +429,33 @@ export default function CAChaserQueuePage() {
                         </span>
                       </td>
                     </tr>
+                    {timelineChaser === r.id && (
+                      <tr key={`timeline-${r.id}`}>
+                        <td colSpan={12} style={{ padding: "0 14px 12px", background: "rgba(23,18,8,0.02)" }}>
+                          {loadingTimeline ? (
+                            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>Loading…</span>
+                          ) : timelineEvents.length === 0 ? (
+                            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>No events recorded yet.</span>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 10 }}>
+                              {timelineEvents.map((e, i) => (
+                                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                                  <div style={{ width: 8, height: 8, borderRadius: 999, background: e.event_type.includes("escalat") ? "#A93838" : e.event_type.includes("resolv") ? "#1F5A46" : "#8B6914", marginTop: 5, flexShrink: 0 }} />
+                                  <div>
+                                    <span style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 600, color: CA.ink, textTransform: "capitalize" }}>{e.event_type.replace(/_/g, " ")}</span>
+                                    {e.note && <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}> — {e.note}</span>}
+                                    <span style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, marginLeft: 8 }}>{dateIN(e.created_at)}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
+
                 })}
               </tbody>
             </table>

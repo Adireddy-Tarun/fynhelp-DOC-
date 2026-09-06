@@ -1185,6 +1185,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ca_chaser_events: {
+        Row: {
+          actor_id: string | null
+          business_id: string | null
+          ca_firm_id: string
+          chaser_id: string
+          created_at: string
+          event_type: string
+          id: string
+          note: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          business_id?: string | null
+          ca_firm_id: string
+          chaser_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          note?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          business_id?: string | null
+          ca_firm_id?: string
+          chaser_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_chaser_events_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ca_client_access: {
         Row: {
           access_level: string | null
@@ -2210,6 +2251,7 @@ export type Database = {
           created_at: string
           doc_types: string[]
           due_date: string | null
+          escalated_at: string | null
           fulfilled_at: string | null
           id: string
           last_chased_at: string | null
@@ -2227,6 +2269,7 @@ export type Database = {
           created_at?: string
           doc_types?: string[]
           due_date?: string | null
+          escalated_at?: string | null
           fulfilled_at?: string | null
           id?: string
           last_chased_at?: string | null
@@ -2244,6 +2287,7 @@ export type Database = {
           created_at?: string
           doc_types?: string[]
           due_date?: string | null
+          escalated_at?: string | null
           fulfilled_at?: string | null
           id?: string
           last_chased_at?: string | null
@@ -8104,6 +8148,7 @@ export type Database = {
       run_security_sanity_check: { Args: { p_probe?: Json }; Returns: Json }
       security_check_caller_allowed: { Args: never; Returns: boolean }
       text_to_bytea: { Args: { data: string }; Returns: string }
+      trigger_ca_auto_escalate_chasers: { Args: never; Returns: undefined }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
       trigger_ca_brain_master: { Args: never; Returns: undefined }
       trigger_ca_integration_sync: { Args: never; Returns: undefined }
