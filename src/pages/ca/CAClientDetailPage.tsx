@@ -46,6 +46,14 @@ interface Client {
 const TABS = ["Documents", "Reconcile", "GST and ITC", "Compliance", "Close", "Reports", "Deductions"] as const;
 type Tab = typeof TABS[number];
 
+const MIS_TEMPLATES = [
+  { value: "monthly_mis", label: "Monthly MIS" },
+  { value: "bank_rec_summary", label: "Bank Rec Summary" },
+  { value: "variance_report", label: "Variance Report" },
+  { value: "working_paper", label: "Working Paper" },
+] as const;
+
+
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <CACard style={{ padding: "14px 16px" }}>
