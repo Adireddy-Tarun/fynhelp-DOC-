@@ -186,17 +186,29 @@ export default function CAClientDetailPage() {
 
   useEffect(() => {
     if (!firmId || !businessId || !clientId) return;
-    void supabase.from("ca_client_periods").upsert({
-      ca_firm_id: firmId,
-      client_id: clientId,
-      business_id: businessId,
-      period: activePeriod,
-      period_start: periodStart,
-      period_end: periodEnd,
-      status: "active",
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "ca_firm_id,client_id,period" });
-    console.log(`[fyn:period] persisted ${activePeriod} for client ${clientId}`);
+    void (async () => {
+      // Never reopen a period the firm has already closed.
+      const { data: existing } = await supabase
+        .from("ca_client_periods")
+        .select("status")
+        .eq("ca_firm_id", firmId)
+        .eq("client_id", clientId)
+        .eq("period", activePeriod)
+        .maybeSingle();
+      if (existing?.status === "closed") return;
+      await supabase.from("ca_client_periods").upsert({
+        ca_firm_id: firmId,
+        client_id: clientId,
+        business_id: businessId,
+        period: activePeriod,
+        period_start: periodStart,
+        period_end: periodEnd,
+        status: "active",
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "ca_firm_id,client_id,period" });
+      console.log(`[fyn:period] persisted ${activePeriod} for client ${clientId}`);
+    })();
+
     try {
       void supabase.from("ca_brain_events").insert({
         ca_firm_id: firmId,
