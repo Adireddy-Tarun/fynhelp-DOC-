@@ -1369,8 +1369,9 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
         </div>
 
         <Section title="Revenue & expenses">
-          <Row label="Revenue" value={inr(report.revenue)} />
-          <Row label="Expenses" value={inr(report.expenses)} />
+          <Row label="Revenue" value={inr(report.revenue)} ids={report.source_txn_ids?.revenue} rowLabel="Revenue transactions" />
+          <Row label="Expenses" value={inr(report.expenses)} ids={report.source_txn_ids?.expenses} rowLabel="Expense transactions" />
+
           <Row label="Gross profit" value={inr(report.gross_profit)} />
         </Section>
 
