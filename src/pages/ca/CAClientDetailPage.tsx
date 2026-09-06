@@ -637,6 +637,36 @@ export default function CAClientDetailPage() {
     ];
   }, [txns, itc, compliance, reports, activePeriod, periodStart, periodEnd]);
 
+  const handleClosePeriod = async () => {
+    if (!firmId || !clientId || !businessId) return;
+    if (!window.confirm(`Close ${periodLabel}? No new transactions can be posted to this period after closing.`)) return;
+    setClosingPeriod(true);
+    const { error } = await supabase.from("ca_client_periods").upsert({
+      ca_firm_id: firmId,
+      client_id: clientId,
+      business_id: businessId,
+      period: activePeriod,
+      period_start: periodStart,
+      period_end: periodEnd,
+      status: "closed",
+      close_step_1: closeChecklist[0].done,
+      close_step_2: closeChecklist[1].done,
+      close_step_3: closeChecklist[2].done,
+      close_step_4: closeChecklist[3].done,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "ca_firm_id,client_id,period" });
+    setClosingPeriod(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`${periodLabel} closed. Switch to the next period to continue posting.`);
+    void supabase.from("ca_brain_events").insert({
+      ca_firm_id: firmId,
+      business_id: businessId,
+      event_type: "period_closed",
+      payload: { period: activePeriod },
+    });
+  };
+
+
 
 
   if (loading) return <CAEmpty title="Loading client…" />;
