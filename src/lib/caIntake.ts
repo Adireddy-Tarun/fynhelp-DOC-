@@ -356,6 +356,51 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
     detail: { classification, confidence, rows: rows.length, review_state: reviewState, filename: file.name },
   });
 
+  // Auto-resolve any open document chaser for this client when a document arrives.
+  // Chasers live in ca_document_requests; this whole block is non-blocking.
+  try {
+    const { data: pendingChasers } = await supabase
+      .from("ca_document_requests")
+      .select("id, title")
+      .eq("ca_firm_id", firmId)
+      .eq("business_id", businessId)
+      .in("status", ["pending", "sent", "chased", "escalated"])
+      .limit(5);
+    if (pendingChasers && pendingChasers.length > 0) {
+      const nowIso = new Date().toISOString();
+      await supabase
+        .from("ca_document_requests")
+        .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso })
+        .eq("ca_firm_id", firmId)
+        .eq("business_id", businessId)
+        .in("status", ["pending", "sent", "chased", "escalated"]);
+
+      console.log(`[fyn:chaser] auto-resolved ${pendingChasers.length} chasers for ${businessId}`);
+
+      await supabase.from("ca_brain_events").insert({
+        ca_firm_id: firmId,
+        business_id: businessId,
+        event_type: "chaser_auto_resolved",
+        payload: {
+          resolved_count: pendingChasers.length,
+          trigger: "document_upload",
+          filename: file.name,
+          classification,
+        },
+      });
+
+      await supabase.from("ca_notifications").insert({
+        ca_firm_id: firmId,
+        business_id: businessId,
+        type: "chaser_resolved",
+        title: "Client responded",
+        message: `${file.name} was uploaded — ${pendingChasers.length} pending chaser${pendingChasers.length > 1 ? "s" : ""} auto-resolved`,
+        is_read: false,
+      });
+    }
+  } catch { /* non-blocking — chaser resolution must never block the intake pipeline */ }
+
+
   return {
     ok: true,
     extractionId: extraction.id,
