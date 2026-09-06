@@ -956,7 +956,22 @@ export default function CAClientDetailPage() {
 
         {tab === "Reconcile" && (
           <>
-          <ThreeWayMatchTab firmId={firmId} businessId={businessId} />
+          <div style={{
+            background: "rgba(139,105,20,0.07)", border: "1px solid rgba(139,105,20,0.20)",
+            borderRadius: 10, padding: "10px 14px", marginBottom: 14,
+            display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+          }}>
+            <span style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 700, color: "#8B6914", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              Period scope
+            </span>
+            <span style={{ fontFamily: CA.mono, fontSize: 13, color: CA.ink }}>
+              {periodStart} to {periodEnd}
+            </span>
+            <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}>
+              Only transactions and documents within this period are matched. Change period using the selector above.
+            </span>
+          </div>
+          <ThreeWayMatchTab firmId={firmId} businessId={businessId} periodStart={periodStart} periodEnd={periodEnd} />
           <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: CA.faint, marginTop: 20, marginBottom: 10 }}>
             Bank transactions
           </div>
