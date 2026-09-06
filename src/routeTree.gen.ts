@@ -90,6 +90,7 @@ import { Route as MainDashboardSimulatorRouteImport } from './routes/_main/dashb
 import { Route as MainDashboardTdsTaxRouteImport } from './routes/_main/dashboard/tds-tax'
 import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboard/vendors'
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
+import { Route as ApiPublicCaAutoEscalateChasersRouteImport } from './routes/api/public/ca-auto-escalate-chasers'
 import { Route as ApiPublicCaAutoFollowupRouteImport } from './routes/api/public/ca-auto-followup'
 import { Route as ApiPublicCaBrainChaserLearningRouteImport } from './routes/api/public/ca-brain-chaser-learning'
 import { Route as ApiPublicCaBrainDeductionLearningRouteImport } from './routes/api/public/ca-brain-deduction-learning'
@@ -635,6 +636,12 @@ const MainDashboardWorkingCapitalRoute =
     id: '/dashboard/working-capital',
     path: '/dashboard/working-capital',
     getParentRoute: () => MainRoute,
+  } as any)
+const ApiPublicCaAutoEscalateChasersRoute =
+  ApiPublicCaAutoEscalateChasersRouteImport.update({
+    id: '/api/public/ca-auto-escalate-chasers',
+    path: '/api/public/ca-auto-escalate-chasers',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicCaAutoFollowupRoute = ApiPublicCaAutoFollowupRouteImport.update({
   id: '/api/public/ca-auto-followup',
@@ -1481,6 +1488,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
   '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
@@ -1689,6 +1697,7 @@ export interface FileRoutesByTo {
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
   '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
@@ -1908,6 +1917,7 @@ export interface FileRoutesById {
   '/_main/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
   '/_main/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
+  '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
   '/api/public/ca-auto-followup': typeof ApiPublicCaAutoFollowupRoute
   '/api/public/ca-brain-chaser-learning': typeof ApiPublicCaBrainChaserLearningRoute
   '/api/public/ca-brain-deduction-learning': typeof ApiPublicCaBrainDeductionLearningRoute
@@ -2122,6 +2132,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-escalate-chasers'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-brain-chaser-learning'
     | '/api/public/ca-brain-deduction-learning'
@@ -2330,6 +2341,7 @@ export interface FileRouteTypes {
     | '/dashboard/tds-tax'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
+    | '/api/public/ca-auto-escalate-chasers'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-brain-chaser-learning'
     | '/api/public/ca-brain-deduction-learning'
@@ -2548,6 +2560,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/tds-tax'
     | '/_main/dashboard/vendors'
     | '/_main/dashboard/working-capital'
+    | '/api/public/ca-auto-escalate-chasers'
     | '/api/public/ca-auto-followup'
     | '/api/public/ca-brain-chaser-learning'
     | '/api/public/ca-brain-deduction-learning'
@@ -2696,6 +2709,7 @@ export interface RootRouteChildren {
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
   V2Route: typeof V2RouteWithChildren
+  ApiPublicCaAutoEscalateChasersRoute: typeof ApiPublicCaAutoEscalateChasersRoute
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
   ApiPublicCaBrainDeductionLearningRoute: typeof ApiPublicCaBrainDeductionLearningRoute
@@ -3277,6 +3291,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/working-capital'
       preLoaderRoute: typeof MainDashboardWorkingCapitalRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/api/public/ca-auto-escalate-chasers': {
+      id: '/api/public/ca-auto-escalate-chasers'
+      path: '/api/public/ca-auto-escalate-chasers'
+      fullPath: '/api/public/ca-auto-escalate-chasers'
+      preLoaderRoute: typeof ApiPublicCaAutoEscalateChasersRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/ca-auto-followup': {
       id: '/api/public/ca-auto-followup'
@@ -4751,6 +4772,7 @@ const rootRouteChildren: RootRouteChildren = {
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
   V2Route: V2RouteWithChildren,
+  ApiPublicCaAutoEscalateChasersRoute: ApiPublicCaAutoEscalateChasersRoute,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,
   ApiPublicCaBrainDeductionLearningRoute:

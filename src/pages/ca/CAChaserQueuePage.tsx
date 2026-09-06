@@ -45,6 +45,41 @@ export default function CAChaserQueuePage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [timelineChaser, setTimelineChaser] = useState<string | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<{ event_type: string; note: string | null; actor_id: string | null; created_at: string }[]>([]);
+  const [loadingTimeline, setLoadingTimeline] = useState(false);
+
+  /** One timeline open at a time — clicking the open row collapses it. */
+  const loadTimeline = async (chaserId: string) => {
+    if (timelineChaser === chaserId) { setTimelineChaser(null); return; }
+    setTimelineChaser(chaserId);
+    setLoadingTimeline(true);
+    const { data } = await supabase
+      .from("ca_chaser_events")
+      .select("event_type, note, actor_id, created_at")
+      .eq("chaser_id", chaserId)
+      .order("created_at", { ascending: true });
+    const events = (data ?? []) as { event_type: string; note: string | null; actor_id: string | null; created_at: string }[];
+    setTimelineEvents(events);
+    setLoadingTimeline(false);
+    console.log(`[fyn:chaser] timeline loaded ${events.length} events for ${chaserId}`);
+  };
+
+  /** Non-blocking chase history entry. */
+  const logChaserEvent = async (r: RequestRow, eventType: string, note: string) => {
+    if (!firmId) return;
+    try {
+      await supabase.from("ca_chaser_events").insert({
+        chaser_id: r.id,
+        ca_firm_id: firmId,
+        business_id: r.business_id,
+        event_type: eventType,
+        actor_id: userId ?? null,
+        note,
+      });
+    } catch { /* history must never block the action */ }
+  };
+
 
   const load = useCallback(async () => {
     if (!firmId) {
