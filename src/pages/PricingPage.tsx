@@ -238,13 +238,13 @@ export default function PricingPage() {
           <div className="in">
             <Reveal>
               <div>
-                <span className="fh-kicker">Pricing · Pay per client</span>
+                <span className="fh-kicker">The intelligence layer on top of Tally and Zoho</span>
                 <h1>
                   Pay for the clients <span className="ital">you actually close.</span>
                 </h1>
                 <p className="sub" style={{ marginInline: "auto" }}>
-                  Unlimited users and the full Extract, Recon, Narrate pipeline on every plan. Your
-                  bill only grows when your book does.
+                  FynHelp sits on top of Tally, Zoho Books, and your bank feeds — extracting,
+                  reconciling, and narrating automatically. Your bill only grows when your book does.
                 </p>
                 <div style={{ marginTop: 24 }}>
                   <span

@@ -84,6 +84,12 @@ function Hero() {
             chasing reconciliations. FynHelp automates the grunt work — so your firm can take on
             more clients without hiring more staff.
           </p>
+          <p
+            className="mt-4 max-w-xl text-[17px] leading-relaxed"
+            style={{ color: "rgba(23,18,8,0.72)" }}
+          >
+            The intelligence layer on top of Tally and Zoho — for faster, trusted month-end close.
+          </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <a
