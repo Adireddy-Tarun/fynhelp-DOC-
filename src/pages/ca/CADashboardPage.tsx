@@ -662,6 +662,35 @@ export default function CADashboardPage() {
                       <div style={{ marginTop: 12 }}>
                         <CABadge tone={ws.tone}>{ws.label}</CABadge>
                       </div>
+                      {nbaMap[c.id] && (
+                        <div style={{ marginTop: 8 }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const nba = nbaMap[c.id]!;
+                              navigate(nba.path);
+                              try {
+                                void supabase.from("ca_brain_events").insert({
+                                  ca_firm_id: firmId,
+                                  business_id: c.business_id,
+                                  event_type: "nba_clicked",
+                                  payload: { action: nba.action, tone: nba.tone, client_id: c.id },
+                                });
+                              } catch { /* non-blocking */ }
+                            }}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6, width: "100%",
+                              background: nbaMap[c.id]!.tone === "red" ? "rgba(169,56,56,0.08)" : nbaMap[c.id]!.tone === "gold" ? "rgba(139,105,20,0.08)" : "rgba(31,90,70,0.08)",
+                              border: `1px solid ${nbaMap[c.id]!.tone === "red" ? "rgba(169,56,56,0.20)" : nbaMap[c.id]!.tone === "gold" ? "rgba(139,105,20,0.18)" : "rgba(31,90,70,0.18)"}`,
+                              borderRadius: 8, padding: "7px 10px", cursor: "pointer", textAlign: "left",
+                              fontFamily: CA.sans, fontSize: 12, fontWeight: 600,
+                              color: nbaMap[c.id]!.tone === "red" ? "#A93838" : nbaMap[c.id]!.tone === "gold" ? "#8B6914" : "#1F5A46",
+                            }}
+                          >
+                            {nbaMap[c.id]!.action}
+                          </button>
+                        </div>
+                      )}
                       <div style={{ marginTop: 12, fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
                         Next GST due: {c.next_gst_due ? `${dateIN(c.next_gst_due)}${c.next_gst_type ? ` · ${c.next_gst_type}` : ""}` : "—"}
                       </div>
