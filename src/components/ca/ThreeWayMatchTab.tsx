@@ -58,7 +58,7 @@ function isoDate(v: unknown): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
 }
 
-export default function ThreeWayMatchTab({ firmId, businessId }: { firmId: string | null; businessId: string | null }) {
+export default function ThreeWayMatchTab({ firmId, businessId, periodStart, periodEnd }: { firmId: string | null; businessId: string | null; periodStart?: string; periodEnd?: string }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [ran, setRan] = useState(false);
