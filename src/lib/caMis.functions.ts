@@ -151,6 +151,34 @@ export const generateMisReport = createServerFn({ method: "POST" })
     const compliance = summariseCompliance((complianceRes.data ?? []) as unknown as MisComplianceRow[]);
     const exceptions = summariseExceptions((exceptionsRes.data ?? []) as unknown as MisExceptionRow[]);
 
+    // Collect source transaction IDs so the MIS can drill through to the ledger.
+    const sourceTxnIds: NonNullable<MisReport["source_txn_ids"]> = {
+      revenue: [],
+      expenses: [],
+      exceptions: [],
+    };
+    try {
+      const from = hasRange ? data.period_start! : "2000-01-01";
+      const to = hasRange ? data.period_end! : new Date().toISOString().slice(0, 10);
+      const [revTxns, expTxns, excItems] = await Promise.all([
+        supabase.from("bank_transactions").select("id")
+          .eq("business_id", data.business_id).eq("type", "credit")
+          .gte("date", from).lte("date", to).limit(500),
+        supabase.from("bank_transactions").select("id")
+          .eq("business_id", data.business_id).eq("type", "debit")
+          .gte("date", from).lte("date", to).limit(500),
+        supabase.from("ca_exceptions").select("id")
+          .eq("ca_firm_id", data.firm_id).eq("business_id", data.business_id)
+          .neq("status", "resolved").limit(100),
+      ]);
+      sourceTxnIds.revenue = (revTxns.data ?? []).map((r) => r.id as string);
+      sourceTxnIds.expenses = (expTxns.data ?? []).map((r) => r.id as string);
+      sourceTxnIds.exceptions = (excItems.data ?? []).map((r) => r.id as string);
+      console.log(
+        `[fyn:mis] source_txn_ids revenue=${sourceTxnIds.revenue.length} expenses=${sourceTxnIds.expenses.length} exceptions=${sourceTxnIds.exceptions.length}`,
+      );
+    } catch { /* non-blocking */ }
+
     const report = {
       period: periodLabel,
       client_name: clientRes.data?.client_name ?? "Client",
@@ -166,7 +194,9 @@ export const generateMisReport = createServerFn({ method: "POST" })
       exceptions_summary: exceptions,
       data_quality: { doc_count: docs.doc_count, confidence_avg: docs.confidence_avg },
       generated_at: new Date().toISOString(),
+      source_txn_ids: sourceTxnIds,
     };
+
 
     const { data: logRow, error: logErr } = await supabase
       .from("ca_reports_log")
