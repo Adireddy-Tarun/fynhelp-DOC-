@@ -186,7 +186,7 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
         total_received: credits.reduce((s, c) => s + c.amount, 0),
       },
     });
-  }, [firmId, businessId]);
+  }, [firmId, businessId, periodStart, periodEnd]);
 
   useEffect(() => { void run(); }, [run]);
 
