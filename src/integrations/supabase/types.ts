@@ -8148,6 +8148,7 @@ export type Database = {
       run_security_sanity_check: { Args: { p_probe?: Json }; Returns: Json }
       security_check_caller_allowed: { Args: never; Returns: boolean }
       text_to_bytea: { Args: { data: string }; Returns: string }
+      trigger_ca_auto_escalate_chasers: { Args: never; Returns: undefined }
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
       trigger_ca_brain_master: { Args: never; Returns: undefined }
       trigger_ca_integration_sync: { Args: never; Returns: undefined }
