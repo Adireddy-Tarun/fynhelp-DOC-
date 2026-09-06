@@ -252,7 +252,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period, reason, days_overdue: daysOverdue(r.due_date) },
     });
+    await logChaserEvent(r, "skipped", `Skipped by user — ${reason}`);
     toast.success("Skip logged");
+
   };
 
   const onChase = async (r: RequestRow) => {
