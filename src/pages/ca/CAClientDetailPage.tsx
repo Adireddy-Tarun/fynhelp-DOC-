@@ -713,6 +713,28 @@ export default function CAClientDetailPage() {
         </span>
       </div>
 
+      {clientNba && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12, marginTop: 10,
+          padding: "10px 16px", borderRadius: 10,
+          background: `${clientNba.tone}14`,
+          border: `1px solid ${clientNba.tone}30`,
+        }}>
+          <span style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: clientNba.tone, flexShrink: 0 }}>
+            Next action
+          </span>
+          <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink, flex: 1 }}>
+            {clientNba.action}
+          </span>
+          <button
+            onClick={() => navigate(clientNba.path)}
+            style={{ background: clientNba.tone, color: "#F7F1E6", border: "none", borderRadius: 8, padding: "6px 14px", fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+          >
+            Go
+          </button>
+        </div>
+      )}
+
 
 
       <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
