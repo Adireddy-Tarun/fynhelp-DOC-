@@ -195,6 +195,7 @@ export interface IntakeInput {
   firmId: string;
   businessId: string;
   clientReferenceCode: string;
+  clientId?: string | null;
   requestId?: string | null;
   period?: string | null;
   classification?: CADocClass;
