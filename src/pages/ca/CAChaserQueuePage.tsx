@@ -232,7 +232,9 @@ export default function CAChaserQueuePage() {
       actorRole: role,
       detail: { title: r.title, period: r.period },
     });
+    await logChaserEvent(r, "replied", "Marked replied manually");
     toast.success("Reply recorded");
+
     void load();
   };
 
