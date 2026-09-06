@@ -670,12 +670,14 @@ export default function CADashboardPage() {
                               const nba = nbaMap[c.id]!;
                               navigate(nba.path);
                               try {
-                                void supabase.from("ca_brain_events").insert({
-                                  ca_firm_id: firmId,
-                                  business_id: c.business_id ?? undefined,
-                                  event_type: "nba_clicked",
-                                  payload: { action: nba.action, tone: nba.tone, client_id: c.id },
-                                });
+                                if (firmId) {
+                                  void supabase.from("ca_brain_events").insert({
+                                    ca_firm_id: firmId,
+                                    business_id: c.business_id ?? undefined,
+                                    event_type: "nba_clicked",
+                                    payload: { action: nba.action, tone: nba.tone, client_id: c.id },
+                                  });
+                                }
                               } catch { /* non-blocking */ }
                             }}
                             style={{
