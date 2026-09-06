@@ -353,7 +353,9 @@ export default function CAChaserQueuePage() {
                   const c = clients.get(r.business_id);
                   const od = daysOverdue(r.due_date);
                   return (
-                    <tr key={r.id}>
+                    <Fragment key={r.id}>
+                    <tr>
+
                       <td style={caTd}>
                         <input
                           type="checkbox"
