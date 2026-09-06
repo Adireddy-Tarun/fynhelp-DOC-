@@ -453,6 +453,88 @@ export default function CAReportsPage() {
   );
 }
 
+// ───────── MIS Sign-off button ─────────
+function MISSignOffButton({
+  report,
+  firmId,
+  userId,
+  onSigned,
+}: {
+  report: ReportRow;
+  firmId: string;
+  userId: string;
+  onSigned: () => void;
+}) {
+  const [notes, setNotes] = useState("");
+  const [history, setHistory] = useState<{ id: string; signed_off_at: string; notes: string | null; profiles: { full_name: string | null } | null }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadHistory = async () => {
+    if (!firmId || !report.business_id) return;
+    const { data } = await supabase
+      .from("ca_mis_signoffs")
+      .select("id, signed_off_at, notes, profiles(full_name)")
+      .eq("ca_firm_id", firmId)
+      .eq("client_id", report.business_id)
+      .eq("period_id", report.period)
+      .order("signed_off_at", { ascending: false });
+    setHistory((data as typeof history) || []);
+  };
+
+  useEffect(() => {
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firmId, report.business_id, report.period]);
+
+  const handleSignOff = async () => {
+    if (!firmId || !userId || !report.business_id) return;
+    setLoading(true);
+    const { error } = await supabase.from("ca_mis_signoffs").insert({
+      ca_firm_id: firmId,
+      client_id: report.business_id,
+      period_id: report.period,
+      report_type: "MIS",
+      signed_off_by: userId,
+      notes: notes.trim() || null,
+    });
+    setLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("MIS report signed off successfully");
+    setNotes("");
+    await loadHistory();
+    onSigned();
+  };
+
+  return (
+    <div className="space-y-2">
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Sign-off notes (optional)"
+        rows={2}
+        className="w-full px-2 py-1.5 rounded text-xs resize-none"
+        style={{ border: `1px solid ${COLORS.caBorder}` }}
+      />
+      <SecondaryBtn size="sm" onClick={handleSignOff} disabled={loading}>
+        {loading ? "Signing..." : "Sign off"}
+      </SecondaryBtn>
+      {history.length > 0 && (
+        <div className="mt-2 space-y-1.5">
+          <div className="text-[11px] font-medium" style={{ color: "rgba(23,18,8,0.55)" }}>Sign-off history</div>
+          {history.map((h) => (
+            <div key={h.id} className="text-[11px]" style={{ color: "rgba(23,18,8,0.65)" }}>
+              <span className="font-medium">{h.profiles?.full_name || "Unknown"}</span>
+              {" · "}
+              {fmtDateTime(h.signed_off_at)}
+              {h.notes && <span> · {h.notes}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ───────── Action menu item ─────────
 function ActionItem({ icon: Icon, label, onClick, danger }: { icon: typeof Download; label: string; onClick: () => void; danger?: boolean }) {
   return (
