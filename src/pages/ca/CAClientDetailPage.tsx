@@ -824,7 +824,20 @@ export default function CAClientDetailPage() {
               <CAButton onClick={generateMis} disabled={!businessId || misBusy}>
                 {misBusy ? "Building…" : "Generate MIS for this client"}
               </CAButton>
+              <CAButton
+                variant="ghost"
+                onClick={handleClosePeriod}
+                disabled={closingPeriod || closeChecklist.filter((i) => i.done).length < 4}
+              >
+                {closingPeriod ? "Closing…" : "Close this period"}
+              </CAButton>
             </div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginTop: 6 }}>
+              {closeChecklist.filter((i) => i.done).length < 4
+                ? "Complete all 4 steps before closing the period."
+                : "All steps complete. Safe to close."}
+            </div>
+
           </CACard>
           </>
         )}
