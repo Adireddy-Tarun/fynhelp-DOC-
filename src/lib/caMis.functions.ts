@@ -197,7 +197,9 @@ export const generateMisReport = createServerFn({ method: "POST" })
       data_quality: { doc_count: docs.doc_count, confidence_avg: docs.confidence_avg },
       generated_at: new Date().toISOString(),
       source_txn_ids: sourceTxnIds,
+      report_type: reportType,
     };
+
 
 
     const { data: logRow, error: logErr } = await supabase
