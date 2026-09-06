@@ -3,7 +3,7 @@
  * how long the client has kept the firm waiting. Chases send a real email,
  * record a client message and increment the chaser counter.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
