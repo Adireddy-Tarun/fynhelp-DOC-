@@ -168,6 +168,21 @@ export default function CAReportsPage() {
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [caFirm?.id]);
 
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from("ca_firm_members")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .limit(1)
+        .maybeSingle();
+      setCaRole(data?.role ?? null);
+    };
+    fetchRole();
+  }, [user?.id]);
+
   useEffect(() => { console.log("[fyn:ca:os-complete] CAReportsPage mounted"); }, []);
 
   /** Partner or manager sign-off on a generated report. */
