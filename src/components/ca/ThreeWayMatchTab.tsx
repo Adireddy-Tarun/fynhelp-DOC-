@@ -66,6 +66,7 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
   const run = useCallback(async () => {
     if (!firmId || !businessId) return;
     setLoading(true);
+    console.log(`[fyn:recon] period-scoped periodStart=${periodStart ?? "none"} periodEnd=${periodEnd ?? "none"}`);
     const [extRes, bankRes] = await Promise.all([
       supabase
         .from("ca_document_extractions")
@@ -73,12 +74,16 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
         .eq("business_id", businessId)
         .eq("ca_firm_id", firmId)
         .eq("classification", "invoice")
-        .eq("review_state", "posted"),
+        .eq("review_state", "posted")
+        .gte("created_at", periodStart ? `${periodStart}T00:00:00Z` : "2000-01-01T00:00:00Z")
+        .lte("created_at", periodEnd ? `${periodEnd}T23:59:59Z` : new Date().toISOString()),
       supabase
         .from("bank_transactions")
         .select("id, date, amount, description, type")
         .eq("business_id", businessId)
         .eq("type", "credit")
+        .gte("date", periodStart ?? "2000-01-01")
+        .lte("date", periodEnd ?? new Date().toISOString().slice(0, 10))
         .order("date", { ascending: false })
         .limit(1000),
     ]);
