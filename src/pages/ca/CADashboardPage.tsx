@@ -672,7 +672,7 @@ export default function CADashboardPage() {
                               try {
                                 void supabase.from("ca_brain_events").insert({
                                   ca_firm_id: firmId,
-                                  business_id: c.business_id,
+                                  business_id: c.business_id ?? undefined,
                                   event_type: "nba_clicked",
                                   payload: { action: nba.action, tone: nba.tone, client_id: c.id },
                                 });
