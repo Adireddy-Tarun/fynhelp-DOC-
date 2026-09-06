@@ -194,6 +194,38 @@ export default function CAClientDetailPage() {
     } catch { /* non-blocking */ }
   }, [activePeriod, firmId, businessId, clientId]);
 
+  useEffect(() => {
+    if (!businessId || !firmId) return;
+    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    let cancelled = false;
+    (async () => {
+      try {
+        const [excRes, compRes, txnRes] = await Promise.all([
+          supabase.from("ca_exceptions").select("amount, status").eq("ca_firm_id", firmId).eq("business_id", businessId).neq("status", "resolved").order("amount", { ascending: false }).limit(1),
+          supabase.from("ca_compliance_events").select("status, due_date, event_type").eq("ca_firm_id", firmId).eq("business_id", businessId).neq("status", "filed").lte("due_date", in3Days).order("due_date", { ascending: true }).limit(1),
+          supabase.from("bank_transactions").select("id").eq("business_id", businessId).gte("date", periodStart).limit(1),
+        ]);
+        if (cancelled) return;
+        const topException = excRes.data?.[0] as { amount: number; status: string } | undefined;
+        const nextCompliance = compRes.data?.[0] as { due_date: string; event_type: string; status: string } | undefined;
+        const hasTxns = (txnRes.data?.length ?? 0) > 0;
+
+        if (topException && topException.amount > 10000) {
+          setClientNba({ action: `Resolve exception — ₹${Math.round(topException.amount).toLocaleString("en-IN")} at risk`, path: "/ca/exceptions", tone: "#A93838" });
+        } else if (nextCompliance && new Date(nextCompliance.due_date) < new Date()) {
+          setClientNba({ action: `File overdue ${nextCompliance.event_type} — was due ${nextCompliance.due_date}`, path: `/ca/clients/${clientId}`, tone: "#A93838" });
+        } else if (!hasTxns) {
+          setClientNba({ action: "No bank transactions this period — upload a bank statement", path: "/ca/intake/inbox", tone: "#8B6914" });
+        } else if (nextCompliance) {
+          setClientNba({ action: `File ${nextCompliance.event_type} by ${nextCompliance.due_date}`, path: `/ca/clients/${clientId}`, tone: "#1F5A46" });
+        } else {
+          setClientNba(null);
+        }
+      } catch { setClientNba(null); }
+    })();
+    return () => { cancelled = true; };
+  }, [businessId, firmId, periodStart, clientId]);
+
 
 
   useEffect(() => {
