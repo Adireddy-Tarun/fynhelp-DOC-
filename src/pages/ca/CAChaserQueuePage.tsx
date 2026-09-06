@@ -388,7 +388,16 @@ export default function CAChaserQueuePage() {
                           );
                         })()}
                       </td>
+                      <td style={caTd}>
+                        <button
+                          onClick={() => void loadTimeline(r.id)}
+                          style={{ background: "none", border: "none", color: CA.teal, fontFamily: CA.sans, fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                        >
+                          {timelineChaser === r.id ? "Hide" : "Timeline"}
+                        </button>
+                      </td>
                       <td style={{ ...caTd, textAlign: "right", whiteSpace: "nowrap" }}>
+
                         <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                           <CAButton onClick={() => void onChase(r)} disabled={busy === r.id}>
                             {busy === r.id ? "Chasing…" : "Chase now"}
