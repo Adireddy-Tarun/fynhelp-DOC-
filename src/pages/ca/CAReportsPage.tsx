@@ -466,19 +466,26 @@ function MISSignOffButton({
   onSigned: () => void;
 }) {
   const [notes, setNotes] = useState("");
-  const [history, setHistory] = useState<{ id: string; signed_off_at: string; notes: string | null; profiles: { full_name: string | null } | null }[]>([]);
+  const [history, setHistory] = useState<{ id: string; signed_off_at: string; notes: string | null; signed_off_by: string; full_name: string | null }[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadHistory = async () => {
     if (!firmId || !report.business_id) return;
     const { data } = await supabase
       .from("ca_mis_signoffs")
-      .select("id, signed_off_at, notes, profiles(full_name)")
+      .select("id, signed_off_at, notes, signed_off_by")
       .eq("ca_firm_id", firmId)
       .eq("client_id", report.business_id)
-      .eq("period_id", report.period)
+      .eq("period_id", report.period ?? "")
       .order("signed_off_at", { ascending: false });
-    setHistory((data as typeof history) || []);
+    const rows = (data || []) as { id: string; signed_off_at: string; notes: string | null; signed_off_by: string }[];
+    const userIds = Array.from(new Set(rows.map(r => r.signed_off_by).filter(Boolean)));
+    let nameMap: Record<string, string> = {};
+    if (userIds.length > 0) {
+      const { data: prof } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
+      nameMap = Object.fromEntries(((prof || []) as any[]).map((p: any) => [p.id, p.full_name]));
+    }
+    setHistory(rows.map(r => ({ ...r, full_name: nameMap[r.signed_off_by] || null })));
   };
 
   useEffect(() => {
