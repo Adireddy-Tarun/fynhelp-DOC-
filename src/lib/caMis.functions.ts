@@ -44,6 +44,8 @@ export interface MisReport {
   data_quality: { doc_count: number; confidence_avg: number };
   generated_at: string;
   report_id: string;
+  report_type?: string;
+
   source_txn_ids?: {
     revenue: string[];
     expenses: string[];
