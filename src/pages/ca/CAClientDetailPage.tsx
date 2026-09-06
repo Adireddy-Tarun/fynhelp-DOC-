@@ -1401,10 +1401,50 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
           <Row label="Average confidence" value={`${report.data_quality.confidence_avg}%`} />
         </Section>
 
+        {drilldownIds && (
+          <div style={{ marginTop: 16, background: CA.card, borderRadius: 10, border: "1px solid rgba(23,18,8,0.09)", padding: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: CA.faint }}>{drilldownLabel}</div>
+              <button aria-label="Close details" onClick={() => { setDrilldownIds(null); setDrilldownTxns([]); }} style={{ background: "none", border: "none", cursor: "pointer", color: CA.muted, fontSize: 18 }}>
+                <X size={16} aria-hidden="true" />
+              </button>
+            </div>
+            {loadingDrill ? (
+              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>Loading…</div>
+            ) : drilldownTxns.length === 0 ? (
+              <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>No transactions found.</div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead><tr>
+                  <th style={caTh}>Date</th><th style={caTh}>Description</th>
+                  <th style={{ ...caTh, textAlign: "right" }}>Amount</th><th style={caTh}>Source</th>
+                </tr></thead>
+                <tbody>
+                  {drilldownTxns.map((t: any) => (
+                    <tr key={t.id}>
+                      <td style={caTd}>{dateIN(t.date)}</td>
+                      <td style={caTd}>{t.description ?? "—"}</td>
+                      <td style={{ ...caNum, color: t.type === "debit" ? CA.red : CA.green }}>{inr(Math.abs(Number(t.amount)))}</td>
+                      <td style={caTd}><span style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint }}>{t.source_reference ?? "—"}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {drilldownIds.length > 50 && (
+              <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint, marginTop: 8 }}>
+                Showing first 50 of {drilldownIds.length} transactions.
+              </div>
+            )}
+          </div>
+        )}
+
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 20 }}>
           <CAButton variant="ghost" onClick={onClose}>Close</CAButton>
           <CAButton onClick={download}>Download JSON</CAButton>
+          <CAButton onClick={downloadExcel}>Download Excel</CAButton>
         </div>
+
       </div>
     </div>
   );
