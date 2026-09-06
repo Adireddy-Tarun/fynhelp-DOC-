@@ -77,6 +77,8 @@ export default function CAClientDetailPage() {
   const [showComplianceForm, setShowComplianceForm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [misBusy, setMisBusy] = useState(false);
+  const [misTemplate, setMisTemplate] = useState<"monthly_mis" | "bank_rec_summary" | "variance_report" | "working_paper">("monthly_mis");
+
   const [hideDemo, setHideDemoState] = useState<boolean>(() => {
     try { return window.localStorage.getItem("hide_seed_transactions") === "1"; } catch { return false; }
   });
