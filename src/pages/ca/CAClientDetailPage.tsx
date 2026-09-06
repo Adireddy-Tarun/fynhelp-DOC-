@@ -179,12 +179,24 @@ export default function CAClientDetailPage() {
   }, [activePeriod]);
 
   const [clientNba, setClientNba] = useState<{ action: string; path: string; tone: string } | null>(null);
+  const [closingPeriod, setClosingPeriod] = useState(false);
 
 
   const businessId = client?.business_id ?? null;
 
   useEffect(() => {
-    if (!firmId || !businessId) return;
+    if (!firmId || !businessId || !clientId) return;
+    void supabase.from("ca_client_periods").upsert({
+      ca_firm_id: firmId,
+      client_id: clientId,
+      business_id: businessId,
+      period: activePeriod,
+      period_start: periodStart,
+      period_end: periodEnd,
+      status: "active",
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "ca_firm_id,client_id,period" });
+    console.log(`[fyn:period] persisted ${activePeriod} for client ${clientId}`);
     try {
       void supabase.from("ca_brain_events").insert({
         ca_firm_id: firmId,
@@ -193,7 +205,8 @@ export default function CAClientDetailPage() {
         payload: { period: activePeriod, client_id: clientId },
       });
     } catch { /* non-blocking */ }
-  }, [activePeriod, firmId, businessId, clientId]);
+  }, [activePeriod, firmId, businessId, clientId, periodStart, periodEnd]);
+
 
   useEffect(() => {
     if (!businessId || !firmId) return;
