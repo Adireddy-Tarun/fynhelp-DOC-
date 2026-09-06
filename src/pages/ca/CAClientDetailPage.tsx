@@ -1323,6 +1323,24 @@ export default function CAClientDetailPage() {
 }
 
 function MisModal({ report, onClose }: { report: MisReport; onClose: () => void }) {
+  const [drilldownIds, setDrilldownIds] = useState<string[] | null>(null);
+  const [drilldownLabel, setDrilldownLabel] = useState("");
+  const [drilldownTxns, setDrilldownTxns] = useState<any[]>([]);
+  const [loadingDrill, setLoadingDrill] = useState(false);
+
+  const drilldown = async (ids: string[] | undefined, label: string) => {
+    if (!ids || ids.length === 0) return;
+    setDrilldownLabel(label);
+    setDrilldownIds(ids);
+    setLoadingDrill(true);
+    const { data } = await supabase
+      .from("bank_transactions")
+      .select("id, date, description, amount, type, source_reference")
+      .in("id", ids.slice(0, 50));
+    setDrilldownTxns(data ?? []);
+    setLoadingDrill(false);
+  };
+
   const download = () => {
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1333,12 +1351,64 @@ function MisModal({ report, onClose }: { report: MisReport; onClose: () => void 
     URL.revokeObjectURL(url);
   };
 
-  const Row = ({ label, value }: { label: string; value: string }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `0.5px solid ${CA.line}` }}>
+  const downloadExcel = () => {
+    const rows = [
+      ["FynHelp MIS Report", "", "", ""],
+      ["Client", report.client_name, "Period", report.period],
+      ["Generated", new Date(report.generated_at).toLocaleString("en-IN"), "", ""],
+      ["", "", "", ""],
+      ["Revenue and Expenses", "", "", ""],
+      ["Revenue", report.revenue, "", ""],
+      ["Expenses", report.expenses, "", ""],
+      ["Gross Profit", report.gross_profit, "", ""],
+      ["", "", "", ""],
+      ["GST Summary", "", "", ""],
+      ["GST Collected", report.gst_collected, "", ""],
+      ["GST Paid", report.gst_paid, "", ""],
+      ["", "", "", ""],
+      ["ITC Status", "", "", ""],
+      ["ITC Available", report.itc_available, "", ""],
+      ["ITC Claimed", report.itc_claimed, "", ""],
+      ["ITC Balance", report.itc_balance, "", ""],
+      ["", "", "", ""],
+      ["Compliance", "", "", ""],
+      ["Filed", report.compliance_summary.filed, "", ""],
+      ["Pending", report.compliance_summary.pending, "", ""],
+      ["Overdue", report.compliance_summary.overdue, "", ""],
+      ["", "", "", ""],
+      ["Exceptions", "", "", ""],
+      ["Open count", report.exceptions_summary.open_count, "", ""],
+      ["Amount at risk", report.exceptions_summary.amount_at_risk, "", ""],
+      ["", "", "", ""],
+      ["Data Quality", "", "", ""],
+      ["Documents posted", report.data_quality.doc_count, "", ""],
+      ["Avg confidence", `${report.data_quality.confidence_avg}%`, "", ""],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{ wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "MIS");
+    XLSX.writeFile(wb, `MIS-${report.client_name.replace(/\s+/g, "-")}-${report.period.replace(/\s+/g, "-")}.xlsx`);
+  };
+
+  const Row = ({ label, value, ids, rowLabel }: { label: string; value: string; ids?: string[]; rowLabel?: string }) => (
+    <div
+      onClick={ids?.length ? () => void drilldown(ids, rowLabel ?? label) : undefined}
+      style={{
+        display: "flex", justifyContent: "space-between", padding: "7px 0",
+        borderBottom: `0.5px solid ${CA.line}`,
+        cursor: ids?.length ? "pointer" : "default",
+        borderRadius: ids?.length ? 4 : 0,
+      }}
+    >
       <span style={{ fontSize: 12.5, color: CA.muted }}>{label}</span>
-      <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontFamily: CA.mono, fontSize: 13, fontVariantNumeric: "tabular-nums" }}>{value}</span>
+        {ids?.length ? <span style={{ fontSize: 11, color: CA.teal, fontWeight: 600 }}>View</span> : null}
+      </div>
     </div>
   );
+
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div style={{ marginTop: 16 }}>
