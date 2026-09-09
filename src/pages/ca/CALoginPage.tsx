@@ -9,6 +9,7 @@ import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
 import BackHomeLink from "@/components/BackHomeLink";
+import { GoogleAuthButton } from "@/components/ca/GoogleAuthButton";
 
 const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
 const serif = "'Fraunces',Georgia,serif";

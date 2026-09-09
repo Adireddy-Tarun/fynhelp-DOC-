@@ -155,6 +155,7 @@ import { Route as CaAuthCaPortalTdsTrackerRouteImport } from './routes/_caAuth/c
 import { Route as CaAuthCaPortalUsersRouteImport } from './routes/_caAuth/ca/_portal/users'
 import { Route as CaAuthCaPortalVaultRouteImport } from './routes/_caAuth/ca/_portal/vault'
 import { Route as CaAuthCaPortalWorkingPapersRouteImport } from './routes/_caAuth/ca/_portal/working-papers'
+import { Route as CaAuthCaAuthCallbackRouteImport } from './routes/_caAuth/ca/auth/callback'
 import { Route as CaAuthCaInviteAcceptRouteImport } from './routes/_caAuth/ca/invite/accept'
 import { Route as MainDemoGateDemoIndexRouteImport } from './routes/_main/_demoGate/demo/index'
 import { Route as MainDemoGateDemoBankingRouteImport } from './routes/_main/_demoGate/demo/banking'
@@ -1006,6 +1007,11 @@ const CaAuthCaPortalWorkingPapersRoute =
     path: '/working-papers',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
+const CaAuthCaAuthCallbackRoute = CaAuthCaAuthCallbackRouteImport.update({
+  id: '/ca/auth/callback',
+  path: '/ca/auth/callback',
+  getParentRoute: () => CaAuthRoute,
+} as any)
 const CaAuthCaInviteAcceptRoute = CaAuthCaInviteAcceptRouteImport.update({
   id: '/ca/invite/accept',
   path: '/ca/invite/accept',
@@ -1555,6 +1561,7 @@ export interface FileRoutesByFullPath {
   '/ca/users': typeof CaAuthCaPortalUsersRoute
   '/ca/vault': typeof CaAuthCaPortalVaultRoute
   '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
+  '/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -1764,6 +1771,7 @@ export interface FileRoutesByTo {
   '/ca/users': typeof CaAuthCaPortalUsersRoute
   '/ca/vault': typeof CaAuthCaPortalVaultRoute
   '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
+  '/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -1984,6 +1992,7 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/users': typeof CaAuthCaPortalUsersRoute
   '/_caAuth/ca/_portal/vault': typeof CaAuthCaPortalVaultRoute
   '/_caAuth/ca/_portal/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
+  '/_caAuth/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/_caAuth/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
   '/_main/_demoGate/demo/banking': typeof MainDemoGateDemoBankingRoute
   '/_main/_demoGate/demo/ca': typeof MainDemoGateDemoCaRoute
@@ -2199,6 +2208,7 @@ export interface FileRouteTypes {
     | '/ca/users'
     | '/ca/vault'
     | '/ca/working-papers'
+    | '/ca/auth/callback'
     | '/ca/invite/accept'
     | '/demo/banking'
     | '/demo/ca'
@@ -2408,6 +2418,7 @@ export interface FileRouteTypes {
     | '/ca/users'
     | '/ca/vault'
     | '/ca/working-papers'
+    | '/ca/auth/callback'
     | '/ca/invite/accept'
     | '/demo/banking'
     | '/demo/ca'
@@ -2627,6 +2638,7 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/users'
     | '/_caAuth/ca/_portal/vault'
     | '/_caAuth/ca/_portal/working-papers'
+    | '/_caAuth/ca/auth/callback'
     | '/_caAuth/ca/invite/accept'
     | '/_main/_demoGate/demo/banking'
     | '/_main/_demoGate/demo/ca'
@@ -3747,6 +3759,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaPortalWorkingPapersRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
     }
+    '/_caAuth/ca/auth/callback': {
+      id: '/_caAuth/ca/auth/callback'
+      path: '/ca/auth/callback'
+      fullPath: '/ca/auth/callback'
+      preLoaderRoute: typeof CaAuthCaAuthCallbackRouteImport
+      parentRoute: typeof CaAuthRoute
+    }
     '/_caAuth/ca/invite/accept': {
       id: '/_caAuth/ca/invite/accept'
       path: '/ca/invite/accept'
@@ -4468,6 +4487,7 @@ interface CaAuthRouteChildren {
   CaAuthCaOnboardingRoute: typeof CaAuthCaOnboardingRoute
   CaAuthCaRegisterRoute: typeof CaAuthCaRegisterRoute
   CaAuthCaVerificationPendingRoute: typeof CaAuthCaVerificationPendingRoute
+  CaAuthCaAuthCallbackRoute: typeof CaAuthCaAuthCallbackRoute
   CaAuthCaInviteAcceptRoute: typeof CaAuthCaInviteAcceptRoute
 }
 
@@ -4477,6 +4497,7 @@ const CaAuthRouteChildren: CaAuthRouteChildren = {
   CaAuthCaOnboardingRoute: CaAuthCaOnboardingRoute,
   CaAuthCaRegisterRoute: CaAuthCaRegisterRoute,
   CaAuthCaVerificationPendingRoute: CaAuthCaVerificationPendingRoute,
+  CaAuthCaAuthCallbackRoute: CaAuthCaAuthCallbackRoute,
   CaAuthCaInviteAcceptRoute: CaAuthCaInviteAcceptRoute,
 }
 
