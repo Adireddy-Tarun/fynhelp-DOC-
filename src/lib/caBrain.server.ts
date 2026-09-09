@@ -694,9 +694,12 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
 export async function learnFiling(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
   let firmsTouched = 0;
+  let signalsUsed = 0;
 
   for (const firm of firms) {
     let touched = false;
+    const feed = signalsByClient(await loadSignals(admin, firm.id, ["compliance_filed"], 730));
+
     for (const businessId of firm.business_ids) {
       const { data: events } = await admin
         .from("ca_compliance_events")
@@ -712,10 +715,20 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
         .filter((e) => e.due_date && e.filed_at)
         .map((e) => (new Date(`${e.due_date}T23:59:59Z`).getTime() - new Date(e.filed_at!).getTime()) / DAY);
 
-      if (deltas.length < 3) continue;
+      // Every "mark filed" carries how many days late it was; a positive
+      // days_late is a negative days-before-due.
+      const filedSignals = feed.get(businessId) ?? [];
+      const signalDeltas = filedSignals
+        .map((s) => num(s.payload, "days_late"))
+        .filter((n): n is number => n != null && Math.abs(n) < 730)
+        .map((n) => -n);
+      signalsUsed += filedSignals.length;
 
-      const mean = round(avg(deltas) ?? 0, 1);
-      const lateShare = deltas.filter((d) => d < 0).length / deltas.length;
+      const all = [...deltas, ...signalDeltas];
+      if (all.length < 3) continue;
+
+      const mean = round(avg(all) ?? 0, 1);
+      const lateShare = all.filter((d) => d < 0).length / all.length;
       const filing_risk_score =
         lateShare > 0.5 ? 0.8 : mean > 5 && lateShare === 0 ? 0.1 : round(clamp(0.15 + lateShare, 0, 1));
 
@@ -727,6 +740,7 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, payload);
+      await markSignalsProcessed(admin, filedSignals.map((s) => s.id));
       clientsUpdated += 1;
       touched = true;
     }
@@ -736,7 +750,7 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
     }
   }
 
-  return { clients_updated: clientsUpdated, firms_touched: firmsTouched };
+  return { clients_updated: clientsUpdated, firms_touched: firmsTouched, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
