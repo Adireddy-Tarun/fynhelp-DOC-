@@ -23,7 +23,7 @@ export default function DocumentsPage() {
   const upload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     if (!clientId) { toast.error("Add a client before uploading"); return; }
-    Array.from(files).forEach((f) => addDoc(f.name, clientId, source));
+    Array.from(files).forEach((f) => addDoc(f.name, clientId, source, f));
     toast.success(`Extract agent is reading your ${source === "Manual" ? "upload" : source + " document"}`);
   };
 
