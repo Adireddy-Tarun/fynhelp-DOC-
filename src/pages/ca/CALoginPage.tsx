@@ -223,6 +223,12 @@ export default function CALoginPage() {
             </form>
           ) : (
             <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
+              <GoogleAuthButton mode="signin" onStart={() => setLoading(true)} />
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ flex: 1, height: "1px", background: "rgba(23,18,8,0.09)" }} />
+                <span style={{ fontFamily: "'Instrument Sans','Inter',system-ui,sans-serif", fontSize: 12, color: "rgba(23,18,8,0.38)", fontWeight: 500 }}>or</span>
+                <div style={{ flex: 1, height: "1px", background: "rgba(23,18,8,0.09)" }} />
+              </div>
               <div>
                 <label style={labelStyle}>Email</label>
                 <input
