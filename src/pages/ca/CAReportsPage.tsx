@@ -129,7 +129,7 @@ type ClientOpt = { business_id: string; business_name: string };
 export default function CAReportsPage() {
   const { caFirm, user } = useCAAuth();
   const [caRole, setCaRole] = useState<string | null>(null);
-  const canSignOff = caRole === "admin" || caRole === "manager";
+  const canSignOff = caRole === "admin" || caRole === "manager" || caRole === "partner" || caRole === "owner";
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [schedules, setSchedules] = useState<ScheduleRow[]>([]);
   const [clients, setClients] = useState<ClientOpt[]>([]);
