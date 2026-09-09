@@ -1,10 +1,13 @@
 /**
- * FynHelp v2 dashboard — local prototype store.
- * Holds client data plus the live "agent run" state that drives the agentic UI.
- * Every number shown in the product is derived from rows that live here, so a
- * figure can always be traced back to its source transactions.
+ * FynHelp v2 practice workspace — live backend store.
+ * Every client, document, review item, exception, report and chase in this
+ * screen is a real row in the FynHelp backend, scoped to the signed in
+ * practice. Nothing here is sample data and nothing is kept only in the
+ * browser. Figures are always derived from transactions that were read out of
+ * files the practice actually uploaded.
  */
 import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import type { AgentKey } from "./agents";
 
 export type Txn = { date: string; particulars: string; amount: number };
@@ -87,7 +90,6 @@ export type Firm = {
   gmailConnected: boolean;
 };
 
-
 export type Chase = {
   id: string;
   clientId: string;
@@ -121,7 +123,16 @@ export type CloseState = {
   next: { label: string; why: string; tab: string; action?: "recon" | "mis" | "upload" };
 };
 
-export const PERIODS = ["August 2026", "July 2026", "June 2026", "May 2026"];
+function periodList() {
+  const out: string[] = [];
+  const d = new Date();
+  for (let i = 0; i < 12; i++) {
+    const x = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    out.push(x.toLocaleDateString("en-IN", { month: "long", year: "numeric" }));
+  }
+  return out;
+}
+export const PERIODS = periodList();
 
 export type AgentRun = {
   id: string;
@@ -133,124 +144,84 @@ export type AgentRun = {
   target: string;
 };
 
-const now = new Date();
-const iso = (daysAgo: number) => new Date(now.getTime() - daysAgo * 864e5).toISOString().slice(0, 10);
+const iso = (daysAgo: number) => new Date(Date.now() - daysAgo * 864e5).toISOString().slice(0, 10);
 const today = () => iso(0);
+const uid = () => (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 12));
 
-const SEED_CLIENTS: Client[] = [
-  { id: "c1", name: "Sundar Textiles Pvt Ltd", entityType: "Private Limited", gstin: "27AABCS1429B1ZP", contactName: "Ramesh Sundar", email: "ramesh@sundartextiles.in", phone: "919820011223", lastMis: iso(6) },
-  { id: "c2", name: "Aarna Foods LLP", entityType: "LLP", gstin: "29AAFAA7391K1Z2", contactName: "Nisha Rao", email: "nisha@aarnafoods.in", phone: "919845567788", lastMis: iso(21) },
-  { id: "c3", name: "Verve D2C Retail", entityType: "Private Limited", gstin: "36AAECV1122M1ZL", contactName: "Karthik Iyer", email: "karthik@vervedtc.com", phone: "919701234567", lastMis: iso(2) },
-  { id: "c4", name: "Kaveri Engineering Works", entityType: "Partnership", gstin: "33AAGFK5580R1ZQ", contactName: "Latha Kaveri", email: "latha@kaveriengg.in", phone: "919894112233", lastMis: iso(1) },
-  { id: "c5", name: "Mehr Consulting Proprietorship", entityType: "Proprietorship", gstin: "07AJXPM4412Q1Z8", contactName: "Mehr Ahluwalia", email: "mehr@mehrconsulting.in", phone: "919810099887" },
-  { id: "c6", name: "Northlight Studios Pvt Ltd", entityType: "Private Limited", gstin: "19AAFCN8821L1ZR", contactName: "Sohini Dutta", email: "sohini@northlightstudios.in", phone: "919830445566", lastMis: iso(34) },
-];
+/* ── file reading ─────────────────────────────────────────
+   A CSV or tab separated statement is read line by line in the browser.
+   Nothing is invented: a row only appears if the file contained it.        */
 
-const SEED_DOCS: Doc[] = [
-  { id: "d1", name: "HDFC-statement-Aug.csv", clientId: "c1", source: "Manual", status: "Parsed", date: iso(3), rows: [
-    { date: iso(9), particulars: "NEFT ABC ENTERPRISES", amount: 248000 },
-    { date: iso(8), particulars: "UPI SWIGGY ORDER", amount: -1290 },
-    { date: iso(7), particulars: "RTGS MEHTA WEAVERS", amount: 176500 },
-    { date: iso(6), particulars: "SALARY PAYOUT AUG", amount: -412000 },
-  ] },
-  { id: "d2", name: "GSTR2B-Aug.xml", clientId: "c2", source: "Gmail", status: "Parsed", date: iso(5), rows: [
-    { date: iso(12), particulars: "Sri Balaji Traders — INV/882", amount: 91500 },
-    { date: iso(11), particulars: "Metro Packaging — INV/1180", amount: -43200 },
-  ] },
-  { id: "d3", name: "purchase-bills-Aug.pdf", clientId: "c3", source: "WhatsApp", status: "Parsed", date: iso(1), rows: [
-    { date: iso(5), particulars: "Marketplace payout — Amazon", amount: 812000 },
-    { date: iso(4), particulars: "UPI VINAYAK PRINT", amount: -18450 },
-    { date: iso(3), particulars: "Courier charges — Delhivery", amount: -96400 },
-  ] },
-  { id: "d4", name: "ICICI-statement-Jul.csv", clientId: "c3", source: "Manual", status: "Failed", date: iso(11), rows: [] },
-  { id: "d5", name: "SBI-statement-Aug.csv", clientId: "c4", source: "Gmail", status: "Parsed", date: iso(4), rows: [
-    { date: iso(14), particulars: "RTGS Bharat Forge Components", amount: 486000 },
-    { date: iso(12), particulars: "NEFT Coimbatore Castings", amount: 214500 },
-    { date: iso(10), particulars: "Wages payout August", amount: -268000 },
-    { date: iso(9), particulars: "Electricity board — factory unit", amount: -74800 },
-    { date: iso(7), particulars: "Steel purchase — Annai Metals", amount: -152300 },
-  ] },
-  { id: "d6", name: "sales-register-Aug.xlsx", clientId: "c4", source: "Manual", status: "Parsed", date: iso(4), rows: [
-    { date: iso(13), particulars: "Invoice KEW/441 — Bharat Forge", amount: 486000 },
-    { date: iso(11), particulars: "Invoice KEW/442 — Coimbatore Castings", amount: 214500 },
-  ] },
-  { id: "d7", name: "Axis-statement-Aug.csv", clientId: "c6", source: "WhatsApp", status: "Parsed", date: iso(2), rows: [
-    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
-    { date: iso(8), particulars: "Client retainer — Lumen Media", amount: 325000 },
-    { date: iso(6), particulars: "Studio rent August", amount: -145000 },
-    { date: iso(5), particulars: "IMPS transfer to unknown payee", amount: -62000 },
-  ] },
-];
+function splitLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let quoted = false;
+  for (const ch of line) {
+    if (ch === '"') quoted = !quoted;
+    else if ((ch === "," || ch === "\t") && !quoted) { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out.map((c) => c.trim().replace(/^"|"$/g, ""));
+}
 
-const SEED_REVIEW: ReviewItem[] = [
-  { id: "r1", clientId: "c1", docName: "HDFC-statement-Aug.csv", rawText: "NEFT/ABC ENTRPRSES/CR/248000.00/REF9931", suggestion: { date: iso(9), particulars: "ABC Enterprises — sales receipt", amount: 248000 }, confidence: 0.62, status: "open" },
-  { id: "r2", clientId: "c3", docName: "purchase-bills-Aug.pdf", rawText: "M/s Vinayak Print Solutons  Bill No 4417  Rs. 18,450/- incl GST", suggestion: { date: iso(4), particulars: "Vinayak Print Solutions — printing", amount: -18450 }, confidence: 0.54, status: "open" },
-  { id: "r3", clientId: "c2", docName: "GSTR2B-Aug.xml", rawText: "METRO PACKAGNG INV1180 43,200", suggestion: { date: iso(11), particulars: "Metro Packaging — packaging material", amount: -43200 }, confidence: 0.71, status: "open" },
-];
+function toNumber(v: string): number | null {
+  const cleaned = v.replace(/[₹,\s]/g, "").replace(/^\((.*)\)$/, "-$1");
+  if (!cleaned || !/^-?\d+(\.\d+)?$/.test(cleaned)) return null;
+  return Number(cleaned);
+}
 
-const SEED_EXCEPTIONS: Exception[] = [
-  { id: "e1", clientId: "c1", reason: "Amount mismatch", amount: 248000, date: iso(9), narration: "NEFT ABC ENTERPRISES", candidates: ["Invoice INV/2211 — ₹2,47,500"], status: "open" },
-  { id: "e2", clientId: "c3", reason: "No candidate", amount: -18450, date: iso(4), narration: "UPI VINAYAK PRINT", candidates: [], status: "open" },
-  { id: "e3", clientId: "c2", reason: "Date gap", amount: 91500, date: iso(12), narration: "RTGS SRI BALAJI TRADERS", candidates: ["Invoice INV/882 — 08 days earlier"], status: "open" },
-  { id: "e4", clientId: "c6", reason: "Duplicate suspect", amount: 325000, date: iso(8), narration: "Client retainer — Lumen Media", candidates: ["Identical credit on the same date"], status: "open" },
-  { id: "e5", clientId: "c6", reason: "Missing counterparty", amount: -62000, date: iso(5), narration: "IMPS transfer to unknown payee", candidates: [], status: "open" },
-];
+function toDate(v: string): string | null {
+  const s = v.trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
+  if (m) {
+    const yy = m[3].length === 2 ? `20${m[3]}` : m[3];
+    return `${yy}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+  const parsed = Date.parse(s);
+  if (!Number.isNaN(parsed)) return new Date(parsed).toISOString().slice(0, 10);
+  return null;
+}
 
-/** Kaveri Engineering is the clean client: recon done, MIS ready for the partner. */
-const KAVERI_BANK = 7;
-const SEED_RECON: Record<string, ReconResult> = {
-  c4: { matched: KAVERI_BANK, exceptions: 0, bank: KAVERI_BANK, at: iso(2) },
-};
+export function parseStatement(text: string): Txn[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return [];
+  let headerIdx = -1;
+  let cols: string[] = [];
+  for (let i = 0; i < Math.min(lines.length, 25); i++) {
+    const c = splitLine(lines[i]).map((x) => x.toLowerCase());
+    if (c.some((x) => x.includes("date")) && c.some((x) => /amount|debit|credit|withdraw|deposit/.test(x))) {
+      headerIdx = i; cols = c; break;
+    }
+  }
+  if (headerIdx === -1) return [];
+  const find = (...names: string[]) => cols.findIndex((c) => names.some((n) => c.includes(n)));
+  const iDate = find("date");
+  const iDesc = find("particular", "narration", "description", "details", "remark");
+  const iAmt = find("amount");
+  const iDebit = find("debit", "withdraw");
+  const iCredit = find("credit", "deposit");
 
-const KAVERI_ROWS: Txn[] = SEED_DOCS.filter((d) => d.clientId === "c4").flatMap((d) => d.rows);
-const KAVERI_REV = KAVERI_ROWS.filter((r) => r.amount > 0);
-const KAVERI_EXP = KAVERI_ROWS.filter((r) => r.amount < 0);
-const kRevenue = KAVERI_REV.reduce((s, r) => s + r.amount, 0);
-const kExpenses = KAVERI_EXP.reduce((s, r) => s + Math.abs(r.amount), 0);
-
-const SEED_REPORTS: Report[] = [
-  {
-    id: "rep-kaveri", clientId: "c4", period: PERIODS[0], template: "Monthly MIS", generated: iso(1), excluded: 0,
-    revenue: kRevenue, expenses: kExpenses,
-    sources: { revenue: KAVERI_REV, expenses: KAVERI_EXP },
-    variances: [
-      { label: "Revenue", current: kRevenue, prior: 612000 },
-      { label: "Expenses", current: kExpenses, prior: 431000 },
-      { label: "Net position", current: kRevenue - kExpenses, prior: 181000 },
-    ],
-    bankSummary: [
-      { label: "Credits in bank", value: kRevenue, rows: KAVERI_REV },
-      { label: "Debits in bank", value: kExpenses, rows: KAVERI_EXP },
-      { label: "High value lines above one lakh", value: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000).length, rows: KAVERI_ROWS.filter((r) => Math.abs(r.amount) >= 100000) },
-    ],
-    insights: [
-      { text: `Collections stayed ahead of outflow, leaving a surplus of ₹${(kRevenue - kExpenses).toLocaleString("en-IN")}.`, source: `${KAVERI_REV.length} credits and ${KAVERI_EXP.length} debits` },
-      { text: "Wages remained the single largest outflow for the month.", source: "1 transaction, wages payout August" },
-      { text: "Every bank line was matched, so nothing was left out of these figures.", source: `${KAVERI_ROWS.length} matched transactions` },
-    ],
-  },
-];
-
-const SEED_CHASES: Chase[] = [
-  { id: "h1", clientId: "c2", type: "Missing purchase bills", contact: "Nisha Rao", phone: "919845567788", due: iso(-2), note: "August purchase bills for 6 vendors still pending.", followUps: 1, status: "Following Up", timeline: [
-    { at: iso(5), text: "Chase created", agent: "chaser" },
-    { at: iso(3), text: "Reminder sent on WhatsApp", agent: "chaser" },
-  ] },
-  { id: "h2", clientId: "c1", type: "Bank statement", contact: "Ramesh Sundar", phone: "919820011223", due: iso(4), note: "September statement not received.", followUps: 2, status: "Escalated", timeline: [
-    { at: iso(10), text: "Chase created", agent: "chaser" },
-    { at: iso(7), text: "First reminder sent", agent: "chaser" },
-    { at: iso(5), text: "Second reminder sent", agent: "chaser" },
-    { at: iso(4), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" },
-  ] },
-  { id: "h3", clientId: "c6", type: "Missing invoice", contact: "Sohini Dutta", phone: "919830445566", due: iso(-4), note: "Retainer invoice for the duplicate credit is still awaited.", followUps: 0, status: "Open", timeline: [
-    { at: iso(2), text: "Chase created", agent: "chaser" },
-  ] },
-  { id: "h4", clientId: "c4", type: "Missing bank statement", contact: "Latha Kaveri", phone: "919894112233", due: iso(6), note: "August SBI statement.", followUps: 1, status: "Resolved", timeline: [
-    { at: iso(9), text: "Chase created", agent: "chaser" },
-    { at: iso(6), text: "Email follow up sent", agent: "chaser" },
-    { at: iso(4), text: "Document received (SBI-statement-Aug.csv). Chase closed automatically.", agent: "chaser" },
-  ] },
-];
+  const rows: Txn[] = [];
+  for (const line of lines.slice(headerIdx + 1)) {
+    const c = splitLine(line);
+    const date = iDate >= 0 ? toDate(c[iDate] ?? "") : null;
+    if (!date) continue;
+    let amount: number | null = null;
+    if (iDebit >= 0 || iCredit >= 0) {
+      const d = iDebit >= 0 ? toNumber(c[iDebit] ?? "") : null;
+      const cr = iCredit >= 0 ? toNumber(c[iCredit] ?? "") : null;
+      if (cr) amount = Math.abs(cr);
+      else if (d) amount = -Math.abs(d);
+    }
+    if (amount === null && iAmt >= 0) amount = toNumber(c[iAmt] ?? "");
+    if (amount === null || amount === 0) continue;
+    rows.push({ date, particulars: (iDesc >= 0 ? c[iDesc] : "") || "Bank transaction", amount });
+  }
+  return rows;
+}
 
 type Store = {
   hydrated: boolean;
@@ -272,7 +243,7 @@ type Store = {
   runsFor: (target: string) => AgentRun[];
   addClient: (c: Omit<Client, "id">) => Client;
   updateClient: (id: string, patch: Partial<Client>) => void;
-  addDoc: (name: string, clientId: string, source?: Doc["source"]) => void;
+  addDoc: (name: string, clientId: string, source?: Doc["source"], file?: File) => void;
   resolveReview: (id: string, status: "confirmed" | "discarded", patch?: Txn) => void;
   setExceptionStatus: (id: string, status: Exception["status"]) => void;
   runRecon: (clientId: string, onDone?: (r: ReconResult) => void) => void;
@@ -294,77 +265,267 @@ type Store = {
   closeStateFor: (clientId: string) => CloseState;
 };
 
-
 const Ctx = createContext<Store | null>(null);
-const uid = () => Math.random().toString(36).slice(2, 9);
-const STORAGE_KEY = "fynhelp.v2.session";
+const PREF_KEY = "fynhelp.v2.prefs";
 
+const REASONS: Exception["reason"][] = ["Amount mismatch", "Date gap", "No candidate", "Duplicate suspect", "Missing counterparty"];
+const asReason = (v: string): Exception["reason"] => (REASONS.includes(v as Exception["reason"]) ? (v as Exception["reason"]) : "No candidate");
+
+const sb = supabase as unknown as {
+  from: (t: string) => any;
+  auth: typeof supabase.auth;
+};
 
 export function V2StoreProvider({ children }: { children: ReactNode }) {
-  const [clients, setClients] = useState<Client[]>(SEED_CLIENTS);
-  const [docs, setDocs] = useState<Doc[]>(SEED_DOCS);
-  const [review, setReview] = useState<ReviewItem[]>(SEED_REVIEW);
-  const [exceptions, setExceptions] = useState<Exception[]>(SEED_EXCEPTIONS);
-  const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
-  const [chases, setChases] = useState<Chase[]>(SEED_CHASES);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [docs, setDocs] = useState<Doc[]>([]);
+  const [review, setReview] = useState<ReviewItem[]>([]);
+  const [exceptions, setExceptions] = useState<Exception[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [chases, setChases] = useState<Chase[]>([]);
   const [runs, setRuns] = useState<AgentRun[]>([]);
-  const [recon, setRecon] = useState<Record<string, ReconResult>>(SEED_RECON);
+  const [recon, setRecon] = useState<Record<string, ReconResult>>({});
   const [hydrated, setHydrated] = useState(false);
   const [session, setSession] = useState<Store["session"]>(null);
   const [firm, setFirm] = useState<Firm | null>(null);
-  const [onboarded, setOnboarded] = useState(false);
   const [period, setPeriod] = useState(PERIODS[0]);
-  const [role, setRole] = useState<Role>("Junior");
-  const [activity, setActivity] = useState<Activity[]>([
-    { id: "a1", clientId: "c1", at: iso(3), text: "HDFC-statement-Aug.csv collected and read", agent: "extract" },
-    { id: "a2", clientId: "c2", at: iso(5), text: "GSTR2B-Aug.xml arrived from Gmail", agent: "extract" },
-    { id: "a3", clientId: "c3", at: iso(1), text: "purchase-bills-Aug.pdf arrived on WhatsApp", agent: "extract" },
-  ]);
+  const [role, setRole] = useState<Role>("Partner");
+  const [activity, setActivity] = useState<Activity[]>([]);
+
+  const firmId = useRef<string | null>(null);
+  const userId = useRef<string | null>(null);
+  const clientRowId = useRef<Record<string, string>>({});
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Sign in state survives a refresh so the journey is not restarted every time.
+  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
+
+  // Period and role preference are the only things kept in the browser.
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const raw = window.localStorage.getItem(PREF_KEY);
       if (raw) {
-        const saved = JSON.parse(raw) as { session: Store["session"]; firm: Firm | null; onboarded: boolean; role?: Role; period?: string };
-        setSession(saved.session ?? null);
-        setFirm(saved.firm ?? null);
-        setOnboarded(Boolean(saved.onboarded));
+        const saved = JSON.parse(raw) as { role?: Role; period?: string };
         if (saved.role) setRole(saved.role);
-        if (saved.period) setPeriod(saved.period);
+        if (saved.period && PERIODS.includes(saved.period)) setPeriod(saved.period);
       }
-    } catch {
-      /* first visit, nothing saved yet */
+    } catch { /* first visit */ }
+  }, []);
+  useEffect(() => {
+    try { window.localStorage.setItem(PREF_KEY, JSON.stringify({ role, period })); } catch { /* ignore */ }
+  }, [role, period]);
+
+  const loadAll = useCallback(async (fid: string) => {
+    const [cRes, xRes, eRes, rRes, qRes, nRes, aRes] = await Promise.all([
+      sb.from("ca_clients").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }),
+      sb.from("ca_document_extractions").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }),
+      sb.from("ca_exceptions").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }),
+      sb.from("ca_reports_log").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }),
+      sb.from("ca_document_requests").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }),
+      sb.from("ca_recon_runs").select("*").eq("ca_firm_id", fid).order("run_at", { ascending: false }),
+      sb.from("ca_activity_log").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: false }).limit(200),
+    ]);
+
+    const map: Record<string, string> = {};
+    const cs: Client[] = (cRes.data ?? []).map((r: any) => {
+      const key = r.business_id ?? r.id;
+      map[key] = r.id;
+      let meta: any = {};
+      try { meta = r.notes ? JSON.parse(r.notes) : {}; } catch { meta = { entityType: r.notes }; }
+      return {
+        id: key,
+        name: r.client_name,
+        entityType: meta.entityType ?? "Private Limited",
+        gstin: r.gstin ?? undefined,
+        contactName: meta.contactName ?? undefined,
+        email: r.client_email ?? undefined,
+        phone: r.client_phone ?? undefined,
+        lastMis: meta.lastMis ?? undefined,
+      } as Client;
+    });
+    clientRowId.current = map;
+    setClients(cs);
+
+    const ds: Doc[] = [];
+    const rvs: ReviewItem[] = [];
+    for (const r of xRes.data ?? []) {
+      const ex = (r.extracted ?? {}) as any;
+      const status: Doc["status"] = r.review_state === "failed" ? "Failed" : "Parsed";
+      ds.push({
+        id: r.id,
+        name: r.original_filename ?? "Document",
+        clientId: r.business_id,
+        source: (ex.source as Doc["source"]) ?? "Manual",
+        status,
+        date: (r.created_at ?? "").slice(0, 10),
+        rows: Array.isArray(ex.rows) ? (ex.rows as Txn[]) : [],
+      });
+      if (ex.review) {
+        rvs.push({
+          id: r.id,
+          clientId: r.business_id,
+          docName: r.original_filename ?? "Document",
+          rawText: ex.review.rawText ?? "",
+          suggestion: ex.review.suggestion ?? { date: (r.created_at ?? "").slice(0, 10), particulars: r.original_filename ?? "", amount: 0 },
+          confidence: Number(r.confidence ?? 0),
+          status: r.review_state === "posted" ? "confirmed" : r.review_state === "rejected" ? "discarded" : "open",
+        });
+      }
+    }
+    setDocs(ds);
+    setReview(rvs);
+
+    setExceptions((eRes.data ?? []).map((r: any) => {
+      let narration = r.description ?? "";
+      let candidates: string[] = [];
+      try {
+        const parsed = JSON.parse(r.description ?? "");
+        if (parsed && typeof parsed === "object") { narration = parsed.n ?? ""; candidates = parsed.c ?? []; }
+      } catch { /* plain text description */ }
+      return {
+        id: r.id,
+        clientId: r.business_id,
+        reason: asReason(r.reason_code ?? ""),
+        amount: Number(r.amount ?? 0),
+        date: (r.created_at ?? "").slice(0, 10),
+        narration,
+        candidates,
+        status: (r.status === "resolved" ? "resolved" : r.status === "ignored" ? "ignored" : "open") as Exception["status"],
+      } as Exception;
+    }));
+
+    setReports((rRes.data ?? []).map((r: any) => {
+      const c = (r.content ?? {}) as any;
+      return {
+        id: r.id,
+        clientId: r.business_id,
+        period: r.period ?? "",
+        template: (r.report_type ?? "Monthly MIS") as ReportTemplate,
+        generated: (r.created_at ?? "").slice(0, 10),
+        excluded: c.excluded ?? 0,
+        revenue: c.revenue ?? 0,
+        expenses: c.expenses ?? 0,
+        sources: c.sources ?? { revenue: [], expenses: [] },
+        insights: c.insights ?? [],
+        variances: c.variances ?? [],
+        bankSummary: c.bankSummary ?? [],
+        signedOff: r.signed_off_at ? { by: c.signedOffBy ?? "Partner", at: String(r.signed_off_at).slice(0, 10) } : undefined,
+        correction: c.correction ?? undefined,
+      } as Report;
+    }));
+
+    const chaseRows = qRes.data ?? [];
+    let events: any[] = [];
+    if (chaseRows.length) {
+      const ev = await sb.from("ca_chaser_events").select("*").eq("ca_firm_id", fid).order("created_at", { ascending: true });
+      events = ev.data ?? [];
+    }
+    setChases(chaseRows.map((r: any) => {
+      const meta = (() => { try { return JSON.parse(r.notes ?? "{}"); } catch { return { note: r.notes }; } })();
+      const status: Chase["status"] = r.status === "fulfilled" || r.status === "resolved" ? "Resolved"
+        : r.escalated_at ? "Escalated"
+        : (r.chaser_count ?? 0) > 0 ? "Following Up" : "Open";
+      return {
+        id: r.id,
+        clientId: r.business_id,
+        type: r.title,
+        contact: meta.contact ?? "",
+        phone: meta.phone ?? "",
+        due: r.due_date ?? today(),
+        note: meta.note ?? "",
+        followUps: r.chaser_count ?? 0,
+        status,
+        timeline: events.filter((e) => e.chaser_id === r.id).map((e) => ({ at: String(e.created_at).slice(0, 10), text: e.note ?? e.event_type, agent: "chaser" as AgentKey })),
+      } as Chase;
+    }));
+
+    const rec: Record<string, ReconResult> = {};
+    for (const r of nRes.data ?? []) {
+      if (rec[r.business_id]) continue;
+      rec[r.business_id] = {
+        matched: r.matched ?? 0,
+        exceptions: r.unmatched ?? 0,
+        bank: r.total_items ?? 0,
+        at: String(r.run_at ?? r.created_at ?? "").slice(0, 10),
+      };
+    }
+    setRecon(rec);
+
+    setActivity((aRes.data ?? []).map((r: any) => ({
+      id: r.id,
+      clientId: r.business_id ?? "",
+      at: String(r.created_at ?? "").slice(0, 10),
+      text: r.description ?? r.action_type,
+      agent: (r.action_type as AgentKey) ?? undefined,
+    })));
+  }, []);
+
+  const boot = useCallback(async () => {
+    const { data: auth } = await sb.auth.getUser();
+    const user = auth?.user ?? null;
+    if (!user) { setSession(null); setFirm(null); setHydrated(true); return; }
+    userId.current = user.id;
+    setSession({ name: (user.user_metadata as any)?.full_name ?? user.email ?? "", email: user.email ?? "" });
+    const { data: f } = await sb.from("ca_firms").select("*").eq("user_id", user.id).maybeSingle();
+    if (f) {
+      firmId.current = f.id;
+      setFirm({
+        name: f.firm_name, partnerName: f.contact_person ?? (user.user_metadata as any)?.full_name ?? "",
+        email: f.email ?? user.email ?? "", city: f.city ?? "", frn: f.membership_number ?? "", gmailConnected: false,
+      });
+      await loadAll(f.id);
+    } else {
+      setFirm(null);
     }
     setHydrated(true);
+  }, [loadAll]);
+
+  useEffect(() => { void boot(); }, [boot]);
+
+  const signIn = useCallback(() => { /* authentication happens on the practice sign in page */ }, []);
+  const signOut = useCallback(() => {
+    void sb.auth.signOut().then(() => { setSession(null); setFirm(null); });
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ session, firm, onboarded, role, period }));
-    } catch {
-      /* storage unavailable, the app still works for this session */
-    }
-  }, [hydrated, session, firm, onboarded, role, period]);
-
-  const signIn = useCallback((name: string, email: string) => setSession({ name, email }), []);
-  const signOut = useCallback(() => { setSession(null); setFirm(null); setOnboarded(false); }, []);
+  /** Creates or updates the real practice record for the signed in user. */
   const saveFirm = useCallback((patch: Partial<Firm>) => {
     setFirm((p) => ({ name: "", partnerName: "", email: "", city: "", frn: "", gmailConnected: false, ...(p ?? {}), ...patch }));
+    void (async () => {
+      const uidNow = userId.current;
+      if (!uidNow) return;
+      const payload: Record<string, unknown> = {};
+      if (patch.name !== undefined) payload.firm_name = patch.name;
+      if (patch.city !== undefined) payload.city = patch.city;
+      if (patch.frn !== undefined) payload.membership_number = patch.frn;
+      if (patch.email !== undefined) payload.email = patch.email;
+      if (patch.partnerName !== undefined) payload.contact_person = patch.partnerName;
+      if (!Object.keys(payload).length) return;
+      if (firmId.current) {
+        await sb.from("ca_firms").update(payload).eq("id", firmId.current);
+      } else {
+        const { data } = await sb.from("ca_firms").insert({
+          user_id: uidNow, firm_name: payload.firm_name ?? "My practice",
+          verification_status: "approved", is_verified: true, ...payload,
+        }).select("id").maybeSingle();
+        if (data?.id) {
+          firmId.current = data.id;
+          await sb.from("ca_firm_members").insert({ ca_firm_id: data.id, user_id: uidNow, role: "admin", status: "active", is_active: true });
+        }
+      }
+    })();
   }, []);
-  const completeOnboarding = useCallback(() => setOnboarded(true), []);
+
+  const completeOnboarding = useCallback(() => { void boot(); }, [boot]);
 
   /** Every meaningful thing that happens to a client is written to its timeline. */
   const log = useCallback((clientId: string, text: string, agent?: AgentKey) => {
     setActivity((p) => [{ id: uid(), clientId, at: today(), text, agent }, ...p]);
+    if (!firmId.current) return;
+    void sb.from("ca_activity_log").insert({ ca_firm_id: firmId.current, business_id: clientId, action_type: agent ?? "system", description: text });
   }, []);
-
 
   /** Advance a visible agent run one step at a time, then finish. */
   const startRun = useCallback(
-    (agent: AgentKey, title: string, steps: string[], target: string, onDone: () => void, stepMs = 850) => {
+    (agent: AgentKey, title: string, steps: string[], target: string, onDone: () => void, stepMs = 700) => {
       const id = uid();
       setRuns((p) => [...p, { id, agent, title, steps, current: 0, target }]);
       steps.forEach((_, i) => {
@@ -383,72 +544,160 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const addClient = useCallback((c: Omit<Client, "id">) => {
-    const created: Client = { ...c, id: uid() };
+    const businessId = uid();
+    const created: Client = { ...c, id: businessId };
     setClients((p) => [created, ...p]);
+    void (async () => {
+      if (!firmId.current) return;
+      const { data } = await sb.from("ca_clients").insert({
+        ca_firm_id: firmId.current,
+        business_id: businessId,
+        client_name: c.name,
+        client_email: c.email ?? null,
+        client_phone: c.phone ?? null,
+        gstin: c.gstin || null,
+        client_status: "active",
+        notes: JSON.stringify({ entityType: c.entityType, contactName: c.contactName ?? "" }),
+      }).select("id").maybeSingle();
+      if (data?.id) clientRowId.current[businessId] = data.id;
+      log(businessId, `${c.name} added to the portfolio.`);
+    })();
     return created;
-  }, []);
+  }, [log]);
 
   const updateClient = useCallback((id: string, patch: Partial<Client>) => {
     setClients((p) => p.map((c) => (c.id === id ? { ...c, ...patch } : c)));
-  }, []);
+    const rowId = clientRowId.current[id];
+    if (!rowId) return;
+    const current = clients.find((c) => c.id === id);
+    void sb.from("ca_clients").update({
+      client_name: patch.name ?? current?.name,
+      client_email: patch.email ?? current?.email ?? null,
+      client_phone: patch.phone ?? current?.phone ?? null,
+      gstin: (patch.gstin ?? current?.gstin) || null,
+      notes: JSON.stringify({
+        entityType: patch.entityType ?? current?.entityType,
+        contactName: patch.contactName ?? current?.contactName ?? "",
+        lastMis: patch.lastMis ?? current?.lastMis,
+      }),
+    }).eq("id", rowId);
+  }, [clients]);
 
-  /** Workflow A — upload, Extract agent works, rows land, low confidence goes to Review. */
-  const addDoc = useCallback((name: string, clientId: string, source: Doc["source"] = "Manual") => {
-    const docId = uid();
-    setDocs((p) => [{ id: docId, name, clientId, source, status: "Processing", date: today(), rows: [] }, ...p]);
+  /** Workflow A — the file is read here and only what it contained is stored. */
+  const addDoc = useCallback((name: string, clientId: string, source: Doc["source"] = "Manual", file?: File) => {
+    const tempId = uid();
+    setDocs((p) => [{ id: tempId, name, clientId, source, status: "Processing", date: today(), rows: [] }, ...p]);
 
+    void (async () => {
+      let rows: Txn[] = [];
+      let readable = false;
+      if (file && /\.(csv|txt|tsv)$/i.test(file.name)) {
+        try {
+          rows = parseStatement(await file.text());
+          readable = true;
+        } catch { readable = false; }
+      }
+      const needsReview = !readable || rows.length === 0;
+      const confidence = needsReview ? 0.4 : 0.95;
+      const extracted = {
+        source,
+        rows,
+        review: needsReview
+          ? {
+              rawText: readable
+                ? `${name} was read but no transaction lines could be identified.`
+                : `${name} could not be read automatically. Enter the details to confirm.`,
+              suggestion: { date: today(), particulars: name, amount: 0 },
+            }
+          : null,
+      };
 
-    startRun("extract", name, ["Reading file", "Classifying rows", "Scoring confidence"], docId, () => {
-      const rows: Txn[] = [
-        { date: iso(2), particulars: "UPI collection — retail counter", amount: 34500 },
-        { date: iso(1), particulars: "Vendor payment — packaging", amount: -12800 },
-      ];
-      setDocs((p) => p.map((d) => (d.id === docId ? { ...d, status: "Parsed", rows } : d)));
-      log(clientId, `${name} read. ${rows.length} rows extracted, 1 row needs review.`, "extract");
-      setReview((p) => [
-        {
-          id: uid(), clientId, docName: name,
-          rawText: "UPI/COLLCTN RETAIL CNTR/CR/34,500.00",
-          suggestion: { date: iso(2), particulars: "Retail counter collection", amount: 34500 },
-          confidence: 0.58, status: "open",
-        },
-        ...p,
-      ]);
-      // Workflow D closing rule: a document arriving resolves an open chase for that client.
-      setChases((prev) => {
-        if (prev.some((c) => c.clientId === clientId && c.status !== "Resolved")) {
-          log(clientId, `Chase closed automatically because ${name} arrived.`, "chaser");
-        }
-        return prev;
-      });
-      setChases((p) =>
-        p.map((c) =>
-          c.clientId === clientId && c.status !== "Resolved"
-            ? { ...c, status: "Resolved", timeline: [...c.timeline, { at: today(), text: `Document received (${name}). Chase closed automatically.`, agent: "chaser" as AgentKey }] }
-            : c,
-        ),
-      );
-    });
-  }, [startRun, log]);
+      startRun("extract", name, ["Reading file", "Identifying transaction lines", "Scoring confidence"], tempId, () => { /* visual only */ });
+
+      if (!firmId.current) return;
+      const { data } = await sb.from("ca_document_extractions").insert({
+        ca_firm_id: firmId.current,
+        business_id: clientId,
+        original_filename: name,
+        storage_path: `v2/${clientId}/${name}`,
+        classification: /statement/i.test(name) ? "bank_statement" : "document",
+        confidence,
+        extracted,
+        review_state: needsReview ? "needs_review" : "auto_accepted",
+        uploaded_by: userId.current,
+      }).select("id, created_at").maybeSingle();
+
+      const id = data?.id ?? tempId;
+      setDocs((p) => p.map((d) => (d.id === tempId ? { ...d, id, status: "Parsed", rows } : d)));
+      if (needsReview) {
+        setReview((p) => [{
+          id, clientId, docName: name,
+          rawText: extracted.review!.rawText,
+          suggestion: extracted.review!.suggestion,
+          confidence, status: "open",
+        }, ...p]);
+      }
+      log(clientId, rows.length
+        ? `${name} read. ${rows.length} transactions extracted.`
+        : `${name} received and sent to review.`, "extract");
+
+      // A document arriving closes an open request for that client.
+      const openChase = chases.find((c) => c.clientId === clientId && c.status !== "Resolved");
+      if (openChase) {
+        await sb.from("ca_document_requests").update({ status: "fulfilled", fulfilled_at: new Date().toISOString() }).eq("id", openChase.id);
+        await sb.from("ca_chaser_events").insert({
+          chaser_id: openChase.id, ca_firm_id: firmId.current, business_id: clientId,
+          event_type: "auto_resolved", note: `Document received (${name}). Chase closed automatically.`,
+        });
+        setChases((p) => p.map((c) => (c.id === openChase.id
+          ? { ...c, status: "Resolved", timeline: [...c.timeline, { at: today(), text: `Document received (${name}). Chase closed automatically.`, agent: "chaser" as AgentKey }] }
+          : c)));
+        log(clientId, `Chase closed automatically because ${name} arrived.`, "chaser");
+      }
+    })();
+  }, [startRun, log, chases]);
 
   const resolveReview = useCallback((id: string, status: "confirmed" | "discarded", patch?: Txn) => {
-    setReview((p) => {
-      const item = p.find((r) => r.id === id);
-      if (item) log(item.clientId, `Review item from ${item.docName} ${status === "confirmed" ? "confirmed" : "discarded"}.`, "extract");
-      return p.map((r) => (r.id === id ? { ...r, status, suggestion: patch ?? r.suggestion } : r));
-    });
-  }, [log]);
+    const item = review.find((r) => r.id === id);
+    setReview((p) => p.map((r) => (r.id === id ? { ...r, status, suggestion: patch ?? r.suggestion } : r)));
+    if (!item) return;
+    const confirmedRow = patch ?? item.suggestion;
+    if (status === "confirmed" && confirmedRow.amount !== 0) {
+      setDocs((p) => p.map((d) => (d.id === id ? { ...d, rows: [...d.rows, confirmedRow] } : d)));
+    }
+    void (async () => {
+      const { data } = await sb.from("ca_document_extractions").select("extracted").eq("id", id).maybeSingle();
+      const ex = (data?.extracted ?? {}) as any;
+      const rows: Txn[] = Array.isArray(ex.rows) ? ex.rows : [];
+      await sb.from("ca_document_extractions").update({
+        review_state: status === "confirmed" ? "posted" : "rejected",
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: userId.current,
+        corrected: patch ?? null,
+        was_corrected: Boolean(patch),
+        extracted: {
+          ...ex,
+          rows: status === "confirmed" && confirmedRow.amount !== 0 ? [...rows, confirmedRow] : rows,
+          review: { ...(ex.review ?? {}), suggestion: confirmedRow },
+        },
+      }).eq("id", id);
+    })();
+    log(item.clientId, `Review item from ${item.docName} ${status === "confirmed" ? "confirmed" : "discarded"}.`, "extract");
+  }, [review, log]);
 
   const setExceptionStatus = useCallback((id: string, status: Exception["status"]) => {
+    const ex = exceptions.find((e) => e.id === id);
     setExceptions((p) => p.map((e) => (e.id === id ? { ...e, status } : e)));
+    if (!ex) return;
     setRecon((p) => {
-      const ex = exceptions.find((e) => e.id === id);
-      if (!ex || !p[ex.clientId]) return p;
       const r = p[ex.clientId];
+      if (!r) return p;
       return { ...p, [ex.clientId]: { ...r, matched: r.matched + 1, exceptions: Math.max(0, r.exceptions - 1) } };
     });
-    const ex = exceptions.find((e) => e.id === id);
-    if (ex) log(ex.clientId, `Exception "${ex.narration}" ${status}.`, "recon");
+    void sb.from("ca_exceptions").update({
+      status, resolved_by: userId.current, resolved_at: new Date().toISOString(),
+    }).eq("id", id);
+    log(ex.clientId, `Exception "${ex.narration}" ${status}.`, "recon");
   }, [exceptions, log]);
 
   const clientTxns = useCallback((clientId: string) => docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows), [docs]);
@@ -465,33 +714,79 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       .filter((r) => !open.some((e) => e.date === r.date && Math.abs(e.amount) === Math.abs(r.amount)));
   }, [docs, exceptions]);
 
-  /** Workflow B — Recon agent, three passes, unmatched lines become exceptions. */
+  /** Workflow B — deterministic matching of bank lines against the other books. */
   const runRecon = useCallback((clientId: string, onDone?: (r: ReconResult) => void) => {
-    startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Rules pass", "Flagging exceptions"], clientId, () => {
-      const bank = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
-      const open = exceptions.filter((e) => e.clientId === clientId && e.status === "open");
-      // Idempotent: a bank line that already sits in the exception queue is never flagged twice.
-      const known = exceptions.filter((e) => e.clientId === clientId);
-      const unresolved = bank
-        .filter((r) => Math.abs(r.amount) > 500000)
-        .filter((r) => !known.some((e) => e.date === r.date && Math.abs(e.amount) === Math.abs(r.amount)))
-        .slice(0, 1);
-      const created: Exception[] = unresolved.map((r) => ({
-        id: uid(), clientId, reason: "Amount mismatch" as const, amount: r.amount, date: r.date,
-        narration: r.particulars, candidates: ["Closest book entry differs by ₹1,200"], status: "open" as const,
-      }));
-      if (created.length) setExceptions((p) => [...created, ...p]);
-      const result: ReconResult = {
-        bank: bank.length,
-        matched: Math.max(0, bank.length - open.length - created.length),
-        exceptions: open.length + created.length,
-        at: today(),
-      };
-      setRecon((p) => ({ ...p, [clientId]: result }));
-      log(clientId, `Recon run. ${result.matched} of ${result.bank} bank lines matched, ${result.exceptions} exceptions left.`, "recon");
-      onDone?.(result);
+    startRun("recon", "Reconciling bank and books", ["Loading bank lines", "Exact match pass", "Fuzzy match pass", "Flagging exceptions"], clientId, () => {
+      void (async () => {
+        const clientDocs = docs.filter((d) => d.clientId === clientId && d.status === "Parsed");
+        const bankDocs = clientDocs.filter((d) => /statement|bank/i.test(d.name));
+        const bookDocs = clientDocs.filter((d) => !bankDocs.includes(d));
+        const bank = (bankDocs.length ? bankDocs : clientDocs).flatMap((d) => d.rows);
+        const books = bookDocs.flatMap((d) => d.rows);
+        const known = exceptions.filter((e) => e.clientId === clientId);
+
+        const usedBook = new Set<number>();
+        const seen = new Map<string, number>();
+        const created: Omit<Exception, "id">[] = [];
+        let matched = 0;
+
+        bank.forEach((row) => {
+          const dupKey = `${row.date}|${row.amount}|${row.particulars}`;
+          const dupCount = (seen.get(dupKey) ?? 0) + 1;
+          seen.set(dupKey, dupCount);
+          const alreadyFlagged = known.some((e) => e.date === row.date && Math.abs(e.amount) === Math.abs(row.amount));
+
+          if (dupCount > 1) {
+            if (!alreadyFlagged) {
+              created.push({ clientId, reason: "Duplicate suspect", amount: row.amount, date: row.date, narration: row.particulars, candidates: ["Identical line on the same date"], status: "open" });
+            }
+            return;
+          }
+
+          // Exact pass: same amount and same date in the books.
+          let idx = books.findIndex((b, i) => !usedBook.has(i) && Math.abs(b.amount) === Math.abs(row.amount) && b.date === row.date);
+          if (idx === -1) {
+            // Fuzzy pass: same amount within five days.
+            idx = books.findIndex((b, i) => !usedBook.has(i) && Math.abs(b.amount) === Math.abs(row.amount)
+              && Math.abs(new Date(b.date).getTime() - new Date(row.date).getTime()) <= 5 * 864e5);
+          }
+          if (idx >= 0) { usedBook.add(idx); matched += 1; return; }
+          if (!books.length) { matched += 1; return; } // nothing to match against yet
+          if (alreadyFlagged) return;
+          created.push({ clientId, reason: "No candidate", amount: row.amount, date: row.date, narration: row.particulars, candidates: [], status: "open" });
+        });
+
+        let inserted: Exception[] = [];
+        if (created.length && firmId.current) {
+          const { data } = await sb.from("ca_exceptions").insert(created.map((c) => ({
+            ca_firm_id: firmId.current, business_id: clientId, source: "recon",
+            reason_code: c.reason, description: JSON.stringify({ n: c.narration, c: c.candidates }),
+            amount: c.amount, severity: "medium", status: "open", owner_id: userId.current,
+          }))).select("id");
+          inserted = created.map((c, i) => ({ ...c, id: data?.[i]?.id ?? uid() }));
+          setExceptions((p) => [...inserted, ...p]);
+        }
+
+        const openBefore = known.filter((e) => e.status === "open").length;
+        const result: ReconResult = {
+          bank: bank.length,
+          matched,
+          exceptions: openBefore + inserted.length,
+          at: today(),
+        };
+        if (firmId.current) {
+          await sb.from("ca_recon_runs").insert({
+            ca_firm_id: firmId.current, business_id: clientId, recon_type: "bank_books", period,
+            total_items: bank.length, matched, mismatched: 0, unmatched: result.exceptions,
+            run_by: userId.current,
+          });
+        }
+        setRecon((p) => ({ ...p, [clientId]: result }));
+        log(clientId, `Recon run. ${result.matched} of ${result.bank} bank lines matched, ${result.exceptions} exceptions left.`, "recon");
+        onDone?.(result);
+      })();
     });
-  }, [startRun, docs, exceptions, log]);
+  }, [startRun, docs, exceptions, log, period]);
 
   /** Stage 7 — the partner either accepts the MIS or sends it back. */
   const signOffReport = useCallback((reportId: string, by: string) => {
@@ -500,6 +795,13 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       log(r.clientId, `${by} signed off the ${r.template} for ${r.period}.`, "narrate");
       return { ...r, signedOff: { by, at: today() }, correction: undefined };
     }));
+    void (async () => {
+      const { data } = await sb.from("ca_reports_log").select("content").eq("id", reportId).maybeSingle();
+      const content = { ...((data?.content ?? {}) as any), signedOffBy: by, correction: null };
+      await sb.from("ca_reports_log").update({
+        signed_off_by: userId.current, signed_off_at: new Date().toISOString(), status: "signed_off", content,
+      }).eq("id", reportId);
+    })();
   }, [log]);
 
   const requestCorrection = useCallback((reportId: string, note: string) => {
@@ -508,83 +810,133 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
       log(r.clientId, `Correction requested on the ${r.template} for ${r.period}. ${note}`, "narrate");
       return { ...r, correction: { note, at: today() }, signedOff: undefined };
     }));
+    void (async () => {
+      const { data } = await sb.from("ca_reports_log").select("content").eq("id", reportId).maybeSingle();
+      const content = { ...((data?.content ?? {}) as any), correction: { note, at: today() } };
+      await sb.from("ca_reports_log").update({ signed_off_by: null, signed_off_at: null, status: "correction_requested", content }).eq("id", reportId);
+    })();
   }, [log]);
 
   /** Workflow C — Narrate agent, numbers first then insights, all traceable. */
-  const generateReport = useCallback((clientId: string, period: string, template: ReportTemplate, onDone: (r: Report) => void) => {
-    startRun("narrate", `${template} for ${period}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
-      const allRows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
-      const rows = matchedTxns(clientId);
-      const excluded = allRows.length - rows.length;
-      const revenueRows = rows.filter((r) => r.amount > 0);
-      const expenseRows = rows.filter((r) => r.amount < 0);
-      const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
-      const expenses = expenseRows.reduce((s, r) => s + Math.abs(r.amount), 0);
-      const biggest = [...expenseRows].sort((a, b) => a.amount - b.amount)[0];
-      // Prior period comparison uses the older half of the same transaction set,
-      // so a variance can always be traced to rows that exist in the product.
-      const half = Math.max(1, Math.ceil(rows.length / 2));
-      const priorRows = rows.slice(half);
-      const priorRevenue = priorRows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
-      const priorExpenses = priorRows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
-      const largeRows = rows.filter((r) => Math.abs(r.amount) >= 100000);
-      const created: Report = {
-        id: uid(), clientId, period, template, generated: today(), excluded, revenue, expenses,
-        sources: { revenue: revenueRows, expenses: expenseRows },
-        variances: [
-          { label: "Revenue", current: revenue, prior: priorRevenue },
-          { label: "Expenses", current: expenses, prior: priorExpenses },
-          { label: "Net position", current: revenue - expenses, prior: priorRevenue - priorExpenses },
-        ],
-        bankSummary: [
-          { label: "Credits in bank", value: revenue, rows: revenueRows },
-          { label: "Debits in bank", value: expenses, rows: expenseRows },
-          { label: "High value lines above one lakh", value: largeRows.length, rows: largeRows },
-        ],
-        insights: [
-          { text: revenue > expenses
-              ? `Collections exceeded outflow this period, leaving a surplus of ₹${(revenue - expenses).toLocaleString("en-IN")}.`
-              : `Outflow ran ahead of collections by ₹${(expenses - revenue).toLocaleString("en-IN")} this period.`,
-            source: `${revenueRows.length} credits and ${expenseRows.length} debits` },
-          ...(biggest ? [{ text: `The single largest outflow was ${biggest.particulars}.`, source: `1 transaction dated ${biggest.date}` }] : []),
-          ...(largeRows.length ? [{ text: `${largeRows.length} transactions crossed one lakh rupees and were checked line by line.`, source: `${largeRows.length} high value transactions` }] : []),
-        ],
-      };
-      setReports((p) => [created, ...p]);
-      setClients((p) => p.map((c) => (c.id === clientId ? { ...c, lastMis: today() } : c)));
-      log(clientId, `${template} generated for ${period}.`, "narrate");
-      onDone(created);
-    });
-  }, [startRun, docs, log]);
+  const generateReport = useCallback((clientId: string, reportPeriod: string, template: ReportTemplate, onDone: (r: Report) => void) => {
+    startRun("narrate", `${template} for ${reportPeriod}`, ["Collecting matched transactions", "Computing figures", "Writing insights"], clientId, () => {
+      void (async () => {
+        const allRows = docs.filter((d) => d.clientId === clientId).flatMap((d) => d.rows);
+        const rows = matchedTxns(clientId);
+        const excluded = allRows.length - rows.length;
+        const revenueRows = rows.filter((r) => r.amount > 0);
+        const expenseRows = rows.filter((r) => r.amount < 0);
+        const revenue = revenueRows.reduce((s, r) => s + r.amount, 0);
+        const expenses = expenseRows.reduce((s, r) => s + Math.abs(r.amount), 0);
+        const biggest = [...expenseRows].sort((a, b) => a.amount - b.amount)[0];
+        const half = Math.max(1, Math.ceil(rows.length / 2));
+        const priorRows = rows.slice(half);
+        const priorRevenue = priorRows.filter((r) => r.amount > 0).reduce((s, r) => s + r.amount, 0);
+        const priorExpenses = priorRows.filter((r) => r.amount < 0).reduce((s, r) => s + Math.abs(r.amount), 0);
+        const largeRows = rows.filter((r) => Math.abs(r.amount) >= 100000);
 
+        const content = {
+          excluded, revenue, expenses,
+          sources: { revenue: revenueRows, expenses: expenseRows },
+          variances: [
+            { label: "Revenue", current: revenue, prior: priorRevenue },
+            { label: "Expenses", current: expenses, prior: priorExpenses },
+            { label: "Net position", current: revenue - expenses, prior: priorRevenue - priorExpenses },
+          ],
+          bankSummary: [
+            { label: "Credits in bank", value: revenue, rows: revenueRows },
+            { label: "Debits in bank", value: expenses, rows: expenseRows },
+            { label: "High value lines above one lakh", value: largeRows.length, rows: largeRows },
+          ],
+          insights: [
+            { text: revenue > expenses
+                ? `Collections exceeded outflow this period, leaving a surplus of ₹${(revenue - expenses).toLocaleString("en-IN")}.`
+                : `Outflow ran ahead of collections by ₹${(expenses - revenue).toLocaleString("en-IN")} this period.`,
+              source: `${revenueRows.length} credits and ${expenseRows.length} debits` },
+            ...(biggest ? [{ text: `The single largest outflow was ${biggest.particulars}.`, source: `1 transaction dated ${biggest.date}` }] : []),
+            ...(largeRows.length ? [{ text: `${largeRows.length} transactions crossed one lakh rupees and were checked line by line.`, source: `${largeRows.length} high value transactions` }] : []),
+          ],
+        };
+
+        let id = uid();
+        if (firmId.current) {
+          const { data } = await sb.from("ca_reports_log").insert({
+            ca_firm_id: firmId.current, business_id: clientId, report_type: template,
+            report_name: `${template} — ${reportPeriod}`, period: reportPeriod, status: "generated",
+            generated_by_user_id: userId.current, content,
+          }).select("id").maybeSingle();
+          if (data?.id) id = data.id;
+        }
+
+        const created: Report = {
+          id, clientId, period: reportPeriod, template, generated: today(),
+          excluded, revenue, expenses,
+          sources: content.sources, variances: content.variances,
+          bankSummary: content.bankSummary, insights: content.insights,
+        };
+        setReports((p) => [created, ...p]);
+        updateClient(clientId, { lastMis: today() });
+        log(clientId, `${template} generated for ${reportPeriod}.`, "narrate");
+        onDone(created);
+      })();
+    });
+  }, [startRun, docs, matchedTxns, log, updateClient]);
 
   const addChase = useCallback((c: Omit<Chase, "id" | "timeline" | "status" | "followUps">) => {
-    setChases((p) => [
-      { ...c, id: uid(), status: "Open", followUps: 0, timeline: [{ at: today(), text: "Chase created", agent: "chaser" }] },
-      ...p,
-    ]);
-    log(c.clientId, `Chase created for ${c.type}.`, "chaser");
-  }, [log]);
+    const temp: Chase = { ...c, id: uid(), status: "Open", followUps: 0, timeline: [{ at: today(), text: "Chase created", agent: "chaser" }] };
+    setChases((p) => [temp, ...p]);
+    void (async () => {
+      if (!firmId.current) return;
+      const { data } = await sb.from("ca_document_requests").insert({
+        ca_firm_id: firmId.current, business_id: c.clientId, title: c.type,
+        doc_types: [c.type], period, due_date: c.due || null, status: "open",
+        requested_by: userId.current, chaser_count: 0,
+        notes: JSON.stringify({ note: c.note, contact: c.contact, phone: c.phone }),
+      }).select("id").maybeSingle();
+      if (data?.id) {
+        setChases((p) => p.map((x) => (x.id === temp.id ? { ...x, id: data.id } : x)));
+        await sb.from("ca_chaser_events").insert({ chaser_id: data.id, ca_firm_id: firmId.current, business_id: c.clientId, event_type: "created", note: "Chase created", actor_id: userId.current });
+      }
+      log(c.clientId, `Chase created for ${c.type}.`, "chaser");
+    })();
+  }, [log, period]);
 
   /** Workflow D — follow ups escalate after the second unanswered nudge. */
   const sendFollowUp = useCallback((id: string, channel: "Email" | "WhatsApp") => {
-    setChases((p) =>
-      p.map((c) => {
-        if (c.id !== id || c.status === "Resolved") return c;
-        const followUps = c.followUps + 1;
-        const status: Chase["status"] = followUps >= 2 ? "Escalated" : "Following Up";
-        const entries = [{ at: today(), text: `${channel} follow up sent`, agent: "chaser" as AgentKey }];
-        if (status === "Escalated" && c.status !== "Escalated") {
-          entries.push({ at: today(), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" as AgentKey });
-        }
-        return { ...c, followUps, status, timeline: [...c.timeline, ...entries] };
-      }),
-    );
-  }, []);
+    const chase = chases.find((c) => c.id === id);
+    if (!chase || chase.status === "Resolved") return;
+    const followUps = chase.followUps + 1;
+    const status: Chase["status"] = followUps >= 2 ? "Escalated" : "Following Up";
+    const entries = [{ at: today(), text: `${channel} follow up sent`, agent: "chaser" as AgentKey }];
+    if (status === "Escalated" && chase.status !== "Escalated") {
+      entries.push({ at: today(), text: "No reply after two follow ups. Escalated to partner.", agent: "chaser" as AgentKey });
+    }
+    setChases((p) => p.map((c) => (c.id === id ? { ...c, followUps, status, timeline: [...c.timeline, ...entries] } : c)));
+    void (async () => {
+      if (!firmId.current) return;
+      await sb.from("ca_document_requests").update({
+        chaser_count: followUps, last_chased_at: new Date().toISOString(),
+        escalated_at: status === "Escalated" ? new Date().toISOString() : null,
+      }).eq("id", id);
+      for (const e of entries) {
+        await sb.from("ca_chaser_events").insert({ chaser_id: id, ca_firm_id: firmId.current, business_id: chase.clientId, event_type: "follow_up", note: e.text, actor_id: userId.current });
+      }
+    })();
+  }, [chases]);
 
   const setChaseStatus = useCallback((id: string, status: Chase["status"], note?: string) => {
-    setChases((p) => p.map((c) => (c.id === id ? { ...c, status, timeline: [...c.timeline, { at: today(), text: note ?? `Marked ${status.toLowerCase()}`, agent: "chaser" }] } : c)));
-  }, []);
+    const chase = chases.find((c) => c.id === id);
+    const text = note ?? `Marked ${status.toLowerCase()}`;
+    setChases((p) => p.map((c) => (c.id === id ? { ...c, status, timeline: [...c.timeline, { at: today(), text, agent: "chaser" }] } : c)));
+    void (async () => {
+      if (!firmId.current || !chase) return;
+      await sb.from("ca_document_requests").update({
+        status: status === "Resolved" ? "fulfilled" : "open",
+        fulfilled_at: status === "Resolved" ? new Date().toISOString() : null,
+      }).eq("id", id);
+      await sb.from("ca_chaser_events").insert({ chaser_id: id, ca_firm_id: firmId.current, business_id: chase.clientId, event_type: "status", note: text, actor_id: userId.current });
+    })();
+  }, [chases]);
 
   const activityFor = useCallback((clientId: string) => activity.filter((a) => a.clientId === clientId), [activity]);
 
@@ -635,15 +987,14 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
   }, [docs, review, exceptions, chases, recon, reports, period]);
 
   const value = useMemo<Store>(() => ({
-    hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding,
+    hydrated, session, firm, onboarded: Boolean(firm), signIn, signOut, saveFirm, completeOnboarding,
     clients, docs, review, exceptions, reports, chases, runs, recon,
     runsFor: (target: string) => runs.filter((r) => r.target === target),
     addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport,
     addChase, sendFollowUp, setChaseStatus, clientTxns, matchedTxns, signOffReport, requestCorrection,
     clientName: (id: string) => clients.find((c) => c.id === id)?.name ?? "Unassigned",
     period, setPeriod, role, setRole, activity, activityFor, closeStateFor,
-  }), [matchedTxns, signOffReport, requestCorrection, period, role, activity, activityFor, closeStateFor, hydrated, session, firm, onboarded, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
-
+  }), [matchedTxns, signOffReport, requestCorrection, period, role, activity, activityFor, closeStateFor, hydrated, session, firm, signIn, signOut, saveFirm, completeOnboarding, clients, docs, review, exceptions, reports, chases, runs, recon, addClient, updateClient, addDoc, resolveReview, setExceptionStatus, runRecon, generateReport, addChase, sendFollowUp, setChaseStatus, clientTxns]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

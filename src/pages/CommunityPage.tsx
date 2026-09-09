@@ -108,7 +108,7 @@ export default function CommunityPage() {
 
       <Section center kicker="In the meantime" title="The product is" italic="already running">
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginTop: 26 }}>
-          <Link to="/demo" className="fh-btn fh-btn-primary">Open the live demo</Link>
+          <Link to="/waitlist" className="fh-btn fh-btn-primary">Book a demo</Link>
           <Link to="/blog" className="fh-btn fh-btn-ghost">Read the blog</Link>
         </div>
       </Section>

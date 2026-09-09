@@ -325,8 +325,8 @@ export default function HeroSection() {
               <button className="fyn-btn-primary" onClick={() => navigate("/waitlist")}>
                 Join Waitlist <ArrowRight size={14} />
               </button>
-              <button className="fyn-btn-ghost" onClick={() => navigate("/demo/login")}>
-                <Play size={13} /> Watch Demo
+              <button className="fyn-btn-ghost" onClick={() => navigate("/waitlist")}>
+                <Play size={13} /> Book a demo
               </button>
 
             </div>

@@ -33,7 +33,6 @@ const ENTRIES: Entry[] = [
   { label: "Pricing", to: "/pricing", group: "FynHelp" },
   { label: "Resources", to: "/resources", group: "FynHelp" },
   { label: "Blog", to: "/blog", group: "FynHelp" },
-  { label: "Product demo", to: "/demo/liquidity", group: "FynHelp", keywords: "sample data" },
 ];
 
 const GROUPS = Array.from(new Set(ENTRIES.map((e) => e.group)));

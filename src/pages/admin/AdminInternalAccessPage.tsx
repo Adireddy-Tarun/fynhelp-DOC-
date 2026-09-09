@@ -58,7 +58,7 @@ export default function AdminInternalAccessPage() {
         </p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
-            onClick={() => nav("/demo/dashboard")}
+            onClick={() => nav("/dashboard")}
             style={{
               background: "#C41E1E", color: "#fff", border: "none", borderRadius: 10,
               padding: "12px 18px", fontFamily: "Inter, sans-serif", fontWeight: 600,
@@ -92,7 +92,7 @@ export default function AdminInternalAccessPage() {
         </p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
-            onClick={() => nav("/demo/ca")}
+            onClick={() => nav("/ca/dashboard")}
             style={{
               background: "#C41E1E", color: "#fff", border: "none", borderRadius: 10,
               padding: "12px 18px", fontFamily: "Inter, sans-serif", fontWeight: 600,

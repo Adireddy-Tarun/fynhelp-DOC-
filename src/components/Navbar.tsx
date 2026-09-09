@@ -421,7 +421,7 @@ const Navbar = () => {
                 ctaHref={active.href}
               />
               <Link
-                to="/demo/login"
+                to="/waitlist"
                 className="group inline-flex items-center gap-1.5 self-end text-[12.5px] font-semibold text-fyn-ink/70 hover:text-fyn-red transition-colors"
               >
                 <PlayCircle size={14} /> Or start from demo login <span aria-hidden>→</span>
@@ -691,7 +691,7 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <Link
-                  to="/demo/login"
+                  to="/waitlist"
                   onClick={() => setMobileOpen(false)}
                   className="mt-3 mb-1 flex items-center gap-2 text-fyn-red text-[13.5px] font-semibold"
                 >

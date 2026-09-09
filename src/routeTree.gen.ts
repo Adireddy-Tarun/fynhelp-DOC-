@@ -16,7 +16,6 @@ import { Route as InternalAdminRouteImport } from './routes/_internalAdmin'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as V2RouteImport } from './routes/v2'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainDemoGateRouteImport } from './routes/_main/_demoGate'
 import { Route as MainAboutRouteImport } from './routes/_main/about'
 import { Route as MainCaFirmsRouteImport } from './routes/_main/ca-firms'
 import { Route as MainCommunityRouteImport } from './routes/_main/community'
@@ -31,6 +30,8 @@ import { Route as MainSecurityRouteImport } from './routes/_main/security'
 import { Route as MainSignupRouteImport } from './routes/_main/signup'
 import { Route as MainUseCasesRouteImport } from './routes/_main/use-cases'
 import { Route as MainWaitlistRouteImport } from './routes/_main/waitlist'
+import { Route as DemoIndexRouteImport } from './routes/demo.index'
+import { Route as DemoSplatRouteImport } from './routes/demo.$'
 import { Route as V2IndexRouteImport } from './routes/v2/index'
 import { Route as V2ChaserRouteImport } from './routes/v2/chaser'
 import { Route as V2DocumentsRouteImport } from './routes/v2/documents'
@@ -157,25 +158,6 @@ import { Route as CaAuthCaPortalVaultRouteImport } from './routes/_caAuth/ca/_po
 import { Route as CaAuthCaPortalWorkingPapersRouteImport } from './routes/_caAuth/ca/_portal/working-papers'
 import { Route as CaAuthCaAuthCallbackRouteImport } from './routes/_caAuth/ca/auth/callback'
 import { Route as CaAuthCaInviteAcceptRouteImport } from './routes/_caAuth/ca/invite/accept'
-import { Route as MainDemoGateDemoIndexRouteImport } from './routes/_main/_demoGate/demo/index'
-import { Route as MainDemoGateDemoBankingRouteImport } from './routes/_main/_demoGate/demo/banking'
-import { Route as MainDemoGateDemoCaRouteImport } from './routes/_main/_demoGate/demo/ca'
-import { Route as MainDemoGateDemoCaPartnerRouteImport } from './routes/_main/_demoGate/demo/ca-partner'
-import { Route as MainDemoGateDemoCockpitRouteImport } from './routes/_main/_demoGate/demo/cockpit'
-import { Route as MainDemoGateDemoCostRouteImport } from './routes/_main/_demoGate/demo/cost'
-import { Route as MainDemoGateDemoDashboardRouteImport } from './routes/_main/_demoGate/demo/dashboard'
-import { Route as MainDemoGateDemoDecisionSimulatorRouteImport } from './routes/_main/_demoGate/demo/decision-simulator'
-import { Route as MainDemoGateDemoFynnyRouteImport } from './routes/_main/_demoGate/demo/fynny'
-import { Route as MainDemoGateDemoGovernanceRouteImport } from './routes/_main/_demoGate/demo/governance'
-import { Route as MainDemoGateDemoHrRouteImport } from './routes/_main/_demoGate/demo/hr'
-import { Route as MainDemoGateDemoInvestorRouteImport } from './routes/_main/_demoGate/demo/investor'
-import { Route as MainDemoGateDemoLiquidityRouteImport } from './routes/_main/_demoGate/demo/liquidity'
-import { Route as MainDemoGateDemoLoginRouteImport } from './routes/_main/_demoGate/demo/login'
-import { Route as MainDemoGateDemoMarketGrowthRouteImport } from './routes/_main/_demoGate/demo/market-growth'
-import { Route as MainDemoGateDemoOnboardingRouteImport } from './routes/_main/_demoGate/demo/onboarding'
-import { Route as MainDemoGateDemoReportsRouteImport } from './routes/_main/_demoGate/demo/reports'
-import { Route as MainDemoGateDemoRevenueRouteImport } from './routes/_main/_demoGate/demo/revenue'
-import { Route as MainDemoGateDemoUploadRouteImport } from './routes/_main/_demoGate/demo/upload'
 import { Route as MainDashboardReportsIndexRouteImport } from './routes/_main/dashboard/reports/index'
 import { Route as MainDashboardReportsIdRouteImport } from './routes/_main/dashboard/reports/$id'
 import { Route as MainDashboardReportsBooksRouteImport } from './routes/_main/dashboard/reports/books'
@@ -210,22 +192,6 @@ import { Route as CaAuthCaPortalSettingsCommunicationsRouteImport } from './rout
 import { Route as CaAuthCaPortalSettingsDefaultsRouteImport } from './routes/_caAuth/ca/_portal/settings/defaults'
 import { Route as CaAuthCaPortalSettingsNotificationsRouteImport } from './routes/_caAuth/ca/_portal/settings/notifications'
 import { Route as CaAuthCaPortalSettingsTeamRouteImport } from './routes/_caAuth/ca/_portal/settings/team'
-import { Route as MainDemoGateDemoBankIdRouteImport } from './routes/_main/_demoGate/demo/bank/$id'
-import { Route as MainDemoGateDemoCustomersIndexRouteImport } from './routes/_main/_demoGate/demo/customers/index'
-import { Route as MainDemoGateDemoCustomersIdRouteImport } from './routes/_main/_demoGate/demo/customers/$id'
-import { Route as MainDemoGateDemoDealsIdRouteImport } from './routes/_main/_demoGate/demo/deals/$id'
-import { Route as MainDemoGateDemoEmployeesIndexRouteImport } from './routes/_main/_demoGate/demo/employees/index'
-import { Route as MainDemoGateDemoEmployeesIdRouteImport } from './routes/_main/_demoGate/demo/employees/$id'
-import { Route as MainDemoGateDemoExpensesIndexRouteImport } from './routes/_main/_demoGate/demo/expenses/index'
-import { Route as MainDemoGateDemoExpensesIdRouteImport } from './routes/_main/_demoGate/demo/expenses/$id'
-import { Route as MainDemoGateDemoGstIndexRouteImport } from './routes/_main/_demoGate/demo/gst/index'
-import { Route as MainDemoGateDemoGstIdRouteImport } from './routes/_main/_demoGate/demo/gst/$id'
-import { Route as MainDemoGateDemoInsuranceIdRouteImport } from './routes/_main/_demoGate/demo/insurance/$id'
-import { Route as MainDemoGateDemoInvoicesIndexRouteImport } from './routes/_main/_demoGate/demo/invoices/index'
-import { Route as MainDemoGateDemoInvoicesIdRouteImport } from './routes/_main/_demoGate/demo/invoices/$id'
-import { Route as MainDemoGateDemoRisksIdRouteImport } from './routes/_main/_demoGate/demo/risks/$id'
-import { Route as MainDemoGateDemoVendorsIndexRouteImport } from './routes/_main/_demoGate/demo/vendors/index'
-import { Route as MainDemoGateDemoVendorsIdRouteImport } from './routes/_main/_demoGate/demo/vendors/$id'
 import { Route as AdminAuthAdminProtectedBlogPostIdEditRouteImport } from './routes/_adminAuth/admin/_protected/blog/$postId.edit'
 
 const AdminAuthRoute = AdminAuthRouteImport.update({
@@ -256,10 +222,6 @@ const V2Route = V2RouteImport.update({
 const MainIndexRoute = MainIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => MainRoute,
-} as any)
-const MainDemoGateRoute = MainDemoGateRouteImport.update({
-  id: '/_demoGate',
   getParentRoute: () => MainRoute,
 } as any)
 const MainAboutRoute = MainAboutRouteImport.update({
@@ -331,6 +293,16 @@ const MainWaitlistRoute = MainWaitlistRouteImport.update({
   id: '/waitlist',
   path: '/waitlist',
   getParentRoute: () => MainRoute,
+} as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/demo/',
+  path: '/demo/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoSplatRoute = DemoSplatRouteImport.update({
+  id: '/demo/$',
+  path: '/demo/$',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const V2IndexRoute = V2IndexRouteImport.update({
   id: '/',
@@ -1017,109 +989,6 @@ const CaAuthCaInviteAcceptRoute = CaAuthCaInviteAcceptRouteImport.update({
   path: '/ca/invite/accept',
   getParentRoute: () => CaAuthRoute,
 } as any)
-const MainDemoGateDemoIndexRoute = MainDemoGateDemoIndexRouteImport.update({
-  id: '/demo/',
-  path: '/demo/',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoBankingRoute = MainDemoGateDemoBankingRouteImport.update({
-  id: '/demo/banking',
-  path: '/demo/banking',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoCaRoute = MainDemoGateDemoCaRouteImport.update({
-  id: '/demo/ca',
-  path: '/demo/ca',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoCaPartnerRoute =
-  MainDemoGateDemoCaPartnerRouteImport.update({
-    id: '/demo/ca-partner',
-    path: '/demo/ca-partner',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoCockpitRoute = MainDemoGateDemoCockpitRouteImport.update({
-  id: '/demo/cockpit',
-  path: '/demo/cockpit',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoCostRoute = MainDemoGateDemoCostRouteImport.update({
-  id: '/demo/cost',
-  path: '/demo/cost',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoDashboardRoute =
-  MainDemoGateDemoDashboardRouteImport.update({
-    id: '/demo/dashboard',
-    path: '/demo/dashboard',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoDecisionSimulatorRoute =
-  MainDemoGateDemoDecisionSimulatorRouteImport.update({
-    id: '/demo/decision-simulator',
-    path: '/demo/decision-simulator',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoFynnyRoute = MainDemoGateDemoFynnyRouteImport.update({
-  id: '/demo/fynny',
-  path: '/demo/fynny',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoGovernanceRoute =
-  MainDemoGateDemoGovernanceRouteImport.update({
-    id: '/demo/governance',
-    path: '/demo/governance',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoHrRoute = MainDemoGateDemoHrRouteImport.update({
-  id: '/demo/hr',
-  path: '/demo/hr',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoInvestorRoute =
-  MainDemoGateDemoInvestorRouteImport.update({
-    id: '/demo/investor',
-    path: '/demo/investor',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoLiquidityRoute =
-  MainDemoGateDemoLiquidityRouteImport.update({
-    id: '/demo/liquidity',
-    path: '/demo/liquidity',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoLoginRoute = MainDemoGateDemoLoginRouteImport.update({
-  id: '/demo/login',
-  path: '/demo/login',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoMarketGrowthRoute =
-  MainDemoGateDemoMarketGrowthRouteImport.update({
-    id: '/demo/market-growth',
-    path: '/demo/market-growth',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoOnboardingRoute =
-  MainDemoGateDemoOnboardingRouteImport.update({
-    id: '/demo/onboarding',
-    path: '/demo/onboarding',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoReportsRoute = MainDemoGateDemoReportsRouteImport.update({
-  id: '/demo/reports',
-  path: '/demo/reports',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoRevenueRoute = MainDemoGateDemoRevenueRouteImport.update({
-  id: '/demo/revenue',
-  path: '/demo/revenue',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoUploadRoute = MainDemoGateDemoUploadRouteImport.update({
-  id: '/demo/upload',
-  path: '/demo/upload',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
 const MainDashboardReportsIndexRoute =
   MainDashboardReportsIndexRouteImport.update({
     id: '/dashboard/reports/',
@@ -1323,98 +1192,6 @@ const CaAuthCaPortalSettingsTeamRoute =
     path: '/settings/team',
     getParentRoute: () => CaAuthCaPortalRoute,
   } as any)
-const MainDemoGateDemoBankIdRoute = MainDemoGateDemoBankIdRouteImport.update({
-  id: '/demo/bank/$id',
-  path: '/demo/bank/$id',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoCustomersIndexRoute =
-  MainDemoGateDemoCustomersIndexRouteImport.update({
-    id: '/demo/customers/',
-    path: '/demo/customers/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoCustomersIdRoute =
-  MainDemoGateDemoCustomersIdRouteImport.update({
-    id: '/demo/customers/$id',
-    path: '/demo/customers/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoDealsIdRoute = MainDemoGateDemoDealsIdRouteImport.update({
-  id: '/demo/deals/$id',
-  path: '/demo/deals/$id',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoEmployeesIndexRoute =
-  MainDemoGateDemoEmployeesIndexRouteImport.update({
-    id: '/demo/employees/',
-    path: '/demo/employees/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoEmployeesIdRoute =
-  MainDemoGateDemoEmployeesIdRouteImport.update({
-    id: '/demo/employees/$id',
-    path: '/demo/employees/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoExpensesIndexRoute =
-  MainDemoGateDemoExpensesIndexRouteImport.update({
-    id: '/demo/expenses/',
-    path: '/demo/expenses/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoExpensesIdRoute =
-  MainDemoGateDemoExpensesIdRouteImport.update({
-    id: '/demo/expenses/$id',
-    path: '/demo/expenses/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoGstIndexRoute =
-  MainDemoGateDemoGstIndexRouteImport.update({
-    id: '/demo/gst/',
-    path: '/demo/gst/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoGstIdRoute = MainDemoGateDemoGstIdRouteImport.update({
-  id: '/demo/gst/$id',
-  path: '/demo/gst/$id',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoInsuranceIdRoute =
-  MainDemoGateDemoInsuranceIdRouteImport.update({
-    id: '/demo/insurance/$id',
-    path: '/demo/insurance/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoInvoicesIndexRoute =
-  MainDemoGateDemoInvoicesIndexRouteImport.update({
-    id: '/demo/invoices/',
-    path: '/demo/invoices/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoInvoicesIdRoute =
-  MainDemoGateDemoInvoicesIdRouteImport.update({
-    id: '/demo/invoices/$id',
-    path: '/demo/invoices/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoRisksIdRoute = MainDemoGateDemoRisksIdRouteImport.update({
-  id: '/demo/risks/$id',
-  path: '/demo/risks/$id',
-  getParentRoute: () => MainDemoGateRoute,
-} as any)
-const MainDemoGateDemoVendorsIndexRoute =
-  MainDemoGateDemoVendorsIndexRouteImport.update({
-    id: '/demo/vendors/',
-    path: '/demo/vendors/',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
-const MainDemoGateDemoVendorsIdRoute =
-  MainDemoGateDemoVendorsIdRouteImport.update({
-    id: '/demo/vendors/$id',
-    path: '/demo/vendors/$id',
-    getParentRoute: () => MainDemoGateRoute,
-  } as any)
 const AdminAuthAdminProtectedBlogPostIdEditRoute =
   AdminAuthAdminProtectedBlogPostIdEditRouteImport.update({
     id: '/blog/$postId/edit',
@@ -1439,12 +1216,14 @@ export interface FileRoutesByFullPath {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/demo/$': typeof DemoSplatRoute
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
   '/v2/onboarding': typeof V2OnboardingRoute
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
+  '/demo/': typeof DemoIndexRoute
   '/v2/': typeof V2IndexRoute
   '/admin': typeof AdminAuthAdminProtectedRouteWithChildren
   '/admin/login': typeof AdminAuthAdminLoginRoute
@@ -1563,24 +1342,6 @@ export interface FileRoutesByFullPath {
   '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
-  '/demo/banking': typeof MainDemoGateDemoBankingRoute
-  '/demo/ca': typeof MainDemoGateDemoCaRoute
-  '/demo/ca-partner': typeof MainDemoGateDemoCaPartnerRoute
-  '/demo/cockpit': typeof MainDemoGateDemoCockpitRoute
-  '/demo/cost': typeof MainDemoGateDemoCostRoute
-  '/demo/dashboard': typeof MainDemoGateDemoDashboardRoute
-  '/demo/decision-simulator': typeof MainDemoGateDemoDecisionSimulatorRoute
-  '/demo/fynny': typeof MainDemoGateDemoFynnyRoute
-  '/demo/governance': typeof MainDemoGateDemoGovernanceRoute
-  '/demo/hr': typeof MainDemoGateDemoHrRoute
-  '/demo/investor': typeof MainDemoGateDemoInvestorRoute
-  '/demo/liquidity': typeof MainDemoGateDemoLiquidityRoute
-  '/demo/login': typeof MainDemoGateDemoLoginRoute
-  '/demo/market-growth': typeof MainDemoGateDemoMarketGrowthRoute
-  '/demo/onboarding': typeof MainDemoGateDemoOnboardingRoute
-  '/demo/reports': typeof MainDemoGateDemoReportsRoute
-  '/demo/revenue': typeof MainDemoGateDemoRevenueRoute
-  '/demo/upload': typeof MainDemoGateDemoUploadRoute
   '/dashboard/reports/$id': typeof MainDashboardReportsIdRoute
   '/dashboard/reports/books': typeof MainDashboardReportsBooksRoute
   '/dashboard/settings/billing': typeof MainDashboardSettingsBillingRoute
@@ -1596,7 +1357,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
   '/admin/': typeof AdminAuthAdminProtectedIndexRoute
   '/ca/': typeof CaAuthCaPortalIndexRoute
-  '/demo/': typeof MainDemoGateDemoIndexRoute
   '/dashboard/reports/': typeof MainDashboardReportsIndexRoute
   '/dashboard/settings/': typeof MainDashboardSettingsIndexRoute
   '/admin/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
@@ -1613,27 +1373,11 @@ export interface FileRoutesByFullPath {
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
-  '/demo/bank/$id': typeof MainDemoGateDemoBankIdRoute
-  '/demo/customers/$id': typeof MainDemoGateDemoCustomersIdRoute
-  '/demo/deals/$id': typeof MainDemoGateDemoDealsIdRoute
-  '/demo/employees/$id': typeof MainDemoGateDemoEmployeesIdRoute
-  '/demo/expenses/$id': typeof MainDemoGateDemoExpensesIdRoute
-  '/demo/gst/$id': typeof MainDemoGateDemoGstIdRoute
-  '/demo/insurance/$id': typeof MainDemoGateDemoInsuranceIdRoute
-  '/demo/invoices/$id': typeof MainDemoGateDemoInvoicesIdRoute
-  '/demo/risks/$id': typeof MainDemoGateDemoRisksIdRoute
-  '/demo/vendors/$id': typeof MainDemoGateDemoVendorsIdRoute
   '/admin/blog/': typeof AdminAuthAdminProtectedBlogIndexRoute
   '/admin/support/': typeof AdminAuthAdminProtectedSupportIndexRoute
   '/admin/users/': typeof AdminAuthAdminProtectedUsersIndexRoute
   '/ca/clients/': typeof CaAuthCaPortalClientsIndexRoute
   '/ca/settings/': typeof CaAuthCaPortalSettingsIndexRoute
-  '/demo/customers/': typeof MainDemoGateDemoCustomersIndexRoute
-  '/demo/employees/': typeof MainDemoGateDemoEmployeesIndexRoute
-  '/demo/expenses/': typeof MainDemoGateDemoExpensesIndexRoute
-  '/demo/gst/': typeof MainDemoGateDemoGstIndexRoute
-  '/demo/invoices/': typeof MainDemoGateDemoInvoicesIndexRoute
-  '/demo/vendors/': typeof MainDemoGateDemoVendorsIndexRoute
   '/admin/blog/$postId/edit': typeof AdminAuthAdminProtectedBlogPostIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -1652,12 +1396,14 @@ export interface FileRoutesByTo {
   '/signup': typeof MainSignupRoute
   '/use-cases': typeof MainUseCasesRoute
   '/waitlist': typeof MainWaitlistRoute
+  '/demo/$': typeof DemoSplatRoute
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
   '/v2/onboarding': typeof V2OnboardingRoute
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
+  '/demo': typeof DemoIndexRoute
   '/v2': typeof V2IndexRoute
   '/admin/login': typeof AdminAuthAdminLoginRoute
   '/blog-admin/editor': typeof BlogAdminBlogAdminEditorRoute
@@ -1773,24 +1519,6 @@ export interface FileRoutesByTo {
   '/ca/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
-  '/demo/banking': typeof MainDemoGateDemoBankingRoute
-  '/demo/ca': typeof MainDemoGateDemoCaRoute
-  '/demo/ca-partner': typeof MainDemoGateDemoCaPartnerRoute
-  '/demo/cockpit': typeof MainDemoGateDemoCockpitRoute
-  '/demo/cost': typeof MainDemoGateDemoCostRoute
-  '/demo/dashboard': typeof MainDemoGateDemoDashboardRoute
-  '/demo/decision-simulator': typeof MainDemoGateDemoDecisionSimulatorRoute
-  '/demo/fynny': typeof MainDemoGateDemoFynnyRoute
-  '/demo/governance': typeof MainDemoGateDemoGovernanceRoute
-  '/demo/hr': typeof MainDemoGateDemoHrRoute
-  '/demo/investor': typeof MainDemoGateDemoInvestorRoute
-  '/demo/liquidity': typeof MainDemoGateDemoLiquidityRoute
-  '/demo/login': typeof MainDemoGateDemoLoginRoute
-  '/demo/market-growth': typeof MainDemoGateDemoMarketGrowthRoute
-  '/demo/onboarding': typeof MainDemoGateDemoOnboardingRoute
-  '/demo/reports': typeof MainDemoGateDemoReportsRoute
-  '/demo/revenue': typeof MainDemoGateDemoRevenueRoute
-  '/demo/upload': typeof MainDemoGateDemoUploadRoute
   '/dashboard/reports/$id': typeof MainDashboardReportsIdRoute
   '/dashboard/reports/books': typeof MainDashboardReportsBooksRoute
   '/dashboard/settings/billing': typeof MainDashboardSettingsBillingRoute
@@ -1806,7 +1534,6 @@ export interface FileRoutesByTo {
   '/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
   '/admin': typeof AdminAuthAdminProtectedIndexRoute
   '/ca': typeof CaAuthCaPortalIndexRoute
-  '/demo': typeof MainDemoGateDemoIndexRoute
   '/dashboard/reports': typeof MainDashboardReportsIndexRoute
   '/dashboard/settings': typeof MainDashboardSettingsIndexRoute
   '/admin/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
@@ -1823,27 +1550,11 @@ export interface FileRoutesByTo {
   '/ca/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/ca/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/ca/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
-  '/demo/bank/$id': typeof MainDemoGateDemoBankIdRoute
-  '/demo/customers/$id': typeof MainDemoGateDemoCustomersIdRoute
-  '/demo/deals/$id': typeof MainDemoGateDemoDealsIdRoute
-  '/demo/employees/$id': typeof MainDemoGateDemoEmployeesIdRoute
-  '/demo/expenses/$id': typeof MainDemoGateDemoExpensesIdRoute
-  '/demo/gst/$id': typeof MainDemoGateDemoGstIdRoute
-  '/demo/insurance/$id': typeof MainDemoGateDemoInsuranceIdRoute
-  '/demo/invoices/$id': typeof MainDemoGateDemoInvoicesIdRoute
-  '/demo/risks/$id': typeof MainDemoGateDemoRisksIdRoute
-  '/demo/vendors/$id': typeof MainDemoGateDemoVendorsIdRoute
   '/admin/blog': typeof AdminAuthAdminProtectedBlogIndexRoute
   '/admin/support': typeof AdminAuthAdminProtectedSupportIndexRoute
   '/admin/users': typeof AdminAuthAdminProtectedUsersIndexRoute
   '/ca/clients': typeof CaAuthCaPortalClientsIndexRoute
   '/ca/settings': typeof CaAuthCaPortalSettingsIndexRoute
-  '/demo/customers': typeof MainDemoGateDemoCustomersIndexRoute
-  '/demo/employees': typeof MainDemoGateDemoEmployeesIndexRoute
-  '/demo/expenses': typeof MainDemoGateDemoExpensesIndexRoute
-  '/demo/gst': typeof MainDemoGateDemoGstIndexRoute
-  '/demo/invoices': typeof MainDemoGateDemoInvoicesIndexRoute
-  '/demo/vendors': typeof MainDemoGateDemoVendorsIndexRoute
   '/admin/blog/$postId/edit': typeof AdminAuthAdminProtectedBlogPostIdEditRoute
 }
 export interface FileRoutesById {
@@ -1854,7 +1565,6 @@ export interface FileRoutesById {
   '/_internalAdmin': typeof InternalAdminRouteWithChildren
   '/_main': typeof MainRouteWithChildren
   '/v2': typeof V2RouteWithChildren
-  '/_main/_demoGate': typeof MainDemoGateRouteWithChildren
   '/_main/about': typeof MainAboutRoute
   '/_main/ca-firms': typeof MainCaFirmsRoute
   '/_main/community': typeof MainCommunityRoute
@@ -1869,6 +1579,7 @@ export interface FileRoutesById {
   '/_main/signup': typeof MainSignupRoute
   '/_main/use-cases': typeof MainUseCasesRoute
   '/_main/waitlist': typeof MainWaitlistRoute
+  '/demo/$': typeof DemoSplatRoute
   '/v2/chaser': typeof V2ChaserRoute
   '/v2/documents': typeof V2DocumentsRoute
   '/v2/exceptions': typeof V2ExceptionsRoute
@@ -1876,6 +1587,7 @@ export interface FileRoutesById {
   '/v2/review': typeof V2ReviewRoute
   '/v2/settings': typeof V2SettingsRoute
   '/_main/': typeof MainIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/v2/': typeof V2IndexRoute
   '/_adminAuth/admin/_protected': typeof AdminAuthAdminProtectedRouteWithChildren
   '/_adminAuth/admin/login': typeof AdminAuthAdminLoginRoute
@@ -1994,24 +1706,6 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/working-papers': typeof CaAuthCaPortalWorkingPapersRoute
   '/_caAuth/ca/auth/callback': typeof CaAuthCaAuthCallbackRoute
   '/_caAuth/ca/invite/accept': typeof CaAuthCaInviteAcceptRoute
-  '/_main/_demoGate/demo/banking': typeof MainDemoGateDemoBankingRoute
-  '/_main/_demoGate/demo/ca': typeof MainDemoGateDemoCaRoute
-  '/_main/_demoGate/demo/ca-partner': typeof MainDemoGateDemoCaPartnerRoute
-  '/_main/_demoGate/demo/cockpit': typeof MainDemoGateDemoCockpitRoute
-  '/_main/_demoGate/demo/cost': typeof MainDemoGateDemoCostRoute
-  '/_main/_demoGate/demo/dashboard': typeof MainDemoGateDemoDashboardRoute
-  '/_main/_demoGate/demo/decision-simulator': typeof MainDemoGateDemoDecisionSimulatorRoute
-  '/_main/_demoGate/demo/fynny': typeof MainDemoGateDemoFynnyRoute
-  '/_main/_demoGate/demo/governance': typeof MainDemoGateDemoGovernanceRoute
-  '/_main/_demoGate/demo/hr': typeof MainDemoGateDemoHrRoute
-  '/_main/_demoGate/demo/investor': typeof MainDemoGateDemoInvestorRoute
-  '/_main/_demoGate/demo/liquidity': typeof MainDemoGateDemoLiquidityRoute
-  '/_main/_demoGate/demo/login': typeof MainDemoGateDemoLoginRoute
-  '/_main/_demoGate/demo/market-growth': typeof MainDemoGateDemoMarketGrowthRoute
-  '/_main/_demoGate/demo/onboarding': typeof MainDemoGateDemoOnboardingRoute
-  '/_main/_demoGate/demo/reports': typeof MainDemoGateDemoReportsRoute
-  '/_main/_demoGate/demo/revenue': typeof MainDemoGateDemoRevenueRoute
-  '/_main/_demoGate/demo/upload': typeof MainDemoGateDemoUploadRoute
   '/_main/dashboard/reports/$id': typeof MainDashboardReportsIdRoute
   '/_main/dashboard/reports/books': typeof MainDashboardReportsBooksRoute
   '/_main/dashboard/settings/billing': typeof MainDashboardSettingsBillingRoute
@@ -2027,7 +1721,6 @@ export interface FileRoutesById {
   '/_main/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
   '/_adminAuth/admin/_protected/': typeof AdminAuthAdminProtectedIndexRoute
   '/_caAuth/ca/_portal/': typeof CaAuthCaPortalIndexRoute
-  '/_main/_demoGate/demo/': typeof MainDemoGateDemoIndexRoute
   '/_main/dashboard/reports/': typeof MainDashboardReportsIndexRoute
   '/_main/dashboard/settings/': typeof MainDashboardSettingsIndexRoute
   '/_adminAuth/admin/_protected/blog/new': typeof AdminAuthAdminProtectedBlogNewRoute
@@ -2044,27 +1737,11 @@ export interface FileRoutesById {
   '/_caAuth/ca/_portal/settings/defaults': typeof CaAuthCaPortalSettingsDefaultsRoute
   '/_caAuth/ca/_portal/settings/notifications': typeof CaAuthCaPortalSettingsNotificationsRoute
   '/_caAuth/ca/_portal/settings/team': typeof CaAuthCaPortalSettingsTeamRoute
-  '/_main/_demoGate/demo/bank/$id': typeof MainDemoGateDemoBankIdRoute
-  '/_main/_demoGate/demo/customers/$id': typeof MainDemoGateDemoCustomersIdRoute
-  '/_main/_demoGate/demo/deals/$id': typeof MainDemoGateDemoDealsIdRoute
-  '/_main/_demoGate/demo/employees/$id': typeof MainDemoGateDemoEmployeesIdRoute
-  '/_main/_demoGate/demo/expenses/$id': typeof MainDemoGateDemoExpensesIdRoute
-  '/_main/_demoGate/demo/gst/$id': typeof MainDemoGateDemoGstIdRoute
-  '/_main/_demoGate/demo/insurance/$id': typeof MainDemoGateDemoInsuranceIdRoute
-  '/_main/_demoGate/demo/invoices/$id': typeof MainDemoGateDemoInvoicesIdRoute
-  '/_main/_demoGate/demo/risks/$id': typeof MainDemoGateDemoRisksIdRoute
-  '/_main/_demoGate/demo/vendors/$id': typeof MainDemoGateDemoVendorsIdRoute
   '/_adminAuth/admin/_protected/blog/': typeof AdminAuthAdminProtectedBlogIndexRoute
   '/_adminAuth/admin/_protected/support/': typeof AdminAuthAdminProtectedSupportIndexRoute
   '/_adminAuth/admin/_protected/users/': typeof AdminAuthAdminProtectedUsersIndexRoute
   '/_caAuth/ca/_portal/clients/': typeof CaAuthCaPortalClientsIndexRoute
   '/_caAuth/ca/_portal/settings/': typeof CaAuthCaPortalSettingsIndexRoute
-  '/_main/_demoGate/demo/customers/': typeof MainDemoGateDemoCustomersIndexRoute
-  '/_main/_demoGate/demo/employees/': typeof MainDemoGateDemoEmployeesIndexRoute
-  '/_main/_demoGate/demo/expenses/': typeof MainDemoGateDemoExpensesIndexRoute
-  '/_main/_demoGate/demo/gst/': typeof MainDemoGateDemoGstIndexRoute
-  '/_main/_demoGate/demo/invoices/': typeof MainDemoGateDemoInvoicesIndexRoute
-  '/_main/_demoGate/demo/vendors/': typeof MainDemoGateDemoVendorsIndexRoute
   '/_adminAuth/admin/_protected/blog/$postId/edit': typeof AdminAuthAdminProtectedBlogPostIdEditRoute
 }
 export interface FileRouteTypes {
@@ -2086,12 +1763,14 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/demo/$'
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
     | '/v2/onboarding'
     | '/v2/review'
     | '/v2/settings'
+    | '/demo/'
     | '/v2/'
     | '/admin'
     | '/admin/login'
@@ -2210,24 +1889,6 @@ export interface FileRouteTypes {
     | '/ca/working-papers'
     | '/ca/auth/callback'
     | '/ca/invite/accept'
-    | '/demo/banking'
-    | '/demo/ca'
-    | '/demo/ca-partner'
-    | '/demo/cockpit'
-    | '/demo/cost'
-    | '/demo/dashboard'
-    | '/demo/decision-simulator'
-    | '/demo/fynny'
-    | '/demo/governance'
-    | '/demo/hr'
-    | '/demo/investor'
-    | '/demo/liquidity'
-    | '/demo/login'
-    | '/demo/market-growth'
-    | '/demo/onboarding'
-    | '/demo/reports'
-    | '/demo/revenue'
-    | '/demo/upload'
     | '/dashboard/reports/$id'
     | '/dashboard/reports/books'
     | '/dashboard/settings/billing'
@@ -2243,7 +1904,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/team'
     | '/admin/'
     | '/ca/'
-    | '/demo/'
     | '/dashboard/reports/'
     | '/dashboard/settings/'
     | '/admin/blog/new'
@@ -2260,27 +1920,11 @@ export interface FileRouteTypes {
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
-    | '/demo/bank/$id'
-    | '/demo/customers/$id'
-    | '/demo/deals/$id'
-    | '/demo/employees/$id'
-    | '/demo/expenses/$id'
-    | '/demo/gst/$id'
-    | '/demo/insurance/$id'
-    | '/demo/invoices/$id'
-    | '/demo/risks/$id'
-    | '/demo/vendors/$id'
     | '/admin/blog/'
     | '/admin/support/'
     | '/admin/users/'
     | '/ca/clients/'
     | '/ca/settings/'
-    | '/demo/customers/'
-    | '/demo/employees/'
-    | '/demo/expenses/'
-    | '/demo/gst/'
-    | '/demo/invoices/'
-    | '/demo/vendors/'
     | '/admin/blog/$postId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2299,12 +1943,14 @@ export interface FileRouteTypes {
     | '/signup'
     | '/use-cases'
     | '/waitlist'
+    | '/demo/$'
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
     | '/v2/onboarding'
     | '/v2/review'
     | '/v2/settings'
+    | '/demo'
     | '/v2'
     | '/admin/login'
     | '/blog-admin/editor'
@@ -2420,24 +2066,6 @@ export interface FileRouteTypes {
     | '/ca/working-papers'
     | '/ca/auth/callback'
     | '/ca/invite/accept'
-    | '/demo/banking'
-    | '/demo/ca'
-    | '/demo/ca-partner'
-    | '/demo/cockpit'
-    | '/demo/cost'
-    | '/demo/dashboard'
-    | '/demo/decision-simulator'
-    | '/demo/fynny'
-    | '/demo/governance'
-    | '/demo/hr'
-    | '/demo/investor'
-    | '/demo/liquidity'
-    | '/demo/login'
-    | '/demo/market-growth'
-    | '/demo/onboarding'
-    | '/demo/reports'
-    | '/demo/revenue'
-    | '/demo/upload'
     | '/dashboard/reports/$id'
     | '/dashboard/reports/books'
     | '/dashboard/settings/billing'
@@ -2453,7 +2081,6 @@ export interface FileRouteTypes {
     | '/dashboard/settings/team'
     | '/admin'
     | '/ca'
-    | '/demo'
     | '/dashboard/reports'
     | '/dashboard/settings'
     | '/admin/blog/new'
@@ -2470,27 +2097,11 @@ export interface FileRouteTypes {
     | '/ca/settings/defaults'
     | '/ca/settings/notifications'
     | '/ca/settings/team'
-    | '/demo/bank/$id'
-    | '/demo/customers/$id'
-    | '/demo/deals/$id'
-    | '/demo/employees/$id'
-    | '/demo/expenses/$id'
-    | '/demo/gst/$id'
-    | '/demo/insurance/$id'
-    | '/demo/invoices/$id'
-    | '/demo/risks/$id'
-    | '/demo/vendors/$id'
     | '/admin/blog'
     | '/admin/support'
     | '/admin/users'
     | '/ca/clients'
     | '/ca/settings'
-    | '/demo/customers'
-    | '/demo/employees'
-    | '/demo/expenses'
-    | '/demo/gst'
-    | '/demo/invoices'
-    | '/demo/vendors'
     | '/admin/blog/$postId/edit'
   id:
     | '__root__'
@@ -2500,7 +2111,6 @@ export interface FileRouteTypes {
     | '/_internalAdmin'
     | '/_main'
     | '/v2'
-    | '/_main/_demoGate'
     | '/_main/about'
     | '/_main/ca-firms'
     | '/_main/community'
@@ -2515,6 +2125,7 @@ export interface FileRouteTypes {
     | '/_main/signup'
     | '/_main/use-cases'
     | '/_main/waitlist'
+    | '/demo/$'
     | '/v2/chaser'
     | '/v2/documents'
     | '/v2/exceptions'
@@ -2522,6 +2133,7 @@ export interface FileRouteTypes {
     | '/v2/review'
     | '/v2/settings'
     | '/_main/'
+    | '/demo/'
     | '/v2/'
     | '/_adminAuth/admin/_protected'
     | '/_adminAuth/admin/login'
@@ -2640,24 +2252,6 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/working-papers'
     | '/_caAuth/ca/auth/callback'
     | '/_caAuth/ca/invite/accept'
-    | '/_main/_demoGate/demo/banking'
-    | '/_main/_demoGate/demo/ca'
-    | '/_main/_demoGate/demo/ca-partner'
-    | '/_main/_demoGate/demo/cockpit'
-    | '/_main/_demoGate/demo/cost'
-    | '/_main/_demoGate/demo/dashboard'
-    | '/_main/_demoGate/demo/decision-simulator'
-    | '/_main/_demoGate/demo/fynny'
-    | '/_main/_demoGate/demo/governance'
-    | '/_main/_demoGate/demo/hr'
-    | '/_main/_demoGate/demo/investor'
-    | '/_main/_demoGate/demo/liquidity'
-    | '/_main/_demoGate/demo/login'
-    | '/_main/_demoGate/demo/market-growth'
-    | '/_main/_demoGate/demo/onboarding'
-    | '/_main/_demoGate/demo/reports'
-    | '/_main/_demoGate/demo/revenue'
-    | '/_main/_demoGate/demo/upload'
     | '/_main/dashboard/reports/$id'
     | '/_main/dashboard/reports/books'
     | '/_main/dashboard/settings/billing'
@@ -2673,7 +2267,6 @@ export interface FileRouteTypes {
     | '/_main/dashboard/settings/team'
     | '/_adminAuth/admin/_protected/'
     | '/_caAuth/ca/_portal/'
-    | '/_main/_demoGate/demo/'
     | '/_main/dashboard/reports/'
     | '/_main/dashboard/settings/'
     | '/_adminAuth/admin/_protected/blog/new'
@@ -2690,27 +2283,11 @@ export interface FileRouteTypes {
     | '/_caAuth/ca/_portal/settings/defaults'
     | '/_caAuth/ca/_portal/settings/notifications'
     | '/_caAuth/ca/_portal/settings/team'
-    | '/_main/_demoGate/demo/bank/$id'
-    | '/_main/_demoGate/demo/customers/$id'
-    | '/_main/_demoGate/demo/deals/$id'
-    | '/_main/_demoGate/demo/employees/$id'
-    | '/_main/_demoGate/demo/expenses/$id'
-    | '/_main/_demoGate/demo/gst/$id'
-    | '/_main/_demoGate/demo/insurance/$id'
-    | '/_main/_demoGate/demo/invoices/$id'
-    | '/_main/_demoGate/demo/risks/$id'
-    | '/_main/_demoGate/demo/vendors/$id'
     | '/_adminAuth/admin/_protected/blog/'
     | '/_adminAuth/admin/_protected/support/'
     | '/_adminAuth/admin/_protected/users/'
     | '/_caAuth/ca/_portal/clients/'
     | '/_caAuth/ca/_portal/settings/'
-    | '/_main/_demoGate/demo/customers/'
-    | '/_main/_demoGate/demo/employees/'
-    | '/_main/_demoGate/demo/expenses/'
-    | '/_main/_demoGate/demo/gst/'
-    | '/_main/_demoGate/demo/invoices/'
-    | '/_main/_demoGate/demo/vendors/'
     | '/_adminAuth/admin/_protected/blog/$postId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -2721,6 +2298,8 @@ export interface RootRouteChildren {
   InternalAdminRoute: typeof InternalAdminRouteWithChildren
   MainRoute: typeof MainRouteWithChildren
   V2Route: typeof V2RouteWithChildren
+  DemoSplatRoute: typeof DemoSplatRoute
+  DemoIndexRoute: typeof DemoIndexRoute
   ApiPublicCaAutoEscalateChasersRoute: typeof ApiPublicCaAutoEscalateChasersRoute
   ApiPublicCaAutoFollowupRoute: typeof ApiPublicCaAutoFollowupRoute
   ApiPublicCaBrainChaserLearningRoute: typeof ApiPublicCaBrainChaserLearningRoute
@@ -2784,13 +2363,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof MainIndexRouteImport
-      parentRoute: typeof MainRoute
-    }
-    '/_main/_demoGate': {
-      id: '/_main/_demoGate'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof MainDemoGateRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/about': {
@@ -2890,6 +2462,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/waitlist'
       preLoaderRoute: typeof MainWaitlistRouteImport
       parentRoute: typeof MainRoute
+    }
+    '/demo/': {
+      id: '/demo/'
+      path: '/demo'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/$': {
+      id: '/demo/$'
+      path: '/demo/$'
+      fullPath: '/demo/$'
+      preLoaderRoute: typeof DemoSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/v2/': {
       id: '/v2/'
@@ -3773,139 +3359,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CaAuthCaInviteAcceptRouteImport
       parentRoute: typeof CaAuthRoute
     }
-    '/_main/_demoGate/demo/': {
-      id: '/_main/_demoGate/demo/'
-      path: '/demo'
-      fullPath: '/demo/'
-      preLoaderRoute: typeof MainDemoGateDemoIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/banking': {
-      id: '/_main/_demoGate/demo/banking'
-      path: '/demo/banking'
-      fullPath: '/demo/banking'
-      preLoaderRoute: typeof MainDemoGateDemoBankingRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/ca': {
-      id: '/_main/_demoGate/demo/ca'
-      path: '/demo/ca'
-      fullPath: '/demo/ca'
-      preLoaderRoute: typeof MainDemoGateDemoCaRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/ca-partner': {
-      id: '/_main/_demoGate/demo/ca-partner'
-      path: '/demo/ca-partner'
-      fullPath: '/demo/ca-partner'
-      preLoaderRoute: typeof MainDemoGateDemoCaPartnerRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/cockpit': {
-      id: '/_main/_demoGate/demo/cockpit'
-      path: '/demo/cockpit'
-      fullPath: '/demo/cockpit'
-      preLoaderRoute: typeof MainDemoGateDemoCockpitRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/cost': {
-      id: '/_main/_demoGate/demo/cost'
-      path: '/demo/cost'
-      fullPath: '/demo/cost'
-      preLoaderRoute: typeof MainDemoGateDemoCostRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/dashboard': {
-      id: '/_main/_demoGate/demo/dashboard'
-      path: '/demo/dashboard'
-      fullPath: '/demo/dashboard'
-      preLoaderRoute: typeof MainDemoGateDemoDashboardRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/decision-simulator': {
-      id: '/_main/_demoGate/demo/decision-simulator'
-      path: '/demo/decision-simulator'
-      fullPath: '/demo/decision-simulator'
-      preLoaderRoute: typeof MainDemoGateDemoDecisionSimulatorRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/fynny': {
-      id: '/_main/_demoGate/demo/fynny'
-      path: '/demo/fynny'
-      fullPath: '/demo/fynny'
-      preLoaderRoute: typeof MainDemoGateDemoFynnyRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/governance': {
-      id: '/_main/_demoGate/demo/governance'
-      path: '/demo/governance'
-      fullPath: '/demo/governance'
-      preLoaderRoute: typeof MainDemoGateDemoGovernanceRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/hr': {
-      id: '/_main/_demoGate/demo/hr'
-      path: '/demo/hr'
-      fullPath: '/demo/hr'
-      preLoaderRoute: typeof MainDemoGateDemoHrRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/investor': {
-      id: '/_main/_demoGate/demo/investor'
-      path: '/demo/investor'
-      fullPath: '/demo/investor'
-      preLoaderRoute: typeof MainDemoGateDemoInvestorRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/liquidity': {
-      id: '/_main/_demoGate/demo/liquidity'
-      path: '/demo/liquidity'
-      fullPath: '/demo/liquidity'
-      preLoaderRoute: typeof MainDemoGateDemoLiquidityRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/login': {
-      id: '/_main/_demoGate/demo/login'
-      path: '/demo/login'
-      fullPath: '/demo/login'
-      preLoaderRoute: typeof MainDemoGateDemoLoginRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/market-growth': {
-      id: '/_main/_demoGate/demo/market-growth'
-      path: '/demo/market-growth'
-      fullPath: '/demo/market-growth'
-      preLoaderRoute: typeof MainDemoGateDemoMarketGrowthRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/onboarding': {
-      id: '/_main/_demoGate/demo/onboarding'
-      path: '/demo/onboarding'
-      fullPath: '/demo/onboarding'
-      preLoaderRoute: typeof MainDemoGateDemoOnboardingRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/reports': {
-      id: '/_main/_demoGate/demo/reports'
-      path: '/demo/reports'
-      fullPath: '/demo/reports'
-      preLoaderRoute: typeof MainDemoGateDemoReportsRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/revenue': {
-      id: '/_main/_demoGate/demo/revenue'
-      path: '/demo/revenue'
-      fullPath: '/demo/revenue'
-      preLoaderRoute: typeof MainDemoGateDemoRevenueRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/upload': {
-      id: '/_main/_demoGate/demo/upload'
-      path: '/demo/upload'
-      fullPath: '/demo/upload'
-      preLoaderRoute: typeof MainDemoGateDemoUploadRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
     '/_main/dashboard/reports/': {
       id: '/_main/dashboard/reports/'
       path: '/dashboard/reports'
@@ -4143,118 +3596,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ca/settings/team'
       preLoaderRoute: typeof CaAuthCaPortalSettingsTeamRouteImport
       parentRoute: typeof CaAuthCaPortalRoute
-    }
-    '/_main/_demoGate/demo/bank/$id': {
-      id: '/_main/_demoGate/demo/bank/$id'
-      path: '/demo/bank/$id'
-      fullPath: '/demo/bank/$id'
-      preLoaderRoute: typeof MainDemoGateDemoBankIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/customers/': {
-      id: '/_main/_demoGate/demo/customers/'
-      path: '/demo/customers'
-      fullPath: '/demo/customers/'
-      preLoaderRoute: typeof MainDemoGateDemoCustomersIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/customers/$id': {
-      id: '/_main/_demoGate/demo/customers/$id'
-      path: '/demo/customers/$id'
-      fullPath: '/demo/customers/$id'
-      preLoaderRoute: typeof MainDemoGateDemoCustomersIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/deals/$id': {
-      id: '/_main/_demoGate/demo/deals/$id'
-      path: '/demo/deals/$id'
-      fullPath: '/demo/deals/$id'
-      preLoaderRoute: typeof MainDemoGateDemoDealsIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/employees/': {
-      id: '/_main/_demoGate/demo/employees/'
-      path: '/demo/employees'
-      fullPath: '/demo/employees/'
-      preLoaderRoute: typeof MainDemoGateDemoEmployeesIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/employees/$id': {
-      id: '/_main/_demoGate/demo/employees/$id'
-      path: '/demo/employees/$id'
-      fullPath: '/demo/employees/$id'
-      preLoaderRoute: typeof MainDemoGateDemoEmployeesIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/expenses/': {
-      id: '/_main/_demoGate/demo/expenses/'
-      path: '/demo/expenses'
-      fullPath: '/demo/expenses/'
-      preLoaderRoute: typeof MainDemoGateDemoExpensesIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/expenses/$id': {
-      id: '/_main/_demoGate/demo/expenses/$id'
-      path: '/demo/expenses/$id'
-      fullPath: '/demo/expenses/$id'
-      preLoaderRoute: typeof MainDemoGateDemoExpensesIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/gst/': {
-      id: '/_main/_demoGate/demo/gst/'
-      path: '/demo/gst'
-      fullPath: '/demo/gst/'
-      preLoaderRoute: typeof MainDemoGateDemoGstIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/gst/$id': {
-      id: '/_main/_demoGate/demo/gst/$id'
-      path: '/demo/gst/$id'
-      fullPath: '/demo/gst/$id'
-      preLoaderRoute: typeof MainDemoGateDemoGstIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/insurance/$id': {
-      id: '/_main/_demoGate/demo/insurance/$id'
-      path: '/demo/insurance/$id'
-      fullPath: '/demo/insurance/$id'
-      preLoaderRoute: typeof MainDemoGateDemoInsuranceIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/invoices/': {
-      id: '/_main/_demoGate/demo/invoices/'
-      path: '/demo/invoices'
-      fullPath: '/demo/invoices/'
-      preLoaderRoute: typeof MainDemoGateDemoInvoicesIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/invoices/$id': {
-      id: '/_main/_demoGate/demo/invoices/$id'
-      path: '/demo/invoices/$id'
-      fullPath: '/demo/invoices/$id'
-      preLoaderRoute: typeof MainDemoGateDemoInvoicesIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/risks/$id': {
-      id: '/_main/_demoGate/demo/risks/$id'
-      path: '/demo/risks/$id'
-      fullPath: '/demo/risks/$id'
-      preLoaderRoute: typeof MainDemoGateDemoRisksIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/vendors/': {
-      id: '/_main/_demoGate/demo/vendors/'
-      path: '/demo/vendors'
-      fullPath: '/demo/vendors/'
-      preLoaderRoute: typeof MainDemoGateDemoVendorsIndexRouteImport
-      parentRoute: typeof MainDemoGateRoute
-    }
-    '/_main/_demoGate/demo/vendors/$id': {
-      id: '/_main/_demoGate/demo/vendors/$id'
-      path: '/demo/vendors/$id'
-      fullPath: '/demo/vendors/$id'
-      preLoaderRoute: typeof MainDemoGateDemoVendorsIdRouteImport
-      parentRoute: typeof MainDemoGateRoute
     }
     '/_adminAuth/admin/_protected/blog/$postId/edit': {
       id: '/_adminAuth/admin/_protected/blog/$postId/edit'
@@ -4516,87 +3857,6 @@ const InternalAdminRouteWithChildren = InternalAdminRoute._addFileChildren(
   InternalAdminRouteChildren,
 )
 
-interface MainDemoGateRouteChildren {
-  MainDemoGateDemoBankingRoute: typeof MainDemoGateDemoBankingRoute
-  MainDemoGateDemoCaRoute: typeof MainDemoGateDemoCaRoute
-  MainDemoGateDemoCaPartnerRoute: typeof MainDemoGateDemoCaPartnerRoute
-  MainDemoGateDemoCockpitRoute: typeof MainDemoGateDemoCockpitRoute
-  MainDemoGateDemoCostRoute: typeof MainDemoGateDemoCostRoute
-  MainDemoGateDemoDashboardRoute: typeof MainDemoGateDemoDashboardRoute
-  MainDemoGateDemoDecisionSimulatorRoute: typeof MainDemoGateDemoDecisionSimulatorRoute
-  MainDemoGateDemoFynnyRoute: typeof MainDemoGateDemoFynnyRoute
-  MainDemoGateDemoGovernanceRoute: typeof MainDemoGateDemoGovernanceRoute
-  MainDemoGateDemoHrRoute: typeof MainDemoGateDemoHrRoute
-  MainDemoGateDemoInvestorRoute: typeof MainDemoGateDemoInvestorRoute
-  MainDemoGateDemoLiquidityRoute: typeof MainDemoGateDemoLiquidityRoute
-  MainDemoGateDemoLoginRoute: typeof MainDemoGateDemoLoginRoute
-  MainDemoGateDemoMarketGrowthRoute: typeof MainDemoGateDemoMarketGrowthRoute
-  MainDemoGateDemoOnboardingRoute: typeof MainDemoGateDemoOnboardingRoute
-  MainDemoGateDemoReportsRoute: typeof MainDemoGateDemoReportsRoute
-  MainDemoGateDemoRevenueRoute: typeof MainDemoGateDemoRevenueRoute
-  MainDemoGateDemoUploadRoute: typeof MainDemoGateDemoUploadRoute
-  MainDemoGateDemoIndexRoute: typeof MainDemoGateDemoIndexRoute
-  MainDemoGateDemoBankIdRoute: typeof MainDemoGateDemoBankIdRoute
-  MainDemoGateDemoCustomersIdRoute: typeof MainDemoGateDemoCustomersIdRoute
-  MainDemoGateDemoDealsIdRoute: typeof MainDemoGateDemoDealsIdRoute
-  MainDemoGateDemoEmployeesIdRoute: typeof MainDemoGateDemoEmployeesIdRoute
-  MainDemoGateDemoExpensesIdRoute: typeof MainDemoGateDemoExpensesIdRoute
-  MainDemoGateDemoGstIdRoute: typeof MainDemoGateDemoGstIdRoute
-  MainDemoGateDemoInsuranceIdRoute: typeof MainDemoGateDemoInsuranceIdRoute
-  MainDemoGateDemoInvoicesIdRoute: typeof MainDemoGateDemoInvoicesIdRoute
-  MainDemoGateDemoRisksIdRoute: typeof MainDemoGateDemoRisksIdRoute
-  MainDemoGateDemoVendorsIdRoute: typeof MainDemoGateDemoVendorsIdRoute
-  MainDemoGateDemoCustomersIndexRoute: typeof MainDemoGateDemoCustomersIndexRoute
-  MainDemoGateDemoEmployeesIndexRoute: typeof MainDemoGateDemoEmployeesIndexRoute
-  MainDemoGateDemoExpensesIndexRoute: typeof MainDemoGateDemoExpensesIndexRoute
-  MainDemoGateDemoGstIndexRoute: typeof MainDemoGateDemoGstIndexRoute
-  MainDemoGateDemoInvoicesIndexRoute: typeof MainDemoGateDemoInvoicesIndexRoute
-  MainDemoGateDemoVendorsIndexRoute: typeof MainDemoGateDemoVendorsIndexRoute
-}
-
-const MainDemoGateRouteChildren: MainDemoGateRouteChildren = {
-  MainDemoGateDemoBankingRoute: MainDemoGateDemoBankingRoute,
-  MainDemoGateDemoCaRoute: MainDemoGateDemoCaRoute,
-  MainDemoGateDemoCaPartnerRoute: MainDemoGateDemoCaPartnerRoute,
-  MainDemoGateDemoCockpitRoute: MainDemoGateDemoCockpitRoute,
-  MainDemoGateDemoCostRoute: MainDemoGateDemoCostRoute,
-  MainDemoGateDemoDashboardRoute: MainDemoGateDemoDashboardRoute,
-  MainDemoGateDemoDecisionSimulatorRoute:
-    MainDemoGateDemoDecisionSimulatorRoute,
-  MainDemoGateDemoFynnyRoute: MainDemoGateDemoFynnyRoute,
-  MainDemoGateDemoGovernanceRoute: MainDemoGateDemoGovernanceRoute,
-  MainDemoGateDemoHrRoute: MainDemoGateDemoHrRoute,
-  MainDemoGateDemoInvestorRoute: MainDemoGateDemoInvestorRoute,
-  MainDemoGateDemoLiquidityRoute: MainDemoGateDemoLiquidityRoute,
-  MainDemoGateDemoLoginRoute: MainDemoGateDemoLoginRoute,
-  MainDemoGateDemoMarketGrowthRoute: MainDemoGateDemoMarketGrowthRoute,
-  MainDemoGateDemoOnboardingRoute: MainDemoGateDemoOnboardingRoute,
-  MainDemoGateDemoReportsRoute: MainDemoGateDemoReportsRoute,
-  MainDemoGateDemoRevenueRoute: MainDemoGateDemoRevenueRoute,
-  MainDemoGateDemoUploadRoute: MainDemoGateDemoUploadRoute,
-  MainDemoGateDemoIndexRoute: MainDemoGateDemoIndexRoute,
-  MainDemoGateDemoBankIdRoute: MainDemoGateDemoBankIdRoute,
-  MainDemoGateDemoCustomersIdRoute: MainDemoGateDemoCustomersIdRoute,
-  MainDemoGateDemoDealsIdRoute: MainDemoGateDemoDealsIdRoute,
-  MainDemoGateDemoEmployeesIdRoute: MainDemoGateDemoEmployeesIdRoute,
-  MainDemoGateDemoExpensesIdRoute: MainDemoGateDemoExpensesIdRoute,
-  MainDemoGateDemoGstIdRoute: MainDemoGateDemoGstIdRoute,
-  MainDemoGateDemoInsuranceIdRoute: MainDemoGateDemoInsuranceIdRoute,
-  MainDemoGateDemoInvoicesIdRoute: MainDemoGateDemoInvoicesIdRoute,
-  MainDemoGateDemoRisksIdRoute: MainDemoGateDemoRisksIdRoute,
-  MainDemoGateDemoVendorsIdRoute: MainDemoGateDemoVendorsIdRoute,
-  MainDemoGateDemoCustomersIndexRoute: MainDemoGateDemoCustomersIndexRoute,
-  MainDemoGateDemoEmployeesIndexRoute: MainDemoGateDemoEmployeesIndexRoute,
-  MainDemoGateDemoExpensesIndexRoute: MainDemoGateDemoExpensesIndexRoute,
-  MainDemoGateDemoGstIndexRoute: MainDemoGateDemoGstIndexRoute,
-  MainDemoGateDemoInvoicesIndexRoute: MainDemoGateDemoInvoicesIndexRoute,
-  MainDemoGateDemoVendorsIndexRoute: MainDemoGateDemoVendorsIndexRoute,
-}
-
-const MainDemoGateRouteWithChildren = MainDemoGateRoute._addFileChildren(
-  MainDemoGateRouteChildren,
-)
-
 interface MainDashboardSettingsRouteChildren {
   MainDashboardSettingsBillingRoute: typeof MainDashboardSettingsBillingRoute
   MainDashboardSettingsBusinessRoute: typeof MainDashboardSettingsBusinessRoute
@@ -4635,7 +3895,6 @@ const MainDashboardSettingsRouteWithChildren =
   )
 
 interface MainRouteChildren {
-  MainDemoGateRoute: typeof MainDemoGateRouteWithChildren
   MainAboutRoute: typeof MainAboutRoute
   MainCaFirmsRoute: typeof MainCaFirmsRoute
   MainCommunityRoute: typeof MainCommunityRoute
@@ -4695,7 +3954,6 @@ interface MainRouteChildren {
 }
 
 const MainRouteChildren: MainRouteChildren = {
-  MainDemoGateRoute: MainDemoGateRouteWithChildren,
   MainAboutRoute: MainAboutRoute,
   MainCaFirmsRoute: MainCaFirmsRoute,
   MainCommunityRoute: MainCommunityRoute,
@@ -4793,6 +4051,8 @@ const rootRouteChildren: RootRouteChildren = {
   InternalAdminRoute: InternalAdminRouteWithChildren,
   MainRoute: MainRouteWithChildren,
   V2Route: V2RouteWithChildren,
+  DemoSplatRoute: DemoSplatRoute,
+  DemoIndexRoute: DemoIndexRoute,
   ApiPublicCaAutoEscalateChasersRoute: ApiPublicCaAutoEscalateChasersRoute,
   ApiPublicCaAutoFollowupRoute: ApiPublicCaAutoFollowupRoute,
   ApiPublicCaBrainChaserLearningRoute: ApiPublicCaBrainChaserLearningRoute,

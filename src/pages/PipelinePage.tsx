@@ -153,7 +153,7 @@ export default function PipelinePage() {
                 </p>
                 <div className="acts" style={{ justifyContent: "center" }}>
                   <Link to="/signup" className="fh-btn fh-btn-primary">Start 30-day trial</Link>
-                  <Link to="/demo" className="fh-btn fh-btn-ghost">See the live demo</Link>
+                  <Link to="/waitlist" className="fh-btn fh-btn-ghost">Book a demo</Link>
                 </div>
               </div>
             </Reveal>

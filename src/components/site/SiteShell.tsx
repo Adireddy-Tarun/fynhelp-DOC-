@@ -42,7 +42,7 @@ export function SiteFooter() {
             <Link to="/pipeline">The pipeline</Link>
             <Link to="/pricing">Pricing</Link>
             <Link to="/#faq">FAQ</Link>
-            <Link to="/demo">Live demo</Link>
+            <Link to="/waitlist">Book a demo</Link>
           </div>
           <div>
             <h4>Modules</h4>
