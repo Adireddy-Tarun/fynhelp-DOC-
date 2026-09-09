@@ -413,9 +413,14 @@ function lagDays(snapshot: unknown): number[] {
 
 export async function learnRecon(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
+  let signalsUsed = 0;
   const since = new Date(Date.now() - 180 * DAY).toISOString();
 
   for (const firm of firms) {
+    const feed = signalsByClient(
+      await loadSignals(admin, firm.id, ["recon_match_accepted", "exception_resolved"], 180),
+    );
+
     for (const businessId of firm.business_ids) {
       // HARD CLIENT SCOPE — firm + client on every read.
       const { data: runs } = await admin
@@ -427,21 +432,39 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
         .order("run_at", { ascending: false })
         .limit(30);
 
-      if (!runs?.length) continue;
+      const clientSignals = feed.get(businessId) ?? [];
+      const accepted = clientSignals.filter((s) => s.event_type === "recon_match_accepted");
+      const resolved = clientSignals.filter((s) => s.event_type === "exception_resolved");
+
+      if (!runs?.length && accepted.length < 5) continue;
 
       const variances: number[] = [];
       const lags: number[] = [];
       let items = 0;
       let matched = 0;
       let mismatched = 0;
-      for (const r of runs as { total_items: number; matched: number; mismatched: number; snapshot: unknown }[]) {
+      for (const r of (runs ?? []) as { total_items: number; matched: number; mismatched: number; snapshot: unknown }[]) {
         items += Number(r.total_items ?? 0);
         matched += Number(r.matched ?? 0);
         mismatched += Number(r.mismatched ?? 0);
         variances.push(...variancePercents(r.snapshot));
         lags.push(...lagDays(r.snapshot));
       }
-      if (items < 5) continue;
+
+      // Accepted matches are the reviewer telling us what "close enough" means.
+      const partialShare = accepted.length
+        ? accepted.filter((s) => s.payload["partial"] === true).length / accepted.length
+        : 0;
+      const fuzzyShare = accepted.length
+        ? accepted.filter((s) => String(s.payload["pass"] ?? "").toLowerCase().includes("fuzzy")).length /
+          accepted.length
+        : 0;
+      const meanConfidence = avg(
+        accepted.map((s) => num(s.payload, "confidence")).filter((n): n is number => n != null),
+      );
+      signalsUsed += accepted.length + resolved.length;
+
+      if (items < 5 && accepted.length < 5) continue;
 
       let tolerance: number;
       if (variances.length >= 5) {
@@ -449,16 +472,37 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
         const sorted = [...variances].sort((a, b) => a - b);
         const p90 = sorted[Math.floor(sorted.length * 0.9)] ?? 0;
         tolerance = p90 <= 0.25 ? 0.5 : p90 <= 1.2 ? 1 : p90 <= 2.2 ? 2 : 3;
+      } else if (accepted.length >= 5) {
+        tolerance = partialShare > 0.3 || fuzzyShare > 0.5 ? 2 : fuzzyShare > 0.2 ? 1 : 0.5;
       } else {
         const mismatchRate = items ? mismatched / items : 0;
         const matchRate = items ? matched / items : 0;
         tolerance = matchRate > 0.95 ? 0.5 : mismatchRate > 0.2 ? 2 : 1;
       }
 
-      const lagAvg = lags.length >= 5 ? avg(lags) : null;
-      const dateWindow = lagAvg == null ? 3 : clamp(Math.ceil(lagAvg) + 1, 1, 15);
+      // Reviewers repeatedly accepting low-confidence matches means our bar is
+      // too strict for this client; a run of exceptions closed as amount
+      // differences means the same thing from the other direction.
+      if (accepted.length >= 5 && meanConfidence != null && meanConfidence < 0.7) {
+        tolerance = Math.min(3, tolerance * 2);
+      }
+      const amountExceptions = resolved.filter((s) =>
+        /amount|value|variance/i.test(String(s.payload["reason_code"] ?? "")),
+      ).length;
+      if (amountExceptions >= 3) tolerance = Math.min(3, tolerance + 0.5);
 
-      const match_preferences = { tolerance_pct: tolerance, date_window_days: dateWindow };
+      const lagAvg = lags.length >= 5 ? avg(lags) : null;
+      const signalLag = avg(
+        resolved.map((s) => num(s.payload, "days_open")).filter((n): n is number => n != null),
+      );
+      const dateWindow =
+        lagAvg != null
+          ? clamp(Math.ceil(lagAvg) + 1, 1, 15)
+          : signalLag != null && resolved.length >= 5
+            ? clamp(Math.ceil(signalLag / 2) + 1, 1, 15)
+            : 3;
+
+      const match_preferences = { tolerance_pct: round(tolerance), date_window_days: dateWindow };
       const problems = auditClientPayload({ match_preferences });
       if (problems.length) {
         await logPrivacySkip(admin, firm.id, businessId, problems, "recon");
@@ -466,11 +510,12 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, { match_preferences });
+      await markSignalsProcessed(admin, clientSignals.map((s) => s.id));
       clientsUpdated += 1;
     }
   }
 
-  return { clients_updated: clientsUpdated };
+  return { clients_updated: clientsUpdated, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
