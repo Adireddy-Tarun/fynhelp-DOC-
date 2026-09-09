@@ -5,7 +5,7 @@ import { useGeneratedReports, useGenerateReport } from "@/hooks/dashboard/useRep
 import { IntelligenceProvider, DEMO_BIZ, type IntelligenceMode } from "@/components/intelligence/DataSource";
 import { IntelPage, IntelCard, ACCENT } from "@/components/intelligence/_primitives";
 import DashboardLayout from "@/components/DashboardLayout";
-import DemoModeBanner from "@/components/demo/DemoModeBanner";
+
 import { toast } from "sonner";
 import {
   TrendingUp, Droplets, Flame, FileText, ArrowLeftRight, IndianRupee,
@@ -534,8 +534,5 @@ export default function ReportsPage({ mode = "live" }: { mode?: IntelligenceMode
       <ReportsContent mode={mode} />
     </IntelligenceProvider>
   );
-  if (mode === "demo") {
-    return <DemoModeBanner>{content}</DemoModeBanner>;
-  }
   return <DashboardLayout>{content}</DashboardLayout>;
 }

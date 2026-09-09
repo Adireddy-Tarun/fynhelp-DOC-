@@ -737,8 +737,8 @@ export default function HomePage() {
                 One workspace for every entity: what came in, what matched, what needs a decision and what is
                 ready for partner sign-off.
               </p>
-              <Link to="/demo" className="fh-btn fh-btn-primary" style={{ marginTop: 24 }}>
-                See the live demo <ArrowRight size={15} />
+              <Link to="/waitlist" className="fh-btn fh-btn-primary" style={{ marginTop: 24 }}>
+                Book a demo <ArrowRight size={15} />
               </Link>
             </div>
           </Reveal>

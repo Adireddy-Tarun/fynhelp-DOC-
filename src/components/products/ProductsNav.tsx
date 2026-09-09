@@ -104,7 +104,7 @@ export default function ProductsNav({
       if (user) {
         navigate("/dashboard/fynny-chat");
       } else {
-        navigate("/demo/fynny");
+        navigate("/waitlist");
       }
       return;
     }

@@ -39,7 +39,7 @@ export default function AgentPage({ slug }: { slug: string }) {
             <Link to="/waitlist" className="fh-btn fh-btn-primary">
               Book a demo <ArrowRight size={15} />
             </Link>
-            <Link to="/demo" className="fh-btn fh-btn-ghost">
+            <Link to="/waitlist" className="fh-btn fh-btn-ghost">
               See it running
             </Link>
           </>

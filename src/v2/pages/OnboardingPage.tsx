@@ -10,12 +10,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Check, Mail, UploadCloud, UserPlus } from "lucide-react";
 import { V } from "../ui";
 import { AgentStatusBadge } from "../agents";
+import { supabase } from "@/integrations/supabase/client";
 import { ENTITY_TYPES, useV2 } from "../store";
 
 const STEPS = ["Your account", "Your firm", "First client", "Gmail", "First document"];
 
 export default function OnboardingPage() {
-  const { session, signIn, saveFirm, addClient, addDoc, completeOnboarding, firm } = useV2();
+  const { session, saveFirm, addClient, addDoc, completeOnboarding, firm } = useV2();
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -25,21 +26,26 @@ export default function OnboardingPage() {
   const [client, setClient] = useState({ name: "", entityType: ENTITY_TYPES[0], gstin: "", contactName: "", email: "", phone: "" });
   const [clientId, setClientId] = useState<string | null>(null);
   const [uploaded, setUploaded] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
 
-  /** One click into the sample practice, so the whole product can be explored immediately. */
-  const demoLogin = () => {
-    signIn("Prajwal Vakode", "partner@mehtaassociates.in");
-    saveFirm({ name: "Mehta and Associates", partnerName: "Prajwal Vakode", email: "partner@mehtaassociates.in", city: "Bengaluru", frn: "012345S", gmailConnected: true });
-    completeOnboarding();
-    toast.success("Sample practice loaded");
-    navigate({ to: "/v2" });
-  };
-
-  const submitAccount = (e: React.FormEvent) => {
+  const submitAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    signIn(account.name.trim(), account.email.trim());
+    setBusy(true);
+    const email = account.email.trim();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: account.password,
+      options: { data: { full_name: account.name.trim() }, emailRedirectTo: `${window.location.origin}/v2` },
+    });
+    if (error && /already/i.test(error.message)) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: account.password });
+      if (signInError) { setBusy(false); toast.error(signInError.message); return; }
+    } else if (error) {
+      setBusy(false); toast.error(error.message); return;
+    }
+    setBusy(false);
     toast.success(`Welcome ${account.name.trim().split(" ")[0] || "in"}`);
     next();
   };
@@ -62,7 +68,7 @@ export default function OnboardingPage() {
   const upload = (files: FileList | null) => {
     if (!files || files.length === 0 || !clientId) return;
     const file = files[0];
-    addDoc(file.name, clientId, "Manual");
+    addDoc(file.name, clientId, "Manual", file);
     setUploaded(file.name);
     toast.success("Extract agent is reading your document");
   };
@@ -113,11 +119,10 @@ export default function OnboardingPage() {
               <Field label="Work email"><input className="v2-input" type="email" required value={account.email} onChange={(e) => setAccount({ ...account, email: e.target.value })} placeholder="you@firm.com" /></Field>
               <Field label="Password"><input className="v2-input" type="password" required minLength={6} value={account.password} onChange={(e) => setAccount({ ...account, password: e.target.value })} placeholder="At least six characters" /></Field>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button className="v2-btn v2-btn-primary" type="submit">Create account</button>
-                <button className="v2-btn v2-btn-ghost" type="button" onClick={demoLogin}>Explore with sample data</button>
+                <button className="v2-btn v2-btn-primary" type="submit" disabled={busy}>{busy ? "Creating" : "Create account"}</button>
               </div>
               <p style={{ fontSize: 12.5, color: V.muted, margin: 0 }}>
-                Exploring drops you straight into a practice with six sample clients, so you can see every screen already alive.
+                Already have a FynHelp practice login? Use the same email and password here and we will bring your practice in.
               </p>
             </form>
           )}

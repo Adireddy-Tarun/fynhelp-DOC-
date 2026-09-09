@@ -324,7 +324,7 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
         {/* GST badge */}
         {gst && (
           <button
-            onClick={() => navigate(isDemo ? "/demo/gst" : "/dashboard/gst")}
+            onClick={() => navigate("/dashboard/gst")}
             style={{
               ...gstBadgeStyle(gst.state),
               padding: isMobile ? "4px 6px" : "3px 9px",
@@ -397,11 +397,6 @@ export default function GlobalHeader({ sidebarOpen, onToggleSidebar, onOpenMobil
               <MenuItem onClick={() => { setMenuOpen(false); navigate("/dashboard/settings/profile"); }}>
                 Profile & Settings
               </MenuItem>
-              {!isDemo && (
-                <MenuItem onClick={() => { setMenuOpen(false); navigate("/demo/liquidity"); }}>
-                  Switch to Demo
-                </MenuItem>
-              )}
               <div style={{ height: 1, background: BORDER, margin: "4px 0" }} />
               <MenuItem onClick={() => { setMenuOpen(false); handleLogout(); }}>
                 Log out
