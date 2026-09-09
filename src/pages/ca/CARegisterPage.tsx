@@ -8,6 +8,7 @@ import HCaptcha from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 import FynLogo from "@/components/FynLogo";
+import { GoogleAuthButton } from "@/components/ca/GoogleAuthButton";
 
 export default function CARegisterPage() {
   const navigate = useNavigate();
@@ -115,6 +116,15 @@ export default function CARegisterPage() {
         </p>
 
         <form onSubmit={handleSubmit} style={{ marginTop: 24, display: "grid", gap: 16 }}>
+          <GoogleAuthButton mode="register" onStart={() => setLoading(true)} />
+          <p style={{ fontFamily: "'Instrument Sans','Inter',system-ui,sans-serif", fontSize: 12, color: "rgba(23,18,8,0.42)", textAlign: "center", margin: "2px 0 0" }}>
+            Your firm profile will be created automatically after Google sign-in.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ flex: 1, height: "1px", background: "rgba(23,18,8,0.09)" }} />
+            <span style={{ fontFamily: "'Instrument Sans','Inter',system-ui,sans-serif", fontSize: 12, color: "rgba(23,18,8,0.38)", fontWeight: 500 }}>or</span>
+            <div style={{ flex: 1, height: "1px", background: "rgba(23,18,8,0.09)" }} />
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <CAField label="Full name" error={errors.caName}>
               <input style={caInputStyle} value={form.caName} onChange={set("caName")} placeholder="CA Anita Rao" />
