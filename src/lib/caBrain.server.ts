@@ -216,6 +216,71 @@ async function upsertClient(admin: Admin, firmId: string, businessId: string, pa
 }
 
 /* ------------------------------------------------------------------ */
+/* Signal feed (ca_brain_events)                                       */
+/* ------------------------------------------------------------------ */
+
+export interface BrainSignal {
+  id: string;
+  business_id: string | null;
+  event_type: string;
+  payload: Record<string, unknown>;
+  created_at: string;
+}
+
+/** Reads a firm's own feedback signals. Firm scope is enforced on every read. */
+export async function loadSignals(
+  admin: Admin,
+  firmId: string,
+  eventTypes: string[],
+  windowDays: number,
+): Promise<BrainSignal[]> {
+  const since = new Date(Date.now() - windowDays * DAY).toISOString();
+  const { data } = await (admin as unknown as Loose)
+    .from("ca_brain_events")
+    .select("id, business_id, event_type, payload, created_at")
+    .eq("ca_firm_id", firmId)
+    .in("event_type", eventTypes)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(20000);
+  return ((data ?? []) as BrainSignal[]).map((r) => ({
+    ...r,
+    payload: (r.payload ?? {}) as Record<string, unknown>,
+  }));
+}
+
+/** Groups signals by client. Rows without a client are dropped. */
+export function signalsByClient(signals: BrainSignal[]): Map<string, BrainSignal[]> {
+  const m = new Map<string, BrainSignal[]>();
+  for (const s of signals) {
+    if (!s.business_id) continue;
+    const list = m.get(s.business_id) ?? [];
+    list.push(s);
+    m.set(s.business_id, list);
+  }
+  return m;
+}
+
+/** Reads a finite number out of a signal payload, or null. */
+export function num(payload: Record<string, unknown>, key: string): number | null {
+  const v = payload[key];
+  if (typeof v !== "number" || !Number.isFinite(v)) return null;
+  return v;
+}
+
+/** Stamps consumed signals so operators can see the feed is being read. */
+export async function markSignalsProcessed(admin: Admin, ids: string[]): Promise<void> {
+  if (!ids.length) return;
+  const stamp = new Date().toISOString();
+  for (let i = 0; i < ids.length; i += 500) {
+    await (admin as unknown as Loose)
+      .from("ca_brain_events")
+      .update({ processed_at: stamp })
+      .in("id", ids.slice(i, i + 500));
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* MODULE 1 — OCR confidence learning (FIRM scope)                     */
 /* ------------------------------------------------------------------ */
 
