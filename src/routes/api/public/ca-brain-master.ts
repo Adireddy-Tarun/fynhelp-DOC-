@@ -85,12 +85,19 @@ async function run(request: Request): Promise<Response> {
     await loose.from("ca_firms").update({ brain_last_run_at: nowIso }).eq("id", firm.id);
   }
 
+  const signals_consumed =
+    (ocr_result.signals_used ?? 0) +
+    (recon_result.signals_used ?? 0) +
+    (chaser_result.signals_used ?? 0) +
+    (filing_result.signals_used ?? 0);
+
   const payload = {
     ocr_result,
     recon_result,
     deduction_result,
     chaser_result,
     filing_result,
+    signals_consumed,
     total_firms_updated: firms.length,
     privacy_violations,
     duration_ms: Date.now() - startedAt,

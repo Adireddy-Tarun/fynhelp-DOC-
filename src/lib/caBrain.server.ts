@@ -216,12 +216,78 @@ async function upsertClient(admin: Admin, firmId: string, businessId: string, pa
 }
 
 /* ------------------------------------------------------------------ */
+/* Signal feed (ca_brain_events)                                       */
+/* ------------------------------------------------------------------ */
+
+export interface BrainSignal {
+  id: string;
+  business_id: string | null;
+  event_type: string;
+  payload: Record<string, unknown>;
+  created_at: string;
+}
+
+/** Reads a firm's own feedback signals. Firm scope is enforced on every read. */
+export async function loadSignals(
+  admin: Admin,
+  firmId: string,
+  eventTypes: string[],
+  windowDays: number,
+): Promise<BrainSignal[]> {
+  const since = new Date(Date.now() - windowDays * DAY).toISOString();
+  const { data } = await (admin as unknown as Loose)
+    .from("ca_brain_events")
+    .select("id, business_id, event_type, payload, created_at")
+    .eq("ca_firm_id", firmId)
+    .in("event_type", eventTypes)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(20000);
+  return ((data ?? []) as BrainSignal[]).map((r) => ({
+    ...r,
+    payload: (r.payload ?? {}) as Record<string, unknown>,
+  }));
+}
+
+/** Groups signals by client. Rows without a client are dropped. */
+export function signalsByClient(signals: BrainSignal[]): Map<string, BrainSignal[]> {
+  const m = new Map<string, BrainSignal[]>();
+  for (const s of signals) {
+    if (!s.business_id) continue;
+    const list = m.get(s.business_id) ?? [];
+    list.push(s);
+    m.set(s.business_id, list);
+  }
+  return m;
+}
+
+/** Reads a finite number out of a signal payload, or null. */
+export function num(payload: Record<string, unknown>, key: string): number | null {
+  const v = payload[key];
+  if (typeof v !== "number" || !Number.isFinite(v)) return null;
+  return v;
+}
+
+/** Stamps consumed signals so operators can see the feed is being read. */
+export async function markSignalsProcessed(admin: Admin, ids: string[]): Promise<void> {
+  if (!ids.length) return;
+  const stamp = new Date().toISOString();
+  for (let i = 0; i < ids.length; i += 500) {
+    await (admin as unknown as Loose)
+      .from("ca_brain_events")
+      .update({ processed_at: stamp })
+      .in("id", ids.slice(i, i + 500));
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* MODULE 1 — OCR confidence learning (FIRM scope)                     */
 /* ------------------------------------------------------------------ */
 
 export async function learnOcr(admin: Admin, firms: FirmScope[]) {
   let firmsUpdated = 0;
   let classificationsAdjusted = 0;
+  let signalsUsed = 0;
   const since = new Date(Date.now() - 90 * DAY).toISOString();
 
   for (const firm of firms) {
@@ -233,22 +299,47 @@ export async function learnOcr(admin: Admin, firms: FirmScope[]) {
       .gte("created_at", since)
       .limit(5000);
 
-    if (!rows?.length) continue;
+    // Live reviewer feedback from the signal feed — a correction recorded in
+    // the review queue counts exactly like a corrected extraction row.
+    const signals = await loadSignals(admin, firm.id, ["ocr_correction"], 90);
 
-    const stats = new Map<string, { total: number; corrected: number }>();
-    for (const r of rows as { classification: string | null; was_corrected: boolean | null }[]) {
+    const stats = new Map<string, { total: number; corrected: number; signalConfidence: number[] }>();
+    const bump = (cls: string) =>
+      stats.get(cls) ?? { total: 0, corrected: 0, signalConfidence: [] as number[] };
+
+    for (const r of (rows ?? []) as { classification: string | null; was_corrected: boolean | null }[]) {
       const cls = (r.classification ?? "unclassified").toLowerCase();
-      const s = stats.get(cls) ?? { total: 0, corrected: 0 };
+      const s = bump(cls);
       s.total += 1;
       if (r.was_corrected) s.corrected += 1;
       stats.set(cls, s);
     }
 
+    for (const sig of signals) {
+      const cls = String(sig.payload["classification"] ?? "unclassified").toLowerCase();
+      const s = bump(cls);
+      s.total += 1;
+      s.corrected += 1;
+      const conf = num(sig.payload, "original_confidence");
+      if (conf != null) s.signalConfidence.push(clamp(conf > 1 ? conf / 100 : conf, 0, 1));
+      stats.set(cls, s);
+      signalsUsed += 1;
+    }
+
+    if (!stats.size) continue;
+
     const overrides: Record<string, number> = {};
     for (const [cls, s] of stats) {
       if (s.total < 5) continue; // not enough history to move a threshold
       const rate = s.corrected / s.total;
-      overrides[cls] = rate > 0.3 ? 0.75 : rate < 0.05 ? 0.92 : 0.85;
+      let threshold = rate > 0.3 ? 0.75 : rate < 0.05 ? 0.92 : 0.85;
+      // Corrections that arrived on confident extractions mean the model is
+      // over-confident for this classification: raise the review threshold.
+      const meanSignalConf = avg(s.signalConfidence);
+      if (meanSignalConf != null && s.signalConfidence.length >= 3 && meanSignalConf > threshold) {
+        threshold = round(clamp(meanSignalConf + 0.03, 0.6, 0.98));
+      }
+      overrides[cls] = threshold;
       classificationsAdjusted += 1;
     }
     if (!Object.keys(overrides).length) continue;
@@ -263,10 +354,15 @@ export async function learnOcr(admin: Admin, firms: FirmScope[]) {
       confidence_overrides: overrides,
       last_ocr_learning_at: new Date().toISOString(),
     });
+    await markSignalsProcessed(admin, signals.map((s) => s.id));
     firmsUpdated += 1;
   }
 
-  return { firms_updated: firmsUpdated, classifications_adjusted: classificationsAdjusted };
+  return {
+    firms_updated: firmsUpdated,
+    classifications_adjusted: classificationsAdjusted,
+    signals_used: signalsUsed,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -317,9 +413,14 @@ function lagDays(snapshot: unknown): number[] {
 
 export async function learnRecon(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
+  let signalsUsed = 0;
   const since = new Date(Date.now() - 180 * DAY).toISOString();
 
   for (const firm of firms) {
+    const feed = signalsByClient(
+      await loadSignals(admin, firm.id, ["recon_match_accepted", "exception_resolved"], 180),
+    );
+
     for (const businessId of firm.business_ids) {
       // HARD CLIENT SCOPE — firm + client on every read.
       const { data: runs } = await admin
@@ -331,21 +432,39 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
         .order("run_at", { ascending: false })
         .limit(30);
 
-      if (!runs?.length) continue;
+      const clientSignals = feed.get(businessId) ?? [];
+      const accepted = clientSignals.filter((s) => s.event_type === "recon_match_accepted");
+      const resolved = clientSignals.filter((s) => s.event_type === "exception_resolved");
+
+      if (!runs?.length && accepted.length < 5) continue;
 
       const variances: number[] = [];
       const lags: number[] = [];
       let items = 0;
       let matched = 0;
       let mismatched = 0;
-      for (const r of runs as { total_items: number; matched: number; mismatched: number; snapshot: unknown }[]) {
+      for (const r of (runs ?? []) as { total_items: number; matched: number; mismatched: number; snapshot: unknown }[]) {
         items += Number(r.total_items ?? 0);
         matched += Number(r.matched ?? 0);
         mismatched += Number(r.mismatched ?? 0);
         variances.push(...variancePercents(r.snapshot));
         lags.push(...lagDays(r.snapshot));
       }
-      if (items < 5) continue;
+
+      // Accepted matches are the reviewer telling us what "close enough" means.
+      const partialShare = accepted.length
+        ? accepted.filter((s) => s.payload["partial"] === true).length / accepted.length
+        : 0;
+      const fuzzyShare = accepted.length
+        ? accepted.filter((s) => String(s.payload["pass"] ?? "").toLowerCase().includes("fuzzy")).length /
+          accepted.length
+        : 0;
+      const meanConfidence = avg(
+        accepted.map((s) => num(s.payload, "confidence")).filter((n): n is number => n != null),
+      );
+      signalsUsed += accepted.length + resolved.length;
+
+      if (items < 5 && accepted.length < 5) continue;
 
       let tolerance: number;
       if (variances.length >= 5) {
@@ -353,16 +472,37 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
         const sorted = [...variances].sort((a, b) => a - b);
         const p90 = sorted[Math.floor(sorted.length * 0.9)] ?? 0;
         tolerance = p90 <= 0.25 ? 0.5 : p90 <= 1.2 ? 1 : p90 <= 2.2 ? 2 : 3;
+      } else if (accepted.length >= 5) {
+        tolerance = partialShare > 0.3 || fuzzyShare > 0.5 ? 2 : fuzzyShare > 0.2 ? 1 : 0.5;
       } else {
         const mismatchRate = items ? mismatched / items : 0;
         const matchRate = items ? matched / items : 0;
         tolerance = matchRate > 0.95 ? 0.5 : mismatchRate > 0.2 ? 2 : 1;
       }
 
-      const lagAvg = lags.length >= 5 ? avg(lags) : null;
-      const dateWindow = lagAvg == null ? 3 : clamp(Math.ceil(lagAvg) + 1, 1, 15);
+      // Reviewers repeatedly accepting low-confidence matches means our bar is
+      // too strict for this client; a run of exceptions closed as amount
+      // differences means the same thing from the other direction.
+      if (accepted.length >= 5 && meanConfidence != null && meanConfidence < 0.7) {
+        tolerance = Math.min(3, tolerance * 2);
+      }
+      const amountExceptions = resolved.filter((s) =>
+        /amount|value|variance/i.test(String(s.payload["reason_code"] ?? "")),
+      ).length;
+      if (amountExceptions >= 3) tolerance = Math.min(3, tolerance + 0.5);
 
-      const match_preferences = { tolerance_pct: tolerance, date_window_days: dateWindow };
+      const lagAvg = lags.length >= 5 ? avg(lags) : null;
+      const signalLag = avg(
+        resolved.map((s) => num(s.payload, "days_open")).filter((n): n is number => n != null),
+      );
+      const dateWindow =
+        lagAvg != null
+          ? clamp(Math.ceil(lagAvg) + 1, 1, 15)
+          : signalLag != null && resolved.length >= 5
+            ? clamp(Math.ceil(signalLag / 2) + 1, 1, 15)
+            : 3;
+
+      const match_preferences = { tolerance_pct: round(tolerance), date_window_days: dateWindow };
       const problems = auditClientPayload({ match_preferences });
       if (problems.length) {
         await logPrivacySkip(admin, firm.id, businessId, problems, "recon");
@@ -370,11 +510,12 @@ export async function learnRecon(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, { match_preferences });
+      await markSignalsProcessed(admin, clientSignals.map((s) => s.id));
       clientsUpdated += 1;
     }
   }
 
-  return { clients_updated: clientsUpdated };
+  return { clients_updated: clientsUpdated, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
@@ -444,8 +585,11 @@ export async function learnDeductions(admin: Admin, firms: FirmScope[]) {
 
 export async function learnChaser(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
+  let signalsUsed = 0;
 
   for (const firm of firms) {
+    const feed = signalsByClient(await loadSignals(admin, firm.id, ["chaser_replied"], 365));
+
     for (const businessId of firm.business_ids) {
       const { data: reqs } = await admin
         .from("ca_document_requests")
@@ -458,10 +602,18 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
         (r) => (r as { fulfilled_at: string | null }).fulfilled_at,
       ) as { doc_types: string[] | null; created_at: string; fulfilled_at: string; chaser_count: number | null }[];
 
-      if (fulfilled.length < 3) continue;
+      // Replies logged by staff in the chaser queue, even when the request row
+      // was never stamped as fulfilled.
+      const replies = feed.get(businessId) ?? [];
+      const replyDays = replies
+        .map((s) => num(s.payload, "days_to_reply"))
+        .filter((n): n is number => n != null && n >= 0 && n < 365);
+      signalsUsed += replies.length;
+
+      if (fulfilled.length < 3 && replyDays.length < 3) continue;
 
       const days = fulfilled.map((r) => (new Date(r.fulfilled_at).getTime() - new Date(r.created_at).getTime()) / DAY);
-      const avgResponse = round(avg(days) ?? 0, 1);
+      const avgResponse = round(avg([...days, ...replyDays]) ?? 0, 1);
 
       // Slow document CATEGORIES only — titles/filenames are never read.
       const perCategory = new Map<string, number[]>();
@@ -479,12 +631,21 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
         .map(([cat]) => cat)
         .slice(0, 8);
 
-      // Day of week where fulfilment is fastest.
+      // Day of week where a reply actually lands — fulfilment rows and logged
+      // replies both count.
       const perDay = new Map<number, number[]>();
       fulfilled.forEach((r, i) => {
         const dow = new Date(r.fulfilled_at).getUTCDay();
         const list = perDay.get(dow) ?? [];
         list.push(days[i] ?? 0);
+        perDay.set(dow, list);
+      });
+      replies.forEach((s) => {
+        const d = num(s.payload, "days_to_reply");
+        if (d == null || d < 0 || d >= 365) return;
+        const dow = new Date(s.created_at).getUTCDay();
+        const list = perDay.get(dow) ?? [];
+        list.push(d);
         perDay.set(dow, list);
       });
       let bestDay: number | null = null;
@@ -495,7 +656,15 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
       }
 
       const avgChasers = avg(fulfilled.map((r) => Number(r.chaser_count ?? 0))) ?? 0;
-      const preferred_channel = avgChasers > 3 ? "needs_whatsapp" : avgChasers > 1 ? "needs_reminder" : "first_email";
+      let preferred_channel = avgChasers > 3 ? "needs_whatsapp" : avgChasers > 1 ? "needs_reminder" : "first_email";
+      // A client that keeps replying on the portal instead of email needs a
+      // louder nudge next time.
+      if (replies.length >= 3) {
+        const emailShare =
+          replies.filter((s) => String(s.payload["channel"] ?? "") === "email").length / replies.length;
+        if (emailShare < 0.4 && avgResponse > 5) preferred_channel = "needs_whatsapp";
+        else if (emailShare < 0.7 && preferred_channel === "first_email") preferred_channel = "needs_reminder";
+      }
 
       const payload = {
         avg_response_days: avgResponse,
@@ -510,11 +679,12 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, payload);
+      await markSignalsProcessed(admin, replies.map((s) => s.id));
       clientsUpdated += 1;
     }
   }
 
-  return { clients_updated: clientsUpdated };
+  return { clients_updated: clientsUpdated, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
@@ -524,9 +694,12 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
 export async function learnFiling(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
   let firmsTouched = 0;
+  let signalsUsed = 0;
 
   for (const firm of firms) {
     let touched = false;
+    const feed = signalsByClient(await loadSignals(admin, firm.id, ["compliance_filed"], 730));
+
     for (const businessId of firm.business_ids) {
       const { data: events } = await admin
         .from("ca_compliance_events")
@@ -542,10 +715,20 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
         .filter((e) => e.due_date && e.filed_at)
         .map((e) => (new Date(`${e.due_date}T23:59:59Z`).getTime() - new Date(e.filed_at!).getTime()) / DAY);
 
-      if (deltas.length < 3) continue;
+      // Every "mark filed" carries how many days late it was; a positive
+      // days_late is a negative days-before-due.
+      const filedSignals = feed.get(businessId) ?? [];
+      const signalDeltas = filedSignals
+        .map((s) => num(s.payload, "days_late"))
+        .filter((n): n is number => n != null && Math.abs(n) < 730)
+        .map((n) => -n);
+      signalsUsed += filedSignals.length;
 
-      const mean = round(avg(deltas) ?? 0, 1);
-      const lateShare = deltas.filter((d) => d < 0).length / deltas.length;
+      const all = [...deltas, ...signalDeltas];
+      if (all.length < 3) continue;
+
+      const mean = round(avg(all) ?? 0, 1);
+      const lateShare = all.filter((d) => d < 0).length / all.length;
       const filing_risk_score =
         lateShare > 0.5 ? 0.8 : mean > 5 && lateShare === 0 ? 0.1 : round(clamp(0.15 + lateShare, 0, 1));
 
@@ -557,6 +740,7 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, payload);
+      await markSignalsProcessed(admin, filedSignals.map((s) => s.id));
       clientsUpdated += 1;
       touched = true;
     }
@@ -566,7 +750,7 @@ export async function learnFiling(admin: Admin, firms: FirmScope[]) {
     }
   }
 
-  return { clients_updated: clientsUpdated, firms_touched: firmsTouched };
+  return { clients_updated: clientsUpdated, firms_touched: firmsTouched, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
