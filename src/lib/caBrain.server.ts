@@ -585,8 +585,11 @@ export async function learnDeductions(admin: Admin, firms: FirmScope[]) {
 
 export async function learnChaser(admin: Admin, firms: FirmScope[]) {
   let clientsUpdated = 0;
+  let signalsUsed = 0;
 
   for (const firm of firms) {
+    const feed = signalsByClient(await loadSignals(admin, firm.id, ["chaser_replied"], 365));
+
     for (const businessId of firm.business_ids) {
       const { data: reqs } = await admin
         .from("ca_document_requests")
@@ -599,10 +602,18 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
         (r) => (r as { fulfilled_at: string | null }).fulfilled_at,
       ) as { doc_types: string[] | null; created_at: string; fulfilled_at: string; chaser_count: number | null }[];
 
-      if (fulfilled.length < 3) continue;
+      // Replies logged by staff in the chaser queue, even when the request row
+      // was never stamped as fulfilled.
+      const replies = feed.get(businessId) ?? [];
+      const replyDays = replies
+        .map((s) => num(s.payload, "days_to_reply"))
+        .filter((n): n is number => n != null && n >= 0 && n < 365);
+      signalsUsed += replies.length;
+
+      if (fulfilled.length < 3 && replyDays.length < 3) continue;
 
       const days = fulfilled.map((r) => (new Date(r.fulfilled_at).getTime() - new Date(r.created_at).getTime()) / DAY);
-      const avgResponse = round(avg(days) ?? 0, 1);
+      const avgResponse = round(avg([...days, ...replyDays]) ?? 0, 1);
 
       // Slow document CATEGORIES only — titles/filenames are never read.
       const perCategory = new Map<string, number[]>();
@@ -620,12 +631,21 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
         .map(([cat]) => cat)
         .slice(0, 8);
 
-      // Day of week where fulfilment is fastest.
+      // Day of week where a reply actually lands — fulfilment rows and logged
+      // replies both count.
       const perDay = new Map<number, number[]>();
       fulfilled.forEach((r, i) => {
         const dow = new Date(r.fulfilled_at).getUTCDay();
         const list = perDay.get(dow) ?? [];
         list.push(days[i] ?? 0);
+        perDay.set(dow, list);
+      });
+      replies.forEach((s) => {
+        const d = num(s.payload, "days_to_reply");
+        if (d == null || d < 0 || d >= 365) return;
+        const dow = new Date(s.created_at).getUTCDay();
+        const list = perDay.get(dow) ?? [];
+        list.push(d);
         perDay.set(dow, list);
       });
       let bestDay: number | null = null;
@@ -636,7 +656,15 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
       }
 
       const avgChasers = avg(fulfilled.map((r) => Number(r.chaser_count ?? 0))) ?? 0;
-      const preferred_channel = avgChasers > 3 ? "needs_whatsapp" : avgChasers > 1 ? "needs_reminder" : "first_email";
+      let preferred_channel = avgChasers > 3 ? "needs_whatsapp" : avgChasers > 1 ? "needs_reminder" : "first_email";
+      // A client that keeps replying on the portal instead of email needs a
+      // louder nudge next time.
+      if (replies.length >= 3) {
+        const emailShare =
+          replies.filter((s) => String(s.payload["channel"] ?? "") === "email").length / replies.length;
+        if (emailShare < 0.4 && avgResponse > 5) preferred_channel = "needs_whatsapp";
+        else if (emailShare < 0.7 && preferred_channel === "first_email") preferred_channel = "needs_reminder";
+      }
 
       const payload = {
         avg_response_days: avgResponse,
@@ -651,11 +679,12 @@ export async function learnChaser(admin: Admin, firms: FirmScope[]) {
       }
 
       await upsertClient(admin, firm.id, businessId, payload);
+      await markSignalsProcessed(admin, replies.map((s) => s.id));
       clientsUpdated += 1;
     }
   }
 
-  return { clients_updated: clientsUpdated };
+  return { clients_updated: clientsUpdated, signals_used: signalsUsed };
 }
 
 /* ------------------------------------------------------------------ */
