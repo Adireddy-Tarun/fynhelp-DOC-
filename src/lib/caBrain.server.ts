@@ -287,6 +287,7 @@ export async function markSignalsProcessed(admin: Admin, ids: string[]): Promise
 export async function learnOcr(admin: Admin, firms: FirmScope[]) {
   let firmsUpdated = 0;
   let classificationsAdjusted = 0;
+  let signalsUsed = 0;
   const since = new Date(Date.now() - 90 * DAY).toISOString();
 
   for (const firm of firms) {
@@ -298,22 +299,47 @@ export async function learnOcr(admin: Admin, firms: FirmScope[]) {
       .gte("created_at", since)
       .limit(5000);
 
-    if (!rows?.length) continue;
+    // Live reviewer feedback from the signal feed — a correction recorded in
+    // the review queue counts exactly like a corrected extraction row.
+    const signals = await loadSignals(admin, firm.id, ["ocr_correction"], 90);
 
-    const stats = new Map<string, { total: number; corrected: number }>();
-    for (const r of rows as { classification: string | null; was_corrected: boolean | null }[]) {
+    const stats = new Map<string, { total: number; corrected: number; signalConfidence: number[] }>();
+    const bump = (cls: string) =>
+      stats.get(cls) ?? { total: 0, corrected: 0, signalConfidence: [] as number[] };
+
+    for (const r of (rows ?? []) as { classification: string | null; was_corrected: boolean | null }[]) {
       const cls = (r.classification ?? "unclassified").toLowerCase();
-      const s = stats.get(cls) ?? { total: 0, corrected: 0 };
+      const s = bump(cls);
       s.total += 1;
       if (r.was_corrected) s.corrected += 1;
       stats.set(cls, s);
     }
 
+    for (const sig of signals) {
+      const cls = String(sig.payload["classification"] ?? "unclassified").toLowerCase();
+      const s = bump(cls);
+      s.total += 1;
+      s.corrected += 1;
+      const conf = num(sig.payload, "original_confidence");
+      if (conf != null) s.signalConfidence.push(clamp(conf > 1 ? conf / 100 : conf, 0, 1));
+      stats.set(cls, s);
+      signalsUsed += 1;
+    }
+
+    if (!stats.size) continue;
+
     const overrides: Record<string, number> = {};
     for (const [cls, s] of stats) {
       if (s.total < 5) continue; // not enough history to move a threshold
       const rate = s.corrected / s.total;
-      overrides[cls] = rate > 0.3 ? 0.75 : rate < 0.05 ? 0.92 : 0.85;
+      let threshold = rate > 0.3 ? 0.75 : rate < 0.05 ? 0.92 : 0.85;
+      // Corrections that arrived on confident extractions mean the model is
+      // over-confident for this classification: raise the review threshold.
+      const meanSignalConf = avg(s.signalConfidence);
+      if (meanSignalConf != null && s.signalConfidence.length >= 3 && meanSignalConf > threshold) {
+        threshold = round(clamp(meanSignalConf + 0.03, 0.6, 0.98));
+      }
+      overrides[cls] = threshold;
       classificationsAdjusted += 1;
     }
     if (!Object.keys(overrides).length) continue;
@@ -328,10 +354,15 @@ export async function learnOcr(admin: Admin, firms: FirmScope[]) {
       confidence_overrides: overrides,
       last_ocr_learning_at: new Date().toISOString(),
     });
+    await markSignalsProcessed(admin, signals.map((s) => s.id));
     firmsUpdated += 1;
   }
 
-  return { firms_updated: firmsUpdated, classifications_adjusted: classificationsAdjusted };
+  return {
+    firms_updated: firmsUpdated,
+    classifications_adjusted: classificationsAdjusted,
+    signals_used: signalsUsed,
+  };
 }
 
 /* ------------------------------------------------------------------ */
