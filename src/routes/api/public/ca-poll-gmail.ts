@@ -53,7 +53,9 @@ async function run(request: Request): Promise<Response> {
 
   const { data: connections } = await supabaseAdmin
     .from("ca_gmail_connections")
-    .select("id, ca_firm_id, user_id, gmail_address, access_token_enc, refresh_token_enc, token_expiry, last_history_id")
+    .select(
+      "id, ca_firm_id, user_id, gmail_address, access_token_enc, refresh_token_enc, token_expiry, last_history_id, refresh_locked_until",
+    )
     .eq("is_active", true);
 
   const list = (connections ?? []) as unknown as GmailConnection[];
