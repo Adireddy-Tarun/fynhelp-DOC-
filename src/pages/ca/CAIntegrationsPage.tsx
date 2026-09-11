@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { getFirmIntegrations, syncZohoBooks, syncRazorpay } from "@/lib/caSync.functions";
-import { startGmailConnect, disconnectGmail } from "@/lib/caGmail.functions";
+import { startGmailConnect, disconnectGmail, pollGmailNow } from "@/lib/caGmail.functions";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, dateIN, caTh, caTd, CAEmpty,
 } from "@/components/ca/portalUi";
@@ -75,6 +75,7 @@ export default function CAIntegrationsPage() {
 
   const beginGmailConnect = useServerFn(startGmailConnect);
   const endGmailConnection = useServerFn(disconnectGmail);
+  const runGmailPoll = useServerFn(pollGmailNow);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -137,12 +138,24 @@ export default function CAIntegrationsPage() {
     setGmailConnecting(true);
     try {
       const res = await beginGmailConnect({ data: { firmId, origin: window.location.origin } });
+      try { window.sessionStorage.setItem("fyn:gmail:connect-origin", window.location.origin); } catch { /* ignore */ }
       window.location.href = res.url;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Could not start the Gmail connection";
       if (/GMAIL_CLIENT_ID|not configured/i.test(message)) setGmailSetupNeeded(true);
       else toast.error(message);
       setGmailConnecting(false);
+    }
+  };
+
+  const testPollGmail = async () => {
+    if (!firmId) return;
+    try {
+      const res = await runGmailPoll({ data: { firmId, origin: window.location.origin } });
+      if (res.ok) toast.success("Check started — open the Gmail tab in the Intake inbox in about 30 seconds");
+      else toast.error("The check could not run right now. Please try again shortly.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start the check");
     }
   };
 
@@ -267,12 +280,20 @@ export default function CAIntegrationsPage() {
             <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 2 }}>
               Connect your Gmail. Documents clients email you are read and routed to the right client automatically, every 15 minutes.
             </div>
+            <div style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, marginTop: 6 }}>
+              Google must allow this return address: {typeof window !== "undefined" ? `${window.location.origin}/ca/integrations/gmail/callback` : "/ca/integrations/gmail/callback"}
+            </div>
           </div>
-          {gmailConnections.filter((c) => c.is_active).length === 0 && (
-            <CAButton onClick={connectGmail} disabled={gmailConnecting} style={{ flexShrink: 0 }}>
-              {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
-            </CAButton>
-          )}
+          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+            {typeof window !== "undefined" && /lovable\.app|localhost/.test(window.location.hostname) && (
+              <CAButton variant="ghost" onClick={testPollGmail}>Test poll now</CAButton>
+            )}
+            {gmailConnections.filter((c) => c.is_active).length === 0 && (
+              <CAButton onClick={connectGmail} disabled={gmailConnecting}>
+                {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
+              </CAButton>
+            )}
+          </div>
         </div>
         {gmailConnections.length === 0 ? (
           <div style={{ padding: "20px", fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>

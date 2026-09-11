@@ -23,7 +23,7 @@ export const startGmailConnect = createServerFn({ method: "POST" })
     if (!input?.firmId) throw new Error("firmId is required");
     return input;
   })
-  .handler(async ({ data, context }): Promise<{ url: string }> => {
+  .handler(async ({ data, context }): Promise<{ url: string; redirectUri: string }> => {
     await assertFirmMember(context.supabase as never, data.firmId);
     const { gmailCredentials, redirectUriFor, GMAIL_SCOPES } = await import("@/lib/caGmail.server");
     const { clientId } = gmailCredentials();
@@ -39,7 +39,31 @@ export const startGmailConnect = createServerFn({ method: "POST" })
       prompt: "consent",
       state,
     });
-    return { url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` };
+    console.log(`[fyn:gmail] consent start — redirect_uri=${redirectUri}`);
+    return { url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`, redirectUri };
+  });
+
+/** Run the Gmail poller once, on demand, for a firm the caller belongs to. */
+export const pollGmailNow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { firmId: string; origin?: string }) => {
+    if (!input?.firmId) throw new Error("firmId is required");
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<{ ok: boolean; detail: string }> => {
+    await assertFirmMember(context.supabase as never, data.firmId);
+    const secret = process.env["CA_CRON_SECRET"] ?? process.env["CRON_SECRET"];
+    if (!secret) throw new Error("The scheduled job secret is not configured");
+    const { redirectUriFor, CALLBACK_PATH } = await import("@/lib/caGmail.server");
+    const base = redirectUriFor(data.origin ?? null).replace(CALLBACK_PATH, "");
+    const res = await fetch(`${base}/api/public/ca-poll-gmail`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-cron-secret": secret },
+      body: JSON.stringify({ source: "manual_test" }),
+    });
+    const detail = (await res.text()).slice(0, 300);
+    console.log(`[fyn:gmail] manual poll — status=${res.status} body=${detail}`);
+    return { ok: res.ok, detail };
   });
 
 /** Exchange the Google code for tokens and store the connection. */
@@ -63,7 +87,7 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
 
     const g = await import("@/lib/caGmail.server");
     const redirectUri = g.redirectUriFor(data.origin ?? null);
-    console.log("[fyn:gmail] oauth callback — code received, exchanging for tokens");
+    console.log(`[fyn:gmail] oauth callback — exchanging code, redirect_uri=${redirectUri}`);
     const tokens = await g.exchangeCode(data.code, redirectUri);
     if (!tokens.refresh_token) {
       throw new Error("Google did not return a refresh token. Remove FynHelp from your Google account permissions and connect again.");

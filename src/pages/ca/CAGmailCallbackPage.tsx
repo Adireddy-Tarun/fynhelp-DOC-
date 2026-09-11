@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { completeGmailConnect } from "@/lib/caGmail.functions";
 import { CA, CACard, CAButton } from "@/components/ca/portalUi";
 
+const ORIGIN_KEY = "fyn:gmail:connect-origin";
+
 export default function CAGmailCallbackPage() {
   const navigate = useNavigate();
   const complete = useServerFn(completeGmailConnect);
@@ -27,19 +29,38 @@ export default function CAGmailCallbackPage() {
         setErrorMsg(
           error === "access_denied"
             ? "You declined Gmail access. You can try again from the Integrations page."
-            : "Something went wrong with the Google authorisation. Please try again.",
+            : `Google returned: ${error ?? "no authorisation code"}. If it mentions a redirect mismatch, add ${window.location.origin}/ca/integrations/gmail/callback to the authorised redirect list in Google Cloud Console.`,
         );
         return;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
+      // The session can lag behind the redirect on some browsers — wait for it.
+      let session = null;
+      for (let i = 0; i < 5; i++) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          session = data.session;
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 1000));
+      }
       if (!session) {
-        setErrorMsg("Your session expired. Please sign in again, then reconnect Gmail.");
+        setErrorMsg("Your sign in did not carry over from Google. Please sign in again, then reconnect Gmail from the Integrations page.");
         return;
       }
 
+      // Use the exact origin the consent started from, so the redirect address matches Google.
+      let origin = window.location.origin;
       try {
-        const res = await complete({ data: { code, state, origin: window.location.origin } });
+        const saved = window.sessionStorage.getItem(ORIGIN_KEY);
+        if (saved) origin = saved;
+      } catch { /* storage unavailable */ }
+
+      console.log(`[fyn:gmail] session confirmed, completing connection origin=${origin}`);
+
+      try {
+        const res = await complete({ data: { code, state, origin } });
+        try { window.sessionStorage.removeItem(ORIGIN_KEY); } catch { /* ignore */ }
         toast.success(`Gmail connected — ${res.gmailAddress}`);
         navigate("/ca/integrations", { replace: true });
       } catch (e) {
@@ -53,10 +74,16 @@ export default function CAGmailCallbackPage() {
   if (errorMsg) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: CA.page, padding: 24 }}>
-        <CACard style={{ maxWidth: 440, padding: 36, textAlign: "center" }}>
+        <CACard style={{ maxWidth: 480, padding: 36, textAlign: "center" }}>
           <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700, color: CA.ink }}>Gmail not connected</div>
-          <div style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.red, marginTop: 14, marginBottom: 20, lineHeight: 1.6 }}>{errorMsg}</div>
-          <CAButton onClick={() => navigate("/ca/integrations")}>Back to Integrations</CAButton>
+          <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red, marginTop: 14, marginBottom: 8 }}>Something stopped the connection</div>
+          <div style={{ fontFamily: CA.mono, fontSize: 12, color: CA.muted, marginBottom: 20, lineHeight: 1.6, textAlign: "left", background: "rgba(23,18,8,0.04)", padding: "10px 14px", borderRadius: 8 }}>
+            {errorMsg}
+          </div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <CAButton onClick={() => navigate("/ca/integrations")}>Back to Integrations</CAButton>
+            <CAButton variant="ghost" onClick={() => { window.location.href = "/ca/integrations"; }}>Try again</CAButton>
+          </div>
         </CACard>
       </div>
     );
