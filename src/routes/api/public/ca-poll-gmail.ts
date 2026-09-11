@@ -301,7 +301,7 @@ async function run(request: Request): Promise<Response> {
           }
           totalProcessed++;
 
-          if (match.businessId) {
+          if (match.businessId && reviewState !== "pending_verification") {
             await supabaseAdmin
               .from("ca_email_sender_mappings")
               .upsert(
@@ -326,7 +326,7 @@ async function run(request: Request): Promise<Response> {
                 .select("id")
                 .eq("ca_firm_id", conn.ca_firm_id)
                 .eq("business_id", match.businessId)
-                .in("status", ["pending", "sent", "chased", "escalated"])
+                .in("status", ["open", "pending", "sent", "chased", "escalated"])
                 .limit(20);
               if (open && open.length > 0) {
                 await supabaseAdmin
@@ -344,7 +344,14 @@ async function run(request: Request): Promise<Response> {
                 const periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0))
                   .toISOString()
                   .slice(0, 10);
-                const [{ count: openCompliance }, { count: openExceptions }, { count: txnCount }] = await Promise.all([
+                const [{ count: openRequests }, { count: openCompliance }, { count: openExceptions }, { count: txnCount }] = await Promise.all([
+                  supabaseAdmin
+                    .from("ca_document_requests")
+                    .select("id", { count: "exact", head: true })
+                    .eq("ca_firm_id", conn.ca_firm_id)
+                    .eq("business_id", match.businessId)
+                    .eq("period", currentPeriod)
+                    .in("status", ["open", "pending", "sent", "chased", "escalated"]),
                   supabaseAdmin
                     .from("ca_compliance_events")
                     .select("id", { count: "exact", head: true })
@@ -367,7 +374,12 @@ async function run(request: Request): Promise<Response> {
                     .lte("date", periodEnd),
                 ]);
 
-                if ((openCompliance ?? 1) === 0 && (openExceptions ?? 1) === 0 && (txnCount ?? 0) > 0) {
+                if (
+                  (openRequests ?? 1) === 0 &&
+                  (openCompliance ?? 1) === 0 &&
+                  (openExceptions ?? 1) === 0 &&
+                  (txnCount ?? 0) > 0
+                ) {
                   const { count: existingNotice } = await supabaseAdmin
                     .from("ca_notifications")
                     .select("id", { count: "exact", head: true })
