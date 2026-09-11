@@ -8330,6 +8330,7 @@ export type Database = {
       trigger_ca_auto_followup: { Args: never; Returns: undefined }
       trigger_ca_brain_master: { Args: never; Returns: undefined }
       trigger_ca_integration_sync: { Args: never; Returns: undefined }
+      trigger_ca_poll_gmail: { Args: never; Returns: undefined }
       trigger_compliance_alerts: { Args: never; Returns: undefined }
       urlencode:
         | { Args: { data: Json }; Returns: string }
