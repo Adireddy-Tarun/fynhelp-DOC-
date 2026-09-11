@@ -36,6 +36,14 @@ interface FieldMap {
   canonical_field_id: string | null;
 }
 
+interface GmailConnection {
+  id: string;
+  gmail_address: string;
+  last_polled_at: string | null;
+  is_active: boolean;
+  error_message: string | null;
+}
+
 type SourceKey = "tally" | "zoho_books" | "razorpay" | "bank_csv";
 
 const SOURCE_LABEL: Record<SourceKey, string> = {
