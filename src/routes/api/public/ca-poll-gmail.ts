@@ -14,8 +14,6 @@ import type { ParsedRow } from "@/lib/caGmail.server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const ACCEPTED_MIME = /(pdf|csv|xml|excel|spreadsheet)|^image\//i;
-
 interface GmailConnection {
   id: string;
   ca_firm_id: string;
@@ -25,6 +23,7 @@ interface GmailConnection {
   refresh_token_enc: string;
   token_expiry: string;
   last_history_id: string | null;
+  refresh_locked_until: string | null;
 }
 
 function authorized(request: Request): boolean {
