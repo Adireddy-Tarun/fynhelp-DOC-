@@ -9,6 +9,18 @@ import { CA, CACard, CAButton, CABadge, caInputStyle, caTh, caTd, dateIN } from 
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
 
+interface GmailRow {
+  id: string;
+  original_filename: string | null;
+  gmail_sender_email: string | null;
+  gmail_subject: string | null;
+  gmail_match_method: string | null;
+  gmail_match_confidence: number | null;
+  business_id: string | null;
+  review_state: string;
+  created_at: string;
+}
+
 interface Row {
   id: string;
   business_id: string;
@@ -109,6 +121,11 @@ export default function CADocumentInboxPage() {
   const [busy, setBusy] = useState(false);
   const [reclassify, setReclassify] = useState<Record<string, CADocClass>>({});
   const [viewBusy, setViewBusy] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [inboxTab, setInboxTab] = useState<"upload" | "gmail">("upload");
+  const [gmailItems, setGmailItems] = useState<GmailRow[]>([]);
+  const [loadingGmail, setLoadingGmail] = useState(false);
+  const [assignBusy, setAssignBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!firmId) return;
