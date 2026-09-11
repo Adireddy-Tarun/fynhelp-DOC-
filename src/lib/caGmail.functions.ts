@@ -1,0 +1,142 @@
+/**
+ * Gmail intake — authenticated server functions used by the CA portal.
+ * Every call proves the caller belongs to the firm it names before touching tokens.
+ */
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+async function assertFirmMember(
+  supabase: { from: (t: string) => any }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  firmId: string,
+): Promise<void> {
+  const { data } = await supabase.from("ca_firm_members").select("id").eq("ca_firm_id", firmId).limit(1);
+  if (data && data.length > 0) return;
+  const { data: owned } = await supabase.from("ca_firms").select("id").eq("id", firmId).limit(1);
+  if (owned && owned.length > 0) return;
+  throw new Error("You do not have access to this practice");
+}
+
+/** Build the Google consent URL. */
+export const startGmailConnect = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { firmId: string; origin?: string }) => {
+    if (!input?.firmId) throw new Error("firmId is required");
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<{ url: string }> => {
+    await assertFirmMember(context.supabase as never, data.firmId);
+    const { gmailCredentials, redirectUriFor, GMAIL_SCOPES } = await import("@/lib/caGmail.server");
+    const { clientId } = gmailCredentials();
+    const redirectUri = redirectUriFor(data.origin ?? null);
+    const state = btoa(JSON.stringify({ firmId: data.firmId, userId: context.userId, ts: Date.now() }));
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: GMAIL_SCOPES,
+      access_type: "offline",
+      include_granted_scopes: "true",
+      prompt: "consent",
+      state,
+    });
+    return { url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` };
+  });
+
+/** Exchange the Google code for tokens and store the connection. */
+export const completeGmailConnect = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { code: string; state: string; origin?: string }) => {
+    if (!input?.code || !input?.state) throw new Error("code and state are required");
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<{ ok: true; gmailAddress: string }> => {
+    let parsed: { firmId?: string; userId?: string };
+    try {
+      parsed = JSON.parse(atob(data.state));
+    } catch {
+      throw new Error("The Google authorisation could not be verified. Please try again.");
+    }
+    if (!parsed.firmId || parsed.userId !== context.userId) {
+      throw new Error("The Google authorisation did not match your session. Please try again.");
+    }
+    await assertFirmMember(context.supabase as never, parsed.firmId);
+
+    const g = await import("@/lib/caGmail.server");
+    const redirectUri = g.redirectUriFor(data.origin ?? null);
+    console.log("[fyn:gmail] oauth callback — code received, exchanging for tokens");
+    const tokens = await g.exchangeCode(data.code, redirectUri);
+    if (!tokens.refresh_token) {
+      throw new Error("Google did not return a refresh token. Remove FynHelp from your Google account permissions and connect again.");
+    }
+    const gmailAddress = await g.fetchGmailAddress(tokens.access_token);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("ca_gmail_connections").upsert(
+      {
+        ca_firm_id: parsed.firmId,
+        user_id: context.userId,
+        gmail_address: gmailAddress,
+        access_token_enc: await g.encryptToken(tokens.access_token),
+        refresh_token_enc: await g.encryptToken(tokens.refresh_token),
+        token_expiry: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+        is_active: true,
+        error_message: null,
+      } as never,
+      { onConflict: "ca_firm_id,gmail_address" },
+    );
+    if (error) throw new Error(error.message);
+
+    try {
+      await supabaseAdmin.from("ca_brain_events").insert({
+        ca_firm_id: parsed.firmId,
+        business_id: null,
+        event_type: "gmail_connected",
+        payload: { connected_at: new Date().toISOString() },
+      } as never);
+    } catch { /* fire and forget */ }
+
+    return { ok: true, gmailAddress };
+  });
+
+/** Revoke the Google grant and mark the connection inactive. */
+export const disconnectGmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { connectionId: string; firmId: string }) => {
+    if (!input?.connectionId || !input?.firmId) throw new Error("connectionId and firmId are required");
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertFirmMember(context.supabase as never, data.firmId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const g = await import("@/lib/caGmail.server");
+
+    const { data: conn } = await supabaseAdmin
+      .from("ca_gmail_connections")
+      .select("access_token_enc")
+      .eq("id", data.connectionId)
+      .eq("ca_firm_id", data.firmId)
+      .maybeSingle();
+    const enc = (conn as { access_token_enc?: string } | null)?.access_token_enc;
+    if (enc) {
+      try {
+        await g.revokeToken(await g.decryptToken(enc));
+      } catch { /* revocation is best effort */ }
+    }
+
+    await supabaseAdmin
+      .from("ca_gmail_connections")
+      .update({ is_active: false, error_message: null } as never)
+      .eq("id", data.connectionId)
+      .eq("ca_firm_id", data.firmId);
+
+    try {
+      await supabaseAdmin.from("ca_brain_events").insert({
+        ca_firm_id: data.firmId,
+        business_id: null,
+        event_type: "gmail_disconnected",
+        payload: { disconnected_at: new Date().toISOString() },
+      } as never);
+    } catch { /* fire and forget */ }
+
+    return { ok: true };
+  });
