@@ -142,6 +142,69 @@ export default function CADocumentInboxPage() {
     void load();
   }, [load]);
 
+  const loadGmailItems = useCallback(async () => {
+    if (!firmId) return;
+    setLoadingGmail(true);
+    const { data } = await supabase
+      .from("ca_document_extractions")
+      .select("id, original_filename, gmail_sender_email, gmail_subject, gmail_match_method, gmail_match_confidence, business_id, review_state, created_at")
+      .eq("ca_firm_id", firmId)
+      .eq("source_type", "gmail")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    setGmailItems((data ?? []) as unknown as GmailRow[]);
+    setLoadingGmail(false);
+  }, [firmId]);
+
+  useEffect(() => {
+    if (inboxTab === "gmail") void loadGmailItems();
+  }, [inboxTab, loadGmailItems]);
+
+  const assignGmailClient = async (extractionId: string, businessId: string, senderEmail: string | null) => {
+    if (!firmId) return;
+    setAssignBusy(extractionId);
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({ business_id: businessId, review_state: "needs_review", error_message: null })
+      .eq("id", extractionId);
+    if (error) {
+      toast.error(error.message);
+      setAssignBusy(null);
+      return;
+    }
+
+    if (senderEmail) {
+      const { data: userRes } = await supabase.auth.getUser();
+      await supabase
+        .from("ca_email_sender_mappings")
+        .upsert(
+          {
+            ca_firm_id: firmId,
+            business_id: businessId,
+            sender_email: senderEmail,
+            sender_domain: senderEmail.split("@")[1] ?? null,
+            match_method: "manual",
+            confidence: 0.95,
+            confirmed_by_user_id: userRes?.user?.id ?? null,
+            confirmed_at: new Date().toISOString(),
+          },
+          { onConflict: "ca_firm_id,sender_email" },
+        );
+      try {
+        await supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: businessId,
+          event_type: "gmail_client_mapped",
+          payload: { sender_domain: senderEmail.split("@")[1] ?? null, match_method: "manual" },
+        });
+      } catch { /* fire and forget */ }
+    }
+
+    toast.success("Client assigned. Future emails from this sender route here automatically.");
+    setAssignBusy(null);
+    void loadGmailItems();
+  };
+
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
 
   const handleFileList = async (files: FileList) => {
