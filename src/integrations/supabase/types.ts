@@ -2862,6 +2862,7 @@ export type Database = {
           is_active: boolean
           last_history_id: string | null
           last_polled_at: string | null
+          refresh_locked_until: string | null
           refresh_token_enc: string
           token_expiry: string
           user_id: string
@@ -2876,6 +2877,7 @@ export type Database = {
           is_active?: boolean
           last_history_id?: string | null
           last_polled_at?: string | null
+          refresh_locked_until?: string | null
           refresh_token_enc: string
           token_expiry: string
           user_id: string
@@ -2890,6 +2892,7 @@ export type Database = {
           is_active?: boolean
           last_history_id?: string | null
           last_polled_at?: string | null
+          refresh_locked_until?: string | null
           refresh_token_enc?: string
           token_expiry?: string
           user_id?: string
