@@ -4,9 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
-import { CA, CACard, CAButton, caInputStyle, dateIN } from "@/components/ca/portalUi";
+import { useNavigate } from "@/lib/router-compat";
+import { CA, CACard, CAButton, CABadge, caInputStyle, caTh, caTd, dateIN } from "@/components/ca/portalUi";
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
+
+interface GmailRow {
+  id: string;
+  original_filename: string | null;
+  gmail_sender_email: string | null;
+  gmail_subject: string | null;
+  gmail_match_method: string | null;
+  gmail_match_confidence: number | null;
+  business_id: string | null;
+  review_state: string;
+  created_at: string;
+}
 
 interface Row {
   id: string;
@@ -108,6 +121,11 @@ export default function CADocumentInboxPage() {
   const [busy, setBusy] = useState(false);
   const [reclassify, setReclassify] = useState<Record<string, CADocClass>>({});
   const [viewBusy, setViewBusy] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [inboxTab, setInboxTab] = useState<"upload" | "gmail">("upload");
+  const [gmailItems, setGmailItems] = useState<GmailRow[]>([]);
+  const [loadingGmail, setLoadingGmail] = useState(false);
+  const [assignBusy, setAssignBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -123,6 +141,69 @@ export default function CADocumentInboxPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const loadGmailItems = useCallback(async () => {
+    if (!firmId) return;
+    setLoadingGmail(true);
+    const { data } = await supabase
+      .from("ca_document_extractions")
+      .select("id, original_filename, gmail_sender_email, gmail_subject, gmail_match_method, gmail_match_confidence, business_id, review_state, created_at")
+      .eq("ca_firm_id", firmId)
+      .eq("source_type", "gmail")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    setGmailItems((data ?? []) as unknown as GmailRow[]);
+    setLoadingGmail(false);
+  }, [firmId]);
+
+  useEffect(() => {
+    if (inboxTab === "gmail") void loadGmailItems();
+  }, [inboxTab, loadGmailItems]);
+
+  const assignGmailClient = async (extractionId: string, businessId: string, senderEmail: string | null) => {
+    if (!firmId) return;
+    setAssignBusy(extractionId);
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({ business_id: businessId, review_state: "needs_review", error_message: null })
+      .eq("id", extractionId);
+    if (error) {
+      toast.error(error.message);
+      setAssignBusy(null);
+      return;
+    }
+
+    if (senderEmail) {
+      const { data: userRes } = await supabase.auth.getUser();
+      await supabase
+        .from("ca_email_sender_mappings")
+        .upsert(
+          {
+            ca_firm_id: firmId,
+            business_id: businessId,
+            sender_email: senderEmail,
+            sender_domain: senderEmail.split("@")[1] ?? null,
+            match_method: "manual",
+            confidence: 0.95,
+            confirmed_by_user_id: userRes?.user?.id ?? null,
+            confirmed_at: new Date().toISOString(),
+          },
+          { onConflict: "ca_firm_id,sender_email" },
+        );
+      try {
+        await supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: businessId,
+          event_type: "gmail_client_mapped",
+          payload: { sender_domain: senderEmail.split("@")[1] ?? null, match_method: "manual" },
+        });
+      } catch { /* fire and forget */ }
+    }
+
+    toast.success("Client assigned. Future emails from this sender route here automatically.");
+    setAssignBusy(null);
+    void loadGmailItems();
+  };
 
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
 
@@ -219,6 +300,115 @@ export default function CADocumentInboxPage() {
         ]}
       />
 
+      <div style={{ display: "flex", marginBottom: 16, borderBottom: `0.5px solid ${CA.line}` }}>
+        {(["upload", "gmail"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setInboxTab(tab)}
+            style={{
+              background: "none",
+              border: "none",
+              borderBottom: inboxTab === tab ? `2px solid ${CA.teal}` : "2px solid transparent",
+              padding: "10px 18px",
+              fontFamily: CA.sans,
+              fontSize: 13,
+              fontWeight: inboxTab === tab ? 700 : 400,
+              color: inboxTab === tab ? CA.ink : CA.muted,
+              cursor: "pointer",
+              marginBottom: -1,
+            }}
+          >
+            {tab === "upload" ? "Upload" : "From Gmail"}
+          </button>
+        ))}
+      </div>
+
+      {inboxTab === "gmail" ? (
+        <CACard style={{ padding: 20 }}>
+          {loadingGmail ? (
+            <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint, padding: 20 }}>Loading Gmail documents…</div>
+          ) : gmailItems.length === 0 ? (
+            <div style={{ padding: "32px 24px", textAlign: "center", border: `2px dashed ${CA.line}`, borderRadius: 14 }}>
+              <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink, marginBottom: 8 }}>No Gmail documents yet</div>
+              <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, maxWidth: 420, margin: "0 auto" }}>
+                Connect your Gmail on the Integrations page. Attachments your clients email you appear here on their own, every 15 minutes.
+              </p>
+              <CAButton onClick={() => navigate("/ca/integrations")} style={{ marginTop: 16 }}>
+                Go to Integrations
+              </CAButton>
+            </div>
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead><tr>
+                  <th style={caTh}>Received</th>
+                  <th style={caTh}>From</th>
+                  <th style={caTh}>Subject</th>
+                  <th style={caTh}>File</th>
+                  <th style={caTh}>Matched client</th>
+                  <th style={caTh}>Confidence</th>
+                  <th style={caTh}>State</th>
+                  <th style={caTh}>Action</th>
+                </tr></thead>
+                <tbody>
+                  {gmailItems.map((item) => {
+                    const conf = Number(item.gmail_match_confidence ?? 0);
+                    const confColor = conf >= 0.75 ? CA.green : conf >= 0.5 ? CA.gold : CA.red;
+                    return (
+                      <tr key={item.id}>
+                        <td style={caTd}>{dateIN(item.created_at)}</td>
+                        <td style={{ ...caTd, fontFamily: CA.mono, fontSize: 12 }}>{item.gmail_sender_email ?? "—"}</td>
+                        <td style={caTd}>{item.gmail_subject ?? "—"}</td>
+                        <td style={caTd}>{item.original_filename ?? "—"}</td>
+                        <td style={caTd}>
+                          {item.business_id ? (
+                            <span style={{ fontWeight: 600 }}>{nameFor(item.business_id)}</span>
+                          ) : (
+                            <select
+                              defaultValue=""
+                              disabled={assignBusy === item.id}
+                              onChange={(e) => {
+                                if (e.target.value) void assignGmailClient(item.id, e.target.value, item.gmail_sender_email);
+                              }}
+                              style={{ ...caInputStyle, height: 30, fontSize: 12, padding: "0 8px", width: "auto" }}
+                            >
+                              <option value="">Assign client…</option>
+                              {clients.map((c) => (
+                                <option key={c.business_id} value={c.business_id}>{c.client_name}</option>
+                              ))}
+                            </select>
+                          )}
+                        </td>
+                        <td style={caTd}>
+                          <span style={{ fontFamily: CA.mono, fontSize: 12, color: confColor, fontWeight: 600 }}>
+                            {conf >= 0.75 ? "Auto matched" : conf >= 0.5 ? `${Math.round(conf * 100)} percent, confirm` : "Unmatched"}
+                          </span>
+                        </td>
+                        <td style={caTd}>
+                          <CABadge tone={item.review_state === "posted" ? "green" : item.review_state === "needs_review" ? "amber" : "grey"}>
+                            {item.review_state.replace(/_/g, " ")}
+                          </CABadge>
+                        </td>
+                        <td style={caTd}>
+                          {item.review_state === "needs_review" && item.business_id && (
+                            <CAButton variant="ghost" onClick={() => navigate("/ca/intake/review")} style={{ fontSize: 12, padding: "4px 10px" }}>
+                              Review
+                            </CAButton>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div style={{ marginTop: 14 }}>
+            <CAButton variant="ghost" onClick={() => void loadGmailItems()}>Refresh</CAButton>
+          </div>
+        </CACard>
+      ) : (
+      <>
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12, marginBottom: 16 }}>
           <select style={caInputStyle} value={businessId} onChange={(e) => setBusinessId(e.target.value)}>
@@ -315,6 +505,8 @@ export default function CADocumentInboxPage() {
           Refresh
         </CAButton>
       </div>
+      </>
+      )}
     </div>
   );
 }

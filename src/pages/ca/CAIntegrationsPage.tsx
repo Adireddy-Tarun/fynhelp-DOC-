@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { getFirmIntegrations, syncZohoBooks, syncRazorpay } from "@/lib/caSync.functions";
+import { startGmailConnect, disconnectGmail } from "@/lib/caGmail.functions";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, dateIN, caTh, caTd, CAEmpty,
 } from "@/components/ca/portalUi";
@@ -35,6 +36,14 @@ interface FieldMap {
   canonical_field_id: string | null;
 }
 
+interface GmailConnection {
+  id: string;
+  gmail_address: string;
+  last_polled_at: string | null;
+  is_active: boolean;
+  error_message: string | null;
+}
+
 type SourceKey = "tally" | "zoho_books" | "razorpay" | "bank_csv";
 
 const SOURCE_LABEL: Record<SourceKey, string> = {
@@ -60,6 +69,12 @@ export default function CAIntegrationsPage() {
   const [bankStats, setBankStats] = useState<{ count: number; last: string | null }>({ count: 0, last: null });
   const [fields, setFields] = useState<CanonicalField[]>([]);
   const [maps, setMaps] = useState<FieldMap[]>([]);
+  const [gmailConnections, setGmailConnections] = useState<GmailConnection[]>([]);
+  const [gmailConnecting, setGmailConnecting] = useState(false);
+  const [gmailSetupNeeded, setGmailSetupNeeded] = useState(false);
+
+  const beginGmailConnect = useServerFn(startGmailConnect);
+  const endGmailConnection = useServerFn(disconnectGmail);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -81,6 +96,13 @@ export default function CAIntegrationsPage() {
           .select("created_at").eq("ca_firm_id", firmId).order("created_at", { ascending: false }).limit(1),
         supabase.from("ca_client_access").select("business_id").eq("ca_firm_id", firmId).eq("is_active", true),
       ]);
+
+      const { data: gmailData } = await supabase
+        .from("ca_gmail_connections")
+        .select("id, gmail_address, last_polled_at, is_active, error_message")
+        .eq("ca_firm_id", firmId)
+        .order("created_at", { ascending: false });
+      setGmailConnections((gmailData as GmailConnection[]) ?? []);
 
       setJobs((jobsRes.data as SyncJob[]) ?? []);
       setFields((fieldsRes.data as CanonicalField[]) ?? []);
@@ -109,6 +131,31 @@ export default function CAIntegrationsPage() {
   }, [firmId, loadIntegrations]);
 
   useEffect(() => { load(); }, [load]);
+
+  const connectGmail = async () => {
+    if (!firmId) return;
+    setGmailConnecting(true);
+    try {
+      const res = await beginGmailConnect({ data: { firmId, origin: window.location.origin } });
+      window.location.href = res.url;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Could not start the Gmail connection";
+      if (/GMAIL_CLIENT_ID|not configured/i.test(message)) setGmailSetupNeeded(true);
+      else toast.error(message);
+      setGmailConnecting(false);
+    }
+  };
+
+  const handleGmailDisconnect = async (connectionId: string) => {
+    if (!firmId) return;
+    try {
+      await endGmailConnection({ data: { connectionId, firmId } });
+      toast.success("Gmail disconnected");
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not disconnect Gmail");
+    }
+  };
 
   const jobsBySource = useMemo(() => {
     const out: Record<string, { last: SyncJob | null; records: number }> = {};
@@ -212,6 +259,85 @@ export default function CAIntegrationsPage() {
       <p style={{ fontFamily: CA.mono, fontSize: 11.5, color: CA.faint, marginTop: 4 }}>
         Syncs every 6 hours
       </p>
+
+      <CACard style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
+        <div style={{ padding: "14px 20px", borderBottom: `0.5px solid ${CA.line}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <div>
+            <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: CA.ink }}>Gmail intake</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 2 }}>
+              Connect your Gmail. Documents clients email you are read and routed to the right client automatically, every 15 minutes.
+            </div>
+          </div>
+          {gmailConnections.filter((c) => c.is_active).length === 0 && (
+            <CAButton onClick={connectGmail} disabled={gmailConnecting} style={{ flexShrink: 0 }}>
+              {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
+            </CAButton>
+          )}
+        </div>
+        {gmailConnections.length === 0 ? (
+          <div style={{ padding: "20px", fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>
+            No Gmail account connected yet. Once connected, attachments your clients email you appear in the Intake inbox on their own.
+          </div>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead><tr>
+              <th style={caTh}>Gmail account</th>
+              <th style={caTh}>Status</th>
+              <th style={caTh}>Last checked</th>
+              <th style={{ ...caTh, textAlign: "right" }}>Action</th>
+            </tr></thead>
+            <tbody>
+              {gmailConnections.map((conn) => (
+                <tr key={conn.id}>
+                  <td style={caTd}>
+                    <div style={{ fontWeight: 600 }}>{conn.gmail_address}</div>
+                    {conn.error_message && (
+                      <div style={{ fontSize: 11.5, color: CA.red, marginTop: 2 }}>{conn.error_message}</div>
+                    )}
+                  </td>
+                  <td style={caTd}>
+                    <CABadge tone={conn.is_active ? "green" : "red"}>{conn.is_active ? "connected" : "disconnected"}</CABadge>
+                  </td>
+                  <td style={caTd}>{conn.last_polled_at ? dateIN(conn.last_polled_at) : "Not checked yet"}</td>
+                  <td style={{ ...caTd, textAlign: "right" }}>
+                    {conn.is_active ? (
+                      <CAButton variant="danger" onClick={() => handleGmailDisconnect(conn.id)} style={{ fontSize: 12, padding: "5px 10px" }}>
+                        Disconnect
+                      </CAButton>
+                    ) : (
+                      <CAButton variant="ghost" onClick={connectGmail} style={{ fontSize: 12, padding: "5px 10px" }}>
+                        Reconnect
+                      </CAButton>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </CACard>
+
+      {gmailSetupNeeded && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
+          <CACard style={{ maxWidth: 480, width: "100%", padding: 30 }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 19, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>
+              Gmail needs one-time setup
+            </div>
+            <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, lineHeight: 1.65, marginBottom: 14 }}>
+              Gmail intake needs a Google sign-in app for FynHelp. Create OAuth credentials in Google Cloud Console under APIs and Services, Credentials, then add them in Project Settings, Secrets as GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET.
+            </p>
+            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint, lineHeight: 1.6, marginBottom: 20 }}>
+              Add this address as an authorised redirect in Google: {typeof window !== "undefined" ? `${window.location.origin}/ca/integrations/gmail/callback` : "/ca/integrations/gmail/callback"}
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <CAButton variant="ghost" onClick={() => setGmailSetupNeeded(false)}>Close</CAButton>
+              <CAButton onClick={() => { setGmailSetupNeeded(false); connectGmail(); }}>Try again</CAButton>
+            </div>
+          </CACard>
+        </div>
+      )}
+
+
 
 
       <CACard style={{ marginTop: 20, overflow: "hidden" }}>
