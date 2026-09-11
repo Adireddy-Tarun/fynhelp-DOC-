@@ -35,8 +35,8 @@ export function redirectUriFor(origin: string | null | undefined): string {
 }
 
 export function gmailCredentials(): { clientId: string; clientSecret: string } {
-  const clientId = process.env["GMAIL_CLIENT_ID"] ?? "";
-  const clientSecret = process.env["GMAIL_CLIENT_SECRET"] ?? "";
+  const clientId = process.env["GMAIL_CLIENT_ID"] ?? process.env["GOOGLE_OAUTH_CLIENT_ID"] ?? "";
+  const clientSecret = process.env["GMAIL_CLIENT_SECRET"] ?? process.env["GOOGLE_OAUTH_CLIENT_SECRET"] ?? "";
   if (!clientId || !clientSecret) {
     throw new Error("GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET are not configured");
   }
