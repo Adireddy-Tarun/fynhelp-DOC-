@@ -23,7 +23,7 @@ export const startGmailConnect = createServerFn({ method: "POST" })
     if (!input?.firmId) throw new Error("firmId is required");
     return input;
   })
-  .handler(async ({ data, context }): Promise<{ url: string }> => {
+  .handler(async ({ data, context }): Promise<{ url: string; redirectUri: string }> => {
     await assertFirmMember(context.supabase as never, data.firmId);
     const { gmailCredentials, redirectUriFor, GMAIL_SCOPES } = await import("@/lib/caGmail.server");
     const { clientId } = gmailCredentials();
