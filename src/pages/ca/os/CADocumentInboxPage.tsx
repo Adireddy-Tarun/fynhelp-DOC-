@@ -505,6 +505,8 @@ export default function CADocumentInboxPage() {
           Refresh
         </CAButton>
       </div>
+      </>
+      )}
     </div>
   );
 }
