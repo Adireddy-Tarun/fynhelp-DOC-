@@ -2155,7 +2155,7 @@ export type Database = {
       }
       ca_document_extractions: {
         Row: {
-          business_id: string
+          business_id: string | null
           ca_firm_id: string
           classification: string
           confidence: number
@@ -2165,6 +2165,11 @@ export type Database = {
           document_id: string | null
           error_message: string | null
           extracted: Json
+          gmail_match_confidence: number | null
+          gmail_match_method: string | null
+          gmail_message_id: string | null
+          gmail_sender_email: string | null
+          gmail_subject: string | null
           id: string
           original_filename: string | null
           posted_at: string | null
@@ -2173,13 +2178,14 @@ export type Database = {
           review_state: string
           reviewed_at: string | null
           reviewed_by: string | null
+          source_type: string
           storage_path: string | null
           updated_at: string
           uploaded_by: string | null
           was_corrected: boolean
         }
         Insert: {
-          business_id: string
+          business_id?: string | null
           ca_firm_id: string
           classification?: string
           confidence?: number
@@ -2189,6 +2195,11 @@ export type Database = {
           document_id?: string | null
           error_message?: string | null
           extracted?: Json
+          gmail_match_confidence?: number | null
+          gmail_match_method?: string | null
+          gmail_message_id?: string | null
+          gmail_sender_email?: string | null
+          gmail_subject?: string | null
           id?: string
           original_filename?: string | null
           posted_at?: string | null
@@ -2197,13 +2208,14 @@ export type Database = {
           review_state?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          source_type?: string
           storage_path?: string | null
           updated_at?: string
           uploaded_by?: string | null
           was_corrected?: boolean
         }
         Update: {
-          business_id?: string
+          business_id?: string | null
           ca_firm_id?: string
           classification?: string
           confidence?: number
@@ -2213,6 +2225,11 @@ export type Database = {
           document_id?: string | null
           error_message?: string | null
           extracted?: Json
+          gmail_match_confidence?: number | null
+          gmail_match_method?: string | null
+          gmail_message_id?: string | null
+          gmail_sender_email?: string | null
+          gmail_subject?: string | null
           id?: string
           original_filename?: string | null
           posted_at?: string | null
@@ -2221,6 +2238,7 @@ export type Database = {
           review_state?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          source_type?: string
           storage_path?: string | null
           updated_at?: string
           uploaded_by?: string | null
@@ -2356,6 +2374,56 @@ export type Database = {
             columns: ["extraction_id"]
             isOneToOne: false
             referencedRelation: "ca_document_extractions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_email_sender_mappings: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          confidence: number
+          confirmed_at: string | null
+          confirmed_by_user_id: string | null
+          created_at: string
+          id: string
+          match_method: string | null
+          sender_domain: string | null
+          sender_email: string
+          sender_name: string | null
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          confidence?: number
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          id?: string
+          match_method?: string | null
+          sender_domain?: string | null
+          sender_email: string
+          sender_name?: string | null
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          confidence?: number
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          id?: string
+          match_method?: string | null
+          sender_domain?: string | null
+          sender_email?: string
+          sender_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_email_sender_mappings_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
             referencedColumns: ["id"]
           },
         ]
@@ -2782,6 +2850,59 @@ export type Database = {
           source?: string
         }
         Relationships: []
+      }
+      ca_gmail_connections: {
+        Row: {
+          access_token_enc: string
+          ca_firm_id: string
+          created_at: string
+          error_message: string | null
+          gmail_address: string
+          id: string
+          is_active: boolean
+          last_history_id: string | null
+          last_polled_at: string | null
+          refresh_token_enc: string
+          token_expiry: string
+          user_id: string
+        }
+        Insert: {
+          access_token_enc: string
+          ca_firm_id: string
+          created_at?: string
+          error_message?: string | null
+          gmail_address: string
+          id?: string
+          is_active?: boolean
+          last_history_id?: string | null
+          last_polled_at?: string | null
+          refresh_token_enc: string
+          token_expiry: string
+          user_id: string
+        }
+        Update: {
+          access_token_enc?: string
+          ca_firm_id?: string
+          created_at?: string
+          error_message?: string | null
+          gmail_address?: string
+          id?: string
+          is_active?: boolean
+          last_history_id?: string | null
+          last_polled_at?: string | null
+          refresh_token_enc?: string
+          token_expiry?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_gmail_connections_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ca_gstr2b_uploads: {
         Row: {
