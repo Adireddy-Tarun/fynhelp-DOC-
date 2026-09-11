@@ -75,6 +75,7 @@ export default function CAIntegrationsPage() {
 
   const beginGmailConnect = useServerFn(startGmailConnect);
   const endGmailConnection = useServerFn(disconnectGmail);
+  const runGmailPoll = useServerFn(pollGmailNow);
 
   const load = useCallback(async () => {
     if (!firmId) return;
