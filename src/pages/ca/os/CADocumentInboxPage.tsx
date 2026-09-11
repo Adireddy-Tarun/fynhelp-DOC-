@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useCARole } from "@/hooks/useCARole";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
-import { CA, CACard, CAButton, caInputStyle, dateIN } from "@/components/ca/portalUi";
+import { useNavigate } from "@/lib/router-compat";
+import { CA, CACard, CAButton, CABadge, caInputStyle, caTh, caTd, dateIN } from "@/components/ca/portalUi";
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
 
