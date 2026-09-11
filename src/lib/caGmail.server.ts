@@ -303,3 +303,58 @@ export function classifyByFilename(filename: string): "bank" | "invoice" | "expe
   if (/(challan|gst|tds|itns|payment[-_ ]?ack)/.test(f)) return "challan";
   return "other";
 }
+
+/**
+ * Recursively extract all attachments from a Gmail message payload.
+ * Handles nested multipart/mixed, multipart/related and multipart/alternative
+ * so attachments are found however deeply they are nested.
+ */
+export interface GmailAttachment {
+  filename: string;
+  mimeType: string;
+  attachmentId: string;
+  size: number;
+}
+
+export function extractAttachments(
+  part: {
+    filename?: string;
+    mimeType?: string;
+    body?: { attachmentId?: string; size?: number };
+    parts?: unknown[];
+  },
+  depth = 0,
+): GmailAttachment[] {
+  if (depth > 6) return [];
+
+  const results: GmailAttachment[] = [];
+
+  const filename = (part.filename ?? "").trim();
+  const attachmentId = part.body?.attachmentId;
+  if (
+    filename &&
+    attachmentId &&
+    (part.mimeType?.includes("pdf") ||
+      part.mimeType?.includes("csv") ||
+      part.mimeType?.includes("xml") ||
+      part.mimeType?.includes("excel") ||
+      part.mimeType?.includes("spreadsheet") ||
+      part.mimeType?.startsWith("image/") ||
+      part.mimeType === "application/octet-stream")
+  ) {
+    results.push({
+      filename,
+      mimeType: part.mimeType ?? "application/octet-stream",
+      attachmentId,
+      size: part.body?.size ?? 0,
+    });
+  }
+
+  if (Array.isArray(part.parts)) {
+    for (const child of part.parts) {
+      results.push(...extractAttachments(child as Parameters<typeof extractAttachments>[0], depth + 1));
+    }
+  }
+
+  return results;
+}
