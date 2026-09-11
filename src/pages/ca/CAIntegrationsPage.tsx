@@ -147,6 +147,17 @@ export default function CAIntegrationsPage() {
     }
   };
 
+  const testPollGmail = async () => {
+    if (!firmId) return;
+    try {
+      const res = await runGmailPoll({ data: { firmId, origin: window.location.origin } });
+      if (res.ok) toast.success("Check started — open the Gmail tab in the Intake inbox in about 30 seconds");
+      else toast.error("The check could not run right now. Please try again shortly.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start the check");
+    }
+  };
+
   const handleGmailDisconnect = async (connectionId: string) => {
     if (!firmId) return;
     try {
