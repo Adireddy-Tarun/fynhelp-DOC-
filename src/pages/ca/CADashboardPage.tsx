@@ -79,6 +79,7 @@ export default function CADashboardPage() {
   // 0 = not first run, 1 = no clients, 2 = has client no docs, 3 = has docs needs review, 4 = complete
   const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4>(0);
   const [nbaMap, setNbaMap] = useState<Record<string, { action: string; path: string; tone: "red" | "gold" | "teal" }>>({});
+  const [pendingVerificationCount, setPendingVerificationCount] = useState(0);
 
   useEffect(() => {
     if (!clients.length || !firmId) return;
@@ -93,6 +94,20 @@ export default function CADashboardPage() {
       let compliance: { business_id: string; status: string; due_date: string; event_type: string }[] = [];
       const recentTxns = new Set<string>();
       const pendingChasers = new Set<string>();
+      const pendingVerification = new Set<string>();
+
+      try {
+        const pendingVerifRes = await supabase
+          .from("ca_document_extractions")
+          .select("business_id", { count: "exact" })
+          .eq("ca_firm_id", firmId)
+          .eq("review_state", "pending_verification")
+          .limit(200);
+        for (const item of (pendingVerifRes.data ?? []) as { business_id: string | null }[]) {
+          if (item.business_id) pendingVerification.add(item.business_id);
+        }
+        if (!cancelled) setPendingVerificationCount(pendingVerifRes.count ?? 0);
+      } catch { /* silent */ }
 
       try {
         const excRes = await supabase
@@ -136,7 +151,9 @@ export default function CADashboardPage() {
         const overdueCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) < now);
         const upcomingCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) >= now);
 
-        if (topException && (topException.amount ?? 0) > 10000) {
+        if (pendingVerification.has(bid)) {
+          map[c.id] = { action: "Confirm Gmail document before ledger posting", path: "/ca/intake/inbox", tone: "red" };
+        } else if (topException && (topException.amount ?? 0) > 10000) {
           map[c.id] = { action: `Resolve exception — ${inr(topException.amount)} at risk`, path: "/ca/exceptions", tone: "red" };
         } else if (overdueCompliance.length > 0) {
           map[c.id] = { action: `File overdue ${overdueCompliance[0]!.event_type ?? "return"}`, path: `/ca/clients/${c.id}`, tone: "red" };
@@ -450,7 +467,7 @@ export default function CADashboardPage() {
 
   const active = clients.filter((c) => (c.client_status ?? "").toLowerCase() === "active").length;
 
-  const actionsToday = dueToday.length + overdueCount;
+  const actionsToday = dueToday.length + overdueCount + pendingVerificationCount;
   const now = new Date();
   const daysToMonthEnd = Math.max(
     0,
@@ -530,7 +547,7 @@ export default function CADashboardPage() {
             {actionsToday}
           </div>
           <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginTop: 4 }}>
-            {dueToday.length} reminders, {overdueCount} overdue filings
+            {pendingVerificationCount} verifications, {dueToday.length} reminders, {overdueCount} overdue filings
           </div>
           {actionsToday > 0 && (
             <span style={{ display: "inline-block", marginTop: 8, background: "rgba(169,56,56,0.10)", color: "#A93838", fontFamily: CA.sans, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 999 }}>

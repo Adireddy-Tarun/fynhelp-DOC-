@@ -279,6 +279,44 @@ export function parseBankCsvText(text: string): ParsedRow[] {
   return rows;
 }
 
+/**
+ * Parse a Tally XML export byte buffer.
+ * Returns rows in the same shape as parseBankCsvText so the poll route
+ * does not need to know which parser was used.
+ */
+export function parseTallyXmlBytes(bytes: Uint8Array): ParsedRow[] {
+  try {
+    const text = new TextDecoder().decode(bytes);
+    // DOMParser is unavailable in the server route, so extract Tally vouchers directly.
+    const rows: ParsedRow[] = [];
+    const voucherMatches = text.matchAll(/<VOUCHER[^>]*>([\s\S]*?)<\/VOUCHER>/gi);
+    for (const voucher of voucherMatches) {
+      const inner = voucher[1] ?? "";
+      const dateMatch = inner.match(/<DATE>\s*([0-9]{8})\s*<\/DATE>/i);
+      const narration = inner.match(/<NARRATION>\s*(.*?)\s*<\/NARRATION>/i)?.[1]
+        ?? inner.match(/<VOUCHERTYPENAME>\s*(.*?)\s*<\/VOUCHERTYPENAME>/i)?.[1]
+        ?? "";
+      if (!dateMatch) continue;
+      const raw = dateMatch[1];
+      const date = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+      const ledgerAmounts = inner.matchAll(/<AMOUNT>\s*([-0-9.]+)\s*<\/AMOUNT>/gi);
+      for (const ledgerAmount of ledgerAmounts) {
+        const amount = Number.parseFloat(ledgerAmount[1] ?? "0");
+        if (!Number.isFinite(amount) || amount === 0) continue;
+        rows.push({
+          date,
+          description: narration,
+          amount: Math.abs(amount),
+          direction: amount < 0 ? "debit" : "credit",
+        });
+      }
+    }
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
 /** Confidence of a CSV extraction: how complete the parsed rows are. */
 export function scoreRows(rows: ParsedRow[]): number {
   if (!rows.length) return 0;

@@ -17,6 +17,7 @@ interface GmailRow {
   gmail_match_method: string | null;
   gmail_match_confidence: number | null;
   business_id: string | null;
+  confidence: number;
   review_state: string;
   created_at: string;
 }
@@ -126,6 +127,8 @@ export default function CADocumentInboxPage() {
   const [gmailItems, setGmailItems] = useState<GmailRow[]>([]);
   const [loadingGmail, setLoadingGmail] = useState(false);
   const [assignBusy, setAssignBusy] = useState<string | null>(null);
+  const [verifyItem, setVerifyItem] = useState<GmailRow | null>(null);
+  const [verifyBusy, setVerifyBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -147,7 +150,7 @@ export default function CADocumentInboxPage() {
     setLoadingGmail(true);
     const { data } = await supabase
       .from("ca_document_extractions")
-      .select("id, original_filename, gmail_sender_email, gmail_subject, gmail_match_method, gmail_match_confidence, business_id, review_state, created_at")
+      .select("id, original_filename, gmail_sender_email, gmail_subject, gmail_match_method, gmail_match_confidence, business_id, confidence, review_state, created_at")
       .eq("ca_firm_id", firmId)
       .eq("source_type", "gmail")
       .order("created_at", { ascending: false })
@@ -203,6 +206,78 @@ export default function CADocumentInboxPage() {
     toast.success("Client assigned. Future emails from this sender route here automatically.");
     setAssignBusy(null);
     void loadGmailItems();
+  };
+
+  const confirmGmailMatch = async (
+    item: GmailRow,
+    confirmedBusinessId: string,
+    action: "confirm" | "reassign" | "reject",
+  ) => {
+    if (!firmId) return;
+    setVerifyItem(item);
+    setVerifyBusy(true);
+    try {
+      if (action === "reject") {
+        const { error } = await supabase
+          .from("ca_document_extractions")
+          .update({ review_state: "rejected", error_message: "Rejected by CA during Gmail verification." })
+          .eq("ca_firm_id", firmId)
+          .eq("id", item.id);
+        if (error) throw error;
+        void supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: item.business_id,
+          event_type: "gmail_match_rejected",
+          payload: { sender_email: item.gmail_sender_email, original_match_method: item.gmail_match_method },
+        }).then(undefined, () => undefined);
+        toast.success("Document rejected and will not be posted.");
+      } else {
+        const newState = item.confidence >= 0.85 ? "auto_accepted" : "needs_review";
+        const { error } = await supabase
+          .from("ca_document_extractions")
+          .update({ business_id: confirmedBusinessId, review_state: newState, error_message: null })
+          .eq("ca_firm_id", firmId)
+          .eq("id", item.id);
+        if (error) throw error;
+
+        const { data: userRes } = await supabase.auth.getUser();
+        const { error: mappingError } = await supabase.from("ca_email_sender_mappings").upsert({
+          ca_firm_id: firmId,
+          business_id: confirmedBusinessId,
+          sender_email: item.gmail_sender_email ?? "",
+          sender_domain: item.gmail_sender_email?.split("@")[1] ?? null,
+          match_method: "manual",
+          confidence: 0.95,
+          confirmed_by_user_id: userRes.user?.id ?? null,
+          confirmed_at: new Date().toISOString(),
+        }, { onConflict: "ca_firm_id,sender_email" });
+        if (mappingError) throw mappingError;
+
+        void supabase.from("ca_brain_events").insert({
+          ca_firm_id: firmId,
+          business_id: confirmedBusinessId,
+          event_type: "gmail_client_mapped",
+          payload: {
+            sender_email: item.gmail_sender_email,
+            match_method: "manual",
+            original_method: item.gmail_match_method,
+            original_confidence: item.gmail_match_confidence,
+            action,
+          },
+        }).then(undefined, () => undefined);
+        toast.success(
+          newState === "auto_accepted"
+            ? "Client confirmed. The extraction is ready for automatic processing."
+            : "Client confirmed and moved to the Review Queue for an extraction check.",
+        );
+      }
+      setVerifyItem(null);
+      await loadGmailItems();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not complete verification");
+    } finally {
+      setVerifyBusy(false);
+    }
   };
 
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
@@ -284,6 +359,8 @@ export default function CADocumentInboxPage() {
 
   const needsReview = rows.filter((r) => r.review_state === "needs_review").length;
   const posted = rows.filter((r) => r.review_state === "posted").length;
+  const pendingVerification = gmailItems.filter((item) => item.review_state === "pending_verification");
+  const otherGmailItems = gmailItems.filter((item) => item.review_state !== "pending_verification");
 
   return (
     <div>
@@ -338,7 +415,72 @@ export default function CADocumentInboxPage() {
               </CAButton>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
+            <>
+            {pendingVerification.length > 0 && (
+              <div style={{ background: "rgba(139,105,20,0.06)", border: "1px solid rgba(139,105,20,0.22)", borderRadius: 12, padding: "16px 18px", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 999, background: CA.gold }} />
+                  <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 700, color: CA.gold }}>
+                    {pendingVerification.length} document{pendingVerification.length > 1 ? "s" : ""} need confirmation before posting
+                  </div>
+                </div>
+                <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginBottom: 12, lineHeight: 1.55 }}>
+                  Confirm the correct client before these documents can post to a ledger. The confirmed sender mapping is remembered for future emails.
+                </p>
+                {pendingVerification.map((item) => {
+                  const suggestedClient = clients.find((client) => client.business_id === item.business_id);
+                  return (
+                    <div key={item.id} style={{ background: CA.card, border: `1px solid ${CA.line}`, borderRadius: 10, padding: "14px 16px", marginBottom: 8 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 12 }}>
+                        {[
+                          ["From", item.gmail_sender_email ?? "Not available"],
+                          ["Subject", item.gmail_subject ?? "Not available"],
+                          ["File", item.original_filename ?? "Not available"],
+                        ].map(([label, value]) => (
+                          <div key={label}>
+                            <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontFamily: label === "From" ? CA.mono : CA.sans, fontSize: 12.5, color: CA.ink, fontWeight: label === "File" ? 600 : 400 }}>{value}</div>
+                          </div>
+                        ))}
+                        <div>
+                          <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.faint, marginBottom: 2 }}>System suggested</div>
+                          <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.gold, fontWeight: 600 }}>
+                            {suggestedClient?.client_name ?? "No suggestion"}
+                            <span style={{ fontWeight: 400, color: CA.faint, fontSize: 11, marginLeft: 6 }}>
+                              {Math.round((item.gmail_match_confidence ?? 0) * 100)} percent confidence via {item.gmail_match_method ?? "matching"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginBottom: 10, padding: "8px 10px", background: "rgba(139,105,20,0.05)", borderRadius: 6, borderLeft: `3px solid ${CA.gold}` }}>
+                        This document has not been posted to any ledger. Confirm the client before it is processed.
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                        <select defaultValue={item.business_id ?? ""} id={`verify-client-${item.id}`} style={{ ...caInputStyle, flex: 1, minWidth: 200 }}>
+                          <option value="">Select the correct client</option>
+                          {clients.map((client) => <option key={client.business_id} value={client.business_id}>{client.client_name}</option>)}
+                        </select>
+                        <CAButton
+                          disabled={verifyBusy}
+                          onClick={async () => {
+                            const selected = document.getElementById(`verify-client-${item.id}`);
+                            const selectedBusinessId = selected instanceof HTMLSelectElement ? selected.value : "";
+                            if (!selectedBusinessId) return toast.error("Select a client before confirming");
+                            await confirmGmailMatch(item, selectedBusinessId, selectedBusinessId === item.business_id ? "confirm" : "reassign");
+                          }}
+                        >
+                          {verifyBusy && verifyItem?.id === item.id ? "Processing" : "Confirm and process"}
+                        </CAButton>
+                        <CAButton variant="danger" disabled={verifyBusy} onClick={() => void confirmGmailMatch(item, "", "reject")}>
+                          Reject as non-client document
+                        </CAButton>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {otherGmailItems.length > 0 && <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead><tr>
                   <th style={caTh}>Received</th>
@@ -351,7 +493,7 @@ export default function CADocumentInboxPage() {
                   <th style={caTh}>Action</th>
                 </tr></thead>
                 <tbody>
-                  {gmailItems.map((item) => {
+                  {otherGmailItems.map((item) => {
                     const conf = Number(item.gmail_match_confidence ?? 0);
                     const confColor = conf >= 0.75 ? CA.green : conf >= 0.5 ? CA.gold : CA.red;
                     return (
@@ -401,7 +543,8 @@ export default function CADocumentInboxPage() {
                   })}
                 </tbody>
               </table>
-            </div>
+            </div>}
+            </>
           )}
           <div style={{ marginTop: 14 }}>
             <CAButton variant="ghost" onClick={() => void loadGmailItems()}>Refresh</CAButton>

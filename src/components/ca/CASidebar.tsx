@@ -145,7 +145,12 @@ export default function CASidebar({
           .eq("ca_firm_id", firmId)
           .eq("match_status", "mismatched")
           .eq("is_demo", false);
-        if (!cancelled) setUrgentCount(overdue + (mismatched ?? 0));
+        const { count: pendingVerif } = await supabase
+          .from("ca_document_extractions")
+          .select("id", { count: "exact", head: true })
+          .eq("ca_firm_id", firmId)
+          .eq("review_state", "pending_verification");
+        if (!cancelled) setUrgentCount(overdue + (mismatched ?? 0) + (pendingVerif ?? 0));
       } catch { /* silent */ }
     })();
     return () => { cancelled = true; };

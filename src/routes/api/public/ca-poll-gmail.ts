@@ -203,13 +203,52 @@ async function run(request: Request): Promise<Response> {
 
           const filename = String(att.filename ?? "attachment");
           const isCsv = /\.csv$/i.test(filename) || String(att.mimeType ?? "").includes("csv");
+          const isXml = /\.xml$/i.test(filename);
+          const isPdfOrImage =
+            String(att.mimeType ?? "").includes("pdf") ||
+            String(att.mimeType ?? "").startsWith("image/");
           const classification = gmail.classifyByFilename(filename);
 
           let rows: ParsedRow[] = [];
           let extractConfidence = 0;
+          let ocrAttempted = false;
           if (isCsv) {
             rows = gmail.parseBankCsvText(new TextDecoder().decode(bytes));
             extractConfidence = gmail.scoreRows(rows);
+          } else if (isXml) {
+            rows = gmail.parseTallyXmlBytes(bytes);
+            extractConfidence = gmail.scoreRows(rows);
+          } else if (isPdfOrImage && match.businessId) {
+            try {
+              ocrAttempted = true;
+              let binary = "";
+              for (const byte of bytes) binary += String.fromCharCode(byte);
+              const base64Data = btoa(binary);
+              const mimeType = String(att.mimeType ?? "application/pdf");
+              const docType = classification === "invoice" || classification === "expense" ? classification : "bank";
+              const ocrRes = await supabaseAdmin.functions.invoke("extract-document-ai", {
+                body: {
+                  doc_type: docType,
+                  file_base64: base64Data,
+                  mime_type: mimeType,
+                  filename,
+                  classification,
+                  firmId: conn.ca_firm_id,
+                  businessId: match.businessId,
+                  userId: conn.user_id,
+                },
+              });
+              const ocrData = ocrRes.data as { rows?: ParsedRow[]; confidence?: number } | null;
+              if (!ocrRes.error && Array.isArray(ocrData?.rows) && ocrData.rows.length > 0) {
+                rows = ocrData.rows;
+                extractConfidence = ocrData.confidence ?? gmail.scoreRows(rows);
+                console.log(`[fyn:gmail] OCR complete for ${filename} — rows=${rows.length} confidence=${extractConfidence}`);
+              } else if (ocrRes.error) {
+                throw ocrRes.error;
+              }
+            } catch (ocrErr) {
+              console.error(`[fyn:gmail] OCR failed for ${filename}: ${ocrErr instanceof Error ? ocrErr.message : String(ocrErr)}`);
+            }
           }
 
           const path = `${conn.ca_firm_id}/${match.businessId ?? "unassigned"}/gmail/${Date.now()}_${safeName(filename)}`;
@@ -221,11 +260,17 @@ async function run(request: Request): Promise<Response> {
             continue;
           }
 
-          const reviewState = !match.businessId
-            ? "needs_review"
-            : rows.length > 0 && extractConfidence >= 0.85 && match.confidence >= 0.75
-              ? "auto_accepted"
-              : "needs_review";
+          const reviewState =
+            !match.businessId
+              ? "needs_review"
+              : match.confidence < 0.75
+                ? "pending_verification"
+                : rows.length > 0 && extractConfidence >= 0.85
+                  ? "auto_accepted"
+                  : "needs_review";
+          if (reviewState === "pending_verification") {
+            console.log(`[fyn:gmail] pending_verification set for ${filename} — match confidence=${match.confidence}`);
+          }
 
           const { error: insertErr } = await supabaseAdmin.from("ca_document_extractions").insert({
             ca_firm_id: conn.ca_firm_id,
@@ -244,7 +289,9 @@ async function run(request: Request): Promise<Response> {
             gmail_match_confidence: match.confidence,
             uploaded_by: conn.user_id,
             error_message: match.businessId
-              ? null
+              ? isPdfOrImage && !ocrAttempted && rows.length === 0
+                ? "PDF received but OCR not run. Assign the client, then re-extract from the Review Queue."
+                : null
               : `Sender ${senderEmail} could not be matched to a client. Assign the client in the Intake inbox.`,
           } as never);
 
@@ -254,7 +301,7 @@ async function run(request: Request): Promise<Response> {
           }
           totalProcessed++;
 
-          if (match.businessId) {
+          if (match.businessId && reviewState !== "pending_verification") {
             await supabaseAdmin
               .from("ca_email_sender_mappings")
               .upsert(
@@ -279,7 +326,7 @@ async function run(request: Request): Promise<Response> {
                 .select("id")
                 .eq("ca_firm_id", conn.ca_firm_id)
                 .eq("business_id", match.businessId)
-                .in("status", ["pending", "sent", "chased", "escalated"])
+                .in("status", ["open", "pending", "sent", "chased", "escalated"])
                 .limit(20);
               if (open && open.length > 0) {
                 await supabaseAdmin
@@ -288,6 +335,86 @@ async function run(request: Request): Promise<Response> {
                   .in("id", open.map((o: any) => o.id));
               }
             } catch { /* non-blocking */ }
+
+            if (reviewState === "auto_accepted") {
+              try {
+                const now = new Date();
+                const currentPeriod = now.toISOString().slice(0, 7);
+                const periodStart = `${currentPeriod}-01`;
+                const periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0))
+                  .toISOString()
+                  .slice(0, 10);
+                const [{ count: openRequests }, { count: openCompliance }, { count: openExceptions }, { count: txnCount }] = await Promise.all([
+                  supabaseAdmin
+                    .from("ca_document_requests")
+                    .select("id", { count: "exact", head: true })
+                    .eq("ca_firm_id", conn.ca_firm_id)
+                    .eq("business_id", match.businessId)
+                    .eq("period", currentPeriod)
+                    .in("status", ["open", "pending", "sent", "chased", "escalated"]),
+                  supabaseAdmin
+                    .from("ca_compliance_events")
+                    .select("id", { count: "exact", head: true })
+                    .eq("ca_firm_id", conn.ca_firm_id)
+                    .eq("business_id", match.businessId)
+                    .neq("status", "filed")
+                    .gte("due_date", periodStart)
+                    .lte("due_date", periodEnd),
+                  supabaseAdmin
+                    .from("ca_exceptions")
+                    .select("id", { count: "exact", head: true })
+                    .eq("ca_firm_id", conn.ca_firm_id)
+                    .eq("business_id", match.businessId)
+                    .neq("status", "resolved"),
+                  supabaseAdmin
+                    .from("bank_transactions")
+                    .select("id", { count: "exact", head: true })
+                    .eq("business_id", match.businessId)
+                    .gte("date", periodStart)
+                    .lte("date", periodEnd),
+                ]);
+
+                if (
+                  (openRequests ?? 1) === 0 &&
+                  (openCompliance ?? 1) === 0 &&
+                  (openExceptions ?? 1) === 0 &&
+                  (txnCount ?? 0) > 0
+                ) {
+                  const { count: existingNotice } = await supabaseAdmin
+                    .from("ca_notifications")
+                    .select("id", { count: "exact", head: true })
+                    .eq("ca_firm_id", conn.ca_firm_id)
+                    .eq("business_id", match.businessId)
+                    .eq("type", "period_ready")
+                    .gte("created_at", periodStart);
+                  if ((existingNotice ?? 0) === 0) {
+                    const { data: clientData } = await supabaseAdmin
+                      .from("ca_clients")
+                      .select("client_name")
+                      .eq("ca_firm_id", conn.ca_firm_id)
+                      .eq("business_id", match.businessId)
+                      .maybeSingle();
+                    const clientName = (clientData as { client_name?: string } | null)?.client_name ?? "Client";
+                    await supabaseAdmin.from("ca_notifications").insert({
+                      ca_firm_id: conn.ca_firm_id,
+                      business_id: match.businessId,
+                      type: "period_ready",
+                      severity: "info",
+                      title: `${clientName} is ready for MIS`,
+                      message: `All documents for ${currentPeriod} are in. No open compliance items or exceptions. Run reconciliation and generate the MIS with one click.`,
+                      is_read: false,
+                    } as never);
+                    void supabaseAdmin.from("ca_brain_events").insert({
+                      ca_firm_id: conn.ca_firm_id,
+                      business_id: match.businessId,
+                      event_type: "period_ready_notified",
+                      payload: { period: currentPeriod, trigger: "gmail_document_completed_intake" },
+                    } as never).then(undefined, () => undefined);
+                    console.log(`[fyn:gmail] period_ready fired for ${match.businessId} period=${currentPeriod}`);
+                  }
+                }
+              } catch { /* non-blocking — readiness must never break intake */ }
+            }
           }
 
           try {
