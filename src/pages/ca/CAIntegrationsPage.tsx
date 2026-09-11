@@ -280,12 +280,20 @@ export default function CAIntegrationsPage() {
             <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 2 }}>
               Connect your Gmail. Documents clients email you are read and routed to the right client automatically, every 15 minutes.
             </div>
+            <div style={{ fontFamily: CA.mono, fontSize: 11, color: CA.faint, marginTop: 6 }}>
+              Google must allow this return address: {typeof window !== "undefined" ? `${window.location.origin}/ca/integrations/gmail/callback` : "/ca/integrations/gmail/callback"}
+            </div>
           </div>
-          {gmailConnections.filter((c) => c.is_active).length === 0 && (
-            <CAButton onClick={connectGmail} disabled={gmailConnecting} style={{ flexShrink: 0 }}>
-              {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
-            </CAButton>
-          )}
+          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+            {typeof window !== "undefined" && /lovable\.app|localhost/.test(window.location.hostname) && (
+              <CAButton variant="ghost" onClick={testPollGmail}>Test poll now</CAButton>
+            )}
+            {gmailConnections.filter((c) => c.is_active).length === 0 && (
+              <CAButton onClick={connectGmail} disabled={gmailConnecting}>
+                {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
+              </CAButton>
+            )}
+          </div>
         </div>
         {gmailConnections.length === 0 ? (
           <div style={{ padding: "20px", fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>
