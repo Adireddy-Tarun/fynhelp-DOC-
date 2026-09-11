@@ -174,6 +174,7 @@ import { Route as MainDashboardSettingsPreferencesRouteImport } from './routes/_
 import { Route as MainDashboardSettingsProfileRouteImport } from './routes/_main/dashboard/settings/profile'
 import { Route as MainDashboardSettingsSecurityRouteImport } from './routes/_main/dashboard/settings/security'
 import { Route as MainDashboardSettingsTeamRouteImport } from './routes/_main/dashboard/settings/team'
+import { Route as CaIntegrationsGmailCallbackRouteImport } from './routes/ca.integrations.gmail.callback'
 import { Route as AdminAuthAdminProtectedBlogIndexRouteImport } from './routes/_adminAuth/admin/_protected/blog/index'
 import { Route as AdminAuthAdminProtectedBlogNewRouteImport } from './routes/_adminAuth/admin/_protected/blog/new'
 import { Route as AdminAuthAdminProtectedSupportIndexRouteImport } from './routes/_adminAuth/admin/_protected/support/index'
@@ -1084,6 +1085,12 @@ const MainDashboardSettingsTeamRoute =
     path: '/team',
     getParentRoute: () => MainDashboardSettingsRoute,
   } as any)
+const CaIntegrationsGmailCallbackRoute =
+  CaIntegrationsGmailCallbackRouteImport.update({
+    id: '/ca/integrations/gmail/callback',
+    path: '/ca/integrations/gmail/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminAuthAdminProtectedBlogIndexRoute =
   AdminAuthAdminProtectedBlogIndexRouteImport.update({
     id: '/blog/',
@@ -1362,6 +1369,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/profile': typeof MainDashboardSettingsProfileRoute
   '/dashboard/settings/security': typeof MainDashboardSettingsSecurityRoute
   '/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
+  '/ca/integrations/gmail/callback': typeof CaIntegrationsGmailCallbackRoute
   '/admin/': typeof AdminAuthAdminProtectedIndexRoute
   '/ca/': typeof CaAuthCaPortalIndexRoute
   '/dashboard/reports/': typeof MainDashboardReportsIndexRoute
@@ -1540,6 +1548,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/profile': typeof MainDashboardSettingsProfileRoute
   '/dashboard/settings/security': typeof MainDashboardSettingsSecurityRoute
   '/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
+  '/ca/integrations/gmail/callback': typeof CaIntegrationsGmailCallbackRoute
   '/admin': typeof AdminAuthAdminProtectedIndexRoute
   '/ca': typeof CaAuthCaPortalIndexRoute
   '/dashboard/reports': typeof MainDashboardReportsIndexRoute
@@ -1728,6 +1737,7 @@ export interface FileRoutesById {
   '/_main/dashboard/settings/profile': typeof MainDashboardSettingsProfileRoute
   '/_main/dashboard/settings/security': typeof MainDashboardSettingsSecurityRoute
   '/_main/dashboard/settings/team': typeof MainDashboardSettingsTeamRoute
+  '/ca/integrations/gmail/callback': typeof CaIntegrationsGmailCallbackRoute
   '/_adminAuth/admin/_protected/': typeof AdminAuthAdminProtectedIndexRoute
   '/_caAuth/ca/_portal/': typeof CaAuthCaPortalIndexRoute
   '/_main/dashboard/reports/': typeof MainDashboardReportsIndexRoute
@@ -1912,6 +1922,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/profile'
     | '/dashboard/settings/security'
     | '/dashboard/settings/team'
+    | '/ca/integrations/gmail/callback'
     | '/admin/'
     | '/ca/'
     | '/dashboard/reports/'
@@ -2090,6 +2101,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/profile'
     | '/dashboard/settings/security'
     | '/dashboard/settings/team'
+    | '/ca/integrations/gmail/callback'
     | '/admin'
     | '/ca'
     | '/dashboard/reports'
@@ -2277,6 +2289,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/settings/profile'
     | '/_main/dashboard/settings/security'
     | '/_main/dashboard/settings/team'
+    | '/ca/integrations/gmail/callback'
     | '/_adminAuth/admin/_protected/'
     | '/_caAuth/ca/_portal/'
     | '/_main/dashboard/reports/'
@@ -2325,6 +2338,7 @@ export interface RootRouteChildren {
   ApiPublicCaInvoicePaymentWebhookRoute: typeof ApiPublicCaInvoicePaymentWebhookRoute
   ApiPublicCaPollGmailRoute: typeof ApiPublicCaPollGmailRoute
   SharedMisTokenRoute: typeof SharedMisTokenRoute
+  CaIntegrationsGmailCallbackRoute: typeof CaIntegrationsGmailCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -3484,6 +3498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainDashboardSettingsTeamRouteImport
       parentRoute: typeof MainDashboardSettingsRoute
     }
+    '/ca/integrations/gmail/callback': {
+      id: '/ca/integrations/gmail/callback'
+      path: '/ca/integrations/gmail/callback'
+      fullPath: '/ca/integrations/gmail/callback'
+      preLoaderRoute: typeof CaIntegrationsGmailCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_adminAuth/admin/_protected/blog/': {
       id: '/_adminAuth/admin/_protected/blog/'
       path: '/blog'
@@ -4087,6 +4108,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCaInvoicePaymentWebhookRoute: ApiPublicCaInvoicePaymentWebhookRoute,
   ApiPublicCaPollGmailRoute: ApiPublicCaPollGmailRoute,
   SharedMisTokenRoute: SharedMisTokenRoute,
+  CaIntegrationsGmailCallbackRoute: CaIntegrationsGmailCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
