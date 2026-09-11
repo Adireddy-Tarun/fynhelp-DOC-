@@ -137,6 +137,7 @@ export default function CAIntegrationsPage() {
     setGmailConnecting(true);
     try {
       const res = await beginGmailConnect({ data: { firmId, origin: window.location.origin } });
+      try { window.sessionStorage.setItem("fyn:gmail:connect-origin", window.location.origin); } catch { /* ignore */ }
       window.location.href = res.url;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Could not start the Gmail connection";
