@@ -260,6 +260,85 @@ export default function CAIntegrationsPage() {
         Syncs every 6 hours
       </p>
 
+      <CACard style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
+        <div style={{ padding: "14px 20px", borderBottom: `0.5px solid ${CA.line}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+          <div>
+            <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: CA.ink }}>Gmail intake</div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 2 }}>
+              Connect your Gmail. Documents clients email you are read and routed to the right client automatically, every 15 minutes.
+            </div>
+          </div>
+          {gmailConnections.filter((c) => c.is_active).length === 0 && (
+            <CAButton onClick={connectGmail} disabled={gmailConnecting} style={{ flexShrink: 0 }}>
+              {gmailConnecting ? "Opening Google…" : "Connect Gmail"}
+            </CAButton>
+          )}
+        </div>
+        {gmailConnections.length === 0 ? (
+          <div style={{ padding: "20px", fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>
+            No Gmail account connected yet. Once connected, attachments your clients email you appear in the Intake inbox on their own.
+          </div>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead><tr>
+              <th style={caTh}>Gmail account</th>
+              <th style={caTh}>Status</th>
+              <th style={caTh}>Last checked</th>
+              <th style={{ ...caTh, textAlign: "right" }}>Action</th>
+            </tr></thead>
+            <tbody>
+              {gmailConnections.map((conn) => (
+                <tr key={conn.id}>
+                  <td style={caTd}>
+                    <div style={{ fontWeight: 600 }}>{conn.gmail_address}</div>
+                    {conn.error_message && (
+                      <div style={{ fontSize: 11.5, color: CA.red, marginTop: 2 }}>{conn.error_message}</div>
+                    )}
+                  </td>
+                  <td style={caTd}>
+                    <CABadge tone={conn.is_active ? "green" : "red"}>{conn.is_active ? "connected" : "disconnected"}</CABadge>
+                  </td>
+                  <td style={caTd}>{conn.last_polled_at ? dateIN(conn.last_polled_at) : "Not checked yet"}</td>
+                  <td style={{ ...caTd, textAlign: "right" }}>
+                    {conn.is_active ? (
+                      <CAButton variant="danger" onClick={() => handleGmailDisconnect(conn.id)} style={{ fontSize: 12, padding: "5px 10px" }}>
+                        Disconnect
+                      </CAButton>
+                    ) : (
+                      <CAButton variant="ghost" onClick={connectGmail} style={{ fontSize: 12, padding: "5px 10px" }}>
+                        Reconnect
+                      </CAButton>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </CACard>
+
+      {gmailSetupNeeded && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
+          <CACard style={{ maxWidth: 480, width: "100%", padding: 30 }}>
+            <div style={{ fontFamily: CA.serif, fontSize: 19, fontWeight: 700, color: CA.ink, marginBottom: 12 }}>
+              Gmail needs one-time setup
+            </div>
+            <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, lineHeight: 1.65, marginBottom: 14 }}>
+              Gmail intake needs a Google sign-in app for FynHelp. Create OAuth credentials in Google Cloud Console under APIs and Services, Credentials, then add them in Project Settings, Secrets as GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET.
+            </p>
+            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint, lineHeight: 1.6, marginBottom: 20 }}>
+              Add this address as an authorised redirect in Google: {typeof window !== "undefined" ? `${window.location.origin}/ca/integrations/gmail/callback` : "/ca/integrations/gmail/callback"}
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <CAButton variant="ghost" onClick={() => setGmailSetupNeeded(false)}>Close</CAButton>
+              <CAButton onClick={() => { setGmailSetupNeeded(false); connectGmail(); }}>Try again</CAButton>
+            </div>
+          </CACard>
+        </div>
+      )}
+
+
+
 
       <CACard style={{ marginTop: 20, overflow: "hidden" }}>
         {loading ? (
