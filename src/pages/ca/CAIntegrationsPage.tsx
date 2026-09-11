@@ -132,6 +132,31 @@ export default function CAIntegrationsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const connectGmail = async () => {
+    if (!firmId) return;
+    setGmailConnecting(true);
+    try {
+      const res = await beginGmailConnect({ data: { firmId, origin: window.location.origin } });
+      window.location.href = res.url;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Could not start the Gmail connection";
+      if (/GMAIL_CLIENT_ID|not configured/i.test(message)) setGmailSetupNeeded(true);
+      else toast.error(message);
+      setGmailConnecting(false);
+    }
+  };
+
+  const handleGmailDisconnect = async (connectionId: string) => {
+    if (!firmId) return;
+    try {
+      await endGmailConnection({ data: { connectionId, firmId } });
+      toast.success("Gmail disconnected");
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not disconnect Gmail");
+    }
+  };
+
   const jobsBySource = useMemo(() => {
     const out: Record<string, { last: SyncJob | null; records: number }> = {};
     for (const j of jobs) {
