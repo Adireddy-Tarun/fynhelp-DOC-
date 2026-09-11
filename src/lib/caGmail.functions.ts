@@ -87,7 +87,7 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
 
     const g = await import("@/lib/caGmail.server");
     const redirectUri = g.redirectUriFor(data.origin ?? null);
-    console.log("[fyn:gmail] oauth callback — code received, exchanging for tokens");
+    console.log(`[fyn:gmail] oauth callback — exchanging code, redirect_uri=${redirectUri}`);
     const tokens = await g.exchangeCode(data.code, redirectUri);
     if (!tokens.refresh_token) {
       throw new Error("Google did not return a refresh token. Remove FynHelp from your Google account permissions and connect again.");
