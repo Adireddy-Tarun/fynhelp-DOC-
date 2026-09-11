@@ -184,20 +184,14 @@ async function run(request: Request): Promise<Response> {
 
         const match = await gmail.identifyClient(supabaseAdmin as any, conn.ca_firm_id, senderEmail, senderName, subject);
 
-        // Attachments can be nested one level inside multipart parts.
-        const flat: any[] = [];
-        const walk = (parts: any[]) => {
-          for (const p of parts) {
-            if (p.parts) walk(p.parts);
-            if (p.filename && p.body?.attachmentId) flat.push(p);
-          }
-        };
-        walk(msgBody.payload?.parts ?? []);
-        const attachments = flat.filter((p) => ACCEPTED_MIME.test(String(p.mimeType ?? "")));
+        // Attachments can be nested at any depth inside multipart parts.
+        const attachments = msgBody.payload
+          ? gmail.extractAttachments(msgBody.payload as Parameters<typeof gmail.extractAttachments>[0])
+          : [];
 
         for (const att of attachments) {
           const attRes = await fetch(
-            `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}/attachments/${att.body.attachmentId}`,
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}/attachments/${att.attachmentId}`,
             { headers: { Authorization: `Bearer ${accessToken}` } },
           );
           const attBody = (await attRes.json()) as { data?: string };
