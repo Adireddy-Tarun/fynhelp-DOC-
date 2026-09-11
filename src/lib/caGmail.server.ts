@@ -180,21 +180,32 @@ export async function identifyClient(
     .maybeSingle();
   if (learned?.business_id) return { businessId: learned.business_id, method: "learned", confidence: 0.95 };
 
-  // Layer 3 — unique domain match.
-  if (domain) {
-    const domainMatches = list.filter((c: any) => (c.client_email ?? "").split("@")[1]?.toLowerCase() === domain.toLowerCase());
+  // Layer 3 — unique domain match (skip shared providers — they match everyone).
+  const SHARED_DOMAINS = new Set([
+    "gmail.com", "googlemail.com", "yahoo.com", "yahoo.in", "yahoo.co.in",
+    "outlook.com", "hotmail.com", "live.com", "rediffmail.com",
+    "icloud.com", "me.com", "msn.com", "aol.com",
+  ]);
+  if (domain && !SHARED_DOMAINS.has(domain.toLowerCase())) {
+    const domainMatches = list.filter(
+      (c: any) => (c.client_email ?? "").split("@")[1]?.toLowerCase() === domain.toLowerCase(),
+    );
     if (domainMatches.length === 1) {
       return { businessId: domainMatches[0].business_id, method: "domain", confidence: 0.75 };
     }
   }
 
-  // Layer 4 — fuzzy sender-name match.
+  // Layer 4 — fuzzy sender-name match with Indian business name normalisation.
+  const LEGAL_NOISE = /\b(pvt|private|limited|ltd|llp|llc|co|corp|corporation|enterprises|enterprise|trading|industries|solutions|services|group|associates|&|and)\b\.?/gi;
+  const normaliseName = (name: string): string =>
+    name.toLowerCase().replace(LEGAL_NOISE, " ").replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+
   if (senderName) {
-    const senderTokens = senderName.toLowerCase().split(/\s+/).filter(Boolean);
+    const senderTokens = normaliseName(senderName).split(/\s+/).filter((t) => t.length > 2);
     let bestScore = 0;
     let bestId: string | null = null;
     for (const c of list) {
-      const clientTokens = String(c.client_name ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+      const clientTokens = normaliseName(String(c.client_name ?? "")).split(/\s+/).filter((t) => t.length > 2);
       if (!clientTokens.length || !senderTokens.length) continue;
       const common = senderTokens.filter((t) => clientTokens.includes(t)).length;
       const total = new Set([...senderTokens, ...clientTokens]).size;
@@ -204,7 +215,9 @@ export async function identifyClient(
         bestId = c.business_id;
       }
     }
-    if (bestScore > 0.7 && bestId) return { businessId: bestId, method: "name", confidence: 0.65 };
+    if (bestScore >= 0.6 && bestId) {
+      return { businessId: bestId, method: "name", confidence: Math.min(0.65, 0.4 + bestScore * 0.3) };
+    }
   }
 
   // Layer 5 — GSTIN quoted in the subject line.
@@ -289,4 +302,59 @@ export function classifyByFilename(filename: string): "bank" | "invoice" | "expe
   if (/(expense|purchase|vendor|receipt|voucher)/.test(f)) return "expense";
   if (/(challan|gst|tds|itns|payment[-_ ]?ack)/.test(f)) return "challan";
   return "other";
+}
+
+/**
+ * Recursively extract all attachments from a Gmail message payload.
+ * Handles nested multipart/mixed, multipart/related and multipart/alternative
+ * so attachments are found however deeply they are nested.
+ */
+export interface GmailAttachment {
+  filename: string;
+  mimeType: string;
+  attachmentId: string;
+  size: number;
+}
+
+export function extractAttachments(
+  part: {
+    filename?: string;
+    mimeType?: string;
+    body?: { attachmentId?: string; size?: number };
+    parts?: unknown[];
+  },
+  depth = 0,
+): GmailAttachment[] {
+  if (depth > 6) return [];
+
+  const results: GmailAttachment[] = [];
+
+  const filename = (part.filename ?? "").trim();
+  const attachmentId = part.body?.attachmentId;
+  if (
+    filename &&
+    attachmentId &&
+    (part.mimeType?.includes("pdf") ||
+      part.mimeType?.includes("csv") ||
+      part.mimeType?.includes("xml") ||
+      part.mimeType?.includes("excel") ||
+      part.mimeType?.includes("spreadsheet") ||
+      part.mimeType?.startsWith("image/") ||
+      part.mimeType === "application/octet-stream")
+  ) {
+    results.push({
+      filename,
+      mimeType: part.mimeType ?? "application/octet-stream",
+      attachmentId,
+      size: part.body?.size ?? 0,
+    });
+  }
+
+  if (Array.isArray(part.parts)) {
+    for (const child of part.parts) {
+      results.push(...extractAttachments(child as Parameters<typeof extractAttachments>[0], depth + 1));
+    }
+  }
+
+  return results;
 }
