@@ -72,44 +72,96 @@ async function run(request: Request): Promise<Response> {
     try {
       let accessToken = await gmail.decryptToken(conn.access_token_enc);
 
-      // Refresh when the token expires within five minutes.
+      // Refresh when the token expires within five minutes, under an optimistic lock
+      // so two concurrent poll cycles never refresh the same token at once.
       if (new Date(conn.token_expiry).getTime() - Date.now() < 5 * 60 * 1000) {
-        const refreshed = await gmail.refreshAccessToken(await gmail.decryptToken(conn.refresh_token_enc));
-        if (!refreshed) {
+        const nowTs = new Date();
+        if (conn.refresh_locked_until && new Date(conn.refresh_locked_until) > nowTs) {
+          console.log(`[fyn:gmail] skipping refresh for ${conn.gmail_address} — already locked`);
+          const { data: refreshedConn } = await supabaseAdmin
+            .from("ca_gmail_connections")
+            .select("access_token_enc")
+            .eq("id", conn.id)
+            .maybeSingle();
+          const enc = (refreshedConn as { access_token_enc?: string } | null)?.access_token_enc;
+          if (enc) accessToken = await gmail.decryptToken(enc);
+        } else {
           await supabaseAdmin
             .from("ca_gmail_connections")
-            .update({ is_active: false, error_message: "Google access was revoked. Please reconnect Gmail." } as never)
+            .update({ refresh_locked_until: new Date(Date.now() + 2 * 60 * 1000).toISOString() } as never)
             .eq("id", conn.id);
-          await supabaseAdmin.from("ca_notifications").insert({
-            ca_firm_id: conn.ca_firm_id,
-            type: "gmail_disconnected",
-            severity: "critical",
-            title: "Gmail connection expired",
-            message: `The Gmail connection for ${conn.gmail_address} has expired. Open Integrations to reconnect.`,
-            is_read: false,
-          } as never);
-          continue;
+
+          const refreshed = await gmail.refreshAccessToken(await gmail.decryptToken(conn.refresh_token_enc));
+          if (!refreshed) {
+            await supabaseAdmin
+              .from("ca_gmail_connections")
+              .update({
+                is_active: false,
+                refresh_locked_until: null,
+                error_message: "Google access was revoked. Please reconnect Gmail.",
+              } as never)
+              .eq("id", conn.id);
+            await supabaseAdmin.from("ca_notifications").insert({
+              ca_firm_id: conn.ca_firm_id,
+              type: "gmail_disconnected",
+              severity: "critical",
+              title: "Gmail connection expired",
+              message: `The Gmail connection for ${conn.gmail_address} has expired. Open Integrations to reconnect.`,
+              is_read: false,
+            } as never);
+            continue;
+          }
+
+          accessToken = refreshed.access_token;
+          await supabaseAdmin
+            .from("ca_gmail_connections")
+            .update({
+              access_token_enc: await gmail.encryptToken(accessToken),
+              token_expiry: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
+              refresh_locked_until: null,
+              error_message: null,
+            } as never)
+            .eq("id", conn.id);
+          console.log(`[fyn:gmail] token refreshed for ${conn.gmail_address}`);
         }
-        accessToken = refreshed.access_token;
-        await supabaseAdmin
-          .from("ca_gmail_connections")
-          .update({
-            access_token_enc: await gmail.encryptToken(accessToken),
-            token_expiry: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
-            error_message: null,
-          } as never)
-          .eq("id", conn.id);
       }
 
-      const query = "has:attachment newer_than:2d";
-      const listRes = await fetch(
-        `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=25`,
-        { headers: { Authorization: `Bearer ${accessToken}` } },
-      );
-      const listBody = (await listRes.json()) as { messages?: { id: string }[]; error?: { message: string } };
-      if (listBody.error) throw new Error(listBody.error.message);
+      // 25-hour window gives a one-hour overlap so nothing slips through at midnight.
+      const cutoffTimestamp = Math.floor((Date.now() - 25 * 60 * 60 * 1000) / 1000);
+      const gmailQuery = `has:attachment after:${cutoffTimestamp}`;
 
-      for (const msg of listBody.messages ?? []) {
+      const allMessageIds: string[] = [];
+      let pageToken: string | undefined = undefined;
+      let pages = 0;
+
+      do {
+        const queryParams = new URLSearchParams({ q: gmailQuery, maxResults: "500" });
+        if (pageToken) queryParams.set("pageToken", pageToken);
+
+        const pageRes = await fetch(
+          `https://gmail.googleapis.com/gmail/v1/users/me/messages?${queryParams.toString()}`,
+          { headers: { Authorization: `Bearer ${accessToken}` } },
+        );
+        const pageData = (await pageRes.json()) as {
+          messages?: { id: string; threadId: string }[];
+          nextPageToken?: string;
+          error?: { message: string };
+        };
+        if (pageData.error) throw new Error(pageData.error.message);
+
+        pages++;
+        for (const m of pageData.messages ?? []) allMessageIds.push(m.id);
+        pageToken = pageData.nextPageToken;
+
+        // Safety cap: never process more than 500 messages per poll cycle per connection.
+        if (allMessageIds.length >= 500) break;
+      } while (pageToken);
+
+      console.log(
+        `[fyn:gmail] found ${allMessageIds.length} messages for ${conn.gmail_address} across ${pages} pages`,
+      );
+
+      for (const msg of allMessageIds.map((id) => ({ id }))) {
         const { data: seen } = await supabaseAdmin
           .from("ca_document_extractions")
           .select("id")
