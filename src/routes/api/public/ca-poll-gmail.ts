@@ -10,6 +10,7 @@
  * `Authorization: Bearer <secret>`). No message content is returned.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import type { ParsedRow } from "@/lib/caGmail.server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -157,7 +158,7 @@ async function run(request: Request): Promise<Response> {
           const isCsv = /\.csv$/i.test(filename) || String(att.mimeType ?? "").includes("csv");
           const classification = gmail.classifyByFilename(filename);
 
-          let rows: gmail.ParsedRow[] = [];
+          let rows: ParsedRow[] = [];
           let extractConfidence = 0;
           if (isCsv) {
             rows = gmail.parseBankCsvText(new TextDecoder().decode(bytes));
