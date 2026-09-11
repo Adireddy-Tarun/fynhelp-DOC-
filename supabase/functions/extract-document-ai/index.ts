@@ -13,6 +13,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 
 type DocType = "bank" | "invoice" | "expense";
@@ -71,24 +72,31 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const bearer = auth.slice("Bearer ".length);
+    const internalCall = bearer === SUPABASE_SERVICE_ROLE_KEY;
+    const requestBody = await req.json().catch(() => ({}));
+    const supabase = createClient(SUPABASE_URL, internalCall ? SUPABASE_SERVICE_ROLE_KEY : SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: auth } },
     });
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData?.user) {
+    const { data: userData } = internalCall ? { data: { user: null } } : await supabase.auth.getUser();
+    const userId = userData?.user?.id ?? (internalCall ? String(requestBody?.userId || "") : "");
+    if (!userId) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const { data: profileRow } = await supabase
-      .from("profiles").select("business_id").eq("user_id", userData.user.id).maybeSingle();
-    const businessId = (profileRow as { business_id?: string } | null)?.business_id ?? null;
+    const { data: profileRow } = internalCall
+      ? { data: null }
+      : await supabase.from("profiles").select("business_id").eq("user_id", userId).maybeSingle();
+    const businessId = internalCall
+      ? String(requestBody?.businessId || "") || null
+      : (profileRow as { business_id?: string } | null)?.business_id ?? null;
 
     const quota = await checkAiQuota(businessId, userData.user.id);
     if (!quota.allowed) {
       await logAiUsage({
-        userId: userData.user.id, businessId, feature: "document_extraction",
+        userId, businessId, feature: "document_extraction",
         model: "google/gemini-2.5-flash", prompt: "(blocked before call)",
         status: "blocked", errorMessage: "daily_limit_reached",
       });
@@ -96,7 +104,7 @@ Deno.serve(async (req) => {
     }
 
     const startedAt = Date.now();
-    const body = await req.json().catch(() => ({}));
+    const body = requestBody;
     const docType = String(body?.doc_type || "") as DocType;
     const fileBase64 = String(body?.file_base64 || "");
     const mimeType = String(body?.mime_type || "image/png");
@@ -156,7 +164,7 @@ Deno.serve(async (req) => {
           ? "AI credits exhausted."
           : "AI gateway error";
       await logAiUsage({
-        userId: userData.user.id, businessId, feature: "document_extraction",
+        userId, businessId, feature: "document_extraction",
         model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
         responseTimeMs: Date.now() - startedAt, status: "error", errorMessage: msg,
       });
@@ -168,7 +176,7 @@ Deno.serve(async (req) => {
     const json = await aiResp.json();
     const raw = json?.choices?.[0]?.message?.content ?? "";
     await logAiUsage({
-      userId: userData.user.id, businessId, feature: "document_extraction",
+      userId, businessId, feature: "document_extraction",
       model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
       response: String(raw).slice(0, 2000),
       tokensUsed: json?.usage?.total_tokens ?? estimateTokens(String(raw)),
@@ -183,7 +191,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ rows: parsed.rows, doc_type: docType }), {
+    const required: Record<DocType, string[]> = {
+      bank: ["date", "description", "amount", "direction"],
+      invoice: ["customer", "invoice_number", "amount", "date"],
+      expense: ["vendor", "amount", "date"],
+    };
+    const fields = required[docType];
+    const total = parsed.rows.length * fields.length;
+    const filled = parsed.rows.reduce(
+      (sum: number, row: Record<string, unknown>) => sum + fields.filter((field) => String(row[field] ?? "").trim() !== "").length,
+      0,
+    );
+    const volumeFactor = docType === "bank" && parsed.rows.length < 3 ? 0.9 : 1;
+    const confidence = total > 0 ? Math.round((filled / total) * volumeFactor * 100) / 100 : 0;
+    return new Response(JSON.stringify({ rows: parsed.rows, doc_type: docType, confidence }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
