@@ -69,6 +69,12 @@ export default function CAIntegrationsPage() {
   const [bankStats, setBankStats] = useState<{ count: number; last: string | null }>({ count: 0, last: null });
   const [fields, setFields] = useState<CanonicalField[]>([]);
   const [maps, setMaps] = useState<FieldMap[]>([]);
+  const [gmailConnections, setGmailConnections] = useState<GmailConnection[]>([]);
+  const [gmailConnecting, setGmailConnecting] = useState(false);
+  const [gmailSetupNeeded, setGmailSetupNeeded] = useState(false);
+
+  const beginGmailConnect = useServerFn(startGmailConnect);
+  const endGmailConnection = useServerFn(disconnectGmail);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -90,6 +96,13 @@ export default function CAIntegrationsPage() {
           .select("created_at").eq("ca_firm_id", firmId).order("created_at", { ascending: false }).limit(1),
         supabase.from("ca_client_access").select("business_id").eq("ca_firm_id", firmId).eq("is_active", true),
       ]);
+
+      const { data: gmailData } = await supabase
+        .from("ca_gmail_connections")
+        .select("id, gmail_address, last_polled_at, is_active, error_message")
+        .eq("ca_firm_id", firmId)
+        .order("created_at", { ascending: false });
+      setGmailConnections((gmailData as GmailConnection[]) ?? []);
 
       setJobs((jobsRes.data as SyncJob[]) ?? []);
       setFields((fieldsRes.data as CanonicalField[]) ?? []);
