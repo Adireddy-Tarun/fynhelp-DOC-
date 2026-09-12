@@ -365,6 +365,22 @@ export default function CADocumentInboxPage() {
     void load();
   };
 
+  const loadVaultFiles = async () => {
+    if (!firmId || !businessId) return;
+    setVaultLoading(true);
+    const { data, error } = await supabase.storage
+      .from("ca-client-documents")
+      .list(`${firmId}/${businessId}`, { limit: 50, sortBy: { column: "created_at", order: "desc" } });
+    if (!error && data) {
+      setVaultFiles(data.filter((f) => f.name !== ".emptyFolderPlaceholder").map((f) => ({
+        name: f.name,
+        path: `${firmId}/${businessId}/${f.name}`,
+        created_at: f.created_at ?? "",
+      })));
+    }
+    setVaultLoading(false);
+  };
+
   const handleReclassify = async (rowId: string, newClass: CADocClass) => {
     const { error } = await supabase
       .from("ca_document_extractions")
