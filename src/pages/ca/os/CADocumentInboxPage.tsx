@@ -203,6 +203,10 @@ export default function CADocumentInboxPage() {
     if (inboxTab === "gmail") void loadGmailItems();
   }, [inboxTab, loadGmailItems]);
 
+  useEffect(() => {
+    if (vaultOpen && businessId) void loadVaultFiles();
+  }, [vaultOpen, businessId]);
+
   const assignGmailClient = async (extractionId: string, businessId: string, senderEmail: string | null) => {
     if (!firmId) return;
     setAssignBusy(extractionId);
