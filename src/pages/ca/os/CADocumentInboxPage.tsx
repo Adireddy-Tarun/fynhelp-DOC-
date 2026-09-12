@@ -117,8 +117,8 @@ function UploadZone({
             {!businessId ? "Select a client above, then drag files here" : dragging ? "Drop to upload" : "Drag and drop or click to upload"}
           </div>
           {!businessId && (
-            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.gold, marginTop: 8, fontWeight: 600 }}>
-              Pick a client from the dropdown above first
+            <p style={{ fontFamily: CA.sans, fontSize: 13, color: "#A93838", fontWeight: 600, marginTop: 10 }}>
+              Select a client from the dropdown above to begin uploading
             </p>
           )}
           <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, maxWidth: 420, margin: "0 auto 12px" }}>
