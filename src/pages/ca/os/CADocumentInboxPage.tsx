@@ -643,7 +643,7 @@ export default function CADocumentInboxPage() {
       <>
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12, marginBottom: 16 }}>
-          <select style={caInputStyle} value={businessId} onChange={(e) => setBusinessId(e.target.value)}>
+          <select id="client-select-dropdown" style={caInputStyle} value={businessId} onChange={(e) => setBusinessId(e.target.value)}>
             <option value="">Select client…</option>
             {clients.map((c) => (
               <option key={c.business_id} value={c.business_id}>
