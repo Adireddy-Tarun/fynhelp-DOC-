@@ -675,6 +675,81 @@ export default function CADocumentInboxPage() {
         )}
       </CACard>
 
+      {businessId && (
+        <div style={{ marginBottom: 16 }}>
+          <button
+            onClick={() => setVaultOpen((v) => !v)}
+            style={{
+              background: "none",
+              border: "none",
+              fontFamily: CA.sans,
+              fontSize: 13,
+              color: CA.teal,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 0",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18M9 21V9"/>
+            </svg>
+            {vaultOpen ? "Hide vault" : "Or pick from vault — previously uploaded files for this client"}
+          </button>
+          {vaultOpen && (
+            <div style={{ background: CA.card, border: `1px solid ${CA.line}`, borderRadius: 12, padding: 16, marginTop: 8 }}>
+              {vaultLoading ? (
+                <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>Loading vault files…</div>
+              ) : vaultFiles.length === 0 ? (
+                <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>No files in vault for this client yet.</div>
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={caTh}>Filename</th>
+                      <th style={caTh}>Uploaded</th>
+                      <th style={caTh}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vaultFiles.map((f) => (
+                      <tr key={f.path}>
+                        <td style={caTd}>
+                          <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink }}>{f.name}</span>
+                        </td>
+                        <td style={caTd}>
+                          <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                            {f.created_at ? new Date(f.created_at).toLocaleDateString("en-IN") : "—"}
+                          </span>
+                        </td>
+                        <td style={caTd}>
+                          <button
+                            onClick={async () => {
+                              const { data } = await supabase.storage.from("ca-client-documents").createSignedUrl(f.path, 300);
+                              if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
+                              else toast.error("Could not open file");
+                            }}
+                            style={{ background: "none", border: "none", color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <div style={{ marginTop: 12 }}>
+                <CAButton variant="ghost" onClick={loadVaultFiles} style={{ fontSize: 12 }}>Refresh vault</CAButton>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <CACard style={{ padding: 20 }}>
         {rows.length === 0 ? (
           <div style={{
