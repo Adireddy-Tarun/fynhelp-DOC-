@@ -166,6 +166,9 @@ export default function CADocumentInboxPage() {
   const [verifyItem, setVerifyItem] = useState<GmailRow | null>(null);
   const [verifyBusy, setVerifyBusy] = useState(false);
   const [uploadLog, setUploadLog] = useState<Array<{ filename: string; status: "ok" | "error" | "review"; message: string }>>([]);
+  const [vaultFiles, setVaultFiles] = useState<Array<{ name: string; path: string; created_at: string }>>([]);
+  const [vaultOpen, setVaultOpen] = useState(false);
+  const [vaultLoading, setVaultLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) return;
