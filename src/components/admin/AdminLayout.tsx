@@ -59,7 +59,7 @@ export function AdminProtected({ children, allowed }: { children?: ReactNode; al
     );
   }
   if (!user) return <Navigate to="/admin/login" replace />;
-  if (!isAdmin) return <Navigate to="/dashboard/liquidity" replace />;
+  if (!isAdmin) return <Navigate to="/admin/login" replace />;
   if (allowed && allowed.length && !hasRole(...allowed)) {
     return <Navigate to="/admin/dashboard" replace />;
   }
