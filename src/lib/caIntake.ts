@@ -216,6 +216,8 @@ export interface IntakeResult {
 /** Full intake pipeline for one file. */
 export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> {
   const { file, firmId, businessId, clientReferenceCode } = input;
+  console.log("[fyn:intake] intakeDocument called — firmId:", firmId, "businessId:", businessId, "file:", file.name);
+
 
   const policyError = validateUpload("ca-client-documents", file);
   if (policyError) return { ok: false, error: policyError };
@@ -246,7 +248,10 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   const { error: upErr } = await supabase.storage
     .from("ca-client-documents")
     .upload(path, file, { cacheControl: "3600", upsert: false });
-  if (upErr) return { ok: false, error: upErr.message };
+  if (upErr) {
+    console.error("[fyn:intake] storage upload failed:", upErr.message, "path:", path, "firmId:", firmId);
+    return { ok: false, error: `Storage upload failed: ${upErr.message}` };
+  }
 
   const { data: userRes } = await supabase.auth.getUser();
   const userId = userRes?.user?.id ?? null;

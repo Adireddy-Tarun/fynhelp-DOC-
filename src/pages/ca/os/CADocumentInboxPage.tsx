@@ -129,6 +129,7 @@ export default function CADocumentInboxPage() {
   const [assignBusy, setAssignBusy] = useState<string | null>(null);
   const [verifyItem, setVerifyItem] = useState<GmailRow | null>(null);
   const [verifyBusy, setVerifyBusy] = useState(false);
+  const [uploadLog, setUploadLog] = useState<Array<{ filename: string; status: "ok" | "error" | "review"; message: string }>>([]);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -302,14 +303,24 @@ export default function CADocumentInboxPage() {
       });
 
       if (!res.ok) {
-        toast.error(`${file.name}: ${res.error}`);
+        toast.error(`${file.name}: ${res.error}`, { duration: 8000 });
       } else if (res.reviewState === "auto_accepted") {
         toast.success(`${file.name}: ${res.rowCount} rows extracted, high confidence`);
       } else if (res.reviewState === "failed") {
-        toast.warning(`${file.name}: needs manual classification`);
+        toast.warning(`${file.name}: needs manual classification — check browser console for details`, { duration: 8000 });
       } else {
         toast.info(`${file.name}: sent to review queue`);
       }
+
+      setUploadLog((prev) => [...prev, {
+        filename: file.name,
+        status: !res.ok ? "error" : res.reviewState === "auto_accepted" ? "ok" : "review",
+        message: !res.ok
+          ? (res.error ?? "Unknown error")
+          : res.reviewState === "auto_accepted"
+          ? `${res.rowCount ?? 0} rows extracted with high confidence`
+          : "Sent to review queue — confidence below threshold",
+      }]);
     }
     setBusy(false);
     void load();
