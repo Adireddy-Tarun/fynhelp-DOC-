@@ -312,21 +312,21 @@ const BARS = [38, 52, 44, 68, 58, 82, 64, 92, 74, 88, 70, 96];
 const MONTHS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
 
 const FEATURES = [
-  { icon: FileSearch, t: "Document intake, classified", d: "Statements, invoices and GSTR files read into structured lines the moment they land." },
-  { icon: GitCompareArrows, t: "Exact → fuzzy → your rules", d: "What ties out collapses out of the queue. What doesn't arrives with the rule that flagged it." },
-  { icon: Users, t: "Queues split by role", d: "Junior review and partner sign-off are separate objects, not one list with a filter." },
-  { icon: Link2, t: "Source-linked numbers", d: "Every figure in every pack is one click from the bank line it came from." },
+  { icon: FileSearch, t: "Document intake, classified", d: "Statements, invoices and GSTR files read into structured lines automatically, cutting manual entry." },
+  { icon: GitCompareArrows, t: "Exact → fuzzy → your rules", d: "Transactions match fast and accurately, surfacing only the exceptions that need judgement." },
+  { icon: Users, t: "Queues split by role", d: "Juniors handle data, managers review exceptions, partners sign off — freeing staff for client strategy." },
+  { icon: Link2, t: "Source-linked numbers", d: "Every figure traces back to source, so even small practices can deliver records clients trust." },
 ];
 
 const TILES = [
-  { cls: "m", badge: "Recon", fig: "400→8", cap: "Transactions collapse into the handful of decisions that need a human." },
-  { cls: "d", badge: "Review", fig: "15 min", cap: "Per client, per month — instead of three hours of tab-switching." },
-  { cls: "c", badge: "Traceability", fig: "100%", cap: "Every figure in every pack links back to the bank line behind it." },
-  { cls: "g", badge: "Pricing", fig: "₹0", cap: "Per-seat charges. Your whole firm uses it, always." },
+  { cls: "m", badge: "Lower Costs", fig: "₹0", cap: "Routine tasks run automatically through AI agents. No per-seat charges." },
+  { cls: "d", badge: "Higher Speed", fig: "15 min", cap: "Books process faster with fewer errors, per client, per month." },
+  { cls: "c", badge: "Advisory Focus", fig: "100%", cap: "Staff shift from data entry to client strategy and financial advice." },
+  { cls: "g", badge: "Wider Market", fig: "400→8", cap: "Small businesses can finally afford clean, accurate financial records." },
 ];
 
 const MEASURE = [
-  ["98%", "of transactions tie out automatically before anyone opens the queue."],
+  ["98%", "of routine reconciliation decisions are made automatically, so staff move to advisory work."],
   ["4.8s", "average document classification, from upload to structured lines."],
   ["12", "compliance events tracked per entity, with due dates that move with the calendar."],
 ];
