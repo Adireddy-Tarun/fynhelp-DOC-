@@ -96,8 +96,13 @@ function UploadZone({
       ) : (
         <>
           <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink, marginBottom: 8 }}>
-            {dragging ? "Drop to upload" : "Drag and drop or click to upload"}
+            {!businessId ? "Select a client above, then drag files here" : dragging ? "Drop to upload" : "Drag and drop or click to upload"}
           </div>
+          {!businessId && (
+            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.gold, marginTop: 8, fontWeight: 600 }}>
+              Pick a client from the dropdown above first
+            </p>
+          )}
           <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, maxWidth: 420, margin: "0 auto 12px" }}>
             Bank statements, invoices, expense bills, tax challans. CSV files go through the bank parser directly. Images and PDFs go
             through AI extraction.
@@ -107,6 +112,37 @@ function UploadZone({
           </div>
         </>
       )}
+      <div style={{ marginTop: 12, display: "flex", justifyContent: "center", gap: 12 }}>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!busy) fileRef.current?.click();
+          }}
+          disabled={busy}
+          style={{
+            background: "none",
+            border: `1.5px solid rgba(23,18,8,0.2)`,
+            borderRadius: 8,
+            padding: "8px 20px",
+            fontFamily: CA.sans,
+            fontSize: 13,
+            fontWeight: 600,
+            color: CA.ink,
+            cursor: busy ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Browse files
+        </button>
+      </div>
     </div>
   );
 }
@@ -130,6 +166,9 @@ export default function CADocumentInboxPage() {
   const [verifyItem, setVerifyItem] = useState<GmailRow | null>(null);
   const [verifyBusy, setVerifyBusy] = useState(false);
   const [uploadLog, setUploadLog] = useState<Array<{ filename: string; status: "ok" | "error" | "review"; message: string }>>([]);
+  const [vaultFiles, setVaultFiles] = useState<Array<{ name: string; path: string; created_at: string }>>([]);
+  const [vaultOpen, setVaultOpen] = useState(false);
+  const [vaultLoading, setVaultLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -163,6 +202,10 @@ export default function CADocumentInboxPage() {
   useEffect(() => {
     if (inboxTab === "gmail") void loadGmailItems();
   }, [inboxTab, loadGmailItems]);
+
+  useEffect(() => {
+    if (vaultOpen && businessId) void loadVaultFiles();
+  }, [vaultOpen, businessId]);
 
   const assignGmailClient = async (extractionId: string, businessId: string, senderEmail: string | null) => {
     if (!firmId) return;
@@ -324,6 +367,22 @@ export default function CADocumentInboxPage() {
     }
     setBusy(false);
     void load();
+  };
+
+  const loadVaultFiles = async () => {
+    if (!firmId || !businessId) return;
+    setVaultLoading(true);
+    const { data, error } = await supabase.storage
+      .from("ca-client-documents")
+      .list(`${firmId}/${businessId}`, { limit: 50, sortBy: { column: "created_at", order: "desc" } });
+    if (!error && data) {
+      setVaultFiles(data.filter((f) => f.name !== ".emptyFolderPlaceholder").map((f) => ({
+        name: f.name,
+        path: `${firmId}/${businessId}/${f.name}`,
+        created_at: f.created_at ?? "",
+      })));
+    }
+    setVaultLoading(false);
   };
 
   const handleReclassify = async (rowId: string, newClass: CADocClass) => {
@@ -583,24 +642,7 @@ export default function CADocumentInboxPage() {
           </select>
           <input style={caInputStyle} placeholder="Period e.g. 2026-07" value={period} onChange={(e) => setPeriod(e.target.value)} />
         </div>
-        {!businessId ? (
-          <div style={{
-            border: "2px dashed rgba(23,18,8,0.10)",
-            borderRadius: 14,
-            padding: "28px 24px",
-            textAlign: "center",
-            background: "rgba(23,18,8,0.015)",
-          }}>
-            <div style={{ fontFamily: CA.sans, fontSize: 14, color: CA.muted }}>
-              Select a client above before uploading
-            </div>
-            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint, marginTop: 6 }}>
-              Every document must be linked to a client. Pick the client first, then upload their documents.
-            </div>
-          </div>
-        ) : (
-          <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
-        )}
+        <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
         {uploadLog.length > 0 && (
           <div style={{ marginTop: 12, marginBottom: 4 }}>
             {uploadLog.map((entry, i) => (
@@ -632,6 +674,81 @@ export default function CADocumentInboxPage() {
           </div>
         )}
       </CACard>
+
+      {businessId && (
+        <div style={{ marginBottom: 16 }}>
+          <button
+            onClick={() => setVaultOpen((v) => !v)}
+            style={{
+              background: "none",
+              border: "none",
+              fontFamily: CA.sans,
+              fontSize: 13,
+              color: CA.teal,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 0",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18M9 21V9"/>
+            </svg>
+            {vaultOpen ? "Hide vault" : "Or pick from vault — previously uploaded files for this client"}
+          </button>
+          {vaultOpen && (
+            <div style={{ background: CA.card, border: `1px solid ${CA.line}`, borderRadius: 12, padding: 16, marginTop: 8 }}>
+              {vaultLoading ? (
+                <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>Loading vault files…</div>
+              ) : vaultFiles.length === 0 ? (
+                <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint }}>No files in vault for this client yet.</div>
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={caTh}>Filename</th>
+                      <th style={caTh}>Uploaded</th>
+                      <th style={caTh}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vaultFiles.map((f) => (
+                      <tr key={f.path}>
+                        <td style={caTd}>
+                          <span style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 600, color: CA.ink }}>{f.name}</span>
+                        </td>
+                        <td style={caTd}>
+                          <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>
+                            {f.created_at ? new Date(f.created_at).toLocaleDateString("en-IN") : "—"}
+                          </span>
+                        </td>
+                        <td style={caTd}>
+                          <button
+                            onClick={async () => {
+                              const { data } = await supabase.storage.from("ca-client-documents").createSignedUrl(f.path, 300);
+                              if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
+                              else toast.error("Could not open file");
+                            }}
+                            style={{ background: "none", border: "none", color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <div style={{ marginTop: 12 }}>
+                <CAButton variant="ghost" onClick={loadVaultFiles} style={{ fontSize: 12 }}>Refresh vault</CAButton>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <CACard style={{ padding: 20 }}>
         {rows.length === 0 ? (
