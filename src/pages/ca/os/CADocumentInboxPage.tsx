@@ -347,7 +347,8 @@ export default function CADocumentInboxPage() {
   const handleFileList = async (files: FileList) => {
     if (!firmId) return;
     if (!businessId) {
-      toast.error("Pick the client this document belongs to");
+      toast.error("Please select a client before uploading", { duration: 5000 });
+      flashClientSelect();
       return;
     }
     setBusy(true);
