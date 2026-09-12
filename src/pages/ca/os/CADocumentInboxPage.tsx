@@ -96,8 +96,13 @@ function UploadZone({
       ) : (
         <>
           <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink, marginBottom: 8 }}>
-            {dragging ? "Drop to upload" : "Drag and drop or click to upload"}
+            {!businessId ? "Select a client above, then drag files here" : dragging ? "Drop to upload" : "Drag and drop or click to upload"}
           </div>
+          {!businessId && (
+            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.gold, marginTop: 8, fontWeight: 600 }}>
+              Pick a client from the dropdown above first
+            </p>
+          )}
           <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, maxWidth: 420, margin: "0 auto 12px" }}>
             Bank statements, invoices, expense bills, tax challans. CSV files go through the bank parser directly. Images and PDFs go
             through AI extraction.
@@ -107,6 +112,37 @@ function UploadZone({
           </div>
         </>
       )}
+      <div style={{ marginTop: 12, display: "flex", justifyContent: "center", gap: 12 }}>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!busy) fileRef.current?.click();
+          }}
+          disabled={busy}
+          style={{
+            background: "none",
+            border: `1.5px solid rgba(23,18,8,0.2)`,
+            borderRadius: 8,
+            padding: "8px 20px",
+            fontFamily: CA.sans,
+            fontSize: 13,
+            fontWeight: 600,
+            color: CA.ink,
+            cursor: busy ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Browse files
+        </button>
+      </div>
     </div>
   );
 }
