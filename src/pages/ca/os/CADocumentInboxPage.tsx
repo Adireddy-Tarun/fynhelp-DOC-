@@ -65,7 +65,8 @@ function UploadZone({
     e.preventDefault();
     setDragging(false);
     if (!businessId) {
-      toast.error("Pick the client first");
+      toast.error("Please select a client before uploading", { duration: 5000 });
+      flashClientSelect();
       return;
     }
     if (e.dataTransfer.files.length > 0) onFiles(e.dataTransfer.files);
