@@ -35,6 +35,20 @@ interface Row {
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
 
+function flashClientSelect() {
+  const clientSelect = document.getElementById("client-select-dropdown");
+  if (clientSelect) {
+    clientSelect.style.transition = "box-shadow 0.2s, border-color 0.2s";
+    clientSelect.style.boxShadow = "0 0 0 3px rgba(169,56,56,0.35)";
+    clientSelect.style.borderColor = "#A93838";
+    clientSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      clientSelect.style.boxShadow = "";
+      clientSelect.style.borderColor = "";
+    }, 2500);
+  }
+}
+
 function UploadZone({
   busy,
   businessId,
