@@ -15,7 +15,7 @@ export function GoogleAuthButton({ mode, onStart }: Props) {
     onStart?.();
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/ca/auth/callback`,
-      extraParams: { access_type: "offline", prompt: "consent" },
+      extraParams: { access_type: "offline", prompt: "select_account" },
     });
     if (result.redirected) return; // browser is navigating to Google
     const error = result.error;
