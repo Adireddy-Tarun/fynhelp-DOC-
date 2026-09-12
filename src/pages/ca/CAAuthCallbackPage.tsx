@@ -70,7 +70,7 @@ export default function CAAuthCallbackPage() {
             invited_email: email,
             role: "partner",
             status: "active",
-          }).catch(() => {});
+          });
         }
 
         navigate("/ca/dashboard", { replace: true });
