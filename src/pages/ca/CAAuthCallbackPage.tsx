@@ -22,32 +22,61 @@ export default function CAAuthCallbackPage() {
     let cancelled = false;
     const check = async () => {
       console.log("[fyn:auth] google oauth callback — checking session");
-      // The broker returns tokens in the URL hash; give the client a few
-      // chances to hydrate the session before treating it as a failure.
+      // Wait for Supabase to hydrate the session from the OAuth redirect hash
       let session = null;
-      for (let attempt = 0; attempt < 6 && !cancelled; attempt++) {
-        await new Promise((r) => setTimeout(r, 800));
+      for (let attempt = 0; attempt < 8 && !cancelled; attempt++) {
+        await new Promise((r) => setTimeout(r, 600));
         const { data } = await supabase.auth.getSession();
         if (data.session) { session = data.session; break; }
       }
       if (cancelled) return;
       if (!session?.user) { setStatus("error"); return; }
+
       const uid = session.user.id;
       const email = session.user.email ?? "";
       const fullName = (session.user.user_metadata?.full_name as string | undefined) ?? "";
       setUserId(uid);
       setUserEmail(email);
       setCaName(fullName);
-      const { data: existing } = await supabase
-        .from("ca_firms")
-        .select("id")
-        .eq("user_id", uid)
-        .maybeSingle();
+
+      // Check for existing firm — try multiple times because RLS needs session to settle
+      let existingFirm = null;
+      for (let attempt = 0; attempt < 3 && !cancelled; attempt++) {
+        const { data } = await supabase
+          .from("ca_firms")
+          .select("id")
+          .eq("user_id", uid)
+          .maybeSingle();
+        if (data?.id) { existingFirm = data; break; }
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 800));
+      }
+
       if (cancelled) return;
-      if (existing?.id) {
+
+      if (existingFirm?.id) {
+        // Firm exists — also ensure the member row exists (repair if missing)
+        const { data: existingMember } = await supabase
+          .from("ca_firm_members")
+          .select("id")
+          .eq("ca_firm_id", existingFirm.id)
+          .eq("user_id", uid)
+          .maybeSingle();
+
+        if (!existingMember?.id) {
+          // Member row missing — create it silently before redirecting
+          await supabase.from("ca_firm_members").insert({
+            ca_firm_id: existingFirm.id,
+            user_id: uid,
+            invited_email: email,
+            role: "partner",
+            status: "active",
+          });
+        }
+
         navigate("/ca/dashboard", { replace: true });
         return;
       }
+
       setStatus("onboard");
     };
     check();
@@ -61,35 +90,73 @@ export default function CAAuthCallbackPage() {
     if (!userId) return;
     setSaving(true);
     setFormError(null);
+
     try {
-      const { data: firm, error: firmErr } = await supabase
+      // Check if firm already exists (handles double-submit race condition)
+      const { data: existingFirm } = await supabase
         .from("ca_firms")
-        .insert({
-          user_id: userId,
-          firm_name: firmName.trim(),
-          ca_name: caName.trim(),
-          membership_number: "",
-          email: userEmail,
-          is_verified: true,
-          verification_status: "approved",
-          onboarding_step: 1,
-        })
         .select("id")
-        .single();
-      if (firmErr) throw firmErr;
-      const { error: memberErr } = await supabase.from("ca_firm_members").insert({
-        ca_firm_id: firm.id,
-        user_id: userId,
-        invited_email: userEmail,
-        role: "admin",
-        status: "active",
-      });
-      if (memberErr) throw memberErr;
-      toast.success("Firm created. Welcome to FynHelp.");
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      let firmId = existingFirm?.id ?? null;
+
+      if (!firmId) {
+        // Create the firm
+        const { data: firm, error: firmErr } = await supabase
+          .from("ca_firms")
+          .insert({
+            user_id: userId,
+            firm_name: firmName.trim(),
+            ca_name: caName.trim(),
+            membership_number: "",
+            email: userEmail,
+            is_verified: true,
+            verification_status: "approved",
+            onboarding_step: 1,
+          })
+          .select("id")
+          .single();
+
+        if (firmErr) {
+          // If duplicate key — firm was created on a previous attempt
+          if (firmErr.code === "23505") {
+            const { data: retryFirm } = await supabase
+              .from("ca_firms")
+              .select("id")
+              .eq("user_id", userId)
+              .maybeSingle();
+            firmId = retryFirm?.id ?? null;
+            if (!firmId) throw new Error("Firm creation conflict — please try signing in again");
+          } else {
+            throw firmErr;
+          }
+        } else {
+          firmId = firm.id;
+        }
+      }
+
+      // Ensure member row exists — use upsert to handle duplicates gracefully
+      const { error: memberErr } = await supabase
+        .from("ca_firm_members")
+        .upsert({
+          ca_firm_id: firmId,
+          user_id: userId,
+          invited_email: userEmail,
+          role: "partner",
+          status: "active",
+        }, { onConflict: "ca_firm_id,user_id", ignoreDuplicates: true });
+
+      if (memberErr && memberErr.code !== "23505") {
+        throw memberErr;
+      }
+
+      toast.success("Welcome to FynHelp. Your practice is ready.");
       navigate("/ca/dashboard", { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Could not create firm";
       setFormError(msg);
+      console.error("[fyn:auth] handleCreate error:", err);
     } finally {
       setSaving(false);
     }
