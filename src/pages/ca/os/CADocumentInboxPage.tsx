@@ -35,6 +35,20 @@ interface Row {
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
 
+function flashClientSelect() {
+  const clientSelect = document.getElementById("client-select-dropdown");
+  if (clientSelect) {
+    clientSelect.style.transition = "box-shadow 0.2s, border-color 0.2s";
+    clientSelect.style.boxShadow = "0 0 0 3px rgba(169,56,56,0.35)";
+    clientSelect.style.borderColor = "#A93838";
+    clientSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      clientSelect.style.boxShadow = "";
+      clientSelect.style.borderColor = "";
+    }, 2500);
+  }
+}
+
 function UploadZone({
   busy,
   businessId,
@@ -51,7 +65,8 @@ function UploadZone({
     e.preventDefault();
     setDragging(false);
     if (!businessId) {
-      toast.error("Pick the client first");
+      toast.error("Please select a client before uploading", { duration: 5000 });
+      flashClientSelect();
       return;
     }
     if (e.dataTransfer.files.length > 0) onFiles(e.dataTransfer.files);
@@ -87,7 +102,10 @@ function UploadZone({
         disabled={busy}
         onChange={(e) => {
           if (e.target.files?.length && businessId) onFiles(e.target.files);
-          else if (!businessId) toast.error("Pick the client first");
+          else if (!businessId) {
+            toast.error("Please select a client before uploading", { duration: 5000 });
+            flashClientSelect();
+          }
           if (fileRef.current) fileRef.current.value = "";
         }}
       />
@@ -99,8 +117,8 @@ function UploadZone({
             {!businessId ? "Select a client above, then drag files here" : dragging ? "Drop to upload" : "Drag and drop or click to upload"}
           </div>
           {!businessId && (
-            <p style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.gold, marginTop: 8, fontWeight: 600 }}>
-              Pick a client from the dropdown above first
+            <p style={{ fontFamily: CA.sans, fontSize: 13, color: "#A93838", fontWeight: 600, marginTop: 10 }}>
+              Select a client from the dropdown above to begin uploading
             </p>
           )}
           <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, maxWidth: 420, margin: "0 auto 12px" }}>
@@ -329,7 +347,8 @@ export default function CADocumentInboxPage() {
   const handleFileList = async (files: FileList) => {
     if (!firmId) return;
     if (!businessId) {
-      toast.error("Pick the client this document belongs to");
+      toast.error("Please select a client before uploading", { duration: 5000 });
+      flashClientSelect();
       return;
     }
     setBusy(true);
@@ -624,7 +643,7 @@ export default function CADocumentInboxPage() {
       <>
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12, marginBottom: 16 }}>
-          <select style={caInputStyle} value={businessId} onChange={(e) => setBusinessId(e.target.value)}>
+          <select id="client-select-dropdown" style={caInputStyle} value={businessId} onChange={(e) => setBusinessId(e.target.value)}>
             <option value="">Select client…</option>
             {clients.map((c) => (
               <option key={c.business_id} value={c.business_id}>
