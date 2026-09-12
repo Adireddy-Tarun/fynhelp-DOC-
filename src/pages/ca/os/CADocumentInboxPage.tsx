@@ -102,7 +102,10 @@ function UploadZone({
         disabled={busy}
         onChange={(e) => {
           if (e.target.files?.length && businessId) onFiles(e.target.files);
-          else if (!businessId) toast.error("Pick the client first");
+          else if (!businessId) {
+            toast.error("Please select a client before uploading", { duration: 5000 });
+            flashClientSelect();
+          }
           if (fileRef.current) fileRef.current.value = "";
         }}
       />
