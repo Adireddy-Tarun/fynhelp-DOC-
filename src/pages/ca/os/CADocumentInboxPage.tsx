@@ -619,24 +619,7 @@ export default function CADocumentInboxPage() {
           </select>
           <input style={caInputStyle} placeholder="Period e.g. 2026-07" value={period} onChange={(e) => setPeriod(e.target.value)} />
         </div>
-        {!businessId ? (
-          <div style={{
-            border: "2px dashed rgba(23,18,8,0.10)",
-            borderRadius: 14,
-            padding: "28px 24px",
-            textAlign: "center",
-            background: "rgba(23,18,8,0.015)",
-          }}>
-            <div style={{ fontFamily: CA.sans, fontSize: 14, color: CA.muted }}>
-              Select a client above before uploading
-            </div>
-            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint, marginTop: 6 }}>
-              Every document must be linked to a client. Pick the client first, then upload their documents.
-            </div>
-          </div>
-        ) : (
-          <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
-        )}
+        <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
         {uploadLog.length > 0 && (
           <div style={{ marginTop: 12, marginBottom: 4 }}>
             {uploadLog.map((entry, i) => (
