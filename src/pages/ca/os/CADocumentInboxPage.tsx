@@ -129,6 +129,7 @@ export default function CADocumentInboxPage() {
   const [assignBusy, setAssignBusy] = useState<string | null>(null);
   const [verifyItem, setVerifyItem] = useState<GmailRow | null>(null);
   const [verifyBusy, setVerifyBusy] = useState(false);
+  const [uploadLog, setUploadLog] = useState<Array<{ filename: string; status: "ok" | "error" | "review"; message: string }>>([]);
 
   const load = useCallback(async () => {
     if (!firmId) return;
@@ -302,14 +303,24 @@ export default function CADocumentInboxPage() {
       });
 
       if (!res.ok) {
-        toast.error(`${file.name}: ${res.error}`);
+        toast.error(`${file.name}: ${res.error}`, { duration: 8000 });
       } else if (res.reviewState === "auto_accepted") {
         toast.success(`${file.name}: ${res.rowCount} rows extracted, high confidence`);
       } else if (res.reviewState === "failed") {
-        toast.warning(`${file.name}: needs manual classification`);
+        toast.warning(`${file.name}: needs manual classification — check browser console for details`, { duration: 8000 });
       } else {
         toast.info(`${file.name}: sent to review queue`);
       }
+
+      setUploadLog((prev) => [...prev, {
+        filename: file.name,
+        status: !res.ok ? "error" : res.reviewState === "auto_accepted" ? "ok" : "review",
+        message: !res.ok
+          ? (res.error ?? "Unknown error")
+          : res.reviewState === "auto_accepted"
+          ? `${res.rowCount ?? 0} rows extracted with high confidence`
+          : "Sent to review queue — confidence below threshold",
+      }]);
     }
     setBusy(false);
     void load();
@@ -572,7 +583,54 @@ export default function CADocumentInboxPage() {
           </select>
           <input style={caInputStyle} placeholder="Period e.g. 2026-07" value={period} onChange={(e) => setPeriod(e.target.value)} />
         </div>
-        <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
+        {!businessId ? (
+          <div style={{
+            border: "2px dashed rgba(23,18,8,0.10)",
+            borderRadius: 14,
+            padding: "28px 24px",
+            textAlign: "center",
+            background: "rgba(23,18,8,0.015)",
+          }}>
+            <div style={{ fontFamily: CA.sans, fontSize: 14, color: CA.muted }}>
+              Select a client above before uploading
+            </div>
+            <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.faint, marginTop: 6 }}>
+              Every document must be linked to a client. Pick the client first, then upload their documents.
+            </div>
+          </div>
+        ) : (
+          <UploadZone busy={busy} businessId={businessId} onFiles={handleFileList} />
+        )}
+        {uploadLog.length > 0 && (
+          <div style={{ marginTop: 12, marginBottom: 4 }}>
+            {uploadLog.map((entry, i) => (
+              <div key={i} style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+                padding: "8px 12px",
+                marginBottom: 6,
+                borderRadius: 8,
+                background: entry.status === "error" ? "rgba(169,56,56,0.06)" : entry.status === "ok" ? "rgba(31,90,70,0.06)" : "rgba(139,105,20,0.06)",
+                border: `1px solid ${entry.status === "error" ? "rgba(169,56,56,0.18)" : entry.status === "ok" ? "rgba(31,90,70,0.15)" : "rgba(139,105,20,0.15)"}`,
+              }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: entry.status === "error" ? CA.red : entry.status === "ok" ? CA.green : CA.gold, flexShrink: 0 }}>
+                  {entry.status === "error" ? "Error" : entry.status === "ok" ? "Posted" : "Review"}
+                </span>
+                <div>
+                  <div style={{ fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, color: CA.ink }}>{entry.filename}</div>
+                  <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginTop: 2 }}>{entry.message}</div>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() => setUploadLog([])}
+              style={{ background: "none", border: "none", fontFamily: CA.sans, fontSize: 12, color: CA.faint, cursor: "pointer", padding: 0, marginTop: 4 }}
+            >
+              Clear log
+            </button>
+          </div>
+        )}
       </CACard>
 
       <CACard style={{ padding: 20 }}>
