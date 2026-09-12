@@ -22,8 +22,14 @@ export default function CAAuthCallbackPage() {
     let cancelled = false;
     const check = async () => {
       console.log("[fyn:auth] google oauth callback — checking session");
-      await new Promise((r) => setTimeout(r, 1200));
-      const { data: { session } } = await supabase.auth.getSession();
+      // The broker returns tokens in the URL hash; give the client a few
+      // chances to hydrate the session before treating it as a failure.
+      let session = null;
+      for (let attempt = 0; attempt < 6 && !cancelled; attempt++) {
+        await new Promise((r) => setTimeout(r, 800));
+        const { data } = await supabase.auth.getSession();
+        if (data.session) { session = data.session; break; }
+      }
       if (cancelled) return;
       if (!session?.user) { setStatus("error"); return; }
       const uid = session.user.id;

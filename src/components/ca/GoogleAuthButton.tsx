@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
 interface Props {
@@ -13,13 +13,12 @@ export function GoogleAuthButton({ mode, onStart }: Props) {
   const handleGoogle = async () => {
     setLoading(true);
     onStart?.();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/ca/auth/callback`,
-        queryParams: { access_type: "offline", prompt: "consent" },
-      },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/ca/auth/callback`,
+      extraParams: { access_type: "offline", prompt: "consent" },
     });
+    if (result.redirected) return; // browser is navigating to Google
+    const error = result.error;
     if (error) {
       const msg = error.message.toLowerCase();
       if (msg.includes("not enabled") || msg.includes("provider") || msg.includes("unsupported")) {
