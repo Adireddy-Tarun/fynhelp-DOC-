@@ -66,6 +66,7 @@ export default function CALoginPage() {
       setCaptcha(null);
       return;
     }
+    setRememberMe(rememberMe);
     const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInErr) {
