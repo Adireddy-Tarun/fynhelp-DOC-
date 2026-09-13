@@ -132,7 +132,8 @@ export default function CAGstPortfolioPage() {
       });
 
 
-      const rows: ClientRow[] = (bizRes.data || []).map((b: any) => {
+      const rows: ClientRow[] = clientList.map((c: any) => {
+        const b = { id: c.business_id as string, business_name: c.client_name as string, industry: c.industry ?? null, gstin: c.gstin ?? null };
         const itc = itcByBiz.get(b.id) || { safe: 0, risk: 0, mm: 0 };
         return {
           business_id: b.id,
@@ -147,6 +148,7 @@ export default function CAGstPortfolioPage() {
           next_due: dueByBiz.get(b.id) || null,
         };
       });
+
       setClients(rows);
 
       // Vendors aggregated across portfolio
