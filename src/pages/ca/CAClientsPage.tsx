@@ -424,12 +424,16 @@ export default function CAClientsPage() {
               <tr>
                 <th style={{ ...caTh, width: 40 }} />
                 <th style={caTh}>Client</th>
+                <th style={caTh}>Activity</th>
                 <th style={caTh}>Entity type</th>
                 <th style={caTh}>Email</th>
                 <th style={caTh}>GSTIN</th>
+                <th style={caTh}>PAN</th>
                 <th style={caTh}>Status</th>
                 <th style={caTh}>Onboarded</th>
                 <th style={caTh}>Last activity</th>
+                <th style={caTh} />
+
               </tr>
             </thead>
             <tbody>
