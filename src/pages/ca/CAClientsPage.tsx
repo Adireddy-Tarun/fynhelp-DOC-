@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { proxyExternalQuery } from "@/integrations/supabase/external";
@@ -440,7 +440,7 @@ export default function CAClientsPage() {
               {pageRows.map((r) => {
                 const s = (r.business_id && stats[r.business_id]) || { overdue: 0, docs: 0, tasks: 0 };
                 return (
-                <>
+                <Fragment key={r.id}>
                 <tr key={r.id} className="hover:bg-black/[0.015]">
                   <td style={caTd}>
                     <input
@@ -546,7 +546,7 @@ export default function CAClientsPage() {
                     </td>
                   </tr>
                 )}
-                </>
+                </Fragment>
                 );
               })}
 
