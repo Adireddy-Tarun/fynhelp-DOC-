@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { proxyExternalQuery } from "@/integrations/supabase/external";
@@ -26,8 +26,16 @@ interface ClientRow {
 
 const PAGE_SIZE = 20;
 
+type ClientStats = { overdue: number; docs: number; tasks: number };
+
+const plus7 = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0, 10);
+};
+
 export default function CAClientsPage() {
-  const { firmId } = useCAPortal();
+  const { firmId, userId } = useCAPortal();
   const navigate = useNavigate();
   const [rows, setRows] = useState<ClientRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,11 +47,25 @@ export default function CAClientsPage() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
+  const [stats, setStats] = useState<Record<string, ClientStats>>({});
+
+  // Inline quick-task creation
+  const [taskFor, setTaskFor] = useState<ClientRow | null>(null);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDue, setTaskDue] = useState(plus7());
+  const [taskPriority, setTaskPriority] = useState("normal");
+  const [taskBusy, setTaskBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) return;
     setLoading(true);
-    const [{ data, error }, { data: reminders }] = await Promise.all([
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const monthStart = (() => {
+      const d = new Date();
+      return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+    })();
+
+    const [{ data, error }, { data: reminders }, { data: compl }, { data: docs }, { data: openTasks }] = await Promise.all([
       supabase
         .from("ca_clients")
         .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at, parent_id")
@@ -56,18 +78,77 @@ export default function CAClientsPage() {
         .eq("ca_firm_id", firmId)
         .eq("is_done", false)
         .lt("remind_at", new Date().toISOString()),
+      supabase
+        .from("ca_compliance_events")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .neq("status", "filed")
+        .lt("due_date", todayISO),
+      supabase
+        .from("ca_document_extractions")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .gte("created_at", monthStart),
+      supabase
+        .from("ca_tasks")
+        .select("business_id, status")
+        .eq("ca_firm_id", firmId)
+        .not("status", "in", "(done,completed)"),
     ]);
     if (error) toast.error(error.message);
-    setRows((data as ClientRow[]) ?? []);
+    const clientRows = (data as ClientRow[]) ?? [];
+    setRows(clientRows);
     const counts: Record<string, number> = {};
     for (const r of (reminders ?? []) as { business_id: string | null }[]) {
       if (r.business_id) counts[r.business_id] = (counts[r.business_id] ?? 0) + 1;
     }
     setDueReminders(counts);
+
+    const map: Record<string, ClientStats> = {};
+    const bump = (bid: string | null, key: keyof ClientStats) => {
+      if (!bid) return;
+      map[bid] = map[bid] ?? { overdue: 0, docs: 0, tasks: 0 };
+      map[bid][key] += 1;
+    };
+    for (const r of (compl ?? []) as { business_id: string | null }[]) bump(r.business_id, "overdue");
+    for (const r of (docs ?? []) as { business_id: string | null }[]) bump(r.business_id, "docs");
+    for (const r of (openTasks ?? []) as { business_id: string | null }[]) bump(r.business_id, "tasks");
+    setStats(map);
+
+    console.log(`[fyn:clients] clients page loaded — ${clientRows.length} clients`);
     setLoading(false);
   }, [firmId]);
 
   useEffect(() => { load(); }, [load]);
+
+  const openTaskForm = (c: ClientRow) => {
+    setTaskFor(c);
+    setTaskTitle("");
+    setTaskDue(plus7());
+    setTaskPriority("normal");
+  };
+
+  const submitTask = async () => {
+    if (!firmId || !taskFor) return;
+    if (!taskTitle.trim()) return toast.error("Give the task a title");
+    setTaskBusy(true);
+    const { error } = await supabase.from("ca_tasks").insert({
+      ca_firm_id: firmId,
+      business_id: taskFor.business_id,
+      title: taskTitle.trim(),
+      category: "Other",
+      due_date: taskDue || null,
+      priority: taskPriority,
+      status: "todo",
+      created_by: userId,
+    });
+    setTaskBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Task added for ${taskFor.client_name}`);
+    setTaskFor(null);
+    load();
+  };
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -343,22 +424,29 @@ export default function CAClientsPage() {
               <tr>
                 <th style={{ ...caTh, width: 40 }} />
                 <th style={caTh}>Client</th>
+                <th style={caTh}>Activity</th>
                 <th style={caTh}>Entity type</th>
                 <th style={caTh}>Email</th>
                 <th style={caTh}>GSTIN</th>
+                <th style={caTh}>PAN</th>
                 <th style={caTh}>Status</th>
                 <th style={caTh}>Onboarded</th>
                 <th style={caTh}>Last activity</th>
+                <th style={caTh} />
+
               </tr>
             </thead>
             <tbody>
-              {pageRows.map((r) => (
+              {pageRows.map((r) => {
+                const s = (r.business_id && stats[r.business_id]) || { overdue: 0, docs: 0, tasks: 0 };
+                return (
+                <Fragment key={r.id}>
                 <tr key={r.id} className="hover:bg-black/[0.015]">
                   <td style={caTd}>
                     <input
                       type="checkbox"
                       checked={!!selected[r.id]}
-                      onChange={(e) => setSelected((s) => ({ ...s, [r.id]: e.target.checked }))}
+                      onChange={(e) => setSelected((s2) => ({ ...s2, [r.id]: e.target.checked }))}
                     />
                   </td>
                   <td style={{ ...caTd, cursor: "pointer", fontWeight: 600 }} onClick={() => navigate(`/ca/clients/${r.id}`)}>
@@ -396,15 +484,72 @@ export default function CAClientsPage() {
                     </div>
                   </td>
 
+                  <td style={caTd}>
+                    <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
+                      {s.overdue > 0 && <CABadge tone="red">{s.overdue} overdue</CABadge>}
+                      {s.docs > 0 && <CABadge tone="green">{s.docs} docs</CABadge>}
+                      {s.tasks > 0 && <CABadge tone="amber">{s.tasks} tasks</CABadge>}
+                      {s.overdue === 0 && s.docs === 0 && s.tasks === 0 && (
+                        <span style={{ color: CA.faint, fontFamily: CA.sans, fontSize: 12 }}>Nothing pending</span>
+                      )}
+                    </span>
+                  </td>
 
                   <td style={caTd}><CABadge tone="grey">{r.entity_type ?? "—"}</CABadge></td>
                   <td style={{ ...caTd, cursor: "pointer" }} onClick={() => navigate(`/ca/clients/${r.id}`)}>{r.client_email ?? "—"}</td>
                   <td style={{ ...caTd, fontFamily: CA.mono }}>{r.gstin ?? "—"}</td>
+                  <td style={{ ...caTd, fontFamily: CA.mono }}>{r.pan ?? "—"}</td>
                   <td style={caTd}><CABadge tone={statusTone(r.client_status)}>{r.client_status ?? "—"}</CABadge></td>
                   <td style={caTd}>{dateIN(r.onboarded_at)}</td>
                   <td style={caTd}>{dateIN(r.last_activity_at)}</td>
+                  <td style={{ ...caTd, textAlign: "right", whiteSpace: "nowrap" }}>
+                    <CAButton
+                      variant="ghost"
+                      onClick={() => (taskFor?.id === r.id ? setTaskFor(null) : openTaskForm(r))}
+                      style={{ padding: "6px 12px", fontSize: 12 }}
+                    >
+                      {taskFor?.id === r.id ? "Cancel" : "Add task"}
+                    </CAButton>
+                  </td>
                 </tr>
-              ))}
+                {taskFor?.id === r.id && (
+                  <tr key={`${r.id}-task`}>
+                    <td style={caTd} />
+                    <td style={caTd} colSpan={10}>
+                      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                        <input
+                          style={{ ...caInputStyle, maxWidth: 320 }}
+                          placeholder={`Task title for ${r.client_name}`}
+                          value={taskTitle}
+                          onChange={(e) => setTaskTitle(e.target.value)}
+                        />
+                        <input
+                          style={{ ...caInputStyle, maxWidth: 170 }}
+                          type="date"
+                          value={taskDue}
+                          onChange={(e) => setTaskDue(e.target.value)}
+                        />
+                        <select
+                          style={{ ...caInputStyle, maxWidth: 150 } as any}
+                          value={taskPriority}
+                          onChange={(e) => setTaskPriority(e.target.value)}
+                        >
+                          <option value="critical">Urgent</option>
+                          <option value="high">High</option>
+                          <option value="normal">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                        <CAButton onClick={() => void submitTask()} disabled={taskBusy} style={{ padding: "8px 14px", fontSize: 12.5 }}>
+                          {taskBusy ? "Adding…" : "Add task"}
+                        </CAButton>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
+                );
+              })}
+
             </tbody>
           </table>
         )}
