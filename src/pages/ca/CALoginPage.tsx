@@ -10,6 +10,7 @@ import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
 import BackHomeLink from "@/components/BackHomeLink";
 import { GoogleAuthButton } from "@/components/ca/GoogleAuthButton";
+import { setRememberMe, getRememberMe } from "@/lib/sessionPolicy";
 
 const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
 const serif = "'Fraunces',Georgia,serif";
@@ -49,6 +50,7 @@ export default function CALoginPage() {
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
+  const [rememberMe, setRememberMeState] = useState<boolean>(() => getRememberMe());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
