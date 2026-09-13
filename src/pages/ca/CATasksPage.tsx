@@ -51,6 +51,8 @@ export default function CATasksPage({ initialTab = "all" }: { initialTab?: TaskT
 
   const [rows, setRows] = useState<TaskRow[]>([]);
   const [tab, setTab] = useState<TaskTab>(initialTab);
+  const [clientFilter, setClientFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -79,7 +81,9 @@ export default function CATasksPage({ initialTab = "all" }: { initialTab?: TaskT
       .order("due_date", { ascending: true, nullsFirst: false })
       .limit(500);
     if (error) toast.error(error.message);
-    setRows((data ?? []) as TaskRow[]);
+    const taskRows = (data ?? []) as TaskRow[];
+    setRows(taskRows);
+    console.log(`[fyn:tasks] tasks page loaded — ${taskRows.length} tasks`);
     setLoading(false);
   }, [firmId]);
 
@@ -207,7 +211,11 @@ export default function CATasksPage({ initialTab = "all" }: { initialTab?: TaskT
     { key: "today", label: "Due today", count: buckets.today.length },
   ];
 
-  const visible = buckets[tab];
+  const visible = buckets[tab].filter((t) => {
+    if (clientFilter !== "all" && (t.business_id ?? "") !== clientFilter) return false;
+    if (statusFilter !== "all" && t.status !== statusFilter) return false;
+    return true;
+  });
 
   return (
     <div>
@@ -258,7 +266,7 @@ export default function CATasksPage({ initialTab = "all" }: { initialTab?: TaskT
         </CACard>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "center", flexWrap: "wrap" }}>
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -274,6 +282,28 @@ export default function CATasksPage({ initialTab = "all" }: { initialTab?: TaskT
             {t.label} ({t.count})
           </button>
         ))}
+        <select
+          style={{ ...caInputStyle, maxWidth: 220, marginLeft: 6 }}
+          value={clientFilter}
+          onChange={(e) => setClientFilter(e.target.value)}
+        >
+          <option value="all">All clients</option>
+          <option value="">Firm-wide (no client)</option>
+          {clients.map((c) => (
+            <option key={c.business_id} value={c.business_id}>{c.client_name}</option>
+          ))}
+        </select>
+        <select
+          style={{ ...caInputStyle, maxWidth: 180 }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All statuses</option>
+          <option value="todo">Open</option>
+          <option value="in_progress">In progress</option>
+          <option value="review">In review</option>
+          <option value="done">Done</option>
+        </select>
       </div>
 
       <CACard style={{ padding: visible.length ? 0 : 24, overflow: "hidden" }}>
