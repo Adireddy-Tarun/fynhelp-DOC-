@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import CAEvidenceVaultPage from "@/pages/ca/os/CAEvidenceVaultPage";
+import CAVaultPage from "@/pages/ca/CAVaultPage";
 
 export const Route = createFileRoute("/_caAuth/ca/_portal/vault")({
-  component: CAEvidenceVaultPage,
+  component: CAVaultPage,
 });
