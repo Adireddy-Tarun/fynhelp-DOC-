@@ -11,6 +11,7 @@ import { useCAPortal } from "@/hooks/useCAPortal";
 import { CA } from "./portalUi";
 import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
+import { toast } from "sonner";
 
 type NavItem = { label: string; path: string; icon: typeof LayoutGrid; badge?: "urgent" | "unread"; roleRequired?: "admin" };
 
@@ -161,6 +162,23 @@ export default function CASidebar({
     navigate("/ca/login", { replace: true });
   };
 
+  const signOutAllDevices = async () => {
+    const confirmed = window.confirm(
+      "This will sign you out on all browsers and devices. You will need to sign in again on each device. Continue?"
+    );
+    if (!confirmed) return;
+    // Global sign out revokes all refresh tokens for this user.
+    const { error } = await supabase.auth.signOut({ scope: "global" });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    localStorage.removeItem("fyn.sessionOnly");
+    sessionStorage.removeItem("fyn.sessionOnly");
+    toast.success("Signed out from all devices");
+    navigate("/ca/login", { replace: true });
+  };
+
   return (
     <aside
       className="fixed inset-y-0 left-0 flex flex-col z-50"
@@ -226,9 +244,15 @@ export default function CASidebar({
 
       <button
         onClick={signOut}
-        style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 12px 18px", padding: "9px 12px", borderRadius: 9, background: "transparent", border: "none", fontFamily: CA.sans, fontSize: 13, color: CA.muted, cursor: "pointer" }}
+        style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 12px 6px", padding: "9px 12px", borderRadius: 9, background: "transparent", border: "none", fontFamily: CA.sans, fontSize: 13, color: CA.muted, cursor: "pointer" }}
       >
         <LogOut size={15} /> Sign out
+      </button>
+      <button
+        onClick={signOutAllDevices}
+        style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 12px 18px", padding: "4px 12px", borderRadius: 9, background: "transparent", border: "none", fontFamily: CA.sans, fontSize: 12, color: C.maroon, cursor: "pointer" }}
+      >
+        Sign out all devices
       </button>
     </aside>
   );

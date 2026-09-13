@@ -28,6 +28,7 @@ export const isSessionOnly = (): boolean =>
 
 /** Call right before signing in. `remember === false` => ephemeral session. */
 export const setRememberMe = (remember: boolean) => {
+  console.log(`[fyn:auth] remember me set to ${remember}`);
   if (remember) {
     sessionStorage.removeItem(SESSION_ONLY_KEY);
     localStorage.removeItem(SESSION_ONLY_KEY);
@@ -38,6 +39,9 @@ export const setRememberMe = (remember: boolean) => {
     localStorage.setItem(SESSION_ONLY_KEY, "1");
   }
 };
+
+/** Initial checkbox state: remembered unless a session-only flag exists. */
+export const getRememberMe = (): boolean => !isSessionOnly();
 
 export const clearRememberMeFlags = () => {
   sessionStorage.removeItem(SESSION_ONLY_KEY);

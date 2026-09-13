@@ -106,7 +106,15 @@ export function useCAPortal(): CAPortalState {
 
   useEffect(() => {
     load();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "TOKEN_REFRESHED") {
+        console.log("[fyn:auth] session refreshed automatically");
+      }
+      if (event === "SIGNED_OUT") {
+        // Clear remember-me preference on explicit sign out.
+        sessionStorage.removeItem("fyn.sessionOnly");
+        localStorage.removeItem("fyn.sessionOnly");
+      }
       setTimeout(() => load(), 0);
     });
     return () => subscription.unsubscribe();

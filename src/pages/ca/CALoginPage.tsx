@@ -10,6 +10,7 @@ import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
 import BackHomeLink from "@/components/BackHomeLink";
 import { GoogleAuthButton } from "@/components/ca/GoogleAuthButton";
+import { setRememberMe, getRememberMe } from "@/lib/sessionPolicy";
 
 const sans = "'Instrument Sans','Inter',system-ui,sans-serif";
 const serif = "'Fraunces',Georgia,serif";
@@ -49,6 +50,7 @@ export default function CALoginPage() {
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
+  const [rememberMe, setRememberMeState] = useState<boolean>(() => getRememberMe());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +66,7 @@ export default function CALoginPage() {
       setCaptcha(null);
       return;
     }
+    setRememberMe(rememberMe);
     const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInErr) {
@@ -265,6 +268,25 @@ export default function CALoginPage() {
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
+                <input
+                  type="checkbox"
+                  id="remember-me"
+                  checked={rememberMe}
+                  onChange={(e) => {
+                    setRememberMeState(e.target.checked);
+                    setRememberMe(e.target.checked);
+                  }}
+                  style={{ width: 16, height: 16, accentColor: C.maroon, cursor: "pointer", flexShrink: 0 }}
+                />
+                <label
+                  htmlFor="remember-me"
+                  style={{ fontFamily: sans, fontSize: 13, color: C.muted, cursor: "pointer", userSelect: "none", lineHeight: 1.4 }}
+                >
+                  Keep me signed in for 30 days
+                </label>
               </div>
 
               <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
