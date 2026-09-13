@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Real-time financial intelligence for Indian startups and SMEs." },
       { name: "twitter:image", content: "https://www.fynhelp.com/twitter-image.png" },
       { property: "twitter:creator", content: "@fynhelp" },
-      { name: "google-site-verification", content: "YOUR_VERIFICATION_CODE" },
+      { name: "google-site-verification", content: "lwPij_cJgAb2D1gva7DUy_Bnc4sj99qXMxpdXwKODmg" },
     ],
     links: [
       { rel: "preconnect", href: "https://ukmtzflxtcoqnwujvrqh.supabase.co", crossOrigin: "anonymous" },
