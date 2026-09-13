@@ -80,24 +80,23 @@ export default function CAGstPortfolioPage() {
     if (!caFirm?.id) return;
     setLoading(true);
     try {
-      // 1. Get linked client business_ids
-      const { data: access } = await supabase
-        .from("ca_client_access")
-        .select("business_id")
-        .eq("ca_firm_id", caFirm.id)
-        .eq("is_active", true);
+      // 1. Get linked clients from the CA portal table
+      const { data: clientData } = await supabase
+        .from("ca_clients")
+        .select("business_id, client_name, gstin, industry")
+        .eq("ca_firm_id", caFirm.id);
 
-      const ids = (access || []).map((a) => a.business_id);
+      const clientList = ((clientData ?? []) as any[]).filter((c) => !!c.business_id);
+      const ids = clientList.map((c) => c.business_id as string);
       if (ids.length === 0) {
         setClients([]); setVendors([]); setLoading(false); return;
       }
 
       // 2. Fetch in parallel
-      const [bizRes, itcRes, riskRes, complRes, vendorRes] = await Promise.all([
-        supabase.from("businesses").select("id, business_name, industry, gstin").in("id", ids),
+      const [itcRes, riskRes, complRes, vendorRes] = await Promise.all([
         supabase.from("gst_itc_lines").select("business_id, itc_safe, itc_at_risk, mismatch_count, vendor_gstin").in("business_id", ids),
         supabase.from("gst_notice_risk_scores").select("business_id, score, computed_at").in("business_id", ids).order("computed_at", { ascending: false }),
-        supabase.from("compliance_events").select("business_id, filing_name, filing_type, due_date, status").in("business_id", ids).ilike("filing_type", "%gst%"),
+        supabase.from("ca_compliance_events").select("business_id, event_type, filing_period, due_date, status").eq("ca_firm_id", caFirm.id).in("event_type", ["GSTR1", "GSTR3B", "GSTR9", "GSTR2B"]),
         supabase.from("vendor_gst_health").select("business_id, vendor_gstin, vendor_name, compliance_score").in("business_id", ids),
       ]);
 
@@ -118,20 +117,23 @@ export default function CAGstPortfolioPage() {
       const filedByBiz = new Map<string, { name: string; date: string | null }>();
       const dueByBiz = new Map<string, { name: string; date: string }>();
       (complRes.data || []).forEach((c: any) => {
+        const label = `${c.event_type}${c.filing_period ? ` · ${c.filing_period}` : ""}`;
         if (c.status === "filed") {
           const cur = filedByBiz.get(c.business_id);
           if (!cur || (cur.date && c.due_date > cur.date) || !cur.date) {
-            filedByBiz.set(c.business_id, { name: c.filing_name, date: c.due_date });
+            filedByBiz.set(c.business_id, { name: label, date: c.due_date });
           }
-        } else if (c.status === "pending" || !c.status) {
+        } else {
           const cur = dueByBiz.get(c.business_id);
           if (!cur || c.due_date < cur.date) {
-            dueByBiz.set(c.business_id, { name: c.filing_name, date: c.due_date });
+            dueByBiz.set(c.business_id, { name: label, date: c.due_date });
           }
         }
       });
 
-      const rows: ClientRow[] = (bizRes.data || []).map((b: any) => {
+
+      const rows: ClientRow[] = clientList.map((c: any) => {
+        const b = { id: c.business_id as string, business_name: c.client_name as string, industry: c.industry ?? null, gstin: c.gstin ?? null };
         const itc = itcByBiz.get(b.id) || { safe: 0, risk: 0, mm: 0 };
         return {
           business_id: b.id,
@@ -146,6 +148,7 @@ export default function CAGstPortfolioPage() {
           next_due: dueByBiz.get(b.id) || null,
         };
       });
+
       setClients(rows);
 
       // Vendors aggregated across portfolio

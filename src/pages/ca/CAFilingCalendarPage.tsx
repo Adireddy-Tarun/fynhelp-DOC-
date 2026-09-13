@@ -80,19 +80,17 @@ export default function CAFilingCalendarPage() {
 
     (async () => {
       setLoading(true);
-      const { data: access } = await supabase
-        .from("ca_client_access")
-        .select("business_id, businesses(id, business_name)")
-        .eq("ca_firm_id", caFirm.id)
-        .eq("is_active", true);
+      const { data: clientData } = await supabase
+        .from("ca_clients")
+        .select("business_id, client_name")
+        .eq("ca_firm_id", caFirm.id);
 
       if (cancelled) return;
-      const clientList = (access || [])
-        .map((a: any) => a.businesses)
-        .filter(Boolean) as { id: string; business_name: string }[];
-      setClients(clientList);
+      const clientList = ((clientData ?? []) as { business_id: string | null; client_name: string }[])
+        .filter(c => !!c.business_id) as { business_id: string; client_name: string }[];
+      setClients(clientList.map(c => ({ id: c.business_id, business_name: c.client_name })));
 
-      const ids = clientList.map(c => c.id);
+      const ids = clientList.map(c => c.business_id);
       if (ids.length === 0) {
         setFilings([]);
         setLoading(false);
@@ -100,9 +98,9 @@ export default function CAFilingCalendarPage() {
       }
 
       const { data, error } = await supabase
-        .from("compliance_events")
-        .select("id, business_id, filing_type, filing_name, due_date, status, urgency, notes, businesses(id, business_name)")
-        .in("business_id", ids)
+        .from("ca_compliance_events")
+        .select("id, business_id, event_type, status, due_date, filing_period, notes, ca_firm_id")
+        .eq("ca_firm_id", caFirm.id)
         .order("due_date", { ascending: true })
         .limit(500);
 
@@ -111,10 +109,22 @@ export default function CAFilingCalendarPage() {
         toast.error("Failed to load filings");
         setFilings([]);
       } else {
-        setFilings((data || []) as unknown as Filing[]);
+        const clientMap = new Map(clientList.map(c => [c.business_id, c.client_name]));
+        setFilings((data ?? []).map((e: any): Filing => ({
+          id: e.id,
+          business_id: e.business_id,
+          filing_type: e.event_type,
+          filing_name: `${e.event_type}${e.filing_period ? ` · ${e.filing_period}` : ""}`,
+          due_date: e.due_date,
+          status: e.status,
+          urgency: e.status === "overdue" ? "high" : "normal",
+          notes: e.notes,
+          businesses: { id: e.business_id, business_name: clientMap.get(e.business_id) ?? "Unknown client" },
+        })));
       }
       setLoading(false);
     })();
+
 
     return () => { cancelled = true; };
   }, [caFirm]);
@@ -166,7 +176,7 @@ export default function CAFilingCalendarPage() {
 
   // ─── Mark filed ──
   const markFiled = async (f: Filing) => {
-    const { error } = await supabase.from("compliance_events").update({ status: "filed" }).eq("id", f.id);
+    const { error } = await supabase.from("ca_compliance_events").update({ status: "filed", updated_at: new Date().toISOString() }).eq("id", f.id);
     if (error) { toast.error("Failed to update"); return; }
     setFilings(prev => prev.map(x => x.id === f.id ? { ...x, status: "filed" } : x));
     if (caFirm) {
@@ -355,13 +365,14 @@ export default function CAFilingCalendarPage() {
         <BulkFileModal clients={clients} onClose={() => setBulkOpen(false)}
           onSubmit={async ({ filingType, filingName, dueDate, period, clientIds }) => {
             const rows = clientIds.map(bid => ({
+              ca_firm_id: caFirm?.id ?? "",
               business_id: bid,
-              filing_type: filingType,
-              filing_name: `${filingName}${period ? ` · ${period}` : ""}`,
+              event_type: filingType,
+              filing_period: period || dueDate,
               due_date: dueDate,
               status: "filed",
             }));
-            const { error } = await supabase.from("compliance_events").insert(rows);
+            const { error } = await supabase.from("ca_compliance_events").insert(rows);
             if (error) { toast.error("Bulk filing failed"); return; }
             if (caFirm) {
               await supabase.from("ca_activity_log").insert(clientIds.map(bid => ({
@@ -371,15 +382,28 @@ export default function CAFilingCalendarPage() {
             }
             toast.success(`Filed ${filingName} for ${clientIds.length} client${clientIds.length > 1 ? "s" : ""}`);
             // Refresh
-            const ids = clients.map(c => c.id);
-            const { data } = await supabase
-              .from("compliance_events")
-              .select("id, business_id, filing_type, filing_name, due_date, status, urgency, notes, businesses(id, business_name)")
-              .in("business_id", ids)
-              .order("due_date", { ascending: true })
-              .limit(500);
-            setFilings((data || []) as unknown as Filing[]);
+            if (caFirm) {
+              const { data } = await supabase
+                .from("ca_compliance_events")
+                .select("id, business_id, event_type, status, due_date, filing_period, notes, ca_firm_id")
+                .eq("ca_firm_id", caFirm.id)
+                .order("due_date", { ascending: true })
+                .limit(500);
+              const clientMap = new Map(clients.map(c => [c.id, c.business_name]));
+              setFilings((data ?? []).map((e: any): Filing => ({
+                id: e.id,
+                business_id: e.business_id,
+                filing_type: e.event_type,
+                filing_name: `${e.event_type}${e.filing_period ? ` · ${e.filing_period}` : ""}`,
+                due_date: e.due_date,
+                status: e.status,
+                urgency: e.status === "overdue" ? "high" : "normal",
+                notes: e.notes,
+                businesses: { id: e.business_id, business_name: clientMap.get(e.business_id) ?? "Unknown client" },
+              })));
+            }
             setBulkOpen(false);
+
           }} />
       )}
     </PageWrap>
