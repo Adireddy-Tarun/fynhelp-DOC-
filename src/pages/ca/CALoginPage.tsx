@@ -270,6 +270,25 @@ export default function CALoginPage() {
                 </div>
               </div>
 
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
+                <input
+                  type="checkbox"
+                  id="remember-me"
+                  checked={rememberMe}
+                  onChange={(e) => {
+                    setRememberMeState(e.target.checked);
+                    setRememberMe(e.target.checked);
+                  }}
+                  style={{ width: 16, height: 16, accentColor: C.maroon, cursor: "pointer", flexShrink: 0 }}
+                />
+                <label
+                  htmlFor="remember-me"
+                  style={{ fontFamily: sans, fontSize: 13, color: C.muted, cursor: "pointer", userSelect: "none", lineHeight: 1.4 }}
+                >
+                  Keep me signed in for 30 days
+                </label>
+              </div>
+
               <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
 
               {error && <div style={{ fontFamily: sans, fontSize: 13, color: C.maroon }}>{error}</div>}
