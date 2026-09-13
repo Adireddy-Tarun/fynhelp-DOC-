@@ -26,8 +26,16 @@ interface ClientRow {
 
 const PAGE_SIZE = 20;
 
+type ClientStats = { overdue: number; docs: number; tasks: number };
+
+const plus7 = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0, 10);
+};
+
 export default function CAClientsPage() {
-  const { firmId } = useCAPortal();
+  const { firmId, userId } = useCAPortal();
   const navigate = useNavigate();
   const [rows, setRows] = useState<ClientRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,11 +47,25 @@ export default function CAClientsPage() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [dueReminders, setDueReminders] = useState<Record<string, number>>({});
+  const [stats, setStats] = useState<Record<string, ClientStats>>({});
+
+  // Inline quick-task creation
+  const [taskFor, setTaskFor] = useState<ClientRow | null>(null);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDue, setTaskDue] = useState(plus7());
+  const [taskPriority, setTaskPriority] = useState("normal");
+  const [taskBusy, setTaskBusy] = useState(false);
 
   const load = useCallback(async () => {
     if (!firmId) return;
     setLoading(true);
-    const [{ data, error }, { data: reminders }] = await Promise.all([
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const monthStart = (() => {
+      const d = new Date();
+      return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+    })();
+
+    const [{ data, error }, { data: reminders }, { data: compl }, { data: docs }, { data: openTasks }] = await Promise.all([
       supabase
         .from("ca_clients")
         .select("id, business_id, client_name, client_email, gstin, pan, entity_type, client_phone, client_status, onboarded_at, last_activity_at, parent_id")
@@ -56,18 +78,77 @@ export default function CAClientsPage() {
         .eq("ca_firm_id", firmId)
         .eq("is_done", false)
         .lt("remind_at", new Date().toISOString()),
+      supabase
+        .from("ca_compliance_events")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .neq("status", "filed")
+        .lt("due_date", todayISO),
+      supabase
+        .from("ca_document_extractions")
+        .select("business_id")
+        .eq("ca_firm_id", firmId)
+        .gte("created_at", monthStart),
+      supabase
+        .from("ca_tasks")
+        .select("business_id, status")
+        .eq("ca_firm_id", firmId)
+        .not("status", "in", "(done,completed)"),
     ]);
     if (error) toast.error(error.message);
-    setRows((data as ClientRow[]) ?? []);
+    const clientRows = (data as ClientRow[]) ?? [];
+    setRows(clientRows);
     const counts: Record<string, number> = {};
     for (const r of (reminders ?? []) as { business_id: string | null }[]) {
       if (r.business_id) counts[r.business_id] = (counts[r.business_id] ?? 0) + 1;
     }
     setDueReminders(counts);
+
+    const map: Record<string, ClientStats> = {};
+    const bump = (bid: string | null, key: keyof ClientStats) => {
+      if (!bid) return;
+      map[bid] = map[bid] ?? { overdue: 0, docs: 0, tasks: 0 };
+      map[bid][key] += 1;
+    };
+    for (const r of (compl ?? []) as { business_id: string | null }[]) bump(r.business_id, "overdue");
+    for (const r of (docs ?? []) as { business_id: string | null }[]) bump(r.business_id, "docs");
+    for (const r of (openTasks ?? []) as { business_id: string | null }[]) bump(r.business_id, "tasks");
+    setStats(map);
+
+    console.log(`[fyn:clients] clients page loaded — ${clientRows.length} clients`);
     setLoading(false);
   }, [firmId]);
 
   useEffect(() => { load(); }, [load]);
+
+  const openTaskForm = (c: ClientRow) => {
+    setTaskFor(c);
+    setTaskTitle("");
+    setTaskDue(plus7());
+    setTaskPriority("normal");
+  };
+
+  const submitTask = async () => {
+    if (!firmId || !taskFor) return;
+    if (!taskTitle.trim()) return toast.error("Give the task a title");
+    setTaskBusy(true);
+    const { error } = await supabase.from("ca_tasks").insert({
+      ca_firm_id: firmId,
+      business_id: taskFor.business_id,
+      title: taskTitle.trim(),
+      category: "Other",
+      due_date: taskDue || null,
+      priority: taskPriority,
+      status: "todo",
+      created_by: userId,
+    });
+    setTaskBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Task added for ${taskFor.client_name}`);
+    setTaskFor(null);
+    load();
+  };
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
