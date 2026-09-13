@@ -50,7 +50,9 @@ export default function CALoginPage() {
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
-  const [rememberMe, setRememberMeState] = useState<boolean>(() => getRememberMe());
+  // Default: keep signed in for 30 days. A previous session-only choice does
+  // not carry over — the box starts checked every visit.
+  const [rememberMe, setRememberMeState] = useState<boolean>(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
