@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
+import { setRememberMe } from "@/lib/sessionPolicy";
 
 interface Props {
   mode: "signin" | "register";
@@ -13,6 +14,8 @@ export function GoogleAuthButton({ mode, onStart }: Props) {
   const handleGoogle = async () => {
     setLoading(true);
     onStart?.();
+    // Google sign-in is an intentional action — always keep the user signed in.
+    setRememberMe(true);
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/ca/auth/callback`,
       extraParams: { access_type: "offline", prompt: "select_account" },
