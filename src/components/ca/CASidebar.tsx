@@ -65,7 +65,7 @@ const GROUPS: { group: string; links: NavItem[] }[] = [
     links: [
       { label: "Practice analytics", path: "/ca/practice-analytics", icon: BarChart3 },
       { label: "Portfolio health", path: "/ca/portfolio-health", icon: TrendingUp },
-      { label: "Brain insights", path: "/ca/revenue", icon: Brain },
+      { label: "Brain insights", path: "/ca/brain-insights", icon: Brain },
     ],
   },
   {
