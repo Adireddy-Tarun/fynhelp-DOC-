@@ -176,7 +176,7 @@ export default function CAFilingCalendarPage() {
 
   // ─── Mark filed ──
   const markFiled = async (f: Filing) => {
-    const { error } = await supabase.from("compliance_events").update({ status: "filed" }).eq("id", f.id);
+    const { error } = await supabase.from("ca_compliance_events").update({ status: "filed", updated_at: new Date().toISOString() }).eq("id", f.id);
     if (error) { toast.error("Failed to update"); return; }
     setFilings(prev => prev.map(x => x.id === f.id ? { ...x, status: "filed" } : x));
     if (caFirm) {
