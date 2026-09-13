@@ -368,7 +368,7 @@ export default function CAFilingCalendarPage() {
               ca_firm_id: caFirm?.id ?? "",
               business_id: bid,
               event_type: filingType,
-              filing_period: period || null,
+              filing_period: period || dueDate,
               due_date: dueDate,
               status: "filed",
             }));
