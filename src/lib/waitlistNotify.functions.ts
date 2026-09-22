@@ -16,7 +16,7 @@ const leadSchema = z.object({
   landing_page: z.string().max(500).optional().default(""),
 });
 
-const RECIPIENTS = ["nidhi@fynhelp.com", "prajwal@fynhelp.com", "adireddytarun@fynhelp.com"];
+const RECIPIENTS = ["nidhi@fynhelp.com", "prajwal@fynhelp.com", "adireddytarun@fynhelp.com", "samiksha.ch1511@gmail.com"];
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
