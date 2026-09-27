@@ -418,8 +418,8 @@ export default function CADocumentInboxPage() {
         message: !res.ok
           ? (cleanErrorMessage(new Error(res.error ?? "")) || "An unexpected error occurred")
           : res.reviewState === "auto_accepted"
-          ? `${res.rowCount ?? 0} rows extracted with high confidence`
-          : "Sent to review queue — confidence below threshold",
+          ? `${res.rowCount ?? 0} rows extracted at or above the 85% confidence threshold. The CA still reviews and posts the bill.`
+          : "Sent to the CA review queue — confidence below 85% or extraction needs checking.",
       }]);
     }
     setBusy(false);
@@ -520,7 +520,7 @@ export default function CADocumentInboxPage() {
     <div>
       <ModuleHeader
         title="Intake inbox"
-        subtitle="Drop a photo, PDF, CSV or Tally XML. It is stored against the client, read, classified, scored for confidence, and routed to review or straight through."
+        subtitle="Drop a photo, PDF, CSV or Tally XML. Each file is stored against the client, classified, read, and scored. Lower-confidence documents go to the CA review queue."
       />
 
       <StatStrip
@@ -845,7 +845,7 @@ export default function CADocumentInboxPage() {
               Upload your first document
             </div>
             <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, lineHeight: 1.65, maxWidth: 440, margin: "0 auto 20px" }}>
-              Upload a bank statement in CSV or PDF, an invoice, or an expense bill for this client. The system reads and scores it. A high score means the extraction is ready; the CA reviews and posts it. Lower scores go to the Review queue.
+              Upload a bank statement in CSV or PDF, an invoice, or an expense bill for this client. The system reads and scores it. At 85% confidence or above, it is marked ready; the CA still reviews and posts it. Below 85%, it appears in the Review queue.
             </p>
             <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>
               Supported formats: HDFC, ICICI, SBI, Axis and Kotak bank CSVs, Tally XML, generic CSV, PDF invoices and bills
