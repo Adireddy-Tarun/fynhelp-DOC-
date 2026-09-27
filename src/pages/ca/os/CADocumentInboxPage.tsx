@@ -475,7 +475,8 @@ export default function CADocumentInboxPage() {
   };
 
   const saveInboxGstinReview = async (row: Row) => {
-    if (!firmId) return;
+    const currentFirmId = firmId;
+    if (!currentFirmId) return;
     const gstin = gstinDraft.gstin.trim().toUpperCase();
     const validFormat = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin);
     if (gstin && !validFormat) return toast.error("Check the GSTIN: it must match the expected 15-character format.");
@@ -491,7 +492,7 @@ export default function CADocumentInboxPage() {
         gstin_verified_at: gstinDraft.status === "verified" ? new Date().toISOString() : null,
         gstin_verified_by: gstinDraft.status === "verified" ? auth.user?.id ?? null : null,
       })
-      .eq("ca_firm_id", firmId)
+      .eq("ca_firm_id", currentFirmId)
       .eq("id", row.id);
     setGstinSaveBusy(null);
     if (error) return toast.error(`GSTIN review could not be saved: ${error.message}`);
@@ -868,45 +869,34 @@ export default function CADocumentInboxPage() {
               r.supplier_gstin ?? "—",
               <StateChip key={`gstin-${r.id}`} value={r.gstin_verification_status ?? "pending"} />,
               <div key="actions" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <button
-                onClick={() => void handleView(r.id)}
-                disabled={viewBusy === r.id}
-                style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
-              >
-                {viewBusy === r.id ? "…" : "View"}
+                <button
+                  onClick={() => void handleView(r.id)}
+                  disabled={viewBusy === r.id}
+                  style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
+                >
+                  {viewBusy === r.id ? "…" : "View"}
                 </button>
-              <button
-                onClick={() => {
-                  setGstinEditId(gstinEditId === r.id ? null : r.id);
-                  setGstinDraft({ gstin: r.supplier_gstin ?? "", status: r.gstin_verification_status ?? "pending", note: r.gstin_verification_note ?? "" });
-                }}
-                style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
-              >
-                {gstinEditId === r.id ? "Close GSTIN" : "Track GSTIN"}
-              </button>
-              r.review_state === "needs_review" || r.review_state === "failed" ? (
-                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                  <select
-                    value={reclassify[r.id] ?? r.classification}
-                    onChange={(e) => setReclassify((prev) => ({ ...prev, [r.id]: e.target.value as CADocClass }))}
-                    style={{ ...caInputStyle, padding: "3px 8px", height: 28, fontSize: 12 }}
-                  >
-                    {CLASSES.map((c) => (
-                      <option key={c} value={c}>
-                        {DOC_CLASS_LABELS[c]}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => void handleReclassify(r.id, reclassify[r.id] ?? (r.classification as CADocClass))}
-                    style={{ background: "#A93838", color: "#F7F1E6", border: "none", borderRadius: 6, padding: "3px 10px", fontFamily: CA.sans, fontSize: 12, fontWeight: 600, cursor: "pointer" }}
-                  >
-                    Re-route
-                  </button>
-                </div>
-              ) : (
-                <span />
-              ),
+                <button
+                  onClick={() => {
+                    setGstinEditId(gstinEditId === r.id ? null : r.id);
+                    setGstinDraft({ gstin: r.supplier_gstin ?? "", status: r.gstin_verification_status ?? "pending", note: r.gstin_verification_note ?? "" });
+                  }}
+                  style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
+                >
+                  {gstinEditId === r.id ? "Close GSTIN" : "Track GSTIN"}
+                </button>
+                {(r.review_state === "needs_review" || r.review_state === "failed") && (
+                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                    <select
+                      value={reclassify[r.id] ?? r.classification}
+                      onChange={(e) => setReclassify((prev) => ({ ...prev, [r.id]: e.target.value as CADocClass }))}
+                      style={{ ...caInputStyle, padding: "3px 8px", height: 28, fontSize: 12 }}
+                    >
+                      {CLASSES.map((c) => <option key={c} value={c}>{DOC_CLASS_LABELS[c]}</option>)}
+                    </select>
+                    <CAButton onClick={() => void handleReclassify(r.id, reclassify[r.id] ?? (r.classification as CADocClass))} style={{ padding: "3px 10px", fontSize: 12 }}>Re-route</CAButton>
+                  </div>
+                )}
               </div>,
               gstinEditId === r.id ? (
                 <div key={`gstin-edit-${r.id}`} style={{ minWidth: 250, display: "grid", gap: 6 }}>
@@ -921,7 +911,7 @@ export default function CADocumentInboxPage() {
               ) : <span key={`gstin-empty-${r.id}`} />,
             ])}
           />
-        )}
+          )}
       </CACard>
 
       <div style={{ marginTop: 14 }}>
