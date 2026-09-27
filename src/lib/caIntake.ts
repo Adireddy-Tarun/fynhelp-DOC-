@@ -347,6 +347,7 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
       classification,
       confidence,
       extracted: { rows } as never,
+      supplier_gstin: String(rows[0]?.supplier_gstin ?? rows[0]?.vendor_gstin ?? rows[0]?.gstin ?? "").trim().toUpperCase() || null,
       review_state: reviewState,
       error_message: errorMessage,
       uploaded_by: userId,
