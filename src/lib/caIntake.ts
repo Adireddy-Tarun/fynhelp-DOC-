@@ -44,6 +44,11 @@ export interface CAExtraction {
   posted_at: string | null;
   posted_ref: string | null;
   error_message: string | null;
+  supplier_gstin?: string | null;
+  gstin_verification_status?: "pending" | "verified" | "follow_up" | "not_applicable";
+  gstin_verification_note?: string | null;
+  gstin_verified_at?: string | null;
+  gstin_verified_by?: string | null;
   created_at: string;
 }
 
@@ -493,6 +498,7 @@ export async function postExtraction(
     .update({
       review_state: "posted",
       corrected: { rows } as never,
+      supplier_gstin: String(rows[0]?.supplier_gstin ?? rows[0]?.vendor_gstin ?? rows[0]?.gstin ?? "").trim().toUpperCase() || null,
       posted_at: new Date().toISOString(),
       posted_ref: `${cls}:${posted}`,
     })
