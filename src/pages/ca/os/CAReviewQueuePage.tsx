@@ -186,6 +186,38 @@ export default function CAReviewQueuePage() {
             <ConfidenceChip value={active.confidence} />
           </div>
 
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, marginBottom: 14, flexWrap: "wrap" }}>
+            <CAButton
+              variant="ghost"
+              onClick={() => viewFile(active)}
+              style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              View original file
+            </CAButton>
+            <CAButton
+              variant="ghost"
+              onClick={() => downloadFile(active)}
+              style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download
+            </CAButton>
+            {(active as any).gmail_sender_email && (
+              <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}>
+                From: {(active as any).gmail_sender_email}
+                {(active as any).gmail_subject ? ` · ${(active as any).gmail_subject}` : ""}
+              </span>
+            )}
+          </div>
+
           {active.error_message && (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red, marginBottom: 12 }}>{active.error_message}</div>
           )}
