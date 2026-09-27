@@ -293,7 +293,7 @@ export default function CAIntegrationsPage() {
               <button
                 onClick={async () => {
                   try {
-                    const result = await debugEnv({ data: {} });
+                    const result = await debugEnv();
                     console.log("[fyn:debug] env vars:", result.vars);
                     alert(JSON.stringify(result.vars, null, 2));
                   } catch (e) {
