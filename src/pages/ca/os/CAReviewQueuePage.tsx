@@ -29,6 +29,10 @@ export default function CAReviewQueuePage() {
   const [items, setItems] = useState<CAExtraction[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ExtractionRow[]>([]);
+  const [supplierGstin, setSupplierGstin] = useState("");
+  const [gstinStatus, setGstinStatus] = useState<"pending" | "verified" | "follow_up" | "not_applicable">("pending");
+  const [gstinNote, setGstinNote] = useState("");
+  const [gstinBusy, setGstinBusy] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -55,6 +59,10 @@ export default function CAReviewQueuePage() {
     }
     const rows = active.corrected?.rows ?? active.extracted?.rows ?? [];
     setDraft(rows.map((r) => ({ ...r })));
+    const firstRow = rows[0] ?? {};
+    setSupplierGstin(String(active.supplier_gstin ?? firstRow.supplier_gstin ?? firstRow.vendor_gstin ?? firstRow.gstin ?? "").toUpperCase());
+    setGstinStatus(active.gstin_verification_status ?? "pending");
+    setGstinNote(active.gstin_verification_note ?? "");
   }, [active]);
 
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
@@ -84,6 +92,37 @@ export default function CAReviewQueuePage() {
     a.href = data.signedUrl;
     a.download = extraction.original_filename ?? "document";
     a.click();
+  };
+
+  const saveGstinReview = async () => {
+    if (!active) return;
+    const gstin = supplierGstin.trim().toUpperCase();
+    const validFormat = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin);
+    if (gstin && !validFormat) {
+      toast.error("This GSTIN does not match the expected 15-character format. Check the bill before saving.");
+      return;
+    }
+    if (gstinStatus === "verified" && !gstin) {
+      toast.error("Enter the supplier GSTIN before marking it verified.");
+      return;
+    }
+    setGstinBusy(true);
+    const { data: auth } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({
+        supplier_gstin: gstin || null,
+        gstin_verification_status: gstinStatus,
+        gstin_verification_note: gstinNote.trim() || null,
+        gstin_verified_at: gstinStatus === "verified" ? new Date().toISOString() : null,
+        gstin_verified_by: gstinStatus === "verified" ? auth.user?.id ?? null : null,
+      })
+      .eq("ca_firm_id", active.ca_firm_id)
+      .eq("id", active.id);
+    setGstinBusy(false);
+    if (error) return toast.error(`GSTIN review could not be saved: ${error.message}`);
+    toast.success("Supplier GSTIN review saved to this bill");
+    void load();
   };
 
   const post = async () => {
@@ -131,14 +170,36 @@ export default function CAReviewQueuePage() {
     <div>
       <ModuleHeader
         title="Review queue"
-        subtitle="Anything the model was not sure about stops here. Correct the fields, then post — every posted row keeps a link back to its source document."
+        subtitle="Review extracted bill details, record a supplier GSTIN check, then post approved rows. Every posted row keeps a link back to its source document."
       />
+
+      <CACard style={{ padding: 16, marginBottom: 18 }}>
+        <div style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 700, color: CA.ink, marginBottom: 10 }}>Bill processing trail</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: 8 }}>
+          {[
+            ["1 · Classified", "Filename and document type"],
+            ["2 · Read", "OCR or file parser extracts fields"],
+            ["3 · Confidence", "Completeness score routes review"],
+            ["4 · CA review", "Check values and supplier GSTIN"],
+            ["5 · Ledger", "Post, then follow reconciliation"],
+          ].map(([title, detail], index) => (
+            <div key={title} style={{ borderLeft: `2px solid ${index < 3 ? CA.teal : CA.line}`, padding: "4px 9px" }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.ink, fontWeight: 700 }}>{title}</div>
+              <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.muted, lineHeight: 1.45, marginTop: 3 }}>{detail}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginTop: 10 }}>
+          A high confidence score means the extraction is ready; ledger posting still requires the CA action below. GSTIN review here records your check and does not query the GST authority or file a return.
+        </div>
+      </CACard>
 
       <StatStrip
         items={[
           { label: "In queue", value: String(items.length) },
           { label: "Needs review", value: String(items.filter((i) => i.review_state === "needs_review").length) },
           { label: "Failed extraction", value: String(items.filter((i) => i.review_state === "failed").length) },
+          { label: "GSTIN follow-up", value: String(items.filter((i) => i.gstin_verification_status === "follow_up").length) },
         ]}
       />
 
@@ -149,12 +210,12 @@ export default function CAReviewQueuePage() {
               Review queue is clear
             </div>
             <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
-              All extracted documents are either posted to the ledger or awaiting upload. High confidence extractions post automatically, only items that need a human check appear here.
+              All extracted documents are either posted to the ledger or awaiting upload. Review bills here, check supplier details, and post approved rows to the ledger.
             </p>
           </div>
         ) : (
           <QueueTable
-            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", ""]}
+            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", "Supplier GSTIN", "GSTIN check", ""]}
             empty="Queue is clear"
             emptyHint="Every extraction has been reviewed or auto-accepted."
             rows={items.map((i) => [
@@ -165,6 +226,8 @@ export default function CAReviewQueuePage() {
               String((i.extracted?.rows ?? []).length),
               <ConfidenceChip key="c" value={i.confidence} />,
               <StateChip key="s" value={i.review_state} />,
+              i.supplier_gstin ?? "—",
+              <StateChip key={`gstin-${i.id}`} value={i.gstin_verification_status ?? "pending"} />,
               <CAButton key="o" variant="ghost" onClick={() => setActiveId(i.id === activeId ? null : i.id)}>
                 {i.id === activeId ? "Close" : "Review"}
               </CAButton>,
@@ -221,6 +284,38 @@ export default function CAReviewQueuePage() {
           {active.error_message && (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red, marginBottom: 12 }}>{active.error_message}</div>
           )}
+
+          <div style={{ borderTop: `1px solid ${CA.line}`, borderBottom: `1px solid ${CA.line}`, padding: "16px 0", margin: "8px 0 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 700, color: CA.ink }}>Supplier GSTIN review</div>
+              <StateChip value={gstinStatus} />
+            </div>
+            <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginBottom: 10 }}>
+              Check the GSTIN against the original bill and your approved source. “Verified” records a CA review; it is not a live government validation.
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10, alignItems: "end" }}>
+              <label style={{ fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
+                Supplier GSTIN
+                <input value={supplierGstin} onChange={(event) => setSupplierGstin(event.target.value.toUpperCase())} maxLength={15} placeholder="15-character GSTIN" style={{ ...caInputStyle, height: 36, marginTop: 4, fontFamily: CA.mono, textTransform: "uppercase" }} />
+              </label>
+              <label style={{ fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
+                Review status
+                <select value={gstinStatus} onChange={(event) => setGstinStatus(event.target.value as typeof gstinStatus)} style={{ ...caInputStyle, height: 36, marginTop: 4 }}>
+                  <option value="pending">Pending check</option>
+                  <option value="verified">Checked by CA</option>
+                  <option value="follow_up">Follow-up needed</option>
+                  <option value="not_applicable">Not applicable</option>
+                </select>
+              </label>
+              <label style={{ gridColumn: "1 / -1", fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
+                Check note
+                <textarea value={gstinNote} onChange={(event) => setGstinNote(event.target.value)} rows={2} maxLength={1000} placeholder="Record the evidence checked or the follow-up required" style={{ ...caInputStyle, height: "auto", minHeight: 58, padding: "8px 10px", marginTop: 4, resize: "vertical" }} />
+              </label>
+              <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" }}>
+                <CAButton variant="ghost" disabled={gstinBusy} onClick={() => void saveGstinReview()}>{gstinBusy ? "Saving…" : "Save GSTIN review"}</CAButton>
+              </div>
+            </div>
+          </div>
 
           {fields.length === 0 || draft.length === 0 ? (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted }}>

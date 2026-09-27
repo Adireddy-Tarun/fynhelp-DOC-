@@ -2170,6 +2170,10 @@ export type Database = {
           gmail_message_id: string | null
           gmail_sender_email: string | null
           gmail_subject: string | null
+          gstin_verification_note: string | null
+          gstin_verification_status: string
+          gstin_verified_at: string | null
+          gstin_verified_by: string | null
           id: string
           original_filename: string | null
           posted_at: string | null
@@ -2180,6 +2184,7 @@ export type Database = {
           reviewed_by: string | null
           source_type: string
           storage_path: string | null
+          supplier_gstin: string | null
           updated_at: string
           uploaded_by: string | null
           was_corrected: boolean
@@ -2200,6 +2205,10 @@ export type Database = {
           gmail_message_id?: string | null
           gmail_sender_email?: string | null
           gmail_subject?: string | null
+          gstin_verification_note?: string | null
+          gstin_verification_status?: string
+          gstin_verified_at?: string | null
+          gstin_verified_by?: string | null
           id?: string
           original_filename?: string | null
           posted_at?: string | null
@@ -2210,6 +2219,7 @@ export type Database = {
           reviewed_by?: string | null
           source_type?: string
           storage_path?: string | null
+          supplier_gstin?: string | null
           updated_at?: string
           uploaded_by?: string | null
           was_corrected?: boolean
@@ -2230,6 +2240,10 @@ export type Database = {
           gmail_message_id?: string | null
           gmail_sender_email?: string | null
           gmail_subject?: string | null
+          gstin_verification_note?: string | null
+          gstin_verification_status?: string
+          gstin_verified_at?: string | null
+          gstin_verified_by?: string | null
           id?: string
           original_filename?: string | null
           posted_at?: string | null
@@ -2240,6 +2254,7 @@ export type Database = {
           reviewed_by?: string | null
           source_type?: string
           storage_path?: string | null
+          supplier_gstin?: string | null
           updated_at?: string
           uploaded_by?: string | null
           was_corrected?: boolean
