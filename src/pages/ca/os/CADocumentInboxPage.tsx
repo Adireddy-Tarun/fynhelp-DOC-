@@ -42,6 +42,9 @@ interface Row {
   review_state: string;
   created_at: string;
   error_message: string | null;
+  supplier_gstin: string | null;
+  gstin_verification_status: "pending" | "verified" | "follow_up" | "not_applicable";
+  gstin_verification_note: string | null;
 }
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
@@ -187,6 +190,9 @@ export default function CADocumentInboxPage() {
   const [busy, setBusy] = useState(false);
   const [reclassify, setReclassify] = useState<Record<string, CADocClass>>({});
   const [viewBusy, setViewBusy] = useState<string | null>(null);
+  const [gstinEditId, setGstinEditId] = useState<string | null>(null);
+  const [gstinDraft, setGstinDraft] = useState({ gstin: "", status: "pending" as Row["gstin_verification_status"], note: "" });
+  const [gstinSaveBusy, setGstinSaveBusy] = useState<string | null>(null);
   const navigate = useNavigate();
   const [inboxTab, setInboxTab] = useState<"upload" | "gmail">("upload");
   const [gmailItems, setGmailItems] = useState<GmailRow[]>([]);
@@ -203,7 +209,7 @@ export default function CADocumentInboxPage() {
     if (!firmId) return;
     const { data } = await supabase
       .from("ca_document_extractions")
-      .select("id, business_id, original_filename, classification, confidence, review_state, created_at, error_message")
+      .select("id, business_id, original_filename, classification, confidence, review_state, created_at, error_message, supplier_gstin, gstin_verification_status, gstin_verification_note")
       .eq("ca_firm_id", firmId)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -466,6 +472,31 @@ export default function CADocumentInboxPage() {
     setViewBusy(null);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
     else toast.error("Could not generate view link");
+  };
+
+  const saveInboxGstinReview = async (row: Row) => {
+    const gstin = gstinDraft.gstin.trim().toUpperCase();
+    const validFormat = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin);
+    if (gstin && !validFormat) return toast.error("Check the GSTIN: it must match the expected 15-character format.");
+    if (gstinDraft.status === "verified" && !gstin) return toast.error("Enter the supplier GSTIN before marking it verified.");
+    setGstinSaveBusy(row.id);
+    const { data: auth } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({
+        supplier_gstin: gstin || null,
+        gstin_verification_status: gstinDraft.status,
+        gstin_verification_note: gstinDraft.note.trim() || null,
+        gstin_verified_at: gstinDraft.status === "verified" ? new Date().toISOString() : null,
+        gstin_verified_by: gstinDraft.status === "verified" ? auth.user?.id ?? null : null,
+      })
+      .eq("ca_firm_id", firmId)
+      .eq("id", row.id);
+    setGstinSaveBusy(null);
+    if (error) return toast.error(`GSTIN review could not be saved: ${error.message}`);
+    toast.success("GSTIN review saved");
+    setGstinEditId(null);
+    void load();
   };
 
   if (roleLoading) return null;
@@ -820,7 +851,7 @@ export default function CADocumentInboxPage() {
           </div>
         ) : (
           <QueueTable
-            columns={["Received", "Client", "Document", "Class", "Confidence", "State", "", ""]}
+            columns={["Received", "Client", "Document", "Class", "Confidence", "State", "Supplier GSTIN", "GSTIN review", "Actions"]}
             empty="No documents yet"
             emptyHint="Upload a file above, or raise a request so the client can send it themselves."
             rows={rows.map((r) => [
@@ -833,16 +864,27 @@ export default function CADocumentInboxPage() {
               DOC_CLASS_LABELS[r.classification as CADocClass] ?? r.classification,
               <ConfidenceChip key="c" value={r.confidence} />,
               <StateChip key="s" value={r.review_state} />,
+              r.supplier_gstin ?? "—",
+              <StateChip key={`gstin-${r.id}`} value={r.gstin_verification_status ?? "pending"} />,
+              <div key="actions" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <button
-                key="v"
                 onClick={() => void handleView(r.id)}
                 disabled={viewBusy === r.id}
                 style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
               >
                 {viewBusy === r.id ? "…" : "View"}
               </button>,
+              <button
+                onClick={() => {
+                  setGstinEditId(gstinEditId === r.id ? null : r.id);
+                  setGstinDraft({ gstin: r.supplier_gstin ?? "", status: r.gstin_verification_status ?? "pending", note: r.gstin_verification_note ?? "" });
+                }}
+                style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
+              >
+                {gstinEditId === r.id ? "Close GSTIN" : "Track GSTIN"}
+              </button>
               r.review_state === "needs_review" || r.review_state === "failed" ? (
-                <div key="rc" style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   <select
                     value={reclassify[r.id] ?? r.classification}
                     onChange={(e) => setReclassify((prev) => ({ ...prev, [r.id]: e.target.value as CADocClass }))}
@@ -862,8 +904,20 @@ export default function CADocumentInboxPage() {
                   </button>
                 </div>
               ) : (
-                <span key="rc" />
+                <span />
               ),
+              </div>,
+              gstinEditId === r.id ? (
+                <div key={`gstin-edit-${r.id}`} style={{ minWidth: 250, display: "grid", gap: 6 }}>
+                  <input value={gstinDraft.gstin} maxLength={15} placeholder="Supplier GSTIN" onChange={(event) => setGstinDraft((draft) => ({ ...draft, gstin: event.target.value.toUpperCase() }))} style={{ ...caInputStyle, height: 30, fontFamily: CA.mono, fontSize: 11.5 }} />
+                  <select value={gstinDraft.status} onChange={(event) => setGstinDraft((draft) => ({ ...draft, status: event.target.value as Row["gstin_verification_status"] }))} style={{ ...caInputStyle, height: 30, fontSize: 11.5 }}>
+                    <option value="pending">Pending check</option><option value="verified">Checked by CA</option><option value="follow_up">Follow-up needed</option><option value="not_applicable">Not applicable</option>
+                  </select>
+                  <input value={gstinDraft.note} maxLength={1000} placeholder="Evidence or follow-up note" onChange={(event) => setGstinDraft((draft) => ({ ...draft, note: event.target.value }))} style={{ ...caInputStyle, height: 30, fontSize: 11.5 }} />
+                  <CAButton disabled={gstinSaveBusy === r.id} onClick={() => void saveInboxGstinReview(r)} style={{ justifySelf: "start", padding: "5px 10px", fontSize: 11.5 }}>{gstinSaveBusy === r.id ? "Saving…" : "Save GSTIN review"}</CAButton>
+                  <span style={{ fontFamily: CA.sans, fontSize: 10.5, lineHeight: 1.4, color: CA.faint }}>CA-recorded review only; not an official registration lookup or return filing.</span>
+                </div>
+              ) : <span key={`gstin-empty-${r.id}`} />,
             ])}
           />
         )}
