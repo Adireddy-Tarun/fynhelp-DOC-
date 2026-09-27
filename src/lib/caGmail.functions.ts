@@ -88,13 +88,22 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
     const g = await import("@/lib/caGmail.server");
     const redirectUri = g.redirectUriFor(data.origin ?? null);
     console.log(`[fyn:gmail] oauth callback — exchanging code, redirect_uri=${redirectUri}`);
-    const tokens = await g.exchangeCode(data.code, redirectUri);
+    console.log("[fyn:gmail] attempting token exchange with redirect_uri:", redirectUri);
+    let tokens: Awaited<ReturnType<typeof g.exchangeCode>>;
+    try {
+      tokens = await g.exchangeCode(data.code, redirectUri);
+      console.log("[fyn:gmail] token exchange success — has_refresh_token:", !!tokens.refresh_token);
+    } catch (exchangeErr) {
+      console.error("[fyn:gmail] token exchange failed:", exchangeErr instanceof Error ? exchangeErr.message : exchangeErr);
+      throw exchangeErr;
+    }
     if (!tokens.refresh_token) {
       throw new Error("Google did not return a refresh token. Remove FynHelp from your Google account permissions and connect again.");
     }
     const gmailAddress = await g.fetchGmailAddress(tokens.access_token);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    console.log("[fyn:gmail] attempting db upsert for:", gmailAddress, "firm:", parsed.firmId);
     const { error } = await supabaseAdmin.from("ca_gmail_connections").upsert(
       {
         ca_firm_id: parsed.firmId,
@@ -108,7 +117,11 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
       } as never,
       { onConflict: "ca_firm_id,gmail_address" },
     );
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[fyn:gmail] db upsert failed:", error.code, error.message, error.details);
+      throw new Error(error.message);
+    }
+    console.log("[fyn:gmail] connection saved successfully");
 
     try {
       await supabaseAdmin.from("ca_brain_events").insert({
@@ -120,6 +133,23 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
     } catch { /* fire and forget */ }
 
     return { ok: true, gmailAddress };
+  });
+
+/** Temporary diagnostic — reports which Gmail env vars are present (values never returned). */
+export const debugGmailEnv = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async (): Promise<{ vars: Record<string, string> }> => {
+    return {
+      vars: {
+        GMAIL_CLIENT_ID: process.env["GMAIL_CLIENT_ID"] ? "SET" : "MISSING",
+        GOOGLE_OAUTH_CLIENT_ID: process.env["GOOGLE_OAUTH_CLIENT_ID"] ? "SET" : "MISSING",
+        GMAIL_CLIENT_SECRET: process.env["GMAIL_CLIENT_SECRET"] ? "SET" : "MISSING",
+        GOOGLE_OAUTH_CLIENT_SECRET: process.env["GOOGLE_OAUTH_CLIENT_SECRET"] ? "SET" : "MISSING",
+        GMAIL_ENCRYPTION_KEY: process.env["GMAIL_ENCRYPTION_KEY"] ? "SET" : "MISSING",
+        SUPABASE_SERVICE_ROLE_KEY: process.env["SUPABASE_SERVICE_ROLE_KEY"] ? "SET" : "MISSING",
+        SUPABASE_URL: process.env["SUPABASE_URL"] ? "SET" : "MISSING",
+      },
+    };
   });
 
 /** Revoke the Google grant and mark the connection inactive. */
