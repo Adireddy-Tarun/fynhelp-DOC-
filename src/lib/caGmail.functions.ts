@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Gmail intake — authenticated server functions used by the CA portal.
  * Every call proves the caller belongs to the firm it names before touching tokens.
@@ -175,10 +176,18 @@ export const disconnectGmail = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await assertFirmMember(context.supabase as never, data.firmId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let dbClient: { from: (t: string) => any };
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("ca_gmail_connections").select("id").limit(1);
+      dbClient = supabaseAdmin as { from: (t: string) => any };
+    } catch (adminErr) {
+      console.warn("[fyn:gmail] supabaseAdmin unavailable, falling back to session client:", adminErr instanceof Error ? adminErr.message : adminErr);
+      dbClient = context.supabase as { from: (t: string) => any };
+    }
     const g = await import("@/lib/caGmail.server");
 
-    const { data: conn } = await supabaseAdmin
+    const { data: conn } = await dbClient
       .from("ca_gmail_connections")
       .select("access_token_enc")
       .eq("id", data.connectionId)
@@ -191,14 +200,14 @@ export const disconnectGmail = createServerFn({ method: "POST" })
       } catch { /* revocation is best effort */ }
     }
 
-    await supabaseAdmin
+    await dbClient
       .from("ca_gmail_connections")
       .update({ is_active: false, error_message: null } as never)
       .eq("id", data.connectionId)
       .eq("ca_firm_id", data.firmId);
 
     try {
-      await supabaseAdmin.from("ca_brain_events").insert({
+      await dbClient.from("ca_brain_events").insert({
         ca_firm_id: data.firmId,
         business_id: null,
         event_type: "gmail_disconnected",
