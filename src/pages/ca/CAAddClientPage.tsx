@@ -120,6 +120,7 @@ export default function CAAddClientPage() {
 
       const { data: insertedClient, error: clientErr } = await supabase.from("ca_clients").insert({
         ca_firm_id: firmId,
+        business_id: crypto.randomUUID(),
         client_name: form.clientName.trim(),
         client_email: form.clientEmail.trim().toLowerCase(),
         client_phone: form.phone.trim() || null,

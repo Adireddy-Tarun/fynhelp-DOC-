@@ -273,8 +273,50 @@ export default function CAReviewQueuePage() {
             </div>
           )}
 
+          {!active.business_id && (
+            <div style={{
+              background: "rgba(139,105,20,0.07)",
+              border: "1px solid rgba(139,105,20,0.2)",
+              borderRadius: 8,
+              padding: "10px 14px",
+              marginBottom: 10,
+            }}>
+              <div style={{ fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, color: "#8B6914", marginBottom: 8 }}>
+                Assign to a client before reviewing
+              </div>
+              <select
+                onChange={async (e) => {
+                  if (!e.target.value) return;
+                  const { error } = await supabase
+                    .from("ca_document_extractions")
+                    .update({ business_id: e.target.value } as never)
+                    .eq("id", active.id);
+                  if (error) { toast.error(error.message); return; }
+                  toast.success("Client assigned");
+                  void load();
+                }}
+                style={{
+                  fontFamily: CA.sans,
+                  fontSize: 13,
+                  padding: "6px 10px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(23,18,8,0.2)",
+                  background: "#FFFDF9",
+                  color: "#171208",
+                  width: "100%",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="">Select client to assign…</option>
+                {clients.map((c) => (
+                  <option key={c.business_id} value={c.business_id}>{c.client_name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-            <CAButton onClick={post} disabled={busy || draft.length === 0}>
+            <CAButton onClick={post} disabled={busy || draft.length === 0 || !active.business_id}>
               Confirm & post to ledger
             </CAButton>
             <CAButton variant="danger" onClick={reject}>
