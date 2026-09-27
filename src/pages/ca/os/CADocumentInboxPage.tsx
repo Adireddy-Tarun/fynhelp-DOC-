@@ -475,6 +475,7 @@ export default function CADocumentInboxPage() {
   };
 
   const saveInboxGstinReview = async (row: Row) => {
+    if (!firmId) return;
     const gstin = gstinDraft.gstin.trim().toUpperCase();
     const validFormat = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin);
     if (gstin && !validFormat) return toast.error("Check the GSTIN: it must match the expected 15-character format.");
@@ -843,7 +844,7 @@ export default function CADocumentInboxPage() {
               Upload your first document
             </div>
             <p style={{ fontFamily: CA.sans, fontSize: 13.5, color: CA.muted, lineHeight: 1.65, maxWidth: 440, margin: "0 auto 20px" }}>
-              Upload a bank statement in CSV or PDF, an invoice, or an expense bill for this client. The system reads it automatically. High confidence extractions post to the ledger immediately. Low confidence items come to the Review queue for a quick check.
+              Upload a bank statement in CSV or PDF, an invoice, or an expense bill for this client. The system reads and scores it. A high score means the extraction is ready; the CA reviews and posts it. Lower scores go to the Review queue.
             </p>
             <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.faint }}>
               Supported formats: HDFC, ICICI, SBI, Axis and Kotak bank CSVs, Tally XML, generic CSV, PDF invoices and bills
@@ -851,7 +852,7 @@ export default function CADocumentInboxPage() {
           </div>
         ) : (
           <QueueTable
-            columns={["Received", "Client", "Document", "Class", "Confidence", "State", "Supplier GSTIN", "GSTIN review", "Actions"]}
+            columns={["Received", "Client", "Document", "Class", "Confidence", "State", "Supplier GSTIN", "GSTIN review", "Actions", "GSTIN review details"]}
             empty="No documents yet"
             emptyHint="Upload a file above, or raise a request so the client can send it themselves."
             rows={rows.map((r) => [
@@ -873,7 +874,7 @@ export default function CADocumentInboxPage() {
                 style={{ background: "none", border: "none", padding: 0, color: CA.teal, fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}
               >
                 {viewBusy === r.id ? "…" : "View"}
-              </button>,
+                </button>
               <button
                 onClick={() => {
                   setGstinEditId(gstinEditId === r.id ? null : r.id);
