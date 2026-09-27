@@ -102,29 +102,43 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
     }
     const gmailAddress = await g.fetchGmailAddress(tokens.access_token);
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let dbClient: { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // The admin proxy throws lazily on first use — probe it so the fallback catches init failures.
+      await supabaseAdmin.from("ca_gmail_connections").select("id").limit(1);
+      dbClient = supabaseAdmin as { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+      console.log("[fyn:gmail] using supabaseAdmin for upsert");
+    } catch (adminErr) {
+      console.warn("[fyn:gmail] supabaseAdmin unavailable, falling back to session client:", adminErr instanceof Error ? adminErr.message : adminErr);
+      dbClient = context.supabase as { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    }
+
+    const payload = {
+      ca_firm_id: parsed.firmId,
+      user_id: context.userId,
+      gmail_address: gmailAddress,
+      access_token_enc: await g.encryptToken(tokens.access_token),
+      refresh_token_enc: await g.encryptToken(tokens.refresh_token),
+      token_expiry: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+      is_active: true,
+      error_message: null,
+    };
+
     console.log("[fyn:gmail] attempting db upsert for:", gmailAddress, "firm:", parsed.firmId);
-    const { error } = await supabaseAdmin.from("ca_gmail_connections").upsert(
-      {
-        ca_firm_id: parsed.firmId,
-        user_id: context.userId,
-        gmail_address: gmailAddress,
-        access_token_enc: await g.encryptToken(tokens.access_token),
-        refresh_token_enc: await g.encryptToken(tokens.refresh_token),
-        token_expiry: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-        is_active: true,
-        error_message: null,
-      } as never,
-      { onConflict: "ca_firm_id,gmail_address" },
-    );
+
+    const { error } = await dbClient
+      .from("ca_gmail_connections")
+      .upsert(payload as never, { onConflict: "ca_firm_id,gmail_address" });
+
     if (error) {
       console.error("[fyn:gmail] db upsert failed:", error.code, error.message, error.details);
-      throw new Error(error.message);
+      throw new Error(`Could not save Gmail connection: ${error.message}`);
     }
-    console.log("[fyn:gmail] connection saved successfully");
+    console.log("[fyn:gmail] connection saved successfully for", gmailAddress);
 
     try {
-      await supabaseAdmin.from("ca_brain_events").insert({
+      await dbClient.from("ca_brain_events").insert({
         ca_firm_id: parsed.firmId,
         business_id: null,
         event_type: "gmail_connected",
