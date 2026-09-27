@@ -175,7 +175,7 @@ export default function CAGstPortfolioPage() {
       setVendors(vRows);
     } catch (err: any) {
       toast.error("Unable to load GST portfolio");
-      console.error(err);
+      console.error("[fyn:gst] portfolio load failed:", err);
     } finally {
       setLoading(false);
     }

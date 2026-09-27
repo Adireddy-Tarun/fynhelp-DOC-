@@ -540,7 +540,7 @@ export default function CADashboardPage() {
       )}
 
       {/* ZONE 1 — Command strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
         <div style={cardStyle}>
           <div style={labelStyle}>Actions today</div>
           <div style={{ fontFamily: CA.mono, fontSize: 32, fontWeight: 700, marginTop: 6, color: actionsToday > 0 ? "#A93838" : "#1F5A46", fontVariantNumeric: "tabular-nums" }}>
@@ -748,7 +748,7 @@ export default function CADashboardPage() {
       </div>
 
       {/* ZONE 4 — Summary */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginTop: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginTop: 22 }}>
         {summary.map((s) => (
           <CACard key={s.label} style={{ padding: "16px 18px" }}>
             <div style={{ fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: CA.faint }}>

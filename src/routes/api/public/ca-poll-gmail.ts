@@ -10,6 +10,7 @@
  * `Authorization: Bearer <secret>`). No message content is returned.
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "node:crypto";
 import type { ParsedRow } from "@/lib/caGmail.server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

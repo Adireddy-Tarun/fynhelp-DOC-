@@ -9,6 +9,17 @@ import { CA, CACard, CAButton, CABadge, caInputStyle, caTh, caTd, dateIN } from 
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
 
+function cleanErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message
+      .replace(/\b[0-9]{5}\b/g, "") // strip Postgres error codes
+      .replace(/relation "[^"]*"/g, "database table") // hide table names
+      .replace(/column "[^"]*"/g, "field") // hide column names
+      .trim();
+  }
+  return "An unexpected error occurred";
+}
+
 interface GmailRow {
   id: string;
   original_filename: string | null;
@@ -352,20 +363,41 @@ export default function CADocumentInboxPage() {
       return;
     }
     setBusy(true);
+    const UPLOAD_TIMEOUT_MS = 30000;
     for (const file of Array.from(files)) {
       const cls = classification === "auto" ? guessClassification(file.name) : classification;
-      const res = await intakeDocument({
-        file,
-        firmId,
-        businessId,
-        clientId: clients.find((c) => c.business_id === businessId)?.id ?? null,
-        clientReferenceCode: businessId.slice(0, 8).toUpperCase(),
-        period: period || null,
-        classification: cls,
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Upload timed out after 30 seconds. Check your connection and try again.")),
+          UPLOAD_TIMEOUT_MS,
+        );
       });
+      let res: Awaited<ReturnType<typeof intakeDocument>>;
+      try {
+        res = await Promise.race([
+          intakeDocument({
+            file,
+            firmId,
+            businessId,
+            clientId: clients.find((c) => c.business_id === businessId)?.id ?? null,
+            clientReferenceCode: businessId.slice(0, 8).toUpperCase(),
+            period: period || null,
+            classification: cls,
+          }),
+          timeoutPromise,
+        ]);
+      } catch (err) {
+        console.error("[fyn:intake] upload failed for", file.name, err);
+        res = { ok: false, error: cleanErrorMessage(err) };
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
 
       if (!res.ok) {
-        toast.error(`${file.name}: ${res.error}`, { duration: 8000 });
+        const clean = cleanErrorMessage(new Error(res.error ?? "Upload failed"));
+        console.error("[fyn:intake] upload rejected for", file.name, res.error);
+        toast.error(`Upload failed for ${file.name}: ${clean || "An unexpected error occurred"}`, { duration: 8000 });
       } else if (res.reviewState === "auto_accepted") {
         toast.success(`${file.name}: ${res.rowCount} rows extracted, high confidence`);
       } else if (res.reviewState === "failed") {
@@ -378,7 +410,7 @@ export default function CADocumentInboxPage() {
         filename: file.name,
         status: !res.ok ? "error" : res.reviewState === "auto_accepted" ? "ok" : "review",
         message: !res.ok
-          ? (res.error ?? "Unknown error")
+          ? (cleanErrorMessage(new Error(res.error ?? "")) || "An unexpected error occurred")
           : res.reviewState === "auto_accepted"
           ? `${res.rowCount ?? 0} rows extracted with high confidence`
           : "Sent to review queue — confidence below threshold",
