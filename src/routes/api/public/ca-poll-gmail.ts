@@ -48,7 +48,20 @@ async function run(request: Request): Promise<Response> {
     });
   }
 
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // This is a cron route with no user session — if the admin client fails here, the poll cannot run.
+  let supabaseAdmin: any;
+  try {
+    const mod = await import("@/integrations/supabase/client.server");
+    supabaseAdmin = mod.supabaseAdmin;
+    // The admin proxy throws lazily on first use — probe it so init failures surface here.
+    await supabaseAdmin.from("ca_gmail_connections").select("id").limit(1);
+  } catch (adminErr) {
+    console.error("[fyn:gmail] poll cannot run — supabaseAdmin unavailable:", adminErr instanceof Error ? adminErr.message : adminErr);
+    return new Response(JSON.stringify({ error: "admin client unavailable" }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
+  }
   const gmail = await import("@/lib/caGmail.server");
 
   const { data: connections } = await supabaseAdmin
