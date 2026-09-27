@@ -71,7 +71,17 @@ export const pollGmailNow = createServerFn({ method: "POST" })
 export const completeGmailConnect = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { code: string; state: string; origin?: string }) => {
-    if (!input?.code || !input?.state) throw new Error("code and state are required");
+    if (!input?.code || typeof input.code !== "string" || input.code.trim().length === 0) {
+      throw new Error("Invalid authorisation code");
+    }
+    if (!input?.state || typeof input.state !== "string" || input.state.trim().length === 0) {
+      throw new Error("Invalid state parameter");
+    }
+    if (input.origin !== undefined && typeof input.origin === "string") {
+      if (!input.origin.startsWith("https://") && !input.origin.startsWith("http://localhost")) {
+        throw new Error("Invalid origin");
+      }
+    }
     return input;
   })
   .handler(async ({ data, context }): Promise<{ ok: true; gmailAddress: string }> => {
@@ -153,7 +163,16 @@ export const completeGmailConnect = createServerFn({ method: "POST" })
 /** Temporary diagnostic — reports which Gmail env vars are present (values never returned). */
 export const debugGmailEnv = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async (): Promise<{ vars: Record<string, string> }> => {
+  .handler(async ({ context }): Promise<{ vars: Record<string, string> }> => {
+    const rateKey = `debug-${context.userId}`;
+    const now = Date.now();
+    // Simple in-memory rate limit: once per 60 seconds per user (best effort per worker)
+    const store = globalThis as unknown as Record<string, unknown>;
+    const lastCall = store[rateKey] as number | undefined;
+    if (lastCall && now - lastCall < 60000) {
+      throw new Error("Rate limit: wait 60 seconds between debug calls");
+    }
+    store[rateKey] = now;
     return {
       vars: {
         GMAIL_CLIENT_ID: process.env["GMAIL_CLIENT_ID"] ? "SET" : "MISSING",

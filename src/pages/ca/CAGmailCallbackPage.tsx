@@ -8,6 +8,20 @@ import { CA, CACard, CAButton } from "@/components/ca/portalUi";
 
 const ORIGIN_KEY = "fyn:gmail:connect-origin";
 
+
+function sanitizeErrorForUser(msg: string): string {
+  if (msg.includes("refresh_token") || msg.includes("access_token")) {
+    return "The Google authorisation could not be completed. Please try connecting Gmail again.";
+  }
+  if (msg.includes("ca_gmail_connections") || msg.includes("upsert") || /\b42[0-9A-Z]{3}\b/.test(msg)) {
+    return "Could not save the Gmail connection. Please try again or contact support at support@fynhelp.com";
+  }
+  if (msg.includes("GMAIL_CLIENT") || msg.includes("GOOGLE_OAUTH") || msg.includes("not configured")) {
+    return "Gmail integration is not configured for this environment. Please contact support.";
+  }
+  return msg;
+}
+
 export default function CAGmailCallbackPage() {
   const navigate = useNavigate();
   const complete = useServerFn(completeGmailConnect);
@@ -64,6 +78,7 @@ export default function CAGmailCallbackPage() {
         toast.success(`Gmail connected — ${res.gmailAddress}`);
         navigate("/ca/integrations", { replace: true });
       } catch (e) {
+        console.error("[fyn:gmail] callback failed:", e instanceof Error ? e.message : e);
         setErrorMsg(e instanceof Error ? e.message : "Could not complete the Gmail connection.");
       }
     };
@@ -78,7 +93,7 @@ export default function CAGmailCallbackPage() {
           <div style={{ fontFamily: CA.serif, fontSize: 20, fontWeight: 700, color: CA.ink }}>Gmail not connected</div>
           <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red, marginTop: 14, marginBottom: 8 }}>Something stopped the connection</div>
           <div style={{ fontFamily: CA.mono, fontSize: 12, color: CA.muted, marginBottom: 20, lineHeight: 1.6, textAlign: "left", background: "rgba(23,18,8,0.04)", padding: "10px 14px", borderRadius: 8 }}>
-            {errorMsg}
+            {sanitizeErrorForUser(errorMsg)}
           </div>
           <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
             <CAButton onClick={() => navigate("/ca/integrations")}>Back to Integrations</CAButton>

@@ -819,7 +819,7 @@ export default function CAClientDetailPage() {
 
 
 
-      <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}` }}>
+      <div className="ca-tabstrip" style={{ display: "flex", gap: 6, marginTop: 20, borderBottom: `0.5px solid ${CA.line}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {TABS.map((t) => (
           <button
             key={t}
