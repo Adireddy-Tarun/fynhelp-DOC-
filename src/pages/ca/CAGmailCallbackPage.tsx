@@ -8,6 +8,20 @@ import { CA, CACard, CAButton } from "@/components/ca/portalUi";
 
 const ORIGIN_KEY = "fyn:gmail:connect-origin";
 
+
+function sanitizeErrorForUser(msg: string): string {
+  if (msg.includes("refresh_token") || msg.includes("access_token")) {
+    return "The Google authorisation could not be completed. Please try connecting Gmail again.";
+  }
+  if (msg.includes("ca_gmail_connections") || msg.includes("upsert") || /\b42[0-9A-Z]{3}\b/.test(msg)) {
+    return "Could not save the Gmail connection. Please try again or contact support at support@fynhelp.com";
+  }
+  if (msg.includes("GMAIL_CLIENT") || msg.includes("GOOGLE_OAUTH") || msg.includes("not configured")) {
+    return "Gmail integration is not configured for this environment. Please contact support.";
+  }
+  return msg;
+}
+
 export default function CAGmailCallbackPage() {
   const navigate = useNavigate();
   const complete = useServerFn(completeGmailConnect);
