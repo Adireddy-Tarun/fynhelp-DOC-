@@ -199,6 +199,7 @@ export default function CAReviewQueuePage() {
           { label: "In queue", value: String(items.length) },
           { label: "Needs review", value: String(items.filter((i) => i.review_state === "needs_review").length) },
           { label: "Failed extraction", value: String(items.filter((i) => i.review_state === "failed").length) },
+          { label: "GSTIN follow-up", value: String(items.filter((i) => i.gstin_verification_status === "follow_up").length) },
         ]}
       />
 
@@ -209,12 +210,12 @@ export default function CAReviewQueuePage() {
               Review queue is clear
             </div>
             <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
-              All extracted documents are either posted to the ledger or awaiting upload. High confidence extractions post automatically, only items that need a human check appear here.
+              All extracted documents are either posted to the ledger or awaiting upload. Review bills here, check supplier details, and post approved rows to the ledger.
             </p>
           </div>
         ) : (
           <QueueTable
-            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", ""]}
+            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", "Supplier GSTIN", "GSTIN check", ""]}
             empty="Queue is clear"
             emptyHint="Every extraction has been reviewed or auto-accepted."
             rows={items.map((i) => [
@@ -225,6 +226,8 @@ export default function CAReviewQueuePage() {
               String((i.extracted?.rows ?? []).length),
               <ConfidenceChip key="c" value={i.confidence} />,
               <StateChip key="s" value={i.review_state} />,
+              i.supplier_gstin ?? "—",
+              <StateChip key={`gstin-${i.id}`} value={i.gstin_verification_status ?? "pending"} />,
               <CAButton key="o" variant="ghost" onClick={() => setActiveId(i.id === activeId ? null : i.id)}>
                 {i.id === activeId ? "Close" : "Review"}
               </CAButton>,
