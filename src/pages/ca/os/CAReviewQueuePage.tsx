@@ -59,6 +59,33 @@ export default function CAReviewQueuePage() {
 
   const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
 
+  const viewFile = async (extraction: CAExtraction) => {
+    const path = (extraction as any).storage_path ?? (extraction as any).file_path ?? (extraction as any).storage_key ?? null;
+    if (!path) {
+      toast.error("No file path stored for this document. It may have been uploaded before storage paths were tracked.");
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from("ca-client-documents")
+      .createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error("Could not generate file link. Check storage permissions.");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const downloadFile = async (extraction: CAExtraction) => {
+    const path = (extraction as any).storage_path ?? (extraction as any).file_path ?? null;
+    if (!path) { toast.error("No file stored for this document"); return; }
+    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(path, 60);
+    if (error || !data?.signedUrl) { toast.error("Could not generate download link"); return; }
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = extraction.original_filename ?? "document";
+    a.click();
+  };
+
   const post = async () => {
     if (!active) return;
     setBusy(true);
