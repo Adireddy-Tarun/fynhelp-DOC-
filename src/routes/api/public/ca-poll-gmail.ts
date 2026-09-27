@@ -26,6 +26,17 @@ interface GmailConnection {
   refresh_locked_until: string | null;
 }
 
+function safeEqual(a: string, b: string): boolean {
+  try {
+    const ab = Buffer.from(a);
+    const bb = Buffer.from(b);
+    if (ab.length !== bb.length) return false;
+    return timingSafeEqual(ab, bb);
+  } catch {
+    return false;
+  }
+}
+
 function authorized(request: Request): boolean {
   const accepted = [process.env["CA_CRON_SECRET"], process.env["CRON_SECRET"]].filter(
     (s): s is string => Boolean(s),
@@ -33,7 +44,11 @@ function authorized(request: Request): boolean {
   const provided =
     request.headers.get("x-cron-secret") ??
     (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  return accepted.length > 0 && Boolean(provided) && accepted.includes(provided);
+  if (!provided || accepted.length === 0) return false;
+  // Check every candidate so timing does not reveal which secret matched.
+  let ok = false;
+  for (const s of accepted) if (safeEqual(provided, s)) ok = true;
+  return ok;
 }
 
 function safeName(name: string) {
