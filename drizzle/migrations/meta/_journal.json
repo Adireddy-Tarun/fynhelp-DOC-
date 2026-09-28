@@ -15,6 +15,13 @@
       "when": 1790607345901,
       "tag": "0001_ca_whatsapp_intake",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790608387667,
+      "tag": "0002_wa_embedded_signup",
+      "breakpoints": true
     }
   ]
 }

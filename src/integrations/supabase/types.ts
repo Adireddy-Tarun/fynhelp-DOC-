@@ -4368,12 +4368,14 @@ export type Database = {
           error_message: string | null
           id: string
           is_active: boolean
+          is_coexistence: boolean
           is_verified: boolean
           last_received_at: string | null
           phone_number: string
           phone_number_id: string | null
           updated_at: string
-          webhook_verify_token: string
+          waba_id: string | null
+          webhook_verify_token: string | null
         }
         Insert: {
           access_token_enc?: string | null
@@ -4384,12 +4386,14 @@ export type Database = {
           error_message?: string | null
           id?: string
           is_active?: boolean
+          is_coexistence?: boolean
           is_verified?: boolean
           last_received_at?: string | null
           phone_number: string
           phone_number_id?: string | null
           updated_at?: string
-          webhook_verify_token?: string
+          waba_id?: string | null
+          webhook_verify_token?: string | null
         }
         Update: {
           access_token_enc?: string | null
@@ -4400,12 +4404,14 @@ export type Database = {
           error_message?: string | null
           id?: string
           is_active?: boolean
+          is_coexistence?: boolean
           is_verified?: boolean
           last_received_at?: string | null
           phone_number?: string
           phone_number_id?: string | null
           updated_at?: string
-          webhook_verify_token?: string
+          waba_id?: string | null
+          webhook_verify_token?: string | null
         }
         Relationships: [
           {

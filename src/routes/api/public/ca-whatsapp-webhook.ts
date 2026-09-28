@@ -6,6 +6,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import type { ParsedRow } from "@/lib/caGmail.server";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 function safeName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_{2,}/g, "_").toLowerCase();
@@ -19,25 +20,30 @@ export const Route = createFileRoute("/api/public/ca-whatsapp-webhook")({
         const mode = url.searchParams.get("hub.mode");
         const token = url.searchParams.get("hub.verify_token") ?? "";
         const challenge = url.searchParams.get("hub.challenge");
-        if (mode !== "subscribe" || !challenge || token.length < 32) return new Response("Forbidden", { status: 403 });
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data } = await supabaseAdmin
-          .from("ca_whatsapp_connections")
-          .select("id")
-          .eq("webhook_verify_token", token)
-          .maybeSingle();
-        if (!data?.id) return new Response("Forbidden", { status: 403 });
-        await supabaseAdmin.from("ca_whatsapp_connections").update({ is_verified: true, updated_at: new Date().toISOString() }).eq("id", data.id);
-        console.log("[fyn:whatsapp] webhook verified for connection", data.id);
-        return new Response(challenge, { status: 200 });
+        const expected = process.env["META_WEBHOOK_VERIFY_TOKEN"] ?? "";
+        if (mode !== "subscribe" || !challenge || !expected) return new Response("Forbidden", { status: 403 });
+        const a = Buffer.from(token);
+        const b = Buffer.from(expected);
+        if (a.length !== b.length || !timingSafeEqual(a, b)) return new Response("Forbidden", { status: 403 });
+        return new Response(challenge, { status: 200, headers: { "Content-Type": "text/plain" } });
       },
 
       POST: async ({ request }) => {
         console.log("[fyn:whatsapp] webhook received");
         const raw = await request.text();
+        const appSecret = process.env["META_APP_SECRET"] ?? "";
+        const signature = request.headers.get("x-hub-signature-256") ?? "";
+        const expectedSig = appSecret ? "sha256=" + createHmac("sha256", appSecret).update(raw).digest("hex") : "";
+        const sa = Buffer.from(signature);
+        const sb = Buffer.from(expectedSig);
+        if (!expectedSig || sa.length !== sb.length || !timingSafeEqual(sa, sb)) {
+          console.warn("[fyn:whatsapp] webhook signature rejected");
+          return new Response("Invalid signature", { status: 401 });
+        }
         let body: unknown;
-        try { body = JSON.parse(raw); } catch { return new Response("Bad request", { status: 400 }); }
+        try { body = JSON.parse(raw); } catch { return new Response("OK", { status: 200 }); }
 
+        try {
         const wa = await import("@/lib/caWhatsapp.server");
         const gmail = await import("@/lib/caGmail.server");
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -47,24 +53,16 @@ export const Route = createFileRoute("/api/public/ca-whatsapp-webhook")({
           return new Response("OK", { status: 200 });
         }
 
-        const signature = request.headers.get("x-hub-signature-256");
-        let retryNeeded = false;
-
         for (const msg of messages) {
           const { data: conn } = await supabaseAdmin
             .from("ca_whatsapp_connections")
-            .select("id, ca_firm_id, access_token_enc, app_secret_enc")
+            .select("id, ca_firm_id, access_token_enc")
             .eq("phone_number_id", msg.phoneNumberId)
             .eq("is_active", true)
             .maybeSingle();
-          if (!conn || !conn.access_token_enc || !conn.app_secret_enc) {
-            console.warn("[fyn:whatsapp] no active connection for phone_number_id:", msg.phoneNumberId);
+          if (!conn || !conn.access_token_enc) {
+            console.log(`[fyn:whatsapp] unknown phone_number_id ${msg.phoneNumberId} — ignored`);
             continue;
-          }
-          const appSecret = await gmail.decryptToken(conn.app_secret_enc);
-          if (!wa.verifyMetaSignature(raw, signature, appSecret)) {
-            console.warn("[fyn:whatsapp] signature check failed for connection", conn.id);
-            return new Response("Invalid signature", { status: 401 });
           }
           const caFirmId = conn.ca_firm_id;
           console.log(`[fyn:whatsapp] media message from ${msg.from} — file: ${msg.filename} — type: ${msg.mediaType}`);
@@ -204,12 +202,14 @@ export const Route = createFileRoute("/api/public/ca-whatsapp-webhook")({
             const message = err instanceof Error ? err.message : String(err);
             console.error("[fyn:whatsapp] processing failed:", message);
             await supabaseAdmin.from("ca_whatsapp_connections").update({ error_message: message.slice(0, 300) }).eq("id", conn.id);
-            retryNeeded = true;
           }
         }
+        } catch (err) {
+          console.error("[fyn:whatsapp] webhook error:", err instanceof Error ? err.message : String(err));
+        }
 
-        // 5xx lets Meta retry; duplicates are skipped by message id.
-        return retryNeeded ? new Response("Retry", { status: 500 }) : new Response("OK", { status: 200 });
+        // Always 200 once the signature has passed; duplicates are skipped by message id.
+        return new Response("OK", { status: 200 });
       },
     },
   },
