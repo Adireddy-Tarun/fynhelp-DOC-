@@ -2188,6 +2188,12 @@ export type Database = {
           updated_at: string
           uploaded_by: string | null
           was_corrected: boolean
+          whatsapp_caption: string | null
+          whatsapp_match_confidence: number | null
+          whatsapp_match_method: string | null
+          whatsapp_message_id: string | null
+          whatsapp_sender_name: string | null
+          whatsapp_sender_phone: string | null
         }
         Insert: {
           business_id?: string | null
@@ -2223,6 +2229,12 @@ export type Database = {
           updated_at?: string
           uploaded_by?: string | null
           was_corrected?: boolean
+          whatsapp_caption?: string | null
+          whatsapp_match_confidence?: number | null
+          whatsapp_match_method?: string | null
+          whatsapp_message_id?: string | null
+          whatsapp_sender_name?: string | null
+          whatsapp_sender_phone?: string | null
         }
         Update: {
           business_id?: string | null
@@ -2258,6 +2270,12 @@ export type Database = {
           updated_at?: string
           uploaded_by?: string | null
           was_corrected?: boolean
+          whatsapp_caption?: string | null
+          whatsapp_match_confidence?: number | null
+          whatsapp_match_method?: string | null
+          whatsapp_message_id?: string | null
+          whatsapp_sender_name?: string | null
+          whatsapp_sender_phone?: string | null
         }
         Relationships: [
           {
@@ -2705,6 +2723,7 @@ export type Database = {
           verification_reviewed_at: string | null
           verification_status: string
           verification_submitted_at: string | null
+          whatsapp_number: string | null
           whatsapp_phone: string | null
           years_of_practice: number | null
         }
@@ -2743,6 +2762,7 @@ export type Database = {
           verification_reviewed_at?: string | null
           verification_status?: string
           verification_submitted_at?: string | null
+          whatsapp_number?: string | null
           whatsapp_phone?: string | null
           years_of_practice?: number | null
         }
@@ -2781,6 +2801,7 @@ export type Database = {
           verification_reviewed_at?: string | null
           verification_status?: string
           verification_submitted_at?: string | null
+          whatsapp_number?: string | null
           whatsapp_phone?: string | null
           years_of_practice?: number | null
         }
@@ -4336,6 +4357,104 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ca_whatsapp_connections: {
+        Row: {
+          access_token_enc: string | null
+          app_secret_enc: string | null
+          ca_firm_id: string
+          created_at: string
+          display_name: string | null
+          error_message: string | null
+          id: string
+          is_active: boolean
+          is_verified: boolean
+          last_received_at: string | null
+          phone_number: string
+          phone_number_id: string | null
+          updated_at: string
+          webhook_verify_token: string
+        }
+        Insert: {
+          access_token_enc?: string | null
+          app_secret_enc?: string | null
+          ca_firm_id: string
+          created_at?: string
+          display_name?: string | null
+          error_message?: string | null
+          id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          last_received_at?: string | null
+          phone_number: string
+          phone_number_id?: string | null
+          updated_at?: string
+          webhook_verify_token?: string
+        }
+        Update: {
+          access_token_enc?: string | null
+          app_secret_enc?: string | null
+          ca_firm_id?: string
+          created_at?: string
+          display_name?: string | null
+          error_message?: string | null
+          id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          last_received_at?: string | null
+          phone_number?: string
+          phone_number_id?: string | null
+          updated_at?: string
+          webhook_verify_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ca_whatsapp_connections_ca_firm_id_fkey"
+            columns: ["ca_firm_id"]
+            isOneToOne: false
+            referencedRelation: "ca_firms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ca_whatsapp_sender_mappings: {
+        Row: {
+          business_id: string
+          ca_firm_id: string
+          confidence: number | null
+          confirmed_at: string | null
+          confirmed_by_user_id: string | null
+          created_at: string
+          id: string
+          match_method: string | null
+          sender_name: string | null
+          sender_phone: string
+        }
+        Insert: {
+          business_id: string
+          ca_firm_id: string
+          confidence?: number | null
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          id?: string
+          match_method?: string | null
+          sender_name?: string | null
+          sender_phone: string
+        }
+        Update: {
+          business_id?: string
+          ca_firm_id?: string
+          confidence?: number | null
+          confirmed_at?: string | null
+          confirmed_by_user_id?: string | null
+          created_at?: string
+          id?: string
+          match_method?: string | null
+          sender_name?: string | null
+          sender_phone?: string
+        }
+        Relationships: []
       }
       ca_working_papers: {
         Row: {
