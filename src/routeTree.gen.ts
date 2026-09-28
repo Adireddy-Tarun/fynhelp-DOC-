@@ -103,6 +103,7 @@ import { Route as ApiPublicCaComplianceAutoAlertRouteImport } from './routes/api
 import { Route as ApiPublicCaIntegrationSyncRouteImport } from './routes/api/public/ca-integration-sync'
 import { Route as ApiPublicCaInvoicePaymentWebhookRouteImport } from './routes/api/public/ca-invoice-payment-webhook'
 import { Route as ApiPublicCaPollGmailRouteImport } from './routes/api/public/ca-poll-gmail'
+import { Route as ApiPublicCaWhatsappWebhookRouteImport } from './routes/api/public/ca-whatsapp-webhook'
 import { Route as SharedMisTokenRouteImport } from './routes/shared.mis.$token'
 import { Route as V2ClientsIndexRouteImport } from './routes/v2/clients.index'
 import { Route as V2ClientsClientIdRouteImport } from './routes/v2/clients.$clientId'
@@ -682,6 +683,12 @@ const ApiPublicCaPollGmailRoute = ApiPublicCaPollGmailRouteImport.update({
   path: '/api/public/ca-poll-gmail',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCaWhatsappWebhookRoute =
+  ApiPublicCaWhatsappWebhookRouteImport.update({
+    id: '/api/public/ca-whatsapp-webhook',
+    path: '/api/public/ca-whatsapp-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SharedMisTokenRoute = SharedMisTokenRouteImport.update({
   id: '/shared/mis/$token',
   path: '/shared/mis/$token',
@@ -1305,6 +1312,7 @@ export interface FileRoutesByFullPath {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/api/public/ca-poll-gmail': typeof ApiPublicCaPollGmailRoute
+  '/api/public/ca-whatsapp-webhook': typeof ApiPublicCaWhatsappWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
   '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
   '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
@@ -1485,6 +1493,7 @@ export interface FileRoutesByTo {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/api/public/ca-poll-gmail': typeof ApiPublicCaPollGmailRoute
+  '/api/public/ca-whatsapp-webhook': typeof ApiPublicCaWhatsappWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
   '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
   '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
@@ -1675,6 +1684,7 @@ export interface FileRoutesById {
   '/api/public/ca-integration-sync': typeof ApiPublicCaIntegrationSyncRoute
   '/api/public/ca-invoice-payment-webhook': typeof ApiPublicCaInvoicePaymentWebhookRoute
   '/api/public/ca-poll-gmail': typeof ApiPublicCaPollGmailRoute
+  '/api/public/ca-whatsapp-webhook': typeof ApiPublicCaWhatsappWebhookRoute
   '/shared/mis/$token': typeof SharedMisTokenRoute
   '/v2/clients/$clientId': typeof V2ClientsClientIdRoute
   '/v2/reports/$reportId': typeof V2ReportsReportIdRoute
@@ -1861,6 +1871,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/api/public/ca-poll-gmail'
+    | '/api/public/ca-whatsapp-webhook'
     | '/shared/mis/$token'
     | '/v2/clients/$clientId'
     | '/v2/reports/$reportId'
@@ -2041,6 +2052,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/api/public/ca-poll-gmail'
+    | '/api/public/ca-whatsapp-webhook'
     | '/shared/mis/$token'
     | '/v2/clients/$clientId'
     | '/v2/reports/$reportId'
@@ -2230,6 +2242,7 @@ export interface FileRouteTypes {
     | '/api/public/ca-integration-sync'
     | '/api/public/ca-invoice-payment-webhook'
     | '/api/public/ca-poll-gmail'
+    | '/api/public/ca-whatsapp-webhook'
     | '/shared/mis/$token'
     | '/v2/clients/$clientId'
     | '/v2/reports/$reportId'
@@ -2350,6 +2363,7 @@ export interface RootRouteChildren {
   ApiPublicCaIntegrationSyncRoute: typeof ApiPublicCaIntegrationSyncRoute
   ApiPublicCaInvoicePaymentWebhookRoute: typeof ApiPublicCaInvoicePaymentWebhookRoute
   ApiPublicCaPollGmailRoute: typeof ApiPublicCaPollGmailRoute
+  ApiPublicCaWhatsappWebhookRoute: typeof ApiPublicCaWhatsappWebhookRoute
   SharedMisTokenRoute: typeof SharedMisTokenRoute
   CaIntegrationsGmailCallbackRoute: typeof CaIntegrationsGmailCallbackRoute
 }
@@ -3012,6 +3026,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/ca-poll-gmail'
       fullPath: '/api/public/ca-poll-gmail'
       preLoaderRoute: typeof ApiPublicCaPollGmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ca-whatsapp-webhook': {
+      id: '/api/public/ca-whatsapp-webhook'
+      path: '/api/public/ca-whatsapp-webhook'
+      fullPath: '/api/public/ca-whatsapp-webhook'
+      preLoaderRoute: typeof ApiPublicCaWhatsappWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shared/mis/$token': {
@@ -4129,6 +4150,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCaIntegrationSyncRoute: ApiPublicCaIntegrationSyncRoute,
   ApiPublicCaInvoicePaymentWebhookRoute: ApiPublicCaInvoicePaymentWebhookRoute,
   ApiPublicCaPollGmailRoute: ApiPublicCaPollGmailRoute,
+  ApiPublicCaWhatsappWebhookRoute: ApiPublicCaWhatsappWebhookRoute,
   SharedMisTokenRoute: SharedMisTokenRoute,
   CaIntegrationsGmailCallbackRoute: CaIntegrationsGmailCallbackRoute,
 }
