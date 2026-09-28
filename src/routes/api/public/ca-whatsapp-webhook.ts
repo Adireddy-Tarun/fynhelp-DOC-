@@ -6,6 +6,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import type { ParsedRow } from "@/lib/caGmail.server";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 function safeName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_{2,}/g, "_").toLowerCase();
@@ -201,12 +202,14 @@ export const Route = createFileRoute("/api/public/ca-whatsapp-webhook")({
             const message = err instanceof Error ? err.message : String(err);
             console.error("[fyn:whatsapp] processing failed:", message);
             await supabaseAdmin.from("ca_whatsapp_connections").update({ error_message: message.slice(0, 300) }).eq("id", conn.id);
-            retryNeeded = true;
           }
         }
+        } catch (err) {
+          console.error("[fyn:whatsapp] webhook error:", err instanceof Error ? err.message : String(err));
+        }
 
-        // 5xx lets Meta retry; duplicates are skipped by message id.
-        return retryNeeded ? new Response("Retry", { status: 500 }) : new Response("OK", { status: 200 });
+        // Always 200 once the signature has passed; duplicates are skipped by message id.
+        return new Response("OK", { status: 200 });
       },
     },
   },
