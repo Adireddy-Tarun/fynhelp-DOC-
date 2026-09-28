@@ -151,7 +151,14 @@ export default function CASidebar({
           .select("id", { count: "exact", head: true })
           .eq("ca_firm_id", firmId)
           .eq("review_state", "pending_verification");
-        if (!cancelled) setUrgentCount(overdue + (mismatched ?? 0) + (pendingVerif ?? 0));
+        // pending_verification (all sources) is counted above; add WhatsApp docs still needing review.
+        const { count: waReview } = await supabase
+          .from("ca_document_extractions")
+          .select("id", { count: "exact", head: true })
+          .eq("ca_firm_id", firmId)
+          .eq("source_type", "whatsapp")
+          .eq("review_state", "needs_review");
+        if (!cancelled) setUrgentCount(overdue + (mismatched ?? 0) + (pendingVerif ?? 0) + (waReview ?? 0));
       } catch { /* silent */ }
     })();
     return () => { cancelled = true; };

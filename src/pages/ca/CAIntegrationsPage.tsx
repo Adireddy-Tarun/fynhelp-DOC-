@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { getFirmIntegrations, syncZohoBooks, syncRazorpay } from "@/lib/caSync.functions";
 import { startGmailConnect, disconnectGmail, pollGmailNow, debugGmailEnv } from "@/lib/caGmail.functions";
+import { WhatsAppIntakeCard } from "@/components/ca/WhatsAppIntakeCard";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, dateIN, caTh, caTd, CAEmpty,
 } from "@/components/ca/portalUi";
@@ -354,6 +355,8 @@ export default function CAIntegrationsPage() {
           </table>
         )}
       </CACard>
+
+      <WhatsAppIntakeCard firmId={firmId} />
 
       {gmailSetupNeeded && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(23,18,8,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
