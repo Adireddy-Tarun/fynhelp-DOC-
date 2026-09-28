@@ -8,6 +8,7 @@ import { useNavigate } from "@/lib/router-compat";
 import { CA, CACard, CAButton, CABadge, caInputStyle, caTh, caTd, dateIN } from "@/components/ca/portalUi";
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
+import { WhatsAppInboxPanel } from "@/components/ca/WhatsAppInboxPanel";
 
 function cleanErrorMessage(err: unknown): string {
   if (err instanceof Error) {
@@ -194,7 +195,7 @@ export default function CADocumentInboxPage() {
   const [gstinDraft, setGstinDraft] = useState({ gstin: "", status: "pending" as Row["gstin_verification_status"], note: "" });
   const [gstinSaveBusy, setGstinSaveBusy] = useState<string | null>(null);
   const navigate = useNavigate();
-  const [inboxTab, setInboxTab] = useState<"upload" | "gmail">("upload");
+  const [inboxTab, setInboxTab] = useState<"upload" | "gmail" | "whatsapp">("upload");
   const [gmailItems, setGmailItems] = useState<GmailRow[]>([]);
   const [loadingGmail, setLoadingGmail] = useState(false);
   const [assignBusy, setAssignBusy] = useState<string | null>(null);
@@ -532,7 +533,7 @@ export default function CADocumentInboxPage() {
       />
 
       <div style={{ display: "flex", marginBottom: 16, borderBottom: `0.5px solid ${CA.line}` }}>
-        {(["upload", "gmail"] as const).map((tab) => (
+        {(["upload", "gmail", "whatsapp"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setInboxTab(tab)}
@@ -549,12 +550,14 @@ export default function CADocumentInboxPage() {
               marginBottom: -1,
             }}
           >
-            {tab === "upload" ? "Upload" : "From Gmail"}
+            {tab === "upload" ? "Upload" : tab === "gmail" ? "From Gmail" : "From WhatsApp"}
           </button>
         ))}
       </div>
 
-      {inboxTab === "gmail" ? (
+      {inboxTab === "whatsapp" ? (
+        <WhatsAppInboxPanel firmId={firmId} clients={clients} />
+      ) : inboxTab === "gmail" ? (
         <CACard style={{ padding: 20 }}>
           {loadingGmail ? (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.faint, padding: 20 }}>Loading Gmail documents…</div>
