@@ -1,84 +1,145 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { activateWhatsApp } from "@/lib/caWhatsapp.functions";
-import { CA, CACard, CAButton, CABadge, caInputStyle, dateIN } from "@/components/ca/portalUi";
+import { completeWhatsappSignup, disconnectWhatsapp, getWhatsappSignupConfig } from "@/lib/caWhatsapp.functions";
+import { useCARole } from "@/hooks/useCARole";
+import { CA, CACard, CAButton, CABadge, dateIN } from "@/components/ca/portalUi";
 
 interface WaConnection {
   id: string;
   phone_number: string;
+  phone_number_id: string | null;
   display_name: string | null;
   is_active: boolean;
-  is_verified: boolean;
+  is_coexistence: boolean;
   last_received_at: string | null;
-  webhook_verify_token: string;
-  error_message: string | null;
 }
 
-const WEBHOOK_URL = "https://fynhelp.lovable.app/api/public/ca-whatsapp-webhook";
+interface SessionInfo { phone_number_id: string; waba_id: string; is_coexistence: boolean }
 
 export function WhatsAppIntakeCard({ firmId }: { firmId: string | null }) {
-  const activate = useServerFn(activateWhatsApp);
+  const getConfig = useServerFn(getWhatsappSignupConfig);
+  const complete = useServerFn(completeWhatsappSignup);
+  const disconnectFn = useServerFn(disconnectWhatsapp);
+  const { role } = useCARole();
+  const canManage = role === "partner" || role === "manager";
+
+  const [config, setConfig] = useState<{ appId: string; configId: string; configured: boolean } | null>(null);
   const [conn, setConn] = useState<WaConnection | null>(null);
-  const [phone, setPhone] = useState("+91");
-  const [phoneNumberId, setPhoneNumberId] = useState("");
-  const [token, setToken] = useState("");
-  const [appSecret, setAppSecret] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const session = useRef<SessionInfo | null>(null);
 
   const load = useCallback(async () => {
     if (!firmId) return;
     const { data } = await supabase
       .from("ca_whatsapp_connections")
-      .select("id, phone_number, display_name, is_active, is_verified, last_received_at, webhook_verify_token, error_message")
+      .select("id, phone_number, phone_number_id, display_name, is_active, is_coexistence, last_received_at")
       .eq("ca_firm_id", firmId)
-      .order("created_at", { ascending: false })
+      .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     setConn((data as WaConnection | null) ?? null);
   }, [firmId]);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    getConfig().then(setConfig).catch(() => setConfig({ appId: "", configId: "", configured: false }));
+  }, [getConfig]);
 
-  const connect = async () => {
-    if (!firmId) return;
-    const clean = phone.replace(/\s/g, "");
-    if (!/^\+\d{10,15}$/.test(clean)) return toast.error("Enter the number as +91XXXXXXXXXX");
-    setBusy(true);
-    const { error } = await supabase.from("ca_whatsapp_connections").insert({ ca_firm_id: firmId, phone_number: clean });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Number saved. Finish the setup steps below.");
-    void load();
-  };
+  // Load the Facebook SDK once.
+  useEffect(() => {
+    if (!config?.configured) return;
+    window.fbAsyncInit = () => window.FB?.init({ appId: config.appId, autoLogAppEvents: true, xfbml: false, version: "v21.0" });
+    if (window.FB) { window.fbAsyncInit(); return; }
+    if (document.getElementById("facebook-jssdk")) return;
+    const s = document.createElement("script");
+    s.id = "facebook-jssdk";
+    s.src = "https://connect.facebook.net/en_US/sdk.js";
+    s.async = true;
+    s.defer = true;
+    s.crossOrigin = "anonymous";
+    document.body.appendChild(s);
+  }, [config]);
 
-  const doActivate = async () => {
-    if (!conn) return;
-    setBusy(true);
-    try {
-      await activate({ data: { connectionId: conn.id, phoneNumberId, accessToken: token, appSecret } });
-      toast.success("WhatsApp intake is active");
-      setToken(""); setAppSecret("");
-      void load();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not activate WhatsApp");
-    } finally {
-      setBusy(false);
+  // Listen for Embedded Signup session info.
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      try {
+        if (!new URL(event.origin).hostname.endsWith("facebook.com")) return;
+      } catch { return; }
+      let data: any;
+      try { data = typeof event.data === "string" ? JSON.parse(event.data) : null; } catch { return; }
+      if (!data || data.type !== "WA_EMBEDDED_SIGNUP") return;
+      if (String(data.event).startsWith("FINISH")) {
+        session.current = {
+          phone_number_id: String(data.data?.phone_number_id ?? ""),
+          waba_id: String(data.data?.waba_id ?? ""),
+          is_coexistence: data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING",
+        };
+      } else if (data.event === "CANCEL") {
+        toast("WhatsApp connection was cancelled");
+        session.current = null;
+        setConnecting(false);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const connect = () => {
+    if (!config?.configured || !firmId || !window.FB) {
+      if (!window.FB) toast.error("Facebook is still loading. Try again in a moment.");
+      return;
     }
+    setConnecting(true);
+    session.current = null;
+    window.FB.login((response) => {
+      const code = response.authResponse?.code;
+      if (!code) { setConnecting(false); return; }
+      let waited = 0;
+      const timer = window.setInterval(async () => {
+        waited += 200;
+        const info = session.current;
+        if (info?.phone_number_id && info.waba_id) {
+          window.clearInterval(timer);
+          try {
+            const res = await complete({ data: { code, waba_id: info.waba_id, phone_number_id: info.phone_number_id, firm_id: firmId, is_coexistence: info.is_coexistence } });
+            toast.success(`WhatsApp connected — ${res.phone_number}`);
+            void load();
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Could not connect WhatsApp");
+          } finally {
+            setConnecting(false);
+          }
+        } else if (waited >= 3000) {
+          window.clearInterval(timer);
+          toast.error("Meta did not return your number details. Please try again.");
+          setConnecting(false);
+        }
+      }, 200);
+    }, {
+      config_id: config.configId,
+      response_type: "code",
+      override_default_response_type: true,
+      extras: { setup: {}, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" },
+    });
   };
 
   const disconnect = async () => {
-    if (!conn || !window.confirm("Stop receiving WhatsApp documents from this number?")) return;
-    const { error } = await supabase.from("ca_whatsapp_connections").delete().eq("id", conn.id);
-    if (error) return toast.error(error.message);
-    toast.success("WhatsApp disconnected");
-    setConn(null);
+    if (!firmId || !window.confirm("Disconnect WhatsApp? New documents will stop arriving in FynHelp.")) return;
+    try {
+      await disconnectFn({ data: { firm_id: firmId } });
+      toast.success("WhatsApp disconnected");
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not disconnect WhatsApp");
+    }
   };
 
-  const copy = (v: string) => { void navigator.clipboard.writeText(v); toast.success("Copied"); };
+  const connected = !!conn && conn.is_active && !!conn.phone_number_id;
   const label = { fontFamily: CA.sans, fontSize: 11.5, color: CA.faint, marginBottom: 4 } as const;
-  const mono = { fontFamily: CA.mono, fontSize: 12, color: CA.ink, wordBreak: "break-all" } as const;
+  const muted = { fontFamily: CA.sans, fontSize: 12, color: CA.muted, marginTop: 8 } as const;
 
   return (
     <CACard style={{ marginTop: 20, padding: 0, overflow: "hidden" }}>
@@ -86,55 +147,37 @@ export function WhatsAppIntakeCard({ firmId }: { firmId: string | null }) {
         <div>
           <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: CA.ink }}>WhatsApp Intake</div>
           <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 2 }}>
-            Connect your WhatsApp Business number. Documents your clients send you on WhatsApp are automatically extracted and routed to the correct client project.
+            Documents your clients send you on WhatsApp are extracted and routed to the right client automatically.
           </div>
         </div>
-        {conn && (
+        {connected && canManage && (
           <CAButton variant="danger" onClick={disconnect} style={{ fontSize: 12, padding: "5px 10px", flexShrink: 0 }}>Disconnect</CAButton>
         )}
       </div>
 
       <div style={{ padding: 20 }}>
-        {!conn ? (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91XXXXXXXXXX" style={{ ...caInputStyle, maxWidth: 240 }} />
-            <CAButton onClick={connect} disabled={busy}>{busy ? "Saving…" : "Connect WhatsApp"}</CAButton>
+        {connected ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 14 }}>
+            <div><div style={label}>Number</div><div style={{ fontFamily: CA.mono, fontSize: 12.5 }}>{conn!.phone_number}</div></div>
+            <div><div style={label}>Display name</div><div style={{ fontFamily: CA.sans, fontSize: 12.5 }}>{conn!.display_name ?? "—"}</div></div>
+            <div><div style={label}>Status</div><CABadge tone="green">Active</CABadge></div>
+            {conn!.is_coexistence && <div><div style={label}>Mode</div><div style={{ fontFamily: CA.sans, fontSize: 12.5 }}>Shared with WhatsApp Business app</div></div>}
+            <div><div style={label}>Last document</div><div style={{ fontFamily: CA.sans, fontSize: 12.5 }}>{conn!.last_received_at ? dateIN(conn!.last_received_at) : "None yet"}</div></div>
           </div>
+        ) : !canManage ? (
+          <div style={muted}>Only partners and managers can change the WhatsApp connection.</div>
+        ) : config && !config.configured ? (
+          <>
+            <CAButton disabled>Connect WhatsApp</CAButton>
+            <div style={muted}>WhatsApp connect is not configured yet</div>
+          </>
         ) : (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 16 }}>
-              <div><div style={label}>Number</div><div style={mono}>{conn.phone_number}{conn.display_name ? ` · ${conn.display_name}` : ""}</div></div>
-              <div><div style={label}>Status</div><CABadge tone={conn.is_active ? "green" : "amber"}>{conn.is_active ? "active" : "setup pending"}</CABadge></div>
-              <div><div style={label}>Meta webhook check</div><CABadge tone={conn.is_verified ? "green" : "grey"}>{conn.is_verified ? "verified" : "not yet"}</CABadge></div>
-              <div><div style={label}>Last document</div><div style={{ fontFamily: CA.sans, fontSize: 12.5 }}>{conn.last_received_at ? dateIN(conn.last_received_at) : "None yet"}</div></div>
-            </div>
-            {conn.error_message && <div style={{ fontFamily: CA.sans, fontSize: 12, color: CA.red, marginBottom: 12 }}>{conn.error_message}</div>}
-
-            {!conn.is_active && (
-              <>
-                <div style={{ display: "grid", gap: 10, marginBottom: 16 }}>
-                  <div><div style={label}>Callback URL</div><div style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={mono}>{WEBHOOK_URL}</span><CAButton variant="ghost" onClick={() => copy(WEBHOOK_URL)} style={{ fontSize: 11, padding: "3px 8px" }}>Copy</CAButton></div></div>
-                  <div><div style={label}>Verify token</div><div style={{ display: "flex", gap: 8, alignItems: "center" }}><span style={mono}>{conn.webhook_verify_token}</span><CAButton variant="ghost" onClick={() => copy(conn.webhook_verify_token)} style={{ fontSize: 11, padding: "3px 8px" }}>Copy</CAButton></div></div>
-                </div>
-                <ol style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, lineHeight: 1.8, paddingLeft: 18, marginBottom: 16 }}>
-                  <li>Go to developers.facebook.com and create a WhatsApp Business app</li>
-                  <li>Add your number {conn.phone_number} as a WhatsApp Business number</li>
-                  <li>In Webhooks, set the callback URL to the URL shown above</li>
-                  <li>Set the verify token to the token shown above</li>
-                  <li>Subscribe to the messages field</li>
-                  <li>Copy the Phone number ID, a permanent access token and the App secret (App settings, Basic) and paste them below</li>
-                  <li>Click Activate</li>
-                </ol>
-                <div style={{ display: "grid", gap: 8, maxWidth: 520 }}>
-                  <input value={phoneNumberId} onChange={(e) => setPhoneNumberId(e.target.value)} placeholder="Phone number ID" style={caInputStyle} />
-                  <input value={token} onChange={(e) => setToken(e.target.value)} placeholder="Permanent access token" type="password" style={caInputStyle} />
-                  <input value={appSecret} onChange={(e) => setAppSecret(e.target.value)} placeholder="App secret" type="password" style={caInputStyle} />
-                  <div><CAButton onClick={doActivate} disabled={busy}>{busy ? "Checking with Meta…" : "Activate"}</CAButton></div>
-                </div>
-              </>
-            )}
+            <CAButton onClick={connect} disabled={connecting || !config}>{connecting ? "Connecting…" : "Connect WhatsApp"}</CAButton>
+            <div style={muted}>You will log in with Facebook and verify your number with a one time code. Takes about 2 minutes.</div>
           </>
         )}
+        {connected && !canManage && <div style={muted}>Only partners and managers can change the WhatsApp connection.</div>}
       </div>
     </CACard>
   );
