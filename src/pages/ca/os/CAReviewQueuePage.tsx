@@ -3,32 +3,46 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { useCARole } from "@/hooks/useCARole";
-import { useCAClientOptions } from "@/hooks/useCAClientOptions";
+import { useNavigate } from "@/lib/router-compat";
 import { CA, CACard, CAButton, caInputStyle, dateIN } from "@/components/ca/portalUi";
 import { ConfidenceChip, ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
+import { postExtraction, reExtractAs, rejectExtraction, type CAExtraction, type ExtractionRow } from "@/lib/caIntake";
 import {
-  DOC_CLASS_LABELS,
-  postExtraction,
-  rejectExtraction,
-  type CADocClass,
-  type CAExtraction,
-  type ExtractionRow,
-} from "@/lib/caIntake";
+  CATEGORY_FIELDS, DOC_CATEGORIES, POST_LABEL, categoryLabel, mapClassification, normaliseRows, validateRows, type DocCategory,
+} from "@/lib/caDocCategories";
 import { signalOcrCorrection } from "@/lib/caBrainSignals";
 
-const FIELDS: Record<string, string[]> = {
-  bank: ["date", "description", "amount", "direction"],
-  invoice: ["customer", "invoice_number", "amount", "date"],
-  expense: ["vendor", "category", "amount", "date"],
+type Ex = CAExtraction & {
+  source_type?: string | null;
+  gmail_sender_email?: string | null;
+  gmail_subject?: string | null;
+  whatsapp_sender_phone?: string | null;
+  whatsapp_sender_name?: string | null;
+  extracted: { rows?: ExtractionRow[]; summary?: string } | null;
+};
+interface ClientOpt { id: string; business_id: string; client_name: string }
+
+const DEST: Record<DocCategory, { label: string; path: (bid: string, cid: string | null) => string } | null> = {
+  bank_statement: { label: "View in Reconciliation", path: (b) => `/ca/reconciliation?client=${b}` },
+  sales_invoice: { label: "View client invoices", path: (_b, c) => `/ca/clients/${c}?tab=documents` },
+  purchase_invoice: { label: "View in ITC recon", path: (b) => `/ca/itc-recon?client=${b}` },
+  expense_receipt: null,
+  tds_record: { label: "View in TDS tracker", path: (b) => `/ca/tds-tracker?client=${b}` },
+  reference_document: { label: "View in Evidence vault", path: (b) => `/ca/vault?client=${b}` },
 };
 
 export default function CAReviewQueuePage() {
   const { firmId } = useCAPortal();
   const { can, isLoading: roleLoading } = useCARole();
-  const { clients } = useCAClientOptions();
-  const [items, setItems] = useState<CAExtraction[]>([]);
+  const navigate = useNavigate();
+  const [clients, setClients] = useState<ClientOpt[]>([]);
+  const [items, setItems] = useState<Ex[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ExtractionRow[]>([]);
+  const [selClient, setSelClient] = useState("");
+  const [selCat, setSelCat] = useState<DocCategory>("reference_document");
+  const [assignBusy, setAssignBusy] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [supplierGstin, setSupplierGstin] = useState("");
   const [gstinStatus, setGstinStatus] = useState<"pending" | "verified" | "follow_up" | "not_applicable">("pending");
   const [gstinNote, setGstinNote] = useState("");
@@ -41,71 +55,124 @@ export default function CAReviewQueuePage() {
       .from("ca_document_extractions")
       .select("*")
       .eq("ca_firm_id", firmId)
-      .in("review_state", ["needs_review", "auto_accepted", "failed"])
+      .in("review_state", ["needs_review", "auto_accepted", "failed", "pending_verification"])
       .order("created_at", { ascending: true });
-    setItems((data ?? []) as unknown as CAExtraction[]);
+    setItems((data ?? []) as unknown as Ex[]);
   }, [firmId]);
 
+  useEffect(() => { void load(); }, [load]);
+
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!firmId) return;
+    void supabase
+      .from("ca_clients")
+      .select("id, business_id, client_name")
+      .eq("ca_firm_id", firmId)
+      .eq("client_status", "active")
+      .order("client_name")
+      .then(({ data }) => setClients(((data ?? []) as ClientOpt[]).filter((c) => !!c.business_id)));
+  }, [firmId]);
 
   const active = useMemo(() => items.find((i) => i.id === activeId) ?? null, [items, activeId]);
 
   useEffect(() => {
-    if (!active) {
-      setDraft([]);
-      return;
-    }
+    if (!active) { setDraft([]); return; }
+    const cat = mapClassification(active.classification);
+    setSelCat(cat);
+    setSelClient(active.business_id ?? "");
     const rows = active.corrected?.rows ?? active.extracted?.rows ?? [];
-    setDraft(rows.map((r) => ({ ...r })));
-    const firstRow = rows[0] ?? {};
-    setSupplierGstin(String(active.supplier_gstin ?? firstRow.supplier_gstin ?? firstRow.vendor_gstin ?? firstRow.gstin ?? "").toUpperCase());
+    setDraft(normaliseRows(cat, rows as Record<string, unknown>[]));
+    const firstRow = (rows[0] ?? {}) as Record<string, unknown>;
+    setSupplierGstin(String(active.supplier_gstin ?? firstRow.vendor_gstin ?? firstRow.customer_gstin ?? firstRow.supplier_gstin ?? "").toUpperCase());
     setGstinStatus(active.gstin_verification_status ?? "pending");
     setGstinNote(active.gstin_verification_note ?? "");
   }, [active]);
 
-  const nameFor = (id: string) => clients.find((c) => c.business_id === id)?.client_name ?? "Unknown client";
+  // Re-shape the table whenever the category changes.
+  const onCategoryChange = (c: DocCategory) => {
+    setSelCat(c);
+    setDraft((d) => normaliseRows(c, d as Record<string, unknown>[]));
+  };
 
-  const viewFile = async (extraction: CAExtraction) => {
-    const path = (extraction as any).storage_path ?? (extraction as any).file_path ?? (extraction as any).storage_key ?? null;
-    if (!path) {
-      toast.error("No file path stored for this document. It may have been uploaded before storage paths were tracked.");
-      return;
-    }
-    const { data, error } = await supabase.storage
-      .from("ca-client-documents")
-      .createSignedUrl(path, 300);
-    if (error || !data?.signedUrl) {
-      toast.error("Could not generate file link. Check storage permissions.");
-      return;
-    }
+  const nameFor = (id: string | null) => clients.find((c) => c.business_id === id)?.client_name ?? (id ? "Unknown client" : "Unassigned");
+  const savedCat = active ? mapClassification(active.classification) : "reference_document";
+  const errors = useMemo(() => (selCat === "reference_document" ? [] : validateRows(selCat, draft)), [selCat, draft]);
+  const fields = CATEGORY_FIELDS[selCat];
+
+  const viewFile = async (ex: Ex) => {
+    if (!ex.storage_path) return toast.error("No file path stored for this document. It may have been uploaded before storage paths were tracked.");
+    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(ex.storage_path, 300);
+    if (error || !data?.signedUrl) return toast.error("Could not generate file link. Check storage permissions.");
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
-  const downloadFile = async (extraction: CAExtraction) => {
-    const path = (extraction as any).storage_path ?? (extraction as any).file_path ?? null;
-    if (!path) { toast.error("No file stored for this document"); return; }
-    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(path, 60);
-    if (error || !data?.signedUrl) { toast.error("Could not generate download link"); return; }
+  const downloadFile = async (ex: Ex) => {
+    if (!ex.storage_path) return toast.error("No file stored for this document");
+    const { data, error } = await supabase.storage.from("ca-client-documents").createSignedUrl(ex.storage_path, 60);
+    if (error || !data?.signedUrl) return toast.error("Could not generate download link");
     const a = document.createElement("a");
     a.href = data.signedUrl;
-    a.download = extraction.original_filename ?? "document";
+    a.download = ex.original_filename ?? "document";
     a.click();
+  };
+
+  const saveAssignment = async () => {
+    if (!active || !firmId) return;
+    if (!selClient) return toast.error("Select a client first");
+    setAssignBusy(true);
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id ?? null;
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({ business_id: selClient, classification: selCat, error_message: null, updated_at: nowIso } as never)
+      .eq("id", active.id);
+    if (error) { setAssignBusy(false); return toast.error(error.message); }
+
+    if (active.gmail_sender_email) {
+      const email = active.gmail_sender_email.toLowerCase();
+      const { error: mErr } = await supabase.from("ca_email_sender_mappings").upsert({
+        ca_firm_id: firmId, business_id: selClient, sender_email: email, sender_domain: email.split("@")[1] ?? null,
+        match_method: "manual", confidence: 0.95, confirmed_by_user_id: uid, confirmed_at: nowIso,
+      } as never, { onConflict: "ca_firm_id,sender_email" });
+      if (mErr) toast.error(`Sender could not be remembered: ${mErr.message}`);
+    }
+    if (active.whatsapp_sender_phone) {
+      let phone = active.whatsapp_sender_phone.replace(/\D/g, "");
+      if (phone.length > 10 && phone.startsWith("91")) phone = phone.slice(2);
+      const { error: wErr } = await supabase.from("ca_whatsapp_sender_mappings").upsert({
+        ca_firm_id: firmId, business_id: selClient, sender_phone: phone, sender_name: active.whatsapp_sender_name ?? null,
+        match_method: "manual", confidence: 0.95, confirmed_by_user_id: uid, confirmed_at: nowIso,
+      } as never, { onConflict: "ca_firm_id,sender_phone" });
+      if (wErr) toast.error(`Sender could not be remembered: ${wErr.message}`);
+    }
+    void supabase.from("ca_brain_events").insert({
+      ca_firm_id: firmId, business_id: selClient, event_type: "document_assigned",
+      payload: { from_client: active.business_id, to_client: selClient, from_category: active.classification, to_category: selCat, source_type: active.source_type ?? "upload" },
+    } as never).then(() => undefined);
+    console.log(`[fyn:review] assigned ${active.id} to ${selClient} as ${selCat}`);
+    setAssignBusy(false);
+    toast.success(`Assigned to ${nameFor(selClient)} as ${categoryLabel(selCat)}`);
+    void load();
+  };
+
+  const reExtract = async () => {
+    if (!active) return;
+    setExtracting(true);
+    const res = await reExtractAs(active, selCat);
+    setExtracting(false);
+    if (!res.ok) return toast.error(res.error ?? "Extraction failed");
+    toast.success(selCat === "reference_document" ? "Summary refreshed" : `${res.rows?.length ?? 0} rows extracted as ${categoryLabel(selCat)}`);
+    void load();
   };
 
   const saveGstinReview = async () => {
     if (!active) return;
     const gstin = supplierGstin.trim().toUpperCase();
-    const validFormat = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin);
-    if (gstin && !validFormat) {
-      toast.error("This GSTIN does not match the expected 15-character format. Check the bill before saving.");
-      return;
+    if (gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(gstin)) {
+      return toast.error("This GSTIN does not match the expected 15-character format. Check the bill before saving.");
     }
-    if (gstinStatus === "verified" && !gstin) {
-      toast.error("Enter the supplier GSTIN before marking it verified.");
-      return;
-    }
+    if (gstinStatus === "verified" && !gstin) return toast.error("Enter the supplier GSTIN before marking it verified.");
     setGstinBusy(true);
     const { data: auth } = await supabase.auth.getUser();
     const { error } = await supabase
@@ -125,20 +192,46 @@ export default function CAReviewQueuePage() {
     void load();
   };
 
+  const saveEdits = async () => {
+    if (!active) return;
+    const original = normaliseRows(selCat, (active.extracted?.rows ?? []) as Record<string, unknown>[]);
+    const changed = JSON.stringify(original) !== JSON.stringify(draft);
+    const { error } = await supabase
+      .from("ca_document_extractions")
+      .update({ corrected: { rows: draft } as never, was_corrected: changed, updated_at: new Date().toISOString() } as never)
+      .eq("id", active.id);
+    if (error) return toast.error(error.message);
+    toast.success("Edits saved");
+    void load();
+  };
+
+  const assignmentDirty = !!active && (selClient !== (active.business_id ?? "") || selCat !== savedCat);
+
   const post = async () => {
     if (!active) return;
+    if (assignmentDirty) return toast.error("Save the assignment before posting");
     setBusy(true);
-    const res = await postExtraction(active, draft);
+    const original = normaliseRows(selCat, (active.extracted?.rows ?? []) as Record<string, unknown>[]);
+    const changed = JSON.stringify(original) !== JSON.stringify(draft);
+    if (changed) {
+      await supabase.from("ca_document_extractions").update({ was_corrected: true } as never).eq("id", active.id);
+    }
+    const res = await postExtraction(active, selCat === "reference_document" ? [] : draft, selCat);
     setBusy(false);
-    if (!res.ok) return toast.error(res.error ?? "Could not post");
-    toast.success(`${res.posted} rows posted to the ledger`);
-    void signalOcrCorrection(
-      active.ca_firm_id,
-      active.business_id,
-      active.classification,
-      active.confidence ?? null,
-      draft.length,
-    );
+    if (!res.ok) {
+      if (res.alreadyPosted) { toast.error("Already posted"); void load(); return; }
+      return toast.error(res.error ?? "Could not post");
+    }
+    const bid = active.business_id;
+    const clientRowId = clients.find((c) => c.business_id === bid)?.id ?? null;
+    const dest = DEST[selCat];
+    const msg = selCat === "reference_document" ? "Filed to the evidence vault" : `${res.posted} rows posted — ${categoryLabel(selCat)}`;
+    toast.success(msg, dest && bid && (selCat !== "sales_invoice" || clientRowId)
+      ? { action: { label: dest.label, onClick: () => navigate(dest.path(bid, clientRowId)) }, duration: 10000 }
+      : undefined);
+    if (selCat !== "reference_document") {
+      void signalOcrCorrection(active.ca_firm_id, bid, selCat, active.confidence ?? null, draft.length);
+    }
     setActiveId(null);
     void load();
   };
@@ -164,40 +257,23 @@ export default function CAReviewQueuePage() {
     );
   }
 
-  const fields = active ? FIELDS[active.classification] ?? [] : [];
+  const isRef = selCat === "reference_document";
+  const locked = !!active && (active.review_state === "posted" || active.review_state === "archived" || !!active.posted_at);
+  const postDisabled = busy || !active?.business_id || locked || assignmentDirty || (!isRef && (draft.length === 0 || errors.length > 0));
+  const labelStyle = { fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted } as const;
+  const th = { textAlign: "left", fontFamily: CA.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: CA.faint, padding: "8px 6px", whiteSpace: "nowrap" } as const;
 
   return (
     <div>
       <ModuleHeader
         title="Review queue"
-        subtitle="Review extracted bill details, record a supplier GSTIN check, then post approved rows. Every posted row keeps a link back to its source document."
+        subtitle="Assign each document to a client and category, check the extracted values, then post them to the right register. Every posted row keeps a link back to its source document."
       />
-
-      <CACard style={{ padding: 16, marginBottom: 18 }}>
-        <div style={{ fontFamily: CA.sans, fontSize: 12, fontWeight: 700, color: CA.ink, marginBottom: 10 }}>Bill processing trail</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: 8 }}>
-          {[
-            ["1 · Classified", "Filename and document type"],
-            ["2 · Read", "OCR or file parser extracts fields"],
-            ["3 · Confidence", "Completeness score routes review"],
-            ["4 · CA review", "Check values and supplier GSTIN"],
-            ["5 · Ledger", "Post, then follow reconciliation"],
-          ].map(([title, detail], index) => (
-            <div key={title} style={{ borderLeft: `2px solid ${index < 3 ? CA.teal : CA.line}`, padding: "4px 9px" }}>
-              <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.ink, fontWeight: 700 }}>{title}</div>
-              <div style={{ fontFamily: CA.sans, fontSize: 11, color: CA.muted, lineHeight: 1.45, marginTop: 3 }}>{detail}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginTop: 10 }}>
-          A high confidence score means the extraction is ready; ledger posting still requires the CA action below. GSTIN review here records your check and does not query the GST authority or file a return.
-        </div>
-      </CACard>
 
       <StatStrip
         items={[
           { label: "In queue", value: String(items.length) },
-          { label: "Needs review", value: String(items.filter((i) => i.review_state === "needs_review").length) },
+          { label: "Unassigned", value: String(items.filter((i) => !i.business_id).length) },
           { label: "Failed extraction", value: String(items.filter((i) => i.review_state === "failed").length) },
           { label: "GSTIN follow-up", value: String(items.filter((i) => i.gstin_verification_status === "follow_up").length) },
         ]}
@@ -206,28 +282,24 @@ export default function CAReviewQueuePage() {
       <CACard style={{ padding: 20, marginBottom: 20 }}>
         {items.length === 0 ? (
           <div style={{ padding: "28px 24px", textAlign: "center" }}>
-            <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: "#1F5A46", marginBottom: 6 }}>
-              Review queue is clear
-            </div>
+            <div style={{ fontFamily: CA.sans, fontSize: 14, fontWeight: 700, color: CA.teal, marginBottom: 6 }}>Review queue is clear</div>
             <p style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, lineHeight: 1.6, maxWidth: 400, margin: "0 auto" }}>
-              All extracted documents are either posted to the ledger or awaiting upload. Review bills here, check supplier details, and post approved rows to the ledger.
+              Every document has been posted, filed, or rejected. New documents from uploads, Gmail and WhatsApp appear here.
             </p>
           </div>
         ) : (
           <QueueTable
-            columns={["Received", "Client", "Document", "Class", "Rows", "Confidence", "State", "Supplier GSTIN", "GSTIN check", ""]}
+            columns={["Received", "Client", "Document", "Category", "Rows", "Confidence", "State", ""]}
             empty="Queue is clear"
-            emptyHint="Every extraction has been reviewed or auto-accepted."
+            emptyHint="Every extraction has been reviewed."
             rows={items.map((i) => [
               dateIN(i.created_at),
               nameFor(i.business_id),
               i.original_filename ?? "—",
-              DOC_CLASS_LABELS[i.classification as CADocClass] ?? i.classification,
-              String((i.extracted?.rows ?? []).length),
+              categoryLabel(mapClassification(i.classification)),
+              String((i.corrected?.rows ?? i.extracted?.rows ?? []).length),
               <ConfidenceChip key="c" value={i.confidence} />,
               <StateChip key="s" value={i.review_state} />,
-              i.supplier_gstin ?? "—",
-              <StateChip key={`gstin-${i.id}`} value={i.gstin_verification_status ?? "pending"} />,
               <CAButton key="o" variant="ghost" onClick={() => setActiveId(i.id === activeId ? null : i.id)}>
                 {i.id === activeId ? "Close" : "Review"}
               </CAButton>,
@@ -236,187 +308,164 @@ export default function CAReviewQueuePage() {
         )}
       </CACard>
 
-
       {active && (
         <CACard style={{ padding: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
             <div>
               <div style={{ fontFamily: CA.serif, fontSize: 17, fontWeight: 700, color: CA.ink }}>{active.original_filename}</div>
               <div style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted, marginTop: 3 }}>
-                {nameFor(active.business_id)} · {DOC_CLASS_LABELS[active.classification as CADocClass] ?? active.classification}
+                {nameFor(active.business_id)} · {categoryLabel(savedCat)}
               </div>
             </div>
             <ConfidenceChip value={active.confidence} />
           </div>
 
-          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, marginBottom: 14, flexWrap: "wrap" }}>
-            <CAButton
-              variant="ghost"
-              onClick={() => viewFile(active)}
-              style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-              View original file
-            </CAButton>
-            <CAButton
-              variant="ghost"
-              onClick={() => downloadFile(active)}
-              style={{ fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download
-            </CAButton>
-            {(active as any).gmail_sender_email && (
+          <div style={{ border: `1px solid ${CA.line}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+            <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 700, color: CA.ink, marginBottom: 10 }}>Assignment</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+              <label style={labelStyle}>
+                Client
+                <select value={selClient} onChange={(e) => setSelClient(e.target.value)} style={{ ...caInputStyle, height: 36, marginTop: 4 }}>
+                  <option value="">Select client…</option>
+                  {clients.map((c) => <option key={c.business_id} value={c.business_id}>{c.client_name}</option>)}
+                </select>
+              </label>
+              <label style={labelStyle}>
+                Category
+                <select value={selCat} onChange={(e) => onCategoryChange(e.target.value as DocCategory)} style={{ ...caInputStyle, height: 36, marginTop: 4 }}>
+                  {DOC_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </label>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+              <CAButton onClick={() => void saveAssignment()} disabled={assignBusy || !selClient || locked}>
+                {assignBusy ? "Saving…" : "Save assignment"}
+              </CAButton>
+              <CAButton variant="ghost" onClick={() => void reExtract()} disabled={extracting || locked || !active.storage_path}>
+                {extracting ? "Extracting…" : "Re-extract as this category"}
+              </CAButton>
+            </div>
+            {assignmentDirty && (
+              <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.gold, marginTop: 8 }}>Unsaved assignment — save it before posting.</div>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 14, flexWrap: "wrap" }}>
+            <CAButton variant="ghost" onClick={() => void viewFile(active)} style={{ fontSize: 12 }}>View original file</CAButton>
+            <CAButton variant="ghost" onClick={() => void downloadFile(active)} style={{ fontSize: 12 }}>Download</CAButton>
+            {active.gmail_sender_email && (
               <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}>
-                From: {(active as any).gmail_sender_email}
-                {(active as any).gmail_subject ? ` · ${(active as any).gmail_subject}` : ""}
+                From: {active.gmail_sender_email}{active.gmail_subject ? ` · ${active.gmail_subject}` : ""}
+              </span>
+            )}
+            {active.whatsapp_sender_phone && (
+              <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.muted }}>
+                WhatsApp: {active.whatsapp_sender_name ? `${active.whatsapp_sender_name} · ` : ""}{active.whatsapp_sender_phone}
               </span>
             )}
           </div>
 
-          {active.error_message && (
+          {active.error_message && !active.business_id && (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red, marginBottom: 12 }}>{active.error_message}</div>
           )}
 
-          <div style={{ borderTop: `1px solid ${CA.line}`, borderBottom: `1px solid ${CA.line}`, padding: "16px 0", margin: "8px 0 16px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
-              <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 700, color: CA.ink }}>Supplier GSTIN review</div>
-              <StateChip value={gstinStatus} />
-            </div>
-            <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginBottom: 10 }}>
-              Check the GSTIN against the original bill and your approved source. “Verified” records a CA review; it is not a live government validation.
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10, alignItems: "end" }}>
-              <label style={{ fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
-                Supplier GSTIN
-                <input value={supplierGstin} onChange={(event) => setSupplierGstin(event.target.value.toUpperCase())} maxLength={15} placeholder="15-character GSTIN" style={{ ...caInputStyle, height: 36, marginTop: 4, fontFamily: CA.mono, textTransform: "uppercase" }} />
-              </label>
-              <label style={{ fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
-                Review status
-                <select value={gstinStatus} onChange={(event) => setGstinStatus(event.target.value as typeof gstinStatus)} style={{ ...caInputStyle, height: 36, marginTop: 4 }}>
-                  <option value="pending">Pending check</option>
-                  <option value="verified">Checked by CA</option>
-                  <option value="follow_up">Follow-up needed</option>
-                  <option value="not_applicable">Not applicable</option>
-                </select>
-              </label>
-              <label style={{ gridColumn: "1 / -1", fontFamily: CA.sans, fontSize: 11.5, fontWeight: 600, color: CA.muted }}>
-                Check note
-                <textarea value={gstinNote} onChange={(event) => setGstinNote(event.target.value)} rows={2} maxLength={1000} placeholder="Record the evidence checked or the follow-up required" style={{ ...caInputStyle, height: "auto", minHeight: 58, padding: "8px 10px", marginTop: 4, resize: "vertical" }} />
-              </label>
-              <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" }}>
-                <CAButton variant="ghost" disabled={gstinBusy} onClick={() => void saveGstinReview()}>{gstinBusy ? "Saving…" : "Save GSTIN review"}</CAButton>
+          {(selCat === "sales_invoice" || selCat === "purchase_invoice") && (
+            <div style={{ borderTop: `1px solid ${CA.line}`, borderBottom: `1px solid ${CA.line}`, padding: "16px 0", margin: "8px 0 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
+                <div style={{ fontFamily: CA.sans, fontSize: 13, fontWeight: 700, color: CA.ink }}>Supplier GSTIN review</div>
+                <StateChip value={gstinStatus} />
+              </div>
+              <div style={{ fontFamily: CA.sans, fontSize: 11.5, color: CA.muted, marginBottom: 10 }}>
+                Check the GSTIN against the original bill. “Checked by CA” records your review; it is not a live government validation.
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10, alignItems: "end" }}>
+                <label style={labelStyle}>
+                  Supplier GSTIN
+                  <input value={supplierGstin} onChange={(e) => setSupplierGstin(e.target.value.toUpperCase())} maxLength={15} placeholder="15-character GSTIN" style={{ ...caInputStyle, height: 36, marginTop: 4, fontFamily: CA.mono }} />
+                </label>
+                <label style={labelStyle}>
+                  Review status
+                  <select value={gstinStatus} onChange={(e) => setGstinStatus(e.target.value as typeof gstinStatus)} style={{ ...caInputStyle, height: 36, marginTop: 4 }}>
+                    <option value="pending">Pending check</option>
+                    <option value="verified">Checked by CA</option>
+                    <option value="follow_up">Follow-up needed</option>
+                    <option value="not_applicable">Not applicable</option>
+                  </select>
+                </label>
+                <label style={{ ...labelStyle, gridColumn: "1 / -1" }}>
+                  Check note
+                  <textarea value={gstinNote} onChange={(e) => setGstinNote(e.target.value)} rows={2} maxLength={1000} style={{ ...caInputStyle, height: "auto", minHeight: 58, padding: "8px 10px", marginTop: 4, resize: "vertical" }} />
+                </label>
+                <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end" }}>
+                  <CAButton variant="ghost" disabled={gstinBusy} onClick={() => void saveGstinReview()}>{gstinBusy ? "Saving…" : "Save GSTIN review"}</CAButton>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {fields.length === 0 || draft.length === 0 ? (
-            <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted }}>
-              No extractable rows. Reclassify the document in the inbox or reject it with a reason.
+          {isRef ? (
+            <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.ink, lineHeight: 1.6, background: CA.page, borderRadius: 8, padding: 14 }}>
+              {active.extracted?.summary ?? "Reference document — no ledger rows. It will be kept in the evidence vault for this client."}
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    {fields.map((f) => (
-                      <th
-                        key={f}
-                        style={{
-                          textAlign: "left",
-                          fontFamily: CA.sans,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          letterSpacing: "0.05em",
-                          textTransform: "uppercase",
-                          color: CA.faint,
-                          padding: "8px 6px",
-                        }}
-                      >
-                        {f.replace(/_/g, " ")}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {draft.map((r, i) => (
-                    <tr key={i}>
-                      {fields.map((f) => (
-                        <td key={f} style={{ padding: "4px 6px" }}>
-                          <input
-                            style={{ ...caInputStyle, height: 34, fontSize: 13 }}
-                            value={String(r[f] ?? "")}
-                            onChange={(e) => {
-                              const next = [...draft];
-                              next[i] = { ...next[i], [f]: e.target.value };
-                              setDraft(next);
-                            }}
-                          />
-                        </td>
-                      ))}
+            <>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {fields.map((f) => <th key={f} style={th}>{f.replace(/_/g, " ")}</th>)}
+                      <th style={th} />
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {!active.business_id && (
-            <div style={{
-              background: "rgba(139,105,20,0.07)",
-              border: "1px solid rgba(139,105,20,0.2)",
-              borderRadius: 8,
-              padding: "10px 14px",
-              marginBottom: 10,
-            }}>
-              <div style={{ fontFamily: CA.sans, fontSize: 12.5, fontWeight: 600, color: "#8B6914", marginBottom: 8 }}>
-                Assign to a client before reviewing
+                  </thead>
+                  <tbody>
+                    {draft.map((r, i) => (
+                      <tr key={i}>
+                        {fields.map((f) => (
+                          <td key={f} style={{ padding: "4px 4px" }}>
+                            {f === "type" ? (
+                              <select value={String(r[f] ?? "")} disabled={locked} onChange={(e) => { const n = [...draft]; n[i] = { ...n[i], [f]: e.target.value }; setDraft(n); }} style={{ ...caInputStyle, height: 34, fontSize: 13, minWidth: 90 }}>
+                                <option value="">—</option><option value="debit">debit</option><option value="credit">credit</option>
+                              </select>
+                            ) : (
+                              <input
+                                style={{ ...caInputStyle, height: 34, fontSize: 13, minWidth: f.includes("name") || f === "description" ? 160 : 100 }}
+                                value={String(r[f] ?? "")}
+                                disabled={locked}
+                                onChange={(e) => { const n = [...draft]; n[i] = { ...n[i], [f]: e.target.value }; setDraft(n); }}
+                              />
+                            )}
+                          </td>
+                        ))}
+                        <td style={{ padding: "4px 4px" }}>
+                          <CAButton variant="ghost" disabled={locked} onClick={() => setDraft(draft.filter((_, j) => j !== i))} style={{ fontSize: 12 }}>Delete row</CAButton>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <select
-                onChange={async (e) => {
-                  if (!e.target.value) return;
-                  const { error } = await supabase
-                    .from("ca_document_extractions")
-                    .update({ business_id: e.target.value } as never)
-                    .eq("id", active.id);
-                  if (error) { toast.error(error.message); return; }
-                  toast.success("Client assigned");
-                  void load();
-                }}
-                style={{
-                  fontFamily: CA.sans,
-                  fontSize: 13,
-                  padding: "6px 10px",
-                  borderRadius: 8,
-                  border: "1px solid rgba(23,18,8,0.2)",
-                  background: "#FFFDF9",
-                  color: "#171208",
-                  width: "100%",
-                  cursor: "pointer",
-                }}
-              >
-                <option value="">Select client to assign…</option>
-                {clients.map((c) => (
-                  <option key={c.business_id} value={c.business_id}>{c.client_name}</option>
-                ))}
-              </select>
-            </div>
+              {draft.length === 0 && (
+                <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.muted, marginTop: 8 }}>
+                  No rows yet. Re-extract as this category, add rows by hand, or reject the document.
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <CAButton variant="ghost" disabled={locked} onClick={() => setDraft([...draft, Object.fromEntries(fields.map((f) => [f, ""]))])}>Add row</CAButton>
+                <CAButton variant="ghost" disabled={locked} onClick={() => void saveEdits()}>Save edits</CAButton>
+              </div>
+              {errors.length > 0 && (
+                <ul style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.red, margin: "12px 0 0", paddingLeft: 18, lineHeight: 1.6 }}>
+                  {errors.slice(0, 12).map((e) => <li key={e}>{e}</li>)}
+                  {errors.length > 12 && <li>…and {errors.length - 12} more</li>}
+                </ul>
+              )}
+            </>
           )}
 
-          <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-            <CAButton onClick={post} disabled={busy || draft.length === 0 || !active.business_id}>
-              Confirm & post to ledger
-            </CAButton>
-            <CAButton variant="danger" onClick={reject}>
-              Reject
-            </CAButton>
+          <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap", alignItems: "center" }}>
+            <CAButton onClick={() => void post()} disabled={postDisabled}>{busy ? "Posting…" : POST_LABEL[selCat]}</CAButton>
+            <CAButton variant="danger" onClick={() => void reject()} disabled={locked}>Reject</CAButton>
+            {!active.business_id && <span style={{ fontFamily: CA.sans, fontSize: 12, color: CA.gold }}>Assign a client to enable posting.</span>}
           </div>
         </CACard>
       )}
