@@ -3243,6 +3243,7 @@ export type Database = {
           mismatch_amount: number | null
           sgst_amount: number
           source: string
+          source_document_id: string | null
           supplier_name: string | null
           taxable_value: number
           total_itc: number | null
@@ -3272,6 +3273,7 @@ export type Database = {
           mismatch_amount?: number | null
           sgst_amount?: number
           source?: string
+          source_document_id?: string | null
           supplier_name?: string | null
           taxable_value?: number
           total_itc?: number | null
@@ -3301,6 +3303,7 @@ export type Database = {
           mismatch_amount?: number | null
           sgst_amount?: number
           source?: string
+          source_document_id?: string | null
           supplier_name?: string | null
           taxable_value?: number
           total_itc?: number | null
@@ -4172,6 +4175,7 @@ export type Database = {
           return_filed: boolean | null
           return_filed_date: string | null
           section_code: string
+          source_document_id: string | null
           status: string
           tds_amount: number
           tds_rate: number
@@ -4197,6 +4201,7 @@ export type Database = {
           return_filed?: boolean | null
           return_filed_date?: string | null
           section_code: string
+          source_document_id?: string | null
           status?: string
           tds_amount?: number
           tds_rate?: number
@@ -4222,6 +4227,7 @@ export type Database = {
           return_filed?: boolean | null
           return_filed_date?: string | null
           section_code?: string
+          source_document_id?: string | null
           status?: string
           tds_amount?: number
           tds_rate?: number
@@ -5385,12 +5391,18 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          invoice_number: string | null
           is_demo: boolean
           payment_method: string | null
           payment_status: string
+          source_document_id: string | null
+          source_type: string | null
           subcategory: string | null
+          tax_amount: number | null
           updated_at: string
+          vendor_gstin: string | null
           vendor_id: string | null
+          vendor_name: string | null
         }
         Insert: {
           amount?: number
@@ -5401,12 +5413,18 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          invoice_number?: string | null
           is_demo?: boolean
           payment_method?: string | null
           payment_status?: string
+          source_document_id?: string | null
+          source_type?: string | null
           subcategory?: string | null
+          tax_amount?: number | null
           updated_at?: string
+          vendor_gstin?: string | null
           vendor_id?: string | null
+          vendor_name?: string | null
         }
         Update: {
           amount?: number
@@ -5417,12 +5435,18 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          invoice_number?: string | null
           is_demo?: boolean
           payment_method?: string | null
           payment_status?: string
+          source_document_id?: string | null
+          source_type?: string | null
           subcategory?: string | null
+          tax_amount?: number | null
           updated_at?: string
+          vendor_gstin?: string | null
           vendor_id?: string | null
+          vendor_name?: string | null
         }
         Relationships: [
           {
@@ -6067,7 +6091,9 @@ export type Database = {
         Row: {
           business_id: string
           created_at: string
+          customer_gstin: string | null
           customer_id: string | null
+          customer_name: string | null
           due_date: string | null
           id: string
           invoice_date: string
@@ -6076,6 +6102,8 @@ export type Database = {
           outstanding_amount: number
           paid_amount: number
           payment_date: string | null
+          source_document_id: string | null
+          source_type: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -6085,7 +6113,9 @@ export type Database = {
         Insert: {
           business_id: string
           created_at?: string
+          customer_gstin?: string | null
           customer_id?: string | null
+          customer_name?: string | null
           due_date?: string | null
           id?: string
           invoice_date: string
@@ -6094,6 +6124,8 @@ export type Database = {
           outstanding_amount?: number
           paid_amount?: number
           payment_date?: string | null
+          source_document_id?: string | null
+          source_type?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -6103,7 +6135,9 @@ export type Database = {
         Update: {
           business_id?: string
           created_at?: string
+          customer_gstin?: string | null
           customer_id?: string | null
+          customer_name?: string | null
           due_date?: string | null
           id?: string
           invoice_date?: string
@@ -6112,6 +6146,8 @@ export type Database = {
           outstanding_amount?: number
           paid_amount?: number
           payment_date?: string | null
+          source_document_id?: string | null
+          source_type?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
