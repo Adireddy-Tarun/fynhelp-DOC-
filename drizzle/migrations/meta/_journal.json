@@ -36,6 +36,13 @@
       "when": 1790689782551,
       "tag": "0004_review_posting_allowed_values",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790694438956,
+      "tag": "0005_metrics_nullable_waitlist_lower_email",
+      "breakpoints": true
     }
   ]
 }

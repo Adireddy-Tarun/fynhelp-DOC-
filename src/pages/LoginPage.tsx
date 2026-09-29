@@ -1,5 +1,5 @@
 import BackHomeLink from "@/components/BackHomeLink";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "@/lib/router-compat";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { Link, useNavigate } from "@/lib/router-compat";
@@ -8,7 +8,7 @@ import { Check, X, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { setRememberMe } from "@/lib/sessionPolicy";
 import FynLogo from "@/components/FynLogo";
-import HCaptcha from "@/components/HCaptcha";
+import HCaptcha, { signInFailureMessage, type HCaptchaHandle } from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { RULES, COMMON_WEAK, evaluateStrength } from "@/lib/passwordRules";
 
@@ -34,6 +34,8 @@ const LoginPage = () => {
   const [resetting, setResetting] = useState(false);
   const [siCaptcha, setSiCaptcha] = useState<string | null>(null);
   const [suCaptcha, setSuCaptcha] = useState<string | null>(null);
+  const siCaptchaRef = useRef<HCaptchaHandle>(null);
+  const suCaptchaRef = useRef<HCaptchaHandle>(null);
 
   // Sign-up state
   const [suName, setSuName] = useState("");
@@ -79,6 +81,11 @@ const LoginPage = () => {
   };
 
 
+  // hCaptcha tokens are single use: after any attempt that consumed the token,
+  // reset the widget and clear the stored token so the user can solve it again.
+  const resetSignInCaptcha = () => { siCaptchaRef.current?.resetCaptcha(); setSiCaptcha(null); };
+  const resetSignUpCaptcha = () => { suCaptchaRef.current?.resetCaptcha(); setSuCaptcha(null); };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     const email = siEmail.trim();
@@ -86,26 +93,33 @@ const LoginPage = () => {
     if (!siPassword) { toast.error("Enter your password."); return; }
 
     setSiSubmitting(true);
-    const security = await checkAuthSecurity(email, "sign_in", siCaptcha ?? undefined);
-    if (!security.allowed) {
+    try {
+      const security = await checkAuthSecurity(email, "sign_in", siCaptcha ?? undefined);
+      if (!security.allowed) {
+        resetSignInCaptcha();
+        toast.error(signInFailureMessage(security.error ?? "Too many attempts"));
+        return;
+      }
+
+      // "Remember me": if unchecked, the persisted auth token is purged when the
+      // page unloads, so the session cannot outlive this browser session.
+      setRememberMe(remember);
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password: siPassword });
+      if (error) {
+        resetSignInCaptcha();
+        toast.error(signInFailureMessage(error.message));
+        return;
+      }
+      if (data.user) {
+        toast.success("Signed in.");
+        await routeAfterSignIn(data.user.id);
+      }
+    } catch (err) {
+      resetSignInCaptcha();
+      toast.error(signInFailureMessage((err as Error)?.message));
+    } finally {
       setSiSubmitting(false);
-      toast.error(security.error ?? "Too many attempts. Please try again later.");
-      return;
-    }
-
-    // "Remember me": if unchecked, the persisted auth token is purged when the
-    // page unloads, so the session cannot outlive this browser session.
-    setRememberMe(remember);
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: siPassword });
-    setSiSubmitting(false);
-    if (error) {
-      toast.error(error.message || "Could not sign in.");
-      return;
-    }
-    if (data.user) {
-      toast.success("Signed in.");
-      await routeAfterSignIn(data.user.id);
     }
   };
 
@@ -114,9 +128,11 @@ const LoginPage = () => {
     if (!isValidEmail(email)) { toast.error("Enter your email above first, then tap Forgot password."); return; }
     setResetting(true);
     const security = await checkAuthSecurity(email, "reset_password", siCaptcha ?? undefined);
+    // The check consumed the token either way.
+    resetSignInCaptcha();
     if (!security.allowed) {
       setResetting(false);
-      toast.error(security.error ?? "Too many reset requests. Please try again later.");
+      toast.error(signInFailureMessage(security.error ?? "Too many reset requests"));
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -145,7 +161,8 @@ const LoginPage = () => {
     const security = await checkAuthSecurity(email, "sign_up", suCaptcha ?? undefined);
     if (!security.allowed) {
       setSuSubmitting(false);
-      toast.error(security.error ?? "Too many sign-up attempts. Please try again later.");
+      resetSignUpCaptcha();
+      toast.error(signInFailureMessage(security.error ?? "Too many sign-up attempts"));
       return;
     }
     const { data, error } = await supabase.auth.signUp({
@@ -157,7 +174,7 @@ const LoginPage = () => {
       },
     });
     setSuSubmitting(false);
-    if (error) { toast.error(error.message || "Could not sign up."); return; }
+    if (error) { resetSignUpCaptcha(); toast.error(error.message || "Could not sign up."); return; }
 
     // If email confirmation is required, Supabase returns a user with no session.
     if (data.session) {
@@ -288,10 +305,16 @@ const LoginPage = () => {
                 </button>
               </div>
               <HCaptcha
+                ref={siCaptchaRef}
                 onVerify={(t) => setSiCaptcha(t)}
                 onExpire={() => setSiCaptcha(null)}
                 onError={() => setSiCaptcha(null)}
               />
+              {!siCaptcha && !siSubmitting && (
+                <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)" }}>
+                  Complete the check again to retry
+                </p>
+              )}
               <button
                 type="submit"
                 disabled={!canSignIn}
@@ -456,10 +479,16 @@ const LoginPage = () => {
               </div>
 
               <HCaptcha
+                ref={suCaptchaRef}
                 onVerify={(t) => setSuCaptcha(t)}
                 onExpire={() => setSuCaptcha(null)}
                 onError={() => setSuCaptcha(null)}
               />
+              {!suCaptcha && !suSubmitting && (
+                <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)" }}>
+                  Complete the check to continue
+                </p>
+              )}
 
               <button
                 type="submit"

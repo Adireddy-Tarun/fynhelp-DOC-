@@ -89,6 +89,7 @@ import { Route as MainDashboardRunwayRouteImport } from './routes/_main/dashboar
 import { Route as MainDashboardSettingsRouteImport } from './routes/_main/dashboard/settings'
 import { Route as MainDashboardSimulatorRouteImport } from './routes/_main/dashboard/simulator'
 import { Route as MainDashboardTdsTaxRouteImport } from './routes/_main/dashboard/tds-tax'
+import { Route as MainDashboardTransactionsRouteImport } from './routes/_main/dashboard/transactions'
 import { Route as MainDashboardVendorsRouteImport } from './routes/_main/dashboard/vendors'
 import { Route as MainDashboardWorkingCapitalRouteImport } from './routes/_main/dashboard/working-capital'
 import { Route as ApiPublicCaAutoEscalateChasersRouteImport } from './routes/api/public/ca-auto-escalate-chasers'
@@ -603,6 +604,12 @@ const MainDashboardTdsTaxRoute = MainDashboardTdsTaxRouteImport.update({
   path: '/dashboard/tds-tax',
   getParentRoute: () => MainRoute,
 } as any)
+const MainDashboardTransactionsRoute =
+  MainDashboardTransactionsRouteImport.update({
+    id: '/dashboard/transactions',
+    path: '/dashboard/transactions',
+    getParentRoute: () => MainRoute,
+  } as any)
 const MainDashboardVendorsRoute = MainDashboardVendorsRouteImport.update({
   id: '/dashboard/vendors',
   path: '/dashboard/vendors',
@@ -1298,6 +1305,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof MainDashboardSettingsRouteWithChildren
   '/dashboard/simulator': typeof MainDashboardSimulatorRoute
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
+  '/dashboard/transactions': typeof MainDashboardTransactionsRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
@@ -1479,6 +1487,7 @@ export interface FileRoutesByTo {
   '/dashboard/runway': typeof MainDashboardRunwayRoute
   '/dashboard/simulator': typeof MainDashboardSimulatorRoute
   '/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
+  '/dashboard/transactions': typeof MainDashboardTransactionsRoute
   '/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
@@ -1670,6 +1679,7 @@ export interface FileRoutesById {
   '/_main/dashboard/settings': typeof MainDashboardSettingsRouteWithChildren
   '/_main/dashboard/simulator': typeof MainDashboardSimulatorRoute
   '/_main/dashboard/tds-tax': typeof MainDashboardTdsTaxRoute
+  '/_main/dashboard/transactions': typeof MainDashboardTransactionsRoute
   '/_main/dashboard/vendors': typeof MainDashboardVendorsRoute
   '/_main/dashboard/working-capital': typeof MainDashboardWorkingCapitalRoute
   '/api/public/ca-auto-escalate-chasers': typeof ApiPublicCaAutoEscalateChasersRoute
@@ -1857,6 +1867,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/simulator'
     | '/dashboard/tds-tax'
+    | '/dashboard/transactions'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-escalate-chasers'
@@ -2038,6 +2049,7 @@ export interface FileRouteTypes {
     | '/dashboard/runway'
     | '/dashboard/simulator'
     | '/dashboard/tds-tax'
+    | '/dashboard/transactions'
     | '/dashboard/vendors'
     | '/dashboard/working-capital'
     | '/api/public/ca-auto-escalate-chasers'
@@ -2228,6 +2240,7 @@ export interface FileRouteTypes {
     | '/_main/dashboard/settings'
     | '/_main/dashboard/simulator'
     | '/_main/dashboard/tds-tax'
+    | '/_main/dashboard/transactions'
     | '/_main/dashboard/vendors'
     | '/_main/dashboard/working-capital'
     | '/api/public/ca-auto-escalate-chasers'
@@ -2928,6 +2941,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/tds-tax'
       fullPath: '/dashboard/tds-tax'
       preLoaderRoute: typeof MainDashboardTdsTaxRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/dashboard/transactions': {
+      id: '/_main/dashboard/transactions'
+      path: '/dashboard/transactions'
+      fullPath: '/dashboard/transactions'
+      preLoaderRoute: typeof MainDashboardTransactionsRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/dashboard/vendors': {
@@ -4028,6 +4048,7 @@ interface MainRouteChildren {
   MainDashboardSettingsRoute: typeof MainDashboardSettingsRouteWithChildren
   MainDashboardSimulatorRoute: typeof MainDashboardSimulatorRoute
   MainDashboardTdsTaxRoute: typeof MainDashboardTdsTaxRoute
+  MainDashboardTransactionsRoute: typeof MainDashboardTransactionsRoute
   MainDashboardVendorsRoute: typeof MainDashboardVendorsRoute
   MainDashboardWorkingCapitalRoute: typeof MainDashboardWorkingCapitalRoute
   MainBlogIndexRoute: typeof MainBlogIndexRoute
@@ -4087,6 +4108,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainDashboardSettingsRoute: MainDashboardSettingsRouteWithChildren,
   MainDashboardSimulatorRoute: MainDashboardSimulatorRoute,
   MainDashboardTdsTaxRoute: MainDashboardTdsTaxRoute,
+  MainDashboardTransactionsRoute: MainDashboardTransactionsRoute,
   MainDashboardVendorsRoute: MainDashboardVendorsRoute,
   MainDashboardWorkingCapitalRoute: MainDashboardWorkingCapitalRoute,
   MainBlogIndexRoute: MainBlogIndexRoute,

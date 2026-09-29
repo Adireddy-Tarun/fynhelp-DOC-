@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
-import { normaliseAmount, directionFromSigned, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
+import { validateBankRows, type RowError } from "@/lib/bankCsv";
 import { recomputeIntelligence } from "@/lib/postImportCompute";
 
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
@@ -163,6 +163,42 @@ interface PendingUpload {
   maxDate: string | null;
 }
 
+type ImportOutcome = {
+  status: "success" | "partial" | "rejected";
+  missing: string[];
+  inserted: number;
+  invalid: number;
+  total: number;
+  errors: RowError[];
+};
+
+function OutcomePanel({ o }: { o: ImportOutcome }) {
+  const tone =
+    o.status === "success"
+      ? { bg: "#ECFDF5", border: "#10B981", title: "Imported successfully" }
+      : o.status === "partial"
+        ? { bg: "#FFFBEB", border: "#D97706", title: "Partly imported — some rows were skipped" }
+        : { bg: "#FEF2F2", border: "#A93838", title: "File rejected — nothing was imported" };
+  return (
+    <div className="mt-3 rounded-md p-3 text-xs" style={{ background: tone.bg, borderLeft: `4px solid ${tone.border}` }} role="status">
+      <div className="font-semibold text-fyn-ink">{tone.title}</div>
+      <div className="text-fyn-ink/70 mt-0.5 font-mono tabular-nums">
+        {o.inserted} imported · {o.invalid} skipped · {o.total} rows in file
+      </div>
+      {o.missing.length > 0 && (
+        <div className="mt-1 text-fyn-ink">Missing required columns: {o.missing.join(", ")}</div>
+      )}
+      {o.errors.length > 0 && (
+        <ul className="mt-1 list-disc pl-4 text-fyn-ink/80">
+          {o.errors.map((e, i) => (
+            <li key={i}>{e.row > 0 ? `Row ${e.row}: ` : ""}{e.reason}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -174,6 +210,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const aiInputRef = useRef<HTMLInputElement>(null);
   const [sourceMode, setSourceMode] = useState<"csv" | "ai_extracted">("csv");
+  const [outcome, setOutcome] = useState<ImportOutcome | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     zoneOpeners[type] = () => inputRef.current?.click();
@@ -188,6 +226,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
       toast.error("Please upload a CSV or XLSX file");
       return;
     }
+    setOutcome(null);
     setFile(f);
   };
 
@@ -251,46 +290,51 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
     track("csv_import_started", { file_type: file.type || file.name.split(".").pop() || "unknown" });
     try {
+      let bankOutcome: ImportOutcome | null = null;
       if (type === "bank") {
-        let skipped = 0;
-        const bankHeaders = Object.keys(rows[0] ?? {});
-        const bankDetected = detectAmountPattern(
-          bankHeaders,
-          rows.map(r => bankHeaders.map(h => r[h]))
-        );
-        const records = rows.map(r => {
-          const rawDebit = pick(r, ["Debit", "Withdrawal Amt.", "Withdrawal Amt", "Withdrawal", "Withdrawal Amount", "Dr", "Out", "Paid Out", "Money Out"]);
-          const rawCredit = pick(r, ["Credit", "Deposit Amt.", "Deposit Amt", "Deposit", "Deposit Amount", "Cr", "In", "Paid In", "Money In"]);
-          const rawAmt = pick(r, ["Amount", "Transaction Amount", "Txn Amount"]);
-          const rawType = pick(r, ["Type", "Transaction Type", "Txn Type", "Dr/Cr", "Cr/Dr", "Mode"]);
-          // Signed: negative = debit / money out, positive = credit / money in
-          const amount = normaliseAmount(rawAmt, rawType, rawDebit, rawCredit);
-          if (amount === 0) return null;
-          const direction = directionFromSigned(amount);
-          return {
-            business_id: businessId,
-            date: toDate(pick(r, ["Date", "Transaction Date", "Txn Date", "Value Date"])),
-            description: pick(r, ["Description", "Narration", "Particulars", "Details"]) || "-",
-            counterparty: pick(r, ["Counterparty", "Payee", "Vendor", "Customer"]) || null,
-            amount,
-            direction,
-            category: pick(r, ["Category"]) || null,
-          };
-        }).filter((x): x is NonNullable<typeof x> => {
-
-          if (x === null) { skipped++; return false; }
+        const bankHeaders = Array.from(new Set(rows.flatMap((r) => Object.keys(r))));
+        const v = validateBankRows(bankHeaders, rows);
+        const todayIst = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+        const valid = v.valid.filter((r) => {
+          if (r.date > todayIst) { v.invalid_count++; if (v.errors.length < 10) v.errors.push({ row: 0, reason: `future date ${r.date}` }); return false; }
           return true;
         });
-        logParsePattern("bank-csv", bankDetected, records);
-        if (records.length === 0) {
-          throw new Error("No parseable rows found. Please check your column headers (Date, Debit/Withdrawal, Credit/Deposit or Amount).");
+        if (v.missing_columns.length > 0 || valid.length === 0) {
+          const outcome: ImportOutcome = {
+            status: "rejected",
+            missing: v.missing_columns,
+            inserted: 0,
+            invalid: v.invalid_count,
+            total: v.total,
+            errors: v.errors,
+          };
+          setOutcome(outcome);
+          throw new Error(
+            v.missing_columns.length
+              ? `This file is missing required columns: ${v.missing_columns.join(", ")}`
+              : "No valid rows found in this file.",
+          );
         }
-
+        const records = valid.map((r) => ({
+          business_id: businessId,
+          date: r.date,
+          transaction_date: r.date,
+          description: r.description,
+          amount: r.amount,
+          direction: r.direction,
+          balance_after: r.balance,
+        }));
         const { error } = await supabase.from("transactions").insert(records);
         if (error) throw error;
-        if (skipped > 0) {
-          toast.warning(`${skipped} row${skipped === 1 ? "" : "s"} could not be parsed and were skipped — please verify your column headers.`);
-        }
+        bankOutcome = {
+          status: v.invalid_count > 0 ? "partial" : "success",
+          missing: [],
+          inserted: records.length,
+          invalid: v.invalid_count,
+          total: v.total,
+          errors: v.errors,
+        };
+        setOutcome(bankOutcome);
       } else if (type === "invoice") {
         const records = rows.map(r => {
           const amount = num(pick(r, ["Amount", "Total", "Invoice Amount"]));
@@ -324,6 +368,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         if (error) throw error;
       }
 
+      const insertedCount = bankOutcome ? bankOutcome.inserted : rows.length;
+      const finalStatus = bankOutcome ? bankOutcome.status : "success";
       const { data: { user } } = await supabase.auth.getUser();
       await supabase.from("csv_uploads").insert({
         business_id: businessId,
@@ -331,8 +377,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         upload_type: type,
         file_name: file.name,
         file_size: file.size,
-        row_count: rows.length,
-        status: "success",
+        row_count: insertedCount,
+        status: finalStatus,
+        error_message: bankOutcome && bankOutcome.invalid > 0
+          ? `${bankOutcome.invalid} of ${bankOutcome.total} rows skipped`
+          : null,
         file_hash: p.hash,
         min_date: p.minDate,
         max_date: p.maxDate,
@@ -341,12 +390,13 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
-      // Refresh pre-computed liquidity + cost metrics so dashboards update now.
-      await recomputeIntelligence(businessId);
-      track("csv_import_completed", { records_inserted: rows.length });
-      toast.success(
-        `Import complete. ${rows.length} transaction${rows.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
-      );
+      // Recompute stored metrics now so dashboards update without waiting for the nightly job.
+      const recomputed = await recomputeIntelligence(businessId);
+      await queryClient.invalidateQueries({ queryKey: ["ext", "liquidity_metrics"] });
+      track("csv_import_completed", { records_inserted: insertedCount });
+      const msg = `${insertedCount} transaction${insertedCount === 1 ? "" : "s"} imported.${recomputed ? " Dashboard metrics updated." : ""}`;
+      if (finalStatus === "partial") toast.warning(`Partly imported. ${msg} ${bankOutcome?.invalid} rows skipped.`);
+      else toast.success(`Import complete. ${msg}`);
 
       onSuccess();
       setTimeout(() => {
@@ -709,6 +759,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             <p className="text-sm text-fyn-ink/70">Processing file… {progress}%</p>
           </div>
         )}
+        {outcome && !uploading && <div className="w-full"><OutcomePanel o={outcome} /></div>}
       </div>
 
       <AlertDialog open={!!dupMatch} onOpenChange={(o) => { if (!o) cancelDuplicate(); }}>

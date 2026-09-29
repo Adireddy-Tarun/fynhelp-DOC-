@@ -84,19 +84,18 @@ function resolvePeriod(p: Record<string, unknown>): Period {
     return mk(`${month}-01`, ymd(last), monthLabel(month));
   }
 
-  const fy = typeof p.fy === "string" ? p.fy : "";
+  // The Reports page sends the FY as `period` (e.g. "FY 2025-26"); accept both keys.
+  const fy = typeof p.fy === "string" ? p.fy : typeof p.period === "string" ? p.period : "";
   const fyMatch = fy.match(/(\d{4})/);
   if (fyMatch) {
     const y = Number(fyMatch[1]);
     return mk(`${y}-04-01`, `${y + 1}-03-31`, `FY ${y}-${String((y + 1) % 100).padStart(2, "0")}`);
   }
 
-  // default: trailing 12 months
-  const now = new Date();
-  const end = ymd(now);
-  const startDt = new Date(now);
-  startDt.setMonth(startDt.getMonth() - 11);
-  startDt.setDate(1);
+  // default: trailing 12 months, Asia/Kolkata calendar boundaries
+  const end = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+  const [ey, em] = end.split("-").map(Number);
+  const startDt = new Date(Date.UTC(ey, em - 1 - 11, 1));
   return mk(ymd(startDt), end, `${ymd(startDt)} to ${end}`);
 }
 
@@ -478,12 +477,31 @@ Deno.serve(async (req) => {
       extRows("vendor_payments"),
     ]);
 
-    const [itcRes, tdsRes, complianceRes] = await Promise.all([
+    const [itcRes, tdsRes, complianceRes, localTxRes, localBankRes] = await Promise.all([
       admin.from("ca_itc_records").select("*").eq("business_id", business_id),
       admin.from("ca_tds_records").select("*").eq("business_id", business_id),
       admin.from("ca_compliance_events").select("*").eq("business_id", business_id)
         .order("due_date", { ascending: true }),
+      // Lovable Cloud transactions — where statement uploads are stored.
+      admin.from("transactions").select("date, amount, direction, category, description, balance_after")
+        .eq("business_id", business_id).order("date", { ascending: true }).limit(20000),
+      admin.from("bank_transactions").select("date, amount, type, category, description, balance")
+        .eq("business_id", business_id).eq("is_demo", false).order("date", { ascending: true }).limit(20000),
     ]);
+    // Merge: local uploads + local posted bank rows; external rows only if no local data.
+    const localTx = [
+      ...(localTxRes.data ?? []).map((t: any) => ({
+        date: t.date, amount: Math.abs(num(t.amount)),
+        type: t.direction === "in" ? "credit" : "debit",
+        category: t.category, description: t.description, balance: t.balance_after,
+      })),
+      ...(localBankRes.data ?? []),
+    ];
+    if (localTx.length > 0) {
+      txnsAll.length = 0;
+      txnsAll.push(...localTx.sort((a: any, b: any) => String(a.date).localeCompare(String(b.date))));
+    }
+    console.log("[report] transaction source", { local: localTx.length, used: txnsAll.length });
     const itc = itcRes.data ?? [];
     const tds = tdsRes.data ?? [];
     const compliance = complianceRes.data ?? [];
@@ -590,6 +608,17 @@ Deno.serve(async (req) => {
         title = report_type === "pnl_sch3"
           ? "STATEMENT OF PROFIT AND LOSS (Schedule III)"
           : "PROFIT AND LOSS STATEMENT";
+        if (txns.length === 0) {
+          // Never render a statement full of zeros when there is simply no data.
+          bytes = await makePdf(title, [
+            {
+              kind: "para",
+              title: "NO TRANSACTIONS",
+              text: `No transactions recorded for this period (${period.start} to ${period.end}, Asia/Kolkata). Upload a bank statement for this period and generate the report again.`,
+            },
+          ]);
+          break;
+        }
         const head = (k: string) => cur.heads[k] ?? 0;
         const phead = (k: string) => prev.heads[k] ?? 0;
         const rows: string[][] = [

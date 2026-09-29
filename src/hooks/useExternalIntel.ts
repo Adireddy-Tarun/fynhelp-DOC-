@@ -15,18 +15,22 @@
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseExternal, proxyExternalQuery } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMode } from "@/components/intelligence/DataSource";
 
+/** NULL fields mean "not computable yet" — never treat them as 0. */
 export type LiquidityMetrics = {
   id: string;
   business_id: string;
-  cash_position: number;
-  runway_months: number;
-  runway_days: number;
-  burn_rate_current: number;
-  health_score: number;
+  cash_position: number | null;
+  cash_source: "bank_balance" | "derived_balance" | "derived_cumulative" | "none" | null;
+  runway_months: number | null;
+  runway_days: number | null;
+  burn_rate_current: number | null;
+  health_score: number | null;
   health_status: string;
+  transactions_analyzed: number | null;
   recorded_at: string;
 };
 
@@ -115,19 +119,22 @@ export function useLiquidityMetrics() {
     queryKey: ["ext", "liquidity_metrics", businessId],
     enabled: !!businessId,
     ...QUERY_OPTS,
+    // Reads the Lovable Cloud liquidity_metrics row — the same store that the
+    // import and the nightly job write, keyed by profiles.business_id.
     queryFn: async (): Promise<LiquidityMetrics | null> => {
       try {
-        const { data, error } = await proxyExternalQuery({
-          table: "liquidity_metrics",
-          business_id: businessId!,
-          order: { column: "recorded_at", ascending: false },
-          limit: 1,
-        });
-        if (error) throw new Error(error);
+        const { data, error } = await supabase
+          .from("liquidity_metrics")
+          .select("*")
+          .eq("business_id", businessId!)
+          .order("recorded_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (error) throw error;
         logMount("liquidity_metrics", businessId, data);
-        return ((data?.[0] as LiquidityMetrics) ?? null);
+        return (data as unknown as LiquidityMetrics) ?? null;
       } catch (e) {
-        console.warn("[fyn:external] liquidity_metrics unavailable", e);
+        console.warn("[fyn:liquidity] liquidity_metrics unavailable", e);
         return null;
       }
     },
