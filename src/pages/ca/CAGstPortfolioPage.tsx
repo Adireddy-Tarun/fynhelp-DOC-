@@ -226,7 +226,7 @@ export default function CAGstPortfolioPage() {
       return (b.last_filed?.date || "").localeCompare(a.last_filed?.date || "");
     });
     return rows;
-  }, [clients, riskFilter, itcFilter, filingFilter, sortBy]);
+  }, [clients, riskFilter, itcFilter, filingFilter, sortBy, clientParam]);
 
   const filtersActive = riskFilter !== "all" || itcFilter !== "all" || filingFilter !== "all";
 
