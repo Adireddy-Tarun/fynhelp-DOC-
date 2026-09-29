@@ -758,6 +758,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
             <p className="text-sm text-fyn-ink/70">Processing file… {progress}%</p>
           </div>
         )}
+        {outcome && !uploading && <div className="w-full"><OutcomePanel o={outcome} /></div>}
       </div>
 
       <AlertDialog open={!!dupMatch} onOpenChange={(o) => { if (!o) cancelDuplicate(); }}>
