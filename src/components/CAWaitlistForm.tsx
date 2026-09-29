@@ -18,8 +18,8 @@ const HEAR_ABOUT = [
 ];
 
 const schema = z.object({
-  full_name: z.string().trim().min(1, "Full name is required").max(100),
-  email: z.string().trim().email("Valid work email required").max(255),
+  full_name: z.string().trim().max(100).refine((v) => /\p{L}/u.test(v), "Please enter your name"),
+  email: z.string().trim().toLowerCase().email("Valid work email required").max(255),
   firm_name: z.string().trim().min(1, "Firm name is required").max(150),
   role: z.string().min(1, "Please select your role"),
   client_entities: z.string().min(1, "Please select client count"),
@@ -103,7 +103,15 @@ export default function CAWaitlistForm() {
         position: nextPos,
         is_converted: false,
       });
-      if (error) throw error;
+      if (error) {
+        const code = (error as { code?: string }).code;
+        if (code === "23505" || (error as { status?: number }).status === 409) {
+          setErrors({ form: "You're already on the waitlist. We'll be in touch." });
+          setForm(initial);
+          return;
+        }
+        throw new Error("Something went wrong. Please try again.");
+      }
 
       // Fire-and-forget lead notification email.
       notifyWaitlistLead({
