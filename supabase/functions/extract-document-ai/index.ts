@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
       ? String(requestBody?.businessId || "") || null
       : (profileRow as { business_id?: string } | null)?.business_id ?? null;
 
-    const quota = await checkAiQuota(businessId, userData.user.id);
+    const quota = await checkAiQuota(businessId, userId);
     if (!quota.allowed) {
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
             {
               role: "user",
               content: [
-                { type: "text", text: PROMPTS[docType] },
+                { type: "text", text: category ? CATEGORY_PROMPTS[category] : PROMPTS[docType] },
                 { type: "image_url", image_url: { url: dataUrl } },
               ],
             },
