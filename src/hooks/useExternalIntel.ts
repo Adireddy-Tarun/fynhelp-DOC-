@@ -18,15 +18,18 @@ import { supabaseExternal, proxyExternalQuery } from "@/integrations/supabase/ex
 import { useAuth } from "@/contexts/AuthContext";
 import { useMode } from "@/components/intelligence/DataSource";
 
+/** NULL fields mean "not computable yet" — never treat them as 0. */
 export type LiquidityMetrics = {
   id: string;
   business_id: string;
-  cash_position: number;
-  runway_months: number;
-  runway_days: number;
-  burn_rate_current: number;
-  health_score: number;
+  cash_position: number | null;
+  cash_source: "bank_balance" | "derived_balance" | "derived_cumulative" | "none" | null;
+  runway_months: number | null;
+  runway_days: number | null;
+  burn_rate_current: number | null;
+  health_score: number | null;
   health_status: string;
+  transactions_analyzed: number | null;
   recorded_at: string;
 };
 
