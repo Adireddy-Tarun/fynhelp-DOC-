@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "@/lib/router-compat";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { authErrorMessage } from "@/lib/authErrors";
-import HCaptcha from "@/components/HCaptcha";
+import HCaptcha, { signInFailureMessage, type HCaptchaHandle } from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
@@ -48,33 +48,44 @@ export default function CALoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [captcha, setCaptcha] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptchaHandle>(null);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   // Default: keep signed in for 30 days. A previous session-only choice does
   // not carry over — the box starts checked every visit.
   const [rememberMe, setRememberMeState] = useState<boolean>(true);
 
+  // hCaptcha tokens are single use — reset the widget after every failed attempt.
+  const resetCaptcha = () => { captchaRef.current?.resetCaptcha(); setCaptcha(null); };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Enter a valid email address");
     if (!password) return setError("Enter your password");
-    if (!captcha) return setError("Please complete the CAPTCHA");
+    if (!captcha) return setError("Complete the check again to retry");
     setLoading(true);
-    const security = await checkAuthSecurity(email.trim(), "ca_login", captcha);
-    if (!security.allowed) {
+    try {
+      const security = await checkAuthSecurity(email.trim(), "ca_login", captcha);
+      if (!security.allowed) {
+        resetCaptcha();
+        setError(signInFailureMessage(security.error ?? "Too many attempts"));
+        return;
+      }
+      setRememberMe(rememberMe);
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (signInErr) {
+        resetCaptcha();
+        const m = signInFailureMessage(signInErr.message);
+        setError(m === signInErr.message ? authErrorMessage(signInErr.message, "signin") : m);
+        return;
+      }
+    } catch (err) {
+      resetCaptcha();
+      setError(signInFailureMessage((err as Error)?.message));
+      return;
+    } finally {
       setLoading(false);
-      setError(security.error ?? "Too many attempts. Please try again later.");
-      setCaptcha(null);
-      return;
-    }
-    setRememberMe(rememberMe);
-    const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setLoading(false);
-    if (signInErr) {
-      setError(authErrorMessage(signInErr.message, "signin"));
-      setCaptcha(null);
-      return;
     }
     // If the account has a verified authenticator, the session must reach aal2.
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
