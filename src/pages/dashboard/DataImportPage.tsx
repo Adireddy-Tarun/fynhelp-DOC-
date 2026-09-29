@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
-import { normaliseAmount, directionFromSigned, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
+import { validateBankRows, type RowError } from "@/lib/bankCsv";
 import { recomputeIntelligence } from "@/lib/postImportCompute";
 
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
