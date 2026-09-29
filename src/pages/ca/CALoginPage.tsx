@@ -302,7 +302,12 @@ export default function CALoginPage() {
                 </label>
               </div>
 
-              <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+              <HCaptcha ref={captchaRef} onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+              {!captcha && !loading && (
+                <div style={{ fontFamily: sans, fontSize: 12, color: C.muted, textAlign: "center" }}>
+                  Complete the check again to retry
+                </div>
+              )}
 
               {error && <div style={{ fontFamily: sans, fontSize: 13, color: C.maroon }}>{error}</div>}
               <button type="submit" disabled={loading || !captcha} className="ca-login-btn" style={primaryBtn(loading || !captcha)}>
