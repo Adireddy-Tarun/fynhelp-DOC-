@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "@/lib/router-compat";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import HCaptcha from "@/components/HCaptcha";
+import HCaptcha, { signInFailureMessage, type HCaptchaHandle } from "@/components/HCaptcha";
 import { checkAuthSecurity } from "@/hooks/useAuthSecurity";
 import { CA, CACard, CAHeading, CAButton, CAField, caInputStyle } from "@/components/ca/portalUi";
 import FynLogo from "@/components/FynLogo";
@@ -20,6 +20,7 @@ export default function CARegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [captcha, setCaptcha] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptchaHandle>(null);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -96,8 +97,12 @@ export default function CARegisterPage() {
       toast.success("CA firm registered");
       navigate("/ca/dashboard", { replace: true });
     } catch (e: any) {
-      toast.error(e?.message ?? "Registration failed");
-      setErrors((s) => ({ ...s, form: e?.message ?? "Registration failed" }));
+      // Token is single use — always reset so the user can retry.
+      captchaRef.current?.resetCaptcha();
+      setCaptcha(null);
+      const msg = signInFailureMessage(e?.message ?? "Registration failed");
+      toast.error(msg);
+      setErrors((s) => ({ ...s, form: msg }));
     } finally {
       setLoading(false);
     }
@@ -171,7 +176,7 @@ export default function CARegisterPage() {
             </CAField>
           </div>
 
-          <HCaptcha onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
+          <HCaptcha ref={captchaRef} onVerify={setCaptcha} onExpire={() => setCaptcha(null)} onError={() => setCaptcha(null)} />
 
           {errors.form && (
             <div style={{ fontFamily: CA.sans, fontSize: 13, color: CA.red }}>{errors.form}</div>
