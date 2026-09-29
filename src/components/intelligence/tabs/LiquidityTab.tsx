@@ -128,16 +128,22 @@ export default function LiquidityTab() {
     if (isLive) console.log("[fyn:liquidity] mount", { business_id: liveBizId, liquidity_metrics: liq ?? null });
   }, [isLive, liveBizId, liq]);
 
+  // null = not computable (shown as "—"); a real computed 0 still shows ₹0.
+  const toNum = (v: unknown): number | null => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
   const lm = {
-    cash: Number(liq?.cash_position ?? 0),
-    runwayMonths: Number(liq?.runway_months ?? 0),
-    runwayDays: Number(liq?.runway_days ?? 0),
-    burn: Number(liq?.burn_rate_current ?? 0),
-    score: Math.max(0, Math.min(100, Number(liq?.health_score ?? 0))),
-    status: liq?.health_status ?? "—",
+    cash: toNum(liq?.cash_position),
+    runwayMonths: toNum(liq?.runway_months),
+    runwayDays: toNum(liq?.runway_days),
+    burn: toNum(liq?.burn_rate_current),
+    score: toNum(liq?.health_score) == null ? null : Math.max(0, Math.min(100, Number(liq?.health_score))),
+    status: liq?.health_status && liq.health_status !== "insufficient_data" ? liq.health_status : "not enough data",
+    derived: liq?.cash_source === "derived_balance" || liq?.cash_source === "derived_cumulative",
   };
-  const scoreTone: "green" | "amber" | "red" = lm.score >= 70 ? "green" : lm.score >= 40 ? "amber" : "red";
+  const NA = "Not enough data yet";
+  const goUpload = () => navigate("/dashboard/import");
+  const scoreTone: "green" | "amber" | "red" | "neutral" = lm.score == null ? "neutral" : lm.score >= 70 ? "green" : lm.score >= 40 ? "amber" : "red";
   const scoreColor = scoreTone === "green" ? ACCENT.green : scoreTone === "amber" ? ACCENT.amber : ACCENT.red;
+  const burnZero = lm.burn === 0;
 
   return (
     <div className="space-y-6 fyn-stagger">
@@ -146,27 +152,49 @@ export default function LiquidityTab() {
       {isLive && (
         <IntelCard
           title="Liquidity Position"
-          sub={liq ? `Computed ${new Date(liq.recorded_at).toLocaleString("en-IN")}` : "Awaiting your first data import"}
-          action={<Badge tone={scoreTone}>{String(lm.status).toUpperCase()}</Badge>}
+          sub={liq ? `Computed ${new Date(liq.recorded_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}` : "Awaiting your first data import"}
+          action={<Badge tone={scoreTone === "neutral" ? "amber" : scoreTone}>{String(lm.status).toUpperCase()}</Badge>}
         >
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <KPI label="Cash Position" value={fmtINR(lm.cash)} tone={lm.cash > 0 ? "healthy" : "neutral"} />
-              <KPI label="Runway" value={`${lm.runwayMonths.toFixed(1)} mo`} sub={`${lm.runwayDays.toFixed(0)} days`} tone={lm.runwayMonths < 3 ? "critical" : lm.runwayMonths < 6 ? "warning" : "healthy"} />
-              <KPI label="Burn Rate" value={`${fmtINR(lm.burn)}/mo`} />
-              <KPI label="Health Score" value={`${lm.score.toFixed(0)}/100`} />
+              <KPI
+                label="Cash Position"
+                value={lm.cash == null ? "—" : fmtINR(lm.cash)}
+                sub={lm.cash == null ? NA : lm.derived ? "Derived from transactions" : undefined}
+                tone={lm.cash != null && lm.cash > 0 ? "healthy" : "neutral"}
+              />
+              <KPI
+                label="Runway"
+                value={lm.runwayMonths == null ? (burnZero ? "Not burning" : "—") : `${lm.runwayMonths.toFixed(1)} mo`}
+                sub={lm.runwayMonths == null ? (burnZero ? "Inflows cover outflows" : NA) : `${(lm.runwayDays ?? 0).toFixed(0)} days`}
+                tone={lm.runwayMonths == null ? "neutral" : lm.runwayMonths < 3 ? "critical" : lm.runwayMonths < 6 ? "warning" : "healthy"}
+              />
+              <KPI label="Burn Rate" value={lm.burn == null ? "—" : `${fmtINR(lm.burn)}/mo`} sub={lm.burn == null ? NA : undefined} />
+              <KPI label="Health Score" value={lm.score == null ? "—" : `${lm.score.toFixed(0)}/100`} sub={lm.score == null ? NA : undefined} />
             </div>
-            <div>
-              <div className="flex items-center justify-between text-xs text-fyn-ink/60 mb-1">
-                <span>Financial health</span>
-                <span className="font-mono tabular-nums">{lm.score.toFixed(0)}%</span>
+            {lm.score != null && (
+              <div>
+                <div className="flex items-center justify-between text-xs text-fyn-ink/60 mb-1">
+                  <span>Financial health</span>
+                  <span className="font-mono tabular-nums">{lm.score.toFixed(0)}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-valuenow={lm.score} aria-valuemin={0} aria-valuemax={100}>
+                  <div className="h-full transition-all duration-700" style={{ width: `${lm.score}%`, background: scoreColor }} />
+                </div>
               </div>
-              <div className="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-valuenow={lm.score} aria-valuemin={0} aria-valuemax={100}>
-                <div className="h-full transition-all duration-700" style={{ width: `${lm.score}%`, background: scoreColor }} />
+            )}
+            {!liqL && (lm.cash == null || lm.burn == null) && (
+              <div className="flex flex-wrap items-center gap-3 text-xs text-fyn-ink/70">
+                <span>{NA}. {lm.cash == null ? "We need a bank statement or an opening balance." : "We need transactions from the last 30 days to work out burn and runway."}</span>
+                <button onClick={goUpload} className="px-3 py-1.5 rounded-md text-white font-semibold" style={{ background: ACCENT.red }}>
+                  Upload bank statement
+                </button>
+                {lm.cash == null && (
+                  <button onClick={() => navigate("/dashboard/settings/business")} className="px-3 py-1.5 rounded-md font-semibold border border-fyn-ink/20">
+                    Add opening balance
+                  </button>
+                )}
               </div>
-            </div>
-            {!liqL && !liq && (
-              <NoDataPrompt text="Upload your bank statement to see your liquidity metrics." />
             )}
           </div>
         </IntelCard>
