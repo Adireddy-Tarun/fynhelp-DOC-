@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientParam } from "@/hooks/useClientParam";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { logReconRun } from "@/lib/caReconRuns";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
@@ -107,7 +108,11 @@ export function classify(r: ItcRecord): Line {
 export default function CAItcReconPage() {
   const { firmId } = useCAPortal();
   const { clients } = useCAClientOptions();
+  const clientParam = useClientParam();
   const [businessId, setBusinessId] = useState("");
+  useEffect(() => {
+    if (clientParam && !businessId && clients.some((c) => c.business_id === clientParam)) setBusinessId(clientParam);
+  }, [clientParam, clients, businessId]);
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
   const [records, setRecords] = useState<Line[]>([]);
   const [uploads, setUploads] = useState<UploadRow[]>([]);

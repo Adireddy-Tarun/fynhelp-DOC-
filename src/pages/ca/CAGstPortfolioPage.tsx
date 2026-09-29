@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientParam } from "@/hooks/useClientParam";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { toast } from "sonner";
 import {
@@ -57,6 +58,7 @@ export default function CAGstPortfolioPage() {
   const navigate = useNavigate();
   const { caFirm } = useCAAuth();
 
+  const clientParam = useClientParam();
   const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [vendors, setVendors] = useState<VendorRow[]>([]);
@@ -93,11 +95,12 @@ export default function CAGstPortfolioPage() {
       }
 
       // 2. Fetch in parallel
-      const [itcRes, riskRes, complRes, vendorRes] = await Promise.all([
+      const [itcRes, riskRes, complRes, vendorRes, caItcRes] = await Promise.all([
         supabase.from("gst_itc_lines").select("business_id, itc_safe, itc_at_risk, mismatch_count, vendor_gstin").in("business_id", ids),
         supabase.from("gst_notice_risk_scores").select("business_id, score, computed_at").in("business_id", ids).order("computed_at", { ascending: false }),
         supabase.from("ca_compliance_events").select("business_id, event_type, filing_period, due_date, status").eq("ca_firm_id", caFirm.id).in("event_type", ["GSTR1", "GSTR3B", "GSTR9", "GSTR2B"]),
         supabase.from("vendor_gst_health").select("business_id, vendor_gstin, vendor_name, compliance_score").in("business_id", ids),
+        supabase.from("ca_itc_records").select("business_id, total_itc, match_status, itc_eligible, itc_blocked").eq("ca_firm_id", caFirm.id).eq("is_demo", false),
       ]);
 
       const itcByBiz = new Map<string, { safe: number; risk: number; mm: number }>();
@@ -107,6 +110,15 @@ export default function CAGstPortfolioPage() {
         cur.risk += Number(l.itc_at_risk || 0);
         cur.mm += Number(l.mismatch_count || 0);
         itcByBiz.set(l.business_id, cur);
+      });
+      // Firm ITC register (includes bills posted from the Review queue, source 'document').
+      (caItcRes.data || []).forEach((r: any) => {
+        const cur = itcByBiz.get(r.business_id) || { safe: 0, risk: 0, mm: 0 };
+        const amt = Number(r.total_itc || 0);
+        if (r.match_status === "matched" && r.itc_eligible && !r.itc_blocked) cur.safe += amt;
+        else cur.risk += amt;
+        if (r.match_status === "mismatch") cur.mm += 1;
+        itcByBiz.set(r.business_id, cur);
       });
 
       const riskByBiz = new Map<string, number>();
@@ -184,6 +196,7 @@ export default function CAGstPortfolioPage() {
   // Derived filters
   const filtered = useMemo(() => {
     let rows = [...clients];
+    if (clientParam) rows = rows.filter((r) => r.business_id === clientParam);
     if (riskFilter !== "all") {
       rows = rows.filter((r) =>
         riskFilter === "high" ? r.notice_risk_score > 70
