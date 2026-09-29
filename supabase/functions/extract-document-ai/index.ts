@@ -43,6 +43,35 @@ Return STRICT JSON ONLY of the form:
 - If no expenses are visible, return {"rows":[]}.`,
 };
 
+type Category = "bank_statement" | "sales_invoice" | "purchase_invoice" | "expense_receipt" | "tds_record" | "reference_document";
+
+const CATEGORY_PROMPTS: Record<Category, string> = {
+  bank_statement: `Extract every transaction row in this bank statement.
+Return STRICT JSON ONLY: {"rows":[{"date":"YYYY-MM-DD","description":"...","amount":<positive number>,"type":"credit"|"debit","balance":<number or null>}]}
+- type "debit" for withdrawals, "credit" for deposits. Skip opening/closing balance rows.`,
+  sales_invoice: `This is an outward (sales) GST invoice. Extract each invoice.
+Return STRICT JSON ONLY: {"rows":[{"invoice_number":"...","invoice_date":"YYYY-MM-DD","due_date":"YYYY-MM-DD or empty","customer_name":"...","customer_gstin":"15-char GSTIN or empty","taxable_value":<number>,"cgst":<number>,"sgst":<number>,"igst":<number>,"total_amount":<number>}]}
+- Use 0 for tax heads not present. Either cgst+sgst or igst, never both.`,
+  purchase_invoice: `This is an inward (purchase) GST bill received from a supplier. Extract each bill.
+Return STRICT JSON ONLY: {"rows":[{"invoice_number":"...","invoice_date":"YYYY-MM-DD","due_date":"YYYY-MM-DD or empty","vendor_name":"...","vendor_gstin":"15-char GSTIN or empty","taxable_value":<number>,"cgst":<number>,"sgst":<number>,"igst":<number>,"total_amount":<number>}]}
+- Use 0 for tax heads not present. Either cgst+sgst or igst, never both.`,
+  expense_receipt: `This is an expense receipt without GST. Extract each line.
+Return STRICT JSON ONLY: {"rows":[{"date":"YYYY-MM-DD","vendor_name":"...","description":"...","amount":<positive number>}]}`,
+  tds_record: `This is a TDS challan or TDS certificate (Form 16A / 281). Extract each deduction.
+Return STRICT JSON ONLY: {"rows":[{"section_code":"e.g. 194C","deductee_name":"...","deductee_pan":"10-char PAN or empty","payment_date":"YYYY-MM-DD","payment_amount":<number>,"tds_rate":<number percent>,"tds_amount":<number>,"challan_number":"... or empty","challan_date":"YYYY-MM-DD or empty"}]}`,
+  reference_document: `This is a reference document (agreement, loan letter, notice, KYC).
+Return STRICT JSON ONLY: {"rows":[],"summary":"one line description of the document"}`,
+};
+
+const CATEGORY_REQUIRED: Record<Category, string[]> = {
+  bank_statement: ["date", "description", "amount", "type"],
+  sales_invoice: ["invoice_number", "invoice_date", "customer_name", "total_amount"],
+  purchase_invoice: ["invoice_number", "invoice_date", "vendor_name", "total_amount"],
+  expense_receipt: ["date", "vendor_name", "amount"],
+  tds_record: ["section_code", "deductee_name", "payment_date", "tds_amount"],
+  reference_document: [],
+};
+
 function tryParseJson(raw: string): any | null {
   if (!raw) return null;
   const cleaned = raw
