@@ -608,6 +608,17 @@ Deno.serve(async (req) => {
         title = report_type === "pnl_sch3"
           ? "STATEMENT OF PROFIT AND LOSS (Schedule III)"
           : "PROFIT AND LOSS STATEMENT";
+        if (txns.length === 0) {
+          // Never render a statement full of zeros when there is simply no data.
+          bytes = await makePdf(title, [
+            {
+              kind: "para",
+              title: "NO TRANSACTIONS",
+              text: `No transactions recorded for this period (${period.start} to ${period.end}, Asia/Kolkata). Upload a bank statement for this period and generate the report again.`,
+            },
+          ]);
+          break;
+        }
         const head = (k: string) => cur.heads[k] ?? 0;
         const phead = (k: string) => prev.heads[k] ?? 0;
         const rows: string[][] = [
