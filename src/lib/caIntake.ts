@@ -427,10 +427,6 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   };
 }
 
-function num(v: unknown): number {
-  const n = Number(String(v ?? "").replace(/[^0-9.\-]/g, ""));
-  return Number.isFinite(n) ? n : 0;
-}
 
 function isoDate(v: unknown): string {
   const s = String(v ?? "").trim();
