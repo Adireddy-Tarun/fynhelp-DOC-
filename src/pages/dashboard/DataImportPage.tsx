@@ -163,6 +163,42 @@ interface PendingUpload {
   maxDate: string | null;
 }
 
+type ImportOutcome = {
+  status: "success" | "partial" | "rejected";
+  missing: string[];
+  inserted: number;
+  invalid: number;
+  total: number;
+  errors: RowError[];
+};
+
+function OutcomePanel({ o }: { o: ImportOutcome }) {
+  const tone =
+    o.status === "success"
+      ? { bg: "#ECFDF5", border: "#10B981", title: "Imported successfully" }
+      : o.status === "partial"
+        ? { bg: "#FFFBEB", border: "#D97706", title: "Partly imported — some rows were skipped" }
+        : { bg: "#FEF2F2", border: "#A93838", title: "File rejected — nothing was imported" };
+  return (
+    <div className="mt-3 rounded-md p-3 text-xs" style={{ background: tone.bg, borderLeft: `4px solid ${tone.border}` }} role="status">
+      <div className="font-semibold text-fyn-ink">{tone.title}</div>
+      <div className="text-fyn-ink/70 mt-0.5 font-mono tabular-nums">
+        {o.inserted} imported · {o.invalid} skipped · {o.total} rows in file
+      </div>
+      {o.missing.length > 0 && (
+        <div className="mt-1 text-fyn-ink">Missing required columns: {o.missing.join(", ")}</div>
+      )}
+      {o.errors.length > 0 && (
+        <ul className="mt-1 list-disc pl-4 text-fyn-ink/80">
+          {o.errors.map((e, i) => (
+            <li key={i}>{e.row > 0 ? `Row ${e.row}: ` : ""}{e.reason}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -174,6 +210,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const aiInputRef = useRef<HTMLInputElement>(null);
   const [sourceMode, setSourceMode] = useState<"csv" | "ai_extracted">("csv");
+  const [outcome, setOutcome] = useState<ImportOutcome | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     zoneOpeners[type] = () => inputRef.current?.click();
@@ -329,6 +367,8 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         if (error) throw error;
       }
 
+      const insertedCount = bankOutcome ? bankOutcome.inserted : rows.length;
+      const finalStatus = bankOutcome ? bankOutcome.status : "success";
       const { data: { user } } = await supabase.auth.getUser();
       await supabase.from("csv_uploads").insert({
         business_id: businessId,
@@ -336,8 +376,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
         upload_type: type,
         file_name: file.name,
         file_size: file.size,
-        row_count: rows.length,
-        status: "success",
+        row_count: insertedCount,
+        status: finalStatus,
+        error_message: bankOutcome && bankOutcome.invalid > 0
+          ? `${bankOutcome.invalid} of ${bankOutcome.total} rows skipped`
+          : null,
         file_hash: p.hash,
         min_date: p.minDate,
         max_date: p.maxDate,
@@ -346,12 +389,13 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
 
       clearInterval(interval);
       setProgress(100);
-      // Refresh pre-computed liquidity + cost metrics so dashboards update now.
-      await recomputeIntelligence(businessId);
-      track("csv_import_completed", { records_inserted: rows.length });
-      toast.success(
-        `Import complete. ${rows.length} transaction${rows.length === 1 ? "" : "s"} imported. Dashboard metrics have been updated.`
-      );
+      // Recompute stored metrics now so dashboards update without waiting for the nightly job.
+      const recomputed = await recomputeIntelligence(businessId);
+      await queryClient.invalidateQueries({ queryKey: ["ext", "liquidity_metrics"] });
+      track("csv_import_completed", { records_inserted: insertedCount });
+      const msg = `${insertedCount} transaction${insertedCount === 1 ? "" : "s"} imported.${recomputed ? " Dashboard metrics updated." : ""}`;
+      if (finalStatus === "partial") toast.warning(`Partly imported. ${msg} ${bankOutcome?.invalid} rows skipped.`);
+      else toast.success(`Import complete. ${msg}`);
 
       onSuccess();
       setTimeout(() => {
