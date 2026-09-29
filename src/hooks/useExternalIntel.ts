@@ -15,6 +15,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseExternal, proxyExternalQuery } from "@/integrations/supabase/external";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMode } from "@/components/intelligence/DataSource";
 
@@ -118,19 +119,22 @@ export function useLiquidityMetrics() {
     queryKey: ["ext", "liquidity_metrics", businessId],
     enabled: !!businessId,
     ...QUERY_OPTS,
+    // Reads the Lovable Cloud liquidity_metrics row — the same store that the
+    // import and the nightly job write, keyed by profiles.business_id.
     queryFn: async (): Promise<LiquidityMetrics | null> => {
       try {
-        const { data, error } = await proxyExternalQuery({
-          table: "liquidity_metrics",
-          business_id: businessId!,
-          order: { column: "recorded_at", ascending: false },
-          limit: 1,
-        });
-        if (error) throw new Error(error);
+        const { data, error } = await supabase
+          .from("liquidity_metrics")
+          .select("*")
+          .eq("business_id", businessId!)
+          .order("recorded_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (error) throw error;
         logMount("liquidity_metrics", businessId, data);
-        return ((data?.[0] as LiquidityMetrics) ?? null);
+        return (data as unknown as LiquidityMetrics) ?? null;
       } catch (e) {
-        console.warn("[fyn:external] liquidity_metrics unavailable", e);
+        console.warn("[fyn:liquidity] liquidity_metrics unavailable", e);
         return null;
       }
     },
