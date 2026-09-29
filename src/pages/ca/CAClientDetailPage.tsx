@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
-import { useParams, useNavigate } from "@/lib/router-compat";
+import { useParams, useNavigate, useSearchParams } from "@/lib/router-compat";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { proxyExternalQuery } from "@/integrations/supabase/external";
@@ -68,7 +68,11 @@ export default function CAClientDetailPage() {
   const navigate = useNavigate();
   const { firmId, userId } = useCAPortal();
   const [client, setClient] = useState<Client | null>(null);
-  const [tab, setTab] = useState<Tab>("Documents");
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<Tab>(() => {
+    const t = (searchParams.get("tab") ?? "").toLowerCase();
+    return (TABS.find((x) => x.toLowerCase() === t || x.toLowerCase().startsWith(t + " ")) ?? "Documents") as Tab;
+  });
   const [loading, setLoading] = useState(true);
 
   // Tab data

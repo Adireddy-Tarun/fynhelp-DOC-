@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientParam } from "@/hooks/useClientParam";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { logReconRun } from "@/lib/caReconRuns";
 import { useClientIntelligence } from "@/hooks/useCAIntelligence";
@@ -29,6 +30,7 @@ export default function CAReconciliationPage() {
   const { can, role, isLoading: roleLoading } = useCARole();
   const { clients } = useCAClientOptions();
 
+  const clientParam = useClientParam();
   const [businessId, setBusinessId] = useState("");
   const [from, setFrom] = useState(() => {
     const d = new Date();
@@ -59,8 +61,10 @@ export default function CAReconciliationPage() {
   );
 
   useEffect(() => {
-    if (!businessId && clients.length) setBusinessId(clients[0].business_id);
-  }, [clients, businessId]);
+    if (businessId || !clients.length) return;
+    const fromParam = clientParam && clients.find((c) => c.business_id === clientParam);
+    setBusinessId(fromParam ? clientParam : clients[0].business_id);
+  }, [clients, businessId, clientParam]);
 
   const run = useCallback(async () => {
     if (!businessId) return;

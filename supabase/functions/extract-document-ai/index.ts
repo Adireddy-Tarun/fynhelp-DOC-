@@ -43,6 +43,35 @@ Return STRICT JSON ONLY of the form:
 - If no expenses are visible, return {"rows":[]}.`,
 };
 
+type Category = "bank_statement" | "sales_invoice" | "purchase_invoice" | "expense_receipt" | "tds_record" | "reference_document";
+
+const CATEGORY_PROMPTS: Record<Category, string> = {
+  bank_statement: `Extract every transaction row in this bank statement.
+Return STRICT JSON ONLY: {"rows":[{"date":"YYYY-MM-DD","description":"...","amount":<positive number>,"type":"credit"|"debit","balance":<number or null>}]}
+- type "debit" for withdrawals, "credit" for deposits. Skip opening/closing balance rows.`,
+  sales_invoice: `This is an outward (sales) GST invoice. Extract each invoice.
+Return STRICT JSON ONLY: {"rows":[{"invoice_number":"...","invoice_date":"YYYY-MM-DD","due_date":"YYYY-MM-DD or empty","customer_name":"...","customer_gstin":"15-char GSTIN or empty","taxable_value":<number>,"cgst":<number>,"sgst":<number>,"igst":<number>,"total_amount":<number>}]}
+- Use 0 for tax heads not present. Either cgst+sgst or igst, never both.`,
+  purchase_invoice: `This is an inward (purchase) GST bill received from a supplier. Extract each bill.
+Return STRICT JSON ONLY: {"rows":[{"invoice_number":"...","invoice_date":"YYYY-MM-DD","due_date":"YYYY-MM-DD or empty","vendor_name":"...","vendor_gstin":"15-char GSTIN or empty","taxable_value":<number>,"cgst":<number>,"sgst":<number>,"igst":<number>,"total_amount":<number>}]}
+- Use 0 for tax heads not present. Either cgst+sgst or igst, never both.`,
+  expense_receipt: `This is an expense receipt without GST. Extract each line.
+Return STRICT JSON ONLY: {"rows":[{"date":"YYYY-MM-DD","vendor_name":"...","description":"...","amount":<positive number>}]}`,
+  tds_record: `This is a TDS challan or TDS certificate (Form 16A / 281). Extract each deduction.
+Return STRICT JSON ONLY: {"rows":[{"section_code":"e.g. 194C","deductee_name":"...","deductee_pan":"10-char PAN or empty","payment_date":"YYYY-MM-DD","payment_amount":<number>,"tds_rate":<number percent>,"tds_amount":<number>,"challan_number":"... or empty","challan_date":"YYYY-MM-DD or empty"}]}`,
+  reference_document: `This is a reference document (agreement, loan letter, notice, KYC).
+Return STRICT JSON ONLY: {"rows":[],"summary":"one line description of the document"}`,
+};
+
+const CATEGORY_REQUIRED: Record<Category, string[]> = {
+  bank_statement: ["date", "description", "amount", "type"],
+  sales_invoice: ["invoice_number", "invoice_date", "customer_name", "total_amount"],
+  purchase_invoice: ["invoice_number", "invoice_date", "vendor_name", "total_amount"],
+  expense_receipt: ["date", "vendor_name", "amount"],
+  tds_record: ["section_code", "deductee_name", "payment_date", "tds_amount"],
+  reference_document: [],
+};
+
 function tryParseJson(raw: string): any | null {
   if (!raw) return null;
   const cleaned = raw
@@ -93,7 +122,7 @@ Deno.serve(async (req) => {
       ? String(requestBody?.businessId || "") || null
       : (profileRow as { business_id?: string } | null)?.business_id ?? null;
 
-    const quota = await checkAiQuota(businessId, userData.user.id);
+    const quota = await checkAiQuota(businessId, userId);
     if (!quota.allowed) {
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
@@ -105,11 +134,17 @@ Deno.serve(async (req) => {
 
     const startedAt = Date.now();
     const body = requestBody;
+    const category = (String(body?.category || "") || null) as Category | null;
     const docType = String(body?.doc_type || "") as DocType;
     const fileBase64 = String(body?.file_base64 || "");
     const mimeType = String(body?.mime_type || "image/png");
 
-    if (!["bank", "invoice", "expense"].includes(docType)) {
+    if (category && !(category in CATEGORY_PROMPTS)) {
+      return new Response(JSON.stringify({ error: "invalid category" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!category && !["bank", "invoice", "expense"].includes(docType)) {
       return new Response(JSON.stringify({ error: "invalid doc_type" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -143,7 +178,7 @@ Deno.serve(async (req) => {
             {
               role: "user",
               content: [
-                { type: "text", text: PROMPTS[docType] },
+                { type: "text", text: category ? CATEGORY_PROMPTS[category] : PROMPTS[docType] },
                 { type: "image_url", image_url: { url: dataUrl } },
               ],
             },
@@ -196,6 +231,17 @@ Deno.serve(async (req) => {
       invoice: ["customer", "invoice_number", "amount", "date"],
       expense: ["vendor", "amount", "date"],
     };
+    if (category) {
+      const cf = CATEGORY_REQUIRED[category];
+      const tot = parsed.rows.length * cf.length;
+      const fil = parsed.rows.reduce(
+        (sum: number, row: Record<string, unknown>) => sum + cf.filter((f) => String(row[f] ?? "").trim() !== "").length, 0);
+      const vf = category === "bank_statement" && parsed.rows.length < 3 ? 0.9 : 1;
+      const conf = category === "reference_document" ? 1 : tot > 0 ? Math.round((fil / tot) * vf * 100) / 100 : 0;
+      return new Response(JSON.stringify({ rows: parsed.rows, category, summary: typeof parsed.summary === "string" ? parsed.summary : null, confidence: conf }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const fields = required[docType];
     const total = parsed.rows.length * fields.length;
     const filled = parsed.rows.reduce(

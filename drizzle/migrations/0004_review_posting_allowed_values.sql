@@ -1,0 +1,10 @@
+ALTER TABLE public.invoices DROP CONSTRAINT IF EXISTS invoices_status_check;
+ALTER TABLE public.invoices ADD CONSTRAINT invoices_status_check CHECK (status = ANY (ARRAY['draft','sent','partially_paid','paid','overdue','cancelled','unpaid']));
+ALTER TABLE public.expenses DROP CONSTRAINT IF EXISTS expenses_payment_status_check;
+ALTER TABLE public.expenses ADD CONSTRAINT expenses_payment_status_check CHECK (payment_status = ANY (ARRAY['Paid','Pending','paid','unpaid']));
+ALTER TABLE public.ca_itc_records DROP CONSTRAINT IF EXISTS ca_itc_records_match_status_check;
+ALTER TABLE public.ca_itc_records ADD CONSTRAINT ca_itc_records_match_status_check CHECK (match_status = ANY (ARRAY['matched','mismatch','unmatched','missing_in_2b','extra_in_2b','pending']));
+ALTER TABLE public.ca_itc_records DROP CONSTRAINT IF EXISTS ca_itc_records_source_check;
+ALTER TABLE public.ca_itc_records ADD CONSTRAINT ca_itc_records_source_check CHECK (source = ANY (ARRAY['manual','csv_import','zoho_sync','gstr2b_upload','document']));
+ALTER TABLE public.bank_transactions DROP CONSTRAINT IF EXISTS bank_transactions_source_type_check;
+ALTER TABLE public.bank_transactions ADD CONSTRAINT bank_transactions_source_type_check CHECK (source_type = ANY (ARRAY['import','razorpay','zoho','manual','seed','upload','gmail','whatsapp']));

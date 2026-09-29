@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, type CSSProperties } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientParam } from "@/hooks/useClientParam";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { PageWrap, PageHeader, Card } from "@/components/ca/ui";
 import { toast } from "sonner";
@@ -51,7 +52,9 @@ export default function CAVaultPage() {
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState<VaultFile[]>([]);
   const [clients, setClients] = useState<ClientOption[]>([]);
+  const clientParam = useClientParam();
   const [filterClient, setFilterClient] = useState<string>("");
+  useEffect(() => { if (clientParam) setFilterClient(clientParam); }, [clientParam]);
   const [filterPeriod, setFilterPeriod] = useState<string>("");
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [totalSize, setTotalSize] = useState(0);

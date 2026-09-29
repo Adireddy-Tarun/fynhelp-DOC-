@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { validateUpload } from "@/lib/uploadPolicy";
 import { logCAAudit } from "@/lib/caAudit";
 import { normaliseAmount, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
+import {
+  DOC_CATEGORIES, fyQuarter, filingPeriod, mapClassification, normaliseRows, toNum, validateRows, type DocCategory,
+} from "@/lib/caDocCategories";
 
 export type CADocClass = "bank" | "invoice" | "expense" | "challan" | "other";
 
@@ -424,10 +427,6 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
   };
 }
 
-function num(v: unknown): number {
-  const n = Number(String(v ?? "").replace(/[^0-9.\-]/g, ""));
-  return Number.isFinite(n) ? n : 0;
-}
 
 function isoDate(v: unknown): string {
   const s = String(v ?? "").trim();
@@ -436,87 +435,172 @@ function isoDate(v: unknown): string {
   return Number.isNaN(d.getTime()) ? new Date().toISOString().slice(0, 10) : d.toISOString().slice(0, 10);
 }
 
-/** Post a reviewed extraction into the ledger, keeping the source link. */
+export interface PostResult {
+  ok: boolean;
+  error?: string;
+  posted?: number;
+  table?: string;
+  alreadyPosted?: boolean;
+}
+
+/**
+ * Post a reviewed extraction to the table that matches its category.
+ * Guards against double posting, rolls back partial inserts, and stamps
+ * every row with source_document_id = extraction.id.
+ */
 export async function postExtraction(
   extraction: CAExtraction,
-  rows: ExtractionRow[],
-): Promise<{ ok: boolean; error?: string; posted?: number }> {
-  const cls = extraction.classification as CADocClass;
-  const businessId = extraction.business_id;
-  if (!rows.length) return { ok: false, error: "Nothing to post — no rows in this extraction." };
+  rowsInput?: ExtractionRow[],
+  categoryInput?: DocCategory,
+): Promise<PostResult> {
+  // Re-read: double post guard and latest assignment.
+  const { data: fresh, error: readErr } = await supabase
+    .from("ca_document_extractions")
+    .select("*")
+    .eq("id", extraction.id)
+    .maybeSingle();
+  if (readErr || !fresh) return { ok: false, error: readErr?.message ?? "Document not found" };
+  const ex = fresh as unknown as CAExtraction & { source_type?: string | null; extracted: { rows?: ExtractionRow[]; summary?: string } | null };
+  if (ex.posted_at) {
+    console.log(`[fyn:review] double post blocked for ${ex.id}`);
+    return { ok: false, alreadyPosted: true, error: "Already posted" };
+  }
+  const businessId = ex.business_id;
+  if (!businessId) return { ok: false, error: "Assign a client before posting." };
 
-  let error: string | null = null;
-  let posted = 0;
-
-  if (cls === "bank") {
-    const payload = rows.map((r) => ({
-      business_id: businessId,
-      date: isoDate(r.date),
-      description: String(r.description ?? "").slice(0, 500),
-      type: String(r.direction ?? "debit").toLowerCase() === "credit" ? "credit" : "debit",
-      amount: num(r.amount),
-      balance: 0,
-      source_document_id: extraction.document_id,
-      source_reference: `ca_extraction:${extraction.id}`,
-      source_type: "manual",
-    }));
-    const { error: e, data: inserted } = await supabase.from("bank_transactions").insert(payload).select("id");
-    error = e?.message ?? null;
-    posted = inserted?.length ?? payload.length;
-  } else if (cls === "invoice") {
-    const payload = rows.map((r) => ({
-      business_id: businessId,
-      invoice_number: String(r.invoice_number ?? `AI-${extraction.id.slice(0, 8)}`),
-      invoice_date: isoDate(r.date),
-      subtotal: num(r.amount),
-      total_amount: num(r.amount),
-      outstanding_amount: num(r.amount),
-      status: "pending",
-    }));
-    const { error: e, data: inserted } = await supabase.from("invoices").insert(payload).select("id");
-    error = e?.message ?? null;
-    posted = inserted?.length ?? payload.length;
-  } else if (cls === "expense") {
-    const payload = rows.map((r) => ({
-      business_id: businessId,
-      category: String(r.category ?? "Uncategorised"),
-      description: String(r.vendor ?? ""),
-      amount: num(r.amount),
-      date: isoDate(r.date),
-      payment_status: "pending",
-    }));
-    const { error: e, data: inserted } = await supabase.from("expenses").insert(payload).select("id");
-    error = e?.message ?? null;
-    posted = inserted?.length ?? payload.length;
-  } else {
-    return { ok: false, error: "This document class cannot be posted to the ledger." };
+  const category = categoryInput ?? mapClassification(ex.classification);
+  const raw = rowsInput ?? ex.corrected?.rows ?? ex.extracted?.rows ?? [];
+  const rows = normaliseRows(category, raw as Record<string, unknown>[]);
+  if (category !== "reference_document") {
+    if (!rows.length) return { ok: false, error: "Nothing to post — no rows in this extraction." };
+    const errs = validateRows(category, rows);
+    if (errs.length) return { ok: false, error: errs[0] };
   }
 
-  if (error) return { ok: false, error };
+  const srcType = ex.source_type === "gmail" || ex.source_type === "whatsapp" ? ex.source_type : "upload";
+  const srcId = ex.id;
+  const firmId = ex.ca_firm_id;
+  const s = (v: unknown) => (v === null || v === undefined || String(v).trim() === "" ? null : String(v).trim());
+  const inserted: Record<string, string[]> = {};
 
-  const { error: updErr } = await supabase
+  const rollback = async () => {
+    const tables = Object.keys(inserted) as ("bank_transactions" | "invoices" | "expenses" | "ca_itc_records" | "ca_tds_records")[];
+    for (const t of tables) await supabase.from(t).delete().eq("source_document_id", srcId);
+  };
+
+  const insert = async (table: "bank_transactions" | "invoices" | "expenses" | "ca_itc_records" | "ca_tds_records", payload: Record<string, unknown>[]) => {
+    const { data, error } = await supabase.from(table).insert(payload as never).select("id");
+    if (error) throw new Error(error.message);
+    inserted[table] = ((data ?? []) as { id: string }[]).map((d) => d.id);
+    console.log(`[fyn:review] posted ${inserted[table].length} rows to ${table} for ${srcId}`);
+  };
+
+  try {
+    if (category === "bank_statement") {
+      await insert("bank_transactions", rows.map((r) => ({
+        business_id: businessId, date: isoDate(r.date), description: String(r.description ?? "").slice(0, 500),
+        amount: Math.abs(toNum(r.amount)), type: String(r.type).toLowerCase() === "credit" ? "credit" : "debit",
+        balance: s(r.balance) ? toNum(r.balance) : null, category: "uncategorized", reconciled: false,
+        source_document_id: srcId, source_type: srcType, source_reference: ex.original_filename,
+      })));
+    } else if (category === "sales_invoice") {
+      await insert("invoices", rows.map((r) => {
+        const tax = toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst);
+        const total = toNum(r.total_amount);
+        return {
+          business_id: businessId, invoice_number: String(r.invoice_number), invoice_date: isoDate(r.invoice_date),
+          due_date: s(r.due_date), customer_name: s(r.customer_name), customer_gstin: s(r.customer_gstin)?.toUpperCase() ?? null,
+          subtotal: toNum(r.taxable_value), tax_amount: tax, total_amount: total, paid_amount: 0, outstanding_amount: total,
+          status: "unpaid", source_document_id: srcId, source_type: srcType,
+        };
+      }));
+    } else if (category === "purchase_invoice") {
+      await insert("expenses", rows.map((r) => ({
+        business_id: businessId, vendor_name: s(r.vendor_name), vendor_gstin: s(r.vendor_gstin)?.toUpperCase() ?? null,
+        invoice_number: s(r.invoice_number), date: isoDate(r.invoice_date), due_date: s(r.due_date),
+        amount: toNum(r.total_amount), tax_amount: toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst), category: "purchase",
+        description: `Purchase bill ${r.invoice_number ?? ""} from ${r.vendor_name ?? ""}`.trim(), payment_status: "unpaid",
+        source_document_id: srcId, source_type: srcType,
+      })));
+      await insert("ca_itc_records", rows.map((r) => {
+        const d = isoDate(r.invoice_date);
+        return {
+          ca_firm_id: firmId, business_id: businessId, filing_period: filingPeriod(d),
+          gstin_supplier: s(r.vendor_gstin)?.toUpperCase() ?? null, supplier_name: s(r.vendor_name), invoice_number: s(r.invoice_number),
+          invoice_date: d, taxable_value: toNum(r.taxable_value), igst_amount: toNum(r.igst), cgst_amount: toNum(r.cgst),
+          sgst_amount: toNum(r.sgst), total_itc: toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst), gstr2b_matched: false,
+          match_status: "pending", itc_eligible: true, itc_blocked: false, source: "document", source_document_id: srcId,
+        };
+      }));
+    } else if (category === "expense_receipt") {
+      await insert("expenses", rows.map((r) => ({
+        business_id: businessId, vendor_name: s(r.vendor_name), date: isoDate(r.date), amount: toNum(r.amount),
+        description: String(r.description ?? r.vendor_name ?? ""), category: "expense", payment_status: "paid",
+        source_document_id: srcId, source_type: srcType,
+      })));
+    } else if (category === "tds_record") {
+      await insert("ca_tds_records", rows.map((r) => {
+        const pd = isoDate(r.payment_date);
+        const challan = s(r.challan_number);
+        return {
+          ca_firm_id: firmId, business_id: businessId, ...fyQuarter(pd), section_code: String(r.section_code),
+          deductee_name: s(r.deductee_name), deductee_pan: s(r.deductee_pan)?.toUpperCase() ?? null, payment_date: pd,
+          payment_amount: toNum(r.payment_amount), tds_rate: toNum(r.tds_rate), tds_amount: toNum(r.tds_amount),
+          deposited_amount: challan ? toNum(r.tds_amount) : 0, challan_number: challan, challan_date: s(r.challan_date),
+          return_filed: false, status: challan ? "deposited" : "pending", source_document_id: srcId,
+        };
+      }));
+    } else {
+      inserted.vault = [];
+    }
+  } catch (e) {
+    await rollback();
+    return { ok: false, error: e instanceof Error ? e.message : "Posting failed" };
+  }
+
+  const { data: auth } = await supabase.auth.getUser();
+  const nowIso = new Date().toISOString();
+  const { data: upd, error: updErr } = await supabase
     .from("ca_document_extractions")
     .update({
-      review_state: "posted",
-      corrected: { rows } as never,
-      supplier_gstin: String(rows[0]?.supplier_gstin ?? rows[0]?.vendor_gstin ?? rows[0]?.gstin ?? "").trim().toUpperCase() || null,
-      posted_at: new Date().toISOString(),
-      posted_ref: `${cls}:${posted}`,
-    })
-    .eq("id", extraction.id);
-  if (updErr) return { ok: false, error: updErr.message };
+      review_state: category === "reference_document" ? "archived" : "posted",
+      classification: category,
+      ...(rowsInput ? { corrected: { ...(ex.corrected ?? {}), rows } as never } : {}),
+      posted_at: nowIso,
+      posted_ref: JSON.stringify(inserted),
+      reviewed_by: auth.user?.id ?? null,
+      reviewed_at: nowIso,
+    } as never)
+    .eq("id", srcId)
+    .is("posted_at", null)
+    .select("id");
+  if (updErr || !upd?.length) {
+    await rollback();
+    if (!updErr) console.log(`[fyn:review] double post blocked for ${srcId}`);
+    return { ok: false, alreadyPosted: !updErr, error: updErr?.message ?? "Already posted" };
+  }
+
+  const count = Object.values(inserted).reduce((n, ids) => n + ids.length, 0);
+  const target = DOC_CATEGORIES.find((d) => d.value === category)?.target ?? "";
+  void supabase.from("ca_brain_events").insert({
+    ca_firm_id: firmId, business_id: businessId, event_type: "document_posted",
+    payload: { category, rows: count, target },
+  } as never).then(() => undefined);
+  void supabase
+    .from("ca_document_requests")
+    .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso } as never)
+    .eq("ca_firm_id", firmId)
+    .eq("business_id", businessId)
+    .in("status", ["pending", "sent", "reminded"])
+    .then(() => undefined);
 
   await logCAAudit({
-    firmId: extraction.ca_firm_id,
-    businessId,
-    entityType: "document_extraction",
-    entityId: extraction.id,
-    action: "posted_to_ledger",
-    sourceDocumentId: extraction.document_id,
-    detail: { classification: cls, rows: posted },
+    firmId, businessId, entityType: "document_extraction", entityId: srcId,
+    action: category === "reference_document" ? "filed_to_vault" : "posted_to_ledger",
+    sourceDocumentId: ex.document_id, detail: { category, rows: count, target },
   });
 
-  return { ok: true, posted };
+  return { ok: true, posted: count, table: target };
 }
 
 export async function rejectExtraction(extraction: CAExtraction, reason: string) {
@@ -536,4 +620,61 @@ export async function rejectExtraction(extraction: CAExtraction, reason: string)
     });
   }
   return error?.message ?? null;
+}
+
+/**
+ * Re-run extraction on the stored file as a specific category.
+ * Bank CSV / Tally XML use the deterministic parsers; everything else goes to OCR.
+ * Old data is kept untouched on any failure.
+ */
+export async function reExtractAs(
+  extraction: CAExtraction,
+  category: DocCategory,
+): Promise<{ ok: boolean; error?: string; rows?: ExtractionRow[]; confidence?: number; summary?: string | null }> {
+  if (!extraction.storage_path) return { ok: false, error: "No stored file for this document" };
+  const { data: blob, error: dlErr } = await supabase.storage.from("ca-client-documents").download(extraction.storage_path);
+  if (dlErr || !blob) return { ok: false, error: "Could not read the stored file" };
+  const name = extraction.original_filename ?? "document";
+  const file = new File([blob], name, { type: blob.type || "application/octet-stream" });
+  const lower = name.toLowerCase();
+
+  let rows: ExtractionRow[] = [];
+  let confidence = 0;
+  let summary: string | null = null;
+  if (category === "bank_statement" && (lower.endsWith(".csv") || lower.endsWith(".xml"))) {
+    const parsed = lower.endsWith(".csv") ? await parseBankCSV(file) : await parseTallyXML(file);
+    if (parsed.error && !parsed.rows.length) return { ok: false, error: parsed.error };
+    rows = normaliseRows("bank_statement", parsed.rows as Record<string, unknown>[]);
+    confidence = scoreConfidence("bank", parsed.rows);
+  } else {
+    try {
+      const dataUrl = await fileToBase64(file);
+      const { data, error } = await supabase.functions.invoke("extract-document-ai", {
+        body: { category, file_base64: dataUrl, mime_type: file.type || (lower.endsWith(".pdf") ? "application/pdf" : "image/png") },
+      });
+      if (error) return { ok: false, error: "Extraction failed. Try again in a moment." };
+      const d = data as { rows?: ExtractionRow[]; confidence?: number; summary?: string | null; error?: string };
+      if (d?.error) return { ok: false, error: d.error };
+      rows = Array.isArray(d?.rows) ? d.rows : [];
+      confidence = typeof d?.confidence === "number" ? d.confidence : 0;
+      summary = d?.summary ?? null;
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "Extraction failed" };
+    }
+  }
+
+  const { error: upErr } = await supabase
+    .from("ca_document_extractions")
+    .update({
+      classification: category,
+      extracted: { rows, ...(summary ? { summary } : {}) } as never,
+      corrected: null,
+      was_corrected: false,
+      confidence,
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq("id", extraction.id);
+  if (upErr) return { ok: false, error: upErr.message };
+  return { ok: true, rows, confidence, summary };
 }

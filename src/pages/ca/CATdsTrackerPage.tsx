@@ -3,6 +3,7 @@ import { COLORS, PageWrap, PageHeader, Card, MetricCard, Chip } from "@/componen
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
 import UploadDataPrompt from "@/components/ca/UploadDataPrompt";
 import { supabase } from "@/integrations/supabase/client";
+import { useClientParam } from "@/hooks/useClientParam";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { inr, inrCompact, dateIN } from "@/components/ca/portalUi";
@@ -23,7 +24,11 @@ type TdsRow = {
 export default function CATdsTrackerPage() {
   const { caFirm } = useCAAuth();
   const { clients } = useCAClientOptions();
-  const [rows, setRows] = useState<TdsRow[]>([]);
+  const clientParam = useClientParam();
+  const [allRows, setRows] = useState<TdsRow[]>([]);
+  const [clientFilter, setClientFilter] = useState("");
+  useEffect(() => { if (clientParam) setClientFilter(clientParam); }, [clientParam]);
+  const rows = useMemo(() => (clientFilter ? allRows.filter((r) => r.business_id === clientFilter) : allRows), [allRows, clientFilter]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -84,6 +89,12 @@ export default function CATdsTrackerPage() {
       />
       <GspLimitationBanner />
       <PageHeader title="TDS Tracker" sub="TDS deposits and returns across your portfolio." />
+      <div style={{ marginBottom: 16 }}>
+        <select value={clientFilter} onChange={(e) => setClientFilter(e.target.value)} style={{ height: 36, padding: "0 10px", borderRadius: 8, border: "1px solid rgba(23,18,8,0.15)", background: "#FFFFFF", fontSize: 13, minWidth: 220 }}>
+          <option value="">All clients</option>
+          {clients.map((c) => <option key={c.business_id} value={c.business_id}>{c.client_name}</option>)}
+        </select>
+      </div>
       <div className="grid grid-cols-4 gap-4 mb-6">
         <MetricCard label="TDS Due This Month" value={inrCompact(stats.dueThisMonth)} valueColor={COLORS.amberSoft} sub={`Across ${stats.dueClientCount} client${stats.dueClientCount === 1 ? "" : "s"}`} />
         <MetricCard label="Deposited" value={inrCompact(stats.depositedYtd)} valueColor={COLORS.greenSoft} sub="All recorded challans" />

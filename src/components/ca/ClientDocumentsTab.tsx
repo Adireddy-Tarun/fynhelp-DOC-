@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { postedLabel } from "@/lib/caDocCategories";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ interface DocRow {
   classification: string;
   confidence: number;
   review_state: string;
+  posted_ref: string | null;
   storage_path: string | null;
   created_at: string;
 }
@@ -54,7 +56,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
     setLoading(true);
     const { data, error } = await supabase
       .from("ca_document_extractions")
-      .select("id, document_id, original_filename, classification, confidence, review_state, storage_path, created_at")
+      .select("id, document_id, original_filename, classification, confidence, review_state, posted_ref, storage_path, created_at")
       .eq("ca_firm_id", firmId)
       .eq("business_id", businessId)
       .order("created_at", { ascending: false })
@@ -232,7 +234,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
             <thead><tr>
               <th style={caTh}>File</th><th style={caTh}>Class</th><th style={caTh}>Confidence</th>
               <th style={caTh}>Safety</th><th style={caTh}>Request</th>
-              <th style={caTh}>State</th><th style={caTh}>Uploaded</th><th style={caTh} />
+              <th style={caTh}>State</th><th style={caTh}>Posted to</th><th style={caTh}>Uploaded</th><th style={caTh} />
             </tr></thead>
             <tbody>
               {docs.map((d) => (
@@ -254,6 +256,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                         : <span style={{ color: CA.faint }}>—</span>}
                     </td>
                     <td style={caTd}><CABadge tone={statusTone(d.review_state)}>{d.review_state}</CABadge></td>
+                    <td style={caTd}>{postedLabel(d.posted_ref) ?? <span style={{ color: CA.faint }}>—</span>}</td>
                     <td style={caTd}>{dateIN(d.created_at)}</td>
 
                     <td style={{ ...caTd, textAlign: "right" }}>
@@ -267,7 +270,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
                   </tr>
                   {expanded === d.id && (
                     <tr>
-                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={8}>
+                      <td style={{ ...caTd, background: "rgba(26,26,26,0.02)" }} colSpan={9}>
                         {!versions[d.id] ? (
                           <span style={{ fontFamily: CA.sans, fontSize: 12.5, color: CA.muted }}>Loading versions…</span>
                         ) : versions[d.id].length === 0 ? (
