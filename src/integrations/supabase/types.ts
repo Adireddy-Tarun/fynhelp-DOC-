@@ -6166,42 +6166,48 @@ export type Database = {
       }
       liquidity_metrics: {
         Row: {
-          burn_rate_current: number
+          burn_rate_current: number | null
           business_id: string
-          cash_position: number
+          cash_position: number | null
+          cash_source: string | null
           created_at: string
-          health_score: number
+          health_score: number | null
           health_status: string
           id: string
           recorded_at: string
-          runway_days: number
-          runway_months: number
+          runway_days: number | null
+          runway_months: number | null
+          transactions_analyzed: number | null
           updated_at: string
         }
         Insert: {
-          burn_rate_current?: number
+          burn_rate_current?: number | null
           business_id: string
-          cash_position?: number
+          cash_position?: number | null
+          cash_source?: string | null
           created_at?: string
-          health_score?: number
+          health_score?: number | null
           health_status?: string
           id?: string
           recorded_at?: string
-          runway_days?: number
-          runway_months?: number
+          runway_days?: number | null
+          runway_months?: number | null
+          transactions_analyzed?: number | null
           updated_at?: string
         }
         Update: {
-          burn_rate_current?: number
+          burn_rate_current?: number | null
           business_id?: string
-          cash_position?: number
+          cash_position?: number | null
+          cash_source?: string | null
           created_at?: string
-          health_score?: number
+          health_score?: number | null
           health_status?: string
           id?: string
           recorded_at?: string
-          runway_days?: number
-          runway_months?: number
+          runway_days?: number | null
+          runway_months?: number | null
+          transactions_analyzed?: number | null
           updated_at?: string
         }
         Relationships: []

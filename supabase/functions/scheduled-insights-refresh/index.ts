@@ -2,6 +2,7 @@
 // Triggered daily via pg_cron. See migration that registers the job.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { computeAndStoreLiquidity } from '../_shared/liquidity.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +20,35 @@ interface OrgResult {
   status: 'success' | 'failed'
   attempts: number
   error?: string
+}
+
+function safeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder()
+  const x = enc.encode(a)
+  const y = enc.encode(b)
+  if (x.length === 0 || x.length !== y.length) return false
+  let diff = 0
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i]
+  return diff === 0
+}
+
+/** Recompute stored liquidity metrics for every business with transactions (same logic as compute-liquidity). */
+async function recomputeBusinessMetrics(
+  db: ReturnType<typeof createClient>,
+): Promise<{ businesses: number; ok: number; failed: number }> {
+  const { data, error } = await db.from('transactions').select('business_id').limit(50000)
+  if (error) {
+    console.error('[fyn:cron] list businesses failed', error.message)
+    return { businesses: 0, ok: 0, failed: 0 }
+  }
+  const ids = Array.from(new Set((data ?? []).map((r: any) => r.business_id).filter(Boolean))) as string[]
+  let ok = 0
+  let failed = 0
+  for (const id of ids) {
+    try { await computeAndStoreLiquidity(db, id); ok++ }
+    catch (e) { failed++; console.warn(`[fyn:cron] recompute failed for ${id}`, (e as Error).message) }
+  }
+  return { businesses: ids.length, ok, failed }
 }
 
 async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
@@ -74,12 +104,17 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // ── Auth: require shared CRON_SECRET (set on the pg_cron HTTP call) ──
-  const cronSecret = Deno.env.get('CRON_SECRET') ?? ''
-  const provided =
-    req.headers.get('x-cron-secret') ??
-    (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '')
-  if (!cronSecret || provided !== cronSecret) {
+  // ── Auth: pg_cron sends `Authorization: Bearer <CRON_SECRET from vault>`.
+  // `x-cron-secret` is also accepted for manual calls. Constant-time compare.
+  const cronSecret = (Deno.env.get('CRON_SECRET') ?? '').trim()
+  const bearer = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
+  const headerSecret = (req.headers.get('x-cron-secret') ?? '').trim()
+  if (!cronSecret || !(safeEqual(bearer, cronSecret) || safeEqual(headerSecret, cronSecret))) {
+    console.warn('[fyn:cron] scheduled-insights-refresh unauthorized', {
+      has_env_secret: Boolean(cronSecret),
+      has_bearer: Boolean(bearer),
+      has_header: Boolean(headerSecret),
+    })
     return new Response(
       JSON.stringify({ success: false, error: 'Unauthorized' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
@@ -161,12 +196,16 @@ Deno.serve(async (req) => {
       }
     }
 
+    const metrics = await recomputeBusinessMetrics(supabase)
+    console.log('[fyn:cron] business metrics recomputed', metrics)
+
     const summary = {
       success: results.filter((r) => r.status === 'success').length,
       failed: results.filter((r) => r.status === 'failed').length,
       total: uniqueOrgs.length,
       processed: results.length,
       skipped: uniqueOrgs.length - results.length,
+      business_metrics: metrics,
       duration_ms: Date.now() - startedAt,
     }
 

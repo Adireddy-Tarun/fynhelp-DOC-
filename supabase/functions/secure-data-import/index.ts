@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 import { z } from "npm:zod@3.23.8";
 import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
+import { validateBankRows } from "../_shared/bankCsv.ts";
+import { computeAndStoreLiquidity, istToday } from "../_shared/liquidity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,16 +16,6 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as s
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") as string;
 const EXTERNAL_URL = Deno.env.get("EXTERNAL_SUPABASE_URL") as string;
 const EXTERNAL_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_KEY") as string;
-
-const today = () => new Date().toISOString().slice(0, 10);
-
-const TransactionRecord = z.object({
-  transaction_date: z.string().refine((v) => !isNaN(Date.parse(v)), "invalid date"),
-  amount: z.number().positive("amount must be > 0"),
-  description: z.string().trim().max(500).optional().default(""),
-  category: z.string().trim().max(100).optional().default(""),
-  direction: z.enum(["in", "out"]).optional().default("out"),
-});
 
 const BodySchema = z.object({
   data_type: z.enum(["transactions", "invoices", "vendor_payments"]),
@@ -46,9 +38,6 @@ Deno.serve(async (req) => {
   if (sizeBlock) return sizeBlock;
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-  if (!EXTERNAL_URL || !EXTERNAL_KEY) {
-    return json({ error: "External Supabase not configured" }, 500);
-  }
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -63,7 +52,8 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
     // External Supabase client — used for ALL data writes.
-    const externalClient = createClient(EXTERNAL_URL, EXTERNAL_KEY);
+    // External project only receives the audit_log entry (best effort).
+    const externalClient = EXTERNAL_URL && EXTERNAL_KEY ? createClient(EXTERNAL_URL, EXTERNAL_KEY) : null;
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: authErr } = await localAuthClient.auth.getUser(token);
@@ -99,62 +89,111 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Validate each record
-    const validationErrors: Array<{ index: number; errors: unknown }> = [];
-    const valid: Array<z.infer<typeof TransactionRecord>> = [];
-    records.forEach((r, i) => {
-      const p = TransactionRecord.safeParse({
-        ...r,
-        amount: typeof r.amount === "string" ? Number(r.amount) : r.amount,
-      });
-      if (!p.success) {
-        validationErrors.push({ index: i, errors: p.error.flatten().fieldErrors });
-        return;
+    // Header detection + row validation (shared with the dashboard upload).
+    const stringRows = records.map((r) => {
+      const out: Record<string, string> = {};
+      for (const [k, v] of Object.entries(r)) out[k] = v == null ? "" : String(v);
+      return out;
+    });
+    const headers = Array.from(new Set(stringRows.flatMap((r) => Object.keys(r))));
+    const v = validateBankRows(headers, stringRows);
+    const today = istToday();
+    // Future dates are invalid rows.
+    const valid = v.valid.filter((row, idx) => {
+      if (row.date > today) {
+        v.invalid_count++;
+        if (v.errors.length < 10) v.errors.push({ row: idx + 2, reason: "future date not allowed" });
+        return false;
       }
-      if (new Date(p.data.transaction_date) > new Date(today() + "T23:59:59Z")) {
-        validationErrors.push({ index: i, errors: { transaction_date: ["future date not allowed"] } });
-        return;
-      }
-      valid.push(p.data);
+      return true;
     });
 
-    if (validationErrors.length > 0) {
-      return json(
-        { inserted_count: 0, errors: validationErrors, message: "Validation failed" },
-        400,
-      );
+    const audit = async (inserted: number, status: string) => {
+      try {
+        if (!externalClient) return;
+        await externalClient.from("audit_log").insert({
+          user_id: userId,
+          business_id,
+          action: "secure_data_import",
+          resource_type: data_type,
+          metadata: {
+            status,
+            records_total: v.total,
+            records_valid: valid.length,
+            records_invalid: v.invalid_count,
+            records_inserted: inserted,
+            missing_columns: v.missing_columns,
+          },
+        });
+      } catch (e) {
+        console.warn("[fyn:import] audit_log write failed", (e as Error).message);
+      }
+    };
+
+    if (v.missing_columns.length > 0) {
+      await audit(0, "rejected");
+      return json({
+        status: "rejected",
+        missing_columns: v.missing_columns,
+        message: `This file is missing required columns: ${v.missing_columns.join(", ")}`,
+        records_total: v.total, records_valid: 0, records_invalid: v.total, records_inserted: 0,
+      }, 422);
     }
 
+    if (valid.length === 0) {
+      await audit(0, "rejected");
+      return json({
+        status: "rejected",
+        missing_columns: [],
+        message: "No valid rows found in this file.",
+        records_total: v.total, records_valid: 0, records_invalid: v.invalid_count, records_inserted: 0,
+        invalid_rows: v.errors,
+      }, 422);
+    }
+
+    // Write to the same Lovable Cloud `transactions` table the dashboards read.
     const rows = valid.map((r) => ({
       business_id,
-      date: r.transaction_date,
-      transaction_date: r.transaction_date,
+      date: r.date,
+      transaction_date: r.date,
       amount: r.amount,
       direction: r.direction,
-      description: r.description || null,
-      category: r.category || null,
+      description: r.description,
+      balance_after: r.balance,
     }));
-
-    // Insert into External Supabase.
-    const { data: inserted, error: insertErr } = await externalClient
-      .from(data_type)
+    const { data: inserted, error: insertErr } = await localClient
+      .from("transactions")
       .insert(rows)
       .select("id");
-
     if (insertErr) {
-      return json({ error: insertErr.message, inserted_count: 0 }, 400);
+      await audit(0, "rejected");
+      return json({ status: "rejected", error: insertErr.message, records_inserted: 0 }, 400);
+    }
+    const insertedCount = inserted?.length ?? 0;
+    const status = insertedCount === 0 ? "rejected" : v.invalid_count > 0 ? "partial" : "success";
+
+    // Recompute metrics now (insert has committed). Failure never fails the import.
+    let recomputed = false;
+    if (insertedCount > 0) {
+      try {
+        await computeAndStoreLiquidity(localClient, business_id);
+        recomputed = true;
+      } catch (e) {
+        console.error(`[fyn:import] recompute failed for ${business_id}`, (e as Error).message);
+      }
     }
 
-    // Audit log into External Supabase.
-    await externalClient.from("audit_log").insert({
-      user_id: userId,
-      business_id,
-      action: "secure_data_import",
-      resource_type: data_type,
-      metadata: { inserted_count: inserted?.length ?? 0 },
+    await audit(insertedCount, status);
+    return json({
+      status,
+      records_total: v.total,
+      records_valid: valid.length,
+      records_invalid: v.invalid_count,
+      records_inserted: insertedCount,
+      inserted_count: insertedCount,
+      invalid_rows: v.errors,
+      metrics_recomputed: recomputed,
     });
-
-    return json({ inserted_count: inserted?.length ?? 0, errors: [] });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
   }
