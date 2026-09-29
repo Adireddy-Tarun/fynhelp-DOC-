@@ -68,8 +68,13 @@ export default function WaitlistForm({
     e.preventDefault();
 
     const email = formData.email.trim().toLowerCase();
+    const name = formData.name.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setMessage({ type: "error", text: "Valid email required" });
+      return;
+    }
+    if (!/\p{L}/u.test(name)) {
+      setMessage({ type: "error", text: "Please enter your name" });
       return;
     }
 
@@ -86,9 +91,9 @@ export default function WaitlistForm({
       const nextPos = ((maxRow?.position as number | null) ?? 0) + 1;
 
       const { error } = await supabase.from("waitlist").insert({
-        email: formData.email.trim().toLowerCase(),
-        name: formData.name || "",
-        company_name: formData.company_name || "",
+        email,
+        name,
+        company_name: formData.company_name.trim(),
         phone: formData.phone || "",
         company_type: formData.company_type || "",
         company_size: formData.company_size || "",
@@ -97,8 +102,13 @@ export default function WaitlistForm({
         is_converted: false,
       });
 
-      if (error) {
-        setMessage({ type: "error", text: error.message || "Something went wrong. Please try again." });
+      const isDuplicate =
+        !!error && ((error as { code?: string }).code === "23505" || (error as { status?: number }).status === 409);
+      if (isDuplicate) {
+        setMessage({ type: "success", text: "You're already on the waitlist. We'll be in touch." });
+        setFormData(initial);
+      } else if (error) {
+        setMessage({ type: "error", text: "Something went wrong. Please try again." });
       } else {
         track("waitlist_signup", { source: "homepage" });
         setSubmitted(true);
