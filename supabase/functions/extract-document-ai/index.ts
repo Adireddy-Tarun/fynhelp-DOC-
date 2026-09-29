@@ -134,11 +134,17 @@ Deno.serve(async (req) => {
 
     const startedAt = Date.now();
     const body = requestBody;
+    const category = (String(body?.category || "") || null) as Category | null;
     const docType = String(body?.doc_type || "") as DocType;
     const fileBase64 = String(body?.file_base64 || "");
     const mimeType = String(body?.mime_type || "image/png");
 
-    if (!["bank", "invoice", "expense"].includes(docType)) {
+    if (category && !(category in CATEGORY_PROMPTS)) {
+      return new Response(JSON.stringify({ error: "invalid category" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!category && !["bank", "invoice", "expense"].includes(docType)) {
       return new Response(JSON.stringify({ error: "invalid doc_type" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -225,6 +231,17 @@ Deno.serve(async (req) => {
       invoice: ["customer", "invoice_number", "amount", "date"],
       expense: ["vendor", "amount", "date"],
     };
+    if (category) {
+      const cf = CATEGORY_REQUIRED[category];
+      const tot = parsed.rows.length * cf.length;
+      const fil = parsed.rows.reduce(
+        (sum: number, row: Record<string, unknown>) => sum + cf.filter((f) => String(row[f] ?? "").trim() !== "").length, 0);
+      const vf = category === "bank_statement" && parsed.rows.length < 3 ? 0.9 : 1;
+      const conf = category === "reference_document" ? 1 : tot > 0 ? Math.round((fil / tot) * vf * 100) / 100 : 0;
+      return new Response(JSON.stringify({ rows: parsed.rows, category, summary: typeof parsed.summary === "string" ? parsed.summary : null, confidence: conf }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const fields = required[docType];
     const total = parsed.rows.length * fields.length;
     const filled = parsed.rows.reduce(
