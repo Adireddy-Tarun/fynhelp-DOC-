@@ -96,7 +96,7 @@ export function WhatsAppIntakeCard({ firmId }: { firmId: string | null }) {
     session.current = null;
     window.FB.login((response) => {
       const code = response.authResponse?.code;
-      if (!code) { setConnecting(false); return; }
+      if (!code) { toast("WhatsApp connection was not completed"); setConnecting(false); return; }
       let waited = 0;
       const timer = window.setInterval(async () => {
         waited += 200;
@@ -127,7 +127,7 @@ export function WhatsAppIntakeCard({ firmId }: { firmId: string | null }) {
   };
 
   const disconnect = async () => {
-    if (!firmId || !window.confirm("Disconnect WhatsApp? New documents will stop arriving in FynHelp.")) return;
+    if (!firmId || !window.confirm("Disconnect WhatsApp? New documents will stop arriving.")) return;
     try {
       await disconnectFn({ data: { firm_id: firmId } });
       toast.success("WhatsApp disconnected");
