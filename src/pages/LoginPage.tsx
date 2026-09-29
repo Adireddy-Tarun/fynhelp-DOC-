@@ -1,5 +1,5 @@
 import BackHomeLink from "@/components/BackHomeLink";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "@/lib/router-compat";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { Link, useNavigate } from "@/lib/router-compat";
@@ -305,10 +305,16 @@ const LoginPage = () => {
                 </button>
               </div>
               <HCaptcha
+                ref={siCaptchaRef}
                 onVerify={(t) => setSiCaptcha(t)}
                 onExpire={() => setSiCaptcha(null)}
                 onError={() => setSiCaptcha(null)}
               />
+              {!siCaptcha && !siSubmitting && (
+                <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)" }}>
+                  Complete the check again to retry
+                </p>
+              )}
               <button
                 type="submit"
                 disabled={!canSignIn}
@@ -473,10 +479,16 @@ const LoginPage = () => {
               </div>
 
               <HCaptcha
+                ref={suCaptchaRef}
                 onVerify={(t) => setSuCaptcha(t)}
                 onExpire={() => setSuCaptcha(null)}
                 onError={() => setSuCaptcha(null)}
               />
+              {!suCaptcha && !suSubmitting && (
+                <p className="text-fyn-ink-60 text-center" style={{ fontSize: "var(--fyn-type-small)" }}>
+                  Complete the check to continue
+                </p>
+              )}
 
               <button
                 type="submit"
