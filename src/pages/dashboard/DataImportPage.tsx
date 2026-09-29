@@ -226,6 +226,7 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
       toast.error("Please upload a CSV or XLSX file");
       return;
     }
+    setOutcome(null);
     setFile(f);
   };
 
