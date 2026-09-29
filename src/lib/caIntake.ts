@@ -625,3 +625,60 @@ export async function rejectExtraction(extraction: CAExtraction, reason: string)
   }
   return error?.message ?? null;
 }
+
+/**
+ * Re-run extraction on the stored file as a specific category.
+ * Bank CSV / Tally XML use the deterministic parsers; everything else goes to OCR.
+ * Old data is kept untouched on any failure.
+ */
+export async function reExtractAs(
+  extraction: CAExtraction,
+  category: DocCategory,
+): Promise<{ ok: boolean; error?: string; rows?: ExtractionRow[]; confidence?: number; summary?: string | null }> {
+  if (!extraction.storage_path) return { ok: false, error: "No stored file for this document" };
+  const { data: blob, error: dlErr } = await supabase.storage.from("ca-client-documents").download(extraction.storage_path);
+  if (dlErr || !blob) return { ok: false, error: "Could not read the stored file" };
+  const name = extraction.original_filename ?? "document";
+  const file = new File([blob], name, { type: blob.type || "application/octet-stream" });
+  const lower = name.toLowerCase();
+
+  let rows: ExtractionRow[] = [];
+  let confidence = 0;
+  let summary: string | null = null;
+  if (category === "bank_statement" && (lower.endsWith(".csv") || lower.endsWith(".xml"))) {
+    const parsed = lower.endsWith(".csv") ? await parseBankCSV(file) : await parseTallyXML(file);
+    if (parsed.error && !parsed.rows.length) return { ok: false, error: parsed.error };
+    rows = normaliseRows("bank_statement", parsed.rows as Record<string, unknown>[]);
+    confidence = scoreConfidence("bank", parsed.rows);
+  } else {
+    try {
+      const dataUrl = await fileToBase64(file);
+      const { data, error } = await supabase.functions.invoke("extract-document-ai", {
+        body: { category, file_base64: dataUrl, mime_type: file.type || (lower.endsWith(".pdf") ? "application/pdf" : "image/png") },
+      });
+      if (error) return { ok: false, error: "Extraction failed. Try again in a moment." };
+      const d = data as { rows?: ExtractionRow[]; confidence?: number; summary?: string | null; error?: string };
+      if (d?.error) return { ok: false, error: d.error };
+      rows = Array.isArray(d?.rows) ? d.rows : [];
+      confidence = typeof d?.confidence === "number" ? d.confidence : 0;
+      summary = d?.summary ?? null;
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "Extraction failed" };
+    }
+  }
+
+  const { error: upErr } = await supabase
+    .from("ca_document_extractions")
+    .update({
+      classification: category,
+      extracted: { rows, ...(summary ? { summary } : {}) } as never,
+      corrected: null,
+      was_corrected: false,
+      confidence,
+      error_message: null,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq("id", extraction.id);
+  if (upErr) return { ok: false, error: upErr.message };
+  return { ok: true, rows, confidence, summary };
+}
