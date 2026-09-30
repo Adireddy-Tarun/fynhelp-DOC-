@@ -86,6 +86,123 @@ function tryParseJson(raw: string): any | null {
   return null;
 }
 
+function safeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder();
+  const x = enc.encode(a);
+  const y = enc.encode(b);
+  if (x.length !== y.length || x.length === 0) return false;
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+
+class ProviderError extends Error {
+  status: number | null;
+  constructor(message: string, status: number | null) {
+    super(message);
+    this.status = status;
+  }
+}
+
+type ProviderResult = { text: string; tokens: number | null };
+
+async function callGoogleGemini(
+  promptText: string,
+  systemText: string,
+  base64Data: string,
+  mimeType: string,
+): Promise<ProviderResult> {
+  const raw = base64Data.replace(/^data:[^;,]*;base64,/, "");
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 60_000);
+  let resp: Response;
+  try {
+    resp = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        method: "POST",
+        signal: ctrl.signal,
+        headers: {
+          "x-goog-api-key": Deno.env.get("GEMINI_API_KEY") ?? "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemText }] },
+          contents: [{
+            role: "user",
+            parts: [
+              { text: promptText },
+              { inline_data: { mime_type: mimeType, data: raw } },
+            ],
+          }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0 },
+        }),
+      },
+    );
+  } catch (e) {
+    const reason = (e as Error)?.name === "AbortError" ? "timeout" : "network";
+    throw new ProviderError(`google ${reason}`, null);
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!resp.ok) {
+    await resp.body?.cancel().catch(() => {});
+    throw new ProviderError(`google http ${resp.status}`, resp.status);
+  }
+  const json = await resp.json().catch(() => null);
+  const cand = json?.candidates?.[0];
+  if (!cand) throw new ProviderError(`google http ${resp.status} finishReason=none`, resp.status);
+  const finish = String(cand.finishReason ?? "");
+  if (finish === "SAFETY" || finish === "RECITATION") {
+    throw new ProviderError(`google http ${resp.status} finishReason=${finish}`, resp.status);
+  }
+  const parts: Array<{ text?: string }> = cand?.content?.parts ?? [];
+  const text = parts.filter((p) => typeof p?.text === "string").map((p) => p.text).join("");
+  const tokens = typeof json?.usageMetadata?.totalTokenCount === "number"
+    ? json.usageMetadata.totalTokenCount
+    : null;
+  return { text, tokens };
+}
+
+async function callLovableGateway(
+  promptText: string,
+  systemText: string,
+  dataUrl: string,
+): Promise<ProviderResult> {
+  const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemText },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: promptText },
+            { type: "image_url", image_url: { url: dataUrl } },
+          ],
+        },
+      ],
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!aiResp.ok) {
+    const detail = await aiResp.text().catch(() => "");
+    console.error("extract-document-ai gateway error", aiResp.status, detail.slice(0, 300));
+    throw new ProviderError(`lovable http ${aiResp.status}`, aiResp.status);
+  }
+  const json = await aiResp.json();
+  const text = String(json?.choices?.[0]?.message?.content ?? "");
+  return { text, tokens: json?.usage?.total_tokens ?? null };
+}
+
+const SYSTEM_TEXT =
+  "You extract structured financial data from images and PDFs of Indian bank statements, invoices, and expense bills. Output STRICT JSON only, no prose, no markdown fences.";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const originBlock = rejectDisallowedOrigin(req);
@@ -102,7 +219,7 @@ Deno.serve(async (req) => {
     }
 
     const bearer = auth.slice("Bearer ".length);
-    const internalCall = bearer === SUPABASE_SERVICE_ROLE_KEY;
+    const internalCall = safeEqual(bearer, SUPABASE_SERVICE_ROLE_KEY ?? "");
     const requestBody = await req.json().catch(() => ({}));
     const supabase = createClient(SUPABASE_URL, internalCall ? SUPABASE_SERVICE_ROLE_KEY : SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: auth } },
@@ -126,7 +243,8 @@ Deno.serve(async (req) => {
     if (!quota.allowed) {
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
-        model: "google/gemini-2.5-flash", prompt: "(blocked before call)",
+        model: Deno.env.get("GEMINI_API_KEY") ? "gemini-2.5-flash (google)" : "google/gemini-2.5-flash (lovable)",
+        prompt: "(blocked before call)",
         status: "blocked", errorMessage: "daily_limit_reached",
       });
       return quotaExceededResponse(quota, corsHeaders);
@@ -159,69 +277,66 @@ Deno.serve(async (req) => {
       ? fileBase64
       : `data:${mimeType};base64,${fileBase64}`;
 
-    const aiResp = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You extract structured financial data from images and PDFs of Indian bank statements, invoices, and expense bills. Output STRICT JSON only, no prose, no markdown fences.",
-            },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: category ? CATEGORY_PROMPTS[category] : PROMPTS[docType] },
-                { type: "image_url", image_url: { url: dataUrl } },
-              ],
-            },
-          ],
-          response_format: { type: "json_object" },
-        }),
-      },
-    );
+    const promptText = category ? CATEGORY_PROMPTS[category] : PROMPTS[docType];
+    const label = category ?? docType;
+    let provider: "google" | "lovable" = "lovable";
+    let result: ProviderResult | null = null;
+    let lastStatus: number | null = null;
 
-    if (!aiResp.ok) {
-      const status = aiResp.status === 429 || aiResp.status === 402 ? aiResp.status : 500;
-      const detail = await aiResp.text().catch(() => "");
-      console.error("extract-document-ai gateway error", aiResp.status, detail);
+    if (Deno.env.get("GEMINI_API_KEY")) {
+      try {
+        result = await callGoogleGemini(promptText, SYSTEM_TEXT, fileBase64, mimeType);
+        provider = "google";
+      } catch (e) {
+        const st = e instanceof ProviderError && e.status ? String(e.status) : (e as Error)?.message ?? "error";
+        console.warn(`[fyn:ocr] google failed (${st}) — falling back to lovable gateway`);
+      }
+    }
+    if (!result) {
+      try {
+        result = await callLovableGateway(promptText, SYSTEM_TEXT, dataUrl);
+        provider = "lovable";
+      } catch (e) {
+        lastStatus = e instanceof ProviderError ? e.status : null;
+      }
+    }
+    const modelLabel = provider === "google" ? "gemini-2.5-flash (google)" : "google/gemini-2.5-flash (lovable)";
+
+    if (!result) {
+      const status = lastStatus === 429 || lastStatus === 402 ? lastStatus : 500;
       const msg =
-        aiResp.status === 429
+        lastStatus === 429
           ? "Rate limited. Try again in a moment."
-          : aiResp.status === 402
+          : lastStatus === 402
           ? "AI credits exhausted."
           : "AI gateway error";
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
-        model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
+        model: modelLabel, prompt: `doc_type=${docType}`,
         responseTimeMs: Date.now() - startedAt, status: "error", errorMessage: msg,
       });
-      return new Response(JSON.stringify({ error: msg, status: aiResp.status, details: detail.slice(0, 500) }), {
+      return new Response(JSON.stringify({ error: msg }), {
         status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const json = await aiResp.json();
-    const raw = json?.choices?.[0]?.message?.content ?? "";
+    const raw = result.text;
+    const parsed = tryParseJson(raw);
+    const okParsed = !!parsed && Array.isArray(parsed.rows);
+    const elapsed = Date.now() - startedAt;
+    const tokens = result.tokens ?? estimateTokens(raw);
+    console.log(`[fyn:ocr] provider=${provider} category=${label} ms=${elapsed} tokens=${tokens}`);
     await logAiUsage({
       userId, businessId, feature: "document_extraction",
-      model: "google/gemini-2.5-flash", prompt: `doc_type=${docType}`,
-      response: String(raw).slice(0, 2000),
-      tokensUsed: json?.usage?.total_tokens ?? estimateTokens(String(raw)),
-      responseTimeMs: Date.now() - startedAt, status: "success",
+      model: modelLabel, prompt: `doc_type=${docType}`,
+      response: `rows=${okParsed ? parsed.rows.length : 0} parsed=${okParsed}`,
+      tokensUsed: tokens,
+      responseTimeMs: elapsed, status: "success",
     });
 
-    const parsed = tryParseJson(raw);
-    if (!parsed || !Array.isArray(parsed.rows)) {
-      console.error("extract-document-ai unparseable AI response:", raw?.slice(0, 500));
-      return new Response(JSON.stringify({ error: "Could not parse AI response as JSON", raw: String(raw).slice(0, 500) }), {
+    if (!okParsed) {
+      console.error("extract-document-ai unparseable AI response", { provider, length: raw.length });
+      return new Response(JSON.stringify({ error: "Could not parse AI response as JSON" }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -254,8 +369,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("extract-document-ai error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }), {
+    console.error("extract-document-ai error", String(e instanceof Error ? e.message : e).slice(0, 300));
+    return new Response(JSON.stringify({ error: "Extraction failed. Please try again." }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
