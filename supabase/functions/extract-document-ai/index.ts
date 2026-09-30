@@ -243,7 +243,8 @@ Deno.serve(async (req) => {
     if (!quota.allowed) {
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
-        model: "google/gemini-2.5-flash", prompt: "(blocked before call)",
+        model: Deno.env.get("GEMINI_API_KEY") ? "gemini-2.5-flash (google)" : "google/gemini-2.5-flash (lovable)",
+        prompt: "(blocked before call)",
         status: "blocked", errorMessage: "daily_limit_reached",
       });
       return quotaExceededResponse(quota, corsHeaders);
