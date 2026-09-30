@@ -118,7 +118,7 @@ async function callGoogleGemini(
   let resp: Response;
   try {
     resp = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
       {
         method: "POST",
         signal: ctrl.signal,
@@ -243,7 +243,7 @@ Deno.serve(async (req) => {
     if (!quota.allowed) {
       await logAiUsage({
         userId, businessId, feature: "document_extraction",
-        model: Deno.env.get("GEMINI_API_KEY") ? "gemini-2.5-flash (google)" : "google/gemini-2.5-flash (lovable)",
+        model: Deno.env.get("GEMINI_API_KEY") ? "gemini-3.8-flash (google)" : "google/gemini-2.5-flash (lovable)",
         prompt: "(blocked before call)",
         status: "blocked", errorMessage: "daily_limit_reached",
       });
@@ -300,7 +300,7 @@ Deno.serve(async (req) => {
         lastStatus = e instanceof ProviderError ? e.status : null;
       }
     }
-    const modelLabel = provider === "google" ? "gemini-2.5-flash (google)" : "google/gemini-2.5-flash (lovable)";
+    const modelLabel = provider === "google" ? "gemini-3.8-flash (google)" : "google/gemini-2.5-flash (lovable)";
 
     if (!result) {
       const status = lastStatus === 429 || lastStatus === 402 ? lastStatus : 500;
