@@ -216,11 +216,12 @@ export default function CAReviewQueuePage() {
     if (changed) {
       await supabase.from("ca_document_extractions").update({ was_corrected: true } as never).eq("id", active.id);
     }
-    const res = await postExtraction(active, selCat === "reference_document" ? [] : draft, selCat);
+    const res = await postExtraction(active, selCat === "reference_document" ? [] : draft, selCat, active.business_id);
     setBusy(false);
     if (!res.ok) {
-      if (res.alreadyPosted) { toast.error("Already posted"); void load(); return; }
-      return toast.error(res.error ?? "Could not post");
+      toast.error(res.error ?? "Posting failed. Nothing was saved.");
+      if (res.alreadyPosted) void load();
+      return;
     }
     const bid = active.business_id;
     const clientRowId = clients.find((c) => c.business_id === bid)?.id ?? null;

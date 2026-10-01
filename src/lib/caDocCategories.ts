@@ -2,6 +2,8 @@
  * Review Queue document categories — one source of truth for the category
  * select, the editable table columns, validation, and the posting target.
  */
+import { financialYearOf, fyQuarterOf } from "@/lib/istDate";
+
 export const DOC_CATEGORIES = [
   { value: "bank_statement", label: "Bank statement", target: "bank_transactions" },
   { value: "sales_invoice", label: "Sales invoice (outward)", target: "invoices" },
@@ -127,20 +129,28 @@ export function validateRows(category: DocCategory, rows: Record<string, unknown
   return errs;
 }
 
-/** Indian FY (April–March) and quarter for a YYYY-MM-DD date. */
+/** Indian FY (April–March) and quarter for a YYYY-MM-DD date — no timezone shifting. */
 export function fyQuarter(iso: string): { financial_year: string; quarter: string } {
-  const d = new Date(iso);
-  const m = d.getUTCMonth() + 1;
-  const y = d.getUTCFullYear();
-  const start = m >= 4 ? y : y - 1;
-  const quarter = m >= 4 && m <= 6 ? "Q1" : m >= 7 && m <= 9 ? "Q2" : m >= 10 ? "Q3" : "Q4";
-  return { financial_year: `${start}-${String((start + 1) % 100).padStart(2, "0")}`, quarter };
+  return { financial_year: financialYearOf(iso), quarter: fyQuarterOf(iso) };
 }
 
-/** "MMM YYYY", matching the ITC recon period label. */
+/** "Mon YYYY", matching the ITC recon period label (and the database posting function). */
 export function filingPeriod(iso: string): string {
-  const d = new Date(iso);
-  return new Date(d.getUTCFullYear(), d.getUTCMonth(), 1).toLocaleString("en-IN", { month: "short", year: "numeric" });
+  const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(iso.slice(5, 7)) - 1];
+  return `${m} ${iso.slice(0, 4)}`;
+}
+
+/**
+ * Which document categories answer a request type. Mirror of the SQL function
+ * public.ca_request_type_categories — keep both in step.
+ */
+export function requestTypeCategories(type: string | null | undefined): DocCategory[] {
+  const t = String(type ?? "").toLowerCase();
+  if (t === "bank" || t.includes("bank")) return ["bank_statement"];
+  if (t === "invoice" || t === "sales_invoice" || t.includes("sales")) return ["sales_invoice"];
+  if (["expense", "purchase_invoice", "expense_receipt"].includes(t) || t.includes("purchase") || t.includes("expense") || t.includes("bill")) return ["purchase_invoice", "expense_receipt"];
+  if (["challan", "tds", "tds_record"].includes(t) || t.includes("tds") || t.includes("challan")) return ["tds_record"];
+  return DOC_CATEGORIES.map((d) => d.value);
 }
 
 export function postedLabel(postedRef: string | null | undefined): string | null {

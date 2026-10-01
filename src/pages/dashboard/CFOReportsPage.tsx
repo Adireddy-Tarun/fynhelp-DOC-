@@ -32,6 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { todayIST } from "@/lib/istDate";
 
 const CFOReportsPage = () => {
   const navigate = useNavigate();
@@ -40,13 +41,13 @@ const CFOReportsPage = () => {
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [briefDate, setBriefDate] = useState(
-    () => new Date().toISOString().slice(0, 10)
+    () => todayIST()
   );
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const resetForm = () => {
-    setBriefDate(new Date().toISOString().slice(0, 10));
+    setBriefDate(todayIST());
     setContent("");
   };
 

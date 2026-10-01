@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logCAAudit } from "@/lib/caAudit";
 import { CA, CACard, CAButton, caInputStyle } from "@/components/ca/portalUi";
+import { todayIST } from "@/lib/istDate";
 
 interface Factor {
   id: string;
@@ -48,7 +49,7 @@ export default function CATwoFactorCard({ firmId, canManageFirm }: { firmId: str
     setBusy(true);
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `FynHelp CA ${new Date().toISOString().slice(0, 10)}`,
+      friendlyName: `FynHelp CA ${todayIST()}`,
     });
     setBusy(false);
     if (error) return toast.error(error.message);

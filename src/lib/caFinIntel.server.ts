@@ -3,6 +3,7 @@
  * No Supabase calls here — the chart-of-accounts template and the data
  * quality engine are deterministic functions over real client rows.
  */
+import { toISTDate } from "@/lib/istDate";
 
 export interface CoaSeed {
   code: string;
@@ -235,5 +236,5 @@ export const periodBounds = (period: string): { start: string; end: string } => 
   const [y, m] = period.split("-").map(Number);
   const start = new Date(Date.UTC(y, (m ?? 1) - 1, 1));
   const end = new Date(Date.UTC(y, m ?? 1, 0));
-  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+  return { start: toISTDate(start), end: toISTDate(end) };
 };

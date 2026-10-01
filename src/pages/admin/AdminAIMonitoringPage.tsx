@@ -7,6 +7,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { toISTDate } from "@/lib/istDate";
 
 type Log = {
   id: string; user_id: string | null; business_id: string | null;
@@ -46,7 +47,7 @@ export default function AdminAIMonitoringPage() {
   const dailyData = useMemo(() => {
     const byDay: Record<string, { queries: number; cost: number }> = {};
     for (let i = 29; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      const d = toISTDate(new Date(Date.now() - i * 86400000));
       byDay[d] = { queries: 0, cost: 0 };
     }
     for (const l of logs) {

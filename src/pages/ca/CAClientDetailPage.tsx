@@ -26,6 +26,7 @@ import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
 } from "@/components/ca/portalUi";
+import { isOverdue as isPastDue, toISTDate, todayIST } from "@/lib/istDate";
 
 interface Client {
   id: string;
@@ -98,7 +99,7 @@ export default function CAClientDetailPage() {
     setHideDemoState(v);
     try { window.localStorage.setItem("hide_seed_transactions", v ? "1" : "0"); } catch { /* restricted browser */ }
   };
-  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const todayIso = () => todayIST();
   const monthStartIso = () => `${todayIso().slice(0, 7)}-01`;
   const [groupStart, setGroupStart] = useState(monthStartIso);
   const [groupEnd, setGroupEnd] = useState(todayIso);
@@ -236,7 +237,7 @@ export default function CAClientDetailPage() {
 
   useEffect(() => {
     if (!businessId || !firmId) return;
-    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    const in3Days = toISTDate(new Date(Date.now() + 3 * 86400000));
     let cancelled = false;
     (async () => {
       try {
@@ -252,7 +253,7 @@ export default function CAClientDetailPage() {
 
         if (topException && topException.amount > 10000) {
           setClientNba({ action: `Resolve exception — ₹${Math.round(topException.amount).toLocaleString("en-IN")} at risk`, path: "/ca/exceptions", tone: "#A93838" });
-        } else if (nextCompliance && new Date(nextCompliance.due_date) < new Date()) {
+        } else if (nextCompliance && isPastDue(nextCompliance.due_date)) {
           setClientNba({ action: `File overdue ${nextCompliance.event_type} — was due ${nextCompliance.due_date}`, path: `/ca/clients/${clientId}`, tone: "#A93838" });
         } else if (!hasTxns) {
           setClientNba({ action: "No bank transactions this period — upload a bank statement", path: "/ca/intake/inbox", tone: "#8B6914" });
@@ -465,8 +466,8 @@ export default function CAClientDetailPage() {
     if (!businessId || !firmId) return;
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const period_start = start.toISOString().slice(0, 10);
-    const period_end = now.toISOString().slice(0, 10);
+    const period_start = toISTDate(start);
+    const period_end = toISTDate(now);
 
     setGenerating(true);
     const loadingId = toast.loading("Generating PDF report...");
@@ -657,7 +658,7 @@ export default function CAClientDetailPage() {
 
   const groupedCompliance = useMemo(() => {
     const now = new Date();
-    const isOverdue = (e: any) => e.status !== "filed" && e.due_date && new Date(e.due_date) < now;
+    const isOverdue = (e: any) => e.status !== "filed" && e.due_date && isPastDue(e.due_date);
     return [
       ...compliance.filter(isOverdue),
       ...compliance.filter((e) => e.status !== "filed" && !isOverdue(e)),
@@ -1087,7 +1088,7 @@ export default function CAClientDetailPage() {
                   </tr></thead>
                   <tbody>
                     {groupedCompliance.map((e) => {
-                      const overdue = e.status !== "filed" && e.due_date && new Date(e.due_date) < new Date();
+                      const overdue = e.status !== "filed" && e.due_date && isPastDue(e.due_date);
                       return (
                         <tr key={e.id}>
                           <td style={caTd}>{e.event_type ?? "—"}</td>

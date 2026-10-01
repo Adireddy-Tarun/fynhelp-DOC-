@@ -8,6 +8,7 @@ import { CA, CACard, CAButton, caInputStyle, dateIN } from "@/components/ca/port
 import { ModuleHeader, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { DOC_CLASS_LABELS, type CADocClass } from "@/lib/caIntake";
 import { logCAAudit } from "@/lib/caAudit";
+import { isOverdue as isPastDue } from "@/lib/istDate";
 
 interface RequestRow {
   id: string;
@@ -111,7 +112,7 @@ export default function CADocumentRequestsPage() {
   };
 
   const openCount = rows.filter((r) => r.status === "open").length;
-  const overdue = rows.filter((r) => r.status === "open" && r.due_date && new Date(r.due_date) < new Date()).length;
+  const overdue = rows.filter((r) => r.status === "open" && r.due_date && isPastDue(r.due_date)).length;
 
   return (
     <div>

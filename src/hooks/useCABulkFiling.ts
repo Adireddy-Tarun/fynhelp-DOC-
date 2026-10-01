@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { track } from "@/lib/analytics";
+import { todayIST } from "@/lib/istDate";
 
 export interface BulkFilingJob {
   job_id: string;
@@ -57,7 +58,7 @@ export function useCABulkFiling() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${job.filing_type}_${job.filing_period.replace(/\s/g, "_")}_${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `${job.filing_type}_${job.filing_period.replace(/\s/g, "_")}_${todayIST()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -3,6 +3,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rejectDisallowedOrigin, rejectOversizedBody } from "../_shared/cors.ts";
 import { checkAiQuota, quotaExceededResponse, logAiUsage, estimateTokens } from "../_shared/ai-metering.ts";
+import { todayIST } from "../_shared/istDate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,7 +32,7 @@ async function buildContext(client: ReturnType<typeof createClient>) {
     return { error: "no_business", summary: "User has no business linked yet." };
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIST();
   const ninetyAgo = new Date(Date.now() - 90 * 86400000)
     .toISOString()
     .slice(0, 10);

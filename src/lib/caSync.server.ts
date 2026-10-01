@@ -7,6 +7,7 @@
  *   close the job + write a ca_audit_events row.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { toISTDate } from "@/lib/istDate";
 
 export interface SyncResult {
   success: boolean;
@@ -298,7 +299,7 @@ export async function runRazorpaySync(
 
     const rows: CanonicalTxn[] = usable.map((p) => ({
       business_id: businessId,
-      date: new Date(Number(p.created_at ?? 0) * 1000).toISOString().slice(0, 10),
+      date: toISTDate(new Date(Number(p.created_at ?? 0) * 1000)),
       description: String(p.description ?? `Razorpay payment ${p.id}`).slice(0, 300),
       amount: Number(p.amount ?? 0) / 100,
       type: "credit" as const,

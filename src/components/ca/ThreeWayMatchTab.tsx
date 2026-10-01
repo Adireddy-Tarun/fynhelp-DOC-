@@ -5,6 +5,7 @@ import { logReconRun } from "@/lib/caReconRuns";
 import {
   CA, CACard, CABadge, CAButton, CAEmpty, caTh, caTd, caNum, inr, dateIN,
 } from "@/components/ca/portalUi";
+import { currentPeriodIST, toISTDate, todayIST } from "@/lib/istDate";
 
 type Status = "fully_matched" | "timing_gap" | "invoice_only" | "bank_only";
 
@@ -55,7 +56,7 @@ function isoDate(v: unknown): string | null {
   let d = new Date(s);
   const dmy = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
   if (dmy) d = new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
-  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+  return Number.isNaN(d.getTime()) ? null : toISTDate(d);
 }
 
 export default function ThreeWayMatchTab({ firmId, businessId, periodStart, periodEnd }: { firmId: string | null; businessId: string | null; periodStart?: string; periodEnd?: string }) {
@@ -83,7 +84,7 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
         .eq("business_id", businessId)
         .eq("type", "credit")
         .gte("date", periodStart ?? "2000-01-01")
-        .lte("date", periodEnd ?? new Date().toISOString().slice(0, 10))
+        .lte("date", periodEnd ?? todayIST())
         .order("date", { ascending: false })
         .limit(1000),
     ]);
@@ -168,7 +169,7 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
       firmId,
       businessId,
       reconType: "three_way",
-      period: new Date().toISOString().slice(0, 7),
+      period: currentPeriodIST(),
       totalItems: out.length,
       matched: matched.length,
       mismatched: timing.length,
@@ -209,7 +210,7 @@ export default function ThreeWayMatchTab({ firmId, businessId, periodStart, peri
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `three-way-match-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `three-way-match-${todayIST()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

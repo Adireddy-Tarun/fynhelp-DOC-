@@ -11,6 +11,7 @@ import { CAOnboardingBanner } from "@/components/ca/CAOnboardingBanner";
 
 import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
 import { isCloseReady } from "@/lib/caClose";
+import { isOverdue as isPastDue, toISTDate, todayIST } from "@/lib/istDate";
 
 interface ClientRow {
   id: string;
@@ -51,7 +52,7 @@ interface FirmBrain {
   brain_last_run_at: string | null;
 }
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const todayISO = () => todayIST();
 
 function workStatus(c: Enriched): { label: string; tone: "red" | "amber" | "grey" | "green" } {
   if (c.health_status === "critical") return { label: "Exception open", tone: "red" };
@@ -83,7 +84,7 @@ export default function CADashboardPage() {
 
   useEffect(() => {
     if (!clients.length || !firmId) return;
-    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    const in3Days = toISTDate(new Date(Date.now() + 3 * 86400000));
     let cancelled = false;
 
     const compute = async () => {
@@ -127,7 +128,7 @@ export default function CADashboardPage() {
         const txnRes = await supabase
           .from("bank_transactions").select("business_id, date")
           .in("business_id", businessIds)
-          .gte("date", new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10))
+          .gte("date", toISTDate(new Date(Date.now() - 30 * 86400000)))
           .limit(500);
         for (const t of (txnRes.data ?? []) as { business_id: string }[]) recentTxns.add(t.business_id);
       } catch { /* silent */ }
@@ -148,8 +149,8 @@ export default function CADashboardPage() {
         const topException = exceptions
           .filter((e) => e.business_id === bid)
           .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))[0];
-        const overdueCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) < now);
-        const upcomingCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) >= now);
+        const overdueCompliance = compliance.filter((e) => e.business_id === bid && isPastDue(e.due_date));
+        const upcomingCompliance = compliance.filter((e) => e.business_id === bid && !isPastDue(e.due_date));
 
         if (pendingVerification.has(bid)) {
           map[c.id] = { action: "Confirm Gmail document before ledger posting", path: "/ca/intake/inbox", tone: "red" };
@@ -349,7 +350,7 @@ export default function CADashboardPage() {
         return;
       }
       const today = todayISO();
-      const week = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+      const week = toISTDate(new Date(Date.now() + 7 * 86400000));
 
       const { count: overdue } = await supabase
         .from("ca_compliance_events")

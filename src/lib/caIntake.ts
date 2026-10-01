@@ -9,7 +9,7 @@ import { validateUpload } from "@/lib/uploadPolicy";
 import { logCAAudit } from "@/lib/caAudit";
 import { normaliseAmount, detectAmountPattern, logParsePattern } from "@/lib/bankAmount";
 import {
-  DOC_CATEGORIES, fyQuarter, filingPeriod, mapClassification, normaliseRows, toNum, validateRows, type DocCategory,
+  DOC_CATEGORIES, normaliseRows, type DocCategory,
 } from "@/lib/caDocCategories";
 
 export type CADocClass = "bank" | "invoice" | "expense" | "challan" | "other";
@@ -370,50 +370,11 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
     detail: { classification, confidence, rows: rows.length, review_state: reviewState, filename: file.name },
   });
 
-  // Auto-resolve any open document chaser for this client when a document arrives.
-  // Chasers live in ca_document_requests; this whole block is non-blocking.
-  try {
-    const { data: pendingChasers } = await supabase
-      .from("ca_document_requests")
-      .select("id, title")
-      .eq("ca_firm_id", firmId)
-      .eq("business_id", businessId)
-      .in("status", ["pending", "sent", "chased", "escalated"])
-      .limit(5);
-    if (pendingChasers && pendingChasers.length > 0) {
-      const nowIso = new Date().toISOString();
-      await supabase
-        .from("ca_document_requests")
-        .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso })
-        .eq("ca_firm_id", firmId)
-        .eq("business_id", businessId)
-        .in("status", ["pending", "sent", "chased", "escalated"]);
-
-      console.log(`[fyn:chaser] auto-resolved ${pendingChasers.length} chasers for ${businessId}`);
-
-      await supabase.from("ca_brain_events").insert({
-        ca_firm_id: firmId,
-        business_id: businessId,
-        event_type: "chaser_auto_resolved",
-        payload: {
-          resolved_count: pendingChasers.length,
-          trigger: "document_upload",
-          filename: file.name,
-          classification,
-        },
-      });
-
-      await supabase.from("ca_notifications").insert({
-        ca_firm_id: firmId,
-        business_id: businessId,
-        type: "chaser_resolved",
-        title: "Client responded",
-        message: `${file.name} was uploaded — ${pendingChasers.length} pending chaser${pendingChasers.length > 1 ? "s" : ""} auto-resolved`,
-        is_read: false,
-      });
-    }
-  } catch { /* non-blocking — chaser resolution must never block the intake pipeline */ }
-
+  // Mark matching open requests (same type and period) as received. Closed only on posting.
+  if (businessId) {
+    const { error: mErr } = await supabase.rpc("ca_mark_document_received", { p_extraction_id: extraction.id });
+    if (mErr) console.warn(`[fyn:chaser] received match failed for ${extraction.id}`);
+  }
 
   return {
     ok: true,
@@ -428,179 +389,58 @@ export async function intakeDocument(input: IntakeInput): Promise<IntakeResult> 
 }
 
 
-function isoDate(v: unknown): string {
-  const s = String(v ?? "").trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  const d = new Date(s);
-  return Number.isNaN(d.getTime()) ? new Date().toISOString().slice(0, 10) : d.toISOString().slice(0, 10);
-}
-
 export interface PostResult {
   ok: boolean;
   error?: string;
   posted?: number;
   table?: string;
   alreadyPosted?: boolean;
+  reviewState?: string;
+}
+
+/** Turn a database posting error into plain text. Nothing is saved when this runs. */
+export function postErrorMessage(raw: string | undefined | null): string {
+  const m = String(raw ?? "");
+  if (m.includes("already_posted")) return "This document was already posted";
+  const lock = m.match(/period_locked:(\d{4}-\d{2})/);
+  if (lock) return `Period ${lock[1]} is closed. Reopen it before posting`;
+  const row = m.match(/invalid_row:(\d+):([a-z_]+)/);
+  if (row) return `Row ${row[1]}: check the ${row[2].replace(/_/g, " ")} field`;
+  if (m.includes("forbidden")) return "You do not have access to post for this client";
+  if (m.includes("client_not_in_firm")) return "This client does not belong to your firm";
+  if (m.includes("no_rows")) return "Nothing to post — no rows in this extraction.";
+  return "Posting failed. Nothing was saved.";
 }
 
 /**
- * Post a reviewed extraction to the table that matches its category.
- * Guards against double posting, rolls back partial inserts, and stamps
- * every row with source_document_id = extraction.id.
+ * Post a reviewed extraction through the database function ca_post_extraction.
+ * The database validates, inserts every row and marks the document posted in one
+ * transaction — all or nothing.
  */
 export async function postExtraction(
   extraction: CAExtraction,
-  rowsInput?: ExtractionRow[],
-  categoryInput?: DocCategory,
+  rowsInput: ExtractionRow[] | undefined,
+  category: DocCategory,
+  businessId?: string | null,
 ): Promise<PostResult> {
-  // Re-read: double post guard and latest assignment.
-  const { data: fresh, error: readErr } = await supabase
-    .from("ca_document_extractions")
-    .select("*")
-    .eq("id", extraction.id)
-    .maybeSingle();
-  if (readErr || !fresh) return { ok: false, error: readErr?.message ?? "Document not found" };
-  const ex = fresh as unknown as CAExtraction & { source_type?: string | null; extracted: { rows?: ExtractionRow[]; summary?: string } | null };
-  if (ex.posted_at) {
-    console.log(`[fyn:review] double post blocked for ${ex.id}`);
-    return { ok: false, alreadyPosted: true, error: "Already posted" };
-  }
-  const businessId = ex.business_id;
-  if (!businessId) return { ok: false, error: "Assign a client before posting." };
-
-  const category = categoryInput ?? mapClassification(ex.classification);
-  const raw = rowsInput ?? ex.corrected?.rows ?? ex.extracted?.rows ?? [];
-  const rows = normaliseRows(category, raw as Record<string, unknown>[]);
-  if (category !== "reference_document") {
-    if (!rows.length) return { ok: false, error: "Nothing to post — no rows in this extraction." };
-    const errs = validateRows(category, rows);
-    if (errs.length) return { ok: false, error: errs[0] };
-  }
-
-  const srcType = ex.source_type === "gmail" || ex.source_type === "whatsapp" ? ex.source_type : "upload";
-  const srcId = ex.id;
-  const firmId = ex.ca_firm_id;
-  const s = (v: unknown) => (v === null || v === undefined || String(v).trim() === "" ? null : String(v).trim());
-  const inserted: Record<string, string[]> = {};
-
-  const rollback = async () => {
-    const tables = Object.keys(inserted) as ("bank_transactions" | "invoices" | "expenses" | "ca_itc_records" | "ca_tds_records")[];
-    for (const t of tables) await supabase.from(t).delete().eq("source_document_id", srcId);
-  };
-
-  const insert = async (table: "bank_transactions" | "invoices" | "expenses" | "ca_itc_records" | "ca_tds_records", payload: Record<string, unknown>[]) => {
-    const { data, error } = await supabase.from(table).insert(payload as never).select("id");
-    if (error) throw new Error(error.message);
-    inserted[table] = ((data ?? []) as { id: string }[]).map((d) => d.id);
-    console.log(`[fyn:review] posted ${inserted[table].length} rows to ${table} for ${srcId}`);
-  };
-
-  try {
-    if (category === "bank_statement") {
-      await insert("bank_transactions", rows.map((r) => ({
-        business_id: businessId, date: isoDate(r.date), description: String(r.description ?? "").slice(0, 500),
-        amount: Math.abs(toNum(r.amount)), type: String(r.type).toLowerCase() === "credit" ? "credit" : "debit",
-        balance: s(r.balance) ? toNum(r.balance) : null, category: "uncategorized", reconciled: false,
-        source_document_id: srcId, source_type: srcType, source_reference: ex.original_filename,
-      })));
-    } else if (category === "sales_invoice") {
-      await insert("invoices", rows.map((r) => {
-        const tax = toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst);
-        const total = toNum(r.total_amount);
-        return {
-          business_id: businessId, invoice_number: String(r.invoice_number), invoice_date: isoDate(r.invoice_date),
-          due_date: s(r.due_date), customer_name: s(r.customer_name), customer_gstin: s(r.customer_gstin)?.toUpperCase() ?? null,
-          subtotal: toNum(r.taxable_value), tax_amount: tax, total_amount: total, paid_amount: 0, outstanding_amount: total,
-          status: "unpaid", source_document_id: srcId, source_type: srcType,
-        };
-      }));
-    } else if (category === "purchase_invoice") {
-      await insert("expenses", rows.map((r) => ({
-        business_id: businessId, vendor_name: s(r.vendor_name), vendor_gstin: s(r.vendor_gstin)?.toUpperCase() ?? null,
-        invoice_number: s(r.invoice_number), date: isoDate(r.invoice_date), due_date: s(r.due_date),
-        amount: toNum(r.total_amount), tax_amount: toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst), category: "purchase",
-        description: `Purchase bill ${r.invoice_number ?? ""} from ${r.vendor_name ?? ""}`.trim(), payment_status: "unpaid",
-        source_document_id: srcId, source_type: srcType,
-      })));
-      await insert("ca_itc_records", rows.map((r) => {
-        const d = isoDate(r.invoice_date);
-        return {
-          ca_firm_id: firmId, business_id: businessId, filing_period: filingPeriod(d),
-          gstin_supplier: s(r.vendor_gstin)?.toUpperCase() ?? null, supplier_name: s(r.vendor_name), invoice_number: s(r.invoice_number),
-          invoice_date: d, taxable_value: toNum(r.taxable_value), igst_amount: toNum(r.igst), cgst_amount: toNum(r.cgst),
-          sgst_amount: toNum(r.sgst), total_itc: toNum(r.cgst) + toNum(r.sgst) + toNum(r.igst), gstr2b_matched: false,
-          match_status: "pending", itc_eligible: true, itc_blocked: false, source: "document", source_document_id: srcId,
-        };
-      }));
-    } else if (category === "expense_receipt") {
-      await insert("expenses", rows.map((r) => ({
-        business_id: businessId, vendor_name: s(r.vendor_name), date: isoDate(r.date), amount: toNum(r.amount),
-        description: String(r.description ?? r.vendor_name ?? ""), category: "expense", payment_status: "paid",
-        source_document_id: srcId, source_type: srcType,
-      })));
-    } else if (category === "tds_record") {
-      await insert("ca_tds_records", rows.map((r) => {
-        const pd = isoDate(r.payment_date);
-        const challan = s(r.challan_number);
-        return {
-          ca_firm_id: firmId, business_id: businessId, ...fyQuarter(pd), section_code: String(r.section_code),
-          deductee_name: s(r.deductee_name), deductee_pan: s(r.deductee_pan)?.toUpperCase() ?? null, payment_date: pd,
-          payment_amount: toNum(r.payment_amount), tds_rate: toNum(r.tds_rate), tds_amount: toNum(r.tds_amount),
-          deposited_amount: challan ? toNum(r.tds_amount) : 0, challan_number: challan, challan_date: s(r.challan_date),
-          return_filed: false, status: challan ? "deposited" : "pending", source_document_id: srcId,
-        };
-      }));
-    } else {
-      inserted.vault = [];
-    }
-  } catch (e) {
-    await rollback();
-    return { ok: false, error: e instanceof Error ? e.message : "Posting failed" };
-  }
-
-  const { data: auth } = await supabase.auth.getUser();
-  const nowIso = new Date().toISOString();
-  const { data: upd, error: updErr } = await supabase
-    .from("ca_document_extractions")
-    .update({
-      review_state: category === "reference_document" ? "archived" : "posted",
-      classification: category,
-      ...(rowsInput ? { corrected: { ...(ex.corrected ?? {}), rows } as never } : {}),
-      posted_at: nowIso,
-      posted_ref: JSON.stringify(inserted),
-      reviewed_by: auth.user?.id ?? null,
-      reviewed_at: nowIso,
-    } as never)
-    .eq("id", srcId)
-    .is("posted_at", null)
-    .select("id");
-  if (updErr || !upd?.length) {
-    await rollback();
-    if (!updErr) console.log(`[fyn:review] double post blocked for ${srcId}`);
-    return { ok: false, alreadyPosted: !updErr, error: updErr?.message ?? "Already posted" };
-  }
-
-  const count = Object.values(inserted).reduce((n, ids) => n + ids.length, 0);
-  const target = DOC_CATEGORIES.find((d) => d.value === category)?.target ?? "";
-  void supabase.from("ca_brain_events").insert({
-    ca_firm_id: firmId, business_id: businessId, event_type: "document_posted",
-    payload: { category, rows: count, target },
-  } as never).then(() => undefined);
-  void supabase
-    .from("ca_document_requests")
-    .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso } as never)
-    .eq("ca_firm_id", firmId)
-    .eq("business_id", businessId)
-    .in("status", ["pending", "sent", "reminded"])
-    .then(() => undefined);
-
-  await logCAAudit({
-    firmId, businessId, entityType: "document_extraction", entityId: srcId,
-    action: category === "reference_document" ? "filed_to_vault" : "posted_to_ledger",
-    sourceDocumentId: ex.document_id, detail: { category, rows: count, target },
+  const bid = businessId ?? extraction.business_id;
+  if (!bid) return { ok: false, error: "Assign a client before posting." };
+  const raw = rowsInput ?? extraction.corrected?.rows ?? extraction.extracted?.rows ?? [];
+  const rows = category === "reference_document" ? [] : normaliseRows(category, raw as Record<string, unknown>[]);
+  const { data, error } = await supabase.rpc("ca_post_extraction", {
+    p_extraction_id: extraction.id,
+    p_category: category,
+    p_business_id: bid,
+    p_rows: rows as never,
   });
-
-  return { ok: true, posted: count, table: target };
+  if (error) {
+    if (error.message.includes("already_posted")) console.log(`[fyn:review] double post blocked for ${extraction.id}`);
+    return { ok: false, alreadyPosted: error.message.includes("already_posted"), error: postErrorMessage(error.message) };
+  }
+  const res = (data ?? {}) as { row_count?: number; review_state?: string };
+  const target = DOC_CATEGORIES.find((d) => d.value === category)?.target ?? "";
+  console.log(`[fyn:review] posted ${res.row_count ?? 0} rows to ${target} for ${extraction.id}`);
+  return { ok: true, posted: res.row_count ?? 0, table: target, reviewState: res.review_state };
 }
 
 export async function rejectExtraction(extraction: CAExtraction, reason: string) {

@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { todayIST } from "../_shared/istDate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -70,7 +71,7 @@ Deno.serve(async (req) => {
     }
 
     const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
+    const todayStr = todayIST();
 
     const [gstRes, tdsRes] = await Promise.all([
       supabase.from("gst_filings").select("*").eq("business_id", businessId).order("due_date", { ascending: false }).limit(48),

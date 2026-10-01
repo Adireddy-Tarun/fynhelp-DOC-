@@ -163,21 +163,10 @@ export const Route = createFileRoute("/api/public/ca-whatsapp-webhook")({
 
             await supabaseAdmin.from("ca_whatsapp_connections").update({ last_received_at: new Date().toISOString(), error_message: null }).eq("id", conn.id);
 
-            if (match.businessId && reviewState !== "pending_verification") {
-              const nowIso = new Date().toISOString();
-              const { data: open } = await supabaseAdmin
-                .from("ca_document_requests")
-                .select("id")
-                .eq("ca_firm_id", caFirmId)
-                .eq("business_id", match.businessId)
-                .in("status", ["open", "pending", "sent", "chased", "escalated"])
-                .limit(20);
-              if (open && open.length > 0) {
-                await supabaseAdmin
-                  .from("ca_document_requests")
-                  .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso } as never)
-                  .in("id", open.map((o: any) => o.id));
-              }
+            const newId = (extraction as { id?: string } | null)?.id;
+            if (match.businessId && newId && reviewState !== "pending_verification") {
+              const { error: mErr } = await supabaseAdmin.rpc("ca_match_document_requests", { p_extraction_id: newId, p_mode: "received" });
+              if (mErr) console.warn(`[fyn:whatsapp] request match failed: ${mErr.message}`);
             }
 
             await supabaseAdmin.from("ca_brain_events").insert({

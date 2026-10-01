@@ -17,6 +17,7 @@ import {
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
 import { Plus, Trash2, X } from "lucide-react";
+import { isOverdue as isPastDue, toISTDate } from "@/lib/istDate";
 
 interface LineItem { description: string; amount: number }
 
@@ -59,7 +60,7 @@ const emptyDraft = () => ({
   engagement_id: "",
   period: monthKey(),
   gst_rate: 18,
-  due_date: new Date(Date.now() + 15 * 86400000).toISOString().slice(0, 10),
+  due_date: toISTDate(new Date(Date.now() + 15 * 86400000)),
   items: [{ description: "", amount: "" }] as { description: string; amount: string }[],
 });
 
@@ -121,7 +122,7 @@ export default function CABillingPage() {
     const collected = rows.filter((r) => r.status === "paid").reduce((s, r) => s + Number(r.total || 0), 0);
     const outstanding = rows.filter((r) => r.status === "sent").reduce((s, r) => s + Number(r.total || 0), 0);
     const overdue = rows
-      .filter((r) => r.status === "sent" && r.due_date && new Date(r.due_date) < now)
+      .filter((r) => r.status === "sent" && r.due_date && isPastDue(r.due_date))
       .reduce((s, r) => s + Number(r.total || 0), 0);
     return { billed, collected, outstanding, overdue };
   }, [rows]);
@@ -313,7 +314,7 @@ export default function CABillingPage() {
                     <td style={caNum}>{inr(r.total)}</td>
                     <td style={caTd}>{dateIN(r.due_date)}</td>
                     <td style={caTd}>
-                      {r.status === "sent" && r.due_date && new Date(r.due_date) < new Date() ? (
+                      {r.status === "sent" && r.due_date && isPastDue(r.due_date) ? (
                         <CABadge tone="red">overdue</CABadge>
                       ) : (
                         <CABadge tone={statusTone(r.status)}>{r.status}</CABadge>

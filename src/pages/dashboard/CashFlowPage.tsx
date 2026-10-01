@@ -7,6 +7,7 @@ import { formatINR } from "@/lib/indian-format";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { toISTDate } from "@/lib/istDate";
 
 type MonthlyFlow = { month: string; inflow: number; outflow: number; net: number };
 type Txn = {
@@ -55,7 +56,7 @@ const CashFlowPage = () => {
         .from("transactions")
         .select("amount, date, direction")
         .eq("business_id", businessId)
-        .gte("date", since.toISOString().split("T")[0])
+        .gte("date", toISTDate(since))
         .order("date", { ascending: true });
       if (!data) return [];
 
@@ -90,7 +91,7 @@ const CashFlowPage = () => {
         .from("transactions")
         .select("id, date, amount, direction, description, category, counterparty")
         .eq("business_id", businessId)
-        .gte("date", since.toISOString().split("T")[0])
+        .gte("date", toISTDate(since))
         .order("date", { ascending: false })
         .limit(50);
       return (data as Txn[]) || [];

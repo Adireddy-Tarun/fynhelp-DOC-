@@ -16,6 +16,7 @@ import { CA, CACard, CAButton, CABadge, CAField, caInputStyle, inr, dateIN } fro
 import { ModuleHeader, PermissionNotice, QueueTable, StateChip, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
 import { annualise } from "@/lib/caPractice";
+import { todayIST } from "@/lib/istDate";
 
 interface EngagementRow {
   id: string;
@@ -65,7 +66,7 @@ const emptyDraft = {
   engagement_type: "bookkeeping",
   fee_amount: "",
   billing_cycle: "monthly",
-  start_date: new Date().toISOString().slice(0, 10),
+  start_date: todayIST(),
   end_date: "",
   partner_id: "",
   manager_id: "",

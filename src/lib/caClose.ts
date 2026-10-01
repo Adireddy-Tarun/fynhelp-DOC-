@@ -8,6 +8,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { logCAAudit } from "@/lib/caAudit";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 export interface CloseCheck {
   key: string;
@@ -39,10 +40,10 @@ export interface CloseReadiness {
  */
 export async function isCloseReady(firmId: string, businessId: string): Promise<boolean> {
   const head = { count: "exact" as const, head: true };
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIST();
   const monthStart = new Date();
   monthStart.setDate(1);
-  const from = monthStart.toISOString().slice(0, 10);
+  const from = toISTDate(monthStart);
 
   const [overdue, bankLines, itcMatched, mis] = await Promise.all([
     supabase.from("ca_compliance_events").select("id", head).eq("business_id", businessId).neq("status", "filed").lt("due_date", today),
@@ -64,7 +65,7 @@ export function periodRange(period: string): { from: string; to: string } {
   const [y, m] = period.split("-").map(Number);
   const from = new Date(Date.UTC(y, m - 1, 1));
   const to = new Date(Date.UTC(y, m, 0));
-  return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+  return { from: toISTDate(from), to: toISTDate(to) };
 }
 
 export function periodLabel(period: string): string {

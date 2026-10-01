@@ -43,6 +43,20 @@
       "when": 1790694438956,
       "tag": "0005_metrics_nullable_waitlist_lower_email",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790853494044,
+      "tag": "0006_stage0_transactional_posting_ist_request_matching",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790853525799,
+      "tag": "0007_fix_ca_try_date",
+      "breakpoints": true
     }
   ]
 }

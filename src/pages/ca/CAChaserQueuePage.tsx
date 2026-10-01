@@ -13,6 +13,7 @@ import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/pr
 import { logCAAudit } from "@/lib/caAudit";
 import { useFirmClientIntelligence, DOW } from "@/hooks/useCAIntelligence";
 import { signalBrain } from "@/lib/caBrainSignals";
+import { todayIST } from "@/lib/istDate";
 
 interface RequestRow {
   id: string;
@@ -88,13 +89,13 @@ export default function CAChaserQueuePage() {
       return;
     }
     setLoading(true);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayIST();
     const [{ data: reqs, error }, { data: cls }] = await Promise.all([
       supabase
         .from("ca_document_requests")
         .select("id, business_id, title, period, doc_types, due_date, status, last_chased_at, chaser_count")
         .eq("ca_firm_id", firmId)
-        .neq("status", "fulfilled")
+        .not("status", "in", "(fulfilled,resolved,cancelled,closed)")
         .lt("due_date", today)
         .order("due_date", { ascending: true }),
       supabase.from("ca_clients").select("business_id, client_name, client_email, client_phone").eq("ca_firm_id", firmId),
@@ -365,7 +366,14 @@ export default function CAChaserQueuePage() {
                         />
                       </td>
                       <td style={{ ...caTd, fontWeight: 600 }}>{c?.client_name ?? "Unknown client"}</td>
-                      <td style={caTd}>{r.title}</td>
+                      <td style={caTd}>
+                        {r.title}
+                        {r.status === "received" && (
+                          <a href={`/ca/intake/review?client=${r.business_id}`} style={{ display: "inline-block", marginLeft: 8, padding: "2px 8px", borderRadius: 999, fontSize: 11, fontWeight: 600, color: CA.ink, border: `1px solid ${CA.line}`, textDecoration: "none" }}>
+                            Received, awaiting review
+                          </a>
+                        )}
+                      </td>
                       <td style={caTd}>{r.period ?? "—"}</td>
                       <td style={{ ...caTd, color: CA.muted }}>{r.doc_types?.length ? r.doc_types.join(", ") : "—"}</td>
                       <td style={caTd}>{dateIN(r.due_date)}</td>

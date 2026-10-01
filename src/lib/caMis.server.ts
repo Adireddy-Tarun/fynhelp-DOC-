@@ -3,6 +3,7 @@
  * Kept server-side and free of Supabase calls so the maths can be reasoned
  * about (and tested) on its own.
  */
+import { toISTDate } from "@/lib/istDate";
 
 export interface MisExtraction {
   classification: string | null;
@@ -62,7 +63,7 @@ export function inRange(row: MisExtraction, start: string, end: string): boolean
   if (!raw) return false;
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return raw >= start && raw <= end;
-  const iso = d.toISOString().slice(0, 10);
+  const iso = toISTDate(d);
   return iso >= start && iso <= end;
 }
 

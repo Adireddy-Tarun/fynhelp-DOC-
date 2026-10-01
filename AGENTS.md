@@ -1,0 +1,3 @@
+- Document posting goes only through the database functions ca_post_extraction (browser) / _ca_post_extraction_core (service role) — the database guarantees all-or-nothing writes and no double posting.
+- Request auto-resolution uses ca_match_document_requests (type + period match); arriving documents mark requests "received", posting marks them "fulfilled". Never bulk-update ca_document_requests by client.
+- Business dates (YYYY-MM-DD) use src/lib/istDate.ts / _shared/istDate.ts / ist_today() in India time; audit timestamps stay UTC.

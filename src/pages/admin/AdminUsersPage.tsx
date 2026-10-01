@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { logAdminAction } from "@/lib/adminAudit";
+import { todayIST } from "@/lib/istDate";
 
 const fmtINR = (n: number) =>
   n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : n >= 1000 ? `₹${(n / 1000).toFixed(1)}K` : `₹${n}`;
@@ -131,7 +132,7 @@ export default function AdminUsersPage() {
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `users-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    a.href = url; a.download = `users-${todayIST()}.csv`; a.click();
     URL.revokeObjectURL(url);
     toast.success(`Exported ${target.length} user${target.length === 1 ? "" : "s"}`);
   };

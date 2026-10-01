@@ -19,6 +19,7 @@ import {
   FynCard, FynPageTitle, FynBadge, FynLabel, FynSectionTitle,
 } from "@/components/dashboard/ui";
 import LiveCockpitPanel from "@/components/dashboard/LiveCockpitPanel";
+import { toISTDate } from "@/lib/istDate";
 
 const REFETCH_MS = 30000;
 
@@ -258,7 +259,7 @@ const CockpitPage = () => {
   const { data: transactions = [] } = useQuery({
     queryKey: ["transactions-180", businessId],
     queryFn: async () => {
-      const since = new Date(Date.now() - 180 * 86400000).toISOString().slice(0, 10);
+      const since = toISTDate(new Date(Date.now() - 180 * 86400000));
       const { data, error } = await supabase.from("transactions")
         .select("amount, direction, date").eq("business_id", businessId!)
         .gte("date", since).order("date", { ascending: true });

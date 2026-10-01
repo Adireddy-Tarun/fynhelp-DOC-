@@ -9,6 +9,7 @@
 import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { AgentKey } from "./agents";
+import { toISTDate } from "@/lib/istDate";
 
 export type Txn = { date: string; particulars: string; amount: number };
 
@@ -144,7 +145,7 @@ export type AgentRun = {
   target: string;
 };
 
-const iso = (daysAgo: number) => new Date(Date.now() - daysAgo * 864e5).toISOString().slice(0, 10);
+const iso = (daysAgo: number) => toISTDate(new Date(Date.now() - daysAgo * 864e5));
 const today = () => iso(0);
 const uid = () => (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 12));
 
@@ -181,7 +182,7 @@ function toDate(v: string): string | null {
     return `${yy}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
   }
   const parsed = Date.parse(s);
-  if (!Number.isNaN(parsed)) return new Date(parsed).toISOString().slice(0, 10);
+  if (!Number.isNaN(parsed)) return toISTDate(new Date(parsed));
   return null;
 }
 
@@ -641,18 +642,10 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
         ? `${name} read. ${rows.length} transactions extracted.`
         : `${name} received and sent to review.`, "extract");
 
-      // A document arriving closes an open request for that client.
-      const openChase = chases.find((c) => c.clientId === clientId && c.status !== "Resolved");
-      if (openChase) {
-        await sb.from("ca_document_requests").update({ status: "fulfilled", fulfilled_at: new Date().toISOString() }).eq("id", openChase.id);
-        await sb.from("ca_chaser_events").insert({
-          chaser_id: openChase.id, ca_firm_id: firmId.current, business_id: clientId,
-          event_type: "auto_resolved", note: `Document received (${name}). Chase closed automatically.`,
-        });
-        setChases((p) => p.map((c) => (c.id === openChase.id
-          ? { ...c, status: "Resolved", timeline: [...c.timeline, { at: today(), text: `Document received (${name}). Chase closed automatically.`, agent: "chaser" as AgentKey }] }
-          : c)));
-        log(clientId, `Chase closed automatically because ${name} arrived.`, "chaser");
+      // Mark open requests of the same type and period as received; they close when the document is posted.
+      if (data?.id) {
+        const { data: n } = await supabase.rpc("ca_mark_document_received", { p_extraction_id: data.id });
+        if (n) log(clientId, `${name} arrived — ${n} request${n === 1 ? "" : "s"} marked received.`, "chaser");
       }
     })();
   }, [startRun, log, chases]);
