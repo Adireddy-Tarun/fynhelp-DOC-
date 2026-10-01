@@ -2304,10 +2304,12 @@ export type Database = {
           due_date: string | null
           escalated_at: string | null
           fulfilled_at: string | null
+          fulfilled_by_document_id: string | null
           id: string
           last_chased_at: string | null
           notes: string | null
           period: string | null
+          received_at: string | null
           requested_by: string | null
           status: string
           title: string
@@ -2322,10 +2324,12 @@ export type Database = {
           due_date?: string | null
           escalated_at?: string | null
           fulfilled_at?: string | null
+          fulfilled_by_document_id?: string | null
           id?: string
           last_chased_at?: string | null
           notes?: string | null
           period?: string | null
+          received_at?: string | null
           requested_by?: string | null
           status?: string
           title: string
@@ -2340,10 +2344,12 @@ export type Database = {
           due_date?: string | null
           escalated_at?: string | null
           fulfilled_at?: string | null
+          fulfilled_by_document_id?: string | null
           id?: string
           last_chased_at?: string | null
           notes?: string | null
           period?: string | null
+          received_at?: string | null
           requested_by?: string | null
           status?: string
           title?: string
@@ -8239,6 +8245,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _ca_blank: { Args: { p: string }; Returns: boolean }
+      _ca_nz: { Args: { p: string }; Returns: string }
+      _ca_post_extraction_core: {
+        Args: {
+          p_actor: string
+          p_business_id: string
+          p_category: string
+          p_extraction_id: string
+          p_rows: Json
+        }
+        Returns: Json
+      }
+      _ca_try_date: { Args: { p: string }; Returns: string }
+      _ca_try_num: { Args: { p: string }; Returns: number }
       accept_ca_invitation: { Args: { _token: string }; Returns: string }
       admin_ai_usage_overview: {
         Args: never
@@ -8280,7 +8300,24 @@ export type Database = {
         Args: { _client_id: string; _firm_id: string }
         Returns: boolean
       }
+      ca_mark_document_received: {
+        Args: { p_extraction_id: string }
+        Returns: number
+      }
+      ca_match_document_requests: {
+        Args: { p_extraction_id: string; p_mode: string }
+        Returns: number
+      }
       ca_member_role: { Args: { _firm_id: string }; Returns: string }
+      ca_post_extraction: {
+        Args: {
+          p_business_id: string
+          p_category: string
+          p_extraction_id: string
+          p_rows: Json
+        }
+        Returns: Json
+      }
       ca_probe_sample: {
         Args: { p_limit?: number }
         Returns: {
@@ -8288,6 +8325,10 @@ export type Database = {
           firm_id: string
           probe_user: string
         }[]
+      }
+      ca_request_type_categories: {
+        Args: { p_type: string }
+        Returns: string[]
       }
       check_ai_quota: {
         Args: { _business_id: string; _user_id: string }
@@ -8487,6 +8528,8 @@ export type Database = {
       is_ca_firm_privileged: { Args: { _firm_id: string }; Returns: boolean }
       is_demo_viewer: { Args: never; Returns: boolean }
       is_senior_admin: { Args: never; Returns: boolean }
+      ist_period: { Args: never; Returns: string }
+      ist_today: { Args: never; Returns: string }
       lookup_client_by_reference: {
         Args: { p_ca_firm_id: string; p_reference_code: string }
         Returns: {

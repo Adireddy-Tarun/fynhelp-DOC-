@@ -301,7 +301,7 @@ async function run(request: Request): Promise<Response> {
             console.log(`[fyn:gmail] pending_verification set for ${filename} — match confidence=${match.confidence}`);
           }
 
-          const { error: insertErr } = await supabaseAdmin.from("ca_document_extractions").insert({
+          const { data: insertedRow, error: insertErr } = await supabaseAdmin.from("ca_document_extractions").insert({
             ca_firm_id: conn.ca_firm_id,
             business_id: match.businessId,
             storage_path: path,
@@ -322,7 +322,7 @@ async function run(request: Request): Promise<Response> {
                 ? "PDF received but OCR not run. Assign the client, then re-extract from the Review Queue."
                 : null
               : `Sender ${senderEmail} could not be matched to a client. Assign the client in the Intake inbox.`,
-          } as never);
+          } as never).select("id").maybeSingle();
 
           if (insertErr) {
             console.error(`[fyn:gmail] extraction insert failed: ${insertErr.message}`);
@@ -347,23 +347,12 @@ async function run(request: Request): Promise<Response> {
               )
               .then(undefined, () => undefined);
 
-            // Any open chaser for this client is answered by the arriving document.
-            try {
-              const nowIso = new Date().toISOString();
-              const { data: open } = await supabaseAdmin
-                .from("ca_document_requests")
-                .select("id")
-                .eq("ca_firm_id", conn.ca_firm_id)
-                .eq("business_id", match.businessId)
-                .in("status", ["open", "pending", "sent", "chased", "escalated"])
-                .limit(20);
-              if (open && open.length > 0) {
-                await supabaseAdmin
-                  .from("ca_document_requests")
-                  .update({ status: "fulfilled", fulfilled_at: nowIso, updated_at: nowIso } as never)
-                  .in("id", open.map((o: any) => o.id));
-              }
-            } catch { /* non-blocking */ }
+            // Mark open requests of the same type and period as received (closed on posting).
+            const newId = (insertedRow as { id?: string } | null)?.id;
+            if (newId) {
+              const { error: mErr } = await supabaseAdmin.rpc("ca_match_document_requests", { p_extraction_id: newId, p_mode: "received" });
+              if (mErr) console.warn(`[fyn:gmail] request match failed: ${mErr.message}`);
+            }
 
             if (reviewState === "auto_accepted") {
               try {

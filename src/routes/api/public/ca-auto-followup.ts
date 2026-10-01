@@ -89,7 +89,7 @@ async function run(request: Request): Promise<Response> {
       .from("ca_document_requests")
       .select("id, ca_firm_id, business_id, title, period, doc_types, due_date, last_chased_at, chaser_count")
       .eq("ca_firm_id", rule.ca_firm_id)
-      .neq("status", "fulfilled")
+      .not("status", "in", "(received,fulfilled,resolved,cancelled,closed)")
       .lt("due_date", cutoff.slice(0, 10))
       .limit(500);
 
