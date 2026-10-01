@@ -12,7 +12,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { timingSafeEqual } from "node:crypto";
 import type { ParsedRow } from "@/lib/caGmail.server";
-import { periodOf, toISTDate } from "@/lib/istDate";
+import { currentPeriodIST, monthEnd, monthStart } from "@/lib/istDate";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -357,11 +357,9 @@ async function run(request: Request): Promise<Response> {
 
             if (reviewState === "auto_accepted") {
               try {
-                const now = new Date();
-                const currentPeriod = periodOf(toISTDate(now));
-                const periodStart = `${currentPeriod}-01`;
-                const periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0))
-                  toISTDate();
+                const currentPeriod = currentPeriodIST();
+                const periodStart = monthStart(currentPeriod);
+                const periodEnd = monthEnd(currentPeriod);
                 const [{ count: openRequests }, { count: openCompliance }, { count: openExceptions }, { count: txnCount }] = await Promise.all([
                   supabaseAdmin
                     .from("ca_document_requests")

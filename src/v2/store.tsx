@@ -644,7 +644,7 @@ export function V2StoreProvider({ children }: { children: ReactNode }) {
 
       // Mark open requests of the same type and period as received; they close when the document is posted.
       if (data?.id) {
-        const { data: n } = await sb.rpc("ca_mark_document_received", { p_extraction_id: data.id });
+        const { data: n } = await supabase.rpc("ca_mark_document_received", { p_extraction_id: data.id });
         if (n) log(clientId, `${name} arrived — ${n} request${n === 1 ? "" : "s"} marked received.`, "chaser");
       }
     })();
