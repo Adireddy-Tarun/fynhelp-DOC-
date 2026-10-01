@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
 import { PageWrap, PageHeader, Card } from "@/components/ca/ui";
 import { FileText, CheckCheck, AlertTriangle, BellRing } from "lucide-react";
-import { toISTDate, todayIST, currentPeriodIST, monthEnd } from "@/lib/istDate";
+import { toISTDate, todayIST, currentPeriodIST, monthEnd as periodMonthEnd } from "@/lib/istDate";
 
 type ClientDocStats = {
   business_id: string;
@@ -48,7 +48,7 @@ export default function CAPracticeAnalyticsPage() {
     const load = async () => {
       setLoading(true);
       const today = todayIST();
-      const monthEnd = monthEnd(currentPeriodIST());
+      const monthEnd = periodMonthEnd(currentPeriodIST());
 
       const [
         { count: docs },
