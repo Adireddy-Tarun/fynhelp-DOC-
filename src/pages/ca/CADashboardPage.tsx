@@ -11,7 +11,7 @@ import { CAOnboardingBanner } from "@/components/ca/CAOnboardingBanner";
 
 import { timeAgo, useFirmIntelligence } from "@/hooks/useCAIntelligence";
 import { isCloseReady } from "@/lib/caClose";
-import { toISTDate, todayIST } from "@/lib/istDate";
+import { isOverdue as isPastDue, toISTDate, todayIST } from "@/lib/istDate";
 
 interface ClientRow {
   id: string;
@@ -149,8 +149,8 @@ export default function CADashboardPage() {
         const topException = exceptions
           .filter((e) => e.business_id === bid)
           .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))[0];
-        const overdueCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) < now);
-        const upcomingCompliance = compliance.filter((e) => e.business_id === bid && new Date(e.due_date) >= now);
+        const overdueCompliance = compliance.filter((e) => e.business_id === bid && isPastDue(e.due_date));
+        const upcomingCompliance = compliance.filter((e) => e.business_id === bid && !isPastDue(e.due_date));
 
         if (pendingVerification.has(bid)) {
           map[c.id] = { action: "Confirm Gmail document before ledger posting", path: "/ca/intake/inbox", tone: "red" };

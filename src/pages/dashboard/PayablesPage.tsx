@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { formatINR } from "@/lib/indian-format";
+import { isOverdue as isPastDue } from "@/lib/istDate";
 
 type Payable = {
   id: string;
@@ -55,10 +56,10 @@ const PayablesPage = () => {
   const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const isOverdue = (p: Payable) =>
-    !!p.due_date && new Date(p.due_date) < now && p.status !== "paid";
+    !!p.due_date && isPastDue(p.due_date) && p.status !== "paid";
   const isDueSoon = (p: Payable) =>
     !!p.due_date &&
-    new Date(p.due_date) >= now &&
+    !isPastDue(p.due_date) &&
     new Date(p.due_date) < sevenDaysFromNow &&
     p.status !== "paid";
 

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
-import { toISTDate } from "@/lib/istDate";
+import { isOverdue as isPastDue, toISTDate } from "@/lib/istDate";
 
 const BEIGE = "#F4EDDA";
 const CARD_BORDER = "1px solid rgba(23,18,8,0.08)";
@@ -201,7 +201,7 @@ export default function InvestorPage() {
       const s = (row.status || "").toLowerCase();
       if (s === "filed" || s === "completed") return "green";
       if (s === "overdue") return "red";
-      if (row.due_date && new Date(row.due_date) < new Date() && s !== "filed") return "red";
+      if (row.due_date && isPastDue(row.due_date) && s !== "filed") return "red";
       return "amber";
     };
     return [

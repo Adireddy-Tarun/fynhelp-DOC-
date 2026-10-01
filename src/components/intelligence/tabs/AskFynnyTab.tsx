@@ -9,7 +9,7 @@ import {
   useGstFilings, useEmployees, useCAC, useSalesPipeline,
 } from "../DataSource";
 import { useLiquidityMetrics, useRevenueMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
-import { todayIST } from "@/lib/istDate";
+import { isOverdue as isPastDue, todayIST } from "@/lib/istDate";
 
 const QUICK_PROMPTS = [
   "What's my runway?",
@@ -80,7 +80,7 @@ export default function AskFynnyTab() {
     const outstanding = inv.reduce((s, i) => s + Number(i.outstanding_amount), 0);
 
     const overdue = inv
-      .filter((i) => i.outstanding_amount > 0 && i.due_date && new Date(i.due_date) < new Date())
+      .filter((i) => i.outstanding_amount > 0 && i.due_date && isPastDue(i.due_date))
       .map((i) => ({
         customer: customers?.find((c) => c.id === i.customer_id)?.customer_name ?? "—",
         invoice: i.invoice_number,

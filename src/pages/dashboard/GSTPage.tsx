@@ -15,7 +15,7 @@ import {
   RefreshCw, Download, AlertTriangle, AlertCircle, Info, TrendingUp,
   Sparkles, ArrowRight,
 } from "lucide-react";
-import { toISTDate } from "@/lib/istDate";
+import { isOverdue as isPastDue, toISTDate } from "@/lib/istDate";
 
 /* ────────────── Tax Intelligence (edge function) types ────────────── */
 interface TaxIntelligenceResponse {
@@ -216,14 +216,14 @@ const GSTPage = () => {
     : tdsFilings || [];
 
   /* ───── GST stats ───── */
-  const gstUpcoming = visibleGst.filter((f) => new Date(f.due_date) >= now && f.status === "pending");
-  const gstOverdue = visibleGst.filter((f) => new Date(f.due_date) < now && f.status === "pending");
+  const gstUpcoming = visibleGst.filter((f) => !isPastDue(f.due_date) && f.status === "pending");
+  const gstOverdue = visibleGst.filter((f) => isPastDue(f.due_date) && f.status === "pending");
   const totalTaxPayable = visibleGst.reduce((s, f) => s + Number(f.tax_payable || 0), 0);
   const totalInputCredit = visibleGst.reduce((s, f) => s + Number(f.input_tax_credit || 0), 0);
 
   /* ───── TDS stats ───── */
-  const tdsUpcoming = visibleTds.filter((f) => new Date(f.due_date) >= now && f.status === "pending");
-  const tdsOverdue = visibleTds.filter((f) => new Date(f.due_date) < now && f.status === "pending");
+  const tdsUpcoming = visibleTds.filter((f) => !isPastDue(f.due_date) && f.status === "pending");
+  const tdsOverdue = visibleTds.filter((f) => isPastDue(f.due_date) && f.status === "pending");
   const totalDeducted = visibleTds.reduce((s, f) => s + Number(f.total_tds_deducted || 0), 0);
   const totalDeposited = visibleTds.reduce((s, f) => s + Number(f.total_tds_deposited || 0), 0);
 

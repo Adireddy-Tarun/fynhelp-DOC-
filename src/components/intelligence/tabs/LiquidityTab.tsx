@@ -13,7 +13,7 @@ import ActionItemsSection from "../sections/ActionItemsSection";
 import NoDataPrompt from "../NoDataPrompt";
 
 import { useLiquidityMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
-import { toISTDate } from "@/lib/istDate";
+import { isOverdue as isPastDue, toISTDate } from "@/lib/istDate";
 
 
 function daysBetween(a: string, b: string) {
@@ -62,7 +62,7 @@ export default function LiquidityTab() {
 
     // Overdue
     const overdue = inv
-      .filter((i) => i.status === "overdue" || (i.outstanding_amount > 0 && i.due_date && new Date(i.due_date) < now))
+      .filter((i) => i.status === "overdue" || (i.outstanding_amount > 0 && i.due_date && isPastDue(i.due_date)))
       .map((i) => ({ ...i, daysOver: i.due_date ? Math.max(0, daysBetween(i.due_date, new Date().toISOString())) : 0, customer_name: customers?.find((c) => c.id === i.customer_id)?.customer_name ?? "—" }))
       .sort((a, b) => b.daysOver - a.daysOver)
       .slice(0, 6);
