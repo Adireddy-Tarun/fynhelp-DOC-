@@ -12,6 +12,7 @@ import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { runDataQualityScan } from "@/lib/caFinIntel.functions";
 import { CA, CACard, CAButton, CABadge, CAEmpty, CAField, caInputStyle, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
+import { currentPeriodIST } from "@/lib/istDate";
 
 interface Run {
   id: string; period: string; total_records: number; completeness_score: number;
@@ -31,7 +32,7 @@ export default function CADataQualityPage() {
   const { can } = useCARole();
   const { clients } = useCAClientOptions();
   const [businessId, setBusinessId] = useState("");
-  const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
+  const [period, setPeriod] = useState(() => currentPeriodIST());
   const [runs, setRuns] = useState<Run[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");

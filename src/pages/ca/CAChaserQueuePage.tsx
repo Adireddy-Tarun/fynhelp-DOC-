@@ -13,6 +13,7 @@ import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/pr
 import { logCAAudit } from "@/lib/caAudit";
 import { useFirmClientIntelligence, DOW } from "@/hooks/useCAIntelligence";
 import { signalBrain } from "@/lib/caBrainSignals";
+import { todayIST } from "@/lib/istDate";
 
 interface RequestRow {
   id: string;
@@ -88,7 +89,7 @@ export default function CAChaserQueuePage() {
       return;
     }
     setLoading(true);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayIST();
     const [{ data: reqs, error }, { data: cls }] = await Promise.all([
       supabase
         .from("ca_document_requests")

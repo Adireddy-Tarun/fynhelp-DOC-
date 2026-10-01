@@ -11,6 +11,7 @@ import {
   type MisExtraction,
   type MisItcRow,
 } from "./caMis.server";
+import { todayIST } from "@/lib/istDate";
 
 export interface GenerateMisInput {
   firm_id: string;
@@ -161,7 +162,7 @@ export const generateMisReport = createServerFn({ method: "POST" })
     };
     try {
       const from = hasRange ? data.period_start! : "2000-01-01";
-      const to = hasRange ? data.period_end! : new Date().toISOString().slice(0, 10);
+      const to = hasRange ? data.period_end! : todayIST();
       const [revTxns, expTxns, excItems] = await Promise.all([
         supabase.from("bank_transactions").select("id")
           .eq("business_id", data.business_id).eq("type", "credit")

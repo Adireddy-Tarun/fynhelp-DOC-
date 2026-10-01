@@ -11,6 +11,7 @@ import { useCAClientOptions } from "@/hooks/useCAClientOptions";
 import { logCAAudit } from "@/lib/caAudit";
 import { CA, CACard, CAButton, CABadge, CAEmpty, CAField, caInputStyle, caTh, caTd, inr, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader } from "@/components/ca/os/primitives";
+import { todayIST } from "@/lib/istDate";
 
 type Tab = "parties" | "items" | "currency" | "custom";
 
@@ -53,7 +54,7 @@ export default function CAMastersPage() {
 
   const [pForm, setPForm] = useState({ name: "", party_type: "customer", gstin: "", pan: "", email: "", phone: "", payment_terms_days: "30" });
   const [iForm, setIForm] = useState({ name: "", sku: "", hsn_code: "", uom: "NOS", unit_price: "", gst_rate: "18", category: "" });
-  const [fForm, setFForm] = useState({ base_currency: "USD", quote_currency: "INR", rate: "", rate_date: new Date().toISOString().slice(0, 10) });
+  const [fForm, setFForm] = useState({ base_currency: "USD", quote_currency: "INR", rate: "", rate_date: todayIST() });
   const [cForm, setCForm] = useState({ label: "", field_type: "text", options: "", is_required: false });
 
   useEffect(() => {

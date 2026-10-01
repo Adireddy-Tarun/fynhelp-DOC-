@@ -3,6 +3,7 @@ import { useNavigate } from "@/lib/router-compat";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
+import { toISTDate } from "@/lib/istDate";
 
 type ComplianceEvent = {
   id: string;
@@ -49,8 +50,8 @@ const FilingCalendarPage = () => {
         .from("compliance_events")
         .select("*")
         .eq("business_id", businessId)
-        .gte("due_date", today.toISOString().split("T")[0])
-        .lte("due_date", ninetyDaysFromNow.toISOString().split("T")[0])
+        .gte("due_date", toISTDate(today))
+        .lte("due_date", toISTDate(ninetyDaysFromNow))
         .order("due_date", { ascending: true });
 
       return (data as ComplianceEvent[]) || [];

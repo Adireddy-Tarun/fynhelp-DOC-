@@ -12,6 +12,7 @@ import { useCAFirmMembers } from "@/hooks/useCAFirmMembers";
 import { CA, CACard, CAButton, CABadge, CAEmpty, caInputStyle, caTd, caTh, dateIN, type Tone } from "@/components/ca/portalUi";
 import { ModuleHeader, PermissionNotice, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
+import { todayIST } from "@/lib/istDate";
 
 export type TaskTab = "all" | "mine" | "overdue" | "today";
 
@@ -38,7 +39,7 @@ const STATUS_TONE: Record<string, Tone> = { todo: "grey", in_progress: "teal", r
 const NEXT_STATUS: Record<string, string | null> = { todo: "in_progress", in_progress: "review", review: "done", done: null };
 const NEXT_LABEL: Record<string, string> = { todo: "Start", in_progress: "Send to review", review: "Mark done" };
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const todayISO = () => todayIST();
 
 export const isSlaBreached = (t: { sla_hours: number | null; created_at: string; status: string }) =>
   !!t.sla_hours && t.status !== "done" && Date.now() - new Date(t.created_at).getTime() > t.sla_hours * 3_600_000;

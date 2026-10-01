@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   CA, CACard, CAHeading, CABadge, CAButton, statusTone, dateIN, caTh, caTd, caInputStyle, CAEmpty,
 } from "@/components/ca/portalUi";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 interface ClientRow {
   id: string;
@@ -31,7 +32,7 @@ type ClientStats = { overdue: number; docs: number; tasks: number };
 const plus7 = () => {
   const d = new Date();
   d.setDate(d.getDate() + 7);
-  return d.toISOString().slice(0, 10);
+  return toISTDate(d);
 };
 
 export default function CAClientsPage() {
@@ -59,7 +60,7 @@ export default function CAClientsPage() {
   const load = useCallback(async () => {
     if (!firmId) return;
     setLoading(true);
-    const todayISO = new Date().toISOString().slice(0, 10);
+    const todayISO = todayIST();
     const monthStart = (() => {
       const d = new Date();
       return new Date(d.getFullYear(), d.getMonth(), 1).toISOString();

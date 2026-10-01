@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAPortal } from "@/hooks/useCAPortal";
 import { CA, CACard } from "@/components/ca/portalUi";
+import { todayIST } from "@/lib/istDate";
 
 interface Counts { open: number; overdue: number; breached: number; today: number }
 
@@ -26,7 +27,7 @@ export function CATasksSummaryCard() {
         .limit(1000);
       if (cancelled) return;
       const rows = (data ?? []) as { status: string; due_date: string | null; sla_hours: number | null; created_at: string }[];
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayIST();
       setCounts({
         open: rows.length,
         overdue: rows.filter((r) => r.due_date && r.due_date < today).length,

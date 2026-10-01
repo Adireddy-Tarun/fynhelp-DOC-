@@ -11,6 +11,7 @@ import { detectDeductions } from "@/lib/caDeductions.functions";
 import { logCAAudit } from "@/lib/caAudit";
 import { CA, CACard, CABadge, CAButton, CAEmpty, CAField, caInputStyle, inr, type Tone } from "./portalUi";
 import { useFirmIntelligence } from "@/hooks/useCAIntelligence";
+import { currentPeriodIST } from "@/lib/istDate";
 
 interface Finding {
   id: string;
@@ -110,7 +111,7 @@ export default function ClientDeductionsTab({
   const [filter, setFilter] = useState<Filter>("Open");
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
+  const [period, setPeriod] = useState(() => currentPeriodIST());
   const [entityType, setEntityType] = useState<string | null>(null);
   const runScan = useServerFn(detectDeductions);
   const { data: firmIntel } = useFirmIntelligence(firmId);

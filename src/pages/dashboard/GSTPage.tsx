@@ -15,6 +15,7 @@ import {
   RefreshCw, Download, AlertTriangle, AlertCircle, Info, TrendingUp,
   Sparkles, ArrowRight,
 } from "lucide-react";
+import { toISTDate } from "@/lib/istDate";
 
 /* ────────────── Tax Intelligence (edge function) types ────────────── */
 interface TaxIntelligenceResponse {
@@ -199,7 +200,7 @@ const GSTPage = () => {
   });
 
   const now = new Date();
-  const todayStr = now.toISOString().split("T")[0];
+  const todayStr = toISTDate(now);
   const inRange = (d: string | null | undefined) => {
     if (!d) return false;
     if (fromFilter && d < fromFilter) return false;

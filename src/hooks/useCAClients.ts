@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCAAuth } from "@/contexts/CAAuthContext";
+import { todayIST } from "@/lib/istDate";
 
 export interface CAClientRow {
   id: string;
@@ -79,7 +80,7 @@ export function useCAClients() {
           .eq("ca_firm_id", caFirm.id)
           .in("business_id", ids)
           .in("status", ["pending", "overdue"])
-          .gte("due_date", new Date().toISOString().split("T")[0])
+          .gte("due_date", todayIST())
           .order("due_date", { ascending: true }),
         supabase
           .from("ca_itc_records")

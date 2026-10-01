@@ -9,6 +9,7 @@
 import { createContext, useContext, useMemo, useState, ReactNode, useCallback, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { AgentKey } from "./agents";
+import { toISTDate } from "@/lib/istDate";
 
 export type Txn = { date: string; particulars: string; amount: number };
 
@@ -144,7 +145,7 @@ export type AgentRun = {
   target: string;
 };
 
-const iso = (daysAgo: number) => new Date(Date.now() - daysAgo * 864e5).toISOString().slice(0, 10);
+const iso = (daysAgo: number) => toISTDate(new Date(Date.now() - daysAgo * 864e5));
 const today = () => iso(0);
 const uid = () => (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 12));
 
@@ -181,7 +182,7 @@ function toDate(v: string): string | null {
     return `${yy}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
   }
   const parsed = Date.parse(s);
-  if (!Number.isNaN(parsed)) return new Date(parsed).toISOString().slice(0, 10);
+  if (!Number.isNaN(parsed)) return toISTDate(new Date(parsed));
   return null;
 }
 

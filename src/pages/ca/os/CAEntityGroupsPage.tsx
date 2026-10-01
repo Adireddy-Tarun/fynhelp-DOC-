@@ -14,6 +14,7 @@ import { logCAAudit } from "@/lib/caAudit";
 import { periodBounds } from "@/lib/caFinIntel.server";
 import { CA, CACard, CAButton, CABadge, CAEmpty, CAField, caInputStyle, caTh, caTd, inr, dateIN } from "@/components/ca/portalUi";
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
+import { currentPeriodIST, todayIST } from "@/lib/istDate";
 
 interface Group { id: string; name: string; parent_business_id: string | null; notes: string | null }
 interface Member { business_id: string; client_name: string; group_id: string | null; ownership_pct: number | null }
@@ -29,11 +30,11 @@ export default function CAEntityGroupsPage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [groupId, setGroupId] = useState("");
-  const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
+  const [period, setPeriod] = useState(() => currentPeriodIST());
   const [ietxns, setIetxns] = useState<Ietxn[]>([]);
   const [totals, setTotals] = useState<Record<string, { credit: number; debit: number }>>({});
   const [newGroup, setNewGroup] = useState("");
-  const [ieForm, setIeForm] = useState({ from: "", to: "", amount: "", nature: "sale", txn_date: new Date().toISOString().slice(0, 10), description: "" });
+  const [ieForm, setIeForm] = useState({ from: "", to: "", amount: "", nature: "sale", txn_date: todayIST(), description: "" });
   const editable = can("manage_clients");
 
   const loadGroups = useCallback(async () => {

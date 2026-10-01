@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { usePaymentSettlements, useMode } from "../DataSource";
 import { IntelCard, KPI, fmtCompact } from "../_primitives";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 export default function SettlementsSection() {
   const mode = useMode();
@@ -8,11 +9,11 @@ export default function SettlementsSection() {
   const rows = data ?? [];
 
   const m = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayIST();
     const rzpPending = rows.filter(r => r.gateway === "razorpay" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
     const expectedToday = rows.filter(r => r.expected_date === today).reduce((s, r) => s + Number(r.amount), 0);
     const upiFloat = rows.filter(r => r.gateway === "upi" && r.status === "pending").reduce((s, r) => s + Number(r.amount), 0);
-    const in7 = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    const in7 = toISTDate(new Date(Date.now() + 7 * 86400000));
     const next7 = rows
       .filter(r => r.status === "pending" && r.expected_date && r.expected_date >= today && r.expected_date <= in7)
       .reduce((s, r) => s + Number(r.amount), 0);

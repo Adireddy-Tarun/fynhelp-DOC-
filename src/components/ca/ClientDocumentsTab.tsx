@@ -8,6 +8,7 @@ import {
 } from "@/components/ca/portalUi";
 import { DOC_CLASS_LABELS, guessClassification, intakeDocument, type CADocClass } from "@/lib/caIntake";
 import { scanAndClassifyDocument } from "@/lib/caDocs.functions";
+import { currentPeriodIST } from "@/lib/istDate";
 
 
 const CLASSES: CADocClass[] = ["bank", "invoice", "expense", "challan", "other"];
@@ -42,7 +43,7 @@ export default function ClientDocumentsTab({ firmId, businessId }: { firmId: str
   const [docs, setDocs] = useState<DocRow[]>([]);
   const [meta, setMeta] = useState<Record<string, DocMeta>>({});
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState(() => new Date().toISOString().slice(0, 7));
+  const [period, setPeriod] = useState(() => currentPeriodIST());
   const [classification, setClassification] = useState<CADocClass | "auto">("auto");
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);

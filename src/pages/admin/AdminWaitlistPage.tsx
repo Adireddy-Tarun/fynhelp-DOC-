@@ -7,6 +7,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/contexts/AdminAuthContext";
+import { todayIST } from "@/lib/istDate";
 
 type WaitlistRow = {
   id: string;
@@ -329,7 +330,7 @@ export default function AdminWaitlistPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `waitlist-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `waitlist-${todayIST()}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
     toast.success(`Exported ${all.length} rows`);

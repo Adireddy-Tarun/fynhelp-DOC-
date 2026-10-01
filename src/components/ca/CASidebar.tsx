@@ -12,6 +12,7 @@ import { CA } from "./portalUi";
 import { C } from "@/components/site/siteTheme";
 import FynLogo from "@/components/FynLogo";
 import { toast } from "sonner";
+import { todayIST } from "@/lib/istDate";
 
 type NavItem = { label: string; path: string; icon: typeof LayoutGrid; badge?: "urgent" | "unread"; roleRequired?: "admin" };
 
@@ -122,7 +123,7 @@ export default function CASidebar({
     let cancelled = false;
     (async () => {
       try {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = todayIST();
         const { data: clients } = await supabase
           .from("ca_clients")
           .select("business_id")

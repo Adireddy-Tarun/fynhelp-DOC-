@@ -9,6 +9,7 @@ import {
   useGstFilings, useEmployees, useCAC, useSalesPipeline,
 } from "../DataSource";
 import { useLiquidityMetrics, useRevenueMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
+import { todayIST } from "@/lib/istDate";
 
 const QUICK_PROMPTS = [
   "What's my runway?",
@@ -65,7 +66,7 @@ export default function AskFynnyTab() {
   const context = useMemo(() => {
     const now = Date.now();
     const c30 = new Date(now - 30 * 86400000);
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayIST();
     const inv = invoices ?? [];
     const exp = expenses ?? [];
 

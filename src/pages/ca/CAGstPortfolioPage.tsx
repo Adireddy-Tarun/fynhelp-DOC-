@@ -11,6 +11,7 @@ import {
 import { formatINR } from "@/lib/indian-format";
 import { AlertTriangle, Copy, X, Download, Loader2, FileText } from "lucide-react";
 import { GspLimitationBanner } from "@/components/ca/GspLimitationBanner";
+import { todayIST } from "@/lib/istDate";
 
 type ClientRow = {
   business_id: string;
@@ -212,7 +213,7 @@ export default function CAGstPortfolioPage() {
       );
     }
     if (filingFilter !== "all") {
-      const today = new Date().toISOString().split("T")[0];
+      const today = todayIST();
       rows = rows.filter((r) => {
         if (filingFilter === "overdue") return r.next_due && r.next_due.date < today;
         if (filingFilter === "week") return r.next_due && daysFromNow(r.next_due.date) >= 0 && daysFromNow(r.next_due.date) <= 7;
@@ -236,7 +237,7 @@ export default function CAGstPortfolioPage() {
     const clientsWithSafe = clients.filter((c) => c.itc_safe > 0).length;
     const clientsWithRisk = clients.filter((c) => c.itc_at_risk > 0).length;
     const avgRisk = clients.length ? Math.round(clients.reduce((s, c) => s + c.notice_risk_score, 0) / clients.length) : 0;
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayIST();
     const pending = clients.filter((c) => c.next_due && c.next_due.date >= today).length
       + clients.filter((c) => c.next_due && c.next_due.date < today).length;
     return { totalSafe, totalRisk, clientsWithSafe, clientsWithRisk, avgRisk, pending };
@@ -253,7 +254,7 @@ export default function CAGstPortfolioPage() {
 
   const filingComplianceRate = useMemo(() => {
     if (!clients.length) return 100;
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayIST();
     const ok = clients.filter((c) => !c.next_due || c.next_due.date >= today).length;
     return Math.round((ok / clients.length) * 100);
   }, [clients]);
@@ -279,7 +280,7 @@ export default function CAGstPortfolioPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `fynhelp-gst-portfolio-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `fynhelp-gst-portfolio-${todayIST()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Portfolio report exported");

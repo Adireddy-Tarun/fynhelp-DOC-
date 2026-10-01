@@ -6,6 +6,7 @@
 
 export interface CoaSeed {
   code: string;
+import { toISTDate } from "@/lib/istDate";
   name: string;
   account_type: "asset" | "liability" | "equity" | "income" | "expense";
   is_group: boolean;
@@ -235,5 +236,5 @@ export const periodBounds = (period: string): { start: string; end: string } => 
   const [y, m] = period.split("-").map(Number);
   const start = new Date(Date.UTC(y, (m ?? 1) - 1, 1));
   const end = new Date(Date.UTC(y, m ?? 1, 0));
-  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+  return { start: toISTDate(start), end: toISTDate(end) };
 };

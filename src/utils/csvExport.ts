@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { todayIST } from "@/lib/istDate";
 
 export type CsvRow = Record<string, string | number | boolean | null | undefined>;
 
@@ -29,7 +30,7 @@ export function exportToCsv(data: CsvRow[], filename: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${filename}-${new Date().toISOString().split("T")[0]}.csv`;
+  link.download = `${filename}-${todayIST()}.csv`;
   link.click();
   URL.revokeObjectURL(url);
   toast.success("CSV exported successfully");

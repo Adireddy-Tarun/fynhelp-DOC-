@@ -26,6 +26,7 @@ import {
   CA, CACard, CAHeading, CABadge, CAButton, CAField, caInputStyle, statusTone, healthTone,
   inr, dateIN, caTh, caTd, caNum, CAEmpty,
 } from "@/components/ca/portalUi";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 interface Client {
   id: string;
@@ -98,7 +99,7 @@ export default function CAClientDetailPage() {
     setHideDemoState(v);
     try { window.localStorage.setItem("hide_seed_transactions", v ? "1" : "0"); } catch { /* restricted browser */ }
   };
-  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const todayIso = () => todayIST();
   const monthStartIso = () => `${todayIso().slice(0, 7)}-01`;
   const [groupStart, setGroupStart] = useState(monthStartIso);
   const [groupEnd, setGroupEnd] = useState(todayIso);
@@ -236,7 +237,7 @@ export default function CAClientDetailPage() {
 
   useEffect(() => {
     if (!businessId || !firmId) return;
-    const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+    const in3Days = toISTDate(new Date(Date.now() + 3 * 86400000));
     let cancelled = false;
     (async () => {
       try {
@@ -465,8 +466,8 @@ export default function CAClientDetailPage() {
     if (!businessId || !firmId) return;
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const period_start = start.toISOString().slice(0, 10);
-    const period_end = now.toISOString().slice(0, 10);
+    const period_start = toISTDate(start);
+    const period_end = toISTDate(now);
 
     setGenerating(true);
     const loadingId = toast.loading("Generating PDF report...");

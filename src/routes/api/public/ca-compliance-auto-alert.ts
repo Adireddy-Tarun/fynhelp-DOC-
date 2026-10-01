@@ -9,6 +9,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { penaltyEstimate } from "@/lib/caPenalty";
+import { toISTDate } from "@/lib/istDate";
 
 const DAY = 86_400_000;
 
@@ -33,7 +34,7 @@ async function run(request: Request): Promise<Response> {
     .select("id, ca_firm_id, business_id, event_type, filing_period, due_date, status")
     .neq("status", "filed")
     .not("ca_firm_id", "is", null)
-    .lte("due_date", horizon.toISOString().slice(0, 10))
+    .lte("due_date", toISTDate(horizon))
     .limit(5000);
 
   if (error) {
@@ -142,7 +143,7 @@ async function run(request: Request): Promise<Response> {
     alertsCreated = created?.length ?? 0;
   }
 
-  const today = now.toISOString().slice(0, 10);
+  const today = toISTDate(now);
   const { data: updated, error: updErr } = await supabaseAdmin
     .from("ca_compliance_events")
     .update({ status: "overdue", updated_at: new Date().toISOString() })

@@ -22,6 +22,7 @@ import {
   findHeaderIndex,
   type DetectedColumns,
 } from "@/lib/bankAmount";
+import { toISTDate } from "@/lib/istDate";
 
 
 // ── TYPES ───────────────────────────────────────────────────────────────────
@@ -269,7 +270,7 @@ function toISODate(raw: string): string | null {
     let [, d, mo, y] = dmy;
     if (y.length === 2) y = (Number(y) > 50 ? "19" : "20") + y;
     const dt = new Date(Number(y), Number(mo) - 1, Number(d));
-    if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+    if (!isNaN(dt.getTime())) return toISTDate(dt);
   }
 
   // YYYYMMDD (Tally XML compact format)
@@ -277,7 +278,7 @@ function toISODate(raw: string): string | null {
   if (compact) {
     const [, y, mo, d] = compact;
     const dt = new Date(Number(y), Number(mo) - 1, Number(d));
-    if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+    if (!isNaN(dt.getTime())) return toISTDate(dt);
   }
 
   // DDMMYYYY (Tally ERP 9 legacy compact)
@@ -285,12 +286,12 @@ function toISODate(raw: string): string | null {
   if (compact2) {
     const [, d, mo, y] = compact2;
     const dt = new Date(Number(y), Number(mo) - 1, Number(d));
-    if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+    if (!isNaN(dt.getTime())) return toISTDate(dt);
   }
 
   // Natural language dates: "01 Apr 2024", "April 1 2024", etc.
   const dt = new Date(s);
-  if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+  if (!isNaN(dt.getTime())) return toISTDate(dt);
 
   return null;
 }

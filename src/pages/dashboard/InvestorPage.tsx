@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
+import { toISTDate } from "@/lib/istDate";
 
 const BEIGE = "#F4EDDA";
 const CARD_BORDER = "1px solid rgba(23,18,8,0.08)";
@@ -90,7 +91,7 @@ export default function InvestorPage() {
 
     (async () => {
       setLoading(true);
-      const oneYearAgo = new Date(Date.now() - 365 * 86400000).toISOString().split("T")[0];
+      const oneYearAgo = toISTDate(new Date(Date.now() - 365 * 86400000));
       const [liqRes, txRes, gstRes, tdsRes, bizRes, custRes, subsRes, invRes, manualRes] = await Promise.all([
         supabase.from("liquidity_metrics").select("cash_position,burn_rate_current,health_score,health_status,recorded_at").eq("business_id", businessId).order("recorded_at", { ascending: false }).limit(1).maybeSingle(),
         supabase.from("transactions").select("date,amount,direction").eq("business_id", businessId).gte("date", oneYearAgo).order("date", { ascending: true }),

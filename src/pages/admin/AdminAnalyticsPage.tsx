@@ -6,6 +6,7 @@ import { Download, Users, IndianRupee, TrendingDown, BarChart3, LayoutGrid, Wall
 import { Card, PageHeader } from "./AdminDashboardPage";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
+import { periodOf, toISTDate } from "@/lib/istDate";
 
 export default function AdminAnalyticsPage() {
   const [range, setRange] = useState("30d");
@@ -26,10 +27,10 @@ export default function AdminAnalyticsPage() {
 
       const daily: Record<string, number> = {};
       for (let i = 29; i >= 0; i--) {
-        daily[new Date(Date.now() - i * 86400000).toISOString().slice(0, 10)] = 0;
+        daily[toISTDate(new Date(Date.now() - i * 86400000))] = 0;
       }
       ((profsRes.data ?? []) as { created_at: string }[]).forEach((p) => {
-        const d = new Date(p.created_at).toISOString().slice(0, 10);
+        const d = toISTDate(new Date(p.created_at));
         if (d in daily) daily[d] += 1;
       });
       setUserGrowth(Object.entries(daily).map(([date, users]) => ({
@@ -39,7 +40,7 @@ export default function AdminAnalyticsPage() {
 
       const monthly: Record<string, number> = {};
       ((subsRes.data ?? []) as { mrr: number | string; started_at: string }[]).forEach((s) => {
-        const m = new Date(s.started_at).toISOString().slice(0, 7);
+        const m = periodOf(toISTDate(new Date(s.started_at)));
         monthly[m] = (monthly[m] || 0) + Number(s.mrr || 0);
       });
       let running = 0;

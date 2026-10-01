@@ -8,6 +8,7 @@ import {
   FileText, BarChart3, ShieldCheck, ListChecks, Users, TrendingUp, PieChart, Settings2,
   Download, Eye, Share2, RefreshCw, Trash2, MoreHorizontal, Plus, X, CheckCircle2, AlertCircle, Loader2, Calendar, PlayCircle,
 } from "lucide-react";
+import { toISTDate } from "@/lib/istDate";
 
 // ───────── Templates ─────────
 type TemplateId =
@@ -596,7 +597,7 @@ function GenerateReportModal({ presetTemplate, clients, caFirmId, userId, onClos
 
   const periodToDates = (): { period: string; ps: string | null; pe: string | null } => {
     const today = new Date();
-    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+    const fmt = (d: Date) => toISTDate(d);
     if (period === "last_month") {
       const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
       const end = new Date(today.getFullYear(), today.getMonth(), 0);

@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { supabaseExternal } from "@/integrations/supabase/external";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 type DataType = "transactions" | "invoices" | "vendor_payments";
 
@@ -25,7 +26,7 @@ interface TestResult {
 export default function TestSecureImportPage() {
   const { businessId } = useAuth();
   const [dataType, setDataType] = useState<DataType>("transactions");
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIST();
   const [date, setDate] = useState(today);
   const [amount, setAmount] = useState("1000");
   const [description, setDescription] = useState("Test import");
@@ -77,7 +78,7 @@ export default function TestSecureImportPage() {
     }
   };
 
-  const futureDate = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  const futureDate = toISTDate(new Date(Date.now() + 30 * 86400000));
 
   return (
     <DashboardLayout>

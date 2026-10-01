@@ -22,6 +22,7 @@ import {
   FynLoading,
   FynEmpty,
 } from "@/components/dashboard/ui";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 type FilingRow = { status: string; due_date: string | null; filed_date?: string | null };
 
@@ -165,7 +166,7 @@ const CompliancePage = () => {
   //   overdue = not filed AND due_date < today
   //   pending = not filed AND due_date ≥ today
   //   unknown = due_date missing  → excluded from score denominator
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = todayIST();
   const isFiledStatus = (f: FilingRow) => f.status === "filed";
   const isUnknown = (f: FilingRow) => !f.due_date;
   const isOnTime = (f: FilingRow) =>
@@ -254,7 +255,7 @@ const CompliancePage = () => {
   const sevenDaysOut = (() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
-    return d.toISOString().split("T")[0];
+    return toISTDate(d);
   })();
   const countUrgency = (rows: FilingRow[] = []) => {
     const overdue = rows.filter((r) => !!r.due_date && r.status !== "filed" && r.due_date < today).length;

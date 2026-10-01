@@ -21,6 +21,7 @@ import { ICAIGate } from "@/components/ca/ICAIGate";
 import { useCARole } from "@/hooks/useCARole";
 import { logCAAudit } from "@/lib/caAudit";
 import { Upload } from "lucide-react";
+import { currentPeriodIST } from "@/lib/istDate";
 
 type Verdict = "matched" | "mismatch" | "missing_in_books" | "missing_in_portal";
 
@@ -113,7 +114,7 @@ export default function CAItcReconPage() {
   useEffect(() => {
     if (clientParam && !businessId && clients.some((c) => c.business_id === clientParam)) setBusinessId(clientParam);
   }, [clientParam, clients, businessId]);
-  const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
+  const [month, setMonth] = useState(() => currentPeriodIST());
   const [records, setRecords] = useState<Line[]>([]);
   const [uploads, setUploads] = useState<UploadRow[]>([]);
   const [loading, setLoading] = useState(false);

@@ -11,6 +11,7 @@ import { Link } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import WaitlistStatsWidget from "@/components/admin/WaitlistStatsWidget";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { toISTDate } from "@/lib/istDate";
 
 const fmtINR = (n: number) =>
   n >= 10000000 ? `₹${(n / 10000000).toFixed(1)}Cr`
@@ -131,7 +132,7 @@ export default function AdminDashboardPage() {
       const ai = (aiLogsRes.data ?? []) as { created_at: string; cost_usd: number | string | null; response_time_ms: number | null }[];
       const apiBuckets: Record<string, number> = {};
       for (let i = 29; i >= 0; i--) {
-        const k = new Date(now - i * 86400000).toISOString().slice(0, 10);
+        const k = toISTDate(new Date(now - i * 86400000));
         apiBuckets[k] = 0;
       }
       ai.forEach((l) => {

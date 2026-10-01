@@ -6,6 +6,7 @@
 
 export interface MisExtraction {
   classification: string | null;
+import { toISTDate } from "@/lib/istDate";
   confidence: number | null;
   extracted: Record<string, unknown> | null;
   corrected: Record<string, unknown> | null;
@@ -62,7 +63,7 @@ export function inRange(row: MisExtraction, start: string, end: string): boolean
   if (!raw) return false;
   const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return raw >= start && raw <= end;
-  const iso = d.toISOString().slice(0, 10);
+  const iso = toISTDate(d);
   return iso >= start && iso <= end;
 }
 

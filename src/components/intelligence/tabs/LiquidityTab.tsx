@@ -13,6 +13,7 @@ import ActionItemsSection from "../sections/ActionItemsSection";
 import NoDataPrompt from "../NoDataPrompt";
 
 import { useLiquidityMetrics, useLiveBusinessId } from "@/hooks/useExternalIntel";
+import { toISTDate } from "@/lib/istDate";
 
 
 function daysBetween(a: string, b: string) {
@@ -112,7 +113,7 @@ export default function LiquidityTab() {
     const days = (m.cashBalance / m.netBurn) * 30;
     const d = new Date();
     d.setDate(d.getDate() + Math.round(days));
-    return d.toISOString().slice(0, 10);
+    return toISTDate(d);
   }, [m]);
   const hasCriticalAlert = !liveEmpty && (m.aging.d61_90 + m.aging.d90) > 0;
 

@@ -12,6 +12,7 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, Wallet, ShieldCheck, Sparkles,
   Activity, Users, ArrowUpRight, Calendar as CalIcon, Mail, Download,
 } from "lucide-react";
+import { todayIST } from "@/lib/istDate";
 
 type ClientRow = {
   business_id: string;
@@ -275,7 +276,7 @@ export default function CAPortfolioHealthPage() {
     const blob = new Blob([lines.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `fynhelp-portfolio-health-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    a.href = url; a.download = `fynhelp-portfolio-health-${todayIST()}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 

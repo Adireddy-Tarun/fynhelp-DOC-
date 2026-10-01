@@ -6,6 +6,7 @@
 
 export interface BankTxn {
   id: string;
+import { toISTDate } from "@/lib/istDate";
   date: string;
   description: string | null;
   category: string | null;
@@ -73,7 +74,7 @@ export function periodRange(period: string): { from: string; to: string } {
   const month = m ? Number(m[2]) - 1 : now.getUTCMonth();
   const from = new Date(Date.UTC(year, month, 1));
   const to = new Date(Date.UTC(year, month + 1, 0));
-  return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+  return { from: toISTDate(from), to: toISTDate(to) };
 }
 
 /** Previous month of a "YYYY-MM" period, same format. */

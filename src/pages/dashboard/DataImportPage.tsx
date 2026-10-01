@@ -24,6 +24,7 @@ import { validateBankRows, type RowError } from "@/lib/bankCsv";
 import { recomputeIntelligence } from "@/lib/postImportCompute";
 
 import { Upload, FileText, X, Building, Receipt, Wallet, AlertTriangle, RotateCw, Sparkles, Camera } from "lucide-react";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", buf);
@@ -250,11 +251,11 @@ const UploadZone = ({ type, businessId, onSuccess }: UploadZoneProps) => {
     acceptFile(f);
   };
 
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => todayIST();
   const toDate = (s: string) => {
     if (!s) return today();
     const d = new Date(s);
-    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+    if (!isNaN(d.getTime())) return toISTDate(d);
     const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
     if (m) {
       const [, dd, mm, yy] = m;

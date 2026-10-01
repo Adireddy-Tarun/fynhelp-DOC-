@@ -21,6 +21,7 @@ import {
   type MatchSuggestion,
   type ReconResult,
 } from "@/lib/caRecon";
+import { toISTDate, todayIST } from "@/lib/istDate";
 
 const PASS_LABEL: Record<MatchPass, string> = { exact: "Exact", fuzzy: "Fuzzy", rule: "Rule" };
 const PASS_TONE: Record<MatchPass, "green" | "amber" | "grey"> = { exact: "green", fuzzy: "amber", rule: "grey" };
@@ -35,9 +36,9 @@ export default function CAReconciliationPage() {
   const [from, setFrom] = useState(() => {
     const d = new Date();
     d.setMonth(d.getMonth() - 3);
-    return d.toISOString().slice(0, 10);
+    return toISTDate(d);
   });
-  const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
+  const [to, setTo] = useState(() => todayIST());
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ReconResult | null>(null);
   const [bankCount, setBankCount] = useState(0);

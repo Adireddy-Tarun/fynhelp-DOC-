@@ -17,6 +17,7 @@ import {
 import { ModuleHeader, StatStrip } from "@/components/ca/os/primitives";
 import { logCAAudit } from "@/lib/caAudit";
 import { Plus, Trash2, X } from "lucide-react";
+import { toISTDate } from "@/lib/istDate";
 
 interface LineItem { description: string; amount: number }
 
@@ -59,7 +60,7 @@ const emptyDraft = () => ({
   engagement_id: "",
   period: monthKey(),
   gst_rate: 18,
-  due_date: new Date(Date.now() + 15 * 86400000).toISOString().slice(0, 10),
+  due_date: toISTDate(new Date(Date.now() + 15 * 86400000)),
   items: [{ description: "", amount: "" }] as { description: string; amount: string }[],
 });
 
