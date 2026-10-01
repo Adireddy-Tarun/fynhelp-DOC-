@@ -3,10 +3,10 @@
  * No Supabase calls here — the chart-of-accounts template and the data
  * quality engine are deterministic functions over real client rows.
  */
+import { toISTDate } from "@/lib/istDate";
 
 export interface CoaSeed {
   code: string;
-import { toISTDate } from "@/lib/istDate";
   name: string;
   account_type: "asset" | "liability" | "equity" | "income" | "expense";
   is_group: boolean;

@@ -3,10 +3,10 @@
  * No Supabase calls here — every check takes real client rows and returns
  * candidate findings, so the maths stays reviewable and testable.
  */
+import { toISTDate } from "@/lib/istDate";
 
 export interface BankTxn {
   id: string;
-import { toISTDate } from "@/lib/istDate";
   date: string;
   description: string | null;
   category: string | null;
